@@ -8,112 +8,94 @@
 #include "Activation.h"
 #include "math.h"
 #include <algorithm>
-#include <iostream>
+#include <stdexcept>
 
-Activation::Activation() {};
-Activation::~Activation() {};
+Activation::Activation() { };
+Activation::~Activation() { };
 
-class LinearActivation : public Activation {
-protected:
-	LinearActivation() {};
-	virtual ~LinearActivation() {};
-public:
-	LinearActivation(LinearActivation const&) = delete;
-	void operator=(LinearActivation const&) = delete;
-	double function(double x) {
-		return x;
-	}
-	double d_function(double x) {
-		return 1;
-	}
-	static LinearActivation& get_instance() {
-		static LinearActivation instance;
-		return instance;
-	}
-};
-
-class SigmoidActivation : public Activation {
-protected:
-	SigmoidActivation() {};
-	virtual ~SigmoidActivation() {};
-public:
-	SigmoidActivation(SigmoidActivation const&) = delete;
-	void operator=(SigmoidActivation const&) = delete;
-	double function(double x) {
-		return 1/(1 + exp(-x));
-	}
-	double d_function(double x) {
-		return 1;
-	}
-	static SigmoidActivation& get_instance() {
-		static SigmoidActivation instance;
-		return instance;
-	}
-};
-
-class TanhActivation : public Activation {
-protected:
-	TanhActivation() {};
-	virtual ~TanhActivation() {};
-public:
-	TanhActivation(TanhActivation const&) = delete;
-	void operator=(TanhActivation const&) = delete;
-	double function(double x) {
-		return tanh(x);
-	}
-	double d_function(double x) {
-		double y = tanh(x);
-		return 1 - y*y;
-	}
-	static TanhActivation& get_instance() {
-		static TanhActivation instance;
-		return instance;
-	}
-};
-
-class ReLuActivation : public Activation {
-protected:
-	ReLuActivation() {};
-	virtual ~ReLuActivation() {};
-public:
-	ReLuActivation(ReLuActivation const&) = delete;
-	void operator=(ReLuActivation const&) = delete;
-	double function(double x) {
-		return std::max(.0, x);
-	}
-	double d_function(double x) {
-		return x == .0 ? x : 1;
-	}
-	static ReLuActivation& get_instance() {
-		static ReLuActivation instance;
-		return instance;
-	}
-};
-
-Activation& get_activation(Activations type) {
-	Activation act;
-	switch (type) {
-		case Activations::Linear:
-			act = LinearActivation::get_instance();
-			break;
-		case Activations::Sigmoid:
-			act = SigmoidActivation::get_instance();
-			break;
-		case Activations::Tanh:
-			act = TanhActivation::get_instance();
-			break;
-		case Activations::ReLU:
-			act = ReLuActivation::get_instance();
-			break;
-		default:
-			act = ReLuActivation::get_instance();
-	}
-	Activation& actRef = act;
-	return actRef;
-};
-
-int main(int ac, char** av) {
-	double in = 0.876;
-	Activation& act = get_activation(Activations::Linear);
-	std::cout << "y: " << act.function(in) << "; d y: " << act.d_function(in) << std::endl;
+IdentityActivation::IdentityActivation() { };
+IdentityActivation::~IdentityActivation() { };
+double IdentityActivation::function(double x) {
+	return x;
 }
+double IdentityActivation::d_function(double x, double y) {
+	return 1;
+}
+
+BinaryStepActivation::BinaryStepActivation() { };
+BinaryStepActivation::~BinaryStepActivation() { };
+double BinaryStepActivation::function(double x) {
+	return x >= .0;
+}
+double BinaryStepActivation::d_function(double x, double y) {
+	return 0;
+}
+
+SigmoidActivation::SigmoidActivation() { };
+SigmoidActivation::~SigmoidActivation() { };
+double SigmoidActivation::function(double x) {
+	return 1 / (1 + exp(-x));
+}
+double SigmoidActivation::d_function(double x, double y) {
+	return y * (1 - y);
+}
+
+TanhActivation::TanhActivation() { };
+TanhActivation::~TanhActivation() { };
+double TanhActivation::function(double x) {
+	return tanh(x);
+}
+double TanhActivation::d_function(double x, double y) {
+	return 1 - y * y;
+}
+
+ReLUActivation::ReLUActivation() { };
+ReLUActivation::~ReLUActivation() { };
+double ReLUActivation::function(double x) {
+	return std::max(.0, x);
+}
+double ReLUActivation::d_function(double x, double y) {
+	return x >= .0;
+}
+
+LeakyReLUActivation::LeakyReLUActivation(double alpha) : alpha(alpha) {
+	if (alpha >= 1)
+		throw std::invalid_argument("alpha must be less than 1.");
+};
+LeakyReLUActivation::~LeakyReLUActivation() { };
+double LeakyReLUActivation::function(double x) {
+	return std::max(x, x * alpha);
+}
+double LeakyReLUActivation::d_function(double x, double y) {
+	return x <= .0 ? alpha : 1;
+}
+
+Activation* get_activation(Activations type) {
+	Activation* act = NULL;
+	switch (type) {
+		case Activations::Identity: {
+			act = new IdentityActivation();
+			break;
+		}
+		case Activations::Sigmoid: {
+			act = new SigmoidActivation();
+			break;
+		}
+		case Activations::Tanh: {
+			act = new TanhActivation();
+			break;
+		}
+		case Activations::ReLU: {
+			act = new ReLUActivation();
+			break;
+		}
+		case Activations::LeakyReLU: {
+			act = new LeakyReLUActivation();
+			break;
+		}
+		default: {
+			act = new ReLUActivation();
+		}
+	}
+	return act;
+};

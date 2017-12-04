@@ -6,13 +6,14 @@
  */
 
 #include "Layer.h"
+#include "Neuron.h"
 
-Layer::Layer() {
-	// TODO Auto-generated constructor stub
-
-}
+Layer::Layer(int nodeCnt, Activation* act) : nodeCnt(nodeCnt), act(act), bias(0) {
+	nodes = new Neuron[nodeCnt];
+};
 
 Layer::~Layer() {
-	// TODO Auto-generated destructor stub
+	delete[] nodes;
+	delete act;
 }
 

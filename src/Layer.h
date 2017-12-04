@@ -8,17 +8,22 @@
 #ifndef LAYER_H_
 #define LAYER_H_
 
-#include "Activation.h";
-#include "Neuron.h";
+#include "Activation.h"
+#include "Neuron.h"
 
 class Layer {
 protected:
+	int nodeCnt;
+	Activation* act;
+	Neuron* nodes;
 	double bias;
-	Activation act;
-	Neuron nodes[];
 public:
-	Layer();
+	Layer(int nodeCnt, Activation* act);
 	virtual ~Layer();
+};
+
+enum class Layers {
+	Hidden, Output
 };
 
 #endif /* LAYER_H_ */
