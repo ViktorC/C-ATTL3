@@ -9,7 +9,9 @@
 #define LAYER_H_
 
 #include "Activation.h"
-#include "matrix.hpp"
+
+#include <matrix.hpp>
+#include <string>
 
 namespace cppnn {
 

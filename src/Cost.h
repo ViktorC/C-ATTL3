@@ -8,27 +8,29 @@
 #ifndef COST_H_
 #define COST_H_
 
+#include <vector>
+
 namespace cppnn {
 
 class Cost {
 public:
 	virtual ~Cost() { };
-	virtual double function(int sample, double* obj, int obj_len, double* out, int out_len) = 0;
-	virtual double d_function(double* out, int out_len, double y) = 0;
+	virtual double function(int sample, std::vector<double> out, std::vector<double> obj) = 0;
+	virtual double d_function(int sample, std::vector<double> out, double y) = 0;
 };
 
 class QuadraticCost : public Cost {
 public:
 	virtual ~QuadraticCost() { };
-	virtual double function(int sample, double* obj, int obj_len, double* out, int out_len);
-	virtual double d_function(double* out, int out_len, double y);
+	virtual double function(int sample, std::vector<double> out, std::vector<double> obj);
+	virtual double d_function(int sample, std::vector<double> out, double y);
 };
 
 class CrossEntropyCost : public Cost {
 public:
 	virtual ~CrossEntropyCost() { };
-	virtual double function(int sample, double* obj, int obj_len, double* out, int out_len);
-	virtual double d_function(double* out, int out_len, double y);
+	virtual double function(int sample, std::vector<double> out, std::vector<double> obj);
+	virtual double d_function(int sample, std::vector<double> out, double y);
 };
 
 enum class Costs {

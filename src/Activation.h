@@ -8,9 +8,9 @@
 #ifndef ACTIVATION_H_
 #define ACTIVATION_H_
 
-static const double DEF_LRELU_ALPHA = 1e-1;
-
 namespace cppnn {
+
+static const double DEF_LRELU_ALPHA = 1e-1;
 
 class Activation {
 public:

@@ -5,15 +5,14 @@
  *      Author: Viktor Csomor
  */
 
-#include <random>
-#include <algorithm>
-#include <string>
-#include <stdexcept>
 #include "Layer.h"
-#include "Activation.h"
-#include "vector.hpp"
-#include "matrix.hpp"
-#include "linalg/prod.hpp"
+
+#include <linalg/prod.hpp>
+#include <tools/entry_proxy.hpp>
+#include <vector.hpp>
+#include <stdexcept>
+#include <string>
+
 
 namespace cppnn {
 
@@ -26,7 +25,7 @@ Layer::Layer(int nodes, int prev_nodes, Activation* act) :
 	prev_out = new viennacl::matrix<double>(1, prev_nodes + 1);
 	// Bias trick.
 	(*prev_out)(0,prev_nodes) = 1;
-	prev_out_grads = new viennacl::matrix<double>(1, nodes);
+	prev_out_grads = new viennacl::matrix<double>(1, prev_nodes + 1);
 	in = new viennacl::matrix<double>(1, nodes);
 	in_grads = new viennacl::matrix<double>(1, nodes);
 	out = new viennacl::matrix<double>(1, nodes);
@@ -51,10 +50,10 @@ viennacl::matrix<double>* Layer::get_weight_grads() {
 };
 viennacl::matrix<double>* Layer::feed_forward(viennacl::matrix<double>* prev_out) {
 	viennacl::vector<double> frst_row_src = viennacl::row(*prev_out, 0);
-	viennacl::vector<double> frst_row_dst = viennacl::row(*this->prev_out, 0);
-	// Compute the neuron inputs by multiplying the output of the previous layer by the weights.
+	viennacl::vector<double> frst_row_dst = viennacl::row(*(this->prev_out), 0);
 	viennacl::copy(frst_row_src.begin(), frst_row_src.end(), frst_row_dst.begin());
-	*in = viennacl::linalg::prod(*weights, *this->prev_out);
+	// Compute the neuron inputs by multiplying the output of the previous layer by the weights.
+	*in = viennacl::linalg::prod(*(this->prev_out), *weights);
 	// Activate the neurons.
 	for (int i = 0; i < nodes; i++) {
 		(*out)(0,i) = act->function((*in)(0,i));
@@ -67,13 +66,13 @@ viennacl::matrix<double>* Layer::feed_back(viennacl::matrix<double>* out_grads) 
 		(*in_grads)(0,i) = (*out_grads)(0,i) * act->d_function((*in)(0,i), (*out)(0,i));
 	}
 	*weight_grads = viennacl::linalg::prod(trans(*prev_out), *in_grads);
-	*prev_out_grads = viennacl::linalg::prod(trans(*weights), *in_grads);
+	*prev_out_grads = viennacl::linalg::prod(*in_grads, trans(*weights));
 	return prev_out_grads;
 };
 std::string Layer::to_string() {
 	std::string str;
-	for (int i = 0; i < prev_nodes; i++) {
-		for (int j = 0; j < nodes; j++) {
+	for (unsigned i = 0; i < weights->size1(); i++) {
+		for (unsigned j = 0; j < weights->size2(); j++) {
 			double w = (*weights)(i,j);
 			str += "Weight[" + std::to_string(i) + "," + std::to_string(j) +
 					"]: " + std::to_string(w) + "\n";

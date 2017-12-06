@@ -6,13 +6,19 @@
  */
 
 #include "NeuralNetwork.h"
-#include "Layer.h"
-#include "matrix.hpp"
+
+#include <detail/matrix_def.hpp>
+#include <stddef.h>
+#include <tools/entry_proxy.hpp>
+#include <algorithm>
+#include <random>
 #include <stdexcept>
+#include <vector>
+
 
 namespace cppnn {
 
-NeuralNetwork::NeuralNetwork(int input_size, std::vector<Layer>* layers) :
+NeuralNetwork::NeuralNetwork(int input_size, std::vector<Layer*>* layers) :
 		input_size(input_size),
 		layers(layers) {
 	if (input_size <= 0)
@@ -21,6 +27,9 @@ NeuralNetwork::NeuralNetwork(int input_size, std::vector<Layer>* layers) :
 		throw std::invalid_argument("layers cannot be null and must contain at least 1 element.");
 };
 NeuralNetwork::~NeuralNetwork() {
+	for (unsigned i = 0; i < layers->size(); i++) {
+		delete (*layers)[i];
+	}
 	delete layers;
 };
 void NeuralNetwork::initialize_weights() {
@@ -29,10 +38,12 @@ void NeuralNetwork::initialize_weights() {
 	double const sd = abs_dist_Range * .34;
 	std::normal_distribution<> normal_distribution(0, sd);
 	for (unsigned i = 0; i < layers->size(); i++) {
-		viennacl::matrix<double>* weights = (*layers)[i].get_weights();
-		for (unsigned j = 0; j < weights->size1(); j++) {
-			for (unsigned k = 0; k < weights->size2(); k++) {
-				if (j == 0) {
+		viennacl::matrix<double>* weights = (*layers)[i]->get_weights();
+		unsigned rows = weights->size1();
+		unsigned cols = weights->size2();
+		for (unsigned j = 0; j < rows; j++) {
+			for (unsigned k = 0; k < cols; k++) {
+				if (j == rows - 1) {
 					// Set initial bias value to 0.
 					(*weights)(j,k) = 0;
 				} else {
@@ -48,14 +59,22 @@ void NeuralNetwork::initialize_weights() {
 };
 viennacl::matrix<double>* NeuralNetwork::feed_forward(viennacl::matrix<double>* input) {
 	for (unsigned i = 0; i < layers->size(); i++) {
-		input = (*layers)[i].feed_forward(input);
+		input = (*layers)[i]->feed_forward(input);
 	}
 	return input;
 };
 void NeuralNetwork::feed_back(viennacl::matrix<double>* out_grads) {
-	for (unsigned i = 0; i < layers->size(); i++) {
-		out_grads = (*layers)[i].feed_back(out_grads);
+	for (int i = (int) layers->size() - 1; i >= 0; i--) {
+		out_grads = (*layers)[i]->feed_back(out_grads);
 	}
+};
+std::string NeuralNetwork::to_string() {
+	std::string str = "";
+	for (unsigned i = 0; i < layers->size(); i++) {
+		str += "Layer " + std::to_string(i) + "--------------------\n";
+		str += (*layers)[i]->to_string();
+	}
+	return str;
 };
 
 }

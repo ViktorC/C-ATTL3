@@ -24,8 +24,10 @@
 							<tool command="g++ -std=c++11" id="cdt.managedbuild.tool.gnu.cpp.compiler.mingw.base.840198484" name="GCC C++ Compiler" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.mingw.base">
 								<option id="gnu.cpp.compiler.option.include.paths.901383864" name="Include paths (-I)" superClass="gnu.cpp.compiler.option.include.paths" useByScannerDiscovery="false" valueType="includePath">
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/viennacl}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/CL}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/src}&quot;"/>
 								</option>
-								<option id="gnu.cpp.compiler.option.include.files.418866765" name="Include files (-include)" superClass="gnu.cpp.compiler.option.include.files" useByScannerDiscovery="false" valueType="includeFiles"/>
+								<option id="gnu.cpp.compiler.option.include.files.418866765" name="Include files (-include)" superClass="gnu.cpp.compiler.option.include.files" useByScannerDiscovery="false"/>
 								<inputType id="cdt.managedbuild.tool.gnu.cpp.compiler.input.2027758802" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.input"/>
 							</tool>
 							<tool id="cdt.managedbuild.tool.gnu.c.compiler.mingw.base.2004636143" name="GCC C Compiler" superClass="cdt.managedbuild.tool.gnu.c.compiler.mingw.base">

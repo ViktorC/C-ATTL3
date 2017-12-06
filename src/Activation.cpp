@@ -6,7 +6,8 @@
  */
 
 #include "Activation.h"
-#include "math.h"
+
+#include <math.h>
 #include <algorithm>
 #include <stdexcept>
 
