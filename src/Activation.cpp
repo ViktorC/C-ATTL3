@@ -10,11 +10,8 @@
 #include <algorithm>
 #include <stdexcept>
 
-Activation::Activation() { };
-Activation::~Activation() { };
+namespace cppnn {
 
-IdentityActivation::IdentityActivation() { };
-IdentityActivation::~IdentityActivation() { };
 double IdentityActivation::function(double x) {
 	return x;
 };
@@ -22,8 +19,6 @@ double IdentityActivation::d_function(double x, double y) {
 	return 1;
 };
 
-BinaryStepActivation::BinaryStepActivation() { };
-BinaryStepActivation::~BinaryStepActivation() { };
 double BinaryStepActivation::function(double x) {
 	return x >= .0;
 };
@@ -31,8 +26,6 @@ double BinaryStepActivation::d_function(double x, double y) {
 	return 0;
 };
 
-SigmoidActivation::SigmoidActivation() { };
-SigmoidActivation::~SigmoidActivation() { };
 double SigmoidActivation::function(double x) {
 	return 1 / (1 + exp(-x));
 };
@@ -40,8 +33,6 @@ double SigmoidActivation::d_function(double x, double y) {
 	return y * (1 - y);
 };
 
-TanhActivation::TanhActivation() { };
-TanhActivation::~TanhActivation() { };
 double TanhActivation::function(double x) {
 	return tanh(x);
 };
@@ -49,8 +40,6 @@ double TanhActivation::d_function(double x, double y) {
 	return 1 - y * y;
 };
 
-ReLUActivation::ReLUActivation() { };
-ReLUActivation::~ReLUActivation() { };
 double ReLUActivation::function(double x) {
 	return std::max(.0, x);
 };
@@ -93,3 +82,5 @@ Activation* get_activation(Activations type) {
 		}
 	}
 };
+
+}

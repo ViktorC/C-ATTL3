@@ -7,5 +7,6 @@
 
 #include "Cost.h"
 
+namespace cppnn {
 
-
+}

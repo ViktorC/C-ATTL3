@@ -10,50 +10,46 @@
 
 static const double DEF_LRELU_ALPHA = 1e-1;
 
+namespace cppnn {
+
 class Activation {
 public:
-	Activation();
-	virtual ~Activation();
+	virtual ~Activation() { };
 	virtual double function(double x) = 0;
 	virtual double d_function(double x, double y) = 0;
 };
 
 class IdentityActivation : public Activation {
 public:
-	IdentityActivation();
-	virtual ~IdentityActivation();
+	virtual ~IdentityActivation() { };
 	virtual double function(double x);
 	virtual double d_function(double x, double y);
 };
 
 class BinaryStepActivation : public Activation {
 public:
-	BinaryStepActivation();
-	virtual ~BinaryStepActivation();
+	virtual ~BinaryStepActivation() { };
 	virtual double function(double x);
 	virtual double d_function(double x, double y);
 };
 
 class SigmoidActivation : public Activation {
 public:
-	SigmoidActivation();
-	virtual ~SigmoidActivation();
+	virtual ~SigmoidActivation() { };
 	virtual double function(double x);
 	virtual double d_function(double x, double y);
 };
 
 class TanhActivation : public Activation {
 public:
-	TanhActivation();
-	virtual ~TanhActivation();
+	virtual ~TanhActivation() { };
 	virtual double function(double x);
 	virtual double d_function(double x, double y);
 };
 
 class ReLUActivation : public Activation {
 public:
-	ReLUActivation();
-	virtual ~ReLUActivation();
+	virtual ~ReLUActivation() { };
 	virtual double function(double x);
 	virtual double d_function(double x, double y);
 };
@@ -73,5 +69,7 @@ enum class Activations {
 };
 
 Activation* get_activation(Activations type);
+
+}
 
 #endif /* ACTIVATION_H_ */
