@@ -13,39 +13,39 @@
 
 namespace cppnn {
 
-double IdentityActivation::function(double x) {
-	return x;
+double IdentityActivation::function(double in) {
+	return in;
 };
-double IdentityActivation::d_function(double x, double y) {
+double IdentityActivation::d_function(double in, double out) {
 	return 1;
 };
 
-double BinaryStepActivation::function(double x) {
-	return x >= .0;
+double BinaryStepActivation::function(double in) {
+	return in >= .0;
 };
-double BinaryStepActivation::d_function(double x, double y) {
+double BinaryStepActivation::d_function(double in, double out) {
 	return 0;
 };
 
-double SigmoidActivation::function(double x) {
-	return 1 / (1 + exp(-x));
+double SigmoidActivation::function(double in) {
+	return 1 / (1 + exp(-in));
 };
-double SigmoidActivation::d_function(double x, double y) {
-	return y * (1 - y);
-};
-
-double TanhActivation::function(double x) {
-	return tanh(x);
-};
-double TanhActivation::d_function(double x, double y) {
-	return 1 - y * y;
+double SigmoidActivation::d_function(double in, double out) {
+	return out * (1 - out);
 };
 
-double ReLUActivation::function(double x) {
-	return std::max(.0, x);
+double TanhActivation::function(double in) {
+	return tanh(in);
 };
-double ReLUActivation::d_function(double x, double y) {
-	return x >= .0;
+double TanhActivation::d_function(double in, double out) {
+	return 1 - out * out;
+};
+
+double ReLUActivation::function(double in) {
+	return std::max(.0, in);
+};
+double ReLUActivation::d_function(double in, double out) {
+	return in >= .0;
 };
 
 LeakyReLUActivation::LeakyReLUActivation(double alpha) :
@@ -54,34 +54,11 @@ LeakyReLUActivation::LeakyReLUActivation(double alpha) :
 		throw std::invalid_argument("alpha must be less than 1.");
 };
 LeakyReLUActivation::~LeakyReLUActivation() { };
-double LeakyReLUActivation::function(double x) {
-	return std::max(x, x * alpha);
+double LeakyReLUActivation::function(double in) {
+	return std::max(in, in * alpha);
 };
-double LeakyReLUActivation::d_function(double x, double y) {
-	return x <= .0 ? alpha : 1;
-};
-
-Activation* get_activation(Activations type) {
-	switch (type) {
-		case Activations::Identity: {
-			return new IdentityActivation();
-		}
-		case Activations::Sigmoid: {
-			return new SigmoidActivation();
-		}
-		case Activations::Tanh: {
-			return new TanhActivation();
-		}
-		case Activations::ReLU: {
-			return new ReLUActivation();
-		}
-		case Activations::LeakyReLU: {
-			return new LeakyReLUActivation();
-		}
-		default: {
-			return new ReLUActivation();
-		}
-	}
+double LeakyReLUActivation::d_function(double in, double out) {
+	return in <= .0 ? alpha : 1;
 };
 
 }

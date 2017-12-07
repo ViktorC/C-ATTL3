@@ -16,8 +16,28 @@ public:
 	virtual ~Regularization();
 };
 
-enum class Regularizations {
-	L1, L2, MaxNorm, Dropout
+class L1Regularization : public Regularization {
+public:
+	L1Regularization();
+	virtual ~L1Regularization();
+};
+
+class L2Regularization : public Regularization {
+public:
+	L2Regularization();
+	virtual ~L2Regularization();
+};
+
+class MaxNormRegularization : public Regularization {
+public:
+	MaxNormRegularization();
+	virtual ~MaxNormRegularization();
+};
+
+class DropoutRegularization : public Regularization {
+public:
+	DropoutRegularization();
+	virtual ~DropoutRegularization();
 };
 
 }

@@ -8,7 +8,7 @@
 #ifndef LAYER_H_
 #define LAYER_H_
 
-#include "Activation.h"
+#include <Activation.h>
 
 #include <matrix.hpp>
 #include <string>
@@ -30,10 +30,10 @@ protected:
 public:
 	Layer(int nodes, int prev_nodes, Activation* act);
 	virtual ~Layer();
-	virtual viennacl::matrix<double>* get_weights();
-	virtual viennacl::matrix<double>* get_weight_grads();
-	virtual viennacl::matrix<double>* feed_forward(viennacl::matrix<double>* prev_out);
-	virtual viennacl::matrix<double>* feed_back(viennacl::matrix<double>* out_grads);
+	virtual viennacl::matrix<double>& get_weights();
+	virtual viennacl::matrix<double>& get_weight_grads();
+	virtual viennacl::matrix<double>& feed_forward(viennacl::matrix<double>& prev_out);
+	virtual viennacl::matrix<double>& feed_back(viennacl::matrix<double>& out_grads);
 	virtual std::string to_string();
 };
 

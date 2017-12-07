@@ -9,7 +9,6 @@
 #define NEURALNETWORK_H_
 
 #include <Layer.h>
-#include <matrix.hpp>
 #include <string>
 #include <vector>
 
@@ -25,9 +24,10 @@ protected:
 public:
 	NeuralNetwork(int input_size, std::vector<Layer*>* layers);
 	virtual ~NeuralNetwork();
-	virtual void initialize_weights();
-	virtual viennacl::matrix<double>* feed_forward(viennacl::matrix<double>* input);
-	virtual void feed_back(viennacl::matrix<double>* out_grads);
+	int get_input_size();
+	std::vector<Layer*>& get_layers();
+	virtual std::vector<double>* feed_forward(std::vector<double>& input);
+	virtual void feed_back(std::vector<double>& out_grads);
 	virtual std::string to_string();
 };
 

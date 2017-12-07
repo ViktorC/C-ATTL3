@@ -1,2 +1,2 @@
 # CppNN
-A simple convolutional neural network library written in C++.
+A simple neural network library written in C++.

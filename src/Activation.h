@@ -15,43 +15,43 @@ static const double DEF_LRELU_ALPHA = 1e-1;
 class Activation {
 public:
 	virtual ~Activation() { };
-	virtual double function(double x) = 0;
-	virtual double d_function(double x, double y) = 0;
+	virtual double function(double in) = 0;
+	virtual double d_function(double in, double out) = 0;
 };
 
 class IdentityActivation : public Activation {
 public:
 	virtual ~IdentityActivation() { };
-	virtual double function(double x);
-	virtual double d_function(double x, double y);
+	virtual double function(double in);
+	virtual double d_function(double in, double out);
 };
 
 class BinaryStepActivation : public Activation {
 public:
 	virtual ~BinaryStepActivation() { };
-	virtual double function(double x);
-	virtual double d_function(double x, double y);
+	virtual double function(double in);
+	virtual double d_function(double in, double out);
 };
 
 class SigmoidActivation : public Activation {
 public:
 	virtual ~SigmoidActivation() { };
-	virtual double function(double x);
-	virtual double d_function(double x, double y);
+	virtual double function(double in);
+	virtual double d_function(double in, double out);
 };
 
 class TanhActivation : public Activation {
 public:
 	virtual ~TanhActivation() { };
-	virtual double function(double x);
-	virtual double d_function(double x, double y);
+	virtual double function(double in);
+	virtual double d_function(double in, double out);
 };
 
 class ReLUActivation : public Activation {
 public:
 	virtual ~ReLUActivation() { };
-	virtual double function(double x);
-	virtual double d_function(double x, double y);
+	virtual double function(double in);
+	virtual double d_function(double in, double out);
 };
 
 class LeakyReLUActivation : public Activation {
@@ -60,15 +60,9 @@ protected:
 public:
 	LeakyReLUActivation(double alpha = DEF_LRELU_ALPHA);
 	virtual ~LeakyReLUActivation();
-	virtual double function(double x);
-	virtual double d_function(double x, double y);
+	virtual double function(double in);
+	virtual double d_function(double in, double out);
 };
-
-enum class Activations {
-	Identity, BinaryStep, Sigmoid, Tanh, ReLU, LeakyReLU
-};
-
-Activation* get_activation(Activations type);
 
 }
 
