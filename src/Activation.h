@@ -8,60 +8,84 @@
 #ifndef ACTIVATION_H_
 #define ACTIVATION_H_
 
+#include <Vector.h>
+
 namespace cppnn {
 
-static const double DEF_LRELU_ALPHA = 1e-1;
-
+template<typename Scalar>
 class Activation {
 public:
 	virtual ~Activation() { };
-	virtual double function(double in) = 0;
-	virtual double d_function(double in, double out) = 0;
+	virtual Vector<Scalar> function(Vector<Scalar> x) const = 0;
+	virtual Vector<Scalar> d_function(Vector<Scalar>& x,
+			Vector<Scalar>& y) const = 0;
 };
 
-class IdentityActivation : public Activation {
+template<typename Scalar>
+class IdentityActivation : public Activation<Scalar> {
 public:
-	virtual ~IdentityActivation() { };
-	virtual double function(double in);
-	virtual double d_function(double in, double out);
+	virtual ~IdentityActivation();
+	virtual Vector<Scalar> function(Vector<Scalar> x) const;
+	virtual Vector<Scalar> d_function(Vector<Scalar>& x,
+			Vector<Scalar>& y) const;
 };
 
-class BinaryStepActivation : public Activation {
+template<typename Scalar>
+class BinaryStepActivation : public Activation<Scalar> {
 public:
-	virtual ~BinaryStepActivation() { };
-	virtual double function(double in);
-	virtual double d_function(double in, double out);
+	virtual ~BinaryStepActivation();
+	virtual Vector<Scalar> function(Vector<Scalar> x) const;
+	virtual Vector<Scalar> d_function(Vector<Scalar>& x,
+			Vector<Scalar>& y) const;
 };
 
-class SigmoidActivation : public Activation {
+template<typename Scalar>
+class SigmoidActivation : public Activation<Scalar> {
 public:
-	virtual ~SigmoidActivation() { };
-	virtual double function(double in);
-	virtual double d_function(double in, double out);
+	virtual ~SigmoidActivation();
+	virtual Vector<Scalar> function(Vector<Scalar> x) const;
+	virtual Vector<Scalar> d_function(Vector<Scalar>& x,
+			Vector<Scalar>& y) const;
 };
 
-class TanhActivation : public Activation {
+template<typename Scalar>
+class SoftmaxActivation : public Activation<Scalar> {
 public:
-	virtual ~TanhActivation() { };
-	virtual double function(double in);
-	virtual double d_function(double in, double out);
+	virtual ~SoftmaxActivation() { };
+	virtual Vector<Scalar> function(Vector<Scalar> x) const;
+	virtual Vector<Scalar> d_function(Vector<Scalar>& x,
+			Vector<Scalar>& y) const;
 };
 
-class ReLUActivation : public Activation {
+template<typename Scalar>
+class TanhActivation : public Activation<Scalar> {
 public:
-	virtual ~ReLUActivation() { };
-	virtual double function(double in);
-	virtual double d_function(double in, double out);
+	virtual ~TanhActivation();
+	virtual Vector<Scalar> function(Vector<Scalar> x) const;
+	virtual Vector<Scalar> d_function(Vector<Scalar>& x,
+			Vector<Scalar>& y) const;
 };
 
-class LeakyReLUActivation : public Activation {
+template<typename Scalar>
+class ReLUActivation : public Activation<Scalar> {
+public:
+	virtual ~ReLUActivation();
+	virtual Vector<Scalar> function(Vector<Scalar> x) const;
+	virtual Vector<Scalar> d_function(Vector<Scalar>& x,
+			Vector<Scalar>& y) const;
+};
+
+template<typename Scalar>
+class LeakyReLUActivation : public ReLUActivation<Scalar> {
+	static const Scalar DEF_LRELU_ALPHA = 1e-1;
 protected:
-	double alpha;
+	Scalar alpha;
 public:
-	LeakyReLUActivation(double alpha = DEF_LRELU_ALPHA);
+	LeakyReLUActivation(Scalar alpha = DEF_LRELU_ALPHA);
 	virtual ~LeakyReLUActivation();
-	virtual double function(double in);
-	virtual double d_function(double in, double out);
+	virtual Vector<Scalar> function(Vector<Scalar> x) const;
+	virtual Vector<Scalar> d_function(Vector<Scalar>& x,
+			Vector<Scalar>& y) const;
 };
 
 }

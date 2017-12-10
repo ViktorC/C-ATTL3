@@ -1,42 +1,42 @@
-/*
- * Layer.h
- *
- *  Created on: 04.12.2017
- *      Author: Viktor Csomor
- */
-
-#ifndef LAYER_H_
-#define LAYER_H_
-
-#include <Activation.h>
-
-#include <matrix.hpp>
-#include <string>
-
-namespace cppnn {
-
-class Layer {
-protected:
-	int nodes;
-	int prev_nodes;
-	viennacl::matrix<double>* prev_out;
-	viennacl::matrix<double>* prev_out_grads;
-	viennacl::matrix<double>* in;
-	viennacl::matrix<double>* in_grads;
-	viennacl::matrix<double>* out;
-	viennacl::matrix<double>* weights;
-	viennacl::matrix<double>* weight_grads;
-	Activation* act;
-public:
-	Layer(int nodes, int prev_nodes, Activation* act);
-	virtual ~Layer();
-	virtual viennacl::matrix<double>& get_weights();
-	virtual viennacl::matrix<double>& get_weight_grads();
-	virtual viennacl::matrix<double>& feed_forward(viennacl::matrix<double>& prev_out);
-	virtual viennacl::matrix<double>& feed_back(viennacl::matrix<double>& out_grads);
-	virtual std::string to_string();
-};
-
-}
-
-#endif /* LAYER_H_ */
+///*
+// * Layer.h
+// *
+// *  Created on: 04.12.2017
+// *      Author: Viktor Csomor
+// */
+//
+//#ifndef LAYER_H_
+//#define LAYER_H_
+//
+//#include <Activation.h>
+//#include <Matrix.h>
+//#include <string>
+//#include <Vector.h>
+//
+//namespace cppnn {
+//
+//template<typename Scalar>
+//class Layer {
+//protected:
+//public:
+//		Layer(int nodes, int prev_nodes, const Activation<Scalar>& act);
+//	virtual ~Layer();
+//	virtual Matrix<Scalar>& get_weights() const;
+//	virtual Matrix<Scalar>& get_weight_grads() const;
+//	virtual Vector<Scalar>& feed_forward(Vector<Scalar>& prev_out);
+//	virtual Vector<Scalar>& feed_back(Vector<Scalar>& out_grads);
+//	virtual std::string to_string() const;
+//protected:
+//	// Eigen matrices are backed by arrays on the heap, so these members do not cause a stack overflow.
+//	Vector<Scalar>& prev_out;
+//	Vector<Scalar>& prev_out_grads;
+//	Matrix<Scalar>& weights;
+//	Matrix<Scalar>& weight_grads;
+//	Vector<Scalar>& in;
+//	Vector<Scalar>& out;
+//	const Activation<Scalar>& act;
+//};
+//
+//}
+//
+//#endif /* LAYER_H_ */

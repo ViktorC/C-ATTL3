@@ -5,60 +5,124 @@
  *      Author: Viktor Csomor
  */
 
-#include "Activation.h"
-
-#include <math.h>
-#include <algorithm>
+#include <Activation.h>
+#include <Eigen/Dense>
+#include <Matrix.h>
 #include <stdexcept>
+#include <Vector.h>
 
 namespace cppnn {
 
-double IdentityActivation::function(double in) {
-	return in;
+// TODO Address numeric stability issues.
+
+//template<typename Scalar>
+//Activation<Scalar>::~Activation() { };
+
+template<typename Scalar>
+IdentityActivation<Scalar>::~IdentityActivation() { };
+template<typename Scalar>
+Vector<Scalar> IdentityActivation<Scalar>::function(Vector<Scalar> x) const {
+	return x;
 };
-double IdentityActivation::d_function(double in, double out) {
-	return 1;
+template<typename Scalar>
+Vector<Scalar> IdentityActivation<Scalar>::d_function(Vector<Scalar>& x,
+		Vector<Scalar>& y) const {
+	return Vector<Scalar>::Ones(x.cols());
 };
 
-double BinaryStepActivation::function(double in) {
-	return in >= .0;
+template<typename Scalar>
+BinaryStepActivation<Scalar>::~BinaryStepActivation() { };
+template<typename Scalar>
+Vector<Scalar> BinaryStepActivation<Scalar>::function(Vector<Scalar> x) const {
+	for (unsigned i = 0; i < x.cols(); i++) {
+		x(i) = x(i) > .0;
+	}
+	return x;
 };
-double BinaryStepActivation::d_function(double in, double out) {
-	return 0;
+template<typename Scalar>
+Vector<Scalar> BinaryStepActivation<Scalar>::d_function(Vector<Scalar>& x,
+		Vector<Scalar>& y) const {
+	return Vector<Scalar>::Zero(x.cols());
 };
 
-double SigmoidActivation::function(double in) {
-	return 1 / (1 + exp(-in));
+template<typename Scalar>
+SigmoidActivation<Scalar>::~SigmoidActivation() { };
+template<typename Scalar>
+Vector<Scalar> SigmoidActivation<Scalar>::function(Vector<Scalar> x) const {
+	return 1/(1 + (x * -1).exp());
 };
-double SigmoidActivation::d_function(double in, double out) {
+template<typename Scalar>
+Vector<Scalar> SigmoidActivation<Scalar>::d_function(Vector<Scalar>& x,
+		Vector<Scalar>& y) const {
+	Vector<Scalar> out(y);
 	return out * (1 - out);
 };
 
-double TanhActivation::function(double in) {
-	return tanh(in);
+template<typename Scalar>
+Vector<Scalar> SoftmaxActivation<Scalar>::function(Vector<Scalar> x) const {
+	Vector<Scalar> out = x.exp();
+	return out / out.sum();
+	return x;
 };
-double TanhActivation::d_function(double in, double out) {
+template<typename Scalar>
+Vector<Scalar> SoftmaxActivation<Scalar>::d_function(Vector<Scalar>& x,
+		Vector<Scalar>& y) const {
+	Matrix<Scalar> jacobian;
+	jacobian = y.asDiagonal() - y.transpose().dot(y);
+	Vector<Scalar> out(x.cols());
+	for (unsigned i = 0; i < out.cols(); i++) {
+		out(i) = jacobian.row(i).sum();
+	}
+	return out;
+};
+
+template<typename Scalar>
+TanhActivation<Scalar>::~TanhActivation() { };
+template<typename Scalar>
+Vector<Scalar> TanhActivation<Scalar>::function(Vector<Scalar> x) const {
+	return x.tanh();
+};
+template<typename Scalar>
+Vector<Scalar> TanhActivation<Scalar>::d_function(Vector<Scalar>& x,
+		Vector<Scalar>& y) const {
+	Vector<Scalar> out(y);
 	return 1 - out * out;
 };
 
-double ReLUActivation::function(double in) {
-	return std::max(.0, in);
+template<typename Scalar>
+ReLUActivation<Scalar>::~ReLUActivation() { };
+template<typename Scalar>
+Vector<Scalar> ReLUActivation<Scalar>::function(Vector<Scalar> x) const {
+	for (unsigned i = 0; i < x.cols(); i++) {
+		x(i) = std::max(.0, x(i));
+	}
+	return x;
 };
-double ReLUActivation::d_function(double in, double out) {
-	return in >= .0;
+template<typename Scalar>
+Vector<Scalar> ReLUActivation<Scalar>::d_function(Vector<Scalar>& x,
+		Vector<Scalar>& y) const {
+	Vector<Scalar> out(x);
+	for (unsigned i = 0; i < out.size2(); i++) {
+		out(0,i) = out(0,i) > .0;
+	}
+	return out;
 };
 
-LeakyReLUActivation::LeakyReLUActivation(double alpha) :
+template<typename Scalar>
+LeakyReLUActivation<Scalar>::LeakyReLUActivation(Scalar alpha) :
 		alpha(alpha) {
 	if (alpha >= 1)
 		throw std::invalid_argument("alpha must be less than 1.");
 };
-LeakyReLUActivation::~LeakyReLUActivation() { };
-double LeakyReLUActivation::function(double in) {
-	return std::max(in, in * alpha);
-};
-double LeakyReLUActivation::d_function(double in, double out) {
-	return in <= .0 ? alpha : 1;
+template<typename Scalar>
+LeakyReLUActivation<Scalar>::~LeakyReLUActivation() { };
+template<typename Scalar>
+Vector<Scalar> LeakyReLUActivation<Scalar>::function(Vector<Scalar> x) const {
+	for (unsigned i = 0; i < x.cols(); i++) {
+		Scalar val = x(i);
+		x(i) = std::max(val * alpha, val);
+	}
+	return x;
 };
 
 }
