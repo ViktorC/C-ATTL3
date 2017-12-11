@@ -2,7 +2,7 @@
  * Vector.h
  *
  *  Created on: 9 Dec 2017
- *      Author: Viktor
+ *      Author: Viktor Csomor
  */
 
 #ifndef VECTOR_H_
