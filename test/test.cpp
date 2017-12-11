@@ -1,25 +1,24 @@
 /*
  * test.cpp
  *
- *  Created on: 6 Dec 2017
- *      Author: Viktor
+ *  Created on: Dec 10, 2017
+ *      Author: viktor
  */
 
 #include <Activation.h>
-#include <Matrix.h>
 #include <Vector.h>
 #include <iostream>
 
-int main(int argc, char *argv[]) {
-	cppnn::Vector<double> vector;
-	vector << 1, 3, 5;
-	cppnn::SoftmaxActivation<double> softmax;
-	cppnn::Vector<double> out = softmax.function(vector);
-	for (int i = 0; i < out.cols(); i++) {
-		std::cout << out(i) << ", ";
-	}
-	std::cout << std::endl;
+int main() {
+	cppnn::Vector<double> in(3);
+	in(0) = 1;
+	in(1) = -3;
+	in(2) = 5;
+	std::cout << in << std::endl;
+	cppnn::LeakyReLUActivation<double> act(0.5);
+	cppnn::Vector<double> out = act.function(in);
+	std::cout << out << std::endl;
+	cppnn::Vector<double> grad = act.d_function(in, out);
+	std::cout << grad << std::endl;
 	return 0;
 }
-
-
