@@ -23,7 +23,7 @@ static const std::string* VEC_SIZE_ERR_MSG_PTR =
 template<typename Scalar>
 class Activation {
 public:
-	virtual ~Activation() { };
+	virtual ~Activation() = default;
 	virtual Activation<Scalar>* clone() = 0;
 	virtual Vector<Scalar> function(Vector<Scalar> x) const = 0;
 	virtual Vector<Scalar> d_function(Vector<Scalar>& x,
@@ -33,7 +33,7 @@ public:
 template<typename Scalar>
 class IdentityActivation : public Activation<Scalar> {
 public:
-	virtual ~IdentityActivation() { };
+	virtual ~IdentityActivation() = default;
 	virtual Activation<Scalar>* clone() {
 		return new IdentityActivation();
 	};
@@ -50,7 +50,7 @@ public:
 template<typename Scalar>
 class BinaryStepActivation : public Activation<Scalar> {
 public:
-	virtual ~BinaryStepActivation() { };
+	virtual ~BinaryStepActivation() = default;
 	virtual Activation<Scalar>* clone() {
 		return new BinaryStepActivation();
 	};
@@ -70,7 +70,7 @@ public:
 template<typename Scalar>
 class SigmoidActivation : public Activation<Scalar> {
 public:
-	virtual ~SigmoidActivation() { };
+	virtual ~SigmoidActivation() = default;
 	virtual Activation<Scalar>* clone() {
 		return new SigmoidActivation();
 	};
@@ -88,7 +88,7 @@ public:
 template<typename Scalar>
 class SoftmaxActivation : public Activation<Scalar> {
 public:
-	virtual ~SoftmaxActivation() { };
+	virtual ~SoftmaxActivation() = default;
 	virtual Activation<Scalar>* clone() {
 		return new SoftmaxActivation();
 	};
@@ -116,7 +116,7 @@ public:
 template<typename Scalar>
 class TanhActivation : public Activation<Scalar> {
 public:
-	virtual ~TanhActivation() { };
+	virtual ~TanhActivation() = default;
 	virtual Activation<Scalar>* clone() {
 		return new TanhActivation();
 	};
@@ -133,7 +133,7 @@ public:
 template<typename Scalar>
 class ReLUActivation : public Activation<Scalar> {
 public:
-	virtual ~ReLUActivation() { };
+	virtual ~ReLUActivation() = default;
 	virtual Activation<Scalar>* clone() {
 		return new ReLUActivation();
 	};
@@ -161,7 +161,7 @@ public:
 			alpha(alpha) {
 		assert(alpha < 1 && "alpha must be less than 1");
 	};
-	virtual ~LeakyReLUActivation() { };
+	virtual ~LeakyReLUActivation() = default;
 	virtual Activation<Scalar>* clone() {
 		return new LeakyReLUActivation(alpha);
 	};
