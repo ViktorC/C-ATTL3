@@ -15,6 +15,6 @@ namespace cppnn {
 template <typename Scalar>
 using Vector = Eigen::Matrix<Scalar,1,Eigen::Dynamic,Eigen::RowMajor,1,Eigen::Dynamic>;
 
-}
+} /* namespace cppnn */
 
 #endif /* VECTOR_H_ */

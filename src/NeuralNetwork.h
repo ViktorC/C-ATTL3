@@ -9,88 +9,124 @@
 #define NEURALNETWORK_H_
 
 #include <cassert>
+#include <iomanip>
 #include <Layer.h>
+#include <sstream>
 #include <string>
 #include <vector>
 #include <Vector.h>
-#include <iostream>
 
 namespace cppnn {
 
+// Forward declaration to Optimizer so it can be friended.
+template<typename Scalar>
+class Optimizer;
+
+/**
+ * A neural network class that consists of a vector of neuron layers. It allows
+ * for the calculation of the output of the network given an input vector and
+ * it provides a member function for back-propagating the derivative of a loss
+ * function with respect to the activated output of the network's last layer.
+ * This back-propagation sets the deltas of the weights associated with each
+ * layer.
+ */
 template <typename Scalar>
 class NeuralNetwork {
+	friend class Optimizer<Scalar>;
 public:
-	NeuralNetwork(std::vector<Layer<Scalar>> layers) :
+	/**
+	 * Constructs the network using the provided vector of layers. The object
+	 * takes ownership of the pointers held in the vector and deletes them when
+	 * its destructor is invoked.
+	 *
+	 * @param layers A vector of Layer pointers to compose the neural network.
+	 * The vector must contain at least 1 element and no null pointers. The
+	 * the prev_nodes attributes of the Layer objects pointed to by the pointers
+	 * must match the nodes attribute of the Layer objects pointed to by their
+	 * pointers directly preceding them in the vector.
+	 */
+	NeuralNetwork(std::vector<Layer<Scalar>*> layers) :
 			layers(layers) {
 		assert(layers.size() > 0 && "layers must contain at least 1 element");
-		unsigned input_size = layers[0].get_nodes();
+		unsigned input_size = layers[0]->nodes;
 		for (unsigned i = 1; i < layers.size(); i++) {
-			assert(input_size == layers[i].get_prev_nodes() &&
+			assert(layers[i] != nullptr && "layers contains null pointers");
+			assert(input_size == layers[i]->prev_nodes &&
 					"incompatible layer dimensions");
-			input_size = layers[i].get_nodes();
+			input_size = layers[i]->nodes;
 		}
 	};
-	virtual ~NeuralNetwork() = default;
-	std::vector<Layer<Scalar>>& get_layers() const {
-		std::vector<Layer<Scalar>>& ref = layers;
-		return ref;
-	}
-	virtual std::vector<Scalar> feed_forward(std::vector<Scalar>& input) {
-		assert(layers[0].get_prev_nodes() == input.size() &&
-				"wrong neural network input size");
-		Vector<Scalar> input_vctr(input.size());
-		for (unsigned i = 0; i < input.size(); i++) {
-			input_vctr(i) = input[i];
-		}
-		Vector<Scalar>* input_vctr_ptr = &input_vctr;
+	// Default constructor.
+	NeuralNetwork() : layers(0) { };
+	// Copy constructor.
+	NeuralNetwork(const NeuralNetwork<Scalar>& network) :
+			layers(network.layers.size()) {
 		for (unsigned i = 0; i < layers.size(); i++) {
-			Vector<Scalar>& input_vctr_ref = *input_vctr_ptr;
-			input_vctr_ptr = &(layers[i].feed_forward(input_vctr_ref));
+			layers[i] = network.layers[i]->clone();
 		}
-		std::vector<Scalar> out(input_vctr_ptr->cols());
-		for (unsigned i = 0; i < out.size(); i++) {
-			out[i] = (*input_vctr_ptr)(i);
-		}
-		return out;
 	};
-	virtual void feed_back(std::vector<Scalar>& out_grads) {
-		assert(layers[layers.size() - 1].get_nodes() == out_grads.size() &&
-				"wrong neural network output gradient size");
-		Vector<Scalar> out_grads_vctr(out_grads.size());
-		for (unsigned i = 0; i < out_grads.size(); i++) {
-			out_grads_vctr(i) = out_grads[i];
+	// Move constructor.
+	NeuralNetwork(NeuralNetwork<Scalar>&& network) :
+			NeuralNetwork() {
+		swap(*this, network);
+	};
+	/* Copy/move assignment based on whether the argument is an lvalue or
+	 * an rvalue reference. */
+	NeuralNetwork<Scalar>& operator=(NeuralNetwork<Scalar> network) {
+		swap(*this, network);
+		return *this;
+	};
+	// Take ownership of layer pointers.
+	virtual ~NeuralNetwork() {
+		for (unsigned i = 0; i < layers.size(); i++) {
+			delete layers[i];
 		}
-		Vector<Scalar>* out_grads_vctr_ptr = &out_grads_vctr;
-		for (unsigned i = layers.size() - 1; i >= 0; i--) {
-			Vector<Scalar>& out_grads_vctr_ref = *out_grads_vctr_ptr;
-			std::cout << layers[i].get_nodes() << std::endl;
-			std::cout << out_grads_vctr_ref.cols() << std::endl;
-			out_grads_vctr_ptr = &(layers[i].feed_back(out_grads_vctr_ref));
+	};
+	// For the copy-and-swap idiom.
+	friend void swap(NeuralNetwork<Scalar>& network1,
+			NeuralNetwork<Scalar>& network2) {
+		using std::swap;
+		swap(network1.layers, network2.layers);
+	};
+	virtual Vector<Scalar> feed_forward(Vector<Scalar> input) {
+		assert(layers[0]->prev_nodes == (unsigned) input.cols() &&
+				"wrong neural network input size");
+		for (unsigned i = 0; i < layers.size(); i++) {
+			input = layers[i]->feed_forward(input);
+		}
+		return input;
+	};
+	virtual void feed_back(Vector<Scalar> out_grads) {
+		assert(layers[layers.size() - 1]->nodes == (unsigned) out_grads.cols() &&
+				"wrong neural network output gradient size");
+		for (int i = layers.size() - 1; i >= 0; i--) {
+			out_grads = layers[i]->feed_back(out_grads);
 		}
 	};
 	virtual std::string to_string() {
-		std::string str = "<NN>\n";
+		std::stringstream strm;
+		strm << "Neural Net " << this << std::endl;
 		for (unsigned i = 0; i < layers.size(); i++) {
-			str += "Layer " + std::to_string(i) + "--------------------\n";
-			Matrix<Scalar> weights = layers[i].get_weights();
+			strm << "\tLayer " << std::to_string(i + 1) << "-----------------------"
+					<< std::endl;
+			Matrix<Scalar>& weights = layers[i]->weights;
 			for (int j = 0; j < weights.rows(); j++) {
-				str += "[";
+				strm << "\t\t[ ";
 				for (int k = 0; k < weights.cols(); k++) {
-					str += std::to_string(weights(j,k));
-					if (k != weights.cols()) {
-						str += ", ";
+					strm << std::setw(11) << std::setprecision(4) << weights(j,k);
+					if (k != weights.cols() - 1) {
+						strm << ", ";
 					}
 				}
-				str += "]\n";
+				strm << " ]" << std::endl;
 			}
 		}
-		str += "</NN>\n";
-		return str;
+		return strm.str();
 	};
 protected:
-	std::vector<Layer<Scalar>> layers;
+	std::vector<Layer<Scalar>*> layers;
 };
 
-}
+} /* namespace cppnn */
 
 #endif /* NEURALNETWORK_H_ */

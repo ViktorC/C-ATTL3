@@ -1,38 +1,47 @@
-///*
-// * Cost.h
-// *
-// *  Created on: 4 Dec 2017
-// *      Author: Viktor
-// */
-//
-//#ifndef LOSS_H_
-//#define LOSS_H_
-//
-//#include <vector>
-//
-//namespace cppnn {
-//
-//class Loss {
-//public:
-//	virtual ~Loss() { };
-//	virtual double function(std::vector<double>& out, std::vector<double>& obj) const = 0;
-//	virtual double d_function(std::vector<double>& out, double error) const = 0;
-//};
-//
-//class QuadraticLoss : public Loss {
-//public:
-//	virtual ~QuadraticLoss() { };
-//	virtual double function(std::vector<double>& out, std::vector<double>& obj) const;
-//	virtual double d_function(std::vector<double>& out, double error) const;
-//};
-//
-//class CrossEntropyLoss : public Loss {
-//public:
-//	virtual ~CrossEntropyLoss() { };
-//	virtual double function(std::vector<double>& out, std::vector<double>& obj) const;
-//	virtual double d_function(std::vector<double>& out, double error) const;
-//};
-//
-//}
-//
-//#endif /* LOSS_H_ */
+/*
+ * Cost.h
+ *
+ *  Created on: 4 Dec 2017
+ *      Author: Viktor Csomor
+ */
+
+#ifndef LOSS_H_
+#define LOSS_H_
+
+#include <cassert>
+#include <Vector.h>
+
+namespace cppnn {
+
+template<typename Scalar>
+class Loss {
+public:
+	virtual ~Loss() = default;
+	virtual Scalar function(Vector<Scalar>& out, Vector<Scalar>& obj) const = 0;
+	virtual Scalar d_function(Vector<Scalar>& out, Scalar error) const = 0;
+};
+
+template<typename Scalar>
+class QuadraticLoss : public Loss<Scalar> {
+public:
+	virtual ~QuadraticLoss() = default;
+	virtual Scalar function(Vector<Scalar>& out, Vector<Scalar>& obj) const {
+		assert(out.size() == obj.size());
+		return (out - obj).array().square().sum()/2;
+	};
+	virtual Scalar d_function(Vector<Scalar>& out, Scalar error) const {
+		return 0;
+	}
+};
+
+template<typename Scalar>
+class CrossEntropyLoss : public Loss<Scalar> {
+public:
+	virtual ~CrossEntropyLoss() = default;
+	virtual Scalar function(Vector<Scalar>& out, Vector<Scalar>& obj) const;
+	virtual Scalar d_function(Vector<Scalar>& out, Scalar error) const;
+};
+
+} /* namespace cppnn */
+
+#endif /* LOSS_H_ */

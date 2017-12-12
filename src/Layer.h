@@ -16,100 +16,70 @@
 
 namespace cppnn {
 
+// Forward declarations to NeuralNetwork and Optimizer so they can be friended.
+template<typename Scalar>
+class NeuralNetwork;
+template<typename Scalar>
+class Optimizer;
+
+/**
+ * A class template for a fully connected layer of a neural network.
+ *
+ * The layer representation has its weights before its neurons. This less
+ * intuitive, reverse implementation allows for a more convenient
+ * definition of neural network architectures as the input layer is not
+ * normally activated, while the output layer often is.
+ */
 template<typename Scalar>
 class Layer {
+	friend class NeuralNetwork<Scalar>;
+	friend class Optimizer<Scalar>;
 public:
-	Layer() :
-			prev_nodes(0),
-			nodes(0),
-			act(NULL) { };
-	Layer(unsigned prev_nodes, unsigned nodes, Activation<Scalar>* act) :
+	Layer(unsigned prev_nodes, unsigned nodes, const Activation<Scalar>& act) :
 			prev_nodes(prev_nodes),
 			nodes(nodes),
-			prev_out(prev_nodes + 1),
-			prev_out_grads(prev_nodes + 1),
-			weights(prev_nodes + 1, nodes),
+			prev_out(prev_nodes),
+			weights(prev_nodes + 1, nodes), // Bias trick.
 			weight_grads(prev_nodes + 1, nodes),
 			in(nodes),
 			out(nodes),
 			act(act) {
 		assert(prev_nodes > 0 && "prev_nodes must be greater than 0");
 		assert(nodes > 0 && "nodes must be greater than 0");
-		assert(act != NULL && "act cannot be null");
-		// Bias trick.
-		prev_out(prev_nodes) = 1;
 	};
-	// Copy constructor.
-	Layer(const Layer<Scalar>& layer) :
-			prev_nodes(layer.prev_nodes),
-			nodes(layer.nodes),
-			prev_out(layer.prev_out),
-			prev_out_grads(layer.prev_out_grads),
-			weights(layer.weights),
-			weight_grads(layer.weight_grads),
-			in(layer.in),
-			out(layer.out),
-			act(layer.act->clone()) { };
-	// Move constructor.
-	Layer(Layer<Scalar>&& layer) :
-			Layer() {
-		swap(*this, layer);
-	};
-	/* Copy/move assignment based on whether the argument is an lvalue or
-	 * an rvalue reference. */
-	Layer<Scalar>& operator=(Layer<Scalar> layer) {
-		swap(*this, layer);
-		return *this;
-	};
-	virtual ~Layer() {
-		delete act;
-	};
-	// For the copy-and-swap idiom.
-	friend void swap(Layer<Scalar>& layer1, Layer<Scalar>& layer2) {
-		using std::swap;
-		swap(layer1.prev_nodes, layer2.prev_nodes);
-		swap(layer1.nodes, layer2.nodes);
-		swap(layer1.prev_out, layer2.prev_out);
-		swap(layer1.prev_out_grads, layer2.prev_out_grads);
-		swap(layer1.weights, layer2.weights);
-		swap(layer1.weight_grads, layer2.weight_grads);
-		swap(layer1.in, layer2.in);
-		swap(layer1.out, layer2.out);
-		swap(layer1.act, layer2.act);
-	};
+	virtual ~Layer() = default;
 	unsigned get_prev_nodes() const {
 		return prev_nodes;
 	};
 	unsigned get_nodes() const {
 		return nodes;
 	};
-	virtual Matrix<Scalar>& get_weights() {
-		return weights;
-	};
-	virtual Matrix<Scalar>& get_weight_grads() {
-		return weight_grads;
-	};
-	virtual Vector<Scalar>& feed_forward(Vector<Scalar>& prev_out) {
+	virtual Vector<Scalar> feed_forward(Vector<Scalar> prev_out) {
 		assert((unsigned) prev_out.cols() == prev_nodes &&
 				"illegal input vector size for feed forward");
-		for (unsigned i = 0; i < prev_nodes; i++) {
-			this->prev_out(0,i) = prev_out(0,i);
+		this->prev_out = prev_out;
+		// Add a 1-column to the input for the bias trick.
+		Vector<Scalar> biased_prev_out(prev_out.size() + 1);
+		for (int i = 0; i < prev_out.cols(); i++) {
+			biased_prev_out(i) = prev_out(i);
 		}
+		biased_prev_out(prev_out.size()) = 1;
 		/* Compute the neuron inputs by multiplying the output of the
 		 * previous layer by the weights. */
-		in = this->prev_out * weights;
+		in = biased_prev_out * weights;
 		// Activate the neurons.
-		out = act->function(in);
+		out = act.function(in);
 		return out;
 	};
-	virtual Vector<Scalar>& feed_back(Vector<Scalar>& out_grads) {
+	virtual Vector<Scalar> feed_back(Vector<Scalar> out_grads) {
 		assert((unsigned) out_grads.cols() == nodes &&
 				"illegal input vector size for feed back");
 		// Compute the gradients of the outputs with respect to the weighted inputs.
-		Vector<Scalar> in_grads = act->d_function(in, out).cwiseProduct(out_grads);
+		Vector<Scalar> in_grads = act.d_function(in, out).cwiseProduct(out_grads);
 		weight_grads = prev_out.transpose() * in_grads;
-		prev_out_grads = in_grads * weights.transpose();
-		return prev_out_grads;
+		/* Remove the bias column from the transposed weight matrix and compute the
+		 * out-gradients of the previous layer. */
+		return (in_grads * weights.transpose().block(0, 0, nodes, prev_nodes));
 	};
 protected:
 	unsigned prev_nodes;
@@ -117,14 +87,17 @@ protected:
 	/* Eigen matrices are backed by arrays allocated the heap, so these members do
 	 * not burden the stack. */
 	Vector<Scalar> prev_out;
-	Vector<Scalar> prev_out_grads;
 	Matrix<Scalar> weights;
 	Matrix<Scalar> weight_grads;
 	Vector<Scalar> in;
 	Vector<Scalar> out;
-	Activation<Scalar>* act;
+	const Activation<Scalar>& act;
+	// Clone pattern.
+	virtual Layer<Scalar>* clone() {
+		return new Layer(*this);
+	};
 };
 
-}
+} /* namespace cppnn */
 
 #endif /* LAYER_H_ */

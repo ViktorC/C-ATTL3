@@ -15,6 +15,6 @@ namespace cppnn {
 template <typename Scalar>
 using Matrix = Eigen::Matrix<Scalar,Eigen::Dynamic,Eigen::Dynamic,Eigen::ColMajor,Eigen::Dynamic,Eigen::Dynamic>;
 
-}
+} /* namespace cppnn */
 
 #endif /* MATRIX_H_ */
