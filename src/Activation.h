@@ -24,7 +24,7 @@ template<typename Scalar>
 class Activation {
 public:
 	virtual ~Activation() = default;
-	virtual Vector<Scalar> function(Vector<Scalar> x) const = 0;
+	virtual Vector<Scalar> function(const Vector<Scalar>& x) const = 0;
 	virtual Vector<Scalar> d_function(const Vector<Scalar>& x,
 			const Vector<Scalar>& y) const = 0;
 };
@@ -33,7 +33,7 @@ template<typename Scalar>
 class IdentityActivation : public Activation<Scalar> {
 public:
 	virtual ~IdentityActivation() = default;
-	virtual Vector<Scalar> function(Vector<Scalar> x) const {
+	virtual Vector<Scalar> function(const Vector<Scalar>& x) const {
 		return x;
 	};
 	virtual Vector<Scalar> d_function(const Vector<Scalar>& x,
@@ -47,11 +47,12 @@ template<typename Scalar>
 class BinaryStepActivation : public Activation<Scalar> {
 public:
 	virtual ~BinaryStepActivation() = default;
-	virtual Vector<Scalar> function(Vector<Scalar> x) const {
-		for (int i = 0; i < x.cols(); i++) {
-			x(i) = x(i) > .0;
+	virtual Vector<Scalar> function(const Vector<Scalar>& x) const {
+		Vector<Scalar> out = x;
+		for (int i = 0; i < out.cols(); i++) {
+			out(i) = out(i) > .0;
 		}
-		return x;
+		return out;
 	};
 	virtual Vector<Scalar> d_function(const Vector<Scalar>& x,
 			const Vector<Scalar>& y) const {
@@ -64,7 +65,7 @@ template<typename Scalar>
 class SigmoidActivation : public Activation<Scalar> {
 public:
 	virtual ~SigmoidActivation() = default;
-	virtual Vector<Scalar> function(Vector<Scalar> x) const {
+	virtual Vector<Scalar> function(const Vector<Scalar>& x) const {
 		Vector<Scalar> exp = (-x).array().exp();
 		return (Vector<Scalar>::Ones(x.cols()) + exp).cwiseInverse();
 	};
@@ -79,7 +80,7 @@ template<typename Scalar>
 class SoftmaxActivation : public Activation<Scalar> {
 public:
 	virtual ~SoftmaxActivation() = default;
-	virtual Vector<Scalar> function(Vector<Scalar> x) const {
+	virtual Vector<Scalar> function(const Vector<Scalar>& x) const {
 		Vector<Scalar> out = x.array().exp();
 		return out / out.sum();
 	};
@@ -105,7 +106,7 @@ template<typename Scalar>
 class TanhActivation : public Activation<Scalar> {
 public:
 	virtual ~TanhActivation() = default;
-	virtual Vector<Scalar> function(Vector<Scalar> x) const {
+	virtual Vector<Scalar> function(const Vector<Scalar>& x) const {
 		return x.array().tanh();
 	};
 	virtual Vector<Scalar> d_function(const Vector<Scalar>& x,
@@ -119,7 +120,7 @@ template<typename Scalar>
 class ReLUActivation : public Activation<Scalar> {
 public:
 	virtual ~ReLUActivation() = default;
-	virtual Vector<Scalar> function(Vector<Scalar> x) const {
+	virtual Vector<Scalar> function(const Vector<Scalar>& x) const {
 		return x.cwiseMax(.0);
 	};
 	virtual Vector<Scalar> d_function(const Vector<Scalar>& x,
@@ -144,7 +145,7 @@ public:
 		assert(alpha < 1 && "alpha must be less than 1");
 	};
 	virtual ~LeakyReLUActivation() = default;
-	virtual Vector<Scalar> function(Vector<Scalar> x) const {
+	virtual Vector<Scalar> function(const Vector<Scalar>& x) const {
 		return x.cwiseMax(x * alpha);
 	};
 };

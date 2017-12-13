@@ -12,6 +12,7 @@
 #include <cassert>
 #include <Matrix.h>
 #include <string>
+#include <utility>
 #include <Vector.h>
 
 namespace cppnn {
@@ -57,13 +58,13 @@ public:
 	virtual Vector<Scalar> feed_forward(Vector<Scalar> prev_out) {
 		assert((unsigned) prev_out.cols() == prev_nodes &&
 				"illegal input vector size for feed forward");
-		this->prev_out = prev_out;
+		this->prev_out = std::move(prev_out);
 		// Add a 1-column to the input for the bias trick.
-		Vector<Scalar> biased_prev_out(prev_out.size() + 1);
-		for (int i = 0; i < prev_out.cols(); i++) {
-			biased_prev_out(i) = prev_out(i);
+		Vector<Scalar> biased_prev_out(this->prev_out.size() + 1);
+		for (int i = 0; i < this->prev_out.cols(); i++) {
+			biased_prev_out(i) = this->prev_out(i);
 		}
-		biased_prev_out(prev_out.size()) = 1;
+		biased_prev_out(this->prev_out.size()) = 1;
 		/* Compute the neuron inputs by multiplying the output of the
 		 * previous layer by the weights. */
 		in = biased_prev_out * weights;
