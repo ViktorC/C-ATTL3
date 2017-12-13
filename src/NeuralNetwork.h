@@ -56,8 +56,6 @@ public:
 			input_size = layers[i]->nodes;
 		}
 	};
-	// Default constructor.
-	NeuralNetwork() : layers(0) { };
 	// Copy constructor.
 	NeuralNetwork(const NeuralNetwork<Scalar>& network) :
 			layers(network.layers.size()) {
@@ -66,12 +64,11 @@ public:
 		}
 	};
 	// Move constructor.
-	NeuralNetwork(NeuralNetwork<Scalar>&& network) :
-			NeuralNetwork() {
+	NeuralNetwork(NeuralNetwork<Scalar>&& network) {
 		swap(*this, network);
 	};
-	/* Copy/move assignment based on whether the argument is an lvalue or
-	 * an rvalue reference. */
+	/* The assignment uses the move or copy constructor to pass the parameter
+	 * based on whether it is an lvalue or an rvalue. */
 	NeuralNetwork<Scalar>& operator=(NeuralNetwork<Scalar> network) {
 		swap(*this, network);
 		return *this;
@@ -97,7 +94,7 @@ public:
 		return input;
 	};
 	virtual void feed_back(Vector<Scalar> out_grads) {
-		assert(layers[layers.size() - 1]->nodes == (unsigned) out_grads.cols() &&
+		assert(layers[layers.size() - 1]->nodes == (unsigned)out_grads.cols() &&
 				"wrong neural network output gradient size");
 		for (int i = layers.size() - 1; i >= 0; i--) {
 			out_grads = layers[i]->feed_back(out_grads);
@@ -107,13 +104,14 @@ public:
 		std::stringstream strm;
 		strm << "Neural Net " << this << std::endl;
 		for (unsigned i = 0; i < layers.size(); i++) {
-			strm << "\tLayer " << std::to_string(i + 1) << "-----------------------"
-					<< std::endl;
+			strm << "\tLayer " << std::setw(2) << std::to_string(i + 1) <<
+					"----------------------------" << std::endl;
 			Matrix<Scalar>& weights = layers[i]->weights;
 			for (int j = 0; j < weights.rows(); j++) {
 				strm << "\t\t[ ";
 				for (int k = 0; k < weights.cols(); k++) {
-					strm << std::setw(11) << std::setprecision(4) << weights(j,k);
+					strm << std::setw(11) << std::setprecision(4) <<
+							weights(j,k);
 					if (k != weights.cols() - 1) {
 						strm << ", ";
 					}
