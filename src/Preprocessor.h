@@ -18,89 +18,85 @@
 namespace cppnn {
 
 static const std::string* MISMTCHD_ROWS_ERR_MSG_PTR =
-		new std::string("mismatched compute and process input matrix rows");
+		new std::string("mismatched fit and process input matrix rows");
 
 template<typename Scalar>
 class Preprocessor {
 public:
 	virtual ~Preprocessor() = default;
-	virtual void compute(const Matrix<Scalar>& data) = 0;
-	virtual void process(Matrix<Scalar>& data) const = 0;
+	virtual void fit(const Matrix<Scalar>& data) = 0;
+	virtual void transform(Matrix<Scalar>& data) const = 0;
 };
 
 template<typename Scalar>
 class NormalizationPreprocessor : public Preprocessor<Scalar> {
 public:
-	virtual ~NormalizationPreprocessor() = default;
-	virtual void compute(const Matrix<Scalar>& data) {
-		means = Vector<Scalar>(data.rows());
-		for (int i = 0; means.cols(); i++) {
-			means(i) = data.row(i).mean();
-		}
+	void fit(const Matrix<Scalar>& data) {
+		means = data.rowwise().mean();
 	};
-	virtual void process(Matrix<Scalar>& data) const {
+	void transform(Matrix<Scalar>& data) const {
 		assert(means.cols() == data.rows() && MISMTCHD_ROWS_ERR_MSG_PTR);
-		for (int i = 0; means.cols(); i++) {
-			data.row(i) = data.row(i).array() - means(i);
-		}
+		data = data.colwise() - means;
 	};
-protected:
+private:
 	Vector<Scalar> means;
 };
 
 template<typename Scalar>
-class StandardizationPreprocessor : public NormalizationPreprocessor<Scalar> {
+class StandardizationPreprocessor : public Preprocessor<Scalar> {
 public:
-	virtual ~StandardizationPreprocessor() = default;
-	virtual void compute(const Matrix<Scalar>& data) {
-		means = Vector<Scalar>(data.rows());
-		sd = Vector<Scalar>(data.rows());
-		for (int i = 0; means.cols(); i++) {
-			Scalar mean = data.row(i).mean();
-			means(i) = mean;
-			sd(i) = sqrt((data.row(i).array() - mean).square().mean());
-		}
+	void fit(const Matrix<Scalar>& data) {
+		means = data.rowwise().mean();
+		sd = (data.colwise() - means).square().rowwise().mean().sqrt();
 	};
-	virtual void process(Matrix<Scalar>& data) const {
+	void transform(Matrix<Scalar>& data) const {
 		assert(means.cols() == data.rows() && MISMTCHD_ROWS_ERR_MSG_PTR);
 		for (int i = 0; sd.cols(); i++) {
 			data.row(i) = (data.row(i).array() - means(i)) / sd(i);
 		}
 	};
-protected:
+private:
+	Vector<Scalar> means;
 	Vector<Scalar> sd;
 };
 
 template<typename Scalar>
-class PCAPreprocessor : public StandardizationPreprocessor<Scalar> {
+class PCAPreprocessor : public Preprocessor<Scalar> {
 public:
 	PCAPreprocessor(float retention_rate, bool scale_features) :
 		retention_rate(retention_rate),
 		scale_features(scale_features) { };
-	virtual ~PCAPreprocessor() = default;
-	virtual void compute(const Matrix<Scalar>& data) {
+	void fit(const Matrix<Scalar>& data) {
+		means = data.rowwise().mean();
+		Matrix<Scalar> centered_data = data.colwise() - mean;
 		if (scale_features) {
-			StandardizationPreprocessor<Scalar>::compute(data);
-		} else {
-			NormalizationPreprocessor<Scalar>::compute(data);
+			sd = (data.colwise() - means).square().rowwise().mean().sqrt();
+			for (int i = 0; sd.cols(); i++) {
+				centered_data.row(i) /= sd(i);
+			}
 		}
+		// Compute the covariance matrix
+		Matrix<Scalar> cov = centered_data.transpose() * centered_data;
+
 	};
-	virtual void process(Matrix<Scalar>& data) const {
+	void transform(Matrix<Scalar>& data) const {
 		assert(means.cols() == data.rows() && MISMTCHD_ROWS_ERR_MSG_PTR);
 	};
-protected:
+private:
 	float retention_rate;
 	bool scale_features;
 	Vector<Scalar> means;
+	Vector<Scalar> sd;
+	Matrix<Scalar> eigen_basis;
 };
 
 template<typename Scalar>
 class WhiteningPreprocessor : public Preprocessor<Scalar> {
 public:
-	void compute(const Matrix<Scalar>& data) {
+	void fit(const Matrix<Scalar>& data) {
 
 	};
-	void process(Matrix<Scalar>& data) const {
+	void transform(Matrix<Scalar>& data) const {
 
 	};
 };
