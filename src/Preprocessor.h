@@ -10,7 +10,9 @@
 
 #include <cassert>
 #include <cmath>
+#include <Eigen/Dense>
 #include <Matrix.h>
+#include <string>
 #include <Vector.h>
 
 namespace cppnn {
@@ -27,53 +29,69 @@ public:
 };
 
 template<typename Scalar>
-class CenteringPreprocessor : public Preprocessor<Scalar> {
+class NormalizationPreprocessor : public Preprocessor<Scalar> {
 public:
-	void compute(const Matrix<Scalar>& data) {
+	virtual ~NormalizationPreprocessor() = default;
+	virtual void compute(const Matrix<Scalar>& data) {
 		means = Vector<Scalar>(data.rows());
 		for (int i = 0; means.cols(); i++) {
 			means(i) = data.row(i).mean();
 		}
 	};
-	void process(Matrix<Scalar>& data) const {
+	virtual void process(Matrix<Scalar>& data) const {
 		assert(means.cols() == data.rows() && MISMTCHD_ROWS_ERR_MSG_PTR);
 		for (int i = 0; means.cols(); i++) {
 			data.row(i) = data.row(i).array() - means(i);
 		}
 	};
-private:
+protected:
 	Vector<Scalar> means;
 };
 
 template<typename Scalar>
-class NormalizationPreprocessor : public Preprocessor<Scalar> {
+class StandardizationPreprocessor : public NormalizationPreprocessor<Scalar> {
 public:
-	void compute(const Matrix<Scalar>& data) {
+	virtual ~StandardizationPreprocessor() = default;
+	virtual void compute(const Matrix<Scalar>& data) {
+		means = Vector<Scalar>(data.rows());
 		sd = Vector<Scalar>(data.rows());
 		for (int i = 0; means.cols(); i++) {
 			Scalar mean = data.row(i).mean();
+			means(i) = mean;
 			sd(i) = sqrt((data.row(i).array() - mean).square().mean());
 		}
 	};
-	void process(Matrix<Scalar>& data) const {
-		assert(sd.cols() == data.rows() && MISMTCHD_ROWS_ERR_MSG_PTR);
+	virtual void process(Matrix<Scalar>& data) const {
+		assert(means.cols() == data.rows() && MISMTCHD_ROWS_ERR_MSG_PTR);
 		for (int i = 0; sd.cols(); i++) {
-			data.row(i) /= sd(i);
+			data.row(i) = (data.row(i).array() - means(i)) / sd(i);
 		}
 	};
-private:
+protected:
 	Vector<Scalar> sd;
 };
 
 template<typename Scalar>
-class PCAPreprocessor : public Preprocessor<Scalar> {
+class PCAPreprocessor : public StandardizationPreprocessor<Scalar> {
 public:
-	void compute(const Matrix<Scalar>& data) {
-
+	PCAPreprocessor(float retention_rate, bool scale_features) :
+		retention_rate(retention_rate),
+		scale_features(scale_features) { };
+	virtual ~PCAPreprocessor() = default;
+	virtual void compute(const Matrix<Scalar>& data) {
+		if (scale_features) {
+			StandardizationPreprocessor<Scalar>::compute(data);
+		} else {
+			NormalizationPreprocessor<Scalar>::compute(data);
+		}
 	};
-	void process(Matrix<Scalar>& data) const {
-
+	virtual void process(Matrix<Scalar>& data) const {
+		assert(means.cols() == data.rows() && MISMTCHD_ROWS_ERR_MSG_PTR);
 	};
+protected:
+	float retention_rate;
+	bool scale_features;
+	Vector<Scalar> means;
 };
 
 template<typename Scalar>

@@ -31,12 +31,13 @@ public:
 	virtual ~NDRandInitialization() = default;
 	virtual void init(Matrix<Scalar>& weights) const {
 		int rows = weights.rows();
+		Scalar r_factor = range_factor(rows -  1);
 		for (int j = 0; j < rows; j++) {
 			if (j == rows - 1) { // Bias row.
 				weights.row(i).setConstant(bias_value);
 			} else {
 				for (int k = 0; k < weights.cols(); k++) {
-					weights(j,k) = normal_distribution(gen) * range_factor(rows -  1);
+					weights(j,k) = normal_distribution(gen) * r_factor;
 				}
 			}
 		}
@@ -49,21 +50,22 @@ protected:
 };
 
 template<typename Scalar>
-class StandardNDRandInitialization : public NDRandInitialization<Scalar> {
+class StandardInitialization : public NDRandInitialization<Scalar> {
 public:
-	StandardNDRandInitialization() :
-		NDRandInitialization(0, 0.34, 0) { };
+	StandardInitialization() :
+		NDRandInitialization(0, 0.33, 0) { };
+	virtual ~StandardInitialization() = default;
 protected:
-	Scalar range_factor(int inputs) const {
+	virtual Scalar range_factor(int inputs) const {
 		return 1 / sqrt(inputs);
 	};
 };
 
 template<typename Scalar>
-class ReLUNDRandInitialization : public NDRandInitialization<Scalar> {
+class ReLUInitialization : public NDRandInitialization<Scalar> {
 public:
-	ReLUNDRandInitialization() :
-		NDRandInitialization(0, 0.34, 0) { };
+	ReLUInitialization() :
+		NDRandInitialization(0, 0.33, 0) { };
 protected:
 	Scalar range_factor(int inputs) const {
 		return sqrt(2 / inputs);
