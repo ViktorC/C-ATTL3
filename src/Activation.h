@@ -24,68 +24,64 @@ template<typename Scalar>
 class Activation {
 public:
 	virtual ~Activation() = default;
-	virtual Vector<Scalar> function(const Vector<Scalar>& x) const = 0;
-	virtual Vector<Scalar> d_function(const Vector<Scalar>& x,
-			const Vector<Scalar>& y) const = 0;
+	virtual RowVector<Scalar> function(const RowVector<Scalar>& x) const = 0;
+	virtual RowVector<Scalar> d_function(const RowVector<Scalar>& x,
+			const RowVector<Scalar>& y) const = 0;
 };
 
 template<typename Scalar>
 class IdentityActivation : public Activation<Scalar> {
 public:
-	virtual ~IdentityActivation() = default;
-	virtual Vector<Scalar> function(const Vector<Scalar>& x) const {
+	RowVector<Scalar> function(const RowVector<Scalar>& x) const {
 		return x;
 	};
-	virtual Vector<Scalar> d_function(const Vector<Scalar>& x,
-			const Vector<Scalar>& y) const {
+	RowVector<Scalar> d_function(const RowVector<Scalar>& x,
+			const RowVector<Scalar>& y) const {
 		assert(x.cols() == y.cols() && VEC_SIZE_ERR_MSG_PTR);
-		return Vector<Scalar>::Ones(x.cols());
+		return RowVector<Scalar>::Ones(x.cols());
 	};
 };
 
 template<typename Scalar>
 class BinaryStepActivation : public Activation<Scalar> {
 public:
-	virtual ~BinaryStepActivation() = default;
-	virtual Vector<Scalar> function(const Vector<Scalar>& x) const {
-		Vector<Scalar> out = x;
+	RowVector<Scalar> function(const RowVector<Scalar>& x) const {
+		RowVector<Scalar> out = x;
 		for (int i = 0; i < out.cols(); i++) {
 			out(i) = out(i) > .0;
 		}
 		return out;
 	};
-	virtual Vector<Scalar> d_function(const Vector<Scalar>& x,
-			const Vector<Scalar>& y) const {
+	RowVector<Scalar> d_function(const RowVector<Scalar>& x,
+			const RowVector<Scalar>& y) const {
 		assert(x.cols() == y.cols() && VEC_SIZE_ERR_MSG_PTR);
-		return Vector<Scalar>::Zero(x.cols());
+		return RowVector<Scalar>::Zero(x.cols());
 	};
 };
 
 template<typename Scalar>
 class SigmoidActivation : public Activation<Scalar> {
 public:
-	virtual ~SigmoidActivation() = default;
-	virtual Vector<Scalar> function(const Vector<Scalar>& x) const {
-		Vector<Scalar> exp = (-x).array().exp();
-		return (Vector<Scalar>::Ones(x.cols()) + exp).cwiseInverse();
+	RowVector<Scalar> function(const RowVector<Scalar>& x) const {
+		RowVector<Scalar> exp = (-x).array().exp();
+		return (RowVector<Scalar>::Ones(x.cols()) + exp).cwiseInverse();
 	};
-	virtual Vector<Scalar> d_function(const Vector<Scalar>& x,
-			const Vector<Scalar>& y) const {
+	RowVector<Scalar> d_function(const RowVector<Scalar>& x,
+			const RowVector<Scalar>& y) const {
 		assert(x.cols() == y.cols() && VEC_SIZE_ERR_MSG_PTR);
-		return y.cwiseProduct(Vector<Scalar>::Ones(y.cols()) - y);
+		return y.cwiseProduct(RowVector<Scalar>::Ones(y.cols()) - y);
 	};
 };
 
 template<typename Scalar>
 class SoftmaxActivation : public Activation<Scalar> {
 public:
-	virtual ~SoftmaxActivation() = default;
-	virtual Vector<Scalar> function(const Vector<Scalar>& x) const {
-		Vector<Scalar> out = x.array().exp();
+	RowVector<Scalar> function(const RowVector<Scalar>& x) const {
+		RowVector<Scalar> out = x.array().exp();
 		return out / out.sum();
 	};
-	virtual Vector<Scalar> d_function(const Vector<Scalar>& x,
-			const Vector<Scalar>& y) const {
+	RowVector<Scalar> d_function(const RowVector<Scalar>& x,
+			const RowVector<Scalar>& y) const {
 		assert(x.cols() == y.cols() && VEC_SIZE_ERR_MSG_PTR);
 		// TODO Vectorize the computation of the Jacobian.
 		Matrix<Scalar> jacobian(y.cols(), y.cols());
@@ -94,7 +90,7 @@ public:
 				jacobian(i,j) = y(j) * ((i == j) - y(i));
 			}
 		}
-		Vector<Scalar> out(y.cols());
+		RowVector<Scalar> out(y.cols());
 		for (int i = 0; i < out.cols(); i++) {
 			out(i) = jacobian.row(i).sum();
 		}
@@ -105,14 +101,13 @@ public:
 template<typename Scalar>
 class TanhActivation : public Activation<Scalar> {
 public:
-	virtual ~TanhActivation() = default;
-	virtual Vector<Scalar> function(const Vector<Scalar>& x) const {
+	RowVector<Scalar> function(const RowVector<Scalar>& x) const {
 		return x.array().tanh();
 	};
-	virtual Vector<Scalar> d_function(const Vector<Scalar>& x,
-			const Vector<Scalar>& y) const {
+	RowVector<Scalar> d_function(const RowVector<Scalar>& x,
+			const RowVector<Scalar>& y) const {
 		assert(x.cols() == y.cols() && VEC_SIZE_ERR_MSG_PTR);
-		return Vector<Scalar>::Ones(y.cols()) - y.cwiseProduct(y);
+		return RowVector<Scalar>::Ones(y.cols()) - y.cwiseProduct(y);
 	};
 };
 
@@ -120,13 +115,13 @@ template<typename Scalar>
 class ReLUActivation : public Activation<Scalar> {
 public:
 	virtual ~ReLUActivation() = default;
-	virtual Vector<Scalar> function(const Vector<Scalar>& x) const {
+	virtual RowVector<Scalar> function(const RowVector<Scalar>& x) const {
 		return x.cwiseMax(.0);
 	};
-	virtual Vector<Scalar> d_function(const Vector<Scalar>& x,
-			const Vector<Scalar>& y) const {
+	virtual RowVector<Scalar> d_function(const RowVector<Scalar>& x,
+			const RowVector<Scalar>& y) const {
 		assert(x.cols() == y.cols() && VEC_SIZE_ERR_MSG_PTR);
-		Vector<Scalar> out(x);
+		RowVector<Scalar> out(x);
 		for (int i = 0; i < out.cols(); i++) {
 			out(0,i) = out(0,i) > .0;
 		}
@@ -136,18 +131,34 @@ public:
 
 template<typename Scalar>
 class LeakyReLUActivation : public ReLUActivation<Scalar> {
-	static constexpr Scalar DEF_LRELU_ALPHA = 1e-1;
-protected:
-	Scalar alpha;
 public:
-	LeakyReLUActivation(Scalar alpha = DEF_LRELU_ALPHA) :
+	LeakyReLUActivation(float alpha = DEF_LRELU_ALPHA) :
 			alpha(alpha) {
 		assert(alpha < 1 && "alpha must be less than 1");
 	};
-	virtual ~LeakyReLUActivation() = default;
-	virtual Vector<Scalar> function(const Vector<Scalar>& x) const {
+	RowVector<Scalar> function(const RowVector<Scalar>& x) const {
 		return x.cwiseMax(x * alpha);
 	};
+private:
+	static constexpr float DEF_LRELU_ALPHA = 1e-1;
+	Scalar alpha;
+};
+
+template<typename Scalar>
+class BatchNormalizedActivation : public Activation<Scalar> {
+public:
+	BatchNormalizedActivation(const Activation<Scalar>& act) :
+		act(act) { };
+	RowVector<Scalar> function(const RowVector<Scalar>& x) const {
+
+	};
+	RowVector<Scalar> d_function(const RowVector<Scalar>& x,
+			const RowVector<Scalar>& y) const {
+		assert(x.cols() == y.cols() && VEC_SIZE_ERR_MSG_PTR);
+
+	};
+private:
+	const Activation<Scalar>& act;
 };
 
 } /* namespace cppnn */

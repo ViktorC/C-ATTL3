@@ -13,7 +13,10 @@
 namespace cppnn {
 
 template <typename Scalar>
-using Vector = Eigen::Matrix<Scalar,1,Eigen::Dynamic,Eigen::RowMajor,1,Eigen::Dynamic>;
+using RowVector = Eigen::Matrix<Scalar,1,Eigen::Dynamic,Eigen::RowMajor,1,Eigen::Dynamic>;
+
+template <typename Scalar>
+using ColVector = Eigen::Matrix<Scalar,Eigen::Dynamic,1,Eigen::ColMajor,Eigen::Dynamic,1>;
 
 } /* namespace cppnn */
 

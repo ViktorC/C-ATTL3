@@ -85,7 +85,7 @@ public:
 		using std::swap;
 		swap(network1.layers, network2.layers);
 	};
-	virtual Vector<Scalar> feed_forward(Vector<Scalar> input) {
+	virtual RowVector<Scalar> feed_forward(RowVector<Scalar> input) {
 		assert(layers[0]->prev_nodes == (unsigned) input.cols() &&
 				"wrong neural network input size");
 		for (unsigned i = 0; i < layers.size(); i++) {
@@ -93,7 +93,7 @@ public:
 		}
 		return input;
 	};
-	virtual void feed_back(Vector<Scalar> out_grads) {
+	virtual void feed_back(RowVector<Scalar> out_grads) {
 		assert(layers[layers.size() - 1]->nodes == (unsigned)out_grads.cols() &&
 				"wrong neural network output gradient size");
 		for (int i = layers.size() - 1; i >= 0; i--) {

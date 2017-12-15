@@ -39,32 +39,36 @@ public:
 	Layer(unsigned prev_nodes, unsigned nodes, const Activation<Scalar>& act) :
 			prev_nodes(prev_nodes),
 			nodes(nodes),
-			prev_out(prev_nodes),
-			weights(prev_nodes + 1, nodes), // Bias trick.
-			weight_grads(prev_nodes + 1, nodes),
-			in(nodes),
-			out(nodes),
 			act(act) {
 		assert(prev_nodes > 0 && "prev_nodes must be greater than 0");
 		assert(nodes > 0 && "nodes must be greater than 0");
 	};
 	virtual ~Layer() = default;
-	unsigned get_prev_nodes() const {
+	// Clone pattern.
+	virtual Layer<Scalar>* clone() {
+		return new Layer(*this);
+	};
+	virtual unsigned get_prev_nodes() const {
 		return prev_nodes;
 	};
-	unsigned get_nodes() const {
+	virtual unsigned get_nodes() const {
 		return nodes;
 	};
-	virtual Vector<Scalar> feed_forward(Vector<Scalar> prev_out) {
+	virtual Matrix<Scalar>& get_weights() {
+		return weights;
+	};
+	virtual Matrix<Scalar>& get_weight_grads() {
+		return weight_grads;
+	};
+	virtual RowVector<Scalar> feed_forward(RowVector<Scalar> prev_out) {
 		assert((unsigned) prev_out.cols() == prev_nodes &&
 				"illegal input vector size for feed forward");
 		this->prev_out = std::move(prev_out);
+		int cols = this->prev_out.cols();
 		// Add a 1-column to the input for the bias trick.
-		Vector<Scalar> biased_prev_out(this->prev_out.size() + 1);
-		for (int i = 0; i < this->prev_out.cols(); i++) {
-			biased_prev_out(i) = this->prev_out(i);
-		}
-		biased_prev_out(this->prev_out.size()) = 1;
+		RowVector<Scalar> biased_prev_out(cols + 1);
+		biased_prev_out.leftCols(cols) = this->prev_out;
+		biased_prev_out(cols) = 1;
 		/* Compute the neuron inputs by multiplying the output of the
 		 * previous layer by the weights. */
 		in = biased_prev_out * weights;
@@ -72,12 +76,12 @@ public:
 		out = act.function(in);
 		return out;
 	};
-	virtual Vector<Scalar> feed_back(Vector<Scalar> out_grads) {
+	virtual RowVector<Scalar> feed_back(RowVector<Scalar> out_grads) {
 		assert((unsigned) out_grads.cols() == nodes &&
 				"illegal input vector size for feed back");
 		// Compute the gradients of the outputs with respect to the weighted inputs.
-		Vector<Scalar> in_grads = act.d_function(in, out).cwiseProduct(out_grads);
-		weight_grads = prev_out.transpose() * in_grads;
+		RowVector<Scalar> in_grads = act.d_function(in, out).cwiseProduct(out_grads);
+		weight_grads += prev_out.transpose() * in_grads;
 		/* Remove the bias column from the transposed weight matrix and compute the
 		 * out-gradients of the previous layer. */
 		return (in_grads * weights.transpose().block(0, 0, nodes, prev_nodes));
@@ -87,16 +91,12 @@ protected:
 	unsigned nodes;
 	/* Eigen matrices are backed by arrays allocated the heap, so these members do
 	 * not burden the stack. */
-	Vector<Scalar> prev_out;
+	RowVector<Scalar> prev_out;
 	Matrix<Scalar> weights;
 	Matrix<Scalar> weight_grads;
-	Vector<Scalar> in;
-	Vector<Scalar> out;
+	RowVector<Scalar> in;
+	RowVector<Scalar> out;
 	const Activation<Scalar>& act;
-	// Clone pattern.
-	virtual Layer<Scalar>* clone() {
-		return new Layer(*this);
-	};
 };
 
 } /* namespace cppnn */

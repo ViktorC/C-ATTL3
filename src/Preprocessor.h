@@ -18,9 +18,6 @@
 
 namespace cppnn {
 
-static const std::string* MISMTCHD_ROWS_ERR_MSG_PTR =
-		new std::string("mismatched fit and transform input matrix dimensions");
-
 template<typename Scalar>
 class Preprocessor {
 public:
@@ -36,76 +33,90 @@ public:
 		standardize(standardize) { };
 	virtual ~NormalizationPreprocessor() = default;
 	virtual void fit(const Matrix<Scalar>& data) {
-		means = data.rowwise().mean();
+		means = data.colwise().mean();
 		if (standardize) {
-			sd = (data.colwise() - means).square().rowwise().mean().sqrt();
+			sd = RowVector<Scalar>(means.cols());
+			for (int i = 0; i < sd.cols(); i++) {
+				sd(i) = sqrt((data.col(i).array() - means(i)).square().mean());
+			}
 		}
 	};
 	virtual void transform(Matrix<Scalar>& data) const {
-		assert(means.cols() == data.rows() && MISMTCHD_ROWS_ERR_MSG_PTR);
-		data = data.colwise() - means;
+		assert(means.cols() == data.cols() && "mismatched fit and transform "
+				"input matrix dimensions");
+		data = data.rowwise() - means;
 		if (standardize) {
-			for (int i = 0; sd.cols(); i++) {
-				data.row(i) = (data.row(i).array() - means(i)) / sd(i);
+			for (int i = 0; i < sd.cols(); i++) {
+				data.col(i) /= sd(i);
 			}
 		}
 	};
 protected:
 	bool standardize;
-	Vector<Scalar> means;
-	Vector<Scalar> sd;
+	RowVector<Scalar> means;
+	RowVector<Scalar> sd;
 };
 
 template<typename Scalar>
 class PCAPreprocessor : public NormalizationPreprocessor<Scalar> {
 public:
-	PCAPreprocessor(bool standardize, bool whiten, unsigned max_dims_to_retain) :
-			NormalizationPreprocessor(standardize),
+	PCAPreprocessor(bool standardize, bool whiten, float min_rel_var_to_retain) :
+			NormalizationPreprocessor<Scalar>::NormalizationPreprocessor(standardize),
 			whiten(whiten),
-			max_dims_to_retain(max_dims_to_retain) {
-		assert(dims_to_retain > 0 && "minimum 1 dimension must be retained");
+			min_rel_var_to_retain(min_rel_var_to_retain) {
+		assert(min_rel_var_to_retain > 0 && min_rel_var_to_retain <= 1 &&
+				"the minimum relative variance to be retained must be greater "
+				"then 0 and less than or equal to 1");
 	};
 	void fit(const Matrix<Scalar>& data) {
 		NormalizationPreprocessor<Scalar>::fit(data);
-		Matrix<Scalar> normalized_data = data.colwise() - mean;
-		if (standardize) {
-			for (int i = 0; sd.cols(); i++) {
-				normalized_data.row(i) /= sd(i);
+		Matrix<Scalar> normalized_data = data.rowwise() -
+				NormalizationPreprocessor<Scalar>::means;
+		if (NormalizationPreprocessor<Scalar>::standardize) {
+			for (int i = 0; i < NormalizationPreprocessor<Scalar>::sd.cols(); i++) {
+				normalized_data.row(i) /= NormalizationPreprocessor<Scalar>::sd(i);
 			}
 		}
 		// Compute the covariance matrix.
 		Matrix<Scalar> cov = normalized_data.transpose() * normalized_data /
 				normalized_data.rows();
 		// Eigen decomposition.
-		Eigen::SelfAdjointEigenSolver<Matrix<Scalar>> eig_solver(cov);
-		unsigned _dims_to_retain = std::min(data.rows(), max_dims_to_retain);
+		Eigen::SelfAdjointEigenSolver<Matrix<Scalar>> eigen_solver(cov);
+		// Determine the number of components to retain.
+		const ColVector<Scalar>& eigen_values = eigen_solver.eigenvalues();
+		const Scalar min_var_to_retain = eigen_values.sum() * min_rel_var_to_retain;
+		Scalar var = 0;
+		int dims_to_retain = 0;
+		for (; dims_to_retain < eigen_values.rows(); dims_to_retain++) {
+			if (var >= min_var_to_retain)
+				break;
+			// The eigen values are sorted in an ascending order.
+			var += eigen_values(eigen_values.rows() - (1 + dims_to_retain));
+		}
 		/* The eigen vectors are sorted based on the magnitude of their
 		 * corresponding eigen values. */
-		eigen_basis = eig_solver.eigenvectors().rightCols(_dims_to_retain);
+		eigen_basis = eigen_solver.eigenvectors().rightCols(dims_to_retain);
 		if (whiten) {
-
+			// The eigen values are only needed if whitening is enabled.
+			this->eigen_values = eigen_values.bottomRows(dims_to_retain).transpose();
 		}
 	};
 	void transform(Matrix<Scalar>& data) const {
 		NormalizationPreprocessor<Scalar>::transform(data);
 		data *= eigen_basis;
+		if (whiten) {
+			for (int i = 0; i < data.cols(); i++) {
+				// Add a small constant to avoid division by zero.
+				data.col(i) *= 1 / sqrt(eigen_values(i) + E);
+			}
+		}
 	};
 private:
+	static constexpr float E = 1e-5;
 	bool whiten;
-	int max_dims_to_retain;
+	float min_rel_var_to_retain;
 	Matrix<Scalar> eigen_basis;
-
-};
-
-template<typename Scalar>
-class WhiteningPreprocessor : public Preprocessor<Scalar> {
-public:
-	void fit(const Matrix<Scalar>& data) {
-
-	};
-	void transform(Matrix<Scalar>& data) const {
-
-	};
+	RowVector<Scalar> eigen_values;
 };
 
 } /* namespace cppnn */
