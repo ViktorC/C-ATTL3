@@ -133,19 +133,6 @@ public:
 			strm << "\t\tinit: " << layer->get_init().to_string() << std::endl;
 			strm << "\t\tactivation: " << layer->get_act().to_string() <<
 					std::endl;
-			strm << "\t\tweights:" << std::endl;
-			Matrix<Scalar>& weights = layer->get_weights();
-			for (int j = 0; j < weights.rows(); j++) {
-				strm << "\t\t[ ";
-				for (int k = 0; k < weights.cols(); k++) {
-					strm << std::setw(11) << std::setprecision(4) <<
-							weights(j,k);
-					if (k != weights.cols() - 1) {
-						strm << ", ";
-					}
-				}
-				strm << " ]" << std::endl;
-			}
 			if (layer->get_batch_norm()) {
 				RowVector<Scalar>& gammas = layer->get_gammas();
 				strm << "\t\tgammas:" << std::endl << "\t\t[ ";
@@ -185,6 +172,19 @@ public:
 					strm << std::setw(11) << std::setprecision(4) <<
 							moving_vars(j);
 					if (j != moving_vars.cols() - 1) {
+						strm << ", ";
+					}
+				}
+				strm << " ]" << std::endl;
+			}
+			strm << "\t\tweights:" << std::endl;
+			Matrix<Scalar>& weights = layer->get_weights();
+			for (int j = 0; j < weights.rows(); j++) {
+				strm << "\t\t[ ";
+				for (int k = 0; k < weights.cols(); k++) {
+					strm << std::setw(11) << std::setprecision(4) <<
+							weights(j,k);
+					if (k != weights.cols() - 1) {
 						strm << ", ";
 					}
 				}

@@ -22,12 +22,14 @@ template<typename Scalar>
 class Optimizer {
 public:
 	Optimizer(const Regularization<Scalar>& reg, const Loss<Scalar>& loss) :
-				loss(loss),
-				reg(reg) { };
+			reg(reg),
+			loss(loss) { };
 	virtual ~Optimizer() = default;
-	virtual void update_weights(NeuralNetwork<Scalar>& net, Scalar error) = 0;
 	virtual void train(NeuralNetwork<Scalar>& net, Matrix<Scalar>& x,
-			Matrix<Scalar>& y, unsigned epochs) = 0;
+			Matrix<Scalar>& y, unsigned epochs, unsigned batch_size) = 0;
+	virtual bool check_gradient(NeuralNetwork<Scalar>& net, Matrix<Scalar>& x,
+			Matrix<Scalar>& y, unsigned max_params_to_check, Scalar step_size,
+			Scalar max_rel_diff) const = 0;
 protected:
 	const Regularization<Scalar>& reg;
 	const Loss<Scalar>& loss;
@@ -40,10 +42,6 @@ public:
 				Optimizer(reg, loss) {
 
 	};
-	virtual ~SGDOptimizer();
-	virtual void update_weights(NeuralNetwork<Scalar>& net, Scalar error);
-	virtual void train(NeuralNetwork<Scalar>& net, Matrix<Scalar>& x,
-				Matrix<Scalar>& y, unsigned epochs);
 };
 
 template<typename Scalar>
@@ -53,10 +51,6 @@ public:
 				Optimizer(reg, loss) {
 
 	};
-	virtual ~NadamOptimizer();
-	virtual void update_weights(NeuralNetwork<Scalar>& net, Scalar error);
-	virtual void train(NeuralNetwork<Scalar>& net, Matrix<Scalar>& x,
-					Matrix<Scalar>& y, unsigned epochs);
 };
 
 } /* namespace cppnn */

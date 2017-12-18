@@ -26,43 +26,39 @@ public:
 template<typename Scalar>
 class NDRandInitialization : public Initialization<Scalar> {
 public:
-	NDRandInitialization(Scalar center, Scalar sd, Scalar bias_value) :
-			center(center),
-			sd(sd),
+	NDRandInitialization(Scalar bias_value) :
 			bias_value(bias_value) { };
 	virtual ~NDRandInitialization() = default;
 	virtual void init(Matrix<Scalar>& weights) const {
-		std::default_random_engine gen;
-		std::normal_distribution<Scalar> dist(center, sd);
 		int rows = weights.rows();
-		Scalar r_factor = range_factor(rows -  1);
+		std::default_random_engine gen;
+		std::normal_distribution<Scalar> dist(0, sd(rows -  1));
 		for (int i = 0; i < rows; i++) {
 			if (i == rows - 1) { // Bias row.
 				weights.row(i).setConstant(bias_value);
 			} else {
 				for (int j = 0; j < weights.cols(); j++) {
-					weights(i,j) = dist(gen) * r_factor;
+					weights(i,j) = dist(gen);
 				}
 			}
 		}
 	};
 protected:
-	Scalar center;
-	Scalar sd;
 	Scalar bias_value;
-	virtual Scalar range_factor(int inputs) const = 0;
+	virtual Scalar sd(int inputs) const = 0;
 };
 
 template<typename Scalar>
-class StandardInitialization : public NDRandInitialization<Scalar> {
+class XavierInitialization : public NDRandInitialization<Scalar> {
 public:
-	StandardInitialization() :
-		NDRandInitialization<Scalar>::NDRandInitialization(0, .33, 0) { };
+	XavierInitialization(Scalar bias_value = 0) :
+		NDRandInitialization<Scalar>::NDRandInitialization(bias_value) { };
 	std::string to_string() const {
-		return "standard ND; center: .0; sd: 0.33; bias: .0";
+		return "xavier ND; bias: " + std::to_string(
+				NDRandInitialization<Scalar>::bias_value);
 	};
 protected:
-	Scalar range_factor(int inputs) const {
+	Scalar sd(int inputs) const {
 		return 1 / sqrt(inputs);
 	};
 };
@@ -70,13 +66,14 @@ protected:
 template<typename Scalar>
 class ReLUInitialization : public NDRandInitialization<Scalar> {
 public:
-	ReLUInitialization() :
-		NDRandInitialization<Scalar>::NDRandInitialization(0, .33, 0) { };
+	ReLUInitialization(Scalar bias_value = 0) :
+		NDRandInitialization<Scalar>::NDRandInitialization(bias_value) { };
 	std::string to_string() const {
-		return "relu ND; center: .0; sd: 0.33; bias: .0";
+		return "relu ND; bias: " + std::to_string(
+				NDRandInitialization<Scalar>::bias_value);
 	};
 protected:
-	Scalar range_factor(int inputs) const {
+	Scalar sd(int inputs) const {
 		return sqrt(2 / inputs);
 	};
 };
