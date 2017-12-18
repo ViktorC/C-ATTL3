@@ -29,15 +29,20 @@ public:
 template<typename Scalar>
 class NormalizationPreprocessor : public Preprocessor<Scalar> {
 public:
-	NormalizationPreprocessor(bool standardize) :
-		standardize(standardize) { };
+	NormalizationPreprocessor(bool standardize = false,
+			Scalar epsilon = EPSILON) :
+				standardize(standardize),
+				epsilon(epsilon) {
+		assert(epsilon > 0 && "epsilon must be greater than 0");
+	};
 	virtual ~NormalizationPreprocessor() = default;
 	virtual void fit(const Matrix<Scalar>& data) {
 		means = data.colwise().mean();
 		if (standardize) {
 			sd = RowVector<Scalar>(means.cols());
 			for (int i = 0; i < sd.cols(); i++) {
-				sd(i) = sqrt((data.col(i).array() - means(i)).square().mean());
+				sd(i) = sqrt((data.col(i).array() - means(i)).square().mean() +
+						epsilon);
 			}
 		}
 	};
@@ -52,7 +57,9 @@ public:
 		}
 	};
 protected:
+	static constexpr Scalar EPSILON = 1e-5;
 	bool standardize;
+	float epsilon;
 	RowVector<Scalar> means;
 	RowVector<Scalar> sd;
 };
@@ -60,10 +67,13 @@ protected:
 template<typename Scalar>
 class PCAPreprocessor : public NormalizationPreprocessor<Scalar> {
 public:
-	PCAPreprocessor(bool standardize, bool whiten, float min_rel_var_to_retain) :
-			NormalizationPreprocessor<Scalar>::NormalizationPreprocessor(standardize),
-			whiten(whiten),
-			min_rel_var_to_retain(min_rel_var_to_retain) {
+	PCAPreprocessor(bool standardize = false, bool whiten = false,
+			float min_rel_var_to_retain = 1,
+			Scalar epsilon = NormalizationPreprocessor<Scalar>::EPSILON) :
+				NormalizationPreprocessor<Scalar>::NormalizationPreprocessor(
+						standardize, epsilon),
+				whiten(whiten),
+				min_rel_var_to_retain(min_rel_var_to_retain) {
 		assert(min_rel_var_to_retain > 0 && min_rel_var_to_retain <= 1 &&
 				"the minimum relative variance to be retained must be greater "
 				"then 0 and less than or equal to 1");
@@ -107,12 +117,12 @@ public:
 		if (whiten) {
 			for (int i = 0; i < data.cols(); i++) {
 				// Add a small constant to avoid division by zero.
-				data.col(i) *= 1 / sqrt(eigen_values(i) + E);
+				data.col(i) *= 1 / sqrt(eigen_values(i) +
+						NormalizationPreprocessor<Scalar>::epsilon);
 			}
 		}
 	};
 private:
-	static constexpr float E = 1e-5;
 	bool whiten;
 	float min_rel_var_to_retain;
 	Matrix<Scalar> eigen_basis;

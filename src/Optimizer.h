@@ -10,7 +10,6 @@
 
 #include <algorithm>
 #include <cmath>
-#include <Initialization.h>
 #include <Loss.h>
 #include <Matrix.h>
 #include <NeuralNetwork.h>
@@ -22,24 +21,14 @@ namespace cppnn {
 template<typename Scalar>
 class Optimizer {
 public:
-	Optimizer(const Initialization<Scalar>& init, const Regularization<Scalar>& reg,
-			const Loss<Scalar>& loss) :
-				init(init),
+	Optimizer(const Regularization<Scalar>& reg, const Loss<Scalar>& loss) :
 				loss(loss),
 				reg(reg) { };
 	virtual ~Optimizer() = default;
-	virtual void init_weights(NeuralNetwork<Scalar>& net) {
-		std::default_random_engine gen;
-		for (unsigned i = 0; i < net.layers.size(); i++) {
-			Matrix<Scalar>& weights = net.layers[i].weights;
-			init.init(weights);
-		}
-	};
 	virtual void update_weights(NeuralNetwork<Scalar>& net, Scalar error) = 0;
 	virtual void train(NeuralNetwork<Scalar>& net, Matrix<Scalar>& x,
 			Matrix<Scalar>& y, unsigned epochs) = 0;
 protected:
-	const Initialization<Scalar>& init;
 	const Regularization<Scalar>& reg;
 	const Loss<Scalar>& loss;
 };
@@ -47,9 +36,8 @@ protected:
 template<typename Scalar>
 class SGDOptimizer : public Optimizer<Scalar> {
 public:
-	SGDOptimizer(const Initialization<Scalar>& init, const Regularization<Scalar>& reg,
-			const Loss<Scalar>& loss) :
-				Optimizer(init, reg, loss) {
+	SGDOptimizer(const Regularization<Scalar>& reg, const Loss<Scalar>& loss) :
+				Optimizer(reg, loss) {
 
 	};
 	virtual ~SGDOptimizer();
@@ -61,9 +49,8 @@ public:
 template<typename Scalar>
 class NadamOptimizer : public Optimizer<Scalar> {
 public:
-	NadamOptimizer(const Initialization<Scalar>& init, const Regularization<Scalar>& reg,
-			const Loss<Scalar>& loss) :
-				Optimizer(init, reg, loss) {
+	NadamOptimizer(const Regularization<Scalar>& reg, const Loss<Scalar>& loss) :
+				Optimizer(reg, loss) {
 
 	};
 	virtual ~NadamOptimizer();

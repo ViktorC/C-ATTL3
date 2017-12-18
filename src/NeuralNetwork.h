@@ -8,9 +8,10 @@
 #ifndef NEURALNETWORK_H_
 #define NEURALNETWORK_H_
 
+#include <Layer.h>
 #include <cassert>
 #include <iomanip>
-#include <Layer.h>
+#include <Matrix.h>
 #include <sstream>
 #include <string>
 #include <vector>
@@ -46,19 +47,24 @@ public:
 	 * pointers directly preceding them in the vector.
 	 */
 	NeuralNetwork(std::vector<Layer<Scalar>*> layers) :
-			layers(layers) {
+			layers(layers),
+			batch_size(0) {
 		assert(layers.size() > 0 && "layers must contain at least 1 element");
-		unsigned input_size = layers[0]->nodes;
+		unsigned input_size = layers[0]->get_nodes();
 		for (unsigned i = 1; i < layers.size(); i++) {
 			assert(layers[i] != nullptr && "layers contains null pointers");
-			assert(input_size == layers[i]->prev_nodes &&
+			assert(input_size == layers[i]->get_prev_nodes() &&
 					"incompatible layer dimensions");
-			input_size = layers[i]->nodes;
+			input_size = layers[i]->get_nodes();
+		}
+		for (unsigned i = 0; i < layers.size(); i++) {
+			layers[i]->init_params();
 		}
 	};
 	// Copy constructor.
 	NeuralNetwork(const NeuralNetwork<Scalar>& network) :
-			layers(network.layers.size()) {
+			layers(network.layers.size()),
+			batch_size(network.batch_size) {
 		for (unsigned i = 0; i < layers.size(); i++) {
 			layers[i] = network.layers[i]->clone();
 		}
@@ -84,18 +90,25 @@ public:
 			NeuralNetwork<Scalar>& network2) {
 		using std::swap;
 		swap(network1.layers, network2.layers);
+		swap(network1.batch_size, network2.batch_size);
 	};
-	virtual RowVector<Scalar> feed_forward(RowVector<Scalar> input) {
-		assert(layers[0]->prev_nodes == (unsigned) input.cols() &&
+	virtual Matrix<Scalar> feed_forward(Matrix<Scalar> input) {
+		assert(layers[0]->get_prev_nodes() == (unsigned) input.cols() &&
 				"wrong neural network input size");
+		assert(input.rows() >= 0 && input.cols() >= 0 && "empty feed"
+				"forward input");
+		batch_size = input.rows();
 		for (unsigned i = 0; i < layers.size(); i++) {
-			input = layers[i]->feed_forward(input);
+			input = layers[i]->feed_forward(input, true);
 		}
 		return input;
 	};
-	virtual void feed_back(RowVector<Scalar> out_grads) {
-		assert(layers[layers.size() - 1]->nodes == (unsigned)out_grads.cols() &&
-				"wrong neural network output gradient size");
+	virtual void feed_back(Matrix<Scalar> out_grads) {
+		assert(layers[layers.size() - 1]->get_nodes() == (unsigned)
+				out_grads.cols() && "wrong neural network output "
+				"gradient size");
+		assert(batch_size == out_grads.rows() && "feed back batch "
+				"size incompatible with feed forward batch size");
 		for (int i = layers.size() - 1; i >= 0; i--) {
 			out_grads = layers[i]->feed_back(out_grads);
 		}
@@ -104,9 +117,24 @@ public:
 		std::stringstream strm;
 		strm << "Neural Net " << this << std::endl;
 		for (unsigned i = 0; i < layers.size(); i++) {
+			Layer<Scalar>* layer = layers[i];
 			strm << "\tLayer " << std::setw(2) << std::to_string(i + 1) <<
 					"----------------------------" << std::endl;
-			Matrix<Scalar>& weights = layers[i]->weights;
+			strm << "\t\tprev nodes: " << layer->get_prev_nodes() << std::endl;
+			strm << "\t\tnodes: " << layer->get_nodes() << std::endl;
+			strm << "\t\tdropout: " << std::to_string(layer->get_dropout()) <<
+					std::endl;
+			strm << "\t\tbatch norm: " << std::to_string(layer->get_batch_norm())
+					<< std::endl;
+			if (layer->get_batch_norm()) {
+				strm << "\t\tnorm stats momentum: " << std::to_string(
+						layer->get_norm_stats_momentum()) << std::endl;
+			}
+			strm << "\t\tinit: " << layer->get_init().to_string() << std::endl;
+			strm << "\t\tactivation: " << layer->get_act().to_string() <<
+					std::endl;
+			strm << "\t\tweights:" << std::endl;
+			Matrix<Scalar>& weights = layer->get_weights();
 			for (int j = 0; j < weights.rows(); j++) {
 				strm << "\t\t[ ";
 				for (int k = 0; k < weights.cols(); k++) {
@@ -118,11 +146,56 @@ public:
 				}
 				strm << " ]" << std::endl;
 			}
+			if (layer->get_batch_norm()) {
+				RowVector<Scalar>& gammas = layer->get_gammas();
+				strm << "\t\tgammas:" << std::endl << "\t\t[ ";
+				for (int j = 0; j < gammas.cols(); j++) {
+					strm << std::setw(11) << std::setprecision(4) <<
+							gammas(j);
+					if (j != gammas.cols() - 1) {
+						strm << ", ";
+					}
+				}
+				strm << " ]" << std::endl;
+				RowVector<Scalar>& betas = layer->get_betas();
+				strm << "\t\tbetas:" << std::endl << "\t\t[ ";
+				for (int j = 0; j < betas.cols(); j++) {
+					strm << std::setw(11) << std::setprecision(4) <<
+							betas(j);
+					if (j != betas.cols() - 1) {
+						strm << ", ";
+					}
+				}
+				strm << " ]" << std::endl;
+				const RowVector<Scalar>& moving_means =
+						layer->get_moving_means();
+				strm << "\t\tmoving means:" << std::endl << "\t\t[ ";
+				for (int j = 0; j < moving_means.cols(); j++) {
+					strm << std::setw(11) << std::setprecision(4) <<
+							moving_means(j);
+					if (j != moving_means.cols() - 1) {
+						strm << ", ";
+					}
+				}
+				strm << " ]" << std::endl;
+				const RowVector<Scalar>& moving_vars =
+						layer->get_moving_vars();
+				strm << "\t\tmoving vars:" << std::endl << "\t\t[ ";
+				for (int j = 0; j < moving_vars.cols(); j++) {
+					strm << std::setw(11) << std::setprecision(4) <<
+							moving_vars(j);
+					if (j != moving_vars.cols() - 1) {
+						strm << ", ";
+					}
+				}
+				strm << " ]" << std::endl;
+			}
 		}
 		return strm.str();
 	};
 protected:
 	std::vector<Layer<Scalar>*> layers;
+	int batch_size;
 };
 
 } /* namespace cppnn */
