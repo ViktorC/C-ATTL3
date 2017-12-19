@@ -44,19 +44,21 @@ public:
 protected:
 	/* Only expose methods that allow for the modification of the
 	 * layer's state to friends and sub-classes. */
+	virtual void init_dynamic_params() = 0;
+	virtual void set_batch_norm(bool on) = 0;
+	virtual void set_dropout(Scalar dropout) = 0;
+	virtual void set_norm_stats_momentum(Scalar norm_stats_momentum) = 0;
 	virtual Matrix<Scalar>& get_weights() = 0;
-	virtual const Matrix<Scalar>& get_weight_grads() const = 0;
+	virtual Matrix<Scalar>& get_weight_grads() = 0;
 	// Batch normalization parameters.
 	virtual RowVector<Scalar>& get_betas() = 0;
-	virtual const RowVector<Scalar>& get_beta_grads() const = 0;
+	virtual RowVector<Scalar>& get_beta_grads() = 0;
 	virtual RowVector<Scalar>& get_gammas() = 0;
-	virtual const RowVector<Scalar>& get_gamma_grads() const = 0;
-	virtual const RowVector<Scalar>& get_moving_means() const = 0;
-	virtual const RowVector<Scalar>& get_moving_vars() const = 0;
-	virtual void init_params() = 0;
-	virtual Matrix<Scalar> feed_forward(Matrix<Scalar> prev_out,
-			bool training) = 0;
-	virtual Matrix<Scalar> feed_back(Matrix<Scalar> out_grads) = 0;
+	virtual RowVector<Scalar>& get_gamma_grads() = 0;
+	virtual RowVector<Scalar>& get_moving_means() = 0;
+	virtual RowVector<Scalar>& get_moving_vars() = 0;
+	virtual Matrix<Scalar> pass_forward(Matrix<Scalar> prev_out, bool training) = 0;
+	virtual Matrix<Scalar> pass_back(Matrix<Scalar> out_grads) = 0;
 };
 
 /**
@@ -71,9 +73,8 @@ template<typename Scalar>
 class FCLayer : public Layer<Scalar> {
 public:
 	FCLayer(unsigned prev_nodes, unsigned nodes, const Activation<Scalar>& act,
-			const Initialization<Scalar>& init, bool batch_norm = true,
-			Scalar dropout = .5, Scalar norm_stats_momentum = .9,
-			Scalar epsilon = EPSILON) :
+			const Initialization<Scalar>& init, bool batch_norm = true, Scalar dropout = .5,
+			Scalar norm_stats_momentum = .9, Scalar epsilon = EPSILON) :
 				prev_nodes(prev_nodes),
 				nodes(nodes),
 				act(act),
@@ -124,6 +125,15 @@ public:
 		return init;
 	};
 protected:
+	void set_batch_norm(bool on) {
+		batch_norm = on;
+	};
+	void set_dropout(Scalar dropout) {
+		this->dropout = dropout;
+	};
+	void set_norm_stats_momentum(Scalar norm_stats_momentum) {
+		this->norm_stats_momentum = norm_stats_momentum;
+	};
 	Matrix<Scalar>& get_weights() {
 		return weights;
 	};
@@ -149,7 +159,7 @@ protected:
 	const RowVector<Scalar>& get_moving_vars() const {
 		return moving_vars;
 	};
-	void init_params() {
+	void init_dynamic_params() {
 		init.init(weights);
 		if (batch_norm) {
 			betas.setZero(betas.cols());
@@ -159,7 +169,7 @@ protected:
 		moving_vars.setZero(moving_vars.cols());
 		moving_means_init = false;
 	};
-	Matrix<Scalar> feed_forward(Matrix<Scalar> prev_out,
+	Matrix<Scalar> pass_forward(Matrix<Scalar> prev_out,
 			bool training) {
 		assert((unsigned) prev_out.cols() == prev_nodes &&
 				"illegal input matrix size for feed forward");
@@ -208,7 +218,7 @@ protected:
 		out = act.function(in);
 		return out;
 	};
-	Matrix<Scalar> feed_back(Matrix<Scalar> out_grads) {
+	Matrix<Scalar> pass_back(Matrix<Scalar> out_grads) {
 		assert((unsigned) out_grads.cols() == nodes &&
 				out_grads.rows() == out.rows() &&
 				"illegal input matrix size for feed back");

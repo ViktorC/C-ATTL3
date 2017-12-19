@@ -80,40 +80,15 @@ public:
 		return *this;
 	};
 	// Take ownership of layer pointers.
-	virtual ~NeuralNetwork() {
+	~NeuralNetwork() {
 		for (unsigned i = 0; i < layers.size(); i++) {
 			delete layers[i];
 		}
 	};
-	// For the copy-and-swap idiom.
-	friend void swap(NeuralNetwork<Scalar>& network1,
-			NeuralNetwork<Scalar>& network2) {
-		using std::swap;
-		swap(network1.layers, network2.layers);
-		swap(network1.batch_size, network2.batch_size);
+	Matrix<Scalar> infer(Matrix<Scalar> input) {
+		return feed_forward(input, false);
 	};
-	virtual Matrix<Scalar> feed_forward(Matrix<Scalar> input) {
-		assert(layers[0]->get_prev_nodes() == (unsigned) input.cols() &&
-				"wrong neural network input size");
-		assert(input.rows() >= 0 && input.cols() >= 0 && "empty feed"
-				"forward input");
-		batch_size = input.rows();
-		for (unsigned i = 0; i < layers.size(); i++) {
-			input = layers[i]->feed_forward(input, true);
-		}
-		return input;
-	};
-	virtual void feed_back(Matrix<Scalar> out_grads) {
-		assert(layers[layers.size() - 1]->get_nodes() == (unsigned)
-				out_grads.cols() && "wrong neural network output "
-				"gradient size");
-		assert(batch_size == out_grads.rows() && "feed back batch "
-				"size incompatible with feed forward batch size");
-		for (int i = layers.size() - 1; i >= 0; i--) {
-			out_grads = layers[i]->feed_back(out_grads);
-		}
-	};
-	virtual std::string to_string() {
+	std::string to_string() {
 		std::stringstream strm;
 		strm << "Neural Net " << this << std::endl;
 		for (unsigned i = 0; i < layers.size(); i++) {
@@ -194,6 +169,34 @@ public:
 		return strm.str();
 	};
 protected:
+	// For the copy-and-swap idiom.
+	friend void swap(NeuralNetwork<Scalar>& network1,
+			NeuralNetwork<Scalar>& network2) {
+		using std::swap;
+		swap(network1.layers, network2.layers);
+		swap(network1.batch_size, network2.batch_size);
+	};
+	Matrix<Scalar> feed_forward(Matrix<Scalar> input, bool train) {
+		assert(layers[0]->get_prev_nodes() == (unsigned) input.cols() &&
+				"wrong neural network input size");
+		assert(input.rows() >= 0 && input.cols() >= 0 && "empty feed"
+				"forward input");
+		batch_size = input.rows();
+		for (unsigned i = 0; i < layers.size(); i++) {
+			input = layers[i]->feed_forward(input, true);
+		}
+		return input;
+	};
+	void backpropagate(Matrix<Scalar> out_grads) {
+		assert(layers[layers.size() - 1]->get_nodes() == (unsigned)
+				out_grads.cols() && "wrong neural network output "
+				"gradient size");
+		assert(batch_size == out_grads.rows() && "feed back batch "
+				"size incompatible with feed forward batch size");
+		for (int i = layers.size() - 1; i >= 0; i--) {
+			out_grads = layers[i]->feed_back(out_grads);
+		}
+	};
 	std::vector<Layer<Scalar>*> layers;
 	int batch_size;
 };
