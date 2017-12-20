@@ -11,6 +11,7 @@
 #include <cassert>
 #include <Eigen/Dense>
 #include <Matrix.h>
+#include <NumericalUtils.h>
 #include <string>
 #include <Vector.h>
 
@@ -50,8 +51,7 @@ template<typename Scalar>
 class BinaryStepActivation : public Activation<Scalar> {
 public:
 	Matrix<Scalar> function(Matrix<Scalar>& x) const {
-		Matrix<bool> bool_matrix = (x.array() > .0);
-		return bool_matrix.cast<Scalar>();
+		return x.unaryExpr([](Scalar i) { return (Scalar) greater(i, 0); });
 	};
 	Matrix<Scalar> d_function(Matrix<Scalar>& x,
 			Matrix<Scalar>& y) const {
@@ -149,8 +149,7 @@ public:
 			Matrix<Scalar>& y) const {
 		assert(x.rows() == y.rows() && x.cols() == y.cols() &&
 				&VEC_SIZE_ERR_MSG_PTR);
-		Matrix<bool> bool_matrix = (x.array() > .0);
-		return bool_matrix.cast<Scalar>();
+		return x.unaryExpr([](Scalar i) { return (Scalar) greater(i, 0); });
 	};
 	std::string to_string() const {
 		return "relu";
@@ -172,8 +171,8 @@ public:
 			Matrix<Scalar>& y) const {
 		assert(x.rows() == y.rows() && x.cols() == y.cols() &&
 				&VEC_SIZE_ERR_MSG_PTR);
-		return x.unaryExpr([this](Scalar i) { return i > .0 ? 1 :
-				i == .0 ? .0 : alpha; });
+		return x.unaryExpr([this](Scalar i) { return (Scalar) (greater(i, 0) ? 1 :
+				almost_equal(i, 0) ? 0 : alpha); });
 	};
 	std::string to_string() const {
 		return "leaky relu; alpha: " + std::to_string(alpha);

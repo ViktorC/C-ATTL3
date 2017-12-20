@@ -70,8 +70,7 @@ public:
 	PCAPreprocessor(bool standardize = false, bool whiten = false,
 			float min_rel_var_to_retain = 1,
 			Scalar epsilon = NormalizationPreprocessor<Scalar>::EPSILON) :
-				NormalizationPreprocessor<Scalar>::NormalizationPreprocessor(
-						standardize, epsilon),
+				NormalizationPreprocessor<Scalar>::NormalizationPreprocessor(standardize, epsilon),
 				whiten(whiten),
 				min_rel_var_to_retain(min_rel_var_to_retain) {
 		assert(min_rel_var_to_retain > 0 && min_rel_var_to_retain <= 1 &&

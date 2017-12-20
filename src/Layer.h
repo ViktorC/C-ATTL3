@@ -14,6 +14,7 @@
 #include <cmath>
 #include <Initialization.h>
 #include <Matrix.h>
+#include <NumericalUtils.h>
 #include <string>
 #include <utility>
 #include <Vector.h>
@@ -50,7 +51,6 @@ protected:
 	virtual void set_norm_stats_momentum(Scalar norm_stats_momentum) = 0;
 	virtual Matrix<Scalar>& get_weights() = 0;
 	virtual Matrix<Scalar>& get_weight_grads() = 0;
-	// Batch normalization parameters.
 	virtual RowVector<Scalar>& get_betas() = 0;
 	virtual RowVector<Scalar>& get_beta_grads() = 0;
 	virtual RowVector<Scalar>& get_gammas() = 0;
@@ -126,6 +126,22 @@ public:
 		return init;
 	};
 protected:
+	void reset() {
+		init.init(weights);
+		if (batch_norm) {
+			betas.setZero(betas.cols());
+			gammas.setOnes(gammas.cols());
+		}
+		moving_means.setZero(moving_means.cols());
+		moving_vars.setZero(moving_vars.cols());
+		moving_means_init = false;
+		// Empty the caches.
+		std_prev_out_factor = RowVector<Scalar>(0);
+		centered_prev_out = Matrix<Scalar>(0, 0);
+		biased_prev_out = Matrix<Scalar>(0, 0);
+		in = Matrix<Scalar>(0, 0);
+		out = Matrix<Scalar>(0, 0);
+	};
 	void set_batch_norm(bool on) {
 		batch_norm = on;
 	};
@@ -160,22 +176,6 @@ protected:
 	RowVector<Scalar>& get_moving_vars() {
 		return moving_vars;
 	};
-	void reset() {
-		init.init(weights);
-		if (batch_norm) {
-			betas.setZero(betas.cols());
-			gammas.setOnes(gammas.cols());
-		}
-		moving_means.setZero(moving_means.cols());
-		moving_vars.setZero(moving_vars.cols());
-		moving_means_init = false;
-		// Empty the caches.
-		centered_prev_out = Matrix<Scalar>(0, 0);
-		std_prev_out_factor = RowVector<Scalar>(0);
-		biased_prev_out = Matrix<Scalar>(0, 0);
-		in = Matrix<Scalar>(0, 0);
-		out = Matrix<Scalar>(0, 0);
-	};
 	Matrix<Scalar> pass_forward(Matrix<Scalar> prev_out,
 			bool training) {
 		assert((unsigned) prev_out.cols() == prev_nodes &&
@@ -206,11 +206,13 @@ protected:
 			prev_out = (prev_out * gammas.asDiagonal()).rowwise() + betas;
 		}
 		// Dropout.
-		if (dropout > 0) {
+		if (greater(dropout, 0)) {
 			Matrix<Scalar> dropout_mask;
 			dropout_mask.setRandom(prev_out.rows(), prev_out.cols());
 			dropout_mask = (dropout_mask.array() + 1) / 2;
-			dropout_mask = dropout_mask.unaryExpr([this](Scalar i) { return i >= dropout ? 1 : .0; });
+			dropout_mask = dropout_mask.unaryExpr([this](Scalar i) {
+				return (Scalar) (greater(i, dropout) ? 1 : 0);
+			});
 			dropout_mask /= std::max(1 - dropout, EPSILON);
 			prev_out = prev_out.cwiseProduct(dropout_mask);
 		}
@@ -268,18 +270,20 @@ protected:
 	 * members do not burden the stack. */
 	Matrix<Scalar> weights;
 	Matrix<Scalar> weight_grads;
+	// Dynamic batch normalization parameters.
 	RowVector<Scalar> betas;
 	RowVector<Scalar> beta_grads;
 	RowVector<Scalar> gammas;
 	RowVector<Scalar> gamma_grads;
 	RowVector<Scalar> moving_means;
 	RowVector<Scalar> moving_vars;
-	Matrix<Scalar> centered_prev_out;
+	bool moving_means_init;
+	// Staged computation caches
 	RowVector<Scalar> std_prev_out_factor;
+	Matrix<Scalar> centered_prev_out;
 	Matrix<Scalar> biased_prev_out;
 	Matrix<Scalar> in;
 	Matrix<Scalar> out;
-	bool moving_means_init;
 };
 
 } /* namespace cppnn */

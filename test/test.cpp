@@ -47,7 +47,7 @@ int main() {
 	layers[1] = layer2;
 	cppnn::NeuralNetwork<double> nn(layers);
 	std::cout << nn.to_string() << std::endl << std::endl;
-	cppnn::Matrix<double> out = nn.feed_forward(data);
+	cppnn::Matrix<double> out = nn.infer(data);
 	std::cout << out << std::endl;
 //	cppnn::QuadraticLoss<double> loss;
 	cppnn::Matrix<double> obj(4, 2);
@@ -60,6 +60,6 @@ int main() {
 	obj(3,0) = 0.75;
 	obj(3,1) = 0.25;
 //	std::cout << loss.function(out, obj) << std::endl;
-	nn.feed_back(obj);
+	nn.backpropagate(obj);
 	return 0;
 }

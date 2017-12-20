@@ -20,7 +20,6 @@ class Initialization {
 public:
 	virtual ~Initialization() = default;
 	virtual void init(Matrix<Scalar>& weights) const = 0;
-	virtual std::string to_string() const = 0;
 };
 
 template<typename Scalar>
@@ -53,10 +52,6 @@ class XavierInitialization : public NDRandInitialization<Scalar> {
 public:
 	XavierInitialization(Scalar bias_value = 0) :
 		NDRandInitialization<Scalar>::NDRandInitialization(bias_value) { };
-	std::string to_string() const {
-		return "xavier ND; bias: " + std::to_string(
-				NDRandInitialization<Scalar>::bias_value);
-	};
 protected:
 	Scalar sd(int inputs) const {
 		return 1 / sqrt(inputs);
@@ -68,10 +63,6 @@ class ReLUInitialization : public NDRandInitialization<Scalar> {
 public:
 	ReLUInitialization(Scalar bias_value = 0) :
 		NDRandInitialization<Scalar>::NDRandInitialization(bias_value) { };
-	std::string to_string() const {
-		return "relu ND; bias: " + std::to_string(
-				NDRandInitialization<Scalar>::bias_value);
-	};
 protected:
 	Scalar sd(int inputs) const {
 		return sqrt(2 / inputs);
