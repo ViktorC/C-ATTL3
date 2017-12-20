@@ -17,8 +17,7 @@
 // TODO Address numerical stability issues.
 namespace cppnn {
 
-static std::string* VEC_SIZE_ERR_MSG_PTR =
-		new std::string("mismatched x and y vector lengths for derivation");
+static std::string VEC_SIZE_ERR_MSG_PTR = "mismatched x and y vector lengths for derivation";
 
 template<typename Scalar>
 class Activation {
@@ -39,7 +38,7 @@ public:
 	Matrix<Scalar> d_function(Matrix<Scalar>& x,
 			Matrix<Scalar>& y) const {
 		assert(x.rows() == y.rows() && x.cols() == y.cols() &&
-				VEC_SIZE_ERR_MSG_PTR);
+				&VEC_SIZE_ERR_MSG_PTR);
 		return Matrix<Scalar>::Ones(x.rows(), x.cols());
 	};
 	std::string to_string() const {
@@ -57,7 +56,7 @@ public:
 	Matrix<Scalar> d_function(Matrix<Scalar>& x,
 			Matrix<Scalar>& y) const {
 		assert(x.rows() == y.rows() && x.cols() == y.cols() &&
-				VEC_SIZE_ERR_MSG_PTR);
+				&VEC_SIZE_ERR_MSG_PTR);
 		return Matrix<Scalar>::Zero(x.rows(), x.cols());
 	};
 	std::string to_string() const {
@@ -75,7 +74,7 @@ public:
 	Matrix<Scalar> d_function(Matrix<Scalar>& x,
 			Matrix<Scalar>& y) const {
 		assert(x.rows() == y.rows() && x.cols() == y.cols() &&
-				VEC_SIZE_ERR_MSG_PTR);
+				&VEC_SIZE_ERR_MSG_PTR);
 		return y.cwiseProduct(Matrix<Scalar>::Ones(y.rows(),
 				y.cols()) - y);
 	};
@@ -99,7 +98,7 @@ public:
 	Matrix<Scalar> d_function(Matrix<Scalar>& x,
 			Matrix<Scalar>& y) const {
 		assert(x.rows() == y.rows() && x.cols() == y.cols() &&
-				VEC_SIZE_ERR_MSG_PTR);
+				&VEC_SIZE_ERR_MSG_PTR);
 		// TODO Vectorize the computation of the Jacobian.
 		Matrix<Scalar> out(y.rows(), y.cols());
 		for (int i = 0; i < y.rows(); i++) {
@@ -132,7 +131,7 @@ public:
 	Matrix<Scalar> d_function(Matrix<Scalar>& x,
 			Matrix<Scalar>& y) const {
 		assert(x.rows() == y.rows() && x.cols() == y.cols() &&
-				VEC_SIZE_ERR_MSG_PTR);
+				&VEC_SIZE_ERR_MSG_PTR);
 		return Matrix<Scalar>::Ones(y.rows(), y.cols()) - y.cwiseProduct(y);
 	};
 	std::string to_string() const {
@@ -149,7 +148,7 @@ public:
 	Matrix<Scalar> d_function(Matrix<Scalar>& x,
 			Matrix<Scalar>& y) const {
 		assert(x.rows() == y.rows() && x.cols() == y.cols() &&
-				VEC_SIZE_ERR_MSG_PTR);
+				&VEC_SIZE_ERR_MSG_PTR);
 		Matrix<bool> bool_matrix = (x.array() > .0);
 		return bool_matrix.cast<Scalar>();
 	};
@@ -172,7 +171,7 @@ public:
 	Matrix<Scalar> d_function(Matrix<Scalar>& x,
 			Matrix<Scalar>& y) const {
 		assert(x.rows() == y.rows() && x.cols() == y.cols() &&
-				VEC_SIZE_ERR_MSG_PTR);
+				&VEC_SIZE_ERR_MSG_PTR);
 		return x.unaryExpr([this](Scalar i) { return i > .0 ? 1 :
 				i == .0 ? .0 : alpha; });
 	};

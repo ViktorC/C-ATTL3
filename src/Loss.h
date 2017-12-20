@@ -10,9 +10,12 @@
 
 #include <cassert>
 #include <Matrix.h>
+#include <string>
 #include <Vector.h>
 
 namespace cppnn {
+
+static const std::string INCOMPATIBLE_DIM_ERR_MSG = "incompatible out and object matrix dimensions";
 
 template<typename Scalar>
 class Loss {
@@ -27,8 +30,9 @@ class QuadraticLoss : public Loss<Scalar> {
 public:
 	virtual ~QuadraticLoss() = default;
 	virtual ColVector<Scalar> function(Matrix<Scalar>& out, Matrix<Scalar>& obj) const {
-		assert(out.rows() == obj.rows() && out.cols() == obj.cols());
-		return (out - obj).array().square().sum()/2;
+		assert(out.rows() == obj.rows() && out.cols() == obj.cols() &&
+				&INCOMPATIBLE_DIM_ERR_MSG);
+		return (out - obj).array().square().rowwise().sum();
 	};
 	virtual ColVector<Scalar> d_function(Matrix<Scalar>& out, Scalar error) const {
 		return 0;

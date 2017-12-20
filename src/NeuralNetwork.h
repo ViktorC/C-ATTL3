@@ -46,7 +46,7 @@ public:
 	 * must match the nodes attribute of the Layer objects pointed to by their
 	 * pointers directly preceding them in the vector.
 	 */
-	NeuralNetwork(std::vector<Layer<Scalar>*> layers) :
+	NeuralNetwork(std::vector<Layer<Scalar>*> layers) : // TODO use smart Layer pointers
 			layers(layers),
 			batch_size(0) {
 		assert(layers.size() > 0 && "layers must contain at least 1 element");
@@ -56,9 +56,6 @@ public:
 			assert(input_size == layers[i]->get_prev_nodes() &&
 					"incompatible layer dimensions");
 			input_size = layers[i]->get_nodes();
-		}
-		for (unsigned i = 0; i < layers.size(); i++) {
-			layers[i]->init_params();
 		}
 	};
 	// Copy constructor.

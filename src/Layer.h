@@ -44,7 +44,7 @@ public:
 protected:
 	/* Only expose methods that allow for the modification of the
 	 * layer's state to friends and sub-classes. */
-	virtual void init_dynamic_params() = 0;
+	virtual void reset() = 0;
 	virtual void set_batch_norm(bool on) = 0;
 	virtual void set_dropout(Scalar dropout) = 0;
 	virtual void set_norm_stats_momentum(Scalar norm_stats_momentum) = 0;
@@ -98,6 +98,7 @@ public:
 				"norm_stats_momentum must not be less than 0 or greater than 1");
 		assert(dropout >= 0 && dropout <= 1 && "dropout must not be less than 0 or greater than 1");
 		assert(epsilon > 0 && "epsilon must be greater than 0");
+		reset();
 	};
 	// Clone pattern.
 	Layer<Scalar>* clone() {
@@ -137,29 +138,29 @@ protected:
 	Matrix<Scalar>& get_weights() {
 		return weights;
 	};
-	const Matrix<Scalar>& get_weight_grads() const {
+	Matrix<Scalar>& get_weight_grads() {
 		return weight_grads;
 	};
 	// Batch normalization parameters.
 	RowVector<Scalar>& get_betas(){
 		return betas;
 	};
-	const RowVector<Scalar>& get_beta_grads() const {
+	RowVector<Scalar>& get_beta_grads() {
 		return beta_grads;
 	};
 	RowVector<Scalar>& get_gammas() {
 		return gammas;
 	};
-	const RowVector<Scalar>& get_gamma_grads() const {
+	RowVector<Scalar>& get_gamma_grads() {
 		return gamma_grads;
 	};
-	const RowVector<Scalar>& get_moving_means() const {
+	RowVector<Scalar>& get_moving_means() {
 		return moving_means;
 	};
-	const RowVector<Scalar>& get_moving_vars() const {
+	RowVector<Scalar>& get_moving_vars() {
 		return moving_vars;
 	};
-	void init_dynamic_params() {
+	void reset() {
 		init.init(weights);
 		if (batch_norm) {
 			betas.setZero(betas.cols());
@@ -168,6 +169,12 @@ protected:
 		moving_means.setZero(moving_means.cols());
 		moving_vars.setZero(moving_vars.cols());
 		moving_means_init = false;
+		// Empty the caches.
+		centered_prev_out = Matrix<Scalar>(0, 0);
+		std_prev_out_factor = RowVector<Scalar>(0);
+		biased_prev_out = Matrix<Scalar>(0, 0);
+		in = Matrix<Scalar>(0, 0);
+		out = Matrix<Scalar>(0, 0);
 	};
 	Matrix<Scalar> pass_forward(Matrix<Scalar> prev_out,
 			bool training) {
