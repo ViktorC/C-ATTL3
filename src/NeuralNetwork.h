@@ -180,7 +180,7 @@ protected:
 				"forward input");
 		batch_size = input.rows();
 		for (unsigned i = 0; i < layers.size(); i++) {
-			input = layers[i]->feed_forward(input, true);
+			input = layers[i]->pass_forward(input, true);
 		}
 		return input;
 	};
@@ -191,7 +191,7 @@ protected:
 		assert(batch_size == out_grads.rows() && "feed back batch "
 				"size incompatible with feed forward batch size");
 		for (int i = layers.size() - 1; i >= 0; i--) {
-			out_grads = layers[i]->feed_back(out_grads);
+			out_grads = layers[i]->pass_back(out_grads);
 		}
 	};
 	std::vector<Layer<Scalar>*> layers;

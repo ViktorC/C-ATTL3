@@ -16,8 +16,6 @@
 
 namespace cppnn {
 
-static const std::string INCOMPATIBLE_DIM_ERR_MSG = "incompatible out and object matrix dimensions";
-
 template<typename Scalar>
 class Loss {
 public:
@@ -30,8 +28,7 @@ template<typename Scalar>
 class QuadraticLoss : public Loss<Scalar> {
 public:
 	ColVector<Scalar> function(const Matrix<Scalar>& out, const Matrix<Scalar>& obj) const {
-		assert(out.rows() == obj.rows() && out.cols() == obj.cols() &&
-				&INCOMPATIBLE_DIM_ERR_MSG);
+		assert(out.rows() == obj.rows() && out.cols() == obj.cols());
 		return (out - obj).array().square().rowwise().sum();
 	};
 	Matrix<Scalar> d_function(const Matrix<Scalar>& out, const Matrix<Scalar>& obj) const {
@@ -45,22 +42,20 @@ public:
 	HingeLoss(bool squared = false) :
 		squared(squared) { };
 	ColVector<Scalar> function(const Matrix<Scalar>& out, const Matrix<Scalar>& obj) const {
-		assert(out.rows() == obj.rows() && out.cols() == obj.cols() &&
-				&INCOMPATIBLE_DIM_ERR_MSG);
+		assert(out.rows() == obj.rows() && out.cols() == obj.cols());
 		ColVector<Scalar> loss(out.rows());
 		for (int i = 0; i < obj.rows(); i++) {
 			unsigned ones = 0;
 			int correct_class_ind = -1;
 			for (int j = 0; j < obj.cols(); j++) {
 				Scalar obj_ij = obj(i,j);
-				assert((almost_equal(obj_ij, 0) || almost_equal(obj_ij, 1)) &&
-						"illegal svm loss object values");
+				assert((almost_equal(obj_ij, .0) || almost_equal(obj_ij, 1.0)));
 				if (almost_equal(obj_ij, 1)) {
 					ones++;
 					correct_class_ind = j;
 				}
 			}
-			assert(ones == 1 && "invalid number of correct classes for svm loss");
+			assert(ones == 1);
 			Scalar loss_i = 0;
 			Scalar correct_class_score = out(i,correct_class_ind);
 			for (int j = 0; j < obj.cols(); j++) {
@@ -80,7 +75,7 @@ public:
 			unsigned ones = 0;
 			int correct_class_ind = -1;
 			for (int j = 0; j < obj.cols(); j++) {
-				if (almost_equal(obj(i,j), 1)) {
+				if (almost_equal(obj(i,j), 1.0)) {
 					correct_class_ind = j;
 					break;
 				}
@@ -93,7 +88,7 @@ public:
 				}
 				Scalar out_ij = out(i,j);
 				Scalar margin = out_ij - correct_class_score + 1;
-				if (greater(margin, 0)) {
+				if (greater(margin, .0)) {
 					Scalar loss_grad = squared ? 2 * (out_ij - correct_class_score) : 1;
 					total_loss_grad += loss_grad;
 					loss_grads(i,j) = loss_grad;
@@ -115,8 +110,7 @@ public:
 	CrossEntropyLoss(Scalar epsilon = 1e-8) :
 		epsilon(epsilon) { };
 	ColVector<Scalar> function(const Matrix<Scalar>& out, const Matrix<Scalar>& obj) const {
-		assert(out.rows() == obj.rows() && out.cols() == obj.cols() &&
-				&INCOMPATIBLE_DIM_ERR_MSG);
+		assert(out.rows() == obj.rows() && out.cols() == obj.cols());
 		return (out.array().log() * out.array()).matrix().rowwise().sum() * -1;
 	};
 	Matrix<Scalar> d_function(const Matrix<Scalar>& out, const Matrix<Scalar>& obj) const {

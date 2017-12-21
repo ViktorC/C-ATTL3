@@ -45,18 +45,16 @@ public:
 protected:
 	/* Only expose methods that allow for the modification of the
 	 * layer's state to friends and sub-classes. */
-	virtual void reset() = 0;
-	virtual void set_batch_norm(bool on) = 0;
-	virtual void set_dropout(Scalar dropout) = 0;
-	virtual void set_norm_stats_momentum(Scalar norm_stats_momentum) = 0;
+	virtual void init_params() = 0;
+	virtual void empty_cache() = 0;
 	virtual Matrix<Scalar>& get_weights() = 0;
-	virtual Matrix<Scalar>& get_weight_grads() = 0;
+	virtual const Matrix<Scalar>& get_weight_grads() const = 0;
 	virtual RowVector<Scalar>& get_betas() = 0;
-	virtual RowVector<Scalar>& get_beta_grads() = 0;
+	virtual const RowVector<Scalar>& get_beta_grads() const = 0;
 	virtual RowVector<Scalar>& get_gammas() = 0;
-	virtual RowVector<Scalar>& get_gamma_grads() = 0;
-	virtual RowVector<Scalar>& get_moving_means() = 0;
-	virtual RowVector<Scalar>& get_moving_vars() = 0;
+	virtual const RowVector<Scalar>& get_gamma_grads() const = 0;
+	virtual const RowVector<Scalar>& get_moving_means() const = 0;
+	virtual const RowVector<Scalar>& get_moving_vars() const = 0;
 	virtual Matrix<Scalar> pass_forward(Matrix<Scalar> prev_out, bool training) = 0;
 	virtual Matrix<Scalar> pass_back(Matrix<Scalar> out_grads) = 0;
 };
@@ -98,7 +96,7 @@ public:
 				"norm_stats_momentum must not be less than 0 or greater than 1");
 		assert(dropout >= 0 && dropout <= 1 && "dropout must not be less than 0 or greater than 1");
 		assert(epsilon > 0 && "epsilon must be greater than 0");
-		reset();
+		init_params();
 	};
 	// Clone pattern.
 	Layer<Scalar>* clone() {
@@ -126,7 +124,7 @@ public:
 		return init;
 	};
 protected:
-	void reset() {
+	void init_params() {
 		init.init(weights);
 		if (batch_norm) {
 			betas.setZero(betas.cols());
@@ -135,45 +133,37 @@ protected:
 		moving_means.setZero(moving_means.cols());
 		moving_vars.setZero(moving_vars.cols());
 		moving_means_init = false;
-		// Empty the caches.
+	};
+	void empty_cache() {
 		std_prev_out_factor = RowVector<Scalar>(0);
 		centered_prev_out = Matrix<Scalar>(0, 0);
 		biased_prev_out = Matrix<Scalar>(0, 0);
 		in = Matrix<Scalar>(0, 0);
 		out = Matrix<Scalar>(0, 0);
 	};
-	void set_batch_norm(bool on) {
-		batch_norm = on;
-	};
-	void set_dropout(Scalar dropout) {
-		this->dropout = dropout;
-	};
-	void set_norm_stats_momentum(Scalar norm_stats_momentum) {
-		this->norm_stats_momentum = norm_stats_momentum;
-	};
 	Matrix<Scalar>& get_weights() {
 		return weights;
 	};
-	Matrix<Scalar>& get_weight_grads() {
+	const Matrix<Scalar>& get_weight_grads() const {
 		return weight_grads;
 	};
 	// Batch normalization parameters.
 	RowVector<Scalar>& get_betas(){
 		return betas;
 	};
-	RowVector<Scalar>& get_beta_grads() {
+	const RowVector<Scalar>& get_beta_grads() const {
 		return beta_grads;
 	};
 	RowVector<Scalar>& get_gammas() {
 		return gammas;
 	};
-	RowVector<Scalar>& get_gamma_grads() {
+	const RowVector<Scalar>& get_gamma_grads() const {
 		return gamma_grads;
 	};
-	RowVector<Scalar>& get_moving_means() {
+	const RowVector<Scalar>& get_moving_means() const {
 		return moving_means;
 	};
-	RowVector<Scalar>& get_moving_vars() {
+	const RowVector<Scalar>& get_moving_vars() const {
 		return moving_vars;
 	};
 	Matrix<Scalar> pass_forward(Matrix<Scalar> prev_out,
@@ -206,14 +196,14 @@ protected:
 			prev_out = (prev_out * gammas.asDiagonal()).rowwise() + betas;
 		}
 		// Dropout.
-		if (greater(dropout, 0)) {
+		if (decidedly_greater(dropout, .0)) {
 			Matrix<Scalar> dropout_mask;
 			dropout_mask.setRandom(prev_out.rows(), prev_out.cols());
 			dropout_mask = (dropout_mask.array() + 1) / 2;
 			dropout_mask = dropout_mask.unaryExpr([this](Scalar i) {
-				return (Scalar) (greater(i, dropout) ? 1 : 0);
+				return (Scalar) (decidedly_greater(i, dropout) ? 1.0 : .0);
 			});
-			dropout_mask /= std::max(1 - dropout, EPSILON);
+			dropout_mask /= std::max(1 - dropout, epsilon);
 			prev_out = prev_out.cwiseProduct(dropout_mask);
 		}
 		// Add a 1-column to the input for the bias trick.

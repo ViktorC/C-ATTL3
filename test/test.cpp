@@ -60,6 +60,6 @@ int main() {
 	obj(3,0) = 0.75;
 	obj(3,1) = 0.25;
 //	std::cout << loss.function(out, obj) << std::endl;
-	nn.backpropagate(obj);
+//	nn.backpropagate(obj);
 	return 0;
 }
