@@ -9,7 +9,6 @@
 #define LOSS_H_
 
 #include <cassert>
-#include <cmath>
 #include <Matrix.h>
 #include <NumericalUtils.h>
 #include <string>
@@ -86,7 +85,7 @@ public:
 					break;
 				}
 			}
-			int contributing_elements = 0;
+			Scalar total_loss_grad = 0;
 			Scalar correct_class_score = out(i,correct_class_ind);
 			for (int j = 0; j < obj.cols(); j++) {
 				if (j == correct_class_ind) {
@@ -95,13 +94,14 @@ public:
 				Scalar out_ij = out(i,j);
 				Scalar margin = out_ij - correct_class_score + 1;
 				if (greater(margin, 0)) {
-					contributing_elements++;
-					loss_grads(i,j) = l2 ? 2 * (out_ij - correct_class_score) : 1;
+					Scalar loss_grad = l2 ? 2 * (out_ij - correct_class_score) : 1;
+					total_loss_grad += loss_grad;
+					loss_grads(i,j) = loss_grad;
 				} else {
 					loss_grads(i,j) = 0;
 				}
 			}
-			loss_grads(i,correct_class_ind) = -contributing_elements;
+			loss_grads(i,correct_class_ind) = -total_loss_grad;
 		}
 		return loss_grads;
 	};
