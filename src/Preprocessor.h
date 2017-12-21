@@ -57,7 +57,7 @@ public:
 		}
 	};
 protected:
-	static constexpr Scalar EPSILON = 1e-5;
+	static constexpr Scalar EPSILON = 1e-8;
 	bool standardize;
 	float epsilon;
 	RowVector<Scalar> means;

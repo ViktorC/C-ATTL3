@@ -40,10 +40,10 @@ public:
 };
 
 template<typename Scalar>
-class SVMLoss : public Loss<Scalar> {
+class HingeLoss : public Loss<Scalar> {
 public:
-	SVMLoss(bool l2) :
-		l2(l2) { };
+	HingeLoss(bool squared = false) :
+		squared(squared) { };
 	ColVector<Scalar> function(const Matrix<Scalar>& out, const Matrix<Scalar>& obj) const {
 		assert(out.rows() == obj.rows() && out.cols() == obj.cols() &&
 				&INCOMPATIBLE_DIM_ERR_MSG);
@@ -68,7 +68,7 @@ public:
 					continue;
 				}
 				Scalar loss_ij = std::max(0, out(i,j) - correct_class_score + 1);
-				loss_i += l2 ? loss_ij * loss_ij : loss_ij;
+				loss_i += squared ? loss_ij * loss_ij : loss_ij;
 			}
 			loss(i) = loss_i;
 		}
@@ -94,7 +94,7 @@ public:
 				Scalar out_ij = out(i,j);
 				Scalar margin = out_ij - correct_class_score + 1;
 				if (greater(margin, 0)) {
-					Scalar loss_grad = l2 ? 2 * (out_ij - correct_class_score) : 1;
+					Scalar loss_grad = squared ? 2 * (out_ij - correct_class_score) : 1;
 					total_loss_grad += loss_grad;
 					loss_grads(i,j) = loss_grad;
 				} else {
@@ -106,18 +106,24 @@ public:
 		return loss_grads;
 	};
 private:
-	bool l2;
+	bool squared;
 };
 
 template<typename Scalar>
 class CrossEntropyLoss : public Loss<Scalar> {
 public:
+	CrossEntropyLoss(Scalar epsilon = 1e-8) :
+		epsilon(epsilon) { };
 	ColVector<Scalar> function(const Matrix<Scalar>& out, const Matrix<Scalar>& obj) const {
 		assert(out.rows() == obj.rows() && out.cols() == obj.cols() &&
 				&INCOMPATIBLE_DIM_ERR_MSG);
-		return 0;
+		return (out.array().log() * out.array()).matrix().rowwise().sum() * -1;
 	};
-	Matrix<Scalar> d_function(const Matrix<Scalar>& out, const Matrix<Scalar>& obj) const;
+	Matrix<Scalar> d_function(const Matrix<Scalar>& out, const Matrix<Scalar>& obj) const {
+		return -obj.array() / out.array();
+	}
+private:
+	Scalar epsilon;
 };
 
 } /* namespace cppnn */

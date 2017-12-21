@@ -74,7 +74,7 @@ class FCLayer : public Layer<Scalar> {
 public:
 	FCLayer(unsigned prev_nodes, unsigned nodes, const Activation<Scalar>& act,
 			const Initialization<Scalar>& init, bool batch_norm = true, Scalar dropout = .5,
-			Scalar norm_stats_momentum = .9, Scalar epsilon = EPSILON) :
+			Scalar norm_stats_momentum = .9, Scalar epsilon = 1e-8) :
 				prev_nodes(prev_nodes),
 				nodes(nodes),
 				act(act),
@@ -257,7 +257,6 @@ protected:
 		}
 		return prev_out_grads;
 	};
-	static constexpr Scalar EPSILON = 1e-5;
 	unsigned prev_nodes;
 	unsigned nodes;
 	const Activation<Scalar>& act;
