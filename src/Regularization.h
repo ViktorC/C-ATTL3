@@ -9,6 +9,7 @@
 #define REGULARIZATION_H_
 
 #include <Matrix.h>
+#include <NumericUtils.h>
 #include <Vector.h>
 
 namespace cppnn {
@@ -30,7 +31,7 @@ public:
 		return (lambda * weights.cwiseAbs()).rowwise().sum();
 	};
 	ColVector<Scalar> d_function(const Matrix<Scalar>& weights) const {
-		return x.unaryExpr([this](Scalar i) { return greater_or_equal(i, .0) ? lambda : -lambda; });
+		return weights.unaryExpr([this](Scalar i) { return greater_or_equal(i, .0) ? lambda : -lambda; });
 	};
 private:
 	Scalar lambda;
@@ -62,8 +63,8 @@ public:
 				.matrix().rowwise().sum();
 	};
 	ColVector<Scalar> d_function(const Matrix<Scalar>& weights) const {
-		return x.unaryExpr([this](Scalar i) { return greater_or_equal(i, .0) ? l1_lambda : -l1_lambda; }) +
-				l2_lambda * weights;
+		return weights.unaryExpr([this](Scalar i) { return greater_or_equal(i, .0) ? l1_lambda :
+				-l1_lambda; }) + l2_lambda * weights;
 	};
 private:
 	Scalar l1_lambda;

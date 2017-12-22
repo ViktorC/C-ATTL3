@@ -58,7 +58,7 @@ public:
 	};
 protected:
 	Scalar sd(int inputs) const {
-		return 1 / sqrt(inputs);
+		return 1.0 / sqrt((Scalar) inputs);
 	};
 };
 
@@ -72,7 +72,7 @@ public:
 	};
 protected:
 	Scalar sd(int inputs) const {
-		return sqrt(2 / inputs);
+		return sqrt(2.0 / (Scalar) inputs);
 	};
 };
 

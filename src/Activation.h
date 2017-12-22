@@ -11,7 +11,7 @@
 #include <cassert>
 #include <Eigen/Dense>
 #include <Matrix.h>
-#include <NumericalUtils.h>
+#include <NumericUtils.h>
 #include <string>
 #include <Vector.h>
 
@@ -45,7 +45,7 @@ template<typename Scalar>
 class BinaryStepActivation : public Activation<Scalar> {
 public:
 	Matrix<Scalar> function(const Matrix<Scalar>& x) const {
-		return x.unaryExpr([](Scalar i) { return (Scalar) decidedly_greater(i, .0); });
+		return x.unaryExpr([](Scalar i) { return decidedly_greater(i, .0) ? 1.0 : .0; });
 	};
 	Matrix<Scalar> d_function(const Matrix<Scalar>& x, const Matrix<Scalar>& y) const {
 		assert(x.rows() == y.rows() && x.cols() == y.cols());
@@ -60,7 +60,7 @@ template<typename Scalar>
 class SigmoidActivation : public Activation<Scalar> {
 public:
 	Matrix<Scalar> function(const Matrix<Scalar>& x) const {
-		return (Matrix<Scalar>::Ones(x.rows(), x.cols()) + (-x).array().exp()).cwiseInverse();
+		return (Matrix<Scalar>::Ones(x.rows(), x.cols()).array() + (-x).array().exp()).cwiseInverse();
 	};
 	Matrix<Scalar> d_function(const Matrix<Scalar>& x, const Matrix<Scalar>& y) const {
 		assert(x.rows() == y.rows() && x.cols() == y.cols());
@@ -121,10 +121,9 @@ public:
 	Matrix<Scalar> function(const Matrix<Scalar>& x) const {
 		return x.cwiseMax(.0);
 	};
-	Matrix<Scalar> d_function(const Matrix<Scalar>& x,
-			Matrix<Scalar>& y) const {
+	Matrix<Scalar> d_function(const Matrix<Scalar>& x, const Matrix<Scalar>& y) const {
 		assert(x.rows() == y.rows() && x.cols() == y.cols());
-		return x.unaryExpr([](Scalar i) { return (Scalar) decidedly_greater(i, .0); });
+		return x.unaryExpr([](Scalar i) { return decidedly_greater(i, .0) ? 1.0 : .0; });
 	};
 	std::string to_string() const {
 		return "relu";
@@ -143,8 +142,8 @@ public:
 	};
 	Matrix<Scalar> d_function(const Matrix<Scalar>& x, const Matrix<Scalar>& y) const {
 		assert(x.rows() == y.rows() && x.cols() == y.cols());
-		return x.unaryExpr([this](Scalar i) { return (Scalar) (decidedly_greater(i, .0) ? 1 :
-				almost_equal(i, .0) ? 0 : alpha); });
+		return x.unaryExpr([this](Scalar i) { return (Scalar) (decidedly_greater(i, .0) ? 1.0 :
+				almost_equal(i, .0) ? .0 : alpha); });
 	};
 	std::string to_string() const {
 		return "leaky relu; alpha: " + std::to_string(alpha);

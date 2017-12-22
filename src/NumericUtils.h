@@ -5,17 +5,18 @@
  *      Author: Viktor Csomor
  */
 
-#ifndef NUMERICALUTILS_H_
-#define NUMERICALUTILS_H_
+#ifndef NUMERICUTILS_H_
+#define NUMERICUTILS_H_
 
 #include <algorithm>
+#include <limits>
 
 namespace cppnn {
 
 template<typename Scalar>
 bool almost_equal(Scalar n1, Scalar n2, Scalar abs_epsilon = std::numeric_limits<Scalar>::epsilon(),
 		Scalar rel_epsilon = std::numeric_limits<Scalar>::epsilon()) {
-	Scalar diff = n1 - n2;
+	Scalar diff = std::abs(n1 - n2);
 	if (diff <= abs_epsilon)
 		return true;
 	Scalar max = std::max(std::abs(n1), std::abs(n2));
@@ -46,4 +47,4 @@ bool lesser_or_almost_equal(Scalar n1, Scalar n2,
 
 }
 
-#endif /* NUMERICALUTILS_H_ */
+#endif /* NUMERICUTILS_H_ */

@@ -2,7 +2,7 @@
  * test.cpp
  *
  *  Created on: Dec 10, 2017
- *      Author: viktor Csomor
+ *      Author: Viktor Csomor
  */
 
 #include <Activation.h>
@@ -13,12 +13,16 @@
 #include <Loss.h>
 #include <Matrix.h>
 #include <NeuralNetwork.h>
+#include <Optimizer.h>
 #include <Preprocessor.h>
+#include <Regularization.h>
 #include <vector>
 #include <Vector.h>
 
+typedef double Scalar;
+
 int main() {
-	cppnn::Matrix<double> data(4, 3);
+	cppnn::Matrix<Scalar> data(4, 3);
 	data(0,0) = 2;
 	data(0,1) = 3;
 	data(0,2) = 1;
@@ -32,25 +36,25 @@ int main() {
 	data(3,1) = 3;
 	data(3,2) = 2;
 	std::cout << data << std::endl << std::endl;
-	cppnn::PCAPreprocessor<double> pca(true, true, 0.95);
+	cppnn::PCAPreprocessor<Scalar> pca(true, true, 0.95);
 	pca.fit(data);
 	pca.transform(data);
 	std::cout << data << std::endl << std::endl;
-	cppnn::LeakyReLUActivation<double> lrelu(0.1);
-	cppnn::SoftmaxActivation<double> softmax;
-	cppnn::ReLUInitialization<double> relu_init;
-	cppnn::XavierInitialization<double> xavier_init;
-	cppnn::Layer<double>* layer1 = new cppnn::FCLayer<double>(data.cols(), 5, lrelu, relu_init);
-	cppnn::Layer<double>* layer2 = new cppnn::FCLayer<double>(5, 2, softmax, xavier_init);
-	std::vector<cppnn::Layer<double>*> layers(2);
+	cppnn::SoftmaxActivation<Scalar> act1;
+	cppnn::SoftmaxActivation<Scalar> act2;
+	cppnn::ReLUInitialization<Scalar> init1;
+	cppnn::ReLUInitialization<Scalar> init2;
+	cppnn::Layer<Scalar>* layer1 = new cppnn::FCLayer<Scalar>(data.cols(), 5, 1, act1, init1, true, 0);
+	cppnn::Layer<Scalar>* layer2 = new cppnn::FCLayer<Scalar>(5, 2, 2, act2, init2, true, 0);
+	std::vector<cppnn::Layer<Scalar>*> layers(2);
 	layers[0] = layer1;
 	layers[1] = layer2;
-	cppnn::NeuralNetwork<double> nn(layers);
+	cppnn::FFNeuralNetwork<Scalar> nn(layers);
 	std::cout << nn.to_string() << std::endl << std::endl;
-	cppnn::Matrix<double> out = nn.infer(data);
-	std::cout << out << std::endl;
-//	cppnn::QuadraticLoss<double> loss;
-	cppnn::Matrix<double> obj(4, 2);
+	cppnn::Matrix<Scalar> out = nn.infer(data);
+	std::cout << out << std::endl << std::endl;
+//	cppnn::QuadraticLoss<Scalar> loss;
+	cppnn::Matrix<Scalar> obj(4, 2);
 	obj(0,0) = 0;
 	obj(0,1) = 1;
 	obj(1,0) = 0.1;
@@ -61,5 +65,9 @@ int main() {
 	obj(3,1) = 0.25;
 //	std::cout << loss.function(out, obj) << std::endl;
 //	nn.backpropagate(obj);
+	cppnn::QuadraticLoss<Scalar> loss;
+	cppnn::L2Regularization<Scalar> reg;
+	cppnn::SGDOptimizer<Scalar> opt(reg, loss);
+	std::cout << opt.validate_gradients(nn, data, obj) << std::endl;
 	return 0;
 }

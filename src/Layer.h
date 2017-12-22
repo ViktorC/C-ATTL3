@@ -14,7 +14,7 @@
 #include <cmath>
 #include <Initialization.h>
 #include <Matrix.h>
-#include <NumericalUtils.h>
+#include <NumericUtils.h>
 #include <string>
 #include <utility>
 #include <Vector.h>
@@ -45,7 +45,7 @@ public:
 protected:
 	/* Only expose methods that allow for the modification of the
 	 * layer's state to friends and sub-classes. */
-	virtual void init_params() = 0;
+	virtual void reinit_params() = 0;
 	virtual void empty_cache() = 0;
 	virtual Matrix<Scalar>& get_weights() = 0;
 	virtual const Matrix<Scalar>& get_weight_grads() const = 0;
@@ -70,11 +70,12 @@ protected:
 template<typename Scalar>
 class FCLayer : public Layer<Scalar> {
 public:
-	FCLayer(unsigned prev_nodes, unsigned nodes, const Activation<Scalar>& act,
+	FCLayer(unsigned prev_nodes, unsigned nodes, unsigned ind, const Activation<Scalar>& act,
 			const Initialization<Scalar>& init, bool batch_norm = true, Scalar dropout = .5,
 			Scalar norm_stats_momentum = .9, Scalar epsilon = 1e-8) :
 				prev_nodes(prev_nodes),
 				nodes(nodes),
+				ind(ind),
 				act(act),
 				init(init),
 				batch_norm(batch_norm),
@@ -96,7 +97,7 @@ public:
 				"norm_stats_momentum must not be less than 0 or greater than 1");
 		assert(dropout >= 0 && dropout <= 1 && "dropout must not be less than 0 or greater than 1");
 		assert(epsilon > 0 && "epsilon must be greater than 0");
-		init_params();
+		reinit_params();
 	};
 	// Clone pattern.
 	Layer<Scalar>* clone() {
@@ -124,7 +125,7 @@ public:
 		return init;
 	};
 protected:
-	void init_params() {
+	void reinit_params() {
 		init.init(weights);
 		if (batch_norm) {
 			betas.setZero(betas.cols());
@@ -247,8 +248,10 @@ protected:
 		}
 		return prev_out_grads;
 	};
+private:
 	unsigned prev_nodes;
 	unsigned nodes;
+	unsigned ind;
 	const Activation<Scalar>& act;
 	const Initialization<Scalar>& init;
 	bool batch_norm;

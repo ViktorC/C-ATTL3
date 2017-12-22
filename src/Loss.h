@@ -10,7 +10,7 @@
 
 #include <cassert>
 #include <Matrix.h>
-#include <NumericalUtils.h>
+#include <NumericUtils.h>
 #include <string>
 #include <Vector.h>
 
@@ -21,7 +21,7 @@ class Loss {
 public:
 	virtual ~Loss() = default;
 	virtual ColVector<Scalar> function(const Matrix<Scalar>& out, const Matrix<Scalar>& obj) const = 0;
-	virtual ColVector<Scalar> d_function(const Matrix<Scalar>& out) const = 0;
+	virtual Matrix<Scalar> d_function(const Matrix<Scalar>& out, const Matrix<Scalar>& obj) const = 0;
 };
 
 template<typename Scalar>
