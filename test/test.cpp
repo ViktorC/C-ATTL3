@@ -6,68 +6,72 @@
  */
 
 #include <Activation.h>
-#include <Layer.h>
+#include <DataPreprocessor.h>
 #include <Eigen/Dense>
-#include <Initialization.h>
 #include <iostream>
+#include <Layer.h>
 #include <Loss.h>
 #include <Matrix.h>
 #include <NeuralNetwork.h>
 #include <Optimizer.h>
-#include <Preprocessor.h>
-#include <Regularization.h>
+#include <RegularizationPenalty.h>
 #include <vector>
 #include <Vector.h>
+#include <WeightInitialization.h>
 
 typedef double Scalar;
 
+static Scalar func(Scalar x, Scalar y, Scalar z) {
+	return x * x * x + x * y + 3 * z - x * y * z + 10;
+};
+
 int main() {
-	cppnn::Matrix<Scalar> data(4, 3);
-	data(0,0) = 2;
-	data(0,1) = 3;
-	data(0,2) = 1;
-	data(1,0) = 1;
-	data(1,1) = 2;
-	data(1,2) = 3;
-	data(2,0) = 3;
-	data(2,1) = 4;
-	data(2,2) = 6;
-	data(3,0) = 2;
-	data(3,1) = 3;
-	data(3,2) = 2;
-	std::cout << data << std::endl << std::endl;
-	cppnn::PCAPreprocessor<Scalar> pca(true, true, 0.95);
-	pca.fit(data);
-	pca.transform(data);
-	std::cout << data << std::endl << std::endl;
-	cppnn::SoftmaxActivation<Scalar> act1;
-	cppnn::SoftmaxActivation<Scalar> act2;
-	cppnn::ReLUInitialization<Scalar> init1;
-	cppnn::ReLUInitialization<Scalar> init2;
-	cppnn::Layer<Scalar>* layer1 = new cppnn::FCLayer<Scalar>(data.cols(), 5, 1, act1, init1, true, 0);
-	cppnn::Layer<Scalar>* layer2 = new cppnn::FCLayer<Scalar>(5, 2, 2, act2, init2, true, 0);
-	std::vector<cppnn::Layer<Scalar>*> layers(2);
-	layers[0] = layer1;
-	layers[1] = layer2;
+	cppnn::Matrix<Scalar> data(21 * 21 * 21, 3);
+	unsigned row = 0;
+	for (Scalar i = -2.0; i <= 2.01; i += .2) {
+		for (Scalar j = -1.0; j <= 1.01; j += .1) {
+			for (Scalar k = -3.0; k <= 3.01; k += .3) {
+				data(row, 0) = i;
+				data(row, 1) = j;
+				data(row, 2) = k;
+				row++;
+			}
+		}
+	}
+	cppnn::Matrix<Scalar> obj(data.rows(), 1);
+	for (int i = 0; i < obj.rows(); i++) {
+		obj(i,0) = func(data(i,0), data(i,1), data(i,2));
+	}
+	cppnn::NormalizationDataPreprocessor<Scalar> preproc(true);
+//	cppnn::PCAPreprocessor<Scalar> preproc(true, true, 0.99);
+	preproc.fit(data);
+	preproc.transform(data);
+	cppnn::ReLUWeightInitialization<Scalar> init;
+	cppnn::XavierWeightInitialization<Scalar> f_init;
+	cppnn::ReLUActivation<Scalar> act;
+	cppnn::IdentityActivation<Scalar> f_act;
+	std::vector<cppnn::Layer<Scalar>*> layers(3);
+	layers[0] = new cppnn::FCLayer<Scalar>(data.cols(), 50, init, act);
+	layers[1] = new cppnn::FCLayer<Scalar>(50, 20, init, act);
+	layers[2] = new cppnn::FCLayer<Scalar>(20, 1, f_init, f_act);
 	cppnn::FFNeuralNetwork<Scalar> nn(layers);
-	std::cout << nn.to_string() << std::endl << std::endl;
-	cppnn::Matrix<Scalar> out = nn.infer(data);
-	std::cout << out << std::endl << std::endl;
-//	cppnn::QuadraticLoss<Scalar> loss;
-	cppnn::Matrix<Scalar> obj(4, 2);
-	obj(0,0) = 0;
-	obj(0,1) = 1;
-	obj(1,0) = 0.1;
-	obj(1,1) = 0.9;
-	obj(2,0) = 0.25;
-	obj(2,1) = 0.75;
-	obj(3,0) = 0.75;
-	obj(3,1) = 0.25;
-//	std::cout << loss.function(out, obj) << std::endl;
-//	nn.backpropagate(obj);
+	nn.init();
 	cppnn::QuadraticLoss<Scalar> loss;
-	cppnn::L2Regularization<Scalar> reg;
-	cppnn::SGDOptimizer<Scalar> opt(reg, loss);
-	std::cout << opt.validate_gradients(nn, data, obj) << std::endl;
+	cppnn::L2RegularizationPenalty<Scalar> reg(1e-3);
+	cppnn::NesterovMomentumAcceleratedSGDOptimizer<Scalar> opt(loss, reg, 1e-3, 1e-3, .99, .8, 64);
+	std::cout << nn.to_string() << std::endl << std::endl;
+//	std::cout << opt.verify_gradients(nn, data, obj) << std::endl;
+	opt.train(nn, data, obj, 2000);
+	Scalar x = -0.31452;
+	Scalar y = 0.441;
+	Scalar z = -1.44579;
+	Scalar out = func(x, y, z);
+	cppnn::Matrix<Scalar> in(1, 3);
+	in(0,0) = x;
+	in(0,1) = y;
+	in(0,2) = z;
+	preproc.transform(in);
+	std::cout << "estimate: " << nn.infer(in) << std::endl;
+	std::cout << "actual: " << out << std::endl;
 	return 0;
-}
+};

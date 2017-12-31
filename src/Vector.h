@@ -12,7 +12,7 @@
 
 namespace cppnn {
 
-template <typename Scalar>
+template<typename Scalar>
 using RowVector = Eigen::Matrix<Scalar,1,Eigen::Dynamic,Eigen::RowMajor,1,Eigen::Dynamic>;
 
 template <typename Scalar>

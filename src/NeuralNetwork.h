@@ -16,6 +16,7 @@
 #include <string>
 #include <vector>
 #include <Vector.h>
+#include <WeightInitialization.h>
 
 namespace cppnn {
 
@@ -36,6 +37,13 @@ class NeuralNetwork {
 	friend class Optimizer<Scalar>;
 public:
 	virtual ~NeuralNetwork() = default;
+	virtual unsigned get_input_size() const = 0;
+	virtual unsigned get_output_size() const = 0;
+	virtual void init() {
+		std::vector<Layer<Scalar>*> layers = get_layers();
+		for (unsigned i = 0; i < layers.size(); i++)
+			layers[i]->init();
+	};
 	virtual Matrix<Scalar> infer(Matrix<Scalar> input) {
 		return propagate(input, false);
 	};
@@ -46,16 +54,9 @@ public:
 			Layer<Scalar>* layer = get_layers()[i];
 			strm << "\tLayer " << std::setw(2) << std::to_string(i + 1) <<
 					"----------------------------" << std::endl;
-			strm << "\t\tprev nodes: " << layer->get_prev_nodes() << std::endl;
-			strm << "\t\tnodes: " << layer->get_nodes() << std::endl;
-			strm << "\t\tdropout: " << std::to_string(layer->get_dropout()) << std::endl;
+			strm << "\t\tprev size: " << layer->get_prev_size() << std::endl;
+			strm << "\t\tsize: " << layer->get_size() << std::endl;
 			strm << "\t\tbatch norm: " << std::to_string(layer->get_batch_norm()) << std::endl;
-			if (layer->get_batch_norm()) {
-				strm << "\t\tnorm stats momentum: " <<
-						std::to_string(layer->get_norm_stats_momentum()) << std::endl;
-			}
-			strm << "\t\tinit: " << layer->get_init().to_string() << std::endl;
-			strm << "\t\tactivation: " << layer->get_act().to_string() << std::endl;
 			if (layer->get_batch_norm()) {
 				RowVector<Scalar>& gammas = layer->get_gammas();
 				strm << "\t\tgammas:" << std::endl << "\t\t[ ";
@@ -71,24 +72,6 @@ public:
 				for (int j = 0; j < betas.cols(); j++) {
 					strm << std::setw(11) << std::setprecision(4) << betas(j);
 					if (j != betas.cols() - 1) {
-						strm << ", ";
-					}
-				}
-				strm << " ]" << std::endl;
-				const RowVector<Scalar>& moving_means = layer->get_moving_means();
-				strm << "\t\tmoving means:" << std::endl << "\t\t[ ";
-				for (int j = 0; j < moving_means.cols(); j++) {
-					strm << std::setw(11) << std::setprecision(4) << moving_means(j);
-					if (j != moving_means.cols() - 1) {
-						strm << ", ";
-					}
-				}
-				strm << " ]" << std::endl;
-				const RowVector<Scalar>& moving_vars = layer->get_moving_vars();
-				strm << "\t\tmoving vars:" << std::endl << "\t\t[ ";
-				for (int j = 0; j < moving_vars.cols(); j++) {
-					strm << std::setw(11) << std::setprecision(4) << moving_vars(j);
-					if (j != moving_vars.cols() - 1) {
 						strm << ", ";
 					}
 				}
@@ -110,15 +93,15 @@ public:
 		return strm.str();
 	};
 protected:
-	virtual Matrix<Scalar> pass_forward(Layer<Scalar>& layer, Matrix<Scalar> prev_out, bool training) {
-		return layer.pass_forward(prev_out, training);
-	};
-	virtual Matrix<Scalar> pass_back(Layer<Scalar>& layer, Matrix<Scalar> out_grads) {
-		return layer.pass_back(out_grads);
-	};
 	virtual std::vector<Layer<Scalar>*>& get_layers() = 0;
 	virtual Matrix<Scalar> propagate(Matrix<Scalar> input, bool train) = 0;
 	virtual void backpropagate(Matrix<Scalar> out_grads) = 0;
+	static Matrix<Scalar> pass_forward(Layer<Scalar>& layer, Matrix<Scalar> prev_out, bool training) {
+		return layer.pass_forward(prev_out, training);
+	};
+	static Matrix<Scalar> pass_back(Layer<Scalar>& layer, Matrix<Scalar> out_grads) {
+		return layer.pass_back(out_grads);
+	};
 };
 
 template<typename Scalar>
@@ -138,12 +121,13 @@ public:
 	FFNeuralNetwork(std::vector<Layer<Scalar>*> layers) : // TODO use smart Layer pointers
 			layers(layers) {
 		assert(layers.size() > 0 && "layers must contain at least 1 element");
-		unsigned input_size = layers[0]->get_nodes();
+		input_size = layers[0]->get_prev_size();
+		output_size = layers[layers.size() - 1]->get_size();
+		unsigned prev_size = layers[0]->get_size();
 		for (unsigned i = 1; i < layers.size(); i++) {
 			assert(layers[i] != nullptr && "layers contains null pointers");
-			assert(input_size == layers[i]->get_prev_nodes() &&
-					"incompatible layer dimensions");
-			input_size = layers[i]->get_nodes();
+			assert(prev_size == layers[i]->get_prev_size() && "incompatible layer dimensions");
+			prev_size = layers[i]->get_size();
 		}
 	};
 	// Copy constructor.
@@ -152,6 +136,8 @@ public:
 		for (unsigned i = 0; i < layers.size(); i++) {
 			layers[i] = network.layers[i]->clone();
 		}
+		input_size = network.input_size;
+		output_size = network.output_size;
 	};
 	// Move constructor.
 	FFNeuralNetwork(FFNeuralNetwork<Scalar>&& network) {
@@ -169,18 +155,26 @@ public:
 		swap(*this, network);
 		return *this;
 	};
+	unsigned get_input_size() const {
+		return input_size;
+	};
+	unsigned get_output_size() const {
+		return output_size;
+	};
 protected:
 	// For the copy-and-swap idiom.
 	friend void swap(FFNeuralNetwork<Scalar>& network1,
 			FFNeuralNetwork<Scalar>& network2) {
 		using std::swap;
 		swap(network1.layers, network2.layers);
+		swap(network1.input_size, network2.input_size);
+		swap(network1.output_size, network2.output_size);
 	};
 	std::vector<Layer<Scalar>*>& get_layers() {
 		return layers;
 	};
 	Matrix<Scalar> propagate(Matrix<Scalar> input, bool train) {
-		assert(layers[0]->get_prev_nodes() == (unsigned) input.cols() &&
+		assert(input_size == (unsigned) input.cols() &&
 				"wrong neural network input size");
 		assert(input.rows() >= 0 && input.cols() >= 0 && "empty feed forward input");
 		for (unsigned i = 0; i < layers.size(); i++) {
@@ -189,7 +183,7 @@ protected:
 		return input;
 	};
 	void backpropagate(Matrix<Scalar> out_grads) {
-		assert(layers[layers.size() - 1]->get_nodes() == (unsigned) out_grads.cols() &&
+		assert(output_size == (unsigned) out_grads.cols() &&
 				"wrong neural network output gradient size");
 		for (int i = layers.size() - 1; i >= 0; i--) {
 			out_grads = NeuralNetwork<Scalar>::pass_back(*(layers[i]), out_grads);
@@ -197,6 +191,8 @@ protected:
 	};
 private:
 	std::vector<Layer<Scalar>*> layers;
+	unsigned input_size;
+	unsigned output_size;
 };
 
 } /* namespace cppnn */
