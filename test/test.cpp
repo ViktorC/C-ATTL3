@@ -26,6 +26,7 @@ static Scalar func(Scalar x, Scalar y, Scalar z) {
 };
 
 int main() {
+	std::cout << "Number of threads: " << Eigen::nbThreads() << std::endl;
 	cppnn::Matrix<Scalar> data(21 * 21 * 21, 3);
 	unsigned row = 0;
 	for (Scalar i = -2.0; i <= 2.01; i += .2) {
@@ -51,17 +52,17 @@ int main() {
 	cppnn::ReLUActivation<Scalar> act;
 	cppnn::IdentityActivation<Scalar> f_act;
 	std::vector<cppnn::Layer<Scalar>*> layers(3);
-	layers[0] = new cppnn::FCLayer<Scalar>(data.cols(), 50, init, act);
-	layers[1] = new cppnn::FCLayer<Scalar>(50, 20, init, act);
-	layers[2] = new cppnn::FCLayer<Scalar>(20, 1, f_init, f_act);
+	layers[0] = new cppnn::FCLayer<Scalar>(data.cols(), 100, init, act);
+	layers[1] = new cppnn::FCLayer<Scalar>(100, 50, init, act);
+	layers[2] = new cppnn::FCLayer<Scalar>(50, 1, f_init, f_act);
 	cppnn::FFNeuralNetwork<Scalar> nn(layers);
 	nn.init();
 	cppnn::QuadraticLoss<Scalar> loss;
 	cppnn::L2RegularizationPenalty<Scalar> reg(1e-3);
-	cppnn::NesterovMomentumAcceleratedSGDOptimizer<Scalar> opt(loss, reg, 1e-3, 1e-3, .99, .8, 64);
+	cppnn::AdaMaxOptimizer<Scalar> opt(loss, reg, 32, .8);
 	std::cout << nn.to_string() << std::endl << std::endl;
 //	std::cout << opt.verify_gradients(nn, data, obj) << std::endl;
-	opt.train(nn, data, obj, 2000);
+	opt.train(nn, data, obj, 200);
 	Scalar x = -0.31452;
 	Scalar y = 0.441;
 	Scalar z = -1.44579;
@@ -71,7 +72,7 @@ int main() {
 	in(0,1) = y;
 	in(0,2) = z;
 	preproc.transform(in);
-	std::cout << "estimate: " << nn.infer(in) << std::endl;
-	std::cout << "actual: " << out << std::endl;
+	std::cout << "Estimate: " << nn.infer(in) << std::endl;
+	std::cout << "Actual value: " << out << std::endl;
 	return 0;
 };

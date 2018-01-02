@@ -71,11 +71,15 @@ public:
 template<typename Scalar>
 class SoftmaxActivation : public Activation<Scalar> {
 public:
+	SoftmaxActivation(Scalar epsilon = 1e-8) :
+			epsilon(epsilon) {
+		assert(epsilon > 0);
+	};
 	Matrix<Scalar> function(const Matrix<Scalar>& x) const {
 		/* First subtract the value of the greatest coefficient from each element row-wise
 		 * to avoid an overflow due to raising e to great powers. */
 		Matrix<Scalar> out = (x.array().colwise() - x.array().rowwise().maxCoeff()).exp();
-		return out.array().colwise() / out.array().rowwise().sum();
+		return out.array().colwise() / (out.array().rowwise().sum() + epsilon);
 	};
 	Matrix<Scalar> d_function(const Matrix<Scalar>& x, const Matrix<Scalar>& y,
 			const Matrix<Scalar>& out_grads) const {
@@ -89,6 +93,8 @@ public:
 		}
 		return out;
 	};
+private:
+	Scalar epsilon;
 };
 
 template<typename Scalar>
@@ -140,6 +146,8 @@ public:
 private:
 	Scalar alpha;
 };
+
+// TODO Consider implementing the PReLU activation.
 
 } /* namespace cppnn */
 

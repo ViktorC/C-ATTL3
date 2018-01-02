@@ -98,7 +98,7 @@ public:
 		for (; dims_to_retain < eigen_values.rows(); dims_to_retain++) {
 			if (var >= min_var_to_retain)
 				break;
-			// The eigen values are sorted in an ascending order.
+			// The eigen values are sorted in ascending order.
 			var += eigen_values(eigen_values.rows() - (1 + dims_to_retain));
 		}
 		/* The eigen vectors are sorted based on the magnitude of their

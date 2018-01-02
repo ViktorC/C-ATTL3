@@ -49,6 +49,7 @@ protected:
 	virtual const RowVector<Scalar>& get_beta_grads() const = 0;
 	virtual RowVector<Scalar>& get_gammas() = 0;
 	virtual const RowVector<Scalar>& get_gamma_grads() const = 0;
+	virtual void enforce_max_norm() = 0;
 	virtual Matrix<Scalar> pass_forward(Matrix<Scalar> prev_out, bool training) = 0;
 	virtual Matrix<Scalar> pass_back(Matrix<Scalar> out_grads) = 0;
 };
@@ -66,15 +67,17 @@ class FCLayer : public Layer<Scalar> {
 public:
 	FCLayer(unsigned prev_size, unsigned size, const WeightInitialization<Scalar>& weight_init,
 			const Activation<Scalar>& act, Scalar dropout_prob = 0, bool batch_norm = false,
-			Scalar norm_avg_momentum = .9, Scalar epsilon = 1e-8) :
+			Scalar norm_avg_decay = .1, Scalar max_norm_constraint = .0, Scalar epsilon = 1e-8) :
 				prev_size(prev_size),
 				size(size),
 				weight_init(weight_init),
 				act(act),
 				dropout_prob(dropout_prob),
-				dropout(decidedly_greater(dropout_prob, .0, epsilon, epsilon)),
+				dropout(decidedly_greater(dropout_prob, (Scalar) .0, epsilon, epsilon)),
 				batch_norm(batch_norm),
-				norm_avg_momentum(norm_avg_momentum),
+				norm_avg_decay(norm_avg_decay),
+				max_norm_constraint(max_norm_constraint),
+				max_norm(decidedly_greater(max_norm_constraint, (Scalar) .0, epsilon, epsilon)),
 				epsilon(epsilon),
 				weights(prev_size + 1, size),
 				weight_grads(prev_size + 1, size),
@@ -87,10 +90,9 @@ public:
 				moving_means_init(false) {
 		assert(prev_size > 0 && "prev size must be greater than 0");
 		assert(size > 0 && "size must be greater than 0");
-		assert(norm_avg_momentum >= 0 && norm_avg_momentum <= 1 &&
-				"norm avg momentum must not be less than 0 or greater than 1");
-		assert(dropout_prob >= 0 && dropout_prob <= 1 && "dropout prob must not be less than 0 or "
-				"greater than 1");
+		assert(norm_avg_decay >= 0 && norm_avg_decay <= 1 &&
+				"norm avg decay must not be less than 0 or greater than 1");
+		assert(dropout_prob <= 1 && "dropout prob must not be greater than 1");
 		assert(epsilon > 0 && "epsilon must be greater than 0");
 	};
 	Layer<Scalar>* clone() {
@@ -142,6 +144,13 @@ protected:
 	const RowVector<Scalar>& get_gamma_grads() const {
 		return gamma_grads;
 	};
+	void enforce_max_norm() {
+		if (max_norm) {
+			Scalar l2_norm = weights.squaredNorm();
+			if (l2_norm > max_norm_constraint)
+				weights *= (max_norm_constraint / l2_norm);
+		}
+	};
 	Matrix<Scalar> pass_forward(Matrix<Scalar> prev_out, bool training) {
 		assert((unsigned) prev_out.cols() == prev_size &&
 				"illegal input matrix size for feed forward");
@@ -156,8 +165,8 @@ protected:
 				/* Maintain a moving average of means and variances
 				 * for testing. */
 				if (moving_means_init) {
-					avg_means = avg_means * norm_avg_momentum + means * (1 - norm_avg_momentum);
-					avg_vars = avg_vars * norm_avg_momentum + vars * (1 - norm_avg_momentum);
+					avg_means = (1 - norm_avg_decay) * avg_means + norm_avg_decay * means;
+					avg_vars = (1 - norm_avg_decay) * avg_vars + norm_avg_decay * vars;
 				} else {
 					avg_means = means;
 					avg_vars = vars;
@@ -231,7 +240,9 @@ private:
 	Scalar dropout_prob;
 	bool dropout;
 	bool batch_norm;
-	Scalar norm_avg_momentum;
+	Scalar norm_avg_decay;
+	Scalar max_norm_constraint;
+	bool max_norm;
 	Scalar epsilon;
 	/* Eigen matrices are backed by arrays allocated the heap, so these
 	 * members do not burden the stack. */

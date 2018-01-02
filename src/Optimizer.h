@@ -145,11 +145,8 @@ protected:
 	static const RowVector<Scalar>& get_gamma_grads(Layer<Scalar>* layer_ptr) {
 		return layer_ptr->get_gamma_grads();
 	};
-	static void max_norm(Layer<Scalar>* layer_ptr, Scalar constraint) {
-		Matrix<Scalar>& weights = layer_ptr->get_weights();
-		Scalar l2_norm = weights.squaredNorm();
-		if (l2_norm > constraint)
-			weights *= (constraint / l2_norm);
+	static const void enforce_max_norm(Layer<Scalar>* layer_ptr) {
+		layer_ptr->enforce_max_norm();
 	};
 	const Loss<Scalar>& loss;
 };
@@ -157,14 +154,12 @@ protected:
 template<typename Scalar>
 class SGDOptimizer : public Optimizer<Scalar> {
 public:
-	SGDOptimizer(const Loss<Scalar>& loss, const RegularizationPenalty<Scalar>& reg, Scalar k,
-			unsigned batch_size, Scalar max_norm_constraint) :
+	SGDOptimizer(const Loss<Scalar>& loss, const RegularizationPenalty<Scalar>& reg,
+			unsigned batch_size, Scalar k) :
 				Optimizer<Scalar>::Optimizer(loss),
 				reg(reg),
-				k(k),
 				batch_size(batch_size),
-				max_norm_constraint(max_norm_constraint),
-				max_norm(decidedly_greater(max_norm_constraint, .0)) {
+				k(k) {
 		assert(batch_size > 0);
 		assert(k > 0 && k < 1);
 	};
@@ -212,9 +207,7 @@ public:
 						for (unsigned k = 0; k < layers.size(); k++) {
 							Layer<Scalar>* layer_ptr = layers[k];
 							update_params(layer_ptr, k, i - 1);
-							// Max norm constraint.
-							if (max_norm)
-								Optimizer<Scalar>::max_norm(layer_ptr, max_norm_constraint);
+							Optimizer<Scalar>::enforce_max_norm(layer_ptr);
 						}
 						batch_ind = 0;
 					}
@@ -262,18 +255,16 @@ protected:
 	virtual void fit(NeuralNetwork<Scalar>& net) = 0;
 	virtual void update_params(Layer<Scalar>* layer_ptr, unsigned i, unsigned epoch) = 0;
 	const RegularizationPenalty<Scalar>& reg;
-	Scalar k;
 	unsigned batch_size;
-	Scalar max_norm_constraint;
-	bool max_norm;
+	Scalar k;
 };
 
 template<typename Scalar>
 class VanillaSGDOptimizer : public SGDOptimizer<Scalar> {
 public:
-	VanillaSGDOptimizer(const Loss<Scalar>& loss, const RegularizationPenalty<Scalar>& reg, Scalar learning_rate = 1e-3,
-			Scalar k = 0.8, unsigned batch_size = 1, Scalar max_norm_constraint = 0) :
-				SGDOptimizer<Scalar>::SGDOptimizer(loss, reg, k, batch_size, max_norm_constraint),
+	VanillaSGDOptimizer(const Loss<Scalar>& loss, const RegularizationPenalty<Scalar>& reg, unsigned batch_size = 1,
+			Scalar k = 0.8, Scalar learning_rate = 1e-3) :
+				SGDOptimizer<Scalar>::SGDOptimizer(loss, reg, batch_size, k),
 				learning_rate(learning_rate) {
 		assert(learning_rate > 0);
 	};
@@ -295,24 +286,24 @@ template<typename Scalar>
 class MomentumAcceleratedSGDOptimizer : public SGDOptimizer<Scalar> {
 public:
 	MomentumAcceleratedSGDOptimizer(const Loss<Scalar>& loss, const RegularizationPenalty<Scalar>& reg,
-			Scalar init_learning_rate = 1e-3, Scalar decay = 1e-3, Scalar momentum = .9, Scalar k = 0.8,
-			unsigned batch_size = 1, Scalar max_norm_constraint = 0) :
-				SGDOptimizer<Scalar>::SGDOptimizer(loss, reg, k, batch_size, max_norm_constraint),
+			unsigned batch_size = 1, Scalar k = 0.8, Scalar init_learning_rate = 1e-3, Scalar learning_rate_decay = 1e-3,
+			Scalar momentum = .9) :
+				SGDOptimizer<Scalar>::SGDOptimizer(loss, reg, batch_size, k),
 				init_learning_rate(init_learning_rate),
-				decay(decay),
+				learning_rate_decay(learning_rate_decay),
 				momentum(momentum) {
 		assert(init_learning_rate > 0);
-		assert(decay >= 0);
+		assert(learning_rate_decay >= 0);
 		assert(momentum > 0 && momentum < 1);
 	};
 	virtual ~MomentumAcceleratedSGDOptimizer() = default;
 protected:
 	void fit(NeuralNetwork<Scalar>& net) {
 		std::vector<Layer<Scalar>*> layers = Optimizer<Scalar>::get_layers(net);
-		grads_vec = std::vector<AcceleratedGradients>(layers.size());
+		grads_vec = std::vector<Gradients>(layers.size());
 		for (unsigned i = 0; i < grads_vec.size(); i++) {
 			Layer<Scalar>* layer_ptr = layers[i];
-			AcceleratedGradients& vel = grads_vec[i];
+			Gradients& vel = grads_vec[i];
 			vel.weight = Matrix<Scalar>(Optimizer<Scalar>::get_weight_grads(layer_ptr).rows(),
 					Optimizer<Scalar>::get_weight_grads(layer_ptr).cols());
 			vel.weight.setZero(vel.weight.rows(), vel.weight.cols());
@@ -326,7 +317,7 @@ protected:
 	};
 	void update_params(Layer<Scalar>* layer_ptr, unsigned i, unsigned epoch) {
 		Scalar learning_rate = calculate_learning_rate(epoch);
-		AcceleratedGradients& grads = grads_vec[i];
+		Gradients& grads = grads_vec[i];
 		Matrix<Scalar>& weights = Optimizer<Scalar>::get_weights(layer_ptr);
 		grads.weight = momentum * grads.weight - learning_rate * (Optimizer<Scalar>::get_weight_grads(layer_ptr) +
 				SGDOptimizer<Scalar>::reg.d_function(weights));
@@ -339,31 +330,31 @@ protected:
 		}
 	};
 	Scalar calculate_learning_rate(unsigned epoch) {
-		return init_learning_rate / (1.0 + decay * epoch);
+		return init_learning_rate / (1.0 + learning_rate_decay * epoch);
 	};
 	Scalar init_learning_rate;
-	Scalar decay;
+	Scalar learning_rate_decay;
 	Scalar momentum;
-	struct AcceleratedGradients {
+	struct Gradients {
 		Matrix<Scalar> weight;
 		RowVector<Scalar> beta;
 		RowVector<Scalar> gamma;
 	};
-	std::vector<AcceleratedGradients> grads_vec;
+	std::vector<Gradients> grads_vec;
 };
 
 template<typename Scalar>
 class NesterovMomentumAcceleratedSGDOptimizer : public MomentumAcceleratedSGDOptimizer<Scalar> {
 public:
 	NesterovMomentumAcceleratedSGDOptimizer(const Loss<Scalar>& loss, const RegularizationPenalty<Scalar>& reg,
-			Scalar init_learning_rate = 1e-3, Scalar decay = 1e-3, Scalar momentum = .9, Scalar k = 0.8,
-			unsigned batch_size = 1, Scalar max_norm_constraint = 0) :
-				MomentumAcceleratedSGDOptimizer<Scalar>::MomentumDrivenSGDOptimizer(loss, reg, init_learning_rate,
-				decay, momentum, k, batch_size, max_norm_constraint) { };
+			unsigned batch_size = 1, Scalar k = 0.8, Scalar init_learning_rate = 1e-3, Scalar learning_rate_decay = 1e-3,
+			Scalar momentum = .9) :
+				MomentumAcceleratedSGDOptimizer<Scalar>::MomentumAcceleratedSGDOptimizer(loss, reg, batch_size,
+				k, init_learning_rate, learning_rate_decay, momentum) { };
 protected:
 	void update_params(Layer<Scalar>* layer_ptr, unsigned i, unsigned epoch) {
 		Scalar learning_rate = MomentumAcceleratedSGDOptimizer<Scalar>::calculate_learning_rate(epoch);
-		typename MomentumAcceleratedSGDOptimizer<Scalar>::AcceleratedGradients& grads =
+		typename MomentumAcceleratedSGDOptimizer<Scalar>::Gradients& grads =
 				MomentumAcceleratedSGDOptimizer<Scalar>::grads_vec[i];
 		Matrix<Scalar>& weights = Optimizer<Scalar>::get_weights(layer_ptr);
 		Matrix<Scalar> acc_weight_grads = grads.weight;
@@ -387,7 +378,238 @@ protected:
 	};
 };
 
-// TODO: RMSProp, Adagrad, Nadam, Conjugate Gradient, L-BFGS, LMA, EA, and Particle Swarm
+template<typename Scalar>
+class AdagradOptimizer : public SGDOptimizer<Scalar> {
+public:
+	AdagradOptimizer(const Loss<Scalar>& loss, const RegularizationPenalty<Scalar>& reg, unsigned batch_size = 1,
+			Scalar k = 0.8, Scalar learning_rate = 1e-2, Scalar epsilon = 1e-8) :
+				SGDOptimizer<Scalar>::SGDOptimizer(loss, reg, batch_size, k),
+				learning_rate(learning_rate),
+				epsilon(epsilon) {
+		assert(learning_rate > 0);
+		assert(epsilon > 0);
+	};
+	virtual ~AdagradOptimizer() = default;
+protected:
+	void fit(NeuralNetwork<Scalar>& net) {
+		std::vector<Layer<Scalar>*> layers = Optimizer<Scalar>::get_layers(net);
+		grads_vec = std::vector<GradientSquares>(layers.size());
+		for (unsigned i = 0; i < grads_vec.size(); i++) {
+			Layer<Scalar>* layer_ptr = layers[i];
+			GradientSquares& vel = grads_vec[i];
+			vel.weight = Matrix<Scalar>(Optimizer<Scalar>::get_weight_grads(layer_ptr).rows(),
+					Optimizer<Scalar>::get_weight_grads(layer_ptr).cols());
+			vel.weight.setZero(vel.weight.rows(), vel.weight.cols());
+			if (layer_ptr->get_batch_norm()) {
+				vel.beta = RowVector<Scalar>(Optimizer<Scalar>::get_beta_grads(layer_ptr).cols());
+				vel.beta.setZero(vel.beta.cols());
+				vel.gamma = RowVector<Scalar>(Optimizer<Scalar>::get_gamma_grads(layer_ptr).cols());
+				vel.gamma.setZero(vel.gamma.cols());
+			}
+		}
+	};
+	virtual void update_acc_weight_grad_sqrs(Matrix<Scalar>& acc_weight_grad_sqrs,
+			const Matrix<Scalar>& weight_grads) {
+		acc_weight_grad_sqrs += weight_grads.cwiseProduct(weight_grads);
+	};
+	virtual void update_acc_batch_norm_grad_sqrs(RowVector<Scalar>& acc_batch_norm_grad_sqrs,
+			const RowVector<Scalar>& batch_norm_grads) {
+		acc_batch_norm_grad_sqrs += batch_norm_grads.cwiseProduct(batch_norm_grads);
+	};
+	void update_params(Layer<Scalar>* layer_ptr, unsigned i, unsigned epoch) {
+		GradientSquares& grad_sqrs = grads_vec[i];
+		Matrix<Scalar>& weights = Optimizer<Scalar>::get_weights(layer_ptr);
+		Matrix<Scalar> weight_grads = Optimizer<Scalar>::get_weight_grads(layer_ptr) +
+				SGDOptimizer<Scalar>::reg.d_function(weights);
+		update_acc_weight_grad_sqrs(grad_sqrs.weight, weight_grads);
+		weights -= (learning_rate * weight_grads.array() / (grad_sqrs.weight.array().sqrt() + epsilon)).matrix();
+		if (layer_ptr->get_batch_norm()) {
+			const Matrix<Scalar>& beta_grads = Optimizer<Scalar>::get_beta_grads(layer_ptr);
+			update_acc_batch_norm_grad_sqrs(grad_sqrs.beta, beta_grads);
+			Optimizer<Scalar>::get_betas(layer_ptr) -= (learning_rate * beta_grads.array() /
+					(grad_sqrs.beta.array().sqrt() + epsilon)).matrix();
+			const Matrix<Scalar>& gamma_grads = Optimizer<Scalar>::get_gamma_grads(layer_ptr);
+			update_acc_batch_norm_grad_sqrs(grad_sqrs.gamma, gamma_grads);
+			Optimizer<Scalar>::get_gammas(layer_ptr) -= (learning_rate * gamma_grads.array() /
+					(grad_sqrs.gamma.array().sqrt() + epsilon)).matrix();
+		}
+	};
+	Scalar learning_rate;
+	Scalar epsilon;
+	struct GradientSquares {
+		Matrix<Scalar> weight;
+		RowVector<Scalar> beta;
+		RowVector<Scalar> gamma;
+	};
+	std::vector<GradientSquares> grads_vec;
+};
+
+template<typename Scalar>
+class RMSPropOptimizer : public AdagradOptimizer<Scalar> {
+public:
+	RMSPropOptimizer(const Loss<Scalar>& loss, const RegularizationPenalty<Scalar>& reg,
+			unsigned batch_size = 1, Scalar k = 0.8, Scalar learning_rate = 1e-3, Scalar l2_decay = 1e-1,
+			Scalar epsilon = 1e-8) :
+				AdagradOptimizer<Scalar>::AdagradOptimizer(loss, reg, batch_size, k, learning_rate, epsilon),
+				l2_decay(l2_decay) {
+		assert(l2_decay >= 0 && l2_decay <= 1);
+	};
+protected:
+	void update_acc_weight_grad_sqrs(Matrix<Scalar>& acc_weight_grad_sqrs,
+			const Matrix<Scalar>& weight_grads) {
+		acc_weight_grad_sqrs = (1 - l2_decay) * acc_weight_grad_sqrs + l2_decay * weight_grads.cwiseProduct(weight_grads);
+	};
+	void update_acc_batch_norm_grad_sqrs(RowVector<Scalar>& acc_batch_norm_grad_sqrs,
+			const RowVector<Scalar>& batch_norm_grads) {
+		acc_batch_norm_grad_sqrs = (1 - l2_decay) * acc_batch_norm_grad_sqrs +
+				l2_decay * batch_norm_grads.cwiseProduct(batch_norm_grads);
+	};
+	Scalar l2_decay;
+};
+
+template<typename Scalar>
+class AdamOptimizer : public SGDOptimizer<Scalar> {
+public:
+	AdamOptimizer(const Loss<Scalar>& loss, const RegularizationPenalty<Scalar>& reg, unsigned batch_size = 1,
+			Scalar k = 0.8, Scalar learning_rate = 1e-3, Scalar l1_decay = 1e-1, Scalar l2_decay = 1e-3,
+			Scalar epsilon = 1e-8) :
+				SGDOptimizer<Scalar>::SGDOptimizer(loss, reg, batch_size, k),
+				learning_rate(learning_rate),
+				l1_decay(l1_decay),
+				l2_decay(l2_decay),
+				epsilon(epsilon) {
+		assert(learning_rate > 0);
+		assert(l1_decay >= 0 && l1_decay <= 1);
+		assert(l2_decay >= 0 && l2_decay <= 1);
+		assert(epsilon > 0);
+	};
+	virtual ~AdamOptimizer() = default;
+protected:
+	void fit(NeuralNetwork<Scalar>& net) {
+		std::vector<Layer<Scalar>*> layers = Optimizer<Scalar>::get_layers(net);
+		grad_norms_vec = std::vector<GradientNorms>(layers.size());
+		for (unsigned i = 0; i < grad_norms_vec.size(); i++) {
+			Layer<Scalar>* layer_ptr = layers[i];
+			GradientNorms& vel = grad_norms_vec[i];
+			vel.weight_l1 = Matrix<Scalar>(Optimizer<Scalar>::get_weight_grads(layer_ptr).rows(),
+					Optimizer<Scalar>::get_weight_grads(layer_ptr).cols());
+			vel.weight_l1.setZero(vel.weight_l1.rows(), vel.weight_l1.cols());
+			vel.weight_l2 = Matrix<Scalar>(vel.weight_l1.rows(), vel.weight_l1.cols());
+			vel.weight_l2.setZero(vel.weight_l2.rows(), vel.weight_l2.cols());
+			if (layer_ptr->get_batch_norm()) {
+				vel.beta_l1 = RowVector<Scalar>(Optimizer<Scalar>::get_beta_grads(layer_ptr).cols());
+				vel.beta_l1.setZero(vel.beta_l1.cols());
+				vel.beta_l2 = RowVector<Scalar>(vel.beta_l1.cols());
+				vel.beta_l2.setZero(vel.beta_l2.cols());
+				vel.gamma_l1 = RowVector<Scalar>(Optimizer<Scalar>::get_gamma_grads(layer_ptr).cols());
+				vel.gamma_l1.setZero(vel.gamma_l1.cols());
+				vel.gamma_l2 = RowVector<Scalar>(vel.gamma_l1.cols());
+				vel.gamma_l2.setZero(vel.gamma_l2.cols());
+			}
+		}
+	};
+	void update_params(Layer<Scalar>* layer_ptr, unsigned i, unsigned epoch) {
+		GradientNorms& grad_norms = grad_norms_vec[i];
+		Scalar l1_corr = 1.0 / (1.0 - pow(1.0 - l1_decay, epoch + 1) + epsilon);
+		Scalar l2_corr = 1.0 / (1.0 - pow(1.0 - l2_decay, epoch + 1) + epsilon);
+		Matrix<Scalar>& weights = Optimizer<Scalar>::get_weights(layer_ptr);
+		Matrix<Scalar> weight_grads = Optimizer<Scalar>::get_weight_grads(layer_ptr) +
+				SGDOptimizer<Scalar>::reg.d_function(weights);
+		grad_norms.weight_l1 = (1 - l1_decay) * grad_norms.weight_l1 + l1_decay * weight_grads;
+		grad_norms.weight_l2 = (1 - l2_decay) * grad_norms.weight_l2 +
+				l2_decay * weight_grads.cwiseProduct(weight_grads);
+		weights -= (learning_rate * (grad_norms.weight_l1 * l1_corr).array() /
+				((grad_norms.weight_l2 * l2_corr).array().sqrt() + epsilon)).matrix();
+		if (layer_ptr->get_batch_norm()) {
+			const Matrix<Scalar>& beta_grads = Optimizer<Scalar>::get_beta_grads(layer_ptr);
+			grad_norms.beta_l1 = (1 - l1_decay) * grad_norms.beta_l1 + l1_decay * beta_grads;
+			grad_norms.beta_l2 = (1 - l2_decay) * grad_norms.beta_l2 + l2_decay * beta_grads.cwiseProduct(beta_grads);
+			Optimizer<Scalar>::get_betas(layer_ptr) -= (learning_rate * (grad_norms.beta_l1 * l1_corr).array() /
+					((grad_norms.beta_l2 * l2_corr).array().sqrt() + epsilon)).matrix();
+			const Matrix<Scalar>& gamma_grads = Optimizer<Scalar>::get_gamma_grads(layer_ptr);
+			grad_norms.gamma_l1 = (1 - l1_decay) * grad_norms.gamma_l1 + l1_decay * gamma_grads;
+			grad_norms.gamma_l2 = (1 - l2_decay) * grad_norms.gamma_l2 + l2_decay * gamma_grads.cwiseProduct(gamma_grads);
+			Optimizer<Scalar>::get_betas(layer_ptr) -= (learning_rate * (grad_norms.gamma_l1 * l1_corr).array() /
+					((grad_norms.gamma_l2 * l2_corr).array().sqrt() + epsilon)).matrix();
+		}
+	};
+	Scalar learning_rate;
+	Scalar l1_decay;
+	Scalar l2_decay;
+	Scalar epsilon;
+	struct GradientNorms {
+		Matrix<Scalar> weight_l1;
+		Matrix<Scalar> weight_l2;
+		RowVector<Scalar> beta_l1;
+		RowVector<Scalar> beta_l2;
+		RowVector<Scalar> gamma_l1;
+		RowVector<Scalar> gamma_l2;
+	};
+	std::vector<GradientNorms> grad_norms_vec;
+};
+
+template<typename Scalar>
+class AdaMaxOptimizer : public AdamOptimizer<Scalar> {
+public:
+	AdaMaxOptimizer(const Loss<Scalar>& loss, const RegularizationPenalty<Scalar>& reg, unsigned batch_size = 1,
+			Scalar k = 0.8, Scalar learning_rate = 1e-3, Scalar l1_decay = 1e-1, Scalar l2_decay = 1e-3,
+			Scalar epsilon = 1e-8) :
+				AdamOptimizer<Scalar>::AdamOptimizer(loss, reg, batch_size, k, learning_rate, l1_decay,
+				l2_decay, epsilon) { };
+protected:
+	void update_params(Layer<Scalar>* layer_ptr, unsigned i, unsigned epoch) {
+		typename AdamOptimizer<Scalar>::GradientNorms& grad_norms = AdamOptimizer<Scalar>::grad_norms_vec[i];
+		Scalar l1_corr = 1.0 / (1.0 - pow(1.0 - AdamOptimizer<Scalar>::l1_decay, epoch + 1) + AdamOptimizer<Scalar>::epsilon);
+		Matrix<Scalar>& weights = Optimizer<Scalar>::get_weights(layer_ptr);
+		Matrix<Scalar> weight_grads = Optimizer<Scalar>::get_weight_grads(layer_ptr) +
+				SGDOptimizer<Scalar>::reg.d_function(weights);
+		grad_norms.weight_l1 = (1 - AdamOptimizer<Scalar>::l1_decay) * grad_norms.weight_l1 +
+				AdamOptimizer<Scalar>::l1_decay * weight_grads;
+		grad_norms.weight_l2 = ((1 - AdamOptimizer<Scalar>::l2_decay) * grad_norms.weight_l2)
+				.cwiseMax(weight_grads.cwiseAbs());
+		weights -= (AdamOptimizer<Scalar>::learning_rate * (grad_norms.weight_l1 * l1_corr).array() /
+				(grad_norms.weight_l2.array() + AdamOptimizer<Scalar>::epsilon)).matrix();
+		if (layer_ptr->get_batch_norm()) {
+			const Matrix<Scalar>& beta_grads = Optimizer<Scalar>::get_beta_grads(layer_ptr);
+			grad_norms.beta_l1 = (1 - AdamOptimizer<Scalar>::l1_decay) * grad_norms.beta_l1 +
+					AdamOptimizer<Scalar>::l1_decay * beta_grads;
+			grad_norms.beta_l2 = ((1 - AdamOptimizer<Scalar>::l2_decay) * grad_norms.beta_l2)
+					.cwiseMax(beta_grads.cwiseAbs());
+			Optimizer<Scalar>::get_betas(layer_ptr) -= (AdamOptimizer<Scalar>::learning_rate *
+					(grad_norms.beta_l1 * l1_corr).array() /
+					(grad_norms.beta_l2.array() + AdamOptimizer<Scalar>::epsilon)).matrix();
+			const Matrix<Scalar>& gamma_grads = Optimizer<Scalar>::get_gamma_grads(layer_ptr);
+			grad_norms.gamma_l1 = (1 - AdamOptimizer<Scalar>::l1_decay) * grad_norms.gamma_l1 +
+					AdamOptimizer<Scalar>::l1_decay * gamma_grads;
+			grad_norms.gamma_l2 = ((1 - AdamOptimizer<Scalar>::l2_decay) * grad_norms.gamma_l2)
+					.cwiseMax(gamma_grads.cwiseAbs());
+			Optimizer<Scalar>::get_gammas(layer_ptr) -= (AdamOptimizer<Scalar>::learning_rate *
+					(grad_norms.gamma_l1 * l1_corr).array() /
+					(grad_norms.gamma_l2.array() + AdamOptimizer<Scalar>::epsilon)).matrix();
+		}
+	};
+};
+
+template<typename Scalar>
+class NadamOptimizer : public AdamOptimizer<Scalar> {
+public:
+	NadamOptimizer(const Loss<Scalar>& loss, const RegularizationPenalty<Scalar>& reg, unsigned batch_size = 1,
+			Scalar k = 0.8, Scalar learning_rate = 1e-3, Scalar l1_decay = 1e-1, Scalar l2_decay = 1e-3,
+			Scalar epsilon = 1e-8) :
+				AdamOptimizer<Scalar>::AdamOptimizer(loss, reg, batch_size, k, learning_rate, l1_decay,
+				l2_decay, epsilon) { };
+protected:
+	void update_params(Layer<Scalar>* layer_ptr, unsigned i, unsigned epoch) {
+		typename AdamOptimizer<Scalar>::GradientNorms& grad_norms = AdamOptimizer<Scalar>::grad_norms_vec[i];
+		Scalar l1_corr = 1.0 / (1.0 - pow(1.0 - AdamOptimizer<Scalar>::l1_decay, epoch + 1) + AdamOptimizer<Scalar>::epsilon);
+
+		if (layer_ptr->get_batch_norm()) {
+
+		}
+	};
+};
+
+// TODO: Conjugate Gradient, L-BFGS, LMA, (EA, and Particle Swarm)?
 
 } /* namespace cppnn */
 

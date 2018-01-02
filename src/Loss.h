@@ -128,7 +128,7 @@ public:
 	};
 	Matrix<Scalar> d_function(const Matrix<Scalar>& out, const Matrix<Scalar>& obj) const {
 		assert(out.rows() == obj.rows() && out.cols() == obj.cols());
-		return (-obj.array() / (out.array().max(epsilon))) / out.rows();
+		return (-obj.array() / (out.array() + epsilon)) / out.rows();
 	}
 private:
 	Scalar epsilon;
