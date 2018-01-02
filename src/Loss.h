@@ -55,8 +55,8 @@ public:
 			int correct_class_ind = -1;
 			for (int j = 0; j < obj.cols(); j++) {
 				Scalar obj_ij = obj(i,j);
-				assert((almost_equal(obj_ij, .0) || almost_equal(obj_ij, 1.0)));
-				if (almost_equal(obj_ij, 1.0)) {
+				assert((Utils<Scalar>::almost_equal(obj_ij, .0) || Utils<Scalar>::almost_equal(obj_ij, 1.0)));
+				if (Utils<Scalar>::almost_equal(obj_ij, 1.0)) {
 					ones++;
 					correct_class_ind = j;
 				}
@@ -83,8 +83,8 @@ public:
 			int correct_class_ind = -1;
 			for (int j = 0; j < out.cols(); j++) {
 				Scalar obj_ij = obj(i,j);
-				assert((almost_equal(obj_ij, .0) || almost_equal(obj_ij, 1.0)));
-				if (almost_equal(obj_ij, 1.0)) {
+				assert((Utils<Scalar>::almost_equal(obj_ij, .0) || Utils<Scalar>::almost_equal(obj_ij, 1.0)));
+				if (Utils<Scalar>::almost_equal(obj_ij, 1.0)) {
 					ones++;
 					correct_class_ind = j;
 				}
@@ -98,7 +98,7 @@ public:
 				}
 				Scalar out_ij = out(i,j);
 				Scalar margin = out_ij - correct_class_score + 1;
-				if (decidedly_greater(margin, .0)) {
+				if (Utils<Scalar>::decidedly_greater(margin, .0)) {
 					Scalar out_grad = squared ? 2 * (out_ij - correct_class_score) : 1;
 					total_out_grad += out_grad;
 					out_grads(i,j) = out_grad;
@@ -120,7 +120,7 @@ private:
 template<typename Scalar>
 class CrossEntropyLoss : public Loss<Scalar> {
 public:
-	CrossEntropyLoss(Scalar epsilon = 1e-8) :
+	CrossEntropyLoss(Scalar epsilon = Utils<Scalar>::EPSILON) :
 		epsilon(epsilon) { };
 	ColVector<Scalar> function(const Matrix<Scalar>& out, const Matrix<Scalar>& obj) const {
 		assert(out.rows() == obj.rows() && out.cols() == obj.cols());
@@ -149,7 +149,7 @@ public:
 			Scalar loss_i = 0;
 			for (int j = 0; j < obj.cols(); j++) {
 				Scalar obj_ij = obj(i,j);
-				assert((almost_equal(obj_ij, -1.0) || almost_equal(obj_ij, 1.0)));
+				assert((Utils<Scalar>::almost_equal(obj_ij, -1.0) || Utils<Scalar>::almost_equal(obj_ij, 1.0)));
 				Scalar loss_ij = std::max(.0, 1 - obj_ij * out(i,j));
 				loss_i += squared ? loss_ij * loss_ij : loss_ij;
 			}
@@ -163,10 +163,10 @@ public:
 		for (int i = 0; i < out.rows(); i++) {
 			for (int j = 0; j < out.cols(); j++) {
 				Scalar obj_ij = obj(i,j);
-				assert((almost_equal(obj_ij, -1.0) || almost_equal(obj_ij, 1.0)));
+				assert((Utils<Scalar>::almost_equal(obj_ij, -1.0) || Utils<Scalar>::almost_equal(obj_ij, 1.0)));
 				Scalar out_ij = out(i,j);
 				Scalar margin = 1 - obj_ij * out_ij;
-				if (decidedly_greater(margin, .0)) {
+				if (Utils<Scalar>::decidedly_greater(margin, .0)) {
 					out_grads(i,j) = squared ? 2 * out_ij - 2 * obj_ij : -obj_ij;
 				} else {
 					out_grads(i,j) = 0;
@@ -185,7 +185,7 @@ private:
 template<typename Scalar>
 class MultiLabelLogLoss : public Loss<Scalar> {
 public:
-	MultiLabelLogLoss(Scalar epsilon = 1e-8) :
+	MultiLabelLogLoss(Scalar epsilon = Utils<Scalar>::EPSILON) :
 		epsilon(epsilon) { };
 	ColVector<Scalar> function(const Matrix<Scalar>& out, const Matrix<Scalar>& obj) const {
 		assert(out.rows() == obj.rows() && out.cols() == obj.cols());
@@ -194,7 +194,7 @@ public:
 			Scalar loss_i = 0;
 			for (int j = 0; j < out.cols(); j++) {
 				Scalar obj_ij = obj(i,j);
-				assert(almost_equal(obj_ij, .0) || almost_equal(obj_ij, 1.0));
+				assert(Utils<Scalar>::almost_equal(obj_ij, .0) || Utils<Scalar>::almost_equal(obj_ij, 1.0));
 				Scalar out_ij = out(i,j);
 				loss_i += (obj_ij * log(out_ij) + (1 - obj_ij) * log(1 - out_ij));
 			}
@@ -209,8 +209,8 @@ public:
 		for (int i = 0; i < rows; i++) {
 			for (int j = 0; j < out_grads.cols(); j++) {
 				Scalar obj_ij = obj(i,j);
-				assert(almost_equal(obj_ij, .0) || almost_equal(obj_ij, 1.0));
-				Scalar denominator = out(i,j) - (Scalar) (almost_equal(obj_ij, .0));
+				assert(Utils<Scalar>::almost_equal(obj_ij, .0) || Utils<Scalar>::almost_equal(obj_ij, 1.0));
+				Scalar denominator = out(i,j) - (Scalar) (Utils<Scalar>::almost_equal(obj_ij, .0));
 				if (denominator == 0) {
 					denominator += (rand() % 2 == 0 ? epsilon : -epsilon);
 				}

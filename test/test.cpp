@@ -21,7 +21,7 @@
 
 typedef double Scalar;
 
-static Scalar func(Scalar x, Scalar y, Scalar z) {
+static Scalar f(Scalar x, Scalar y, Scalar z) {
 	return x * x * x + x * y + 3 * z - x * y * z + 10;
 };
 
@@ -40,11 +40,9 @@ int main() {
 		}
 	}
 	cppnn::Matrix<Scalar> obj(data.rows(), 1);
-	for (int i = 0; i < obj.rows(); i++) {
-		obj(i,0) = func(data(i,0), data(i,1), data(i,2));
-	}
-	cppnn::NormalizationDataPreprocessor<Scalar> preproc(true);
-//	cppnn::PCAPreprocessor<Scalar> preproc(true, true, 0.99);
+	for (int i = 0; i < obj.rows(); i++)
+		obj(i,0) = f(data(i,0), data(i,1), data(i,2));
+	cppnn::PCADataPreprocessor<Scalar> preproc(true, true, 0.99);
 	preproc.fit(data);
 	preproc.transform(data);
 	cppnn::ReLUWeightInitialization<Scalar> init;
@@ -59,14 +57,14 @@ int main() {
 	nn.init();
 	cppnn::QuadraticLoss<Scalar> loss;
 	cppnn::L2RegularizationPenalty<Scalar> reg(1e-3);
-	cppnn::AdaMaxOptimizer<Scalar> opt(loss, reg, 32, .8);
+	cppnn::NadamOptimizer<Scalar> opt(loss, reg, 32);
 	std::cout << nn.to_string() << std::endl << std::endl;
 //	std::cout << opt.verify_gradients(nn, data, obj) << std::endl;
 	opt.train(nn, data, obj, 200);
 	Scalar x = -0.31452;
 	Scalar y = 0.441;
 	Scalar z = -1.44579;
-	Scalar out = func(x, y, z);
+	Scalar out = f(x, y, z);
 	cppnn::Matrix<Scalar> in(1, 3);
 	in(0,0) = x;
 	in(0,1) = y;

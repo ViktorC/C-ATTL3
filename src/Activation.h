@@ -71,7 +71,7 @@ public:
 template<typename Scalar>
 class SoftmaxActivation : public Activation<Scalar> {
 public:
-	SoftmaxActivation(Scalar epsilon = 1e-8) :
+	SoftmaxActivation(Scalar epsilon = Utils<Scalar>::EPSILON) :
 			epsilon(epsilon) {
 		assert(epsilon > 0);
 	};
@@ -147,7 +147,7 @@ private:
 	Scalar alpha;
 };
 
-// TODO Consider implementing the PReLU activation.
+// TODO Consider implementing PReLU.
 
 } /* namespace cppnn */
 

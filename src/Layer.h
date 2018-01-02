@@ -49,7 +49,7 @@ protected:
 	virtual const RowVector<Scalar>& get_beta_grads() const = 0;
 	virtual RowVector<Scalar>& get_gammas() = 0;
 	virtual const RowVector<Scalar>& get_gamma_grads() const = 0;
-	virtual void enforce_max_norm() = 0;
+	virtual void enforce_constraints() = 0;
 	virtual Matrix<Scalar> pass_forward(Matrix<Scalar> prev_out, bool training) = 0;
 	virtual Matrix<Scalar> pass_back(Matrix<Scalar> out_grads) = 0;
 };
@@ -67,17 +67,17 @@ class FCLayer : public Layer<Scalar> {
 public:
 	FCLayer(unsigned prev_size, unsigned size, const WeightInitialization<Scalar>& weight_init,
 			const Activation<Scalar>& act, Scalar dropout_prob = 0, bool batch_norm = false,
-			Scalar norm_avg_decay = .1, Scalar max_norm_constraint = .0, Scalar epsilon = 1e-8) :
+			Scalar norm_avg_decay = 1e-1, Scalar max_norm_constraint = 0, Scalar epsilon = Utils<Scalar>::EPSILON) :
 				prev_size(prev_size),
 				size(size),
 				weight_init(weight_init),
 				act(act),
 				dropout_prob(dropout_prob),
-				dropout(decidedly_greater(dropout_prob, (Scalar) .0, epsilon, epsilon)),
+				dropout(Utils<Scalar>::decidedly_greater(dropout_prob, (Scalar) .0, epsilon, epsilon)),
 				batch_norm(batch_norm),
 				norm_avg_decay(norm_avg_decay),
 				max_norm_constraint(max_norm_constraint),
-				max_norm(decidedly_greater(max_norm_constraint, (Scalar) .0, epsilon, epsilon)),
+				max_norm(Utils<Scalar>::decidedly_greater(max_norm_constraint, (Scalar) .0, epsilon, epsilon)),
 				epsilon(epsilon),
 				weights(prev_size + 1, size),
 				weight_grads(prev_size + 1, size),
@@ -144,7 +144,7 @@ protected:
 	const RowVector<Scalar>& get_gamma_grads() const {
 		return gamma_grads;
 	};
-	void enforce_max_norm() {
+	void enforce_constraints() {
 		if (max_norm) {
 			Scalar l2_norm = weights.squaredNorm();
 			if (l2_norm > max_norm_constraint)
@@ -181,7 +181,7 @@ protected:
 		if (training && dropout) {
 			Matrix<Scalar> dropout_mask(prev_out.rows(), prev_out.cols());
 			dropout_mask.setRandom(prev_out.rows(), prev_out.cols());
-			Scalar scaling_factor = 1 / std::max(1 - dropout_prob, epsilon);
+			Scalar scaling_factor = 1 / 1 - dropout_prob + epsilon;
 			dropout_mask = ((dropout_mask.array() + 1) / 2).unaryExpr([this,scaling_factor](Scalar i) {
 				return (Scalar) (i <= dropout_prob ? .0 : scaling_factor);
 			});

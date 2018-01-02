@@ -30,7 +30,7 @@ template<typename Scalar>
 class NormalizationDataPreprocessor : public DataPreprocessor<Scalar> {
 public:
 	NormalizationDataPreprocessor(bool standardize = false,
-			Scalar epsilon = EPSILON) :
+			Scalar epsilon = Utils<Scalar>::EPSILON) :
 				standardize(standardize),
 				epsilon(epsilon) {
 		assert(epsilon > 0 && "epsilon must be greater than 0");
@@ -50,14 +50,10 @@ public:
 		assert(means.cols() == data.cols() && "mismatched fit and transform "
 				"input matrix dimensions");
 		data = data.rowwise() - means;
-		if (standardize) {
-			for (int i = 0; i < sd.cols(); i++) {
-				data.col(i) /= sd(i);
-			}
-		}
+		if (standardize)
+			data *= (sd.array() + epsilon).inverse().matrix().asDiagonal();
 	};
 protected:
-	static constexpr Scalar EPSILON = 1e-8;
 	bool standardize;
 	float epsilon;
 	RowVector<Scalar> means;
@@ -68,7 +64,7 @@ template<typename Scalar>
 class PCADataPreprocessor : public NormalizationDataPreprocessor<Scalar> {
 public:
 	PCADataPreprocessor(bool standardize = false, bool whiten = false, float min_rel_var_to_retain = 1,
-			Scalar epsilon = NormalizationDataPreprocessor<Scalar>::EPSILON) :
+			Scalar epsilon = Utils<Scalar>::EPSILON) :
 				NormalizationDataPreprocessor<Scalar>::NormalizationDataPreprocessor(standardize, epsilon),
 				whiten(whiten),
 				min_rel_var_to_retain(min_rel_var_to_retain) {
@@ -80,11 +76,9 @@ public:
 		NormalizationDataPreprocessor<Scalar>::fit(data);
 		Matrix<Scalar> normalized_data = data.rowwise() -
 				NormalizationDataPreprocessor<Scalar>::means;
-		if (NormalizationDataPreprocessor<Scalar>::standardize) {
-			for (int i = 0; i < NormalizationDataPreprocessor<Scalar>::sd.cols(); i++) {
-				normalized_data.row(i) /= NormalizationDataPreprocessor<Scalar>::sd(i);
-			}
-		}
+		if (NormalizationDataPreprocessor<Scalar>::standardize)
+			normalized_data *= (NormalizationDataPreprocessor<Scalar>::sd.array() +
+					NormalizationDataPreprocessor<Scalar>::epsilon).inverse().matrix().asDiagonal();
 		// Compute the covariance matrix.
 		Matrix<Scalar> cov = normalized_data.transpose() * normalized_data /
 				normalized_data.rows();
@@ -104,20 +98,16 @@ public:
 		/* The eigen vectors are sorted based on the magnitude of their
 		 * corresponding eigen values. */
 		eigen_basis = eigen_solver.eigenvectors().rightCols(dims_to_retain);
-		if (whiten) {
-			// The eigen values are only needed if whitening is enabled.
+		if (whiten) // The eigen values are only needed if whitening is enabled.
 			this->eigen_values = eigen_values.bottomRows(dims_to_retain).transpose();
-		}
 	};
 	void transform(Matrix<Scalar>& data) const {
 		NormalizationDataPreprocessor<Scalar>::transform(data);
 		data *= eigen_basis;
 		if (whiten) {
-			for (int i = 0; i < data.cols(); i++) {
-				// Add a small constant to avoid division by zero.
+			for (int i = 0; i < data.cols(); i++)
 				data.col(i) *= 1 / sqrt(eigen_values(i) +
 						NormalizationDataPreprocessor<Scalar>::epsilon);
-			}
 		}
 	};
 private:
