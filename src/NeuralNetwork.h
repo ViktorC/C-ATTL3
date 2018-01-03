@@ -94,7 +94,7 @@ public:
 	};
 protected:
 	virtual std::vector<Layer<Scalar>*>& get_layers() = 0;
-	virtual Matrix<Scalar> propagate(Matrix<Scalar> input, bool train) = 0;
+	virtual Matrix<Scalar> propagate(Matrix<Scalar> input, bool training) = 0;
 	virtual void backpropagate(Matrix<Scalar> out_grads) = 0;
 	static Matrix<Scalar> pass_forward(Layer<Scalar>& layer, Matrix<Scalar> prev_out, bool training) {
 		return layer.pass_forward(prev_out, training);
@@ -173,12 +173,12 @@ protected:
 	std::vector<Layer<Scalar>*>& get_layers() {
 		return layers;
 	};
-	Matrix<Scalar> propagate(Matrix<Scalar> input, bool train) {
+	Matrix<Scalar> propagate(Matrix<Scalar> input, bool training) {
 		assert(input_size == (unsigned) input.cols() &&
 				"wrong neural network input size");
 		assert(input.rows() >= 0 && input.cols() >= 0 && "empty feed forward input");
 		for (unsigned i = 0; i < layers.size(); i++) {
-			input = NeuralNetwork<Scalar>::pass_forward(*(layers[i]), input, true);
+			input = NeuralNetwork<Scalar>::pass_forward(*(layers[i]), input, training);
 		}
 		return input;
 	};

@@ -19,6 +19,8 @@
 #include <Vector.h>
 #include <WeightInitialization.h>
 
+#include <iostream>
+
 namespace cppnn {
 
 // Forward declarations to NeuralNetwork and Optimizer so they can be friended.
@@ -67,7 +69,7 @@ class FCLayer : public Layer<Scalar> {
 public:
 	FCLayer(unsigned prev_size, unsigned size, const WeightInitialization<Scalar>& weight_init,
 			const Activation<Scalar>& act, Scalar dropout_prob = 0, bool batch_norm = false,
-			Scalar norm_avg_decay = 1e-1, Scalar max_norm_constraint = 0, Scalar epsilon = Utils<Scalar>::EPSILON) :
+			Scalar norm_avg_decay = 5e-2, Scalar max_norm_constraint = 0, Scalar epsilon = Utils<Scalar>::EPSILON) :
 				prev_size(prev_size),
 				size(size),
 				weight_init(weight_init),
@@ -121,6 +123,7 @@ protected:
 	void empty_cache() {
 		std_prev_out_factor = RowVector<Scalar>(0);
 		centered_prev_out = Matrix<Scalar>(0, 0);
+		dropout_mask = Matrix<Scalar>(0, 0);
 		biased_prev_out = Matrix<Scalar>(0, 0);
 		in = Matrix<Scalar>(0, 0);
 		out = Matrix<Scalar>(0, 0);
@@ -157,31 +160,36 @@ protected:
 		// Batch normalization.
 		if (batch_norm) {
 			if (training) {
+//				std::cout << "prev_out:" << std::endl << prev_out << std::endl << std::endl;
 				RowVector<Scalar> means = prev_out.colwise().mean();
 				centered_prev_out = prev_out.rowwise() - means;
+//				std::cout << "centered_prev_out:" << std::endl << centered_prev_out << std::endl << std::endl;
 				RowVector<Scalar> vars = centered_prev_out.array().square().matrix().colwise().mean();
 				std_prev_out_factor = (vars.array() + epsilon).cwiseSqrt().cwiseInverse();
 				prev_out = centered_prev_out * std_prev_out_factor.asDiagonal();
+//				std::cout << "standardized_prev_out:" << std::endl << prev_out << std::endl << std::endl;
 				/* Maintain a moving average of means and variances
 				 * for testing. */
 				if (moving_means_init) {
-					avg_means = (1 - norm_avg_decay) * avg_means + norm_avg_decay * means;
-					avg_vars = (1 - norm_avg_decay) * avg_vars + norm_avg_decay * vars;
+					avg_means = (1.0 - norm_avg_decay) * avg_means + norm_avg_decay * means;
+					avg_vars = (1.0 - norm_avg_decay) * avg_vars + norm_avg_decay * vars;
 				} else {
 					avg_means = means;
 					avg_vars = vars;
 					moving_means_init = true;
 				}
-			} else // For testing, use the moving averages.
+			} else if (moving_means_init) { // For testing, use the moving averages.
 				prev_out = (prev_out.rowwise() - avg_means) *
 						(avg_vars.array() + epsilon).cwiseSqrt().cwiseInverse().matrix().asDiagonal();
+			}
 			prev_out = (prev_out * gammas.asDiagonal()).rowwise() + betas;
+//			std::cout << "beta_gamma_adjusted_prev_out:" << std::endl << prev_out << std::endl << std::endl;
 		}
 		// Dropout.
 		if (training && dropout) {
 			Matrix<Scalar> dropout_mask(prev_out.rows(), prev_out.cols());
 			dropout_mask.setRandom(prev_out.rows(), prev_out.cols());
-			Scalar scaling_factor = 1 / 1 - dropout_prob + epsilon;
+			Scalar scaling_factor = 1 / (1 - dropout_prob + epsilon);
 			dropout_mask = ((dropout_mask.array() + 1) / 2).unaryExpr([this,scaling_factor](Scalar i) {
 				return (Scalar) (i <= dropout_prob ? .0 : scaling_factor);
 			});

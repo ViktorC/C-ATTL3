@@ -6,6 +6,7 @@
  */
 
 #include <Activation.h>
+#include <cmath>
 #include <DataPreprocessor.h>
 #include <Eigen/Dense>
 #include <iostream>
@@ -22,16 +23,17 @@
 typedef double Scalar;
 
 static Scalar f(Scalar x, Scalar y, Scalar z) {
-	return x * x * x + x * y + 3 * z - x * y * z + 10;
+//	return x * x * x + x * y + 3 * z - x * y * z + 10;
+	return sin(x) + cos(y) + tan(z);
 };
 
 int main() {
 	std::cout << "Number of threads: " << Eigen::nbThreads() << std::endl;
-	cppnn::Matrix<Scalar> data(21 * 21 * 21, 3);
+	cppnn::Matrix<Scalar> data(51 * 81 * 51, 3);
 	unsigned row = 0;
-	for (Scalar i = -2.0; i <= 2.01; i += .2) {
-		for (Scalar j = -1.0; j <= 1.01; j += .1) {
-			for (Scalar k = -3.0; k <= 3.01; k += .3) {
+	for (Scalar i = -5.0; i <= 5.01; i += .2) {
+		for (Scalar j = -3.5; j <= 1.509; j += .1) {
+			for (Scalar k = -3.0; k <= 12.01; k += .3) {
 				data(row, 0) = i;
 				data(row, 1) = j;
 				data(row, 2) = k;
@@ -57,9 +59,9 @@ int main() {
 	nn.init();
 	cppnn::QuadraticLoss<Scalar> loss;
 	cppnn::L2RegularizationPenalty<Scalar> reg(1e-3);
-	cppnn::NadamOptimizer<Scalar> opt(loss, reg, 32);
+	cppnn::NadamOptimizer<Scalar> opt(loss, reg, 64);
 	std::cout << nn.to_string() << std::endl << std::endl;
-//	std::cout << opt.verify_gradients(nn, data, obj) << std::endl;
+//	std::cout << opt.verify_gradients(nn, data.topRows(200), obj.topRows(200)) << std::endl;
 	opt.train(nn, data, obj, 200);
 	Scalar x = -0.31452;
 	Scalar y = 0.441;

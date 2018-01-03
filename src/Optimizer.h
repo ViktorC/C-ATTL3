@@ -109,6 +109,7 @@ public:
 				}
 			}
 		}
+		empty_layer_caches(net);
 		return !failure;
 	};
 protected:
@@ -116,6 +117,10 @@ protected:
 		for (unsigned i = 0; i < net.get_layers().size(); i++) {
 			net.get_layers()[i]->empty_cache();
 		}
+	};
+	ColVector<Scalar> compute_training_loss(NeuralNetwork<Scalar>& net, const Matrix<Scalar>& x,
+			const Matrix<Scalar>& y) const {
+		return loss.function(net.propagate(x, true), y);
 	};
 	ColVector<Scalar> compute_training_loss_and_backprop(NeuralNetwork<Scalar>& net,
 			const Matrix<Scalar>& x, const Matrix<Scalar>& y) const {
@@ -203,7 +208,7 @@ public:
 						training_loss += (batch_ind == batch_size ?
 								Optimizer<Scalar>::compute_training_loss_and_backprop(net, batch_x, batch_y) :
 								Optimizer<Scalar>::compute_training_loss_and_backprop(net,
-								batch_x.topRows(batch_ind), batch_y.topRows(batch_ind))).sum();
+										batch_x.topRows(batch_ind), batch_y.topRows(batch_ind))).sum();
 						for (unsigned k = 0; k < layers.size(); k++) {
 							Layer<Scalar>* layer_ptr = layers[k];
 							update_params(layer_ptr, k, i - 1);
@@ -230,7 +235,7 @@ public:
 					test_loss += (batch_ind == batch_size ?
 							Optimizer<Scalar>::loss.function(net.infer(test_batch_x), test_batch_y) :
 							Optimizer<Scalar>::loss.function(net.infer(test_batch_x.topRows(batch_ind)),
-							test_batch_y.topRows(batch_ind))).sum();
+									test_batch_y.topRows(batch_ind))).sum();
 					batch_ind = 0;
 				}
 			}
@@ -289,14 +294,14 @@ template<typename Scalar>
 class MomentumAcceleratedSGDOptimizer : public SGDOptimizer<Scalar> {
 public:
 	MomentumAcceleratedSGDOptimizer(const Loss<Scalar>& loss, const RegularizationPenalty<Scalar>& reg,
-			unsigned batch_size = 1, Scalar k = 0.8, Scalar init_learning_rate = 1e-3, Scalar learning_rate_decay = 1e-3,
+			unsigned batch_size = 1, Scalar k = 0.8, Scalar init_learning_rate = 1e-3, Scalar annealing_rate = 1e-3,
 			Scalar momentum = .9) :
 				SGDOptimizer<Scalar>::SGDOptimizer(loss, reg, batch_size, k),
 				init_learning_rate(init_learning_rate),
-				learning_rate_decay(learning_rate_decay),
+				annealing_rate(annealing_rate),
 				momentum(momentum) {
 		assert(init_learning_rate > 0);
-		assert(learning_rate_decay >= 0);
+		assert(annealing_rate >= 0);
 		assert(momentum > 0 && momentum < 1);
 	};
 	virtual ~MomentumAcceleratedSGDOptimizer() = default;
@@ -333,10 +338,10 @@ protected:
 		}
 	};
 	Scalar calculate_learning_rate(unsigned epoch) {
-		return init_learning_rate / (1.0 + learning_rate_decay * epoch);
+		return init_learning_rate / (1.0 + annealing_rate * epoch);
 	};
 	Scalar init_learning_rate;
-	Scalar learning_rate_decay;
+	Scalar annealing_rate;
 	Scalar momentum;
 	struct Gradients {
 		Matrix<Scalar> weight;
@@ -350,10 +355,10 @@ template<typename Scalar>
 class NesterovMomentumAcceleratedSGDOptimizer : public MomentumAcceleratedSGDOptimizer<Scalar> {
 public:
 	NesterovMomentumAcceleratedSGDOptimizer(const Loss<Scalar>& loss, const RegularizationPenalty<Scalar>& reg,
-			unsigned batch_size = 1, Scalar k = 0.8, Scalar init_learning_rate = 1e-3, Scalar learning_rate_decay = 1e-3,
+			unsigned batch_size = 1, Scalar k = 0.8, Scalar init_learning_rate = 1e-3, Scalar annealing_rate = 1e-3,
 			Scalar momentum = .9) :
 				MomentumAcceleratedSGDOptimizer<Scalar>::MomentumAcceleratedSGDOptimizer(loss, reg, batch_size,
-				k, init_learning_rate, learning_rate_decay, momentum) { };
+						k, init_learning_rate, annealing_rate, momentum) { };
 protected:
 	void update_params(Layer<Scalar>* layer_ptr, unsigned i, unsigned epoch) {
 		Scalar learning_rate = MomentumAcceleratedSGDOptimizer<Scalar>::calculate_learning_rate(epoch);
@@ -631,7 +636,7 @@ public:
 			Scalar k = 0.8, Scalar learning_rate = 1e-3, Scalar l1_decay = 1e-1, Scalar l2_decay = 1e-3,
 			Scalar epsilon = Utils<Scalar>::EPSILON) :
 				AdamOptimizer<Scalar>::AdamOptimizer(loss, reg, batch_size, k, learning_rate, l1_decay,
-				l2_decay, epsilon) { };
+						l2_decay, epsilon) { };
 protected:
 	void update_params(Layer<Scalar>* layer_ptr, unsigned i, unsigned epoch) {
 		typename AdamOptimizer<Scalar>::GradientNorms& grad_norms = AdamOptimizer<Scalar>::grad_norms_vec[i];
@@ -674,7 +679,7 @@ public:
 			Scalar k = 0.8, Scalar learning_rate = 1e-3, Scalar l1_decay = 1e-1, Scalar l2_decay = 1e-3,
 			Scalar epsilon = Utils<Scalar>::EPSILON) :
 				AdamOptimizer<Scalar>::AdamOptimizer(loss, reg, batch_size, k, learning_rate, l1_decay,
-				l2_decay, epsilon) { };
+						l2_decay, epsilon) { };
 protected:
 	void update_params(Layer<Scalar>* layer_ptr, unsigned i, unsigned epoch) {
 		typename AdamOptimizer<Scalar>::GradientNorms& grad_norms = AdamOptimizer<Scalar>::grad_norms_vec[i];

@@ -135,7 +135,7 @@ private:
 };
 
 /**
- * True label: 1; false label: -1. Use with tanh activation.
+ * True label: 1; false label: -1.
  */
 template<typename Scalar>
 class MultiLabelHingeLoss : public Loss<Scalar> {

@@ -44,9 +44,8 @@ public:
 			if (i == rows - 1) { // Bias row.
 				weights.row(i).setConstant(bias_value);
 			} else {
-				for (int j = 0; j < weights.cols(); j++) {
+				for (int j = 0; j < weights.cols(); j++)
 					weights(i,j) = dist(gen);
-				}
 			}
 		}
 	};

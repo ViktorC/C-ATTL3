@@ -38,13 +38,8 @@ public:
 	virtual ~NormalizationDataPreprocessor() = default;
 	virtual void fit(const Matrix<Scalar>& data) {
 		means = data.colwise().mean();
-		if (standardize) {
-			sd = RowVector<Scalar>(means.cols());
-			for (int i = 0; i < sd.cols(); i++) {
-				sd(i) = sqrt((data.col(i).array() - means(i)).square().mean() +
-						epsilon);
-			}
-		}
+		if (standardize)
+			sd = (data.rowwise() - means).array().square().colwise().mean().sqrt();
 	};
 	virtual void transform(Matrix<Scalar>& data) const {
 		assert(means.cols() == data.cols() && "mismatched fit and transform "
@@ -74,14 +69,12 @@ public:
 	};
 	void fit(const Matrix<Scalar>& data) {
 		NormalizationDataPreprocessor<Scalar>::fit(data);
-		Matrix<Scalar> normalized_data = data.rowwise() -
-				NormalizationDataPreprocessor<Scalar>::means;
+		Matrix<Scalar> normalized_data = data.rowwise() - NormalizationDataPreprocessor<Scalar>::means;
 		if (NormalizationDataPreprocessor<Scalar>::standardize)
 			normalized_data *= (NormalizationDataPreprocessor<Scalar>::sd.array() +
 					NormalizationDataPreprocessor<Scalar>::epsilon).inverse().matrix().asDiagonal();
 		// Compute the covariance matrix.
-		Matrix<Scalar> cov = normalized_data.transpose() * normalized_data /
-				normalized_data.rows();
+		Matrix<Scalar> cov = normalized_data.transpose() * normalized_data / normalized_data.rows();
 		// Eigen decomposition.
 		Eigen::SelfAdjointEigenSolver<Matrix<Scalar>> eigen_solver(cov);
 		// Determine the number of components to retain.
@@ -104,11 +97,9 @@ public:
 	void transform(Matrix<Scalar>& data) const {
 		NormalizationDataPreprocessor<Scalar>::transform(data);
 		data *= eigen_basis;
-		if (whiten) {
-			for (int i = 0; i < data.cols(); i++)
-				data.col(i) *= 1 / sqrt(eigen_values(i) +
-						NormalizationDataPreprocessor<Scalar>::epsilon);
-		}
+		if (whiten)
+			data *= (eigen_values.array() + NormalizationDataPreprocessor<Scalar>::epsilon)
+					.sqrt().inverse().matrix().asDiagonal();
 	};
 private:
 	bool whiten;

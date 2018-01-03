@@ -1,5 +1,5 @@
 /*
- * NumericUtils.h
+ * Utils.h
  *
  *  Created on: 20.12.2017
  *      Author: Viktor Csomor
