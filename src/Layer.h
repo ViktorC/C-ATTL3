@@ -19,8 +19,6 @@
 #include <Vector.h>
 #include <WeightInitialization.h>
 
-#include <iostream>
-
 namespace cppnn {
 
 // Forward declarations to NeuralNetwork and Optimizer so they can be friended.
@@ -160,14 +158,11 @@ protected:
 		// Batch normalization.
 		if (batch_norm) {
 			if (training) {
-//				std::cout << "prev_out:" << std::endl << prev_out << std::endl << std::endl;
 				RowVector<Scalar> means = prev_out.colwise().mean();
 				centered_prev_out = prev_out.rowwise() - means;
-//				std::cout << "centered_prev_out:" << std::endl << centered_prev_out << std::endl << std::endl;
 				RowVector<Scalar> vars = centered_prev_out.array().square().matrix().colwise().mean();
 				std_prev_out_factor = (vars.array() + epsilon).cwiseSqrt().cwiseInverse();
 				prev_out = centered_prev_out * std_prev_out_factor.asDiagonal();
-//				std::cout << "standardized_prev_out:" << std::endl << prev_out << std::endl << std::endl;
 				/* Maintain a moving average of means and variances
 				 * for testing. */
 				if (moving_means_init) {
@@ -183,7 +178,6 @@ protected:
 						(avg_vars.array() + epsilon).cwiseSqrt().cwiseInverse().matrix().asDiagonal();
 			}
 			prev_out = (prev_out * gammas.asDiagonal()).rowwise() + betas;
-//			std::cout << "beta_gamma_adjusted_prev_out:" << std::endl << prev_out << std::endl << std::endl;
 		}
 		// Dropout.
 		if (training && dropout) {
@@ -228,15 +222,16 @@ protected:
 			beta_grads = prev_out_grads.colwise().sum();
 			gamma_grads = (prev_out_grads.cwiseProduct(centered_prev_out * std_prev_out_factor.asDiagonal()))
 					.colwise().sum();
-			Matrix<Scalar> normalized_out_grads = prev_out_grads * gammas.asDiagonal();
-			Matrix<Scalar> centered_out_grads = normalized_out_grads * std_prev_out_factor.asDiagonal() +
-					((Matrix<Scalar>::Ones(prev_out_grads.rows(), prev_out_grads.cols()) / prev_out_grads.rows()) *
-					((normalized_out_grads.cwiseProduct(centered_prev_out).colwise().sum()).array() *
-					(std_prev_out_factor.array().pow(3) * -.5)).matrix().asDiagonal())
-					.cwiseProduct(2 * centered_prev_out);
-			prev_out_grads = centered_out_grads +
+			Matrix<Scalar> standardized_prev_out_grads = prev_out_grads * gammas.asDiagonal();
+			Matrix<Scalar> centered_prev_out_grads = standardized_prev_out_grads * std_prev_out_factor.asDiagonal() +
+					(2 * centered_prev_out).cwiseProduct(
 					(Matrix<Scalar>::Ones(prev_out_grads.rows(), prev_out_grads.cols()) / prev_out_grads.rows()) *
-					(-1 * centered_out_grads.colwise().sum()).asDiagonal();
+					(-.5 * std_prev_out_factor.array().pow(3) *
+					standardized_prev_out_grads.cwiseProduct(centered_prev_out).colwise().sum().array())
+					.matrix().asDiagonal());
+			prev_out_grads = centered_prev_out_grads +
+					(Matrix<Scalar>::Ones(prev_out_grads.rows(), prev_out_grads.cols()) / prev_out_grads.rows()) *
+					(-1 * centered_prev_out_grads.colwise().sum()).asDiagonal();
 		}
 		return prev_out_grads;
 	};
