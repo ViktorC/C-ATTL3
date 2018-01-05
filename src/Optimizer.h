@@ -67,26 +67,6 @@ public:
 				}
 			}
 			if (layer.get_batch_norm()) {
-				RowVector<Scalar>& gammas = layer.get_gammas();
-				const RowVector<Scalar>& gamma_grads = layer.get_gamma_grads();
-				for (int j = 0; j < gammas.cols(); j++) {
-					std::cout << "Gamma[" << i << "," << j << "]:" << std::endl;
-					Scalar ana_grad = gamma_grads(j);
-					std::cout << "\tAnalytic gradient = " << ana_grad << std::endl;
-					Scalar gamma = gammas(j);
-					gammas(j) = gamma + step_size;
-					Scalar loss_inc = loss.function(net.propagate(x, true), y).mean();
-					gammas(j) = gamma - step_size;
-					Scalar loss_dec = loss.function(net.propagate(x, true), y).mean();
-					gammas(j) = gamma;
-					Scalar num_grad = (loss_inc - loss_dec) / (2 * step_size);
-					std::cout << "\tNumerical gradient = " << num_grad;
-					if (!Utils<Scalar>::almost_equal(ana_grad, num_grad, abs_epsilon, rel_epsilon)) {
-						std::cout << " *****FAIL*****";
-						failure = true;
-					}
-					std::cout << std::endl;
-				}
 				RowVector<Scalar>& betas = layer.get_betas();
 				const RowVector<Scalar>& beta_grads = layer.get_beta_grads();
 				for (int j = 0; j < betas.cols(); j++) {
@@ -99,6 +79,26 @@ public:
 					betas(j) = beta - step_size;
 					Scalar loss_dec = loss.function(net.propagate(x, true), y).mean();
 					betas(j) = beta;
+					Scalar num_grad = (loss_inc - loss_dec) / (2 * step_size);
+					std::cout << "\tNumerical gradient = " << num_grad;
+					if (!Utils<Scalar>::almost_equal(ana_grad, num_grad, abs_epsilon, rel_epsilon)) {
+						std::cout << " *****FAIL*****";
+						failure = true;
+					}
+					std::cout << std::endl;
+				}
+				RowVector<Scalar>& gammas = layer.get_gammas();
+				const RowVector<Scalar>& gamma_grads = layer.get_gamma_grads();
+				for (int j = 0; j < gammas.cols(); j++) {
+					std::cout << "Gamma[" << i << "," << j << "]:" << std::endl;
+					Scalar ana_grad = gamma_grads(j);
+					std::cout << "\tAnalytic gradient = " << ana_grad << std::endl;
+					Scalar gamma = gammas(j);
+					gammas(j) = gamma + step_size;
+					Scalar loss_inc = loss.function(net.propagate(x, true), y).mean();
+					gammas(j) = gamma - step_size;
+					Scalar loss_dec = loss.function(net.propagate(x, true), y).mean();
+					gammas(j) = gamma;
 					Scalar num_grad = (loss_inc - loss_dec) / (2 * step_size);
 					std::cout << "\tNumerical gradient = " << num_grad;
 					if (!Utils<Scalar>::almost_equal(ana_grad, num_grad, abs_epsilon, rel_epsilon)) {

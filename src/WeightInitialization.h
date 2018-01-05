@@ -31,6 +31,15 @@ public:
 };
 
 template<typename Scalar>
+class OneWeightInitialization : public WeightInitialization<Scalar> {
+public:
+	void apply(Matrix<Scalar>& weights) const {
+		weights.setOnes(weights.rows() - 1, weights.cols());
+		weights.row(weights.rows() - 1).setOnes();
+	};
+};
+
+template<typename Scalar>
 class NDRandWeightInitialization : public WeightInitialization<Scalar> {
 public:
 	NDRandWeightInitialization(Scalar bias_value) :

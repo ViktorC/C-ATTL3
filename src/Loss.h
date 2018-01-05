@@ -35,7 +35,7 @@ public:
 	};
 	Matrix<Scalar> d_function(const Matrix<Scalar>& out, const Matrix<Scalar>& obj) const {
 		assert(out.rows() == obj.rows() && out.cols() == obj.cols());
-		return 2 * (out - obj) / out.rows();
+		return 2 * (out - obj) / out.rows(); // The actual loss is the mean of the column vector returned by 'function'.
 	}
 };
 
