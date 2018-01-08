@@ -65,9 +65,8 @@ public:
 			Scalar loss_i = 0;
 			Scalar correct_class_score = out(i,correct_class_ind);
 			for (int j = 0; j < obj.cols(); j++) {
-				if (j == correct_class_ind) {
+				if (j == correct_class_ind)
 					continue;
-				}
 				Scalar loss_ij = std::max(.0, out(i,j) - correct_class_score + 1);
 				loss_i += squared ? loss_ij * loss_ij : loss_ij;
 			}
@@ -93,18 +92,16 @@ public:
 			Scalar total_out_grad = 0;
 			Scalar correct_class_score = out(i,correct_class_ind);
 			for (int j = 0; j < out.cols(); j++) {
-				if (j == correct_class_ind) {
+				if (j == correct_class_ind)
 					continue;
-				}
 				Scalar out_ij = out(i,j);
 				Scalar margin = out_ij - correct_class_score + 1;
 				if (Utils<Scalar>::decidedly_greater(margin, .0)) {
 					Scalar out_grad = squared ? 2 * (out_ij - correct_class_score) : 1;
 					total_out_grad += out_grad;
 					out_grads(i,j) = out_grad;
-				} else {
+				} else
 					out_grads(i,j) = 0;
-				}
 			}
 			out_grads(i,correct_class_ind) = -total_out_grad;
 		}
@@ -166,11 +163,10 @@ public:
 				assert((Utils<Scalar>::almost_equal(obj_ij, -1.0) || Utils<Scalar>::almost_equal(obj_ij, 1.0)));
 				Scalar out_ij = out(i,j);
 				Scalar margin = 1 - obj_ij * out_ij;
-				if (Utils<Scalar>::decidedly_greater(margin, .0)) {
+				if (Utils<Scalar>::decidedly_greater(margin, .0))
 					out_grads(i,j) = squared ? 2 * out_ij - 2 * obj_ij : -obj_ij;
-				} else {
+				else
 					out_grads(i,j) = 0;
-				}
 			}
 		}
 		return out_grads / out.rows();
@@ -211,9 +207,8 @@ public:
 				Scalar obj_ij = obj(i,j);
 				assert(Utils<Scalar>::almost_equal(obj_ij, .0) || Utils<Scalar>::almost_equal(obj_ij, 1.0));
 				Scalar denominator = out(i,j) - (Scalar) (Utils<Scalar>::almost_equal(obj_ij, .0));
-				if (denominator == 0) {
+				if (denominator == 0)
 					denominator += (rand() % 2 == 0 ? epsilon : -epsilon);
-				}
 				out_grads(i,j) = 1 / (denominator * rows);
 			}
 		}

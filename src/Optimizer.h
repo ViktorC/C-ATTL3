@@ -34,7 +34,7 @@ public:
 	virtual void train(NeuralNetwork<Scalar>& net, const Matrix<Scalar>& x, const Matrix<Scalar>& y,
 			unsigned epochs, bool early_stop) = 0;
 	bool verify_gradients(NeuralNetwork<Scalar>& net, const Matrix<Scalar>& x,
-			const Matrix<Scalar>& y, Scalar step_size = 1e-5, Scalar abs_epsilon = Utils<Scalar>::EPSILON,
+			const Matrix<Scalar>& y, Scalar step_size = 1e-5, Scalar abs_epsilon = 1e-8,
 			Scalar rel_epsilon = 1e-4) const {
 		assert((unsigned) x.cols() == net.get_input_size() && (unsigned) y.cols() == net.get_output_size());
 		assert(x.rows() == y.rows());
@@ -722,7 +722,7 @@ protected:
 	};
 };
 
-// TODO: Conjugate Gradient, L-BFGS, LMA, Particle Swarm, GA
+// TODO: Conjugate Gradient, L-BFGS, LMA, Particle Swarm, GA, PBIL
 
 } /* namespace cppnn */
 

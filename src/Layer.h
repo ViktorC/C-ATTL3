@@ -19,8 +19,6 @@
 #include <Vector.h>
 #include <WeightInitialization.h>
 
-#include <iostream>
-
 namespace cppnn {
 
 // Forward declarations to NeuralNetwork and Optimizer so they can be friended.
@@ -69,7 +67,7 @@ class FCLayer : public Layer<Scalar> {
 public:
 	FCLayer(unsigned prev_size, unsigned size, const WeightInitialization<Scalar>& weight_init,
 			const Activation<Scalar>& act, Scalar dropout_prob = 0, bool batch_norm = false,
-			Scalar norm_avg_decay = 5e-2, Scalar max_norm_constraint = 0, Scalar epsilon = Utils<Scalar>::EPSILON) :
+			Scalar norm_avg_decay = .1, Scalar max_norm_constraint = 0, Scalar epsilon = Utils<Scalar>::EPSILON) :
 				prev_size(prev_size),
 				size(size),
 				weight_init(weight_init),
@@ -125,8 +123,7 @@ protected:
 	};
 	void empty_cache() {
 		inv_prev_out_std = RowVector<Scalar>(0);
-//		std_prev_out = Matrix<Scalar>(0, 0);
-		norm_prev_out = Matrix<Scalar>(0, 0);
+		std_prev_out = Matrix<Scalar>(0, 0);
 		dropout_mask = Matrix<Scalar>(0, 0);
 		biased_prev_out = Matrix<Scalar>(0, 0);
 		in = Matrix<Scalar>(0, 0);
@@ -165,20 +162,21 @@ protected:
 		if (batch_norm) {
 			if (training) {
 				RowVector<Scalar> means = prev_out.colwise().mean();
-				norm_prev_out = prev_out.rowwise() - means;
+				Matrix<Scalar> norm_prev_out = prev_out.rowwise() - means;
 				RowVector<Scalar> vars = norm_prev_out.array().square().matrix().colwise().mean();
 				inv_prev_out_std = (vars.array() + epsilon).sqrt().inverse();
-				prev_out = norm_prev_out * inv_prev_out_std.asDiagonal();
+				std_prev_out = norm_prev_out * inv_prev_out_std.asDiagonal();
+				prev_out = std_prev_out;
 				// Maintain a moving average of means and variances for testing.
 				if (moving_means_init) {
-					avg_means = (1 - norm_avg_decay) * avg_means + norm_avg_decay * means;
-					avg_vars = (1 - norm_avg_decay) * avg_vars + norm_avg_decay * vars;
+					avg_means = (1.0 - norm_avg_decay) * avg_means + norm_avg_decay * means;
+					avg_vars = (1.0 - norm_avg_decay) * avg_vars + norm_avg_decay * vars;
 				} else {
 					avg_means = means;
 					avg_vars = vars;
 					moving_means_init = true;
 				}
-			} else if (moving_means_init) {
+			} else {
 				// For testing, use the moving averages.
 				prev_out = (prev_out.rowwise() - avg_means) *
 						(avg_vars.array() + epsilon).sqrt().inverse().matrix().asDiagonal();
@@ -226,14 +224,12 @@ protected:
 			 * normalization 'function' and also calculate the
 			 * gradients on the betas and gammas. */
 			beta_grads = prev_out_grads.colwise().sum();
-			gamma_grads = prev_out_grads.cwiseProduct(norm_prev_out * inv_prev_out_std.asDiagonal()).colwise().sum();
-			int rows = norm_prev_out.rows();
+			gamma_grads = prev_out_grads.cwiseProduct(std_prev_out).colwise().sum();
 			Matrix<Scalar> std_prev_out_grads = prev_out_grads * gammas.asDiagonal();
-			RowVector<Scalar> prev_out_var_grads = std_prev_out_grads.cwiseProduct(-.5 * norm_prev_out *
-					inv_prev_out_std.array().pow(3).matrix().asDiagonal()).colwise().sum();
-			RowVector<Scalar> prev_out_mean_grads = (-1 * std_prev_out_grads * inv_prev_out_std.asDiagonal()).colwise().sum();
-			prev_out_grads = std_prev_out_grads * inv_prev_out_std.asDiagonal() + 2 / rows * norm_prev_out * prev_out_var_grads.asDiagonal() +
-					(Matrix<Scalar>::Ones(rows, norm_prev_out.cols()) / rows) * prev_out_mean_grads.asDiagonal();
+			int rows = std_prev_out.rows();
+			prev_out_grads = (((rows * std_prev_out_grads).rowwise() - std_prev_out_grads.colwise().sum()) -
+					std_prev_out * (std_prev_out.cwiseProduct(std_prev_out_grads).colwise().sum().asDiagonal())) *
+					((1.0 / rows) * inv_prev_out_std).asDiagonal();
 		}
 		return prev_out_grads;
 	};
@@ -263,13 +259,11 @@ private:
 	bool moving_means_init;
 	// Staged computation caches
 	RowVector<Scalar> inv_prev_out_std;
-//	Matrix<Scalar> std_prev_out;
+	Matrix<Scalar> std_prev_out;
 	Matrix<Scalar> dropout_mask;
 	Matrix<Scalar> biased_prev_out;
 	Matrix<Scalar> in;
 	Matrix<Scalar> out;
-	// Test
-	Matrix<Scalar> norm_prev_out;
 };
 
 } /* namespace cppnn */

@@ -9,6 +9,7 @@
 #define ACTIVATION_H_
 
 #include <cassert>
+#include <cmath>
 #include <Eigen/Dense>
 #include <Matrix.h>
 #include <Utils.h>
@@ -142,6 +143,32 @@ public:
 				x.rows() == out_grads.rows() && x.cols() == out_grads.cols());
 		return x.unaryExpr([this](Scalar i) { return i >= .0 ? 1.0 : alpha; })
 				.cwiseProduct(out_grads);
+	};
+private:
+	Scalar alpha;
+};
+
+template<typename Scalar>
+class ELUActivation : public Activation<Scalar> {
+public:
+	ELUActivation(Scalar alpha = 1) :
+			alpha(alpha) {
+		assert(alpha > 0);
+	};
+	Matrix<Scalar> function(const Matrix<Scalar>& x) const {
+		return x.unaryExpr([this](Scalar i) { return i > .0 ? i : (alpha * (exp(i) - 1)); });
+	};
+	Matrix<Scalar> d_function(const Matrix<Scalar>& x, const Matrix<Scalar>& y,
+			const Matrix<Scalar>& out_grads) const {
+		assert(x.rows() == y.rows() && x.cols() == y.cols() &&
+				x.rows() == out_grads.rows() && x.cols() == out_grads.cols());
+		Matrix<Scalar> out(x.rows(), x.cols());
+		for (int i = 0; i < x.rows(); i++) {
+			for (int j = 0; j < x.cols(); j++) {
+				out(i,j) = (x(i,j) > .0 ? 1.0 : (y(i,j) + alpha)) * out_grads(i,j);
+			}
+		}
+		return out;
 	};
 private:
 	Scalar alpha;
