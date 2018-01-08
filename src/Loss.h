@@ -117,7 +117,7 @@ private:
 template<typename Scalar>
 class CrossEntropyLoss : public Loss<Scalar> {
 public:
-	CrossEntropyLoss(Scalar epsilon = Utils<Scalar>::EPSILON) :
+	CrossEntropyLoss(Scalar epsilon = Utils<Scalar>::EPSILON2) :
 		epsilon(epsilon) { };
 	ColVector<Scalar> function(const Matrix<Scalar>& out, const Matrix<Scalar>& obj) const {
 		assert(out.rows() == obj.rows() && out.cols() == obj.cols());
@@ -181,7 +181,7 @@ private:
 template<typename Scalar>
 class MultiLabelLogLoss : public Loss<Scalar> {
 public:
-	MultiLabelLogLoss(Scalar epsilon = Utils<Scalar>::EPSILON) :
+	MultiLabelLogLoss(Scalar epsilon = Utils<Scalar>::EPSILON2) :
 		epsilon(epsilon) { };
 	ColVector<Scalar> function(const Matrix<Scalar>& out, const Matrix<Scalar>& obj) const {
 		assert(out.rows() == obj.rows() && out.cols() == obj.cols());

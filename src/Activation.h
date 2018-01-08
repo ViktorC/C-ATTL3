@@ -70,35 +70,6 @@ public:
 };
 
 template<typename Scalar>
-class SoftmaxActivation : public Activation<Scalar> {
-public:
-	SoftmaxActivation(Scalar epsilon = Utils<Scalar>::EPSILON) :
-			epsilon(epsilon) {
-		assert(epsilon > 0);
-	};
-	Matrix<Scalar> function(const Matrix<Scalar>& x) const {
-		/* First subtract the value of the greatest coefficient from each element row-wise
-		 * to avoid an overflow due to raising e to great powers. */
-		Matrix<Scalar> out = (x.array().colwise() - x.array().rowwise().maxCoeff()).exp();
-		return out.array().colwise() / (out.array().rowwise().sum() + epsilon);
-	};
-	Matrix<Scalar> d_function(const Matrix<Scalar>& x, const Matrix<Scalar>& y,
-			const Matrix<Scalar>& out_grads) const {
-		assert(x.rows() == y.rows() && x.cols() == y.cols() &&
-				x.rows() == out_grads.rows() && x.cols() == out_grads.cols());
-		Matrix<Scalar> out(y.rows(), y.cols());
-		for (int i = 0; i < out.rows(); i++) {
-			Matrix<Scalar> jacobian = y.row(i).asDiagonal();
-			jacobian -= y.row(i).transpose() * y.row(i);
-			out.row(i) = out_grads.row(i) * jacobian;
-		}
-		return out;
-	};
-private:
-	Scalar epsilon;
-};
-
-template<typename Scalar>
 class TanhActivation : public Activation<Scalar> {
 public:
 	Matrix<Scalar> function(const Matrix<Scalar>& x) const {
@@ -172,6 +143,35 @@ public:
 	};
 private:
 	Scalar alpha;
+};
+
+template<typename Scalar>
+class SoftmaxActivation : public Activation<Scalar> {
+public:
+	SoftmaxActivation(Scalar epsilon = Utils<Scalar>::EPSILON2) :
+			epsilon(epsilon) {
+		assert(epsilon > 0);
+	};
+	Matrix<Scalar> function(const Matrix<Scalar>& x) const {
+		/* First subtract the value of the greatest coefficient from each element row-wise
+		 * to avoid an overflow due to raising e to great powers. */
+		Matrix<Scalar> out = (x.array().colwise() - x.array().rowwise().maxCoeff()).exp();
+		return out.array().colwise() / (out.array().rowwise().sum() + epsilon);
+	};
+	Matrix<Scalar> d_function(const Matrix<Scalar>& x, const Matrix<Scalar>& y,
+			const Matrix<Scalar>& out_grads) const {
+		assert(x.rows() == y.rows() && x.cols() == y.cols() &&
+				x.rows() == out_grads.rows() && x.cols() == out_grads.cols());
+		Matrix<Scalar> out(y.rows(), y.cols());
+		for (int i = 0; i < out.rows(); i++) {
+			Matrix<Scalar> jacobian = y.row(i).asDiagonal();
+			jacobian -= y.row(i).transpose() * y.row(i);
+			out.row(i) = out_grads.row(i) * jacobian;
+		}
+		return out;
+	};
+private:
+	Scalar epsilon;
 };
 
 // TODO Consider implementing PReLU.

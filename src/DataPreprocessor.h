@@ -30,7 +30,7 @@ template<typename Scalar>
 class NormalizationDataPreprocessor : public DataPreprocessor<Scalar> {
 public:
 	NormalizationDataPreprocessor(bool standardize = false,
-			Scalar epsilon = Utils<Scalar>::EPSILON) :
+			Scalar epsilon = Utils<Scalar>::EPSILON2) :
 				standardize(standardize),
 				epsilon(epsilon) {
 		assert(epsilon > 0 && "epsilon must be greater than 0");
@@ -50,7 +50,7 @@ public:
 	};
 protected:
 	bool standardize;
-	float epsilon;
+	Scalar epsilon;
 	RowVector<Scalar> means;
 	RowVector<Scalar> sd;
 };
@@ -59,7 +59,7 @@ template<typename Scalar>
 class PCADataPreprocessor : public NormalizationDataPreprocessor<Scalar> {
 public:
 	PCADataPreprocessor(bool standardize = false, bool whiten = false, float min_rel_var_to_retain = 1,
-			Scalar epsilon = Utils<Scalar>::EPSILON) :
+			Scalar epsilon = Utils<Scalar>::EPSILON2) :
 				NormalizationDataPreprocessor<Scalar>::NormalizationDataPreprocessor(standardize, epsilon),
 				whiten(whiten),
 				min_rel_var_to_retain(min_rel_var_to_retain) {

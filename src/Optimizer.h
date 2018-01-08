@@ -32,10 +32,10 @@ public:
 				loss(loss) { };
 	virtual ~Optimizer() = default;
 	virtual void train(NeuralNetwork<Scalar>& net, const Matrix<Scalar>& x, const Matrix<Scalar>& y,
-			unsigned epochs, bool early_stop) = 0;
+			unsigned epochs, unsigned cons_loss_inc_for_early_stop) = 0;
 	bool verify_gradients(NeuralNetwork<Scalar>& net, const Matrix<Scalar>& x,
-			const Matrix<Scalar>& y, Scalar step_size = 1e-5, Scalar abs_epsilon = 1e-8,
-			Scalar rel_epsilon = 1e-4) const {
+			const Matrix<Scalar>& y, Scalar step_size = 1e-5, Scalar abs_epsilon = Utils<Scalar>::EPSILON2,
+			Scalar rel_epsilon = Utils<Scalar>::EPSILON3) const {
 		assert((unsigned) x.cols() == net.get_input_size() && (unsigned) y.cols() == net.get_output_size());
 		assert(x.rows() == y.rows());
 		assert(step_size > 0);
@@ -170,7 +170,7 @@ public:
 	};
 	virtual ~SGDOptimizer() = default;
 	void train(NeuralNetwork<Scalar>& net, const Matrix<Scalar>& x, const Matrix<Scalar>& y,
-				unsigned epochs = 1000, bool early_stop = false) {
+				unsigned epochs = 1000, unsigned early_stop = 0) {
 		assert((unsigned) x.cols() == net.get_input_size() && (unsigned) y.cols() == net.get_output_size());
 		assert(x.rows() == y.rows());
 		assert(x.rows() > 1);
@@ -189,9 +189,11 @@ public:
 			test_rows[i] = training_rows[i];
 			training_rows.erase(training_rows.begin() + i);
 		}
-		std::vector<Layer<Scalar>*> layers = Optimizer<Scalar>::get_layers(net);
-		Scalar prev_total_loss = std::numeric_limits<Scalar>::max();
+		Scalar prev_test_loss = std::numeric_limits<Scalar>::max();
+		unsigned cons_loss_inc = 0;
+		NeuralNetwork<Scalar>& test_net(net);
 		for (unsigned i = 0; i <= epochs; i++) {
+			std::vector<Layer<Scalar>*> layers = Optimizer<Scalar>::get_layers(test_net);
 			std::cout << "Epoch " << std::setw(4) << i << "----------------------------" << std::endl;
 			// Train.
 			if (i != 0) {
@@ -206,8 +208,8 @@ public:
 					batch_ind++;
 					if (batch_ind == batch_size || j == training_row_num - 1) {
 						training_loss += (batch_ind == batch_size ?
-								Optimizer<Scalar>::compute_training_loss_and_backprop(net, batch_x, batch_y) :
-								Optimizer<Scalar>::compute_training_loss_and_backprop(net,
+								Optimizer<Scalar>::compute_training_loss_and_backprop(test_net, batch_x, batch_y) :
+								Optimizer<Scalar>::compute_training_loss_and_backprop(test_net,
 										batch_x.topRows(batch_ind), batch_y.topRows(batch_ind))).sum();
 						for (unsigned k = 0; k < layers.size(); k++) {
 							Layer<Scalar>* layer_ptr = layers[k];
@@ -219,10 +221,10 @@ public:
 				}
 				Scalar mean_training_loss = training_loss / training_row_num;
 				std::cout << "\ttraining loss: " << std::to_string(mean_training_loss) << std::endl;
-				Optimizer<Scalar>::empty_layer_caches(net);
+				Optimizer<Scalar>::empty_layer_caches(test_net);
 			}
 			// Validate.
-			Scalar test_loss = 0;
+			Scalar obj_loss = 0;
 			unsigned batch_ind = 0;
 			Matrix<Scalar> test_batch_x(batch_size, x.cols());
 			Matrix<Scalar> test_batch_y(batch_size, y.cols());
@@ -232,31 +234,33 @@ public:
 				test_batch_y.row(batch_ind) = y.row(row);
 				batch_ind++;
 				if (batch_ind == batch_size || j == test_row_num - 1) {
-					test_loss += (batch_ind == batch_size ?
+					obj_loss += (batch_ind == batch_size ?
 							Optimizer<Scalar>::loss.function(net.infer(test_batch_x), test_batch_y) :
 							Optimizer<Scalar>::loss.function(net.infer(test_batch_x.topRows(batch_ind)),
 									test_batch_y.topRows(batch_ind))).sum();
 					batch_ind = 0;
 				}
 			}
-			Scalar mean_test_loss = test_loss / test_row_num;
+			Scalar mean_obj_loss = obj_loss / test_row_num;
 			Scalar reg_loss = 0;
-			std::vector<Layer<Scalar>*> layers = Optimizer<Scalar>::get_layers(net);
-			for (unsigned j = 0; j < layers.size(); j++) {
+			for (unsigned j = 0; j < layers.size(); j++)
 				reg_loss += reg.function(Optimizer<Scalar>::get_weights(layers[j]));
-			}
-			Scalar total_test_loss = mean_test_loss + reg_loss;
-			std::cout << "\ttest loss: " << std::to_string(mean_test_loss) << std::endl;
+			Scalar test_loss = mean_obj_loss + reg_loss;
+			std::cout << "\tobj loss: " << std::to_string(mean_obj_loss) << std::endl;
 			std::cout << "\treg loss: " << std::to_string(reg_loss) << std::endl;
-			std::cout << "\ttotal test loss: " << std::to_string(total_test_loss);
-			Optimizer<Scalar>::empty_layer_caches(net);
-			if (total_test_loss >= prev_total_loss) {
+			std::cout << "\tvalidation loss: " << std::to_string(test_loss);
+			Optimizer<Scalar>::empty_layer_caches(test_net);
+			if (test_loss >= prev_test_loss) {
+				cons_loss_inc++;
 				std::cout << " *****INCREASED LOSS*****";
-				if (early_stop)
+				if (early_stop > 0 && cons_loss_inc >= early_stop)
 					break;
+			} else {
+				cons_loss_inc = 0;
+				net = test_net;
 			}
 			std::cout << std::endl << std::endl;
-			prev_total_loss = total_test_loss;
+			prev_test_loss = test_loss;
 		}
 	};
 protected:
@@ -390,7 +394,7 @@ template<typename Scalar>
 class AdagradOptimizer : public SGDOptimizer<Scalar> {
 public:
 	AdagradOptimizer(const Loss<Scalar>& loss, const RegularizationPenalty<Scalar>& reg, unsigned batch_size = 1,
-			Scalar k = 0.8, Scalar learning_rate = 1e-2, Scalar epsilon = Utils<Scalar>::EPSILON) :
+			Scalar k = 0.8, Scalar learning_rate = 1e-2, Scalar epsilon = Utils<Scalar>::EPSILON2) :
 				SGDOptimizer<Scalar>::SGDOptimizer(loss, reg, batch_size, k),
 				learning_rate(learning_rate),
 				epsilon(epsilon) {
@@ -479,7 +483,7 @@ template<typename Scalar>
 class AdadeltaOptimizer : public SGDOptimizer<Scalar> {
 public:
 	AdadeltaOptimizer(const Loss<Scalar>& loss, const RegularizationPenalty<Scalar>& reg, unsigned batch_size = 1,
-			Scalar k = 0.8, Scalar decay = 5e-2, Scalar epsilon = Utils<Scalar>::EPSILON) :
+			Scalar k = 0.8, Scalar decay = 5e-2, Scalar epsilon = Utils<Scalar>::EPSILON2) :
 				SGDOptimizer<Scalar>::SGDOptimizer(loss, reg, batch_size, k),
 				decay(decay),
 				epsilon(epsilon) {
@@ -553,7 +557,7 @@ class AdamOptimizer : public SGDOptimizer<Scalar> {
 public:
 	AdamOptimizer(const Loss<Scalar>& loss, const RegularizationPenalty<Scalar>& reg, unsigned batch_size = 1,
 			Scalar k = 0.8, Scalar learning_rate = 1e-3, Scalar l1_decay = 1e-1, Scalar l2_decay = 1e-3,
-			Scalar epsilon = Utils<Scalar>::EPSILON) :
+			Scalar epsilon = Utils<Scalar>::EPSILON2) :
 				SGDOptimizer<Scalar>::SGDOptimizer(loss, reg, batch_size, k),
 				learning_rate(learning_rate),
 				l1_decay(l1_decay),
@@ -634,7 +638,7 @@ class AdaMaxOptimizer : public AdamOptimizer<Scalar> {
 public:
 	AdaMaxOptimizer(const Loss<Scalar>& loss, const RegularizationPenalty<Scalar>& reg, unsigned batch_size = 1,
 			Scalar k = 0.8, Scalar learning_rate = 1e-3, Scalar l1_decay = 1e-1, Scalar l2_decay = 1e-3,
-			Scalar epsilon = Utils<Scalar>::EPSILON) :
+			Scalar epsilon = Utils<Scalar>::EPSILON2) :
 				AdamOptimizer<Scalar>::AdamOptimizer(loss, reg, batch_size, k, learning_rate, l1_decay,
 						l2_decay, epsilon) { };
 protected:
@@ -677,7 +681,7 @@ class NadamOptimizer : public AdamOptimizer<Scalar> {
 public:
 	NadamOptimizer(const Loss<Scalar>& loss, const RegularizationPenalty<Scalar>& reg, unsigned batch_size = 1,
 			Scalar k = 0.8, Scalar learning_rate = 1e-3, Scalar l1_decay = 1e-1, Scalar l2_decay = 1e-3,
-			Scalar epsilon = Utils<Scalar>::EPSILON) :
+			Scalar epsilon = Utils<Scalar>::EPSILON2) :
 				AdamOptimizer<Scalar>::AdamOptimizer(loss, reg, batch_size, k, learning_rate, l1_decay,
 						l2_decay, epsilon) { };
 protected:

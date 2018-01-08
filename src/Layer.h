@@ -67,17 +67,17 @@ class FCLayer : public Layer<Scalar> {
 public:
 	FCLayer(unsigned prev_size, unsigned size, const WeightInitialization<Scalar>& weight_init,
 			const Activation<Scalar>& act, Scalar dropout_prob = 0, bool batch_norm = false,
-			Scalar norm_avg_decay = .1, Scalar max_norm_constraint = 0, Scalar epsilon = Utils<Scalar>::EPSILON) :
+			Scalar norm_avg_decay = .1, Scalar max_norm_constraint = 0, Scalar epsilon = Utils<Scalar>::EPSILON3) :
 				prev_size(prev_size),
 				size(size),
 				weight_init(weight_init),
 				act(act),
 				dropout_prob(dropout_prob),
-				dropout(Utils<Scalar>::decidedly_greater(dropout_prob, (Scalar) .0, epsilon, epsilon)),
+				dropout(Utils<Scalar>::decidedly_greater(dropout_prob, .0)),
 				batch_norm(batch_norm),
 				norm_avg_decay(norm_avg_decay),
 				max_norm_constraint(max_norm_constraint),
-				max_norm(Utils<Scalar>::decidedly_greater(max_norm_constraint, (Scalar) .0, epsilon, epsilon)),
+				max_norm(Utils<Scalar>::decidedly_greater(max_norm_constraint, .0)),
 				epsilon(epsilon),
 				weights(prev_size + 1, size),
 				weight_grads(prev_size + 1, size),
@@ -86,8 +86,8 @@ public:
 				gammas(batch_norm ? prev_size : 0),
 				gamma_grads(batch_norm ? prev_size : 0),
 				avg_means(batch_norm ? prev_size : 0),
-				avg_vars(batch_norm ? prev_size : 0),
-				moving_means_init(false) {
+				avg_inv_sds(batch_norm ? prev_size : 0),
+				avgs_init(false) {
 		assert(prev_size > 0 && "prev size must be greater than 0");
 		assert(size > 0 && "size must be greater than 0");
 		assert(norm_avg_decay >= 0 && norm_avg_decay <= 1 &&
@@ -118,8 +118,8 @@ protected:
 			gamma_grads.setZero(gamma_grads.cols());
 		}
 		avg_means.setZero(avg_means.cols());
-		avg_vars.setZero(avg_vars.cols());
-		moving_means_init = false;
+		avg_inv_sds.setZero(avg_inv_sds.cols());
+		avgs_init = false;
 	};
 	void empty_cache() {
 		inv_prev_out_std = RowVector<Scalar>(0);
@@ -163,24 +163,20 @@ protected:
 			if (training) {
 				RowVector<Scalar> means = prev_out.colwise().mean();
 				Matrix<Scalar> norm_prev_out = prev_out.rowwise() - means;
-				RowVector<Scalar> vars = norm_prev_out.array().square().matrix().colwise().mean();
-				inv_prev_out_std = (vars.array() + epsilon).sqrt().inverse();
+				inv_prev_out_std = (norm_prev_out.array().square().colwise().mean() + epsilon).sqrt().inverse();
 				std_prev_out = norm_prev_out * inv_prev_out_std.asDiagonal();
 				prev_out = std_prev_out;
 				// Maintain a moving average of means and variances for testing.
-				if (moving_means_init) {
+				if (avgs_init) {
 					avg_means = (1.0 - norm_avg_decay) * avg_means + norm_avg_decay * means;
-					avg_vars = (1.0 - norm_avg_decay) * avg_vars + norm_avg_decay * vars;
+					avg_inv_sds = (1.0 - norm_avg_decay) * avg_inv_sds + norm_avg_decay * inv_prev_out_std;
 				} else {
 					avg_means = means;
-					avg_vars = vars;
-					moving_means_init = true;
+					avg_inv_sds = inv_prev_out_std;
+					avgs_init = true;
 				}
-			} else {
-				// For testing, use the moving averages.
-				prev_out = (prev_out.rowwise() - avg_means) *
-						(avg_vars.array() + epsilon).sqrt().inverse().matrix().asDiagonal();
-			}
+			} else // For testing, use the moving averages.
+				prev_out = (prev_out.rowwise() - avg_means) * avg_inv_sds.asDiagonal();
 			prev_out = (prev_out * gammas.asDiagonal()).rowwise() + betas;
 		}
 		// Dropout.
@@ -255,8 +251,8 @@ private:
 	RowVector<Scalar> gammas;
 	RowVector<Scalar> gamma_grads;
 	RowVector<Scalar> avg_means;
-	RowVector<Scalar> avg_vars;
-	bool moving_means_init;
+	RowVector<Scalar> avg_inv_sds;
+	bool avgs_init;
 	// Staged computation caches
 	RowVector<Scalar> inv_prev_out_std;
 	Matrix<Scalar> std_prev_out;
