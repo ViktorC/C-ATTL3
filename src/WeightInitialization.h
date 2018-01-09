@@ -49,11 +49,11 @@ private:
 };
 
 template<typename Scalar>
-class NDRandWeightInitialization : public WeightInitialization<Scalar> {
+class GaussianWeightInitialization : public WeightInitialization<Scalar> {
 public:
-	NDRandWeightInitialization(Scalar bias_value) :
-			bias_value(bias_value) { };
-	virtual ~NDRandWeightInitialization() = default;
+	GaussianWeightInitialization(Scalar bias) :
+		bias(bias) { };
+	virtual ~GaussianWeightInitialization() = default;
 	virtual void apply(Matrix<Scalar>& weights) const {
 		int rows = weights.rows();
 		int cols = weights.cols();
@@ -61,7 +61,7 @@ public:
 		std::normal_distribution<Scalar> dist(0, sd(rows -  1, cols));
 		for (int i = 0; i < rows; i++) {
 			if (i == rows - 1) { // Bias row.
-				weights.row(i).setConstant(bias_value);
+				weights.row(i).setConstant(bias);
 			} else {
 				for (int j = 0; j < cols; j++)
 					weights(i,j) = dist(gen);
@@ -69,15 +69,15 @@ public:
 		}
 	};
 protected:
-	Scalar bias_value;
+	Scalar bias;
 	virtual Scalar sd(unsigned fan_ins, unsigned fan_outs) const = 0;
 };
 
 template<typename Scalar>
-class LeCunWeightInitialization : public NDRandWeightInitialization<Scalar> {
+class LeCunWeightInitialization : public GaussianWeightInitialization<Scalar> {
 public:
-	LeCunWeightInitialization(Scalar bias_value = 0) :
-		NDRandWeightInitialization<Scalar>::NDRandWeightInitialization(bias_value) { };
+	LeCunWeightInitialization(Scalar bias = 0) :
+		GaussianWeightInitialization<Scalar>::GaussianWeightInitialization(bias) { };
 protected:
 	Scalar sd(unsigned fan_ins, unsigned fan_outs) const {
 		return sqrt(1.0 / (Scalar) fan_ins);
@@ -85,10 +85,10 @@ protected:
 };
 
 template<typename Scalar>
-class GlorotWeightInitialization : public NDRandWeightInitialization<Scalar> {
+class GlorotWeightInitialization : public GaussianWeightInitialization<Scalar> {
 public:
-	GlorotWeightInitialization(Scalar bias_value = 0) :
-		NDRandWeightInitialization<Scalar>::NDRandWeightInitialization(bias_value) { };
+	GlorotWeightInitialization(Scalar bias = 0) :
+		GaussianWeightInitialization<Scalar>::GaussianWeightInitialization(bias) { };
 protected:
 	Scalar sd(unsigned fan_ins, unsigned fan_outs) const {
 		return sqrt(2.0 / (Scalar) (fan_ins + fan_outs));
@@ -96,10 +96,10 @@ protected:
 };
 
 template<typename Scalar>
-class HeWeightInitialization : public NDRandWeightInitialization<Scalar> {
+class HeWeightInitialization : public GaussianWeightInitialization<Scalar> {
 public:
-	HeWeightInitialization(Scalar bias_value = 0) :
-		NDRandWeightInitialization<Scalar>::NDRandWeightInitialization(bias_value) { };
+	HeWeightInitialization(Scalar bias = 0) :
+		GaussianWeightInitialization<Scalar>::GaussianWeightInitialization(bias) { };
 protected:
 	Scalar sd(unsigned fan_ins, unsigned fan_outs) const {
 		return sqrt(2.0 / (Scalar) fan_ins);
@@ -107,34 +107,27 @@ protected:
 };
 
 template<typename Scalar>
-class OrthogonalWeightInitialization : public WeightInitialization<Scalar> {
+class OrthogonalWeightInitialization : public GaussianWeightInitialization<Scalar> {
 public:
-	OrthogonalWeightInitialization(Scalar bias = 0, Scalar scale = 1) :
-			bias(bias),
-			scale(scale) { };
+	OrthogonalWeightInitialization(Scalar bias = 0, Scalar sd = 1) :
+			GaussianWeightInitialization<Scalar>::GaussianWeightInitialization(bias),
+			_sd(sd) { };
 	void apply(Matrix<Scalar>& weights) const {
+		GaussianWeightInitialization<Scalar>::apply(weights);
 		int rows = weights.rows() - 1;
 		int cols = weights.cols();
 		bool more_rows = rows > cols;
-		std::default_random_engine gen;
-		std::normal_distribution<Scalar> dist(0, scale);
-		Matrix<Scalar> ortho_weights(rows, cols);
-		for (int i = 0; i < rows; i++) {
-			for (int j = 0; j < cols; j++)
-				ortho_weights(i,j) = dist(gen);
-		}
 		Eigen::BDCSVD<Matrix<Scalar>> svd;
 		weights.block(0, 0, rows, cols) = more_rows ?
-				svd.compute(ortho_weights, Eigen::ComputeFullU).matrixU().block(0, 0, rows, cols) :
-				svd.compute(ortho_weights, Eigen::ComputeFullV).matrixV().block(0, 0, rows, cols);
-		weights.row(rows).setConstant(bias);
+				svd.compute(weights, Eigen::ComputeFullU).matrixU().block(0, 0, rows, cols) :
+				svd.compute(weights, Eigen::ComputeFullV).matrixV().block(0, 0, rows, cols);
 	};
 private:
-	Scalar bias;
-	Scalar scale;
+	Scalar _sd;
+	Scalar sd(unsigned fan_ins, unsigned fan_outs) const {
+		return _sd;
+	};
 };
-
-// TODO: Orthogonal initialization.
 
 } /* namespace cppnn */
 

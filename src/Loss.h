@@ -35,7 +35,7 @@ public:
 	};
 	Matrix<Scalar> d_function(const Matrix<Scalar>& out, const Matrix<Scalar>& obj) const {
 		assert(out.rows() == obj.rows() && out.cols() == obj.cols());
-		return 2 * (out - obj) / out.rows(); // The actual loss is the mean of the column vector returned by 'function'.
+		return 2 * (out - obj);
 	}
 };
 
@@ -105,7 +105,7 @@ public:
 			}
 			out_grads(i,correct_class_ind) = -total_out_grad;
 		}
-		return out_grads / out.rows();
+		return out_grads;
 	};
 private:
 	bool squared;
@@ -125,7 +125,7 @@ public:
 	};
 	Matrix<Scalar> d_function(const Matrix<Scalar>& out, const Matrix<Scalar>& obj) const {
 		assert(out.rows() == obj.rows() && out.cols() == obj.cols());
-		return (-obj.array() / (out.array() + epsilon)) / out.rows();
+		return (-obj.array() / (out.array() + epsilon));
 	}
 private:
 	Scalar epsilon;
@@ -169,7 +169,7 @@ public:
 					out_grads(i,j) = 0;
 			}
 		}
-		return out_grads / out.rows();
+		return out_grads;
 	};
 private:
 	bool squared;

@@ -38,11 +38,13 @@ int main() {
 	cppnn::GlorotWeightInitialization<Scalar> f_init;
 	cppnn::ReLUActivation<Scalar> act;
 	cppnn::IdentityActivation<Scalar> f_act;
-	std::vector<cppnn::Layer<Scalar>*> layers(4);
+	std::vector<cppnn::Layer<Scalar>*> layers(6);
 	layers[0] = new cppnn::FCLayer<Scalar>(data.cols(), 30, init, act);
 	layers[1] = new cppnn::FCLayer<Scalar>(30, 20, init, act);
 	layers[2] = new cppnn::FCLayer<Scalar>(20, 10, init, act);
-	layers[3] = new cppnn::FCLayer<Scalar>(10, 1, f_init, f_act);
+	layers[3] = new cppnn::FCLayer<Scalar>(10, 10, init, act);
+	layers[4] = new cppnn::FCLayer<Scalar>(10, 10, init, act);
+	layers[5] = new cppnn::FCLayer<Scalar>(10, 1, f_init, f_act);
 	cppnn::FFNeuralNetwork<Scalar> nn(layers);
 	nn.init();
 	cppnn::QuadraticLoss<Scalar> loss;
@@ -50,7 +52,7 @@ int main() {
 	cppnn::NadamOptimizer<Scalar> opt(loss, reg, 32);
 	std::cout << nn.to_string() << std::endl << std::endl;
 //	std::cout << opt.verify_gradients(nn, data, obj) << std::endl;
-	opt.train(nn, data, obj, 2000);
+	opt.optimize(nn, data, obj, 2000);
 	cppnn::Matrix<Scalar> in(1, 1);
 	in(0,0) = 1.2154498;
 	cppnn::Matrix<Scalar> out = 5 * in.array().sin();
