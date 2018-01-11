@@ -5,7 +5,6 @@
  *      Author: Viktor Csomor
  */
 
-#include <Activation.h>
 #include <cmath>
 #include <DataPreprocessor.h>
 #include <Eigen/Dense>
@@ -36,28 +35,36 @@ int main() {
 	preproc.transform(data);
 	cppnn::HeWeightInitialization<Scalar> init;
 	cppnn::GlorotWeightInitialization<Scalar> f_init;
-	cppnn::ReLUActivation<Scalar> act;
-	cppnn::IdentityActivation<Scalar> f_act;
-	std::vector<cppnn::Layer<Scalar>*> layers(6);
-	layers[0] = new cppnn::FCLayer<Scalar>(data.cols(), 30, init, act);
-	layers[1] = new cppnn::FCLayer<Scalar>(30, 20, init, act);
-	layers[2] = new cppnn::FCLayer<Scalar>(20, 10, init, act);
-	layers[3] = new cppnn::FCLayer<Scalar>(10, 10, init, act);
-	layers[4] = new cppnn::FCLayer<Scalar>(10, 10, init, act);
-	layers[5] = new cppnn::FCLayer<Scalar>(10, 1, f_init, f_act);
+	std::vector<cppnn::Layer<Scalar>*> layers(11);
+	layers[0] = new cppnn::DenseLayer<Scalar>(data.cols(), 30, init);
+	layers[1] = new cppnn::PReLUActivationLayer<Scalar>(30);
+//	layers[2] = new cppnn::BatchNormLayer<Scalar>(30);
+	layers[2] = new cppnn::DenseLayer<Scalar>(30, 20, init);
+	layers[3] = new cppnn::PReLUActivationLayer<Scalar>(20);
+//	layers[2] = new cppnn::BatchNormLayer<Scalar>(20);
+	layers[4] = new cppnn::DenseLayer<Scalar>(20, 10, init);
+	layers[5] = new cppnn::PReLUActivationLayer<Scalar>(10);
+//	layers[2] = new cppnn::BatchNormLayer<Scalar>(10);
+	layers[6] = new cppnn::DenseLayer<Scalar>(10, 10, init);
+	layers[7] = new cppnn::PReLUActivationLayer<Scalar>(10);
+//	layers[2] = new cppnn::BatchNormLayer<Scalar>(10);
+	layers[8] = new cppnn::DenseLayer<Scalar>(10, 10, init);
+	layers[9] = new cppnn::PReLUActivationLayer<Scalar>(10);
+//	layers[2] = new cppnn::BatchNormLayer<Scalar>(10);
+	layers[10] = new cppnn::DenseLayer<Scalar>(10, 1, f_init);
 	cppnn::FFNeuralNetwork<Scalar> nn(layers);
 	nn.init();
 	cppnn::QuadraticLoss<Scalar> loss;
 	cppnn::ElasticNetRegularizationPenalty<Scalar> reg(5e-5, 1e-4);
 	cppnn::NadamOptimizer<Scalar> opt(loss, reg, 32);
 	std::cout << nn.to_string() << std::endl << std::endl;
-//	std::cout << opt.verify_gradients(nn, data, obj) << std::endl;
-	opt.optimize(nn, data, obj, 2000);
-	cppnn::Matrix<Scalar> in(1, 1);
-	in(0,0) = 1.2154498;
-	cppnn::Matrix<Scalar> out = 5 * in.array().sin();
-	preproc.transform(in);
-	std::cout << std::endl << "Estimate: " << nn.infer(in) << std::endl;
-	std::cout << "Actual value: " << out << std::endl;
+	std::cout << opt.verify_gradients(nn, data, obj) << std::endl;
+//	opt.optimize(nn, data, obj, 500);
+//	cppnn::Matrix<Scalar> in(1, 1);
+//	in(0,0) = 1.2154498;
+//	cppnn::Matrix<Scalar> out = 5 * in.array().sin();
+//	preproc.transform(in);
+//	std::cout << std::endl << "Estimate: " << nn.infer(in) << std::endl;
+//	std::cout << "Actual value: " << out << std::endl;
 	return 0;
 };

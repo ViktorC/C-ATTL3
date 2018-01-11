@@ -38,72 +38,34 @@ public:
 		assert(x.rows() == y.rows());
 		assert(step_size > 0);
 		assert(abs_epsilon >= 0 && rel_epsilon > 0);
-		net.backpropagate(loss.d_function(net.propagate(x, true), y));
+		net.backpropagate(loss.d_function(net.propagate(x, true), y) / x.rows());
 		bool failure = false;
 		for (unsigned i = 0; i < net.get_layers().size(); i++) {
 			Layer<Scalar>& layer = *(net.get_layers()[i]);
-			Matrix<Scalar>& weights = layer.get_weights();
-			const Matrix<Scalar>& weight_grads = layer.get_weight_grads();
-			for (int j = 0; j < weights.rows(); j++) {
-				for (int k = 0; k < weights.cols(); k++) {
-					std::cout << "Weight[" << i << "," << j << "," << k << "]:" << std::endl;
-					Scalar ana_grad = weight_grads(j,k);
-					std::cout << "\tAnalytic gradient = " << ana_grad << std::endl;
-					Scalar weight = weights(j,k);
-					weights(j,k) = weight + step_size;
-					Scalar loss_inc = loss.function(net.propagate(x, true), y).mean();
-					weights(j,k) = weight - step_size;
-					Scalar loss_dec = loss.function(net.propagate(x, true), y).mean();
-					weights(j,k) = weight;
-					Scalar num_grad = (loss_inc - loss_dec) / (2 * step_size);
-					std::cout << "\tNumerical gradient = " << num_grad;
-					if (!Utils<Scalar>::almost_equal(ana_grad, num_grad, abs_epsilon, rel_epsilon)) {
-						std::cout << " *****FAIL*****";
-						failure = true;
+			if (layer.is_parametric()) {
+				std::cout << "Layer " << std::setw(3) << std::to_string(i + 1) <<
+						"----------------------------" << std::endl;
+				Matrix<Scalar>& params = layer.get_params();
+				const Matrix<Scalar>& param_grads = layer.get_param_grads();
+				for (int j = 0; j < params.rows(); j++) {
+					for (int k = 0; k < params.cols(); k++) {
+						std::cout << "\tParam[" << i << "," << j << "," << k << "]:" << std::endl;
+						Scalar ana_grad = param_grads(j,k);
+						std::cout << "\t\tAnalytic gradient = " << ana_grad << std::endl;
+						Scalar param = params(j,k);
+						params(j,k) = param + step_size;
+						Scalar loss_inc = loss.function(net.propagate(x, true), y).mean();
+						params(j,k) = param - step_size;
+						Scalar loss_dec = loss.function(net.propagate(x, true), y).mean();
+						params(j,k) = param;
+						Scalar num_grad = (loss_inc - loss_dec) / (2 * step_size);
+						std::cout << "\t\tNumerical gradient = " << num_grad;
+						if (!Utils<Scalar>::almost_equal(ana_grad, num_grad, abs_epsilon, rel_epsilon)) {
+							std::cout << " *****FAIL*****";
+							failure = true;
+						}
+						std::cout << std::endl;
 					}
-					std::cout << std::endl;
-				}
-			}
-			if (layer.get_batch_norm()) {
-				RowVector<Scalar>& betas = layer.get_betas();
-				const RowVector<Scalar>& beta_grads = layer.get_beta_grads();
-				for (int j = 0; j < betas.cols(); j++) {
-					std::cout << "Beta[" << i << "," << j << "]:" << std::endl;
-					Scalar ana_grad = beta_grads(j);
-					std::cout << "\tAnalytic gradient = " << ana_grad << std::endl;
-					Scalar beta = betas(j);
-					betas(j) = beta + step_size;
-					Scalar loss_inc = loss.function(net.propagate(x, true), y).mean();
-					betas(j) = beta - step_size;
-					Scalar loss_dec = loss.function(net.propagate(x, true), y).mean();
-					betas(j) = beta;
-					Scalar num_grad = (loss_inc - loss_dec) / (2 * step_size);
-					std::cout << "\tNumerical gradient = " << num_grad;
-					if (!Utils<Scalar>::almost_equal(ana_grad, num_grad, abs_epsilon, rel_epsilon)) {
-						std::cout << " *****FAIL*****";
-						failure = true;
-					}
-					std::cout << std::endl;
-				}
-				RowVector<Scalar>& gammas = layer.get_gammas();
-				const RowVector<Scalar>& gamma_grads = layer.get_gamma_grads();
-				for (int j = 0; j < gammas.cols(); j++) {
-					std::cout << "Gamma[" << i << "," << j << "]:" << std::endl;
-					Scalar ana_grad = gamma_grads(j);
-					std::cout << "\tAnalytic gradient = " << ana_grad << std::endl;
-					Scalar gamma = gammas(j);
-					gammas(j) = gamma + step_size;
-					Scalar loss_inc = loss.function(net.propagate(x, true), y).mean();
-					gammas(j) = gamma - step_size;
-					Scalar loss_dec = loss.function(net.propagate(x, true), y).mean();
-					gammas(j) = gamma;
-					Scalar num_grad = (loss_inc - loss_dec) / (2 * step_size);
-					std::cout << "\tNumerical gradient = " << num_grad;
-					if (!Utils<Scalar>::almost_equal(ana_grad, num_grad, abs_epsilon, rel_epsilon)) {
-						std::cout << " *****FAIL*****";
-						failure = true;
-					}
-					std::cout << std::endl;
 				}
 			}
 		}
@@ -179,23 +141,14 @@ protected:
 	static void backpropagate(NeuralNetwork<Scalar>& net, const Matrix<Scalar>& grads) {
 		net.backpropagate(grads);
 	};
-	static Matrix<Scalar>& get_weights(Layer<Scalar>& layer) {
-		return layer.get_weights();
+	static bool is_parametric(Layer<Scalar>& layer) {
+		return layer.is_parametric();
 	};
-	static const Matrix<Scalar>& get_weight_grads(Layer<Scalar>& layer) {
-		return layer.get_weight_grads();
+	static Matrix<Scalar>& get_params(Layer<Scalar>& layer) {
+		return layer.get_params();
 	};
-	static RowVector<Scalar>& get_betas(Layer<Scalar>& layer) {
-		return layer.get_betas();
-	};
-	static const RowVector<Scalar>& get_beta_grads(Layer<Scalar>& layer) {
-		return layer.get_beta_grads();
-	};
-	static RowVector<Scalar>& get_gammas(Layer<Scalar>& layer) {
-		return layer.get_gammas();
-	};
-	static const RowVector<Scalar>& get_gamma_grads(Layer<Scalar>& layer) {
-		return layer.get_gamma_grads();
+	static const Matrix<Scalar>& get_param_grads(Layer<Scalar>& layer) {
+		return layer.get_param_grads();
 	};
 	static const void enforce_constraints(Layer<Scalar>& layer) {
 		layer.enforce_constraints();
@@ -238,8 +191,10 @@ protected:
 						batch_y.topRows(batch_ind)) / batch_ind);
 				for (unsigned k = 0; k < layers.size(); k++) {
 					Layer<Scalar>& layer = *(layers[k]);
-					update_params(layer, k, epoch - 1);
-					Optimizer<Scalar>::enforce_constraints(layer);
+					if (Optimizer<Scalar>::is_parametric(layer)) {
+						update_params(layer, k, epoch - 1);
+						Optimizer<Scalar>::enforce_constraints(layer);
+					}
 				}
 				batch_ind = 0;
 			}
@@ -268,7 +223,7 @@ protected:
 		Scalar mean_obj_loss = obj_loss / test_row_num;
 		Scalar reg_loss = 0;
 		for (unsigned j = 0; j < layers.size(); j++)
-			reg_loss += reg.function(Optimizer<Scalar>::get_weights(*(layers[j])));
+			reg_loss += reg.function(Optimizer<Scalar>::get_params(*(layers[j])));
 		std::cout << "\tobj loss: " << std::to_string(mean_obj_loss) << std::endl;
 		std::cout << "\treg loss: " << std::to_string(reg_loss) << std::endl;
 		return mean_obj_loss + reg_loss;
@@ -290,13 +245,9 @@ public:
 protected:
 	void fit(NeuralNetwork<Scalar>& net) { };
 	void update_params(Layer<Scalar>& layer, unsigned i, unsigned epoch) {
-		Matrix<Scalar>& weights = Optimizer<Scalar>::get_weights(layer);
-		weights -= (learning_rate * (Optimizer<Scalar>::get_weight_grads(layer) +
-				SGDOptimizer<Scalar>::reg.d_function(weights)));
-		if (layer.get_batch_norm()) {
-			Optimizer<Scalar>::get_betas(layer) -= (learning_rate * Optimizer<Scalar>::get_beta_grads(layer));
-			Optimizer<Scalar>::get_gammas(layer) -= (learning_rate * Optimizer<Scalar>::get_gamma_grads(layer));
-		}
+		Matrix<Scalar>& params = Optimizer<Scalar>::get_params(layer);
+		params -= (learning_rate * (Optimizer<Scalar>::get_param_grads(layer) +
+				SGDOptimizer<Scalar>::reg.d_function(params)));
 	};
 	Scalar learning_rate;
 };
@@ -319,34 +270,22 @@ public:
 protected:
 	void fit(NeuralNetwork<Scalar>& net) {
 		std::vector<Layer<Scalar>*> layers = Optimizer<Scalar>::get_layers(net);
-		grads_vec = std::vector<Gradients>(layers.size());
-		for (unsigned i = 0; i < grads_vec.size(); i++) {
+		param_grads_vec = std::vector<Matrix<Scalar>>(layers.size());
+		for (unsigned i = 0; i < param_grads_vec.size(); i++) {
 			Layer<Scalar>& layer = *(layers[i]);
-			Gradients& vel = grads_vec[i];
-			vel.weight = Matrix<Scalar>(Optimizer<Scalar>::get_weight_grads(layer).rows(),
-					Optimizer<Scalar>::get_weight_grads(layer).cols());
-			vel.weight.setZero(vel.weight.rows(), vel.weight.cols());
-			if (layer.get_batch_norm()) {
-				vel.beta = RowVector<Scalar>(Optimizer<Scalar>::get_beta_grads(layer).cols());
-				vel.beta.setZero(vel.beta.cols());
-				vel.gamma = RowVector<Scalar>(Optimizer<Scalar>::get_gamma_grads(layer).cols());
-				vel.gamma.setZero(vel.gamma.cols());
-			}
+			Matrix<Scalar>& param_grads = param_grads_vec[i];
+			param_grads = Matrix<Scalar>(Optimizer<Scalar>::get_param_grads(layer).rows(),
+					Optimizer<Scalar>::get_param_grads(layer).cols());
+			param_grads.setZero(param_grads.rows(), param_grads.cols());
 		}
 	};
 	void update_params(Layer<Scalar>& layer, unsigned i, unsigned epoch) {
 		Scalar learning_rate = calculate_learning_rate(epoch);
-		Gradients& grads = grads_vec[i];
-		Matrix<Scalar>& weights = Optimizer<Scalar>::get_weights(layer);
-		grads.weight = momentum * grads.weight - learning_rate * (Optimizer<Scalar>::get_weight_grads(layer) +
-				SGDOptimizer<Scalar>::reg.d_function(weights));
-		weights += grads.weight;
-		if (layer.get_batch_norm()) {
-			grads.beta = momentum * grads.beta - learning_rate * Optimizer<Scalar>::get_beta_grads(layer);
-			Optimizer<Scalar>::get_betas(layer) += grads.beta;
-			grads.gamma = momentum * grads.gamma - learning_rate * Optimizer<Scalar>::get_gamma_grads(layer);
-			Optimizer<Scalar>::get_gammas(layer) += grads.gamma;
-		}
+		Matrix<Scalar>& param_grads = param_grads_vec[i];
+		Matrix<Scalar>& params = Optimizer<Scalar>::get_params(layer);
+		param_grads = momentum * param_grads - learning_rate * (Optimizer<Scalar>::get_param_grads(layer) +
+				SGDOptimizer<Scalar>::reg.d_function(params));
+		params += param_grads;
 	};
 	Scalar calculate_learning_rate(unsigned epoch) {
 		return init_learning_rate / (1.0 + annealing_rate * epoch);
@@ -354,12 +293,7 @@ protected:
 	Scalar init_learning_rate;
 	Scalar annealing_rate;
 	Scalar momentum;
-	struct Gradients {
-		Matrix<Scalar> weight;
-		RowVector<Scalar> beta;
-		RowVector<Scalar> gamma;
-	};
-	std::vector<Gradients> grads_vec;
+	std::vector<Matrix<Scalar>> param_grads_vec;
 };
 
 template<typename Scalar>
@@ -373,27 +307,14 @@ public:
 protected:
 	void update_params(Layer<Scalar>& layer, unsigned i, unsigned epoch) {
 		Scalar learning_rate = MomentumAcceleratedSGDOptimizer<Scalar>::calculate_learning_rate(epoch);
-		typename MomentumAcceleratedSGDOptimizer<Scalar>::Gradients& grads =
-				MomentumAcceleratedSGDOptimizer<Scalar>::grads_vec[i];
-		Matrix<Scalar>& weights = Optimizer<Scalar>::get_weights(layer);
-		Matrix<Scalar> acc_weight_grads = grads.weight;
-		grads.weight = MomentumAcceleratedSGDOptimizer<Scalar>::momentum * grads.weight -
-				learning_rate * (Optimizer<Scalar>::get_weight_grads(layer) +
-				SGDOptimizer<Scalar>::reg.d_function(weights));
-		weights += -MomentumAcceleratedSGDOptimizer<Scalar>::momentum * acc_weight_grads +
-				(1 + MomentumAcceleratedSGDOptimizer<Scalar>::momentum) * grads.weight;
-		if (layer.get_batch_norm()) {
-			RowVector<Scalar> acc_beta_grads = grads.beta;
-			grads.beta = MomentumAcceleratedSGDOptimizer<Scalar>::momentum * grads.beta -
-					learning_rate * Optimizer<Scalar>::get_beta_grads(layer);
-			Optimizer<Scalar>::get_betas(layer) += -MomentumAcceleratedSGDOptimizer<Scalar>::momentum * acc_beta_grads +
-					(1 + MomentumAcceleratedSGDOptimizer<Scalar>::momentum) * grads.beta;
-			RowVector<Scalar> acc_gamma_grads = grads.gamma;
-			grads.gamma = MomentumAcceleratedSGDOptimizer<Scalar>::momentum * grads.gamma -
-					learning_rate * Optimizer<Scalar>::get_gamma_grads(layer);
-			Optimizer<Scalar>::get_gammas(layer) += -MomentumAcceleratedSGDOptimizer<Scalar>::momentum * acc_gamma_grads +
-					(1 + MomentumAcceleratedSGDOptimizer<Scalar>::momentum) * grads.gamma;
-		}
+		Matrix<Scalar>& param_grads = MomentumAcceleratedSGDOptimizer<Scalar>::param_grads_vec[i];
+		Matrix<Scalar>& params = Optimizer<Scalar>::get_params(layer);
+		Matrix<Scalar> param_grads_bak = param_grads;
+		param_grads = MomentumAcceleratedSGDOptimizer<Scalar>::momentum * param_grads -
+				learning_rate * (Optimizer<Scalar>::get_param_grads(layer) +
+				SGDOptimizer<Scalar>::reg.d_function(params));
+		params += -MomentumAcceleratedSGDOptimizer<Scalar>::momentum * param_grads_bak +
+				(1 + MomentumAcceleratedSGDOptimizer<Scalar>::momentum) * param_grads;
 	};
 };
 
@@ -412,55 +333,34 @@ public:
 protected:
 	void fit(NeuralNetwork<Scalar>& net) {
 		std::vector<Layer<Scalar>*> layers = Optimizer<Scalar>::get_layers(net);
-		grads_vec = std::vector<GradientSquares>(layers.size());
-		for (unsigned i = 0; i < grads_vec.size(); i++) {
+		param_grad_sqrs_vec = std::vector<Matrix<Scalar>>(layers.size());
+		for (unsigned i = 0; i < param_grad_sqrs_vec.size(); i++) {
 			Layer<Scalar>& layer = *(layers[i]);
-			GradientSquares& grad_sqrs = grads_vec[i];
-			grad_sqrs.weight = Matrix<Scalar>(Optimizer<Scalar>::get_weight_grads(layer).rows(),
-					Optimizer<Scalar>::get_weight_grads(layer).cols());
-			grad_sqrs.weight.setZero(grad_sqrs.weight.rows(), grad_sqrs.weight.cols());
-			if (layer.get_batch_norm()) {
-				grad_sqrs.beta = RowVector<Scalar>(Optimizer<Scalar>::get_beta_grads(layer).cols());
-				grad_sqrs.beta.setZero(grad_sqrs.beta.cols());
-				grad_sqrs.gamma = RowVector<Scalar>(Optimizer<Scalar>::get_gamma_grads(layer).cols());
-				grad_sqrs.gamma.setZero(grad_sqrs.gamma.cols());
-			}
+			Matrix<Scalar>& param_grad_sqrs = param_grad_sqrs_vec[i];
+			param_grad_sqrs = Matrix<Scalar>(Optimizer<Scalar>::get_param_grads(layer).rows(),
+					Optimizer<Scalar>::get_param_grads(layer).cols());
+			param_grad_sqrs.setZero(param_grad_sqrs.rows(), param_grad_sqrs.cols());
 		}
 	};
 	virtual void update_acc_weight_grad_sqrs(Matrix<Scalar>& acc_weight_grad_sqrs,
-			const Matrix<Scalar>& weight_grads) {
-		acc_weight_grad_sqrs += weight_grads.cwiseProduct(weight_grads);
+			const Matrix<Scalar>& param_grads) {
+		acc_weight_grad_sqrs += param_grads.cwiseProduct(param_grads);
 	};
 	virtual void update_acc_batch_norm_grad_sqrs(RowVector<Scalar>& acc_batch_norm_grad_sqrs,
 			const RowVector<Scalar>& batch_norm_grads) {
 		acc_batch_norm_grad_sqrs += batch_norm_grads.cwiseProduct(batch_norm_grads);
 	};
 	void update_params(Layer<Scalar>& layer, unsigned i, unsigned epoch) {
-		GradientSquares& grad_sqrs = grads_vec[i];
-		Matrix<Scalar>& weights = Optimizer<Scalar>::get_weights(layer);
-		Matrix<Scalar> weight_grads = Optimizer<Scalar>::get_weight_grads(layer) +
-				SGDOptimizer<Scalar>::reg.d_function(weights);
-		update_acc_weight_grad_sqrs(grad_sqrs.weight, weight_grads);
-		weights -= (learning_rate * weight_grads.array() / (grad_sqrs.weight.array().sqrt() + epsilon)).matrix();
-		if (layer.get_batch_norm()) {
-			const RowVector<Scalar>& beta_grads = Optimizer<Scalar>::get_beta_grads(layer);
-			update_acc_batch_norm_grad_sqrs(grad_sqrs.beta, beta_grads);
-			Optimizer<Scalar>::get_betas(layer) -= (learning_rate * beta_grads.array() /
-					(grad_sqrs.beta.array().sqrt() + epsilon)).matrix();
-			const RowVector<Scalar>& gamma_grads = Optimizer<Scalar>::get_gamma_grads(layer);
-			update_acc_batch_norm_grad_sqrs(grad_sqrs.gamma, gamma_grads);
-			Optimizer<Scalar>::get_gammas(layer) -= (learning_rate * gamma_grads.array() /
-					(grad_sqrs.gamma.array().sqrt() + epsilon)).matrix();
-		}
+		Matrix<Scalar>& param_grad_sqrs = param_grad_sqrs_vec[i];
+		Matrix<Scalar>& params = Optimizer<Scalar>::get_params(layer);
+		Matrix<Scalar> param_grads = Optimizer<Scalar>::get_param_grads(layer) +
+				SGDOptimizer<Scalar>::reg.d_function(params);
+		update_acc_weight_grad_sqrs(param_grad_sqrs, param_grads);
+		params -= (learning_rate * param_grads.array() / (param_grad_sqrs.array().sqrt() + epsilon)).matrix();
 	};
 	Scalar learning_rate;
 	Scalar epsilon;
-	struct GradientSquares {
-		Matrix<Scalar> weight;
-		RowVector<Scalar> beta;
-		RowVector<Scalar> gamma;
-	};
-	std::vector<GradientSquares> grads_vec;
+	std::vector<Matrix<Scalar>> param_grad_sqrs_vec;
 };
 
 template<typename Scalar>
@@ -475,8 +375,8 @@ public:
 	};
 protected:
 	void update_acc_weight_grad_sqrs(Matrix<Scalar>& acc_weight_grad_sqrs,
-			const Matrix<Scalar>& weight_grads) {
-		acc_weight_grad_sqrs = (1 - l2_decay) * acc_weight_grad_sqrs + l2_decay * weight_grads.cwiseProduct(weight_grads);
+			const Matrix<Scalar>& param_grads) {
+		acc_weight_grad_sqrs = (1 - l2_decay) * acc_weight_grad_sqrs + l2_decay * param_grads.cwiseProduct(param_grads);
 	};
 	void update_acc_batch_norm_grad_sqrs(RowVector<Scalar>& acc_batch_norm_grad_sqrs,
 			const RowVector<Scalar>& batch_norm_grads) {
@@ -500,63 +400,35 @@ public:
 protected:
 	void fit(NeuralNetwork<Scalar>& net) {
 		std::vector<Layer<Scalar>*> layers = Optimizer<Scalar>::get_layers(net);
-		gus_vec = std::vector<GradientAndUpdateSquares>(layers.size());
-		for (unsigned i = 0; i < gus_vec.size(); i++) {
+		pgus_vec = std::vector<ParamGradAndUpdateSqrs>(layers.size());
+		for (unsigned i = 0; i < pgus_vec.size(); i++) {
 			Layer<Scalar>& layer = *(layers[i]);
-			GradientAndUpdateSquares& gus = gus_vec[i];
-			gus.weight_grad = Matrix<Scalar>(Optimizer<Scalar>::get_weight_grads(layer).rows(),
-					Optimizer<Scalar>::get_weight_grads(layer).cols());
-			gus.weight_grad.setZero(gus.weight_grad.rows(), gus.weight_grad.cols());
-			gus.weight_update = Matrix<Scalar>(gus.weight_grad.rows(), gus.weight_grad.cols());
-			gus.weight_update.setZero(gus.weight_update.rows(), gus.weight_update.cols());
-			if (layer.get_batch_norm()) {
-				gus.beta_grad = RowVector<Scalar>(Optimizer<Scalar>::get_beta_grads(layer).cols());
-				gus.beta_grad.setZero(gus.beta_grad.cols());
-				gus.beta_update = RowVector<Scalar>(gus.beta_grad.cols());
-				gus.beta_update.setZero(gus.beta_update.cols());
-				gus.gamma_grad = RowVector<Scalar>(Optimizer<Scalar>::get_gamma_grads(layer).cols());
-				gus.gamma_grad.setZero(gus.gamma_grad.cols());
-				gus.gamma_update = RowVector<Scalar>(gus.gamma_grad.cols());
-				gus.gamma_update.setZero(gus.gamma_update.cols());
-			}
+			ParamGradAndUpdateSqrs& pgus = pgus_vec[i];
+			pgus.param_grad = Matrix<Scalar>(Optimizer<Scalar>::get_param_grads(layer).rows(),
+					Optimizer<Scalar>::get_param_grads(layer).cols());
+			pgus.param_grad.setZero(pgus.param_grad.rows(), pgus.param_grad.cols());
+			pgus.param_update = Matrix<Scalar>(pgus.param_grad.rows(), pgus.param_grad.cols());
+			pgus.param_update.setZero(pgus.param_update.rows(), pgus.param_update.cols());
 		}
 	};
 	void update_params(Layer<Scalar>& layer, unsigned i, unsigned epoch) {
-		GradientAndUpdateSquares& gus = gus_vec[i];
-		Matrix<Scalar>& weights = Optimizer<Scalar>::get_weights(layer);
-		Matrix<Scalar> weight_grads = Optimizer<Scalar>::get_weight_grads(layer) +
-				SGDOptimizer<Scalar>::reg.d_function(weights);
-		gus.weight_grad = (1 - decay) * gus.weight_grad + decay * weight_grads.cwiseProduct(weight_grads);
-		Matrix<Scalar> weight_updates = -weight_grads.array() * (gus.weight_update.array() + epsilon).sqrt() /
-				(gus.weight_grad.array() + epsilon).sqrt();
-		weights += weight_updates;
-		gus.weight_update = (1 - decay) * gus.weight_update + decay * weight_updates.cwiseProduct(weight_updates);
-		if (layer->get_batch_norm()) {
-			const RowVector<Scalar>& beta_grads = Optimizer<Scalar>::get_beta_grads(layer);
-			gus.beta_grad = (1 - decay) * gus.beta_grad + decay * beta_grads.cwiseProduct(beta_grads);
-			Matrix<Scalar> beta_updates = -beta_grads.array() * (gus.beta_update.array() + epsilon).sqrt() /
-					(gus.beta_grad.array() + epsilon).sqrt();
-			Optimizer<Scalar>::get_betas(layer) += beta_updates;
-			gus.beta_update = (1 - decay) * gus.beta_update + decay * beta_updates.cwiseProduct(beta_updates);
-			const RowVector<Scalar>& gamma_grads = Optimizer<Scalar>::get_gamma_grads(layer);
-			gus.gamma_grad = (1 - decay) * gus.gamma_grad + decay * gamma_grads.cwiseProduct(gamma_grads);
-			Matrix<Scalar> gamma_updates = -beta_grads.array() * (gus.gamma_update.array() + epsilon).sqrt() /
-					(gus.gamma_grad.array() + epsilon).sqrt();
-			Optimizer<Scalar>::get_gammas(layer) += gamma_updates;
-			gus.gamma_update = (1 - decay) * gus.gamma_update + decay * gamma_updates.cwiseProduct(gamma_updates);
-		}
+		ParamGradAndUpdateSqrs& pgus = pgus_vec[i];
+		Matrix<Scalar>& params = Optimizer<Scalar>::get_params(layer);
+		Matrix<Scalar> param_grads = Optimizer<Scalar>::get_param_grads(layer) +
+				SGDOptimizer<Scalar>::reg.d_function(params);
+		pgus.param_grad = (1 - decay) * pgus.param_grad + decay * param_grads.cwiseProduct(param_grads);
+		Matrix<Scalar> weight_updates = -param_grads.array() * (pgus.param_update.array() + epsilon).sqrt() /
+				(pgus.param_grad.array() + epsilon).sqrt();
+		params += weight_updates;
+		pgus.param_update = (1 - decay) * pgus.param_update + decay * weight_updates.cwiseProduct(weight_updates);
 	};
 	Scalar decay;
 	Scalar epsilon;
-	struct GradientAndUpdateSquares {
-		Matrix<Scalar> weight_grad;
-		Matrix<Scalar> weight_update;
-		RowVector<Scalar> beta_grad;
-		RowVector<Scalar> beta_update;
-		RowVector<Scalar> gamma_grad;
-		RowVector<Scalar> gamma_update;
+	struct ParamGradAndUpdateSqrs {
+		Matrix<Scalar> param_grad;
+		Matrix<Scalar> param_update;
 	};
-	std::vector<GradientAndUpdateSquares> gus_vec;
+	std::vector<ParamGradAndUpdateSqrs> pgus_vec;
 };
 
 template<typename Scalar>
@@ -579,65 +451,39 @@ public:
 protected:
 	void fit(NeuralNetwork<Scalar>& net) {
 		std::vector<Layer<Scalar>*> layers = Optimizer<Scalar>::get_layers(net);
-		grad_norms_vec = std::vector<GradientNorms>(layers.size());
-		for (unsigned i = 0; i < grad_norms_vec.size(); i++) {
+		pgn_vec = std::vector<ParamGradNorms>(layers.size());
+		for (unsigned i = 0; i < pgn_vec.size(); i++) {
 			Layer<Scalar>& layer = *(layers[i]);
-			GradientNorms& vel = grad_norms_vec[i];
-			vel.weight_l1 = Matrix<Scalar>(Optimizer<Scalar>::get_weight_grads(layer).rows(),
-					Optimizer<Scalar>::get_weight_grads(layer).cols());
-			vel.weight_l1.setZero(vel.weight_l1.rows(), vel.weight_l1.cols());
-			vel.weight_l2 = Matrix<Scalar>(vel.weight_l1.rows(), vel.weight_l1.cols());
-			vel.weight_l2.setZero(vel.weight_l2.rows(), vel.weight_l2.cols());
-			if (layer.get_batch_norm()) {
-				vel.beta_l1 = RowVector<Scalar>(Optimizer<Scalar>::get_beta_grads(layer).cols());
-				vel.beta_l1.setZero(vel.beta_l1.cols());
-				vel.beta_l2 = RowVector<Scalar>(vel.beta_l1.cols());
-				vel.beta_l2.setZero(vel.beta_l2.cols());
-				vel.gamma_l1 = RowVector<Scalar>(Optimizer<Scalar>::get_gamma_grads(layer).cols());
-				vel.gamma_l1.setZero(vel.gamma_l1.cols());
-				vel.gamma_l2 = RowVector<Scalar>(vel.gamma_l1.cols());
-				vel.gamma_l2.setZero(vel.gamma_l2.cols());
-			}
+			ParamGradNorms& vel = pgn_vec[i];
+			vel.param_grad_l1 = Matrix<Scalar>(Optimizer<Scalar>::get_param_grads(layer).rows(),
+					Optimizer<Scalar>::get_param_grads(layer).cols());
+			vel.param_grad_l1.setZero(vel.param_grad_l1.rows(), vel.param_grad_l1.cols());
+			vel.param_grad_l2 = Matrix<Scalar>(vel.param_grad_l1.rows(), vel.param_grad_l1.cols());
+			vel.param_grad_l2.setZero(vel.param_grad_l2.rows(), vel.param_grad_l2.cols());
 		}
 	};
 	void update_params(Layer<Scalar>& layer, unsigned i, unsigned epoch) {
-		GradientNorms& grad_norms = grad_norms_vec[i];
+		ParamGradNorms& grad_norms = pgn_vec[i];
 		Scalar l1_corr = 1.0 / (1.0 - pow(1.0 - l1_decay, epoch + 1) + epsilon);
 		Scalar l2_corr = 1.0 / (1.0 - pow(1.0 - l2_decay, epoch + 1) + epsilon);
-		Matrix<Scalar>& weights = Optimizer<Scalar>::get_weights(layer);
-		Matrix<Scalar> weight_grads = Optimizer<Scalar>::get_weight_grads(layer) +
-				SGDOptimizer<Scalar>::reg.d_function(weights);
-		grad_norms.weight_l1 = (1 - l1_decay) * grad_norms.weight_l1 + l1_decay * weight_grads;
-		grad_norms.weight_l2 = (1 - l2_decay) * grad_norms.weight_l2 +
-				l2_decay * weight_grads.cwiseProduct(weight_grads);
-		weights -= (learning_rate * (grad_norms.weight_l1 * l1_corr).array() /
-				((grad_norms.weight_l2 * l2_corr).array().sqrt() + epsilon)).matrix();
-		if (layer.get_batch_norm()) {
-			const RowVector<Scalar>& beta_grads = Optimizer<Scalar>::get_beta_grads(layer);
-			grad_norms.beta_l1 = (1 - l1_decay) * grad_norms.beta_l1 + l1_decay * beta_grads;
-			grad_norms.beta_l2 = (1 - l2_decay) * grad_norms.beta_l2 + l2_decay * beta_grads.cwiseProduct(beta_grads);
-			Optimizer<Scalar>::get_betas(layer) -= (learning_rate * (grad_norms.beta_l1 * l1_corr).array() /
-					((grad_norms.beta_l2 * l2_corr).array().sqrt() + epsilon)).matrix();
-			const RowVector<Scalar>& gamma_grads = Optimizer<Scalar>::get_gamma_grads(layer);
-			grad_norms.gamma_l1 = (1 - l1_decay) * grad_norms.gamma_l1 + l1_decay * gamma_grads;
-			grad_norms.gamma_l2 = (1 - l2_decay) * grad_norms.gamma_l2 + l2_decay * gamma_grads.cwiseProduct(gamma_grads);
-			Optimizer<Scalar>::get_betas(layer) -= (learning_rate * (grad_norms.gamma_l1 * l1_corr).array() /
-					((grad_norms.gamma_l2 * l2_corr).array().sqrt() + epsilon)).matrix();
-		}
+		Matrix<Scalar>& params = Optimizer<Scalar>::get_params(layer);
+		Matrix<Scalar> param_grads = Optimizer<Scalar>::get_param_grads(layer) +
+				SGDOptimizer<Scalar>::reg.d_function(params);
+		grad_norms.param_grad_l1 = (1 - l1_decay) * grad_norms.param_grad_l1 + l1_decay * param_grads;
+		grad_norms.param_grad_l2 = (1 - l2_decay) * grad_norms.param_grad_l2 +
+				l2_decay * param_grads.cwiseProduct(param_grads);
+		params -= (learning_rate * (grad_norms.param_grad_l1 * l1_corr).array() /
+				((grad_norms.param_grad_l2 * l2_corr).array().sqrt() + epsilon)).matrix();
 	};
 	Scalar learning_rate;
 	Scalar l1_decay;
 	Scalar l2_decay;
 	Scalar epsilon;
-	struct GradientNorms {
-		Matrix<Scalar> weight_l1;
-		Matrix<Scalar> weight_l2;
-		RowVector<Scalar> beta_l1;
-		RowVector<Scalar> beta_l2;
-		RowVector<Scalar> gamma_l1;
-		RowVector<Scalar> gamma_l2;
+	struct ParamGradNorms {
+		Matrix<Scalar> param_grad_l1;
+		Matrix<Scalar> param_grad_l2;
 	};
-	std::vector<GradientNorms> grad_norms_vec;
+	std::vector<ParamGradNorms> pgn_vec;
 };
 
 template<typename Scalar>
@@ -650,36 +496,18 @@ public:
 						l1_decay, l2_decay, epsilon) { };
 protected:
 	void update_params(Layer<Scalar>& layer, unsigned i, unsigned epoch) {
-		typename AdamOptimizer<Scalar>::GradientNorms& grad_norms = AdamOptimizer<Scalar>::grad_norms_vec[i];
+		typename AdamOptimizer<Scalar>::ParamGradNorms& grad_norms = AdamOptimizer<Scalar>::pgn_vec[i];
 		Scalar l1_corr = 1.0 / (1.0 - pow(1.0 - AdamOptimizer<Scalar>::l1_decay, epoch + 1) +
 				AdamOptimizer<Scalar>::epsilon);
-		Matrix<Scalar>& weights = Optimizer<Scalar>::get_weights(layer);
-		Matrix<Scalar> weight_grads = Optimizer<Scalar>::get_weight_grads(layer) +
-				SGDOptimizer<Scalar>::reg.d_function(weights);
-		grad_norms.weight_l1 = (1 - AdamOptimizer<Scalar>::l1_decay) * grad_norms.weight_l1 +
-				AdamOptimizer<Scalar>::l1_decay * weight_grads;
-		grad_norms.weight_l2 = ((1 - AdamOptimizer<Scalar>::l2_decay) * grad_norms.weight_l2)
-				.cwiseMax(weight_grads.cwiseAbs());
-		weights -= (AdamOptimizer<Scalar>::learning_rate * (grad_norms.weight_l1 * l1_corr).array() /
-				(grad_norms.weight_l2.array() + AdamOptimizer<Scalar>::epsilon)).matrix();
-		if (layer.get_batch_norm()) {
-			const RowVector<Scalar>& beta_grads = Optimizer<Scalar>::get_beta_grads(layer);
-			grad_norms.beta_l1 = (1 - AdamOptimizer<Scalar>::l1_decay) * grad_norms.beta_l1 +
-					AdamOptimizer<Scalar>::l1_decay * beta_grads;
-			grad_norms.beta_l2 = ((1 - AdamOptimizer<Scalar>::l2_decay) * grad_norms.beta_l2)
-					.cwiseMax(beta_grads.cwiseAbs());
-			Optimizer<Scalar>::get_betas(layer) -= (AdamOptimizer<Scalar>::learning_rate *
-					(grad_norms.beta_l1 * l1_corr).array() /
-					(grad_norms.beta_l2.array() + AdamOptimizer<Scalar>::epsilon)).matrix();
-			const RowVector<Scalar>& gamma_grads = Optimizer<Scalar>::get_gamma_grads(layer);
-			grad_norms.gamma_l1 = (1 - AdamOptimizer<Scalar>::l1_decay) * grad_norms.gamma_l1 +
-					AdamOptimizer<Scalar>::l1_decay * gamma_grads;
-			grad_norms.gamma_l2 = ((1 - AdamOptimizer<Scalar>::l2_decay) * grad_norms.gamma_l2)
-					.cwiseMax(gamma_grads.cwiseAbs());
-			Optimizer<Scalar>::get_gammas(layer) -= (AdamOptimizer<Scalar>::learning_rate *
-					(grad_norms.gamma_l1 * l1_corr).array() /
-					(grad_norms.gamma_l2.array() + AdamOptimizer<Scalar>::epsilon)).matrix();
-		}
+		Matrix<Scalar>& params = Optimizer<Scalar>::get_params(layer);
+		Matrix<Scalar> param_grads = Optimizer<Scalar>::get_param_grads(layer) +
+				SGDOptimizer<Scalar>::reg.d_function(params);
+		grad_norms.param_grad_l1 = (1 - AdamOptimizer<Scalar>::l1_decay) * grad_norms.param_grad_l1 +
+				AdamOptimizer<Scalar>::l1_decay * param_grads;
+		grad_norms.param_grad_l2 = ((1 - AdamOptimizer<Scalar>::l2_decay) * grad_norms.param_grad_l2)
+				.cwiseMax(param_grads.cwiseAbs());
+		params -= (AdamOptimizer<Scalar>::learning_rate * (grad_norms.param_grad_l1 * l1_corr).array() /
+				(grad_norms.param_grad_l2.array() + AdamOptimizer<Scalar>::epsilon)).matrix();
 	};
 };
 
@@ -693,43 +521,23 @@ public:
 						l1_decay, l2_decay, epsilon) { };
 protected:
 	void update_params(Layer<Scalar>& layer, unsigned i, unsigned epoch) {
-		typename AdamOptimizer<Scalar>::GradientNorms& grad_norms = AdamOptimizer<Scalar>::grad_norms_vec[i];
+		typename AdamOptimizer<Scalar>::ParamGradNorms& grad_norms = AdamOptimizer<Scalar>::pgn_vec[i];
 		Scalar l1_corr = 1.0 / (1.0 - pow(1.0 - AdamOptimizer<Scalar>::l1_decay, epoch + 1) +
 				AdamOptimizer<Scalar>::epsilon);
 		Scalar l1_next_corr = 1.0 / (1.0 - pow(1.0 - AdamOptimizer<Scalar>::l1_decay, epoch + 2) +
 				AdamOptimizer<Scalar>::epsilon);
 		Scalar l2_corr = 1.0 / (1.0 - pow(1.0 - AdamOptimizer<Scalar>::l2_decay, epoch + 1) +
 				AdamOptimizer<Scalar>::epsilon);
-		Matrix<Scalar>& weights = Optimizer<Scalar>::get_weights(layer);
-		Matrix<Scalar> weight_grads = Optimizer<Scalar>::get_weight_grads(layer) +
-				SGDOptimizer<Scalar>::reg.d_function(weights);
-		grad_norms.weight_l1 = (1 - AdamOptimizer<Scalar>::l1_decay) * grad_norms.weight_l1 +
-				AdamOptimizer<Scalar>::l1_decay * weight_grads;
-		grad_norms.weight_l2 = (1 - AdamOptimizer<Scalar>::l2_decay) * grad_norms.weight_l2 +
-				AdamOptimizer<Scalar>::l2_decay * weight_grads.cwiseProduct(weight_grads);
-		weights -= (AdamOptimizer<Scalar>::learning_rate * (AdamOptimizer<Scalar>::l1_decay * l1_corr * weight_grads +
-				(1.0 - AdamOptimizer<Scalar>::l1_decay) * l1_next_corr * grad_norms.weight_l1).array() /
-				((grad_norms.weight_l2 * l2_corr).array().sqrt() + AdamOptimizer<Scalar>::epsilon)).matrix();
-		if (layer.get_batch_norm()) {
-			const RowVector<Scalar>& beta_grads = Optimizer<Scalar>::get_beta_grads(layer);
-			grad_norms.beta_l1 = (1 - AdamOptimizer<Scalar>::l1_decay) * grad_norms.beta_l1 +
-					AdamOptimizer<Scalar>::l1_decay * beta_grads;
-			grad_norms.beta_l2 = (1 - AdamOptimizer<Scalar>::l2_decay) * grad_norms.beta_l2 +
-					AdamOptimizer<Scalar>::l2_decay * beta_grads.cwiseProduct(beta_grads);
-			Optimizer<Scalar>::get_betas(layer) -= (AdamOptimizer<Scalar>::learning_rate *
-					(AdamOptimizer<Scalar>::l1_decay * l1_corr * beta_grads +
-					(1.0 - AdamOptimizer<Scalar>::l1_decay) * l1_next_corr * grad_norms.beta_l1).array() /
-					(grad_norms.beta_l2.array() + AdamOptimizer<Scalar>::epsilon)).matrix();
-			const RowVector<Scalar>& gamma_grads = Optimizer<Scalar>::get_gamma_grads(layer);
-			grad_norms.gamma_l1 = (1 - AdamOptimizer<Scalar>::l1_decay) * grad_norms.gamma_l1 +
-					AdamOptimizer<Scalar>::l1_decay * gamma_grads;
-			grad_norms.gamma_l2 = (1 - AdamOptimizer<Scalar>::l2_decay) * grad_norms.gamma_l2 +
-					AdamOptimizer<Scalar>::l2_decay * gamma_grads.cwiseProduct(gamma_grads);
-			Optimizer<Scalar>::get_gammas(layer) -= (AdamOptimizer<Scalar>::learning_rate *
-					(AdamOptimizer<Scalar>::l1_decay * l1_corr * gamma_grads +
-					(1.0 - AdamOptimizer<Scalar>::l1_decay) * l1_next_corr * grad_norms.gamma_l1).array() /
-					(grad_norms.gamma_l2.array() + AdamOptimizer<Scalar>::epsilon)).matrix();
-		}
+		Matrix<Scalar>& params = Optimizer<Scalar>::get_params(layer);
+		Matrix<Scalar> param_grads = Optimizer<Scalar>::get_param_grads(layer) +
+				SGDOptimizer<Scalar>::reg.d_function(params);
+		grad_norms.param_grad_l1 = (1 - AdamOptimizer<Scalar>::l1_decay) * grad_norms.param_grad_l1 +
+				AdamOptimizer<Scalar>::l1_decay * param_grads;
+		grad_norms.param_grad_l2 = (1 - AdamOptimizer<Scalar>::l2_decay) * grad_norms.param_grad_l2 +
+				AdamOptimizer<Scalar>::l2_decay * param_grads.cwiseProduct(param_grads);
+		params -= (AdamOptimizer<Scalar>::learning_rate * (AdamOptimizer<Scalar>::l1_decay * l1_corr * param_grads +
+				(1.0 - AdamOptimizer<Scalar>::l1_decay) * l1_next_corr * grad_norms.param_grad_l1).array() /
+				((grad_norms.param_grad_l2 * l2_corr).array().sqrt() + AdamOptimizer<Scalar>::epsilon)).matrix();
 	};
 };
 

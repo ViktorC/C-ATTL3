@@ -14,6 +14,7 @@
 #include <Eigen/Dense>
 #include <Matrix.h>
 #include <string>
+#include <Utils.h>
 #include <Vector.h>
 
 namespace cppnn {

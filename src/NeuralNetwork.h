@@ -52,42 +52,23 @@ public:
 		strm << "Neural Net " << this << std::endl;
 		for (unsigned i = 0; i < get_layers().size(); i++) {
 			Layer<Scalar>* layer = get_layers()[i];
-			strm << "\tLayer " << std::setw(2) << std::to_string(i + 1) <<
+			strm << "\tLayer " << std::setw(3) << std::to_string(i + 1) <<
 					"----------------------------" << std::endl;
-			strm << "\t\tprev size: " << layer->get_prev_size() << std::endl;
-			strm << "\t\tsize: " << layer->get_size() << std::endl;
-			strm << "\t\tbatch norm: " << std::to_string(layer->get_batch_norm()) << std::endl;
-			if (layer->get_batch_norm()) {
-				RowVector<Scalar>& gammas = layer->get_gammas();
-				strm << "\t\tgammas:" << std::endl << "\t\t[ ";
-				for (int j = 0; j < gammas.cols(); j++) {
-					strm << std::setw(11) << std::setprecision(4) << gammas(j);
-					if (j != gammas.cols() - 1) {
-						strm << ", ";
+			strm << "\t\tinput size: " << layer->get_input_size() << std::endl;
+			strm << "\t\toutput size: " << layer->get_output_size() << std::endl;
+			if (layer->is_parametric()) {
+				strm << "\t\tparams:" << std::endl;
+				Matrix<Scalar>& params = layer->get_params();
+				for (int j = 0; j < params.rows(); j++) {
+					strm << "\t\t[ ";
+					for (int k = 0; k < params.cols(); k++) {
+						strm << std::setw(11) << std::setprecision(4) << params(j,k);
+						if (k != params.cols() - 1) {
+							strm << ", ";
+						}
 					}
+					strm << " ]" << std::endl;
 				}
-				strm << " ]" << std::endl;
-				RowVector<Scalar>& betas = layer->get_betas();
-				strm << "\t\tbetas:" << std::endl << "\t\t[ ";
-				for (int j = 0; j < betas.cols(); j++) {
-					strm << std::setw(11) << std::setprecision(4) << betas(j);
-					if (j != betas.cols() - 1) {
-						strm << ", ";
-					}
-				}
-				strm << " ]" << std::endl;
-			}
-			strm << "\t\tweights:" << std::endl;
-			Matrix<Scalar>& weights = layer->get_weights();
-			for (int j = 0; j < weights.rows(); j++) {
-				strm << "\t\t[ ";
-				for (int k = 0; k < weights.cols(); k++) {
-					strm << std::setw(11) << std::setprecision(4) << weights(j,k);
-					if (k != weights.cols() - 1) {
-						strm << ", ";
-					}
-				}
-				strm << " ]" << std::endl;
 			}
 		}
 		return strm.str();
@@ -121,13 +102,13 @@ public:
 	FFNeuralNetwork(std::vector<Layer<Scalar>*> layers) : // TODO use smart Layer pointers
 			layers(layers) {
 		assert(layers.size() > 0 && "layers must contain at least 1 element");
-		input_size = layers[0]->get_prev_size();
-		output_size = layers[layers.size() - 1]->get_size();
-		unsigned prev_size = layers[0]->get_size();
+		input_size = layers[0]->get_input_size();
+		output_size = layers[layers.size() - 1]->get_output_size();
+		unsigned prev_size = layers[0]->get_output_size();
 		for (unsigned i = 1; i < layers.size(); i++) {
 			assert(layers[i] != nullptr && "layers contains null pointers");
-			assert(prev_size == layers[i]->get_prev_size() && "incompatible layer dimensions");
-			prev_size = layers[i]->get_size();
+			assert(prev_size == layers[i]->get_input_size() && "incompatible layer dimensions");
+			prev_size = layers[i]->get_output_size();
 		}
 	};
 	// Copy constructor.
@@ -189,10 +170,43 @@ protected:
 			out_grads = NeuralNetwork<Scalar>::pass_back(*(layers[i]), out_grads);
 		}
 	};
-private:
 	std::vector<Layer<Scalar>*> layers;
 	unsigned input_size;
 	unsigned output_size;
+};
+
+template<typename Scalar>
+class ResNeuralNetwork : public FFNeuralNetwork<Scalar> {
+public:
+		ResNeuralNetwork(std::vector<Layer<Scalar>*> layers) :
+				FFNeuralNetwork<Scalar>::FFNeuralNetwork(layers) { };
+		ResNeuralNetwork(const ResNeuralNetwork<Scalar>& network) :
+				FFNeuralNetwork<Scalar>::FFNeuralNetwork(network) { };
+		ResNeuralNetwork(ResNeuralNetwork<Scalar>&& network) :
+				FFNeuralNetwork<Scalar>::FFNeuralNetwork(network) { };
+		ResNeuralNetwork<Scalar>& operator=(ResNeuralNetwork<Scalar> network) {
+			FFNeuralNetwork<Scalar>::swap(*this, network);
+			return *this;
+		};
+protected:
+		Matrix<Scalar> propagate(Matrix<Scalar> input, bool training) {
+			assert(FFNeuralNetwork<Scalar>::input_size == (unsigned) input.cols() &&
+					"wrong neural network input size");
+			assert(input.rows() >= 0 && input.cols() >= 0 && "empty feed forward input");
+			std::vector<Layer<Scalar>*> layers = FFNeuralNetwork<Scalar>::layers;
+			for (unsigned i = 0; i < layers.size(); i++) {
+				input = NeuralNetwork<Scalar>::pass_forward(*(layers[i]), input, training);
+			}
+			return input;
+		};
+		void backpropagate(Matrix<Scalar> out_grads) {
+			assert(FFNeuralNetwork<Scalar>::output_size == (unsigned) out_grads.cols() &&
+					"wrong neural network output gradient size");
+			std::vector<Layer<Scalar>*> layers = FFNeuralNetwork<Scalar>::layers;
+			for (int i = layers.size() - 1; i >= 0; i--) {
+				out_grads = NeuralNetwork<Scalar>::pass_back(*(layers[i]), out_grads);
+			}
+		};
 };
 
 } /* namespace cppnn */
