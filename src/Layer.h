@@ -172,9 +172,9 @@ protected:
 				"illegal input matrix size for feed back");
 		return d_activate(in, out, out_grads);
 	};
-	virtual Matrix<Scalar> activate(const Matrix<Scalar>& in) const = 0;
+	virtual Matrix<Scalar> activate(const Matrix<Scalar>& in) = 0;
 	virtual Matrix<Scalar> d_activate(const Matrix<Scalar>& in, const Matrix<Scalar>& out,
-			const Matrix<Scalar>& out_grads) const = 0;
+			const Matrix<Scalar>& out_grads) = 0;
 	unsigned size;
 	Matrix<Scalar> params;
 	Matrix<Scalar> param_grads;
@@ -192,11 +192,11 @@ public:
 		return new IdentityActivationLayer(*this);
 	};
 protected:
-	Matrix<Scalar> activate(const Matrix<Scalar>& in) const {
+	Matrix<Scalar> activate(const Matrix<Scalar>& in) {
 		return in;
 	};
 	Matrix<Scalar> d_activate(const Matrix<Scalar>& in, const Matrix<Scalar>& out,
-			const Matrix<Scalar>& out_grads) const {
+			const Matrix<Scalar>& out_grads) {
 		return out_grads;
 	};
 };
@@ -211,11 +211,11 @@ public:
 		return new ScalingActivationLayer(*this);
 	};
 protected:
-	Matrix<Scalar> activate(const Matrix<Scalar>& in) const {
+	Matrix<Scalar> activate(const Matrix<Scalar>& in) {
 		return in * scale;
 	};
 	Matrix<Scalar> d_activate(const Matrix<Scalar>& in, const Matrix<Scalar>& out,
-			const Matrix<Scalar>& out_grads) const {
+			const Matrix<Scalar>& out_grads) {
 		return out_grads * scale;
 	};
 private:
@@ -231,11 +231,11 @@ public:
 		return new BinaryStepActivationLayer(*this);
 	};
 protected:
-	Matrix<Scalar> activate(const Matrix<Scalar>& in) const {
+	Matrix<Scalar> activate(const Matrix<Scalar>& in) {
 		return in.unaryExpr([](Scalar i) { return i >= .0 ? 1.0 : .0; });
 	};
 	Matrix<Scalar> d_activate(const Matrix<Scalar>& in, const Matrix<Scalar>& out,
-			const Matrix<Scalar>& out_grads) const {
+			const Matrix<Scalar>& out_grads) {
 		return Matrix<Scalar>::Zero(in.rows(), in.cols());
 	};
 };
@@ -249,11 +249,11 @@ public:
 		return new SigmoidActivationLayer(*this);
 	};
 protected:
-	Matrix<Scalar> activate(const Matrix<Scalar>& in) const {
+	Matrix<Scalar> activate(const Matrix<Scalar>& in) {
 		return ((-in).array().exp() + 1).inverse();
 	};
 	Matrix<Scalar> d_activate(const Matrix<Scalar>& in, const Matrix<Scalar>& out,
-			const Matrix<Scalar>& out_grads) const {
+			const Matrix<Scalar>& out_grads) {
 		return (out.array() *  (-out.array() + 1)) * out_grads.array();
 	};
 };
@@ -267,11 +267,11 @@ public:
 		return new TanhActivationLayer(*this);
 	};
 protected:
-	Matrix<Scalar> activate(const Matrix<Scalar>& in) const {
+	Matrix<Scalar> activate(const Matrix<Scalar>& in) {
 		return in.array().tanh();
 	};
 	Matrix<Scalar> d_activate(const Matrix<Scalar>& in, const Matrix<Scalar>& out,
-			const Matrix<Scalar>& out_grads) const {
+			const Matrix<Scalar>& out_grads) {
 		return (-out.array() * out.array() + 1) * out_grads.array();
 	};
 };
@@ -286,14 +286,14 @@ public:
 		return new SoftmaxActivationLayer(*this);
 	};
 protected:
-	Matrix<Scalar> activate(const Matrix<Scalar>& in) const {
+	Matrix<Scalar> activate(const Matrix<Scalar>& in) {
 		/* First subtract the value of the greatest coefficient from each element row-wise
 		 * to avoid an overflow due to raising e to great powers. */
 		Matrix<Scalar> out = (in.array().colwise() - in.array().rowwise().maxCoeff()).exp();
 		return out.array().colwise() / (out.array().rowwise().sum() + epsilon);
 	};
 	Matrix<Scalar> d_activate(const Matrix<Scalar>& in, const Matrix<Scalar>& out,
-			const Matrix<Scalar>& out_grads) const {
+			const Matrix<Scalar>& out_grads) {
 		Matrix<Scalar> d_in(in.rows(), in.cols());
 		for (int i = 0; i < d_in.rows(); i++) {
 			Matrix<Scalar> jacobian = out.row(i).asDiagonal();
@@ -315,11 +315,11 @@ public:
 		return new ReLUActivationLayer(*this);
 	};
 protected:
-	Matrix<Scalar> activate(const Matrix<Scalar>& in) const {
+	Matrix<Scalar> activate(const Matrix<Scalar>& in) {
 		return in.cwiseMax(.0);
 	};
 	Matrix<Scalar> d_activate(const Matrix<Scalar>& in, const Matrix<Scalar>& out,
-			const Matrix<Scalar>& out_grads) const {
+			const Matrix<Scalar>& out_grads) {
 		return in.unaryExpr([](Scalar i) { return i >= .0 ? 1.0 : .0; })
 				.cwiseProduct(out_grads);
 	};
@@ -335,11 +335,11 @@ public:
 		return new LeakyReLUActivationLayer(*this);
 	};
 protected:
-	Matrix<Scalar> activate(const Matrix<Scalar>& in) const {
+	Matrix<Scalar> activate(const Matrix<Scalar>& in) {
 		return in.cwiseMax(in * alpha);
 	};
 	Matrix<Scalar> d_activate(const Matrix<Scalar>& in, const Matrix<Scalar>& out,
-			const Matrix<Scalar>& out_grads) const {
+			const Matrix<Scalar>& out_grads) {
 		return in.unaryExpr([this](Scalar i) { return i >= .0 ? 1.0 : alpha; })
 				.cwiseProduct(out_grads);
 	};
@@ -357,11 +357,11 @@ public:
 		return new ELUActivationLayer(*this);
 	};
 protected:
-	Matrix<Scalar> activate(const Matrix<Scalar>& in) const {
+	Matrix<Scalar> activate(const Matrix<Scalar>& in) {
 		return in.unaryExpr([this](Scalar i) { return i > .0 ? i : (alpha * (exp(i) - 1)); });
 	};
 	Matrix<Scalar> d_activate(const Matrix<Scalar>& in, const Matrix<Scalar>& out,
-			const Matrix<Scalar>& out_grads) const {
+			const Matrix<Scalar>& out_grads) {
 		Matrix<Scalar> d_in(in.rows(), in.cols());
 		for (int i = 0; i < in.rows(); i++) {
 			for (int j = 0; j < in.cols(); j++)
@@ -390,14 +390,14 @@ protected:
 		ActivationLayer<Scalar>::params.setConstant(init_alpha);
 		ActivationLayer<Scalar>::param_grads.setZero(1, ActivationLayer<Scalar>::size);
 	};
-	Matrix<Scalar> activate(const Matrix<Scalar>& in) const {
+	Matrix<Scalar> activate(const Matrix<Scalar>& in) {
 		return in.cwiseMax(in * ActivationLayer<Scalar>::params.row(0).asDiagonal());
 	};
 	Matrix<Scalar> d_activate(const Matrix<Scalar>& in, const Matrix<Scalar>& out,
-			const Matrix<Scalar>& out_grads) const {
+			const Matrix<Scalar>& out_grads) {
+		ActivationLayer<Scalar>::param_grads.row(0).setZero();
 		Matrix<Scalar> d_in = Matrix<Scalar>(in.rows(), in.cols());
 		for (int i = 0; i < in.rows(); i++) {
-			ActivationLayer<Scalar>::param_grads(0,j) = 0;
 			for (int j = 0; j < in.cols(); j++) {
 				Scalar in_ij = in(i,j);
 				if (in_ij >= 0)
