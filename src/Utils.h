@@ -9,7 +9,12 @@
 #define UTILS_H_
 
 #include <algorithm>
+#include <Dimensions.h>
+#include <Eigen/Dense>
 #include <limits>
+#include <Matrix.h>
+#include <Tensor.h>
+#include <unsupported/Eigen/CXX11/Tensor>
 
 namespace cppnn {
 
@@ -44,6 +49,14 @@ public:
 	static bool lesser_or_almost_equal(Scalar n1, Scalar n2, Scalar abs_epsilon = EPSILON1,
 			Scalar rel_epsilon = EPSILON1) {
 		return n1 < n2 || almost_equal(n1, n2, abs_epsilon, rel_epsilon);
+	};
+	static Matrix<Scalar> tensor4d_to_mat(Tensor4D<Scalar> tensor) {
+		int rows = tensor.dimension(0);
+		return Eigen::Map<Matrix<Scalar>>(tensor.data(), rows, tensor.size() / rows);
+	};
+	static Tensor4D<Scalar> mat_to_tensor4d(Matrix<Scalar> mat, Dimensions dims) {
+		return Eigen::TensorMap<Tensor4D<Scalar>>(mat.data(), mat.rows(), dims.get_dim1(),
+				dims.get_dim2(), dims.get_dim3());
 	};
 };
 

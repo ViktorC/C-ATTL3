@@ -15,17 +15,17 @@ namespace cppnn {
 class Dimensions {
 public:
 	Dimensions();
-	Dimensions(unsigned dim1, unsigned dim2, unsigned dim3);
-	unsigned get_dim1() const;
-	unsigned get_dim2() const;
-	unsigned get_dim3() const;
-	unsigned get_points() const;
+	Dimensions(int dim1, int dim2, int dim3);
+	int get_dim1() const;
+	int get_dim2() const;
+	int get_dim3() const;
+	int get_points() const;
 	bool equals(const Dimensions& dims) const;
 	std::string to_string() const;
 private:
-	unsigned dim1;
-	unsigned dim2;
-	unsigned dim3;
+	int dim1;
+	int dim2;
+	int dim3;
 };
 
 } /* namespace cppnn */

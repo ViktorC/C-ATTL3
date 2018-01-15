@@ -17,12 +17,20 @@
 #include <Utils.h>
 #include <Vector.h>
 
+#ifndef DIM_CHECK1
 #define DIM_CHECK1 assert(out.dimension(0) == obj.dimension(0) && out.dimension(1) == obj.dimension(1) && \
 		out.dimension(2) == obj.dimension(2) && out.dimension(3) == obj.dimension(3));
+#endif
+
+#ifndef DIM_CHECK2
 #define DIM_CHECK2 assert(out.dimension(2) == 1 && out.dimension(3) == 1);
-#define CONV_TENSORS Matrix<Scalar> out_mat = tensor4d_to_mat(out); \
-		Matrix<Scalar> obj_mat = tensor4d_to_mat(obj);
+#define CONV_TENSORS Matrix<Scalar> out_mat = Utils<Scalar>::tensor4d_to_mat(out); \
+		Matrix<Scalar> obj_mat = Utils<Scalar>::tensor4d_to_mat(obj);
+#endif
+
+#ifndef OUT_DIMS
 #define OUT_DIMS Dimensions(out.dimension(1), out.dimension(2), out.dimension(3))
+#endif
 
 namespace cppnn {
 
@@ -47,7 +55,7 @@ public:
 		DIM_CHECK1
 		DIM_CHECK2
 		CONV_TENSORS
-		return mat_to_tensor4d((2 * (out_mat - obj_mat)).eval(), OUT_DIMS);
+		return Utils<Scalar>::mat_to_tensor4d((2 * (out_mat - obj_mat)).eval(), OUT_DIMS);
 	}
 };
 
@@ -121,7 +129,7 @@ public:
 			}
 			out_grads(i,correct_class_ind) = -total_out_grad;
 		}
-		return mat_to_tensor4d(out_grads, OUT_DIMS);
+		return Utils<Scalar>::mat_to_tensor4d(out_grads, OUT_DIMS);
 	};
 private:
 	bool squared;
@@ -145,7 +153,7 @@ public:
 		DIM_CHECK1
 		DIM_CHECK2
 		CONV_TENSORS
-		return mat_to_tensor4d((-obj_mat.array() / (out_mat.array() + epsilon)).eval(), OUT_DIMS);
+		return Utils<Scalar>::mat_to_tensor4d((-obj_mat.array() / (out_mat.array() + epsilon)).eval(), OUT_DIMS);
 	}
 private:
 	Scalar epsilon;
@@ -193,7 +201,7 @@ public:
 					out_grads(i,j) = 0;
 			}
 		}
-		return mat_to_tensor4d(out_grads, OUT_DIMS);
+		return Utils<Scalar>::mat_to_tensor4d(out_grads, OUT_DIMS);
 	};
 private:
 	bool squared;
@@ -240,7 +248,7 @@ public:
 				out_grads(i,j) = 1 / (denominator * rows);
 			}
 		}
-		return mat_to_tensor4d(out_grads, OUT_DIMS);
+		return Utils<Scalar>::mat_to_tensor4d(out_grads, OUT_DIMS);
 	}
 private:
 	Scalar epsilon;

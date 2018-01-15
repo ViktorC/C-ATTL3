@@ -21,7 +21,9 @@
 #include <Vector.h>
 #include <WeightInitialization.h>
 
+#ifndef ILLEGAL_DIMS
 #define ILLEGAL_DIMS "illegal tensor dimensions"
+#endif
 
 namespace cppnn {
 
@@ -97,29 +99,28 @@ protected:
 		}
 	};
 	Tensor4D<Scalar> pass_forward(Tensor4D<Scalar> in, bool training) {
-		assert((unsigned) in.dimension(1) == input_dims.get_dim1() &&
-				(unsigned) in.dimension(2) == input_dims.get_dim2() &&
-				(unsigned) in.dimension(3) == input_dims.get_dim3() &&
-				ILLEGAL_DIMS);
+		assert(in.dimension(1) == input_dims.get_dim1() && in.dimension(2) == input_dims.get_dim2() &&
+				in.dimension(3) == input_dims.get_dim3() && ILLEGAL_DIMS);
+		assert(in.dimension(0) > 0 && ILLEGAL_DIMS);
 		unsigned input_size = input_dims.get_points();
 		// Add a 1-column to the input for the bias trick.
 		biased_in = Matrix<Scalar>(in.dimension(0), input_size + 1);
-		biased_in.leftCols(input_size) = tensor4d_to_mat(in);
+		biased_in.leftCols(input_size) = Utils<Scalar>::tensor4d_to_mat(in);
 		biased_in.col(input_size).setOnes();
-		return mat_to_tensor4d((biased_in * weights).eval(), output_dims);
+		return Utils<Scalar>::mat_to_tensor4d((biased_in * weights).eval(), output_dims);
 	};
 	Tensor4D<Scalar> pass_back(Tensor4D<Scalar> out_grads) {
-		assert((unsigned) out_grads.dimension(1) == output_dims.get_dim1() &&
-				(unsigned) out_grads.dimension(2) == output_dims.get_dim2() &&
-				(unsigned) out_grads.dimension(3) == output_dims.get_dim3() &&
-				biased_in.rows() == out_grads.dimension(0) && ILLEGAL_DIMS);
-		Matrix<Scalar> out_grads_mat = tensor4d_to_mat(out_grads);
+		assert(out_grads.dimension(1) == output_dims.get_dim1() && out_grads.dimension(2) == output_dims.get_dim2() &&
+				out_grads.dimension(3) == output_dims.get_dim3() && biased_in.rows() == out_grads.dimension(0) &&
+				ILLEGAL_DIMS);
+		assert(out_grads.dimension(0) > 0 && ILLEGAL_DIMS);
+		Matrix<Scalar> out_grads_mat = Utils<Scalar>::tensor4d_to_mat(out_grads);
 		/* Compute the gradients of the outputs with respect to the
 		 * weighted inputs. */
 		weight_grads = biased_in.transpose() * out_grads_mat;
 		/* Remove the bias column from the transposed weight matrix
 		 * and compute the out-gradients of the previous layer. */
-		return mat_to_tensor4d((out_grads_mat * weights.topRows(input_dims.get_points()).transpose())
+		return Utils<Scalar>::mat_to_tensor4d((out_grads_mat * weights.topRows(input_dims.get_points()).transpose())
 				.eval(), input_dims);
 	};
 private:
@@ -164,20 +165,20 @@ protected:
 	};
 	void enforce_constraints() { };
 	Tensor4D<Scalar> pass_forward(Tensor4D<Scalar> in, bool training) {
-		assert((unsigned) in.dimension(1) == dims.get_dim1() &&
-				(unsigned) in.dimension(2) == dims.get_dim2() &&
-				(unsigned) in.dimension(3) == dims.get_dim3() &&
-				ILLEGAL_DIMS);
-		this->in = tensor4d_to_mat(in);
+		assert(in.dimension(1) == dims.get_dim1() && in.dimension(2) == dims.get_dim2() &&
+				in.dimension(3) == dims.get_dim3() && ILLEGAL_DIMS);
+		assert(in.dimension(0) > 0 && ILLEGAL_DIMS);
+		this->in = Utils<Scalar>::tensor4d_to_mat(in);
 		out = activate(this->in);
-		return mat_to_tensor4d(out, dims);
+		return Utils<Scalar>::mat_to_tensor4d(out, dims);
 	};
 	Tensor4D<Scalar> pass_back(Tensor4D<Scalar> out_grads) {
-		assert((unsigned) out_grads.dimension(1) == dims.get_dim1() &&
-				(unsigned) out_grads.dimension(2) == dims.get_dim2() &&
-				(unsigned) out_grads.dimension(3) == dims.get_dim3() &&
-				out.rows() == out_grads.dimension(0) && ILLEGAL_DIMS);
-		return mat_to_tensor4d(d_activate(in, out, tensor4d_to_mat(out_grads)), dims);
+		assert(out_grads.dimension(1) == dims.get_dim1() && out_grads.dimension(2) == dims.get_dim2() &&
+				out_grads.dimension(3) == dims.get_dim3() && out.rows() == out_grads.dimension(0) &&
+				ILLEGAL_DIMS);
+		assert(out_grads.dimension(0) > 0 && ILLEGAL_DIMS);
+		return Utils<Scalar>::mat_to_tensor4d(d_activate(in, out,
+				Utils<Scalar>::tensor4d_to_mat(out_grads)), dims);
 	};
 	virtual Matrix<Scalar> activate(const Matrix<Scalar>& in) = 0;
 	virtual Matrix<Scalar> d_activate(const Matrix<Scalar>& in, const Matrix<Scalar>& out,
@@ -370,9 +371,9 @@ protected:
 	Matrix<Scalar> d_activate(const Matrix<Scalar>& in, const Matrix<Scalar>& out,
 			const Matrix<Scalar>& out_grads) {
 		Matrix<Scalar> d_in(in.rows(), in.cols());
-		for (int i = 0; i < in.rows(); i++) {
-			for (int j = 0; j < in.cols(); j++)
-				d_in(i,j) = (in(i,j) > .0 ? 1.0 : (out(i,j) + alpha)) * out_grads(i,j);
+		for (int i = 0; i < in.cols(); i++) {
+			for (int j = 0; j < in.rows(); j++)
+				d_in(j,i) = (in(j,i) > .0 ? 1.0 : (out(j,i) + alpha)) * out_grads(j,i);
 		}
 		return d_in;
 	};
@@ -404,15 +405,15 @@ protected:
 			const Matrix<Scalar>& out_grads) {
 		ActivationLayer<Scalar>::param_grads.row(0).setZero();
 		Matrix<Scalar> d_in = Matrix<Scalar>(in.rows(), in.cols());
-		for (int i = 0; i < in.rows(); i++) {
-			for (int j = 0; j < in.cols(); j++) {
-				Scalar in_ij = in(i,j);
-				if (in_ij >= 0)
-					d_in(i,j) = out_grads(i,j);
+		for (int i = 0; i < in.cols(); i++) {
+			for (int j = 0; j < in.rows(); j++) {
+				Scalar in_ji = in(j,i);
+				if (in_ji >= 0)
+					d_in(j,i) = out_grads(j,i);
 				else {
-					Scalar out_ij = out_grads(i,j);
-					d_in(i,j) = ActivationLayer<Scalar>::params(0,j) * out_ij;
-					ActivationLayer<Scalar>::param_grads(0,j) += in_ij * out_ij;
+					Scalar out_ji = out_grads(j,i);
+					d_in(j,i) = ActivationLayer<Scalar>::params(0,i) * out_ji;
+					ActivationLayer<Scalar>::param_grads(0,i) += in_ji * out_ji;
 				}
 			}
 		}
@@ -450,8 +451,10 @@ public:
 	};
 protected:
 	void init() {
-		for (unsigned i = 0; i < dims.get_dim3(); i += 2) {
+		for (int i = 0; i < dims.get_dim3(); i += 2) {
+			// Gamma
 			params.row(i).setOnes();
+			// Beta
 			params.row(i + 1).setZero();
 		}
 		param_grads.setZero(params.rows(), params.cols());
@@ -460,7 +463,7 @@ protected:
 		avgs_init = false;
 	};
 	void empty_cache() {
-		for (int i = 0; i < cache_vec.size(); i++) {
+		for (unsigned i = 0; i < cache_vec.size(); i++) {
 			Cache& cache = cache_vec[i];
 			cache.inv_in_sd = RowVector<Scalar>(0);
 			cache.std_in = Matrix<Scalar>(0, 0);
@@ -474,16 +477,18 @@ protected:
 	};
 	void enforce_constraints() { };
 	Tensor4D<Scalar> pass_forward(Tensor4D<Scalar> in, bool training) {
-		assert((unsigned) in.dimension(1) == dims.get_dim1() &&
-				(unsigned) in.dimension(2) == dims.get_dim2() &&
-				(unsigned) in.dimension(3) == dims.get_dim3() &&
-				ILLEGAL_DIMS);
-		unsigned rows = in.dimension(0);
+		assert(in.dimension(1) == dims.get_dim1() && in.dimension(2) == dims.get_dim2() &&
+				in.dimension(3) == dims.get_dim3() && ILLEGAL_DIMS);
+		assert(in.dimension(0) > 0 && ILLEGAL_DIMS);
+		int rows = in.dimension(0);
 		Tensor4D<Scalar> out(rows, dims.get_dim1(), dims.get_dim2(), dims.get_dim3());
-		for (unsigned i = 0; i < dims.get_dim3(); i++) {
-			Eigen::array<int, 4> offsets = { 0, 0, 0, i };
-			Eigen::array<int, 4> extents = { rows, dims.get_dim1(), dims.get_dim2(), 1 };
-			Matrix<Scalar> in_ch_i = tensor4d_to_mat(in.slice(offsets, extents).eval());
+		Dimensions slice_dims(dims.get_dim1(), dims.get_dim2(), 1);
+		Eigen::array<int, 4> offsets = { 0, 0, 0, 0 };
+		Eigen::array<int, 4> extents = { rows, slice_dims.get_dim1(), slice_dims.get_dim2(), slice_dims.get_dim3() };
+		for (int i = 0; i < dims.get_dim3(); i++) {
+			offsets[3] = i;
+			Tensor4D<Scalar> in_slice_i = in.slice(offsets, extents);
+			Matrix<Scalar> in_ch_i = Utils<Scalar>::tensor4d_to_mat(std::move(in_slice_i));
 			if (training) {
 				Cache& cache = cache_vec[i];
 				RowVector<Scalar> means = in_ch_i.colwise().mean();
@@ -503,33 +508,36 @@ protected:
 				}
 			} else // For testing, use the moving averages.
 				in_ch_i = (in_ch_i.rowwise() - avg_means.row(i)) * avg_inv_sds.row(i).asDiagonal();
-			out.slice(offsets, extents) = mat_to_tensor4d(((in_ch_i * params.row(i).asDiagonal()).rowwise() +
-					params.row(i + 1)).eval(), dims);
+			out.slice(offsets, extents) = Utils<Scalar>::mat_to_tensor4d(((in_ch_i * params.row(2 * i).asDiagonal())
+					.rowwise() + params.row(2 * i + 1)).eval(), slice_dims);
 		}
 		return out;
 	};
 	Tensor4D<Scalar> pass_back(Tensor4D<Scalar> out_grads) {
-		assert((unsigned) out_grads.dimension(1) == dims.get_dim1() &&
-				(unsigned) out_grads.dimension(2) == dims.get_dim2() &&
-				(unsigned) out_grads.dimension(3) == dims.get_dim3() &&
-				cache_vec[0].std_in.rows() == out_grads.dimension(0) && ILLEGAL_DIMS);
+		assert(out_grads.dimension(1) == dims.get_dim1() && out_grads.dimension(2) == dims.get_dim2() &&
+				out_grads.dimension(3) == dims.get_dim3() && cache_vec[0].std_in.rows() == out_grads.dimension(0) &&
+				ILLEGAL_DIMS);
+		assert(out_grads.dimension(0) > 0 && ILLEGAL_DIMS);
 		int rows = out_grads.dimension(0);
 		Tensor4D<Scalar> prev_out_grads(rows, dims.get_dim1(), dims.get_dim2(), dims.get_dim3());
+		Dimensions slice_dims(dims.get_dim1(), dims.get_dim2(), 1);
+		Eigen::array<int, 4> offsets = { 0, 0, 0, 0 };
+		Eigen::array<int, 4> extents = { rows, slice_dims.get_dim1(), slice_dims.get_dim2(), slice_dims.get_dim3() };
 		/* Back-propagate the gradient through the batch
 		 * normalization 'function' and also calculate the
 		 * gradients on the betas and gammas. */
-		for (unsigned i = 0; i < dims.get_dim3(); i++) {
-			Eigen::array<int, 4> offsets = { 0, 0, 0, i };
-			Eigen::array<int, 4> extents = { rows, dims.get_dim1(), dims.get_dim2(), 1 };
-			Matrix<Scalar> out_grads_ch_i = tensor4d_to_mat(out_grads.slice(offsets, extents).eval());
+		for (int i = 0; i < dims.get_dim3(); i++) {
+			offsets[3] = i;
+			Tensor4D<Scalar> out_grads_slice_i = out_grads.slice(offsets, extents);
+			Matrix<Scalar> out_grads_ch_i = Utils<Scalar>::tensor4d_to_mat(std::move(out_grads_slice_i));
 			Cache& cache = cache_vec[i];
-			param_grads.row(i) = out_grads_ch_i.cwiseProduct(cache.std_in).colwise().sum();
-			param_grads.row(i + 1) = out_grads_ch_i.colwise().sum();
-			Matrix<Scalar> std_in_grads = out_grads_ch_i * params.row(i).asDiagonal();
-			prev_out_grads.slice(offsets, extents) = mat_to_tensor4d(((((rows * std_in_grads).rowwise() -
-					std_in_grads.colwise().sum()) - cache.std_in *
-					(cache.std_in.cwiseProduct(std_in_grads).colwise().sum().asDiagonal())) *
-					((1.0 / rows) * cache.inv_in_sd).asDiagonal()).eval(), dims);
+			param_grads.row(2 * i) = out_grads_ch_i.cwiseProduct(cache.std_in).colwise().sum();
+			param_grads.row(2 * i + 1) = out_grads_ch_i.colwise().sum();
+			Matrix<Scalar> std_in_grads = out_grads_ch_i * params.row(2 * i).asDiagonal();
+			prev_out_grads.slice(offsets, extents) =
+					Utils<Scalar>::mat_to_tensor4d(((((rows * std_in_grads).rowwise() - std_in_grads.colwise().sum()) -
+					cache.std_in * (cache.std_in.cwiseProduct(std_in_grads).colwise().sum().asDiagonal())) *
+					((1.0 / rows) * cache.inv_in_sd).asDiagonal()).eval(), slice_dims);
 		}
 		return prev_out_grads;
 	};
@@ -587,30 +595,30 @@ protected:
 	};
 	void enforce_constraints() { };
 	Tensor4D<Scalar> pass_forward(Tensor4D<Scalar> in, bool training) {
-		assert((unsigned) in.dimension(1) == dims.get_dim1() &&
-				(unsigned) in.dimension(2) == dims.get_dim2() &&
-				(unsigned) in.dimension(3) == dims.get_dim3() &&
-				ILLEGAL_DIMS);
+		assert(in.dimension(1) == dims.get_dim1() && in.dimension(2) == dims.get_dim2() &&
+				in.dimension(3) == dims.get_dim3() && ILLEGAL_DIMS);
+		assert(in.dimension(0) > 0 && ILLEGAL_DIMS);
 		if (training && dropout) {
-			Matrix<Scalar> in_mat = tensor4d_to_mat(in);
+			Matrix<Scalar> in_mat = Utils<Scalar>::tensor4d_to_mat(in);
 			Matrix<Scalar> dropout_mask(in_mat.rows(), in_mat.cols());
 			dropout_mask.setRandom(in_mat.rows(), in_mat.cols());
 			Scalar scaling_factor = 1 / (1 - dropout_prob + epsilon);
 			dropout_mask = ((dropout_mask.array() + 1) / 2).unaryExpr([this,scaling_factor](Scalar i) {
 				return (Scalar) (i <= dropout_prob ? .0 : scaling_factor);
 			});
-			in = mat_to_tensor4d(in_mat.cwiseProduct(dropout_mask).eval(), dims);
+			in = Utils<Scalar>::mat_to_tensor4d(in_mat.cwiseProduct(dropout_mask).eval(), dims);
 			this->dropout_mask = std::move(dropout_mask);
 		}
 		return in;
 	};
 	Tensor4D<Scalar> pass_back(Tensor4D<Scalar> out_grads) {
-		assert((unsigned) out_grads.dimension(1) == dims.get_dim1() &&
-				(unsigned) out_grads.dimension(2) == dims.get_dim2() &&
-				(unsigned) out_grads.dimension(3) == dims.get_dim3() &&
-				dropout_mask.rows() == out_grads.dimension(0) && ILLEGAL_DIMS);
+		assert(out_grads.dimension(1) == dims.get_dim1() && out_grads.dimension(2) == dims.get_dim2() &&
+				out_grads.dimension(3) == dims.get_dim3() && dropout_mask.rows() == out_grads.dimension(0) &&
+				ILLEGAL_DIMS);
+		assert(out_grads.dimension(0) > 0 && ILLEGAL_DIMS);
 		// The derivative of the dropout 'function'.
-		return mat_to_tensor4d(tensor4d_to_mat(out_grads).cwiseProduct(dropout_mask).eval(), dims);
+		return Utils<Scalar>::mat_to_tensor4d(Utils<Scalar>::tensor4d_to_mat(out_grads).cwiseProduct(dropout_mask)
+				.eval(), dims);
 	};
 private:
 	Dimensions dims;
@@ -621,6 +629,127 @@ private:
 	Matrix<Scalar> param_grads;
 	// Staged computation cache_vec
 	Matrix<Scalar> dropout_mask;
+};
+
+template<typename Scalar>
+class ConvLayer : public Layer<Scalar> {
+	// TODO Dilation.
+public:
+	ConvLayer(Dimensions input_dims, const WeightInitialization<Scalar>& weight_init, unsigned filters,
+			unsigned receptor_size = 3, unsigned stride = 1, unsigned padding = 1, Scalar max_norm_constraint = 0) :
+				input_dims(input_dims),
+				output_dims((input_dims.get_dim1() - receptor_size + 2 * padding) / stride + 1,
+						(input_dims.get_dim2() - receptor_size + 2 * padding) / stride + 1, filters),
+				weight_init(weight_init),
+				filters(filters),
+				receptor_size(receptor_size),
+				stride(stride),
+				padding(padding),
+				max_norm_constraint(max_norm_constraint),
+				max_norm(Utils<Scalar>::decidedly_greater(max_norm_constraint, .0)),
+				weights(filters, receptor_size * receptor_size * input_dims.get_dim3() + 1),
+				weight_grads(filters, weights.cols()) {
+		assert(filters > 0);
+		assert(receptor_size > 0);
+		assert(stride > 0);
+	};
+	Layer<Scalar>* clone() {
+		return new ConvLayer(*this);
+	};
+	Dimensions get_input_dims() const {
+		return input_dims;
+	};
+	Dimensions get_output_dims() const {
+		return output_dims;
+	};
+protected:
+	void init() {
+		weight_init.apply(weights);
+		weight_grads.setZero(weight_grads.rows(), weight_grads.cols());
+	};
+	void empty_cache() {
+		biased_in = Matrix<Scalar>(0, 0);
+	};
+	Matrix<Scalar>& get_params() {
+		return weights;
+	};
+	const Matrix<Scalar>& get_param_grads() const {
+		return weight_grads;
+	};
+	void enforce_constraints() {
+		if (max_norm) {
+			Scalar l2_norm = weights.squaredNorm();
+			if (l2_norm > max_norm_constraint)
+				weights *= (max_norm_constraint / l2_norm);
+		}
+	};
+	Tensor4D<Scalar> pass_forward(Tensor4D<Scalar> in, bool training) {
+		assert(in.dimension(1) == input_dims.get_dim1() && in.dimension(2) == input_dims.get_dim2() &&
+				in.dimension(3) == input_dims.get_dim3() && ILLEGAL_DIMS);
+		assert(in.dimension(0) > 0 && ILLEGAL_DIMS);
+		// Spatial padding.
+		Eigen::array<pair<int, int>, 4> paddings;
+		paddings[0] = make_pair(0, 0);
+		paddings[1] = make_pair(padding, padding);
+		paddings[2] = make_pair(padding, padding);
+		paddings[3] = make_pair(0, 0);
+		in = in.pad(paddings);
+		int rows = in.dimension(0);
+		int width = in.dimension(1);
+		int height = in.dimension(2);
+		int depth = in.dimension(3);
+		int patches = ((width - receptor_size) / stride + 1) * ((height - receptor_size) / stride + 1);
+		Eigen::array<int, 4> offsets = { 0, 0, 0, 0 };
+		Eigen::array<int, 4> extents = { 1, receptor_size, receptor_size, depth };
+		Tensor4D<Scalar> out(rows, output_dims.get_dim1(), output_dims.get_dim2(), output_dims.get_dim3());
+		for (int i = 0; i < rows; i++) {
+			offsets[0] = i;
+			int patch_ind = 0;
+			Matrix<Scalar> in_i_mat(weights.cols(), patches);
+			for (int j = 0; j < width - receptor_size; j += stride) {
+				for (int k = 0; k < height - receptor_size; k += stride) {
+					offsets[1] = j;
+					offsets[2] = k;
+					Tensor4D<Scalar> patch = in.slice(offsets, extents);
+					in_i_mat.col(patch_ind++) = Utils<Scalar>::tensor4d_to_mat(patch).transpose();
+				}
+			}
+			// Add a 1-column to the input for the bias trick.
+			biased_in = Matrix<Scalar>(in.dimension(0), input_size + 1);
+			biased_in.leftCols(input_size) = Utils<Scalar>::tensor4d_to_mat(in);
+			biased_in.col(input_size).setOnes();
+		}
+		return Utils<Scalar>::mat_to_tensor4d((biased_in * weights).eval(), output_dims);
+	};
+	Tensor4D<Scalar> pass_back(Tensor4D<Scalar> out_grads) {
+		assert(out_grads.dimension(1) == output_dims.get_dim1() && out_grads.dimension(2) == output_dims.get_dim2() &&
+				out_grads.dimension(3) == output_dims.get_dim3() && biased_in.rows() == out_grads.dimension(0) &&
+				ILLEGAL_DIMS);
+		assert(out_grads.dimension(0) > 0 && ILLEGAL_DIMS);
+		Matrix<Scalar> out_grads_mat = Utils<Scalar>::tensor4d_to_mat(out_grads);
+		/* Compute the gradients of the outputs with respect to the
+		 * weighted inputs. */
+		weight_grads = biased_in.transpose() * out_grads_mat;
+		/* Remove the bias column from the transposed weight matrix
+		 * and compute the out-gradients of the previous layer. */
+		return Utils<Scalar>::mat_to_tensor4d((out_grads_mat * weights.topRows(input_dims.get_points()).transpose())
+				.eval(), input_dims);
+	};
+private:
+	Dimensions input_dims;
+	Dimensions output_dims;
+	const WeightInitialization<Scalar>& weight_init;
+	unsigned filters;
+	unsigned receptor_size;
+	unsigned stride;
+	unsigned padding;
+	Scalar max_norm_constraint;
+	bool max_norm;
+	// The learnable parameters.
+	Matrix<Scalar> weights;
+	Matrix<Scalar> weight_grads;
+	// Staged computation caches
+	Matrix<Scalar> biased_in;
 };
 
 } /* namespace cppnn */
