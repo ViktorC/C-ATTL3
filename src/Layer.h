@@ -11,20 +11,23 @@
 #include <algorithm>
 #include <cassert>
 #include <cmath>
+#include <Dimensions.h>
 #include <Eigen/Dense>
 #include <Matrix.h>
+#include <Tensor.h>
+#include <unsupported/Eigen/CXX11/Tensor>
 #include <Utils.h>
 #include <utility>
 #include <Vector.h>
 #include <WeightInitialization.h>
 
+#define ILLEGAL_DIMS "illegal tensor dimensions"
+
 namespace cppnn {
 
 // Forward declarations to NeuralNetwork and Optimizer so they can be friended.
-template<typename Scalar>
-class NeuralNetwork;
-template<typename Scalar>
-class Optimizer;
+template<typename Scalar> class NeuralNetwork;
+template<typename Scalar> class Optimizer;
 
 template<typename Scalar>
 class Layer {
@@ -34,8 +37,8 @@ public:
 	virtual ~Layer() = default;
 	// Clone pattern.
 	virtual Layer<Scalar>* clone() = 0;
-	virtual unsigned get_input_size() const = 0;
-	virtual unsigned get_output_size() const = 0;
+	virtual Dimensions get_input_dims() const = 0;
+	virtual Dimensions get_output_dims() const = 0;
 protected:
 	bool is_parametric() {
 		return get_params().rows() > 0 && get_params().cols() > 0;
@@ -47,33 +50,30 @@ protected:
 	virtual Matrix<Scalar>& get_params() = 0;
 	virtual const Matrix<Scalar>& get_param_grads() const = 0;
 	virtual void enforce_constraints() = 0;
-	virtual Matrix<Scalar> pass_forward(Matrix<Scalar> in, bool training) = 0;
-	virtual Matrix<Scalar> pass_back(Matrix<Scalar> out_grads) = 0;
+	virtual Tensor4D<Scalar> pass_forward(Tensor4D<Scalar> in, bool training) = 0;
+	virtual Tensor4D<Scalar> pass_back(Tensor4D<Scalar> out_grads) = 0;
 };
 
 template<typename Scalar>
 class DenseLayer : public Layer<Scalar> {
 public:
-	DenseLayer(unsigned input_size, unsigned output_size, const WeightInitialization<Scalar>& weight_init,
+	DenseLayer(Dimensions input_dims, unsigned output_size, const WeightInitialization<Scalar>& weight_init,
 			Scalar max_norm_constraint = 0) :
-				input_size(input_size),
-				output_size(output_size),
+				input_dims(input_dims),
+				output_dims(output_size, 1, 1),
 				weight_init(weight_init),
 				max_norm_constraint(max_norm_constraint),
 				max_norm(Utils<Scalar>::decidedly_greater(max_norm_constraint, .0)),
-				weights(input_size + 1, output_size),
-				weight_grads(input_size + 1, output_size) {
-		assert(input_size > 0 && "prev size must be greater than 0");
-		assert(output_size > 0 && "size must be greater than 0");
-	};
+				weights(input_dims.get_points() + 1, output_size),
+				weight_grads(input_dims.get_points() + 1, output_size) { };
 	Layer<Scalar>* clone() {
 		return new DenseLayer(*this);
 	};
-	unsigned get_input_size() const {
-		return input_size;
+	Dimensions get_input_dims() const {
+		return input_dims;
 	};
-	unsigned get_output_size() const {
-		return output_size;
+	Dimensions get_output_dims() const {
+		return output_dims;
 	};
 protected:
 	void init() {
@@ -81,7 +81,7 @@ protected:
 		weight_grads.setZero(weight_grads.rows(), weight_grads.cols());
 	};
 	void empty_cache() {
-		biased_prev_out = Matrix<Scalar>(0, 0);
+		biased_in = Matrix<Scalar>(0, 0);
 	};
 	Matrix<Scalar>& get_params() {
 		return weights;
@@ -96,29 +96,35 @@ protected:
 				weights *= (max_norm_constraint / l2_norm);
 		}
 	};
-	Matrix<Scalar> pass_forward(Matrix<Scalar> in, bool training) {
-		assert((unsigned) in.cols() == input_size &&
-				"illegal input matrix size for feed forward");
+	Tensor4D<Scalar> pass_forward(Tensor4D<Scalar> in, bool training) {
+		assert((unsigned) in.dimension(1) == input_dims.get_dim1() &&
+				(unsigned) in.dimension(2) == input_dims.get_dim2() &&
+				(unsigned) in.dimension(3) == input_dims.get_dim3() &&
+				ILLEGAL_DIMS);
+		unsigned input_size = input_dims.get_points();
 		// Add a 1-column to the input for the bias trick.
-		biased_prev_out = Matrix<Scalar>(in.rows(), input_size + 1);
-		biased_prev_out.leftCols(input_size) = std::move(in);
-		biased_prev_out.col(input_size).setOnes();
-		return biased_prev_out * weights;
+		biased_in = Matrix<Scalar>(in.dimension(0), input_size + 1);
+		biased_in.leftCols(input_size) = tensor4d_to_mat(in);
+		biased_in.col(input_size).setOnes();
+		return mat_to_tensor4d((biased_in * weights).eval(), output_dims);
 	};
-	Matrix<Scalar> pass_back(Matrix<Scalar> out_grads) {
-		assert((unsigned) out_grads.cols() == output_size &&
-				out_grads.rows() == biased_prev_out.rows() &&
-				"illegal input matrix size for feed back");
+	Tensor4D<Scalar> pass_back(Tensor4D<Scalar> out_grads) {
+		assert((unsigned) out_grads.dimension(1) == output_dims.get_dim1() &&
+				(unsigned) out_grads.dimension(2) == output_dims.get_dim2() &&
+				(unsigned) out_grads.dimension(3) == output_dims.get_dim3() &&
+				biased_in.rows() == out_grads.dimension(0) && ILLEGAL_DIMS);
+		Matrix<Scalar> out_grads_mat = tensor4d_to_mat(out_grads);
 		/* Compute the gradients of the outputs with respect to the
 		 * weighted inputs. */
-		weight_grads = biased_prev_out.transpose() * out_grads;
+		weight_grads = biased_in.transpose() * out_grads_mat;
 		/* Remove the bias column from the transposed weight matrix
 		 * and compute the out-gradients of the previous layer. */
-		return out_grads * weights.topRows(input_size).transpose();
+		return mat_to_tensor4d((out_grads_mat * weights.topRows(input_dims.get_points()).transpose())
+				.eval(), input_dims);
 	};
 private:
-	unsigned input_size;
-	unsigned output_size;
+	Dimensions input_dims;
+	Dimensions output_dims;
 	const WeightInitialization<Scalar>& weight_init;
 	Scalar max_norm_constraint;
 	bool max_norm;
@@ -127,24 +133,22 @@ private:
 	Matrix<Scalar> weights;
 	Matrix<Scalar> weight_grads;
 	// Staged computation caches
-	Matrix<Scalar> biased_prev_out;
+	Matrix<Scalar> biased_in;
 };
 
 template<typename Scalar>
 class ActivationLayer : public Layer<Scalar> {
 public:
-	ActivationLayer(unsigned size) :
-			size(size),
+	ActivationLayer(Dimensions dims) :
+			dims(dims),
 			params(0, 0),
-			param_grads(0, 0) {
-		assert(size > 0 && "size must be greater than 0");
-	};
+			param_grads(0, 0) { };
 	virtual ~ActivationLayer() = default;
-	unsigned get_input_size() const {
-		return size;
+	Dimensions get_input_dims() const {
+		return dims;
 	};
-	unsigned get_output_size() const {
-		return size;
+	Dimensions get_output_dims() const {
+		return dims;
 	};
 protected:
 	void init() { };
@@ -159,23 +163,26 @@ protected:
 		return param_grads;
 	};
 	void enforce_constraints() { };
-	Matrix<Scalar> pass_forward(Matrix<Scalar> in, bool training) {
-		assert((unsigned) in.cols() == size &&
-				"illegal input matrix size for feed forward");
-		this->in = std::move(in);
+	Tensor4D<Scalar> pass_forward(Tensor4D<Scalar> in, bool training) {
+		assert((unsigned) in.dimension(1) == dims.get_dim1() &&
+				(unsigned) in.dimension(2) == dims.get_dim2() &&
+				(unsigned) in.dimension(3) == dims.get_dim3() &&
+				ILLEGAL_DIMS);
+		this->in = tensor4d_to_mat(in);
 		out = activate(this->in);
-		return out;
+		return mat_to_tensor4d(out, dims);
 	};
-	Matrix<Scalar> pass_back(Matrix<Scalar> out_grads) {
-		assert((unsigned) out_grads.cols() == size &&
-				out_grads.rows() == out.rows() &&
-				"illegal input matrix size for feed back");
-		return d_activate(in, out, out_grads);
+	Tensor4D<Scalar> pass_back(Tensor4D<Scalar> out_grads) {
+		assert((unsigned) out_grads.dimension(1) == dims.get_dim1() &&
+				(unsigned) out_grads.dimension(2) == dims.get_dim2() &&
+				(unsigned) out_grads.dimension(3) == dims.get_dim3() &&
+				out.rows() == out_grads.dimension(0) && ILLEGAL_DIMS);
+		return mat_to_tensor4d(d_activate(in, out, tensor4d_to_mat(out_grads)), dims);
 	};
 	virtual Matrix<Scalar> activate(const Matrix<Scalar>& in) = 0;
 	virtual Matrix<Scalar> d_activate(const Matrix<Scalar>& in, const Matrix<Scalar>& out,
 			const Matrix<Scalar>& out_grads) = 0;
-	unsigned size;
+	Dimensions dims;
 	Matrix<Scalar> params;
 	Matrix<Scalar> param_grads;
 	// Staged computation caches
@@ -186,8 +193,8 @@ protected:
 template<typename Scalar>
 class IdentityActivationLayer : public ActivationLayer<Scalar> {
 public:
-	IdentityActivationLayer(unsigned size) :
-			ActivationLayer<Scalar>::ActivationLayer(size) { };
+	IdentityActivationLayer(Dimensions dims) :
+			ActivationLayer<Scalar>::ActivationLayer(dims) { };
 	Layer<Scalar>* clone() {
 		return new IdentityActivationLayer(*this);
 	};
@@ -204,8 +211,8 @@ protected:
 template<typename Scalar>
 class ScalingActivationLayer : public ActivationLayer<Scalar> {
 public:
-	ScalingActivationLayer(unsigned size, Scalar scale) :
-			ActivationLayer<Scalar>::ActivationLayer(size),
+	ScalingActivationLayer(Dimensions dims, Scalar scale) :
+			ActivationLayer<Scalar>::ActivationLayer(dims),
 			scale(scale) { };
 	Layer<Scalar>* clone() {
 		return new ScalingActivationLayer(*this);
@@ -225,8 +232,8 @@ private:
 template<typename Scalar>
 class BinaryStepActivationLayer : public ActivationLayer<Scalar> {
 public:
-	BinaryStepActivationLayer(unsigned size) :
-			ActivationLayer<Scalar>::ActivationLayer(size) { };
+	BinaryStepActivationLayer(Dimensions dims) :
+			ActivationLayer<Scalar>::ActivationLayer(dims) { };
 	Layer<Scalar>* clone() {
 		return new BinaryStepActivationLayer(*this);
 	};
@@ -243,8 +250,8 @@ protected:
 template<typename Scalar>
 class SigmoidActivationLayer : public ActivationLayer<Scalar> {
 public:
-	SigmoidActivationLayer(unsigned size) :
-			ActivationLayer<Scalar>::ActivationLayer(size) { };
+	SigmoidActivationLayer(Dimensions dims) :
+			ActivationLayer<Scalar>::ActivationLayer(dims) { };
 	Layer<Scalar>* clone() {
 		return new SigmoidActivationLayer(*this);
 	};
@@ -261,8 +268,8 @@ protected:
 template<typename Scalar>
 class TanhActivationLayer : public ActivationLayer<Scalar> {
 public:
-	TanhActivationLayer(unsigned size) :
-			ActivationLayer<Scalar>::ActivationLayer(size) { };
+	TanhActivationLayer(Dimensions dims) :
+			ActivationLayer<Scalar>::ActivationLayer(dims) { };
 	Layer<Scalar>* clone() {
 		return new TanhActivationLayer(*this);
 	};
@@ -279,8 +286,8 @@ protected:
 template<typename Scalar>
 class SoftmaxActivationLayer : public ActivationLayer<Scalar> {
 public:
-	SoftmaxActivationLayer(unsigned size, Scalar epsilon = Utils<Scalar>::EPSILON2) :
-			ActivationLayer<Scalar>::ActivationLayer(size),
+	SoftmaxActivationLayer(Dimensions dims, Scalar epsilon = Utils<Scalar>::EPSILON2) :
+			ActivationLayer<Scalar>::ActivationLayer(dims),
 			epsilon(epsilon) { };
 	Layer<Scalar>* clone() {
 		return new SoftmaxActivationLayer(*this);
@@ -309,8 +316,8 @@ private:
 template<typename Scalar>
 class ReLUActivationLayer : public ActivationLayer<Scalar> {
 public:
-	ReLUActivationLayer(unsigned size) :
-			ActivationLayer<Scalar>::ActivationLayer(size) { };
+	ReLUActivationLayer(Dimensions dims) :
+			ActivationLayer<Scalar>::ActivationLayer(dims) { };
 	Layer<Scalar>* clone() {
 		return new ReLUActivationLayer(*this);
 	};
@@ -328,8 +335,8 @@ protected:
 template<typename Scalar>
 class LeakyReLUActivationLayer : public ActivationLayer<Scalar> {
 public:
-	LeakyReLUActivationLayer(unsigned size, Scalar alpha = 1e-1) :
-			ActivationLayer<Scalar>::ActivationLayer(size),
+	LeakyReLUActivationLayer(Dimensions dims, Scalar alpha = 1e-1) :
+			ActivationLayer<Scalar>::ActivationLayer(dims),
 			alpha(alpha) { };
 	Layer<Scalar>* clone() {
 		return new LeakyReLUActivationLayer(*this);
@@ -350,8 +357,8 @@ private:
 template<typename Scalar>
 class ELUActivationLayer : public ActivationLayer<Scalar> {
 public:
-	ELUActivationLayer(unsigned size, Scalar alpha = 1e-1) :
-			ActivationLayer<Scalar>::ActivationLayer(size),
+	ELUActivationLayer(Dimensions dims, Scalar alpha = 1e-1) :
+			ActivationLayer<Scalar>::ActivationLayer(dims),
 			alpha(alpha) { };
 	Layer<Scalar>* clone() {
 		return new ELUActivationLayer(*this);
@@ -376,11 +383,11 @@ private:
 template<typename Scalar>
 class PReLUActivationLayer : public ActivationLayer<Scalar> {
 public:
-	PReLUActivationLayer(unsigned size, Scalar init_alpha = 1e-1) :
-			ActivationLayer<Scalar>::ActivationLayer(size),
+	PReLUActivationLayer(Dimensions dims, Scalar init_alpha = 1e-1) :
+			ActivationLayer<Scalar>::ActivationLayer(dims),
 			init_alpha(init_alpha) {
-		ActivationLayer<Scalar>::params.resize(1, size);
-		ActivationLayer<Scalar>::param_grads.resize(1, size);
+		ActivationLayer<Scalar>::params.resize(1, dims.get_points());
+		ActivationLayer<Scalar>::param_grads.resize(1, dims.get_points());
 	};
 	Layer<Scalar>* clone() {
 		return new PReLUActivationLayer(*this);
@@ -388,7 +395,7 @@ public:
 protected:
 	void init() {
 		ActivationLayer<Scalar>::params.setConstant(init_alpha);
-		ActivationLayer<Scalar>::param_grads.setZero(1, ActivationLayer<Scalar>::size);
+		ActivationLayer<Scalar>::param_grads.setZero(1, ActivationLayer<Scalar>::dims.get_points());
 	};
 	Matrix<Scalar> activate(const Matrix<Scalar>& in) {
 		return in.cwiseMax(in * ActivationLayer<Scalar>::params.row(0).asDiagonal());
@@ -418,16 +425,16 @@ private:
 template<typename Scalar>
 class BatchNormLayer : public Layer<Scalar> {
 public:
-	BatchNormLayer(unsigned size, Scalar norm_avg_decay = .1, Scalar epsilon = Utils<Scalar>::EPSILON3) :
-			size(size),
+	BatchNormLayer(Dimensions dims, Scalar norm_avg_decay = .1, Scalar epsilon = Utils<Scalar>::EPSILON3) :
+			dims(dims),
 			norm_avg_decay(norm_avg_decay),
 			epsilon(epsilon),
-			avg_means(size),
-			avg_inv_sds(size),
+			avg_means(dims.get_dim3(), dims.get_dim1() * dims.get_dim2()),
+			avg_inv_sds(dims.get_dim3(), dims.get_dim1() * dims.get_dim2()),
 			avgs_init(false),
-			params(2, size),
-			param_grads(2, size) {
-		assert(size > 0 && "size must be greater than 0");
+			params(2 * dims.get_dim3(), dims.get_dim1() * dims.get_dim2()),
+			param_grads(2 * dims.get_dim3(), dims.get_dim1() * dims.get_dim2()),
+			cache_vec(dims.get_dim3()) {
 		assert(norm_avg_decay >= 0 && norm_avg_decay <= 1 &&
 				"norm avg decay must not be less than 0 or greater than 1");
 		assert(epsilon > 0 && "epsilon must be greater than 0");
@@ -435,24 +442,29 @@ public:
 	Layer<Scalar>* clone() {
 		return new BatchNormLayer(*this);
 	};
-	unsigned get_input_size() const {
-		return size;
+	Dimensions get_input_dims() const {
+		return dims;
 	};
-	unsigned get_output_size() const {
-		return size;
+	Dimensions get_output_dims() const {
+		return dims;
 	};
 protected:
 	void init() {
-		params.row(0).setOnes();
-		params.row(1).setZero();
+		for (unsigned i = 0; i < dims.get_dim3(); i += 2) {
+			params.row(i).setOnes();
+			params.row(i + 1).setZero();
+		}
 		param_grads.setZero(params.rows(), params.cols());
-		avg_means.setZero(avg_means.cols());
-		avg_inv_sds.setZero(avg_inv_sds.cols());
+		avg_means.setZero(avg_means.rows(), avg_means.cols());
+		avg_inv_sds.setZero(avg_means.rows(), avg_inv_sds.cols());
 		avgs_init = false;
 	};
 	void empty_cache() {
-		inv_in_sd = RowVector<Scalar>(0);
-		std_in = Matrix<Scalar>(0, 0);
+		for (int i = 0; i < cache_vec.size(); i++) {
+			Cache& cache = cache_vec[i];
+			cache.inv_in_sd = RowVector<Scalar>(0);
+			cache.std_in = Matrix<Scalar>(0, 0);
+		}
 	};
 	Matrix<Scalar>& get_params() {
 		return params;
@@ -461,80 +473,106 @@ protected:
 		return param_grads;
 	};
 	void enforce_constraints() { };
-	Matrix<Scalar> pass_forward(Matrix<Scalar> in, bool training) {
-		assert((unsigned) in.cols() == size &&
-				"illegal input matrix size for feed forward");
-		if (training) {
-			RowVector<Scalar> means = in.colwise().mean();
-			Matrix<Scalar> norm_in = in.rowwise() - means;
-			inv_in_sd = (norm_in.array().square().colwise().mean() + epsilon).sqrt().inverse();
-			std_in = norm_in * inv_in_sd.asDiagonal();
-			// Maintain a moving average of means and variances for testing.
-			if (avgs_init) {
-				avg_means = (1.0 - norm_avg_decay) * avg_means + norm_avg_decay * means;
-				avg_inv_sds = (1.0 - norm_avg_decay) * avg_inv_sds + norm_avg_decay * inv_in_sd;
-			} else {
-				avg_means = means;
-				avg_inv_sds = inv_in_sd;
-				avgs_init = true;
-			}
-		} else // For testing, use the moving averages.
-			std_in = (in.rowwise() - avg_means) * avg_inv_sds.asDiagonal();
-		return (std_in * params.row(0).asDiagonal()).rowwise() + params.row(1);
+	Tensor4D<Scalar> pass_forward(Tensor4D<Scalar> in, bool training) {
+		assert((unsigned) in.dimension(1) == dims.get_dim1() &&
+				(unsigned) in.dimension(2) == dims.get_dim2() &&
+				(unsigned) in.dimension(3) == dims.get_dim3() &&
+				ILLEGAL_DIMS);
+		unsigned rows = in.dimension(0);
+		Tensor4D<Scalar> out(rows, dims.get_dim1(), dims.get_dim2(), dims.get_dim3());
+		for (unsigned i = 0; i < dims.get_dim3(); i++) {
+			Eigen::array<int, 4> offsets = { 0, 0, 0, i };
+			Eigen::array<int, 4> extents = { rows, dims.get_dim1(), dims.get_dim2(), 1 };
+			Matrix<Scalar> in_ch_i = tensor4d_to_mat(in.slice(offsets, extents).eval());
+			if (training) {
+				Cache& cache = cache_vec[i];
+				RowVector<Scalar> means = in_ch_i.colwise().mean();
+				Matrix<Scalar> norm_in = in_ch_i.rowwise() - means;
+				cache.inv_in_sd = (norm_in.array().square().colwise().mean() + epsilon).sqrt().inverse();
+				cache.std_in = norm_in * cache.inv_in_sd.asDiagonal();
+				in_ch_i = cache.std_in;
+				// Maintain a moving average of means and variances for testing.
+				if (avgs_init) {
+					avg_means.row(i) = (1.0 - norm_avg_decay) * avg_means.row(i) + norm_avg_decay * means;
+					avg_inv_sds.row(i) = (1.0 - norm_avg_decay) * avg_inv_sds.row(i) + norm_avg_decay *
+							cache.inv_in_sd;
+				} else {
+					avg_means.row(i) = means;
+					avg_inv_sds.row(i) = cache.inv_in_sd;
+					avgs_init = true;
+				}
+			} else // For testing, use the moving averages.
+				in_ch_i = (in_ch_i.rowwise() - avg_means.row(i)) * avg_inv_sds.row(i).asDiagonal();
+			out.slice(offsets, extents) = mat_to_tensor4d(((in_ch_i * params.row(i).asDiagonal()).rowwise() +
+					params.row(i + 1)).eval(), dims);
+		}
+		return out;
 	};
-	Matrix<Scalar> pass_back(Matrix<Scalar> out_grads) {
-		assert((unsigned) out_grads.cols() == size &&
-				out_grads.rows() == std_in.rows() &&
-				"illegal input matrix size for feed back");
+	Tensor4D<Scalar> pass_back(Tensor4D<Scalar> out_grads) {
+		assert((unsigned) out_grads.dimension(1) == dims.get_dim1() &&
+				(unsigned) out_grads.dimension(2) == dims.get_dim2() &&
+				(unsigned) out_grads.dimension(3) == dims.get_dim3() &&
+				cache_vec[0].std_in.rows() == out_grads.dimension(0) && ILLEGAL_DIMS);
+		int rows = out_grads.dimension(0);
+		Tensor4D<Scalar> prev_out_grads(rows, dims.get_dim1(), dims.get_dim2(), dims.get_dim3());
 		/* Back-propagate the gradient through the batch
 		 * normalization 'function' and also calculate the
 		 * gradients on the betas and gammas. */
-		param_grads.row(0) = out_grads.cwiseProduct(std_in).colwise().sum();
-		param_grads.row(1) = out_grads.colwise().sum();
-		Matrix<Scalar> std_in_grads = out_grads * params.row(0).asDiagonal();
-		int rows = std_in.rows();
-		return (((rows * std_in_grads).rowwise() - std_in_grads.colwise().sum()) -
-				std_in * (std_in.cwiseProduct(std_in_grads).colwise().sum().asDiagonal())) *
-				((1.0 / rows) * inv_in_sd).asDiagonal();
+		for (unsigned i = 0; i < dims.get_dim3(); i++) {
+			Eigen::array<int, 4> offsets = { 0, 0, 0, i };
+			Eigen::array<int, 4> extents = { rows, dims.get_dim1(), dims.get_dim2(), 1 };
+			Matrix<Scalar> out_grads_ch_i = tensor4d_to_mat(out_grads.slice(offsets, extents).eval());
+			Cache& cache = cache_vec[i];
+			param_grads.row(i) = out_grads_ch_i.cwiseProduct(cache.std_in).colwise().sum();
+			param_grads.row(i + 1) = out_grads_ch_i.colwise().sum();
+			Matrix<Scalar> std_in_grads = out_grads_ch_i * params.row(i).asDiagonal();
+			prev_out_grads.slice(offsets, extents) = mat_to_tensor4d(((((rows * std_in_grads).rowwise() -
+					std_in_grads.colwise().sum()) - cache.std_in *
+					(cache.std_in.cwiseProduct(std_in_grads).colwise().sum().asDiagonal())) *
+					((1.0 / rows) * cache.inv_in_sd).asDiagonal()).eval(), dims);
+		}
+		return prev_out_grads;
 	};
 private:
-	unsigned size;
+	Dimensions dims;
 	Scalar norm_avg_decay;
 	Scalar epsilon;
 	// Dynamic batch normalization parameters.
-	RowVector<Scalar> avg_means;
-	RowVector<Scalar> avg_inv_sds;
+	Matrix<Scalar> avg_means;
+	Matrix<Scalar> avg_inv_sds;
 	bool avgs_init;
 	// Betas and gammas
 	Matrix<Scalar> params;
 	Matrix<Scalar> param_grads;
-	// Staged computation caches
-	RowVector<Scalar> inv_in_sd;
-	Matrix<Scalar> std_in;
+	// Staged computation cache_vec
+	struct Cache {
+		RowVector<Scalar> inv_in_sd;
+		Matrix<Scalar> std_in;
+	};
+	std::vector<Cache> cache_vec;
 };
 
 template<typename Scalar>
 class DropoutLayer : public Layer<Scalar> {
 public:
-	DropoutLayer(unsigned size, Scalar dropout_prob, Scalar epsilon = Utils<Scalar>::EPSILON3) :
-			size(size),
+	DropoutLayer(Dimensions dims, Scalar dropout_prob, Scalar epsilon = Utils<Scalar>::EPSILON3) :
+			dims(dims),
 			dropout_prob(dropout_prob),
 			epsilon(epsilon),
 			dropout(Utils<Scalar>::decidedly_greater(dropout_prob, .0)),
 			params(0, 0),
 			param_grads(0, 0) {
-		assert(size > 0 && "size must be greater than 0");
 		assert(dropout_prob <= 1 && "dropout prob must not be greater than 1");
 		assert(epsilon > 0 && "epsilon must be greater than 0");
 	};
 	Layer<Scalar>* clone() {
 		return new DropoutLayer(*this);
 	};
-	unsigned get_input_size() const {
-		return size;
+	Dimensions get_input_dims() const {
+		return dims;
 	};
-	unsigned get_output_size() const {
-		return size;
+	Dimensions get_output_dims() const {
+		return dims;
 	};
 protected:
 	void init() { };
@@ -548,36 +586,40 @@ protected:
 		return param_grads;
 	};
 	void enforce_constraints() { };
-	Matrix<Scalar> pass_forward(Matrix<Scalar> in, bool training) {
-		assert((unsigned) in.cols() == size &&
-				"illegal input matrix size for feed forward");
+	Tensor4D<Scalar> pass_forward(Tensor4D<Scalar> in, bool training) {
+		assert((unsigned) in.dimension(1) == dims.get_dim1() &&
+				(unsigned) in.dimension(2) == dims.get_dim2() &&
+				(unsigned) in.dimension(3) == dims.get_dim3() &&
+				ILLEGAL_DIMS);
 		if (training && dropout) {
-			Matrix<Scalar> dropout_mask(in.rows(), in.cols());
-			dropout_mask.setRandom(in.rows(), in.cols());
+			Matrix<Scalar> in_mat = tensor4d_to_mat(in);
+			Matrix<Scalar> dropout_mask(in_mat.rows(), in_mat.cols());
+			dropout_mask.setRandom(in_mat.rows(), in_mat.cols());
 			Scalar scaling_factor = 1 / (1 - dropout_prob + epsilon);
 			dropout_mask = ((dropout_mask.array() + 1) / 2).unaryExpr([this,scaling_factor](Scalar i) {
 				return (Scalar) (i <= dropout_prob ? .0 : scaling_factor);
 			});
-			in = in.cwiseProduct(dropout_mask);
+			in = mat_to_tensor4d(in_mat.cwiseProduct(dropout_mask).eval(), dims);
 			this->dropout_mask = std::move(dropout_mask);
 		}
 		return in;
 	};
-	Matrix<Scalar> pass_back(Matrix<Scalar> out_grads) {
-		assert((unsigned) out_grads.cols() == size &&
-				out_grads.rows() == dropout_mask.rows() &&
-				"illegal input matrix size for feed back");
+	Tensor4D<Scalar> pass_back(Tensor4D<Scalar> out_grads) {
+		assert((unsigned) out_grads.dimension(1) == dims.get_dim1() &&
+				(unsigned) out_grads.dimension(2) == dims.get_dim2() &&
+				(unsigned) out_grads.dimension(3) == dims.get_dim3() &&
+				dropout_mask.rows() == out_grads.dimension(0) && ILLEGAL_DIMS);
 		// The derivative of the dropout 'function'.
-		return out_grads.cwiseProduct(dropout_mask);
+		return mat_to_tensor4d(tensor4d_to_mat(out_grads).cwiseProduct(dropout_mask).eval(), dims);
 	};
 private:
-	unsigned size;
+	Dimensions dims;
 	Scalar dropout_prob;
 	Scalar epsilon;
 	bool dropout;
 	Matrix<Scalar> params;
 	Matrix<Scalar> param_grads;
-	// Staged computation caches
+	// Staged computation cache_vec
 	Matrix<Scalar> dropout_mask;
 };
 
