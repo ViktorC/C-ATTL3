@@ -76,28 +76,71 @@ public:
 		empty_layer_caches(net);
 		return !failure;
 	};
-	void optimize(NeuralNetwork<Scalar>& net, const Tensor4D<Scalar>& x, const Tensor4D<Scalar>& y,
-			unsigned epochs, Scalar k = .8, unsigned early_stop = 0) {
-		int rows = x.dimension(0);
-		assert(rows > 1);
+	void optimize(NeuralNetwork<Scalar>& net, const Tensor4D<Scalar>& x, const Tensor4D<Scalar>& y, unsigned epochs,
+			Scalar k = .8, unsigned early_stop = 0) {
+		assert(x.dimension(0) > 1);
 		assert(x.dimension(1) == net.get_input_dims().get_dim1() && x.dimension(2) == net.get_input_dims().get_dim2() &&
 				x.dimension(3) == net.get_input_dims().get_dim3());
-		assert(rows == y.dimension(0));
-		assert(epochs > 0);
-		assert(k > 0 && k < 1);
-		// Fit the optimizer parameters to the network.
-		fit(net);
+		assert(x.dimension(0) == y.dimension(0));
 		// Divide the data into training and test partitions.
+		unsigned rows = (unsigned) x.dimension(0);
 		unsigned training_row_num = (unsigned) std::min((Scalar) (rows - 1),  (Scalar) std::max(1.0, rows * k));
 		unsigned test_row_num = rows - training_row_num;
 		std::vector<unsigned> training_rows(rows);
-		for (int i = 0; i < rows; i++) training_rows[i] = (unsigned) i;
+		for (unsigned i = 0; i < rows; i++) training_rows[i] = i;
 		std::random_shuffle(training_rows.begin(), training_rows.end());
 		std::vector<unsigned> test_rows(test_row_num);
 		for (unsigned i = 0; i < test_row_num; i++) {
 			test_rows[i] = training_rows[i];
 			training_rows.erase(training_rows.begin() + i);
 		}
+		optimize(net, x, y, x, y, training_rows, test_rows, epochs, k, early_stop);
+	};
+	void optimize(NeuralNetwork<Scalar>& net, const Tensor4D<Scalar>& training_x, const Tensor4D<Scalar>& training_y,
+			const Tensor4D<Scalar>& test_x, const Tensor4D<Scalar>& test_y, unsigned epochs, Scalar k = .8,
+			unsigned early_stop = 0) {
+		assert(test_x.dimension(0) > 0);
+		assert(test_x.dimension(0) == test_y.dimension(0));
+		assert(training_x.dimension(0) > 0);
+		assert(training_x.dimension(0) == training_y.dimension(0));
+		assert(test_x.dimension(1) == net.get_input_dims().get_dim1() &&
+				test_x.dimension(2) == net.get_input_dims().get_dim2() &&
+				test_x.dimension(3) == net.get_input_dims().get_dim3());
+		assert(test_x.dimension(1) == training_x.dimension(1) &&
+				test_x.dimension(2) == training_x.dimension(2) &&
+				test_x.dimension(3) == training_x.dimension(3));
+		assert(test_y.dimension(1) == net.get_output_dims().get_dim1() &&
+				test_y.dimension(2) == net.get_output_dims().get_dim2() &&
+				test_y.dimension(3) == net.get_output_dims().get_dim3());
+		assert(test_y.dimension(1) == training_y.dimension(1) &&
+				test_y.dimension(2) == training_y.dimension(2) &&
+				test_y.dimension(3) == training_y.dimension(3));
+		unsigned training_row_num = (unsigned) training_x.dimension(0);
+		unsigned test_row_num = (unsigned) test_x.dimension(0);
+		std::vector<unsigned> training_rows(training_row_num);
+		for (unsigned i = 0; i < training_row_num; i++) training_rows[i] = i;
+		std::vector<unsigned> test_rows(test_row_num);
+		for (unsigned i = 0; i < test_row_num; i++) test_rows[i] = i;
+		optimize(net, training_x, training_y, test_x, test_y, training_rows, test_rows, epochs, k, early_stop);
+	};
+protected:
+	virtual void fit(NeuralNetwork<Scalar>& net) = 0;
+	virtual Scalar train(NeuralNetwork<Scalar>& net, const Tensor4D<Scalar>& x, const Tensor4D<Scalar>& y,
+			const std::vector<unsigned>& rows, unsigned epoch) = 0;
+	virtual Scalar validate(NeuralNetwork<Scalar>& net, const Tensor4D<Scalar>& x, const Tensor4D<Scalar>& y,
+			const std::vector<unsigned>& rows, unsigned epoch) = 0;
+	void empty_layer_caches(NeuralNetwork<Scalar>& net) const {
+		for (unsigned i = 0; i < net.get_layers().size(); i++) {
+			net.get_layers()[i]->empty_cache();
+		}
+	};
+	void optimize(NeuralNetwork<Scalar>& net, const Tensor4D<Scalar>& training_x, const Tensor4D<Scalar>& training_y,
+			const Tensor4D<Scalar>& test_x, const Tensor4D<Scalar>& test_y, const std::vector<unsigned>& training_rows,
+			const std::vector<unsigned>& test_rows, unsigned epochs, Scalar k, unsigned early_stop ) {
+		assert(epochs > 0);
+		assert(k > 0 && k < 1);
+		// Fit the optimizer parameters to the network.
+		fit(net);
 		Scalar prev_valid_loss = std::numeric_limits<Scalar>::max();
 		unsigned cons_loss_inc = 0;
 		NeuralNetwork<Scalar>& test_net(net);
@@ -105,12 +148,12 @@ public:
 			std::cout << "Epoch " << std::setw(3) << i << "----------------------------" << std::endl;
 			// Train.
 			if (i != 0) {
-				Scalar training_loss = train(test_net, x, y, training_rows, i);
+				Scalar training_loss = train(test_net, training_x, training_y, training_rows, i);
 				std::cout << "\ttraining loss: " << std::to_string(training_loss) << std::endl;
 				empty_layer_caches(test_net);
 			}
 			// Validate.
-			Scalar valid_loss = validate(test_net, x, y, test_rows, i);
+			Scalar valid_loss = validate(test_net, test_x, test_y, test_rows, i);
 			std::cout << "\tvalidation loss: " << std::to_string(valid_loss);
 			empty_layer_caches(test_net);
 			if (valid_loss >= prev_valid_loss) {
@@ -124,17 +167,6 @@ public:
 			}
 			std::cout << std::endl << std::endl;
 			prev_valid_loss = valid_loss;
-		}
-	};
-protected:
-	virtual void fit(NeuralNetwork<Scalar>& net) = 0;
-	virtual Scalar train(NeuralNetwork<Scalar>& net, const Tensor4D<Scalar>& x, const Tensor4D<Scalar>& y,
-			const std::vector<unsigned>& rows, unsigned epoch) = 0;
-	virtual Scalar validate(NeuralNetwork<Scalar>& net, const Tensor4D<Scalar>& x, const Tensor4D<Scalar>& y,
-			const std::vector<unsigned>& rows, unsigned epoch) = 0;
-	void empty_layer_caches(NeuralNetwork<Scalar>& net) const {
-		for (unsigned i = 0; i < net.get_layers().size(); i++) {
-			net.get_layers()[i]->empty_cache();
 		}
 	};
 	static std::vector<Layer<Scalar>*>& get_layers(NeuralNetwork<Scalar>& net) {
@@ -178,12 +210,8 @@ protected:
 		Scalar training_loss = 0;
 		unsigned batch_ind = 0;
 		int training_row_num = rows.size();
-		int x_dim1 = x.dimension(1);
-		int x_dim2 = x.dimension(2);
-		int x_dim3 = x.dimension(3);
-		int y_dim1 = y.dimension(1);
-		int y_dim2 = y.dimension(2);
-		int y_dim3 = y.dimension(3);
+		int x_dim1 = x.dimension(1); int x_dim2 = x.dimension(2); int x_dim3 = x.dimension(3);
+		int y_dim1 = y.dimension(1); int y_dim2 = y.dimension(2); int y_dim3 = y.dimension(3);
 		Tensor4D<Scalar> batch_x(batch_size, x_dim1, x_dim2, x_dim3);
 		Tensor4D<Scalar> batch_y(batch_size, y_dim1, y_dim2, y_dim3);
 		Eigen::array<int, 4> offsets = { 0, 0, 0, 0 };
@@ -234,12 +262,8 @@ protected:
 		Scalar obj_loss = 0;
 		unsigned batch_ind = 0;
 		int test_row_num = rows.size();
-		int x_dim1 = x.dimension(1);
-		int x_dim2 = x.dimension(2);
-		int x_dim3 = x.dimension(3);
-		int y_dim1 = y.dimension(1);
-		int y_dim2 = y.dimension(2);
-		int y_dim3 = y.dimension(3);
+		int x_dim1 = x.dimension(1); int x_dim2 = x.dimension(2); int x_dim3 = x.dimension(3);
+		int y_dim1 = y.dimension(1); int y_dim2 = y.dimension(2); int y_dim3 = y.dimension(3);
 		Tensor4D<Scalar> batch_x(batch_size, x_dim1, x_dim2, x_dim3);
 		Tensor4D<Scalar> batch_y(batch_size, y_dim1, y_dim2, y_dim3);
 		Eigen::array<int, 4> offsets = { 0, 0, 0, 0 };

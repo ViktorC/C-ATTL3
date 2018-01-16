@@ -17,21 +17,6 @@
 #include <Utils.h>
 #include <Vector.h>
 
-#ifndef DIM_CHECK1
-#define DIM_CHECK1 assert(out.dimension(0) == obj.dimension(0) && out.dimension(1) == obj.dimension(1) && \
-		out.dimension(2) == obj.dimension(2) && out.dimension(3) == obj.dimension(3));
-#endif
-
-#ifndef DIM_CHECK2
-#define DIM_CHECK2 assert(out.dimension(2) == 1 && out.dimension(3) == 1);
-#define CONV_TENSORS Matrix<Scalar> out_mat = Utils<Scalar>::tensor4d_to_mat(out); \
-		Matrix<Scalar> obj_mat = Utils<Scalar>::tensor4d_to_mat(obj);
-#endif
-
-#ifndef OUT_DIMS
-#define OUT_DIMS Dimensions(out.dimension(1), out.dimension(2), out.dimension(3))
-#endif
-
 namespace cppnn {
 
 template<typename Scalar>
@@ -46,16 +31,19 @@ template<typename Scalar>
 class QuadraticLoss : public Loss<Scalar> {
 public:
 	ColVector<Scalar> function(const Tensor4D<Scalar>& out, const Tensor4D<Scalar>& obj) const {
-		DIM_CHECK1
-		DIM_CHECK2
-		CONV_TENSORS
-		return (out_mat - obj_mat).array().square().rowwise().sum();
+		assert(out.dimension(0) == obj.dimension(0) && out.dimension(1) == obj.dimension(1) &&
+				out.dimension(2) == obj.dimension(2) && out.dimension(3) == obj.dimension(3));
+		assert(out.dimension(2) == 1 && out.dimension(3) == 1);
+		return (Utils<Scalar>::tensor4d_to_mat(out) - Utils<Scalar>::tensor4d_to_mat(obj))
+				.array().square().rowwise().sum();
 	};
 	Tensor4D<Scalar> d_function(const Tensor4D<Scalar>& out, const Tensor4D<Scalar>& obj) const {
-		DIM_CHECK1
-		DIM_CHECK2
-		CONV_TENSORS
-		return Utils<Scalar>::mat_to_tensor4d((2 * (out_mat - obj_mat)).eval(), OUT_DIMS);
+		assert(out.dimension(0) == obj.dimension(0) && out.dimension(1) == obj.dimension(1) &&
+				out.dimension(2) == obj.dimension(2) && out.dimension(3) == obj.dimension(3));
+		assert(out.dimension(2) == 1 && out.dimension(3) == 1);
+		return Utils<Scalar>::mat_to_tensor4d((2 * (Utils<Scalar>::tensor4d_to_mat(out) -
+				Utils<Scalar>::tensor4d_to_mat(obj))).eval(), Dimensions(out.dimension(1), out.dimension(2),
+						out.dimension(3)));
 	}
 };
 
@@ -68,9 +56,11 @@ public:
 	HingeLoss(bool squared = false) :
 		squared(squared) { };
 	ColVector<Scalar> function(const Tensor4D<Scalar>& out, const Tensor4D<Scalar>& obj) const {
-		DIM_CHECK1
-		DIM_CHECK2
-		CONV_TENSORS
+		assert(out.dimension(0) == obj.dimension(0) && out.dimension(1) == obj.dimension(1) &&
+				out.dimension(2) == obj.dimension(2) && out.dimension(3) == obj.dimension(3));
+		assert(out.dimension(2) == 1 && out.dimension(3) == 1);
+		Matrix<Scalar> out_mat = Utils<Scalar>::tensor4d_to_mat(out);
+		Matrix<Scalar> obj_mat = Utils<Scalar>::tensor4d_to_mat(obj);
 		ColVector<Scalar> loss(out_mat.rows());
 		for (int i = 0; i < obj_mat.rows(); i++) {
 			unsigned ones = 0;
@@ -97,9 +87,11 @@ public:
 		return loss;
 	};
 	Tensor4D<Scalar> d_function(const Tensor4D<Scalar>& out, const Tensor4D<Scalar>& obj) const {
-		DIM_CHECK1
-		DIM_CHECK2
-		CONV_TENSORS
+		assert(out.dimension(0) == obj.dimension(0) && out.dimension(1) == obj.dimension(1) &&
+				out.dimension(2) == obj.dimension(2) && out.dimension(3) == obj.dimension(3));
+		assert(out.dimension(2) == 1 && out.dimension(3) == 1);
+		Matrix<Scalar> out_mat = Utils<Scalar>::tensor4d_to_mat(out);
+		Matrix<Scalar> obj_mat = Utils<Scalar>::tensor4d_to_mat(obj);
 		Matrix<Scalar> out_grads(out_mat.rows(), out_mat.cols());
 		for (int i = 0; i < out_mat.rows(); i++) {
 			unsigned ones = 0;
@@ -129,7 +121,8 @@ public:
 			}
 			out_grads(i,correct_class_ind) = -total_out_grad;
 		}
-		return Utils<Scalar>::mat_to_tensor4d(out_grads, OUT_DIMS);
+		return Utils<Scalar>::mat_to_tensor4d(out_grads, Dimensions(out.dimension(1), out.dimension(2),
+				out.dimension(3)));
 	};
 private:
 	bool squared;
@@ -144,16 +137,19 @@ public:
 	CrossEntropyLoss(Scalar epsilon = Utils<Scalar>::EPSILON2) :
 		epsilon(epsilon) { };
 	ColVector<Scalar> function(const Tensor4D<Scalar>& out, const Tensor4D<Scalar>& obj) const {
-		DIM_CHECK1
-		DIM_CHECK2
-		CONV_TENSORS
-		return (out_mat.array().log() * obj_mat.array()).matrix().rowwise().sum() * -1;
+		assert(out.dimension(0) == obj.dimension(0) && out.dimension(1) == obj.dimension(1) &&
+				out.dimension(2) == obj.dimension(2) && out.dimension(3) == obj.dimension(3));
+		assert(out.dimension(2) == 1 && out.dimension(3) == 1);
+		return (Utils<Scalar>::tensor4d_to_mat(out).array().log() * Utils<Scalar>::tensor4d_to_mat(obj).array())
+				.matrix().rowwise().sum() * -1;
 	};
 	Tensor4D<Scalar> d_function(const Tensor4D<Scalar>& out, const Tensor4D<Scalar>& obj) const {
-		DIM_CHECK1
-		DIM_CHECK2
-		CONV_TENSORS
-		return Utils<Scalar>::mat_to_tensor4d((-obj_mat.array() / (out_mat.array() + epsilon)).eval(), OUT_DIMS);
+		assert(out.dimension(0) == obj.dimension(0) && out.dimension(1) == obj.dimension(1) &&
+				out.dimension(2) == obj.dimension(2) && out.dimension(3) == obj.dimension(3));
+		assert(out.dimension(2) == 1 && out.dimension(3) == 1);
+		return Utils<Scalar>::mat_to_tensor4d((-Utils<Scalar>::tensor4d_to_mat(obj).array() /
+				(Utils<Scalar>::tensor4d_to_mat(out).array() + epsilon)).eval(), Dimensions(out.dimension(1),
+						out.dimension(2), out.dimension(3)));
 	}
 private:
 	Scalar epsilon;
@@ -168,9 +164,11 @@ public:
 	MultiLabelHingeLoss(bool squared = false) :
 		squared(squared) { };
 	ColVector<Scalar> function(const Tensor4D<Scalar>& out, const Tensor4D<Scalar>& obj) const {
-		DIM_CHECK1
-		DIM_CHECK2
-		CONV_TENSORS
+		assert(out.dimension(0) == obj.dimension(0) && out.dimension(1) == obj.dimension(1) &&
+				out.dimension(2) == obj.dimension(2) && out.dimension(3) == obj.dimension(3));
+		assert(out.dimension(2) == 1 && out.dimension(3) == 1);
+		Matrix<Scalar> out_mat = Utils<Scalar>::tensor4d_to_mat(out);
+		Matrix<Scalar> obj_mat = Utils<Scalar>::tensor4d_to_mat(obj);
 		ColVector<Scalar> loss(out_mat.rows());
 		for (int i = 0; i < obj_mat.rows(); i++) {
 			Scalar loss_i = 0;
@@ -185,9 +183,11 @@ public:
 		return loss;
 	};
 	Tensor4D<Scalar> d_function(const Tensor4D<Scalar>& out, const Tensor4D<Scalar>& obj) const {
-		DIM_CHECK1
-		DIM_CHECK2
-		CONV_TENSORS
+		assert(out.dimension(0) == obj.dimension(0) && out.dimension(1) == obj.dimension(1) &&
+				out.dimension(2) == obj.dimension(2) && out.dimension(3) == obj.dimension(3));
+		assert(out.dimension(2) == 1 && out.dimension(3) == 1);
+		Matrix<Scalar> out_mat = Utils<Scalar>::tensor4d_to_mat(out);
+		Matrix<Scalar> obj_mat = Utils<Scalar>::tensor4d_to_mat(obj);
 		Matrix<Scalar> out_grads(out_mat.rows(), out_mat.cols());
 		for (int i = 0; i < out_mat.rows(); i++) {
 			for (int j = 0; j < out_mat.cols(); j++) {
@@ -201,7 +201,8 @@ public:
 					out_grads(i,j) = 0;
 			}
 		}
-		return Utils<Scalar>::mat_to_tensor4d(out_grads, OUT_DIMS);
+		return Utils<Scalar>::mat_to_tensor4d(out_grads, Dimensions(out.dimension(1), out.dimension(2),
+				out.dimension(3)));
 	};
 private:
 	bool squared;
@@ -216,9 +217,11 @@ public:
 	MultiLabelLogLoss(Scalar epsilon = Utils<Scalar>::EPSILON2) :
 		epsilon(epsilon) { };
 	ColVector<Scalar> function(const Tensor4D<Scalar>& out, const Tensor4D<Scalar>& obj) const {
-		DIM_CHECK1
-		DIM_CHECK2
-		CONV_TENSORS
+		assert(out.dimension(0) == obj.dimension(0) && out.dimension(1) == obj.dimension(1) &&
+				out.dimension(2) == obj.dimension(2) && out.dimension(3) == obj.dimension(3));
+		assert(out.dimension(2) == 1 && out.dimension(3) == 1);
+		Matrix<Scalar> out_mat = Utils<Scalar>::tensor4d_to_mat(out);
+		Matrix<Scalar> obj_mat = Utils<Scalar>::tensor4d_to_mat(obj);
 		ColVector<Scalar> loss(out_mat.rows());
 		for (int i = 0; i < out_mat.rows(); i++) {
 			Scalar loss_i = 0;
@@ -233,9 +236,11 @@ public:
 		return loss;
 	};
 	Tensor4D<Scalar> d_function(const Matrix<Scalar>& out, const Matrix<Scalar>& obj) const {
-		DIM_CHECK1
-		DIM_CHECK2
-		CONV_TENSORS
+		assert(out.dimension(0) == obj.dimension(0) && out.dimension(1) == obj.dimension(1) &&
+				out.dimension(2) == obj.dimension(2) && out.dimension(3) == obj.dimension(3));
+		assert(out.dimension(2) == 1 && out.dimension(3) == 1);
+		Matrix<Scalar> out_mat = Utils<Scalar>::tensor4d_to_mat(out);
+		Matrix<Scalar> obj_mat = Utils<Scalar>::tensor4d_to_mat(obj);
 		int rows = out_mat.rows();
 		Matrix<Scalar> out_grads(rows, out_mat.cols());
 		for (int i = 0; i < rows; i++) {
@@ -248,7 +253,8 @@ public:
 				out_grads(i,j) = 1 / (denominator * rows);
 			}
 		}
-		return Utils<Scalar>::mat_to_tensor4d(out_grads, OUT_DIMS);
+		return Utils<Scalar>::mat_to_tensor4d(out_grads, Dimensions(out.dimension(1), out.dimension(2),
+				out.dimension(3)));
 	}
 private:
 	Scalar epsilon;
