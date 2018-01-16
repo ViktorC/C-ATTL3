@@ -21,10 +21,6 @@
 #include <Vector.h>
 #include <WeightInitialization.h>
 
-#ifndef ILLEGAL_DIMS_MSG
-#define ILLEGAL_DIMS_MSG "illegal tensor dimensions"
-#endif
-
 namespace cppnn {
 
 // Forward declarations to NeuralNetwork and Optimizer so they can be friended.
@@ -100,8 +96,8 @@ protected:
 	};
 	Tensor4D<Scalar> pass_forward(Tensor4D<Scalar> in, bool training) {
 		assert(in.dimension(1) == input_dims.get_dim1() && in.dimension(2) == input_dims.get_dim2() &&
-				in.dimension(3) == input_dims.get_dim3() && ILLEGAL_DIMS_MSG);
-		assert(in.dimension(0) > 0 && ILLEGAL_DIMS_MSG);
+				in.dimension(3) == input_dims.get_dim3());
+		assert(in.dimension(0) > 0);
 		unsigned input_size = input_dims.get_points();
 		// Add a 1-column to the input for the bias trick.
 		biased_in = Matrix<Scalar>(in.dimension(0), input_size + 1);
@@ -111,9 +107,8 @@ protected:
 	};
 	Tensor4D<Scalar> pass_back(Tensor4D<Scalar> out_grads) {
 		assert(out_grads.dimension(1) == output_dims.get_dim1() && out_grads.dimension(2) == output_dims.get_dim2() &&
-				out_grads.dimension(3) == output_dims.get_dim3() && biased_in.rows() == out_grads.dimension(0) &&
-				ILLEGAL_DIMS_MSG);
-		assert(out_grads.dimension(0) > 0 && ILLEGAL_DIMS_MSG);
+				out_grads.dimension(3) == output_dims.get_dim3());
+		assert(out_grads.dimension(0) > 0 && biased_in.rows() == out_grads.dimension(0));
 		Matrix<Scalar> out_grads_mat = Utils<Scalar>::tensor4d_to_mat(out_grads);
 		// Compute the gradients of the outputs with respect to the weights.
 		weight_grads = biased_in.transpose() * out_grads_mat;
@@ -165,17 +160,16 @@ protected:
 	void enforce_constraints() { };
 	Tensor4D<Scalar> pass_forward(Tensor4D<Scalar> in, bool training) {
 		assert(in.dimension(1) == dims.get_dim1() && in.dimension(2) == dims.get_dim2() &&
-				in.dimension(3) == dims.get_dim3() && ILLEGAL_DIMS_MSG);
-		assert(in.dimension(0) > 0 && ILLEGAL_DIMS_MSG);
+				in.dimension(3) == dims.get_dim3());
+		assert(in.dimension(0) > 0);
 		this->in = Utils<Scalar>::tensor4d_to_mat(in);
 		out = activate(this->in);
 		return Utils<Scalar>::mat_to_tensor4d(out, dims);
 	};
 	Tensor4D<Scalar> pass_back(Tensor4D<Scalar> out_grads) {
 		assert(out_grads.dimension(1) == dims.get_dim1() && out_grads.dimension(2) == dims.get_dim2() &&
-				out_grads.dimension(3) == dims.get_dim3() && out.rows() == out_grads.dimension(0) &&
-				ILLEGAL_DIMS_MSG);
-		assert(out_grads.dimension(0) > 0 && ILLEGAL_DIMS_MSG);
+				out_grads.dimension(3) == dims.get_dim3());
+		assert(out_grads.dimension(0) > 0 && out.rows() == out_grads.dimension(0));
 		return Utils<Scalar>::mat_to_tensor4d(d_activate(in, out,
 				Utils<Scalar>::tensor4d_to_mat(out_grads)), dims);
 	};
@@ -477,8 +471,8 @@ protected:
 	void enforce_constraints() { };
 	Tensor4D<Scalar> pass_forward(Tensor4D<Scalar> in, bool training) {
 		assert(in.dimension(1) == dims.get_dim1() && in.dimension(2) == dims.get_dim2() &&
-				in.dimension(3) == dims.get_dim3() && ILLEGAL_DIMS_MSG);
-		assert(in.dimension(0) > 0 && ILLEGAL_DIMS_MSG);
+				in.dimension(3) == dims.get_dim3());
+		assert(in.dimension(0) > 0);
 		int rows = in.dimension(0);
 		Tensor4D<Scalar> out(rows, dims.get_dim1(), dims.get_dim2(), dims.get_dim3());
 		Dimensions slice_dims(dims.get_dim1(), dims.get_dim2(), 1);
@@ -514,9 +508,8 @@ protected:
 	};
 	Tensor4D<Scalar> pass_back(Tensor4D<Scalar> out_grads) {
 		assert(out_grads.dimension(1) == dims.get_dim1() && out_grads.dimension(2) == dims.get_dim2() &&
-				out_grads.dimension(3) == dims.get_dim3() && cache_vec[0].std_in.rows() == out_grads.dimension(0) &&
-				ILLEGAL_DIMS_MSG);
-		assert(out_grads.dimension(0) > 0 && ILLEGAL_DIMS_MSG);
+				out_grads.dimension(3) == dims.get_dim3());
+		assert(out_grads.dimension(0) > 0 && cache_vec[0].std_in.rows() == out_grads.dimension(0));
 		int rows = out_grads.dimension(0);
 		Tensor4D<Scalar> prev_out_grads(rows, dims.get_dim1(), dims.get_dim2(), dims.get_dim3());
 		Dimensions slice_dims(dims.get_dim1(), dims.get_dim2(), 1);
@@ -595,8 +588,8 @@ protected:
 	void enforce_constraints() { };
 	Tensor4D<Scalar> pass_forward(Tensor4D<Scalar> in, bool training) {
 		assert(in.dimension(1) == dims.get_dim1() && in.dimension(2) == dims.get_dim2() &&
-				in.dimension(3) == dims.get_dim3() && ILLEGAL_DIMS_MSG);
-		assert(in.dimension(0) > 0 && ILLEGAL_DIMS_MSG);
+				in.dimension(3) == dims.get_dim3());
+		assert(in.dimension(0) > 0);
 		if (training && dropout) {
 			Matrix<Scalar> in_mat = Utils<Scalar>::tensor4d_to_mat(in);
 			Matrix<Scalar> dropout_mask(in_mat.rows(), in_mat.cols());
@@ -612,9 +605,8 @@ protected:
 	};
 	Tensor4D<Scalar> pass_back(Tensor4D<Scalar> out_grads) {
 		assert(out_grads.dimension(1) == dims.get_dim1() && out_grads.dimension(2) == dims.get_dim2() &&
-				out_grads.dimension(3) == dims.get_dim3() && dropout_mask.rows() == out_grads.dimension(0) &&
-				ILLEGAL_DIMS_MSG);
-		assert(out_grads.dimension(0) > 0 && ILLEGAL_DIMS_MSG);
+				out_grads.dimension(3) == dims.get_dim3());
+		assert(out_grads.dimension(0) > 0 && dropout_mask.rows() == out_grads.dimension(0));
 		// The derivative of the dropout 'function'.
 		return Utils<Scalar>::mat_to_tensor4d(Utils<Scalar>::tensor4d_to_mat(out_grads).cwiseProduct(dropout_mask)
 				.eval(), dims);
@@ -629,7 +621,7 @@ private:
 	// Staged computation cache_vec
 	Matrix<Scalar> dropout_mask;
 };
-#include <iostream>
+
 template<typename Scalar>
 class ConvLayer : public Layer<Scalar> {
 	// TODO Dilation.
@@ -691,8 +683,8 @@ protected:
 	};
 	Tensor4D<Scalar> pass_forward(Tensor4D<Scalar> in, bool training) {
 		assert(in.dimension(1) == input_dims.get_dim1() && in.dimension(2) == input_dims.get_dim2() &&
-				in.dimension(3) == input_dims.get_dim3() && ILLEGAL_DIMS_MSG);
-		assert(in.dimension(0) > 0 && ILLEGAL_DIMS_MSG);
+				in.dimension(3) == input_dims.get_dim3());
+		assert(in.dimension(0) > 0);
 		// Spatial padding.
 		Eigen::array<std::pair<int, int>, 4> paddings;
 		paddings[0] = std::make_pair(0, 0);
@@ -704,8 +696,8 @@ protected:
 		int depth = input_dims.get_dim3();
 		int patches = output_dims.get_dim1() * output_dims.get_dim2();
 		int receptor_vol = receptor_size * receptor_size * depth;
-		int width_rem = padded_in.dimension(1) - receptor_size;
-		int height_rem = padded_in.dimension(2) - receptor_size;
+		int height_rem = padded_in.dimension(1) - receptor_size;
+		int width_rem = padded_in.dimension(2) - receptor_size;
 		Eigen::array<int, 4> row_offsets = { 0, 0, 0, 0 };
 		Eigen::array<int, 4> row_extents = { 1, output_dims.get_dim1(), output_dims.get_dim2(), output_dims.get_dim3() };
 		Eigen::array<int, 4> patch_offsets = { 0, 0, 0, 0 };
@@ -718,19 +710,19 @@ protected:
 			row_offsets[0] = i;
 			patch_offsets[0] = i;
 			int patch_ind = 0;
-			Matrix<Scalar> in_i_mat(patches, receptor_vol);
-			for (int j = 0; j <= width_rem; j += stride) {
-				for (int k = 0; k <= height_rem; k += stride) {
-					patch_offsets[1] = j;
+			Matrix<Scalar> in_mat_i(patches, receptor_vol);
+			for (int j = 0; j <= height_rem; j += stride) {
+				patch_offsets[1] = j;
+				for (int k = 0; k <= width_rem; k += stride) {
 					patch_offsets[2] = k;
 					Tensor4D<Scalar> patch = padded_in.slice(patch_offsets, patch_extents);
-					in_i_mat.row(patch_ind++) = Utils<Scalar>::tensor4d_to_mat(patch);
+					in_mat_i.row(patch_ind++) = Utils<Scalar>::tensor4d_to_mat(patch);
 				}
 			}
 			assert(patch_ind == patches);
 			// Set the additional column's elements to 1.
 			Matrix<Scalar> biased_in = Matrix<Scalar>(patches, receptor_vol + 1);
-			biased_in.leftCols(receptor_vol) = std::move(in_i_mat);
+			biased_in.leftCols(receptor_vol) = std::move(in_mat_i);
 			biased_in.col(receptor_vol).setOnes();
 			biased_in_vec[i] = std::move(biased_in);
 			/* Flatten the matrix product into row vector, reshape it into a single 'row' sub tensor, and
@@ -743,20 +735,26 @@ protected:
 	};
 	Tensor4D<Scalar> pass_back(Tensor4D<Scalar> out_grads) {
 		assert(out_grads.dimension(1) == output_dims.get_dim1() && out_grads.dimension(2) == output_dims.get_dim2() &&
-				out_grads.dimension(3) == output_dims.get_dim3() &&
-				biased_in_vec.size() ==(unsigned) out_grads.dimension(0) && ILLEGAL_DIMS_MSG);
-		assert(out_grads.dimension(0) > 0 && ILLEGAL_DIMS_MSG);
+				out_grads.dimension(3) == output_dims.get_dim3());
+		assert(out_grads.dimension(0) > 0 && biased_in_vec.size() == (unsigned) out_grads.dimension(0));
 		int rows = out_grads.dimension(0);
-		Eigen::array<int, 4> offsets = { 0, 0, 0, 0 };
+		int padded_height = input_dims.get_dim1() + 2 * padding;
+		int padded_width = input_dims.get_dim2() + 2 * padding;
+		int height_rem = padded_height - receptor_size;
+		int width_rem = padded_width - receptor_size;
+		int depth = input_dims.get_dim3();
+		Dimensions patch_dims((int) receptor_size, (int) receptor_size, depth);
+		Eigen::array<int, 4> out_grads_row_offsets = { 0, 0, 0, 0 };
 		Eigen::array<int, 4> out_grads_row_extents = { 1, output_dims.get_dim1(), output_dims.get_dim2(),
 				output_dims.get_dim3() };
-		Eigen::array<int, 4> prev_out_grads_row_extents = { 1, input_dims.get_dim1(), input_dims.get_dim2(),
-				input_dims.get_dim3() };
+		Eigen::array<int, 4> patch_offsets = { 0, 0, 0, 0 };
+		Eigen::array<int, 4> patch_extents = { 1, patch_dims.get_dim1(), patch_dims.get_dim2(), depth };
+		Tensor4D<Scalar> prev_out_grads(rows, padded_height, padded_width, input_dims.get_dim3());
+		prev_out_grads.setZero();
 		weight_grads.setZero(weight_grads.rows(), weight_grads.cols());
-		Tensor4D<Scalar> prev_out_grads(rows, input_dims.get_dim1(), input_dims.get_dim2(), input_dims.get_dim3());
 		for (int i = 0; i < rows; i++) {
-			offsets[0] = i;
-			Tensor4D<Scalar> slice_i = out_grads.slice(offsets, out_grads_row_extents);
+			out_grads_row_offsets[0] = i;
+			Tensor4D<Scalar> slice_i = out_grads.slice(out_grads_row_offsets, out_grads_row_extents);
 			Matrix<Scalar> out_grads_mat_i = Eigen::Map<Matrix<Scalar>>(slice_i.data(), output_dims.get_dim1() *
 					output_dims.get_dim2(), filters);
 			// Accumulate the gradients of the outputs w.r.t. the weights for each observation a.k.a 'tensor-row'.
@@ -764,10 +762,25 @@ protected:
 			/* Remove the bias row from the weight matrix, transpose it, and compute gradients w.r.t. the
 			 * previous layer's output. */
 			Matrix<Scalar> prev_out_grads_mat_i = out_grads_mat_i * weights.topRows(weights.rows() - 1).transpose();
-			prev_out_grads.slice(offsets, prev_out_grads_row_extents) =
-					Utils<Scalar>::mat_to_tensor4d(prev_out_grads_mat_i, input_dims);
+			/* Given the gradients w.r.t. the stretched out receptor fields, perform a 'backwards' convolution
+			 * to get the gradients w.r.t. the individual input nodes. */
+			int patch_ind = 0;
+			patch_offsets[0] = i;
+			for (int j = 0; j <= height_rem; j += stride) {
+				patch_offsets[1] = j;
+				for (int k = 0; k <= width_rem; k += stride) {
+					patch_offsets[2] = k;
+					// Accumulate the gradients where the patch tensors overlap.
+					prev_out_grads.slice(patch_offsets, patch_extents) +=
+							Utils<Scalar>::mat_to_tensor4d(prev_out_grads_mat_i.row(patch_ind++), patch_dims);
+				}
+			}
+			assert(patch_ind == prev_out_grads_mat_i.rows());
 		}
-		return prev_out_grads;
+		// Cut off the padding.
+		Eigen::array<int, 4> no_padding_offsets = { 0, (int) padding, (int) padding, 0 };
+		Eigen::array<int, 4> no_padding_extents = { rows, input_dims.get_dim1(), input_dims.get_dim2(), depth };
+		return prev_out_grads.slice(no_padding_offsets, no_padding_extents);
 	};
 private:
 	Dimensions input_dims;
