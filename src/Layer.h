@@ -668,7 +668,7 @@ protected:
 		weight_grads.setZero(weight_grads.rows(), weight_grads.cols());
 	};
 	void empty_cache() {
-		biased_in = Matrix<Scalar>(0, 0);
+		biased_in_vec = std::vector<Matrix<Scalar>>(0);
 	};
 	Matrix<Scalar>& get_params() {
 		return weights;
@@ -688,11 +688,11 @@ protected:
 				in.dimension(3) == input_dims.get_dim3() && ILLEGAL_DIMS);
 		assert(in.dimension(0) > 0 && ILLEGAL_DIMS);
 		// Spatial padding.
-		Eigen::array<pair<int, int>, 4> paddings;
-		paddings[0] = make_pair(0, 0);
-		paddings[1] = make_pair(padding, padding);
-		paddings[2] = make_pair(padding, padding);
-		paddings[3] = make_pair(0, 0);
+		Eigen::array<std::pair<int, int>, 4> paddings;
+		paddings[0] = std::make_pair(0, 0);
+		paddings[1] = std::make_pair(padding, padding);
+		paddings[2] = std::make_pair(padding, padding);
+		paddings[3] = std::make_pair(0, 0);
 		in = in.pad(paddings);
 		int rows = in.dimension(0);
 		int width = in.dimension(1);
@@ -700,7 +700,9 @@ protected:
 		int depth = in.dimension(3);
 		int patches = ((width - receptor_size) / stride + 1) * ((height - receptor_size) / stride + 1);
 		Eigen::array<int, 4> offsets = { 0, 0, 0, 0 };
-		Eigen::array<int, 4> extents = { 1, receptor_size, receptor_size, depth };
+		Eigen::array<int, 4> patch_extents = { 1, receptor_size, receptor_size, depth };
+		Eigen::array<int, 4> row_extents = { 1, output_dims.get_dim1(), output_dims.get_dim2(),
+				output_dims.get_dim3() };
 		Tensor4D<Scalar> out(rows, output_dims.get_dim1(), output_dims.get_dim2(), output_dims.get_dim3());
 		for (int i = 0; i < rows; i++) {
 			offsets[0] = i;
@@ -710,14 +712,18 @@ protected:
 				for (int k = 0; k < height - receptor_size; k += stride) {
 					offsets[1] = j;
 					offsets[2] = k;
-					Tensor4D<Scalar> patch = in.slice(offsets, extents);
+					Tensor4D<Scalar> patch = in.slice(offsets, patch_extents);
 					in_i_mat.col(patch_ind++) = Utils<Scalar>::tensor4d_to_mat(patch).transpose();
 				}
 			}
+			assert(patch_ind == patches);
 			// Add a 1-column to the input for the bias trick.
-			biased_in = Matrix<Scalar>(in.dimension(0), input_size + 1);
-			biased_in.leftCols(input_size) = Utils<Scalar>::tensor4d_to_mat(in);
-			biased_in.col(input_size).setOnes();
+			Matrix<Scalar> biased_in = Matrix<Scalar>(in_i_mat.rows(), patches + 1);
+			biased_in.leftCols(patches) = std::move(in_i_mat);
+			biased_in.col(patches).setOnes();
+			biased_in_vec[i] = biased_in;
+			out.slice(offsets, row_extents) =Utils<Scalar>::mat_to_tensor4d(Map<RowVector<Scalar>,
+					Eigen::Aligned>((weights * biased_in).eval()), output_dim);
 		}
 		return Utils<Scalar>::mat_to_tensor4d((biased_in * weights).eval(), output_dims);
 	};
@@ -749,7 +755,7 @@ private:
 	Matrix<Scalar> weights;
 	Matrix<Scalar> weight_grads;
 	// Staged computation caches
-	Matrix<Scalar> biased_in;
+	std::vector<Matrix<Scalar>> biased_in_vec;
 };
 
 } /* namespace cppnn */
