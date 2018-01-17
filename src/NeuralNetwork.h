@@ -82,6 +82,9 @@ protected:
 	static void set_input_layer(Layer<Scalar>& layer) {
 		layer.set_input_layer();
 	};
+	static void empty_cache(Layer<Scalar>& layer) {
+		layer.empty_cache();
+	};
 	static Tensor4D<Scalar> pass_forward(Layer<Scalar>& layer, Tensor4D<Scalar> prev_out, bool training) {
 		return layer.pass_forward(prev_out, training);
 	};
@@ -165,16 +168,23 @@ protected:
 		assert(input.dimension(0) && "empty neural network input");
 		assert(input.dimension(1) == input_dims.get_dim1() && input.dimension(2) == input_dims.get_dim2() &&
 				input.dimension(3) == input_dims.get_dim3() && "wrong neural network input size");
-		for (unsigned i = 0; i < layers.size(); i++)
-			input = NeuralNetwork<Scalar>::pass_forward(*(layers[i]), input, training);
+		for (unsigned i = 0; i < layers.size(); i++) {
+			Layer<Scalar>& layer = *(layers[i]);
+			input = NeuralNetwork<Scalar>::pass_forward(layer, input, training);
+			if (!training)
+				NeuralNetwork<Scalar>::empty_cache(layer);
+		}
 		return input;
 	};
 	void backpropagate(Tensor4D<Scalar> out_grads) {
 		assert(out_grads.dimension(0) && "empty neural network output gradient");
 		assert(out_grads.dimension(1) == output_dims.get_dim1() && out_grads.dimension(2) == output_dims.get_dim2() &&
 				out_grads.dimension(3) == output_dims.get_dim3() && "wrong neural network output gradient size");
-		for (int i = layers.size() - 1; i >= 0; i--)
+		for (int i = layers.size() - 1; i >= 0; i--) {
+			Layer<Scalar>& layer = *(layers[i]);
 			out_grads = NeuralNetwork<Scalar>::pass_back(*(layers[i]), out_grads);
+			NeuralNetwork<Scalar>::empty_cache(layer);
+		}
 	};
 	std::vector<Layer<Scalar>*> layers;
 	Dimensions input_dims;

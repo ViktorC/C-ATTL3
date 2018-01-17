@@ -57,6 +57,9 @@ public:
 						std::cout << "\t\tAnalytic gradient = " << ana_grad << std::endl;
 						Scalar param = params(j,k);
 						params(j,k) = param + step_size;
+						/* Compute the numerical gradients in training mode to ensure that the means
+						 * and standard deviations used for batch normalization are the same as those
+						 * used during the analytic gradient computation. */
 						Scalar loss_inc = loss.function(net.propagate(x, true), y).mean();
 						params(j,k) = param - step_size;
 						Scalar loss_dec = loss.function(net.propagate(x, true), y).mean();
@@ -72,7 +75,9 @@ public:
 				}
 			}
 		}
-		empty_layer_caches(net);
+		// Empty the layer caches.
+		for (unsigned i = 0; i < net.get_layers().size(); i++)
+			net.get_layers()[i]->empty_cache();
 		return !failure;
 	};
 	void optimize(NeuralNetwork<Scalar>& net, const Tensor4D<Scalar>& x, const Tensor4D<Scalar>& y, unsigned epochs,
@@ -128,11 +133,6 @@ protected:
 			const std::vector<unsigned>& rows, unsigned epoch) = 0;
 	virtual Scalar validate(NeuralNetwork<Scalar>& net, const Tensor4D<Scalar>& x, const Tensor4D<Scalar>& y,
 			const std::vector<unsigned>& rows, unsigned epoch) = 0;
-	void empty_layer_caches(NeuralNetwork<Scalar>& net) const {
-		for (unsigned i = 0; i < net.get_layers().size(); i++) {
-			net.get_layers()[i]->empty_cache();
-		}
-	};
 	void optimize(NeuralNetwork<Scalar>& net, const Tensor4D<Scalar>& training_x, const Tensor4D<Scalar>& training_y,
 			const Tensor4D<Scalar>& test_x, const Tensor4D<Scalar>& test_y, const std::vector<unsigned>& training_rows,
 			const std::vector<unsigned>& test_rows, unsigned epochs, Scalar k, unsigned early_stop ) {
@@ -149,12 +149,10 @@ protected:
 			if (i != 0) {
 				Scalar training_loss = train(test_net, training_x, training_y, training_rows, i);
 				std::cout << "\ttraining loss: " << std::to_string(training_loss) << std::endl;
-				empty_layer_caches(test_net);
 			}
 			// Validate.
 			Scalar valid_loss = validate(test_net, test_x, test_y, test_rows, i);
 			std::cout << "\tvalidation loss: " << std::to_string(valid_loss);
-			empty_layer_caches(test_net);
 			if (valid_loss >= prev_valid_loss) {
 				cons_loss_inc++;
 				std::cout << " *****INCREASED LOSS*****";
