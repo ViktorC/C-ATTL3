@@ -79,6 +79,9 @@ protected:
 	virtual std::vector<Layer<Scalar>*>& get_layers() = 0;
 	virtual Tensor4D<Scalar> propagate(Tensor4D<Scalar> input, bool training) = 0;
 	virtual void backpropagate(Tensor4D<Scalar> out_grads) = 0;
+	static void set_input_layer(Layer<Scalar>& layer) {
+		layer.set_input_layer();
+	};
 	static Tensor4D<Scalar> pass_forward(Layer<Scalar>& layer, Tensor4D<Scalar> prev_out, bool training) {
 		return layer.pass_forward(prev_out, training);
 	};
@@ -104,9 +107,11 @@ public:
 	FFNeuralNetwork(std::vector<Layer<Scalar>*> layers) : // TODO use smart Layer pointers
 			layers(layers) {
 		assert(layers.size() > 0 && "layers must contain at least 1 element");
-		input_dims = layers[0]->get_input_dims();
+		Layer<Scalar>& first_layer = *(layers[0]);
+		NeuralNetwork<Scalar>::set_input_layer(first_layer);
+		input_dims = first_layer.get_input_dims();
 		output_dims = layers[layers.size() - 1]->get_output_dims();
-		Dimensions prev_dims = layers[0]->get_output_dims();
+		Dimensions prev_dims = first_layer.get_output_dims();
 		for (unsigned i = 1; i < layers.size(); i++) {
 			assert(layers[i] != nullptr && "layers contains null pointers");
 			assert(prev_dims.equals(layers[i]->get_input_dims()) && "incompatible layer dimensions");

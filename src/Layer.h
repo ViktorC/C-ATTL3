@@ -13,6 +13,7 @@
 #include <cmath>
 #include <Dimensions.h>
 #include <Eigen/Dense>
+#include <limits>
 #include <Matrix.h>
 #include <Tensor.h>
 #include <unsupported/Eigen/CXX11/Tensor>
@@ -37,12 +38,18 @@ public:
 	virtual Layer<Scalar>* clone() = 0;
 	virtual Dimensions get_input_dims() const = 0;
 	virtual Dimensions get_output_dims() const = 0;
-protected:
 	bool is_parametric() {
 		return get_params().rows() > 0 && get_params().cols() > 0;
 	};
+protected:
 	/* Only expose methods that allow for the modification of the
 	 * layer's state to friends and sub-classes. */
+	void set_input_layer() {
+		input_layer = true;
+	};
+	bool is_input_layer() {
+		return input_layer;
+	};
 	virtual void init() = 0;
 	virtual void empty_cache() = 0;
 	virtual Matrix<Scalar>& get_params() = 0;
@@ -50,6 +57,9 @@ protected:
 	virtual void enforce_constraints() = 0;
 	virtual Tensor4D<Scalar> pass_forward(Tensor4D<Scalar> in, bool training) = 0;
 	virtual Tensor4D<Scalar> pass_back(Tensor4D<Scalar> out_grads) = 0;
+	static constexpr Tensor4D<Scalar> EMPTY_TENSOR = Tensor4D<Scalar>(0, 0, 0, 0);
+private:
+	bool input_layer = false;
 };
 
 template<typename Scalar>
@@ -112,6 +122,8 @@ protected:
 		Matrix<Scalar> out_grads_mat = Utils<Scalar>::tensor4d_to_mat(out_grads);
 		// Compute the gradients of the outputs with respect to the weights.
 		weight_grads = biased_in.transpose() * out_grads_mat;
+		if (is_input_layer())
+			return Layer<Scalar>::EMPTY_TENSOR;
 		/* Remove the bias row from the weight matrix, transpose it, and compute gradients w.r.t. the
 		 * previous layer's output. */
 		return Utils<Scalar>::mat_to_tensor4d((out_grads_mat * weights.topRows(input_dims.get_points()).transpose())
@@ -146,6 +158,9 @@ public:
 		return dims;
 	};
 protected:
+	virtual Matrix<Scalar> activate(const Matrix<Scalar>& in) = 0;
+	virtual Matrix<Scalar> d_activate(const Matrix<Scalar>& in, const Matrix<Scalar>& out,
+			const Matrix<Scalar>& out_grads) = 0;
 	void init() { };
 	void empty_cache() {
 		in = Matrix<Scalar>(0, 0);
@@ -170,12 +185,10 @@ protected:
 		assert(out_grads.dimension(1) == dims.get_dim1() && out_grads.dimension(2) == dims.get_dim2() &&
 				out_grads.dimension(3) == dims.get_dim3());
 		assert(out_grads.dimension(0) > 0 && out.rows() == out_grads.dimension(0));
-		return Utils<Scalar>::mat_to_tensor4d(d_activate(in, out,
-				Utils<Scalar>::tensor4d_to_mat(out_grads)), dims);
+		if (is_input_layer())
+			return Layer<Scalar>::EMPTY_TENSOR;
+		return Utils<Scalar>::mat_to_tensor4d(d_activate(in, out, Utils<Scalar>::tensor4d_to_mat(out_grads)), dims);
 	};
-	virtual Matrix<Scalar> activate(const Matrix<Scalar>& in) = 0;
-	virtual Matrix<Scalar> d_activate(const Matrix<Scalar>& in, const Matrix<Scalar>& out,
-			const Matrix<Scalar>& out_grads) = 0;
 	Dimensions dims;
 	Matrix<Scalar> params;
 	Matrix<Scalar> param_grads;
@@ -525,6 +538,8 @@ protected:
 			Cache& cache = cache_vec[i];
 			param_grads.row(2 * i) = out_grads_ch_i.cwiseProduct(cache.std_in).colwise().sum();
 			param_grads.row(2 * i + 1) = out_grads_ch_i.colwise().sum();
+			if (is_input_layer())
+				continue;
 			Matrix<Scalar> std_in_grads = out_grads_ch_i * params.row(2 * i).asDiagonal();
 			prev_out_grads.slice(offsets, extents) =
 					Utils<Scalar>::mat_to_tensor4d(((((rows * std_in_grads).rowwise() - std_in_grads.colwise().sum()) -
@@ -594,6 +609,7 @@ protected:
 			Matrix<Scalar> in_mat = Utils<Scalar>::tensor4d_to_mat(in);
 			Matrix<Scalar> dropout_mask(in_mat.rows(), in_mat.cols());
 			dropout_mask.setRandom(in_mat.rows(), in_mat.cols());
+			// Inverted dropout.
 			Scalar scaling_factor = 1 / (1 - dropout_prob + epsilon);
 			dropout_mask = ((dropout_mask.array() + 1) / 2).unaryExpr([this,scaling_factor](Scalar i) {
 				return (Scalar) (i <= dropout_prob ? .0 : scaling_factor);
@@ -607,6 +623,8 @@ protected:
 		assert(out_grads.dimension(1) == dims.get_dim1() && out_grads.dimension(2) == dims.get_dim2() &&
 				out_grads.dimension(3) == dims.get_dim3());
 		assert(out_grads.dimension(0) > 0 && dropout_mask.rows() == out_grads.dimension(0));
+		if (is_input_layer())
+			return Layer<Scalar>::EMPTY_TENSOR;
 		// The derivative of the dropout 'function'.
 		return Utils<Scalar>::mat_to_tensor4d(Utils<Scalar>::tensor4d_to_mat(out_grads).cwiseProduct(dropout_mask)
 				.eval(), dims);
@@ -656,9 +674,6 @@ public:
 		return output_dims;
 	};
 protected:
-	static int calculate_output_dim(int input_dim, int receptor_size, int padding, int stride) {
-		return (input_dim - receptor_size + 2 * padding) / stride + 1;
-	};
 	void init() {
 		/* For every filter, there is a column in the weight matrix with the same number of
 		 * elements as the size of the receptive field (F * F * D) + 1 for the bias row. */
@@ -692,6 +707,7 @@ protected:
 		paddings[2] = std::make_pair(padding, padding);
 		paddings[3] = std::make_pair(0, 0);
 		Tensor4D<Scalar> padded_in = in.pad(paddings);
+		// Prepare the base offsets and extents for slicing.
 		int rows = padded_in.dimension(0);
 		int depth = input_dims.get_dim3();
 		int patches = output_dims.get_dim1() * output_dims.get_dim2();
@@ -725,7 +741,7 @@ protected:
 			biased_in.leftCols(receptor_vol) = std::move(in_mat_i);
 			biased_in.col(receptor_vol).setOnes();
 			biased_in_vec[i] = std::move(biased_in);
-			/* Flatten the matrix product into row vector, reshape it into a single 'row' sub tensor, and
+			/* Flatten the matrix product into a row vector, reshape it into a 'single-row' sub-tensor, and
 			 * assign it to the output tensor's corresponding 'row'. */
 			Matrix<Scalar> out_i = biased_in_vec[i] * weights;
 			out.slice(row_offsets, row_extents) = Utils<Scalar>::mat_to_tensor4d(Eigen::Map<Matrix<Scalar>>(out_i.data(),
@@ -759,10 +775,12 @@ protected:
 					output_dims.get_dim2(), filters);
 			// Accumulate the gradients of the outputs w.r.t. the weights for each observation a.k.a 'tensor-row'.
 			weight_grads += biased_in_vec[i].transpose() * out_grads_mat_i;
-			/* Remove the bias row from the weight matrix, transpose it, and compute gradients w.r.t. the
+			if (is_input_layer())
+				continue;
+			/* Remove the bias row from the weight matrix, transpose it, and compute the gradients w.r.t. the
 			 * previous layer's output. */
 			Matrix<Scalar> prev_out_grads_mat_i = out_grads_mat_i * weights.topRows(weights.rows() - 1).transpose();
-			/* Given the gradients w.r.t. the stretched out receptor fields, perform a 'backwards' convolution
+			/* Given the gradients w.r.t. the stretched out receptor patches, perform a 'backwards' convolution
 			 * to get the gradients w.r.t. the individual input nodes. */
 			int patch_ind = 0;
 			patch_offsets[0] = i;
@@ -770,7 +788,7 @@ protected:
 				patch_offsets[1] = j;
 				for (int k = 0; k <= width_rem; k += stride) {
 					patch_offsets[2] = k;
-					// Accumulate the gradients where the patch tensors overlap.
+					// Accumulate the gradients where the receptor patch tensors overlap.
 					prev_out_grads.slice(patch_offsets, patch_extents) +=
 							Utils<Scalar>::mat_to_tensor4d(prev_out_grads_mat_i.row(patch_ind++), patch_dims);
 				}
@@ -781,6 +799,9 @@ protected:
 		Eigen::array<int, 4> no_padding_offsets = { 0, (int) padding, (int) padding, 0 };
 		Eigen::array<int, 4> no_padding_extents = { rows, input_dims.get_dim1(), input_dims.get_dim2(), depth };
 		return prev_out_grads.slice(no_padding_offsets, no_padding_extents);
+	};
+	static int calculate_output_dim(int input_dim, int receptor_size, int padding, int stride) {
+		return (input_dim - receptor_size + 2 * padding) / stride + 1;
 	};
 private:
 	Dimensions input_dims;
@@ -797,6 +818,189 @@ private:
 	Matrix<Scalar> weight_grads;
 	// Staged computation caches
 	std::vector<Matrix<Scalar>> biased_in_vec;
+};
+
+template<typename Scalar>
+class PoolingLayer : public Layer<Scalar> {
+public:
+	PoolingLayer(Dimensions input_dims, unsigned receptor_size, unsigned stride) :
+				input_dims(input_dims),
+				output_dims(calculate_output_dim(input_dims.get_dim1(), receptor_size, stride),
+						calculate_output_dim(input_dims.get_dim2(), receptor_size, stride), input_dims.get_dim3()),
+				receptor_size(receptor_size),
+				stride(stride),
+				params(0, 0),
+				param_grads(0, 0) {
+		assert(input_dims.get_dim1() >= (int) receptor_size && input_dims.get_dim2() >= (int) receptor_size);
+		assert(receptor_size > 0);
+		assert(stride > 0);
+	};
+	virtual ~PoolingLayer() = default;
+	Dimensions get_input_dims() const {
+		return input_dims;
+	};
+	Dimensions get_output_dims() const {
+		return output_dims;
+	};
+protected:
+	virtual void init_cache() = 0;
+	virtual Scalar reduce(const RowVector<Scalar>& patch, unsigned patch_ind) = 0;
+	virtual RowVector<Scalar> d_reduce(Scalar grad, unsigned patch_ind) = 0;
+	void init() { };
+	Matrix<Scalar>& get_params() {
+		return params;
+	};
+	const Matrix<Scalar>& get_param_grads() const {
+		return param_grads;
+	};
+	void enforce_constraints() { };
+	Tensor4D<Scalar> pass_forward(Tensor4D<Scalar> in, bool training) {
+		assert(in.dimension(1) == input_dims.get_dim1() && in.dimension(2) == input_dims.get_dim2() &&
+				in.dimension(3) == input_dims.get_dim3());
+		assert(in.dimension(0) > 0);
+		rows = in.dimension(0);
+		int depth = input_dims.get_dim3();
+		int height_rem = input_dims.get_dim1() - receptor_size;
+		int width_rem = input_dims.get_dim2() - receptor_size;
+		Eigen::array<int, 4> patch_offsets = { 0, 0, 0, 0 };
+		Eigen::array<int, 4> patch_extents = { 1, (int) receptor_size, (int) receptor_size, 1 };
+		Tensor4D<Scalar> out(rows, output_dims.get_dim1(), output_dims.get_dim2(), depth);
+		init_cache();
+		int patch_ind = 0;
+		for (int i = 0; i < rows; i++) {
+			patch_offsets[0] = i;
+			int out_j = 0;
+			for (int j = 0; j <= height_rem; j += stride, out_j++) {
+				patch_offsets[1] = j;
+				int out_k = 0;
+				for (int k = 0; k <= width_rem; k += stride, out_k++) {
+					patch_offsets[2] = k;
+					for (int l = 0; l < depth; l++) {
+						patch_offsets[3] = l;
+						// Reduce the patches to scalars.
+						Tensor4D<Scalar> patch = in.slice(patch_offsets, patch_extents);
+						out(i,out_j,out_k,l) = reduce(Utils<Scalar>::tensor4d_to_mat(patch), patch_ind++);
+					}
+				}
+			}
+		}
+		return out;
+	};
+	Tensor4D<Scalar> pass_back(Tensor4D<Scalar> out_grads) {
+		assert(out_grads.dimension(1) == output_dims.get_dim1() && out_grads.dimension(2) == output_dims.get_dim2() &&
+				out_grads.dimension(3) == output_dims.get_dim3());
+		assert(out_grads.dimension(0) > 0 && rows == out_grads.dimension(0));
+		if (is_input_layer())
+			return Layer<Scalar>::EMPTY_TENSOR;
+		int rows = out_grads.dimension(0);
+		int depth = input_dims.get_dim3();
+		int height_rem = input_dims.get_dim1() - receptor_size;
+		int width_rem = input_dims.get_dim2() - receptor_size;
+		Dimensions patch_dims((int) receptor_size, (int) receptor_size, 1);
+		Eigen::array<int, 4> patch_offsets = { 0, 0, 0, 0 };
+		Eigen::array<int, 4> patch_extents = { 1, patch_dims.get_dim1(), patch_dims.get_dim2(), patch_dims.get_dim3() };
+		Tensor4D<Scalar> prev_out_grads(rows, input_dims.get_dim1(), input_dims.get_dim2(), depth);
+		prev_out_grads.setZero();
+		int patch_ind = 0;
+		for (int i = 0; i < rows; i++) {
+			patch_offsets[0] = i;
+			int out_grads_j = 0;
+			for (int j = 0; j <= height_rem; j += stride, out_grads_j++) {
+				patch_offsets[1] = j;
+				int out_grads_k = 0;
+				for (int k = 0; k <= width_rem; k += stride, out_grads_k++) {
+					patch_offsets[2] = k;
+					for (int l = 0; l < depth; l++) {
+						patch_offsets[3] = l;
+						/* Expand the scalars back into patches and accumulate the gradients where the patches
+						 * overlap. */
+						prev_out_grads.slice(patch_offsets, patch_extents) +=
+								Utils<Scalar>::mat_to_tensor4d(d_reduce(out_grads(i,out_grads_j,out_grads_k,l),
+										patch_ind++), patch_dims);
+					}
+				}
+			}
+		}
+		return prev_out_grads;
+	};
+	static int calculate_output_dim(int input_dim, int receptor_size, int stride) {
+		return (input_dim - receptor_size) / stride + 1;
+	};
+	Dimensions input_dims;
+	Dimensions output_dims;
+	unsigned receptor_size;
+	unsigned stride;
+	// No actual parameters.
+	Matrix<Scalar> params;
+	Matrix<Scalar> param_grads;
+	// Keep track of the input rows.
+	int rows;
+};
+
+template<typename Scalar>
+class MeanPoolingLayer : public PoolingLayer<Scalar> {
+public:
+	MeanPoolingLayer(Dimensions input_dims, unsigned receptor_size = 2, unsigned stride = 2) :
+			PoolingLayer<Scalar>::PoolingLayer(input_dims, receptor_size, stride),
+			receptor_area(PoolingLayer<Scalar>::receptor_size * PoolingLayer<Scalar>::receptor_size) { };
+	Layer<Scalar>* clone() {
+		return new MeanPoolingLayer(*this);
+	};
+protected:
+	void init_cache() { };
+	Scalar reduce(const RowVector<Scalar>& patch, unsigned patch_ind) {
+		return patch.mean();
+	};
+	RowVector<Scalar> d_reduce(Scalar grad, unsigned patch_ind) {
+		RowVector<Scalar> d_patch(receptor_area);
+		d_patch.setConstant(grad / (Scalar) receptor_area);
+		return d_patch;
+	};
+	void empty_cache() { };
+private:
+	int receptor_area;
+};
+
+template<typename Scalar>
+class MaxPoolingLayer : public PoolingLayer<Scalar> {
+public:
+	MaxPoolingLayer(Dimensions input_dims, unsigned receptor_size = 2, unsigned stride = 2) :
+			PoolingLayer<Scalar>::PoolingLayer(input_dims, receptor_size, stride),
+			receptor_area(PoolingLayer<Scalar>::receptor_size * PoolingLayer<Scalar>::receptor_size) { };
+	Layer<Scalar>* clone() {
+		return new MaxPoolingLayer(*this);
+	};
+protected:
+	void init_cache() {
+		max_inds = std::vector<unsigned>(PoolingLayer<Scalar>::rows *
+				PoolingLayer<Scalar>::output_dims.get_points());
+	};
+	Scalar reduce(const RowVector<Scalar>& patch, unsigned patch_ind) {
+		int max_ind = 0;
+		Scalar max = Utils<Scalar>::MIN;
+		for (int i = 0; i < patch.cols(); i++) {
+			Scalar val_i = patch(i);
+			if (val_i > max) {
+				max = val_i;
+				max_ind = i;
+			}
+		}
+		max_inds[patch_ind] = max_ind;
+		return max;
+	};
+	RowVector<Scalar> d_reduce(Scalar grad, unsigned patch_ind) {
+		RowVector<Scalar> d_patch(receptor_area);
+		d_patch.setZero();
+		d_patch(max_inds[patch_ind]) = grad;
+		return d_patch;
+	};
+	void empty_cache() {
+		max_inds = std::vector<unsigned>(0);
+	};
+private:
+	int receptor_area;
+	// Cache
+	std::vector<unsigned> max_inds;
 };
 
 } /* namespace cppnn */

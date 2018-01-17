@@ -23,6 +23,8 @@ class Utils {
 private:
 	Utils() { };
 public:
+	static constexpr Scalar MIN = std::numeric_limits<Scalar>::lowest();
+	static constexpr Scalar MAX = std::numeric_limits<Scalar>::max();
 	static constexpr Scalar EPSILON1 = std::numeric_limits<Scalar>::epsilon();
 	static constexpr Scalar EPSILON2 = 1e-8;
 	static constexpr Scalar EPSILON3 = 1e-4;

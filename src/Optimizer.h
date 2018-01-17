@@ -10,7 +10,6 @@
 
 #include <algorithm>
 #include <cassert>
-#include <limits>
 #include <Loss.h>
 #include <Matrix.h>
 #include <NeuralNetwork.h>
@@ -141,7 +140,7 @@ protected:
 		assert(k > 0 && k < 1);
 		// Fit the optimizer parameters to the network.
 		fit(net);
-		Scalar prev_valid_loss = std::numeric_limits<Scalar>::max();
+		Scalar prev_valid_loss = Utils<Scalar>::MAX;
 		unsigned cons_loss_inc = 0;
 		NeuralNetwork<Scalar>& test_net(net);
 		for (unsigned i = 0; i <= epochs; i++) {
