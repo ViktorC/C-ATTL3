@@ -13,10 +13,8 @@
 #include <cmath>
 #include <Dimensions.h>
 #include <Eigen/Dense>
-#include <limits>
 #include <Matrix.h>
 #include <Tensor.h>
-#include <unsupported/Eigen/CXX11/Tensor>
 #include <Utils.h>
 #include <utility>
 #include <Vector.h>
@@ -34,7 +32,7 @@ class Layer {
 	friend class Optimizer<Scalar>;
 public:
 	Layer() :
-		empty_tensor(0, 0, 0, 0) { };
+		null_tensor(0, 0, 0, 0) { };
 	virtual ~Layer() = default;
 	// Clone pattern.
 	virtual Layer<Scalar>* clone() = 0;
@@ -59,15 +57,15 @@ protected:
 	virtual void enforce_constraints() = 0;
 	virtual Tensor4D<Scalar> pass_forward(Tensor4D<Scalar> in, bool training) = 0;
 	virtual Tensor4D<Scalar> pass_back(Tensor4D<Scalar> out_grads) = 0;
-	const Tensor4D<Scalar> empty_tensor;
+	const Tensor4D<Scalar> null_tensor;
 private:
 	bool input_layer = false;
 };
 
 template<typename Scalar>
-class DenseLayer : public Layer<Scalar> {
+class FCLayer : public Layer<Scalar> {
 public:
-	DenseLayer(Dimensions input_dims, unsigned output_size, const WeightInitialization<Scalar>& weight_init,
+	FCLayer(Dimensions input_dims, unsigned output_size, const WeightInitialization<Scalar>& weight_init,
 			Scalar max_norm_constraint = 0) :
 				input_dims(input_dims),
 				output_dims(output_size, 1, 1),
@@ -77,7 +75,7 @@ public:
 				weights(input_dims.get_points() + 1, output_size),
 				weight_grads(input_dims.get_points() + 1, output_size) { };
 	Layer<Scalar>* clone() {
-		return new DenseLayer(*this);
+		return new FCLayer(*this);
 	};
 	Dimensions get_input_dims() const {
 		return input_dims;
@@ -125,7 +123,7 @@ protected:
 		// Compute the gradients of the outputs with respect to the weights.
 		weight_grads = biased_in.transpose() * out_grads_mat;
 		if (Layer<Scalar>::is_input_layer())
-			return Layer<Scalar>::empty_tensor;
+			return Layer<Scalar>::null_tensor;
 		/* Remove the bias row from the weight matrix, transpose it, and compute gradients w.r.t. the
 		 * previous layer's output. */
 		return Utils<Scalar>::mat_to_tensor4d((out_grads_mat * weights.topRows(input_dims.get_points()).transpose())
@@ -188,7 +186,7 @@ protected:
 				out_grads.dimension(3) == dims.get_dim3());
 		assert(out_grads.dimension(0) > 0 && out.rows() == out_grads.dimension(0));
 		if (Layer<Scalar>::is_input_layer())
-			return Layer<Scalar>::empty_tensor;
+			return Layer<Scalar>::null_tensor;
 		return Utils<Scalar>::mat_to_tensor4d(d_activate(in, out, Utils<Scalar>::tensor4d_to_mat(out_grads)), dims);
 	};
 	Dimensions dims;
@@ -626,7 +624,7 @@ protected:
 				out_grads.dimension(3) == dims.get_dim3());
 		assert(out_grads.dimension(0) > 0 && dropout_mask.rows() == out_grads.dimension(0));
 		if (Layer<Scalar>::is_input_layer())
-			return Layer<Scalar>::empty_tensor;
+			return Layer<Scalar>::null_tensor;
 		// The derivative of the dropout 'function'.
 		return Utils<Scalar>::mat_to_tensor4d(Utils<Scalar>::tensor4d_to_mat(out_grads).cwiseProduct(dropout_mask)
 				.eval(), dims);
@@ -737,7 +735,7 @@ protected:
 				patch_offsets[1] = j;
 				for (int k = 0; k <= width_rem; k += stride) {
 					patch_offsets[2] = k;
-					// If the patch is dilated, stride over the internal padding when stretching it into a row.
+					// If the patch is dilated, skip the internal padding when stretching it into a row.
 					Tensor4D<Scalar> patch = padded_in.slice(patch_offsets, patch_extents).stride(strides);
 					in_mat_i.row(patch_ind++) = Utils<Scalar>::tensor4d_to_mat(patch);
 				}
@@ -797,7 +795,7 @@ protected:
 				patch_offsets[1] = j;
 				for (int k = 0; k <= width_rem; k += stride) {
 					patch_offsets[2] = k;
-					// Accumulate the gradients where the receptor patch tensors overlap.
+					// Accumulate the gradients where the receptor-patch-tensors overlap.
 					prev_out_grads.slice(patch_offsets, patch_extents).stride(strides) +=
 							Utils<Scalar>::mat_to_tensor4d(prev_out_grads_mat_i.row(patch_ind++), comp_patch_dims);
 				}
@@ -839,6 +837,7 @@ public:
 						calculate_output_dim(input_dims.get_dim2(), receptor_size, stride), input_dims.get_dim3()),
 				receptor_size(receptor_size),
 				stride(stride),
+				receptor_area(receptor_size * receptor_size),
 				params(0, 0),
 				param_grads(0, 0) {
 		assert(input_dims.get_dim1() >= (int) receptor_size && input_dims.get_dim2() >= (int) receptor_size);
@@ -901,7 +900,7 @@ protected:
 				out_grads.dimension(3) == output_dims.get_dim3());
 		assert(out_grads.dimension(0) > 0 && rows == out_grads.dimension(0));
 		if (Layer<Scalar>::is_input_layer())
-			return Layer<Scalar>::empty_tensor;
+			return Layer<Scalar>::null_tensor;
 		int rows = out_grads.dimension(0);
 		int depth = input_dims.get_dim3();
 		int height_rem = input_dims.get_dim1() - receptor_size;
@@ -940,6 +939,7 @@ protected:
 	Dimensions output_dims;
 	unsigned receptor_size;
 	unsigned stride;
+	int receptor_area;
 	// No actual parameters.
 	Matrix<Scalar> params;
 	Matrix<Scalar> param_grads;
@@ -948,11 +948,29 @@ protected:
 };
 
 template<typename Scalar>
+class SumPoolingLayer : public PoolingLayer<Scalar> {
+public:
+	SumPoolingLayer(Dimensions input_dims, unsigned receptor_size = 2, unsigned stride = 2) :
+			PoolingLayer<Scalar>::PoolingLayer(input_dims, receptor_size, stride) { };
+	Layer<Scalar>* clone() {
+		return new SumPoolingLayer(*this);
+	};
+protected:
+	void init_cache() { };
+	Scalar reduce(const RowVector<Scalar>& patch, unsigned patch_ind) {
+		return patch.sum();
+	};
+	RowVector<Scalar> d_reduce(Scalar grad, unsigned patch_ind) {
+		return RowVector<Scalar>::Constant(PoolingLayer<Scalar>::receptor_area, grad);
+	};
+	void empty_cache() { };
+};
+
+template<typename Scalar>
 class MeanPoolingLayer : public PoolingLayer<Scalar> {
 public:
 	MeanPoolingLayer(Dimensions input_dims, unsigned receptor_size = 2, unsigned stride = 2) :
-			PoolingLayer<Scalar>::PoolingLayer(input_dims, receptor_size, stride),
-			receptor_area(PoolingLayer<Scalar>::receptor_size * PoolingLayer<Scalar>::receptor_size) { };
+			PoolingLayer<Scalar>::PoolingLayer(input_dims, receptor_size, stride) { };
 	Layer<Scalar>* clone() {
 		return new MeanPoolingLayer(*this);
 	};
@@ -962,21 +980,17 @@ protected:
 		return patch.mean();
 	};
 	RowVector<Scalar> d_reduce(Scalar grad, unsigned patch_ind) {
-		RowVector<Scalar> d_patch(receptor_area);
-		d_patch.setConstant(grad / (Scalar) receptor_area);
-		return d_patch;
+		return RowVector<Scalar>::Constant(PoolingLayer<Scalar>::receptor_area,
+				grad / (Scalar) PoolingLayer<Scalar>::receptor_area);
 	};
 	void empty_cache() { };
-private:
-	int receptor_area;
 };
 
 template<typename Scalar>
 class MaxPoolingLayer : public PoolingLayer<Scalar> {
 public:
 	MaxPoolingLayer(Dimensions input_dims, unsigned receptor_size = 2, unsigned stride = 2) :
-			PoolingLayer<Scalar>::PoolingLayer(input_dims, receptor_size, stride),
-			receptor_area(PoolingLayer<Scalar>::receptor_size * PoolingLayer<Scalar>::receptor_size) { };
+			PoolingLayer<Scalar>::PoolingLayer(input_dims, receptor_size, stride) { };
 	Layer<Scalar>* clone() {
 		return new MaxPoolingLayer(*this);
 	};
@@ -999,8 +1013,7 @@ protected:
 		return max;
 	};
 	RowVector<Scalar> d_reduce(Scalar grad, unsigned patch_ind) {
-		RowVector<Scalar> d_patch(receptor_area);
-		d_patch.setZero();
+		RowVector<Scalar> d_patch = RowVector<Scalar>::Zero(PoolingLayer<Scalar>::receptor_area);
 		d_patch(max_inds[patch_ind]) = grad;
 		return d_patch;
 	};
@@ -1008,7 +1021,6 @@ protected:
 		max_inds = std::vector<unsigned>(0);
 	};
 private:
-	int receptor_area;
 	// Cache
 	std::vector<unsigned> max_inds;
 };

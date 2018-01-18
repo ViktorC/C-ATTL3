@@ -142,26 +142,23 @@ protected:
 		fit(net);
 		Scalar prev_valid_loss = Utils<Scalar>::MAX;
 		unsigned cons_loss_inc = 0;
-		NeuralNetwork<Scalar>& test_net(net);
 		for (unsigned i = 0; i <= epochs; i++) {
 			std::cout << "Epoch " << std::setw(3) << i << "----------------------------" << std::endl;
 			// Train.
 			if (i != 0) {
-				Scalar training_loss = train(test_net, training_x, training_y, training_rows, i);
+				Scalar training_loss = train(net, training_x, training_y, training_rows, i);
 				std::cout << "\ttraining loss: " << std::to_string(training_loss) << std::endl;
 			}
 			// Validate.
-			Scalar valid_loss = validate(test_net, test_x, test_y, test_rows, i);
+			Scalar valid_loss = validate(net, test_x, test_y, test_rows, i);
 			std::cout << "\tvalidation loss: " << std::to_string(valid_loss);
 			if (valid_loss >= prev_valid_loss) {
 				cons_loss_inc++;
 				std::cout << " *****INCREASED LOSS*****";
 				if (early_stop > 0 && cons_loss_inc >= early_stop)
 					break;
-			} else {
+			} else
 				cons_loss_inc = 0;
-				net = test_net;
-			}
 			std::cout << std::endl << std::endl;
 			prev_valid_loss = valid_loss;
 		}

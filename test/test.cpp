@@ -40,12 +40,12 @@ int main() {
 	layers[3] = new cppnn::ConvLayer<Scalar>(layers[2]->get_output_dims(), init, 5, 5, 3, 3);
 	layers[4] = new cppnn::LeakyReLUActivationLayer<Scalar>(layers[3]->get_output_dims());
 	layers[5] = new cppnn::MaxPoolingLayer<Scalar>(layers[4]->get_output_dims());
-	layers[6] = new cppnn::DenseLayer<Scalar>(layers[5]->get_output_dims(), 1, init);
-	cppnn::FFNeuralNetwork<Scalar> nn(layers);
+	layers[6] = new cppnn::FCLayer<Scalar>(layers[5]->get_output_dims(), 1, init);
+	cppnn::SequentialNeuralNetwork<Scalar> nn(layers);
 	nn.init();
 	cppnn::QuadraticLoss<Scalar> loss;
 	cppnn::ElasticNetRegularizationPenalty<Scalar> reg(5e-5, 1e-4);
-	cppnn::NadamOptimizer<Scalar> opt(loss, reg, 32);
+	cppnn::NadamOptimizer<Scalar> opt(loss, reg, 20);
 	std::cout << nn.to_string() << std::endl << std::endl;
 //	std::cout << opt.verify_gradients(nn, data, obj) << std::endl;
 	opt.optimize(nn, data, obj, 500);
