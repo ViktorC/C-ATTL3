@@ -9,7 +9,6 @@
 #define LAYER_H_
 
 #include <algorithm>
-#include <Array.h>
 #include <cassert>
 #include <cmath>
 #include <Dimensions.h>
@@ -41,9 +40,6 @@ public:
 protected:
 	/* Only expose methods that allow for the modification of the
 	 * layer's state to friends and sub-classes. */
-	void set_input_layer(bool on) {
-		input_layer = on;
-	};
 	bool is_input_layer() {
 		return input_layer;
 	};

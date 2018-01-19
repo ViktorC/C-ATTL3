@@ -40,8 +40,9 @@ public:
 		assert(abs_epsilon >= 0 && rel_epsilon > 0);
 		net.backpropagate(loss.d_function(net.propagate(x, true), y) / (Scalar) rows);
 		bool failure = false;
-		for (unsigned i = 0; i < net.get_layers().size(); i++) {
-			Layer<Scalar>& layer = *(net.get_layers()[i]);
+		std::vector<Layer<Scalar>*> layers = net.get_layers();
+		for (unsigned i = 0; i < layers.size(); i++) {
+			Layer<Scalar>& layer = *(layers[i]);
 			if (layer.is_parametric()) {
 				std::cout << "Layer " << std::setw(3) << std::to_string(i + 1) <<
 						"----------------------------" << std::endl;
@@ -73,8 +74,8 @@ public:
 			}
 		}
 		// Empty the layer caches.
-		for (unsigned i = 0; i < net.get_layers().size(); i++)
-			net.get_layers()[i]->empty_cache();
+		for (unsigned i = 0; i < layers.size(); i++)
+			layers[i]->empty_cache();
 		return !failure;
 	};
 	void optimize(NeuralNetwork<Scalar>& net, const Tensor4<Scalar>& x, const Tensor4<Scalar>& y, unsigned epochs,
@@ -160,7 +161,7 @@ protected:
 			prev_valid_loss = valid_loss;
 		}
 	};
-	static std::vector<Layer<Scalar>*>& get_layers(NeuralNetwork<Scalar>& net) {
+	static std::vector<Layer<Scalar>*> get_layers(NeuralNetwork<Scalar>& net) {
 		return net.get_layers();
 	};
 	static Tensor4<Scalar> propagate(NeuralNetwork<Scalar>& net, const Tensor4<Scalar>& x) {
