@@ -12,11 +12,30 @@
 #include <Dimensions.h>
 #include <Eigen/Dense>
 #include <limits>
-#include <Matrix.h>
-#include <Tensor.h>
 #include <unsupported/Eigen/CXX11/Tensor>
 
 namespace cppnn {
+
+template<typename Scalar>
+using RowVector = Eigen::Matrix<Scalar,1,Eigen::Dynamic,Eigen::RowMajor,1,Eigen::Dynamic>;
+
+template <typename Scalar>
+using ColVector = Eigen::Matrix<Scalar,Eigen::Dynamic,1,Eigen::ColMajor,Eigen::Dynamic,1>;
+
+template<typename Scalar>
+using Matrix = Eigen::Matrix<Scalar,Eigen::Dynamic,Eigen::Dynamic,Eigen::ColMajor,Eigen::Dynamic,Eigen::Dynamic>;
+
+template<typename Scalar>
+using MatrixMap = Eigen::Map<Matrix<Scalar>>;
+
+template<typename Scalar>
+using Tensor4 = Eigen::Tensor<Scalar,4,Eigen::ColMajor,int>;
+
+template<typename Scalar>
+using Tensor4Map = Eigen::TensorMap<Tensor4<Scalar>>;
+
+template<typename Scalar>
+using Array4 = Eigen::array<Scalar,4>;
 
 template<typename Scalar>
 class Utils {
@@ -52,12 +71,12 @@ public:
 			Scalar rel_epsilon = EPSILON1) {
 		return n1 < n2 || almost_equal(n1, n2, abs_epsilon, rel_epsilon);
 	};
-	static Matrix<Scalar> tensor4d_to_mat(Tensor4D<Scalar> tensor) {
+	static Matrix<Scalar> tensor4d_to_mat(Tensor4<Scalar> tensor) {
 		int rows = tensor.dimension(0);
-		return Eigen::Map<Matrix<Scalar>>(tensor.data(), rows, tensor.size() / rows);
+		return MatrixMap<Scalar>(tensor.data(), rows, tensor.size() / rows);
 	};
-	static Tensor4D<Scalar> mat_to_tensor4d(Matrix<Scalar> mat, Dimensions dims) {
-		return Eigen::TensorMap<Tensor4D<Scalar>>(mat.data(), mat.rows(), dims.get_dim1(),
+	static Tensor4<Scalar> mat_to_tensor4d(Matrix<Scalar> mat, Dimensions dims) {
+		return Tensor4Map<Scalar>(mat.data(), mat.rows(), dims.get_dim1(),
 				dims.get_dim2(), dims.get_dim3());
 	};
 };

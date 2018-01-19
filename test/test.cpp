@@ -7,26 +7,22 @@
 
 #include <cmath>
 #include <Dimensions.h>
-#include <Eigen/Dense>
 #include <iostream>
 #include <Layer.h>
 #include <Loss.h>
-#include <Matrix.h>
 #include <NeuralNetwork.h>
 #include <Optimizer.h>
 #include <Preprocessor.h>
 #include <RegularizationPenalty.h>
-#include <Tensor.h>
 #include <vector>
-#include <Vector.h>
 #include <WeightInitialization.h>
 
 typedef double Scalar;
 
 int main() {
 	std::cout << "Number of threads: " << Eigen::nbThreads() << std::endl;
-	cppnn::Tensor4D<Scalar> data(100, 32, 32, 3);
-	cppnn::Tensor4D<Scalar> obj(100, 1, 1, 1);
+	cppnn::Tensor4<Scalar> data(100, 32, 32, 3);
+	cppnn::Tensor4<Scalar> obj(100, 1, 1, 1);
 	data = data.setRandom();
 	obj = obj.setRandom();
 //	cppnn::NormalizationPreprocessor<Scalar> preproc(true);

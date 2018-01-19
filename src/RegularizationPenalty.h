@@ -8,7 +8,6 @@
 #ifndef REGULARIZATIONPENALTY_H_
 #define REGULARIZATIONPENALTY_H_
 
-#include <Matrix.h>
 #include <Utils.h>
 
 namespace cppnn {

@@ -12,12 +12,9 @@
 #include <cassert>
 #include <cmath>
 #include <Eigen/Dense>
-#include <Matrix.h>
 #include <string>
-#include <Tensor.h>
 #include <Utils.h>
 #include <vector>
-#include <Vector.h>
 
 namespace cppnn {
 
@@ -25,8 +22,8 @@ template<typename Scalar>
 class Preprocessor {
 public:
 	virtual ~Preprocessor() = default;
-	virtual void fit(const Tensor4D<Scalar>& data) = 0;
-	virtual void transform(Tensor4D<Scalar>& data) const = 0;
+	virtual void fit(const Tensor4<Scalar>& data) = 0;
+	virtual void transform(Tensor4<Scalar>& data) const = 0;
 };
 
 template<typename Scalar>
@@ -39,34 +36,34 @@ public:
 		assert(epsilon > 0 && "epsilon must be greater than 0");
 	};
 	virtual ~NormalizationPreprocessor() = default;
-	virtual void fit(const Tensor4D<Scalar>& data) {
+	virtual void fit(const Tensor4<Scalar>& data) {
 		int rows = data.dimension(0);
 		assert(rows > 0);
 		dims = Dimensions(data.dimension(1), data.dimension(2), data.dimension(3));
-		Eigen::array<int, 4> offsets = { 0, 0, 0, 0 };
-		Eigen::array<int, 4> extents = { rows, dims.get_dim1(), dims.get_dim2(), 1 };
+		Array4<int> offsets = { 0, 0, 0, 0 };
+		Array4<int> extents = { rows, dims.get_dim1(), dims.get_dim2(), 1 };
 		means = Matrix<Scalar>(dims.get_dim3(), dims.get_dim1() * dims.get_dim2());
 		sd = Matrix<Scalar>(means.rows(), means.cols());
 		for (int i = 0; i < dims.get_dim3(); i++) {
 			offsets[3] = i;
-			Tensor4D<Scalar> data_slice_i = data.slice(offsets, extents);
+			Tensor4<Scalar> data_slice_i = data.slice(offsets, extents);
 			Matrix<Scalar> data_mat = Utils<Scalar>::tensor4d_to_mat(data_slice_i);
 			means.row(i) = data_mat.colwise().mean();
 			if (standardize)
 				sd.row(i) = (data_mat.rowwise() - means.row(i)).array().square().colwise().mean().sqrt();
 		}
 	};
-	virtual void transform(Tensor4D<Scalar>& data) const {
+	virtual void transform(Tensor4<Scalar>& data) const {
 		int rows = data.dimension(0);
 		assert(rows > 0);
 		assert(dims.get_dim1() == data.dimension(1) && dims.get_dim2() == data.dimension(2) &&
 				dims.get_dim3() == data.dimension(3) && "mismatched fit and transform input tensor dimensions");
 		Dimensions slice_dims(dims.get_dim1(), dims.get_dim2(), 1);
-		Eigen::array<int, 4> offsets = { 0, 0, 0, 0 };
-		Eigen::array<int, 4> extents = { rows, slice_dims.get_dim1(), slice_dims.get_dim2(), slice_dims.get_dim3() };
+		Array4<int> offsets = { 0, 0, 0, 0 };
+		Array4<int> extents = { rows, slice_dims.get_dim1(), slice_dims.get_dim2(), slice_dims.get_dim3() };
 		for (int i = 0; i < dims.get_dim3(); i++) {
 			offsets[3] = i;
-			Tensor4D<Scalar> data_slice_i = data.slice(offsets, extents);
+			Tensor4<Scalar> data_slice_i = data.slice(offsets, extents);
 			Matrix<Scalar> data_ch_i = Utils<Scalar>::tensor4d_to_mat(data_slice_i);
 			data_ch_i = data_ch_i.rowwise() - means.row(i);
 			if (standardize)
@@ -94,9 +91,9 @@ public:
 				"the minimum relative variance to be retained must be greater "
 				"then 0 and less than or equal to 1");
 	};
-	void fit(const Tensor4D<Scalar>& data) {
+	void fit(const Tensor4<Scalar>& data) {
 		NormalizationPreprocessor<Scalar>::fit(data);
-		Tensor4D<Scalar> norm_data = data;
+		Tensor4<Scalar> norm_data = data;
 		NormalizationPreprocessor<Scalar>::transform(norm_data);
 		Matrix<Scalar> norm_data_mat = Utils<Scalar>::tensor4d_to_mat(norm_data);
 		// Compute the covariance matrix.
@@ -119,7 +116,7 @@ public:
 		if (whiten) // The eigen values are only needed if whitening is enabled.
 			this->eigen_values = eigen_values.bottomRows(dims_to_retain).transpose();
 	};
-	void transform(Tensor4D<Scalar>& data) const {
+	void transform(Tensor4<Scalar>& data) const {
 		NormalizationPreprocessor<Scalar>::transform(data);
 		Matrix<Scalar> data_mat = Utils<Scalar>::tensor4d_to_mat(data);
 		data_mat *= eigen_basis;

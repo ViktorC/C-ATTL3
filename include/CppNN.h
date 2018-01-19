@@ -12,14 +12,11 @@
 #include <../src/Dimensions.h>
 #include <../src/Layer.h>
 #include <../src/Loss.h>
-#include <../src/Matrix.h>
 #include <../src/NeuralNetwork.h>
 #include <../src/Optimizer.h>
 #include <../src/Preprocessor.h>
 #include <../src/RegularizationPenalty.h>
-#include <../src/Tensor.h>
 #include <../src/Utils.h>
-#include <../src/Vector.h>
 #include <../src/WeightInitialization.h>
 
 #endif /* INCLUDE_CPPNN_H_ */

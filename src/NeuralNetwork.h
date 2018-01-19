@@ -11,14 +11,12 @@
 #include <Layer.h>
 #include <cassert>
 #include <Dimensions.h>
+#include <Eigen/Core>
 #include <iomanip>
-#include <Matrix.h>
 #include <pthread.h>
 #include <sstream>
 #include <string>
-#include <Tensor.h>
 #include <vector>
-#include <Vector.h>
 #include <WeightInitialization.h>
 
 namespace cppnn {
@@ -47,7 +45,7 @@ public:
 		for (unsigned i = 0; i < layers.size(); i++)
 			layers[i]->init();
 	};
-	virtual Tensor4D<Scalar> infer(Tensor4D<Scalar> input) {
+	virtual Tensor4<Scalar> infer(Tensor4<Scalar> input) {
 		return propagate(input, false);
 	};
 	virtual std::string to_string() {
@@ -78,37 +76,24 @@ public:
 	};
 protected:
 	virtual std::vector<Layer<Scalar>*>& get_layers() = 0;
-	virtual Tensor4D<Scalar> propagate(Tensor4D<Scalar> input, bool training) = 0;
-	virtual void backpropagate(Tensor4D<Scalar> out_grads) = 0;
-	static void set_input_layer(Layer<Scalar>& layer) {
-		layer.set_input_layer();
+	virtual Tensor4<Scalar> propagate(Tensor4<Scalar> input, bool training) = 0;
+	virtual void backpropagate(Tensor4<Scalar> out_grads) = 0;
+	static void set_input_layer(Layer<Scalar>& layer, bool on) {
+		layer.set_input_layer(on);
 	};
 	static void empty_cache(Layer<Scalar>& layer) {
 		layer.empty_cache();
 	};
-	static Tensor4D<Scalar> pass_forward(Layer<Scalar>& layer, Tensor4D<Scalar> prev_out, bool training) {
+	static Tensor4<Scalar> pass_forward(Layer<Scalar>& layer, Tensor4<Scalar> prev_out, bool training) {
 		return layer.pass_forward(prev_out, training);
 	};
-	static Tensor4D<Scalar> pass_back(Layer<Scalar>& layer, Tensor4D<Scalar> out_grads) {
+	static Tensor4<Scalar> pass_back(Layer<Scalar>& layer, Tensor4<Scalar> out_grads) {
 		return layer.pass_back(out_grads);
 	};
-	static void check_popagation_input(const Tensor4D<Scalar>& input, Dimensions expected_dims) {
+	static void assert_popagation_input(const Tensor4<Scalar>& input, Dimensions expected_dims) {
 		assert(input.dimension(0));
 		assert(input.dimension(1) == expected_dims.get_dim1() && input.dimension(2) == expected_dims.get_dim2() &&
 				input.dimension(3) == expected_dims.get_dim3());
-	};
-	static void check_layer_dims(const std::vector<Layer<Scalar>*>& layers, Dimensions& input_dims,
-			Dimensions& output_dims) {
-		assert(layers.size() > 0 && "layers must contain at least 1 element");
-		Layer<Scalar>& first_layer = *(layers[0]);
-		input_dims = first_layer.get_input_dims();
-		output_dims = layers[layers.size() - 1]->get_output_dims();
-		Dimensions prev_dims = first_layer.get_output_dims();
-		for (unsigned i = 1; i < layers.size(); i++) {
-			assert(layers[i] != nullptr && "layers contains null pointers");
-			assert(prev_dims.equals(layers[i]->get_input_dims()) && "incompatible layer dimensions");
-			prev_dims = layers[i]->get_output_dims();
-		}
 	};
 };
 
@@ -128,8 +113,17 @@ public:
 	 */
 	SequentialNeuralNetwork(std::vector<Layer<Scalar>*> layers) : // TODO use smart Layer pointers
 			layers(layers) {
-		NeuralNetwork<Scalar>::validate_layers(layers, input_dims, output_dims);
-		NeuralNetwork<Scalar>::set_input_layer(*(layers[0]));
+		assert(layers.size() > 0 && "layers must contain at least 1 element");
+		Layer<Scalar>& first_layer = *(layers[0]);
+		input_dims = first_layer.get_input_dims();
+		output_dims = layers[layers.size() - 1]->get_output_dims();
+		Dimensions prev_dims = first_layer.get_output_dims();
+		for (unsigned i = 1; i < layers.size(); i++) {
+			assert(layers[i] != nullptr && "layers contains null pointers");
+			assert(prev_dims.equals(layers[i]->get_input_dims()) && "incompatible layer dimensions");
+			prev_dims = layers[i]->get_output_dims();
+		}
+		NeuralNetwork<Scalar>::set_input_layer(first_layer, true);
 	};
 	// Copy constructor.
 	SequentialNeuralNetwork(const SequentialNeuralNetwork<Scalar>& network) :
@@ -174,8 +168,8 @@ protected:
 	std::vector<Layer<Scalar>*>& get_layers() {
 		return layers;
 	};
-	Tensor4D<Scalar> propagate(Tensor4D<Scalar> input, bool training) {
-		NeuralNetwork<Scalar>::check_popagation_input(input, input_dims);
+	Tensor4<Scalar> propagate(Tensor4<Scalar> input, bool training) {
+		NeuralNetwork<Scalar>::assert_popagation_input(input, input_dims);
 		for (unsigned i = 0; i < layers.size(); i++) {
 			Layer<Scalar>& layer = *(layers[i]);
 			input = NeuralNetwork<Scalar>::pass_forward(layer, input, training);
@@ -184,8 +178,8 @@ protected:
 		}
 		return input;
 	};
-	void backpropagate(Tensor4D<Scalar> out_grads) {
-		NeuralNetwork<Scalar>::check_popagation_input(out_grads, output_dims);
+	void backpropagate(Tensor4<Scalar> out_grads) {
+		NeuralNetwork<Scalar>::assert_popagation_input(out_grads, output_dims);
 		for (int i = layers.size() - 1; i >= 0; i--) {
 			Layer<Scalar>& layer = *(layers[i]);
 			out_grads = NeuralNetwork<Scalar>::pass_back(*(layers[i]), out_grads);
@@ -212,62 +206,86 @@ public:
 	};
 	template<typename _Scalar> class InceptionModule;
 	template<typename _Scalar>
-	class Lane {
+	class InceptionLane : private SequentialNeuralNetwork<_Scalar> {
 		friend class InceptionModule<_Scalar>;
 		friend class InceptionNeuralNetwork<_Scalar>;
 	public:
-		Lane(std::vector<Layer<_Scalar>*> layers) :
-				layers(layers) {
-			NeuralNetwork<_Scalar>::validate_layers(layers, input_dims, output_dims);
+		InceptionLane(std::vector<Layer<_Scalar>*> layers) :
+				SequentialNeuralNetwork<_Scalar>::SequentialNeuralNetwork(layers) {
+			NeuralNetwork<Scalar>::set_input_layer(*(SequentialNeuralNetwork<_Scalar>::layers[0]), false);
 		};
-	private:
-		std::vector<Layer<LaneScalar>*> layers;
-		Dimensions input_dims;
-		Dimensions output_dims;
+		InceptionLane(const InceptionLane<_Scalar>& network) :
+				SequentialNeuralNetwork<_Scalar>::SequentialNeuralNetwork(network) { };
+		InceptionLane(InceptionLane<Scalar>&& network) :
+				SequentialNeuralNetwork<_Scalar>::SequentialNeuralNetwork(network) { };
+		InceptionLane<_Scalar>& operator=(InceptionLane<_Scalar> network) {
+			SequentialNeuralNetwork<_Scalar>::swap(*this, network);
+			return *this;
+		};
 	};
 	template<typename __Scalar>
-	class InceptionModule : protected NeuralNetwork<__Scalar> {
+	class InceptionModule {
 		friend class InceptionNeuralNetwork<__Scalar>;
 	public:
-		InceptionModule(std::vector<Lane<__Scalar>> lanes) :
+		InceptionModule(std::vector<InceptionLane<__Scalar>> lanes) :
 				lanes(lanes) {
 			assert(lanes.size() > 0 && "lanes must contain at least 1 element");
-			Lane<__Scalar>& first_lane = lanes[0];
-			input_dims = first_lane.input_dims;
-			output_dims = first_lane.output_dims;
+			InceptionLane<__Scalar>& first_lane = lanes[0];
+			Dimensions input_dims = first_lane.input_dims;
+			int output_height = first_lane.output_dims.get_dim1();
+			int output_width = first_lane.output_dims.get_dim2();
+			int output_depth = first_lane.output_dims.get_dim3();
 			for (unsigned i = 1; i < lanes.size(); i++) {
-				Lane<__Scalar>& lane = lanes[i];
-				assert(input_dims.equals(lane.input_dims) && output_dims.get_dim1() == lane.output_dims.get_dim1() &&
-						output_dims.get_dim2() == lane.output_dims.get_dim2() && "incompatible lane dimensions");
+				InceptionLane<__Scalar>& lane = lanes[i];
+				assert(input_dims.equals(lane.input_dims) && output_height == lane.output_dims.get_dim1() &&
+						output_width == lane.output_dims.get_dim2() && "incompatible lane dimensions");
+				output_depth += lane.output_dims.get_dim3();
 			}
+			this->input_dims = input_dims;
+			output_dims = Dimensions(output_height, output_width, output_depth);
 		};
-	protected:
-		Dimensions get_input_dims() const {
-			return input_dims;
-		};
-		Dimensions get_output_dims() const {
-			return output_dims;
-		};
-		Tensor4D<__Scalar> propagate(Tensor4D<__Scalar> input, bool training) {
-			NeuralNetwork<__Scalar>::check_popagation_input(input, input_dims);
-
-		};
-		void backpropagate(Tensor4D<__Scalar> out_grads) {
-			NeuralNetwork<__Scalar>::check_popagation_input(out_grads, output_dims);
-
-		};
-
 	private:
-		std::vector<Lane<ModuleScalar>> lanes;
+		Tensor4<__Scalar> propagate(Tensor4<__Scalar> input, bool training) {
+			NeuralNetwork<__Scalar>::assert_popagation_input(input, input_dims);
+			int rows = input.dimension(0);
+			Array4<int> offsets({ 0, 0, 0, 0 });
+			Array4<int> extents({ rows, output_dims.get_dim1(), output_dims.get_dim2(), 0});
+			Tensor4<Scalar> out(rows, output_dims.get_dim1(), output_dims.get_dim2(), output_dims.get_dim3());
+			for (unsigned i = 0; i < lanes.size(); i++) {
+				InceptionLane<__Scalar>& lane = lane[i];
+				int depth = lane.output_dims.get_dim3();
+				offsets[3] += depth;
+				extents[3] = depth;
+				out.slice(offsets, extents) = lane.propagate(input, training);
+			}
+			return out;
+		};
+		Tensor4<__Scalar> backpropagate(Tensor4<__Scalar> out_grads) {
+			NeuralNetwork<__Scalar>::assert_popagation_input(out_grads, output_dims);
+			int rows = input.dimension(0);
+			Array4<int> offsets({ 0, 0, 0, 0 });
+			Array4<int> extents({ rows, output_dims.get_dim1(), output_dims.get_dim2(), 0});
+			Tensor4<Scalar> prev_out_grads(rows, input.get_dim1(), input.get_dim2(), input.get_dim3());
+			for (unsigned i = 0; i < lanes.size(); i++) {
+				InceptionLane<__Scalar>& lane = lane[i];
+				int depth = lane.output_dims.get_dim3();
+				offsets[3] += depth;
+				extents[3] = depth;
+				Tensor4<Scalar> out_grads_slice_i = out_grads.slice(offsets, extents);
+			}
+			return out;
+		};
+	private:
+		std::vector<InceptionLane<ModuleScalar>> lanes;
 		Dimensions input_dims;
 		Dimensions output_dims;
 	};
 protected:
-	Matrix<Scalar> propagate(Tensor4D<Scalar> input, bool training) {
+	Matrix<Scalar> propagate(Tensor4<Scalar> input, bool training) {
 		NeuralNetwork<Scalar>::check_popagation_input(input, input_dims);
 		return 0;
 	};
-	void backpropagate(Tensor4D<Scalar> out_grads) {
+	void backpropagate(Tensor4<Scalar> out_grads) {
 		NeuralNetwork<Scalar>::check_popagation_input(out_grads, output_dims);
 		return;
 	};
@@ -281,24 +299,24 @@ template<typename Scalar>
 class ResidualNeuralNetwork : public SequentialNeuralNetwork<Scalar> {
 public:
 	ResidualNeuralNetwork(std::vector<Layer<Scalar>*> layers) :
-			SequentialNeuralNetwork<Scalar>::FFNeuralNetwork(layers) { };
+			SequentialNeuralNetwork<Scalar>::SequentialNeuralNetwork(layers) { };
 	ResidualNeuralNetwork(const ResidualNeuralNetwork<Scalar>& network) :
-			SequentialNeuralNetwork<Scalar>::FFNeuralNetwork(network) { };
+			SequentialNeuralNetwork<Scalar>::SequentialNeuralNetwork(network) { };
 	ResidualNeuralNetwork(ResidualNeuralNetwork<Scalar>&& network) :
-			SequentialNeuralNetwork<Scalar>::FFNeuralNetwork(network) { };
+			SequentialNeuralNetwork<Scalar>::SequentialNeuralNetwork(network) { };
 	ResidualNeuralNetwork<Scalar>& operator=(ResidualNeuralNetwork<Scalar> network) {
 		SequentialNeuralNetwork<Scalar>::swap(*this, network);
 		return *this;
 	};
 protected:
-	Matrix<Scalar> propagate(Tensor4D<Scalar> input, bool training) {
-		NeuralNetwork<Scalar>::check_popagation_input(input, input_dims);
+	Matrix<Scalar> propagate(Tensor4<Scalar> input, bool training) {
+		NeuralNetwork<Scalar>::assert_popagation_input(input, input_dims);
 		for (unsigned i = 0; i < SequentialNeuralNetwork<Scalar>::layers.size(); i++)
 			input = NeuralNetwork<Scalar>::pass_forward(*(SequentialNeuralNetwork<Scalar>::layers[i]), input, training);
 		return input;
 	};
-	void backpropagate(Tensor4D<Scalar> out_grads) {
-		NeuralNetwork<Scalar>::check_popagation_input(out_grads, output_dims);
+	void backpropagate(Tensor4<Scalar> out_grads) {
+		NeuralNetwork<Scalar>::assert_popagation_input(out_grads, output_dims);
 		for (int i = SequentialNeuralNetwork<Scalar>::layers.size() - 1; i >= 0; i--)
 			out_grads = NeuralNetwork<Scalar>::pass_back(*(SequentialNeuralNetwork<Scalar>::layers[i]), out_grads);
 	};
