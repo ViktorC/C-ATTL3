@@ -65,7 +65,7 @@ public:
 			Scalar rel_epsilon = EPSILON1) {
 		return n1 > n2 || almost_equal(n1, n2, abs_epsilon, rel_epsilon);
 	};
-	bool decidedly_lesser(Scalar n1, Scalar n2, Scalar abs_epsilon = EPSILON1,
+	static bool decidedly_lesser(Scalar n1, Scalar n2, Scalar abs_epsilon = EPSILON1,
 			Scalar rel_epsilon = EPSILON1) {
 		return n1 < n2 && !almost_equal(n1, n2, abs_epsilon, rel_epsilon);
 	};

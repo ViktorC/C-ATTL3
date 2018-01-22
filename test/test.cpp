@@ -26,7 +26,7 @@ int main() {
 	cppnn::Tensor4<Scalar> obj(100, 1, 1, 1);
 	data = data.setRandom();
 	obj = obj.setRandom();
-//	cppnn::NormalizationPreprocessor<Scalar> preproc(true);
+//	cppnn::PCAPreprocessor<Scalar> preproc(true, true);
 //	preproc.fit(data);
 //	preproc.transform(data);
 	cppnn::HeWeightInitialization<Scalar> init;
@@ -43,12 +43,11 @@ int main() {
 		new cppnn::ConvLayer<Scalar>(cppnn::Dimensions<int>(16, 16, 5), 3, init),
 	})), true));
 	modules.push_back(std::make_pair(cppnn::SequentialNeuralNetwork<Scalar>(new cppnn::FCLayer<Scalar>(cppnn::Dimensions<int>(16, 16, 3), 1, init)), false));
-	cppnn::ResidualNeuralNetwork<Scalar,false> nn(modules);
+	cppnn::ResidualNeuralNetwork<Scalar> nn(modules);
 	nn.init();
 	cppnn::QuadraticLoss<Scalar> loss;
 	cppnn::ElasticNetRegularizationPenalty<Scalar> reg(5e-5, 1e-4);
 	cppnn::NadamOptimizer<Scalar> opt(loss, reg, 20);
-	std::cout << nn.to_string() << std::endl << std::endl;
 //	std::cout << opt.verify_gradients(nn, data, obj) << std::endl;
 	opt.optimize(nn, data, obj, 500);
 	return 0;
