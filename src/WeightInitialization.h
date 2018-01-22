@@ -12,11 +12,13 @@
 #include <Eigen/Dense>
 #include <random>
 #include <string>
+#include <type_traits>
 
 namespace cppnn {
 
 template<typename Scalar>
 class WeightInitialization {
+	static_assert(std::is_floating_point<Scalar>::value, "non floating-point scalar type");
 public:
 	virtual ~WeightInitialization() = default;
 	virtual void apply(Matrix<Scalar>& weights) const = 0;

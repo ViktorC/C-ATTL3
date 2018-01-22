@@ -12,6 +12,7 @@
 #include <Dimensions.h>
 #include <Eigen/Dense>
 #include <limits>
+#include <type_traits>
 #include <unsupported/Eigen/CXX11/Tensor>
 
 namespace cppnn {
@@ -39,6 +40,7 @@ using Array4 = Eigen::array<Scalar,4>;
 
 template<typename Scalar>
 class Utils {
+	static_assert(std::is_floating_point<Scalar>::value, "non floating-point scalar type");
 private:
 	Utils() { };
 public:
@@ -75,7 +77,7 @@ public:
 		int rows = tensor.dimension(0);
 		return MatrixMap<Scalar>(tensor.data(), rows, tensor.size() / rows);
 	};
-	static Tensor4<Scalar> mat_to_tensor4d(Matrix<Scalar> mat, Dimensions dims) {
+	static Tensor4<Scalar> mat_to_tensor4d(Matrix<Scalar> mat, Dimensions<int> dims) {
 		return Tensor4Map<Scalar>(mat.data(), mat.rows(), dims.get_dim1(),
 				dims.get_dim2(), dims.get_dim3());
 	};

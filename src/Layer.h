@@ -12,6 +12,7 @@
 #include <cassert>
 #include <cmath>
 #include <Dimensions.h>
+#include <type_traits>
 #include <Utils.h>
 #include <utility>
 #include <WeightInitialization.h>
@@ -24,6 +25,7 @@ template<typename Scalar> class Optimizer;
 
 template<typename Scalar>
 class Layer {
+	static_assert(std::is_floating_point<Scalar>::value, "non floating-point scalar type");
 	friend class NeuralNetwork<Scalar>;
 	friend class Optimizer<Scalar>;
 public:
@@ -32,8 +34,8 @@ public:
 	virtual ~Layer() = default;
 	// Clone pattern.
 	virtual Layer<Scalar>* clone() = 0;
-	virtual Dimensions get_input_dims() const = 0;
-	virtual Dimensions get_output_dims() const = 0;
+	virtual Dimensions<int> get_input_dims() const = 0;
+	virtual Dimensions<int> get_output_dims() const = 0;
 	bool is_parametric() {
 		return get_params().rows() > 0 && get_params().cols() > 0;
 	};
@@ -58,7 +60,7 @@ private:
 template<typename Scalar>
 class FCLayer : public Layer<Scalar> {
 public:
-	FCLayer(Dimensions input_dims, unsigned output_size, const WeightInitialization<Scalar>& weight_init,
+	FCLayer(Dimensions<int> input_dims, unsigned output_size, const WeightInitialization<Scalar>& weight_init,
 			Scalar max_norm_constraint = 0) :
 				input_dims(input_dims),
 				output_dims(output_size, 1, 1),
@@ -70,10 +72,10 @@ public:
 	Layer<Scalar>* clone() {
 		return new FCLayer(*this);
 	};
-	Dimensions get_input_dims() const {
+	Dimensions<int> get_input_dims() const {
 		return input_dims;
 	};
-	Dimensions get_output_dims() const {
+	Dimensions<int> get_output_dims() const {
 		return output_dims;
 	};
 protected:
@@ -123,8 +125,8 @@ protected:
 				.eval(), input_dims);
 	};
 private:
-	Dimensions input_dims;
-	Dimensions output_dims;
+	Dimensions<int> input_dims;
+	Dimensions<int> output_dims;
 	const WeightInitialization<Scalar>& weight_init;
 	Scalar max_norm_constraint;
 	bool max_norm;
@@ -139,15 +141,15 @@ private:
 template<typename Scalar>
 class ActivationLayer : public Layer<Scalar> {
 public:
-	ActivationLayer(Dimensions dims) :
+	ActivationLayer(Dimensions<int> dims) :
 			dims(dims),
 			params(0, 0),
 			param_grads(0, 0) { };
 	virtual ~ActivationLayer() = default;
-	Dimensions get_input_dims() const {
+	Dimensions<int> get_input_dims() const {
 		return dims;
 	};
-	Dimensions get_output_dims() const {
+	Dimensions<int> get_output_dims() const {
 		return dims;
 	};
 protected:
@@ -182,7 +184,7 @@ protected:
 			return Layer<Scalar>::null_tensor;
 		return Utils<Scalar>::mat_to_tensor4d(d_activate(in, out, Utils<Scalar>::tensor4d_to_mat(out_grads)), dims);
 	};
-	Dimensions dims;
+	Dimensions<int> dims;
 	Matrix<Scalar> params;
 	Matrix<Scalar> param_grads;
 	// Staged computation caches
@@ -193,7 +195,7 @@ protected:
 template<typename Scalar>
 class IdentityActivationLayer : public ActivationLayer<Scalar> {
 public:
-	IdentityActivationLayer(Dimensions dims) :
+	IdentityActivationLayer(Dimensions<int> dims) :
 			ActivationLayer<Scalar>::ActivationLayer(dims) { };
 	Layer<Scalar>* clone() {
 		return new IdentityActivationLayer(*this);
@@ -211,7 +213,7 @@ protected:
 template<typename Scalar>
 class ScalingActivationLayer : public ActivationLayer<Scalar> {
 public:
-	ScalingActivationLayer(Dimensions dims, Scalar scale) :
+	ScalingActivationLayer(Dimensions<int> dims, Scalar scale) :
 			ActivationLayer<Scalar>::ActivationLayer(dims),
 			scale(scale) { };
 	Layer<Scalar>* clone() {
@@ -232,14 +234,14 @@ private:
 template<typename Scalar>
 class BinaryStepActivationLayer : public ActivationLayer<Scalar> {
 public:
-	BinaryStepActivationLayer(Dimensions dims) :
+	BinaryStepActivationLayer(Dimensions<int> dims) :
 			ActivationLayer<Scalar>::ActivationLayer(dims) { };
 	Layer<Scalar>* clone() {
 		return new BinaryStepActivationLayer(*this);
 	};
 protected:
 	Matrix<Scalar> activate(const Matrix<Scalar>& in) {
-		return in.unaryExpr([](Scalar i) { return i >= .0 ? 1.0 : .0; });
+		return in.unaryExpr([](Scalar i) { return (Scalar) (i >= .0 ? 1.0 : .0); });
 	};
 	Matrix<Scalar> d_activate(const Matrix<Scalar>& in, const Matrix<Scalar>& out,
 			const Matrix<Scalar>& out_grads) {
@@ -250,7 +252,7 @@ protected:
 template<typename Scalar>
 class SigmoidActivationLayer : public ActivationLayer<Scalar> {
 public:
-	SigmoidActivationLayer(Dimensions dims) :
+	SigmoidActivationLayer(Dimensions<int> dims) :
 			ActivationLayer<Scalar>::ActivationLayer(dims) { };
 	Layer<Scalar>* clone() {
 		return new SigmoidActivationLayer(*this);
@@ -268,7 +270,7 @@ protected:
 template<typename Scalar>
 class TanhActivationLayer : public ActivationLayer<Scalar> {
 public:
-	TanhActivationLayer(Dimensions dims) :
+	TanhActivationLayer(Dimensions<int> dims) :
 			ActivationLayer<Scalar>::ActivationLayer(dims) { };
 	Layer<Scalar>* clone() {
 		return new TanhActivationLayer(*this);
@@ -286,7 +288,7 @@ protected:
 template<typename Scalar>
 class SoftmaxActivationLayer : public ActivationLayer<Scalar> {
 public:
-	SoftmaxActivationLayer(Dimensions dims, Scalar epsilon = Utils<Scalar>::EPSILON2) :
+	SoftmaxActivationLayer(Dimensions<int> dims, Scalar epsilon = Utils<Scalar>::EPSILON2) :
 			ActivationLayer<Scalar>::ActivationLayer(dims),
 			epsilon(epsilon) { };
 	Layer<Scalar>* clone() {
@@ -305,7 +307,7 @@ protected:
 		for (int i = 0; i < d_in.rows(); i++) {
 			Matrix<Scalar> jacobian = out.row(i).asDiagonal();
 			jacobian -= out.row(i).transpose() * out.row(i);
-			out.row(i) = out_grads.row(i) * jacobian;
+			d_in.row(i) = out_grads.row(i) * jacobian;
 		}
 		return d_in;
 	};
@@ -316,7 +318,7 @@ private:
 template<typename Scalar>
 class ReLUActivationLayer : public ActivationLayer<Scalar> {
 public:
-	ReLUActivationLayer(Dimensions dims) :
+	ReLUActivationLayer(Dimensions<int> dims) :
 			ActivationLayer<Scalar>::ActivationLayer(dims) { };
 	Layer<Scalar>* clone() {
 		return new ReLUActivationLayer(*this);
@@ -327,7 +329,7 @@ protected:
 	};
 	Matrix<Scalar> d_activate(const Matrix<Scalar>& in, const Matrix<Scalar>& out,
 			const Matrix<Scalar>& out_grads) {
-		return in.unaryExpr([](Scalar i) { return i >= .0 ? 1.0 : .0; })
+		return in.unaryExpr([](Scalar i) { return (Scalar) (i >= .0 ? 1.0 : .0); })
 				.cwiseProduct(out_grads);
 	};
 };
@@ -335,7 +337,7 @@ protected:
 template<typename Scalar>
 class LeakyReLUActivationLayer : public ActivationLayer<Scalar> {
 public:
-	LeakyReLUActivationLayer(Dimensions dims, Scalar alpha = 1e-1) :
+	LeakyReLUActivationLayer(Dimensions<int> dims, Scalar alpha = 1e-1) :
 			ActivationLayer<Scalar>::ActivationLayer(dims),
 			alpha(alpha) { };
 	Layer<Scalar>* clone() {
@@ -347,7 +349,7 @@ protected:
 	};
 	Matrix<Scalar> d_activate(const Matrix<Scalar>& in, const Matrix<Scalar>& out,
 			const Matrix<Scalar>& out_grads) {
-		return in.unaryExpr([this](Scalar i) { return i >= .0 ? 1.0 : alpha; })
+		return in.unaryExpr([this](Scalar i) { return (Scalar) (i >= .0 ? 1.0 : alpha); })
 				.cwiseProduct(out_grads);
 	};
 private:
@@ -357,7 +359,7 @@ private:
 template<typename Scalar>
 class ELUActivationLayer : public ActivationLayer<Scalar> {
 public:
-	ELUActivationLayer(Dimensions dims, Scalar alpha = 1e-1) :
+	ELUActivationLayer(Dimensions<int> dims, Scalar alpha = 1e-1) :
 			ActivationLayer<Scalar>::ActivationLayer(dims),
 			alpha(alpha) { };
 	Layer<Scalar>* clone() {
@@ -365,7 +367,7 @@ public:
 	};
 protected:
 	Matrix<Scalar> activate(const Matrix<Scalar>& in) {
-		return in.unaryExpr([this](Scalar i) { return i > .0 ? i : (alpha * (exp(i) - 1)); });
+		return in.unaryExpr([this](Scalar i) { return (Scalar) (i > .0 ? i : (alpha * (exp(i) - 1))); });
 	};
 	Matrix<Scalar> d_activate(const Matrix<Scalar>& in, const Matrix<Scalar>& out,
 			const Matrix<Scalar>& out_grads) {
@@ -383,7 +385,7 @@ private:
 template<typename Scalar>
 class PReLUActivationLayer : public ActivationLayer<Scalar> {
 public:
-	PReLUActivationLayer(Dimensions dims, Scalar init_alpha = 1e-1) :
+	PReLUActivationLayer(Dimensions<int> dims, Scalar init_alpha = 1e-1) :
 			ActivationLayer<Scalar>::ActivationLayer(dims),
 			init_alpha(init_alpha) {
 		ActivationLayer<Scalar>::params.resize(1, dims.get_points());
@@ -425,7 +427,7 @@ private:
 template<typename Scalar>
 class BatchNormLayer : public Layer<Scalar> {
 public:
-	BatchNormLayer(Dimensions dims, Scalar norm_avg_decay = .1, Scalar epsilon = Utils<Scalar>::EPSILON3) :
+	BatchNormLayer(Dimensions<int> dims, Scalar norm_avg_decay = .1, Scalar epsilon = Utils<Scalar>::EPSILON3) :
 			dims(dims),
 			norm_avg_decay(norm_avg_decay),
 			epsilon(epsilon),
@@ -442,10 +444,10 @@ public:
 	Layer<Scalar>* clone() {
 		return new BatchNormLayer(*this);
 	};
-	Dimensions get_input_dims() const {
+	Dimensions<int> get_input_dims() const {
 		return dims;
 	};
-	Dimensions get_output_dims() const {
+	Dimensions<int> get_output_dims() const {
 		return dims;
 	};
 protected:
@@ -481,7 +483,7 @@ protected:
 		assert(in.dimension(0) > 0);
 		int rows = in.dimension(0);
 		Tensor4<Scalar> out(rows, dims.get_dim1(), dims.get_dim2(), dims.get_dim3());
-		Dimensions slice_dims(dims.get_dim1(), dims.get_dim2(), 1);
+		Dimensions<int> slice_dims(dims.get_dim1(), dims.get_dim2(), 1);
 		Array4<int> offsets({ 0, 0, 0, 0 });
 		Array4<int> extents({ rows, slice_dims.get_dim1(), slice_dims.get_dim2(), slice_dims.get_dim3() });
 		for (int i = 0; i < dims.get_dim3(); i++) {
@@ -518,7 +520,7 @@ protected:
 		assert(out_grads.dimension(0) > 0 && cache_vec[0].std_in.rows() == out_grads.dimension(0));
 		int rows = out_grads.dimension(0);
 		Tensor4<Scalar> prev_out_grads(rows, dims.get_dim1(), dims.get_dim2(), dims.get_dim3());
-		Dimensions slice_dims(dims.get_dim1(), dims.get_dim2(), 1);
+		Dimensions<int> slice_dims(dims.get_dim1(), dims.get_dim2(), 1);
 		Array4<int> offsets({ 0, 0, 0, 0 });
 		Array4<int> extents({ rows, slice_dims.get_dim1(), slice_dims.get_dim2(), slice_dims.get_dim3() });
 		/* Back-propagate the gradient through the batch
@@ -542,7 +544,7 @@ protected:
 		return prev_out_grads;
 	};
 private:
-	Dimensions dims;
+	Dimensions<int> dims;
 	Scalar norm_avg_decay;
 	Scalar epsilon;
 	// Dynamic batch normalization parameters.
@@ -563,7 +565,7 @@ private:
 template<typename Scalar>
 class DropoutLayer : public Layer<Scalar> {
 public:
-	DropoutLayer(Dimensions dims, Scalar dropout_prob, Scalar epsilon = Utils<Scalar>::EPSILON3) :
+	DropoutLayer(Dimensions<int> dims, Scalar dropout_prob, Scalar epsilon = Utils<Scalar>::EPSILON3) :
 			dims(dims),
 			dropout_prob(dropout_prob),
 			epsilon(epsilon),
@@ -576,10 +578,10 @@ public:
 	Layer<Scalar>* clone() {
 		return new DropoutLayer(*this);
 	};
-	Dimensions get_input_dims() const {
+	Dimensions<int> get_input_dims() const {
 		return dims;
 	};
-	Dimensions get_output_dims() const {
+	Dimensions<int> get_output_dims() const {
 		return dims;
 	};
 protected:
@@ -623,7 +625,7 @@ protected:
 				.eval(), dims);
 	};
 private:
-	Dimensions dims;
+	Dimensions<int> dims;
 	Scalar dropout_prob;
 	Scalar epsilon;
 	bool dropout;
@@ -636,18 +638,18 @@ private:
 template<typename Scalar>
 class ConvLayer : public Layer<Scalar> {
 public:
-	ConvLayer(Dimensions input_dims, const WeightInitialization<Scalar>& weight_init, unsigned filters,
-			unsigned receptor_size = 3, unsigned stride = 1, unsigned padding = 1, unsigned dilation = 0,
+	ConvLayer(Dimensions<int> input_dims, unsigned filters, const WeightInitialization<Scalar>& weight_init,
+			unsigned receptor_size = 3, unsigned padding = 1, unsigned stride = 1, unsigned dilation = 0,
 			Scalar max_norm_constraint = 0) :
 				input_dims(input_dims),
 				output_dims(calculate_output_dim(input_dims.get_dim1(), receptor_size, padding, dilation, stride),
 						calculate_output_dim(input_dims.get_dim2(), receptor_size, padding, dilation, stride),
 						filters),
-				weight_init(weight_init),
 				filters(filters),
+				weight_init(weight_init),
 				receptor_size(receptor_size),
-				stride(stride),
 				padding(padding),
+				stride(stride),
 				dilation(dilation),
 				max_norm_constraint(max_norm_constraint),
 				max_norm(Utils<Scalar>::decidedly_greater(max_norm_constraint, .0)),
@@ -662,10 +664,10 @@ public:
 	Layer<Scalar>* clone() {
 		return new ConvLayer(*this);
 	};
-	Dimensions get_input_dims() const {
+	Dimensions<int> get_input_dims() const {
 		return input_dims;
 	};
-	Dimensions get_output_dims() const {
+	Dimensions<int> get_output_dims() const {
 		return output_dims;
 	};
 protected:
@@ -703,22 +705,22 @@ protected:
 		paddings[3] = std::make_pair(0, 0);
 		Tensor4<Scalar> padded_in = in.pad(paddings);
 		// Prepare the base offsets and extents for slicing and dilation.
-		int dilated_receptor_size = receptor_size + (receptor_size - 1) * dilation;
+		int dil_receptor_size = receptor_size + (receptor_size - 1) * dilation;
 		int rows = padded_in.dimension(0);
 		int depth = input_dims.get_dim3();
 		int patches = output_dims.get_dim1() * output_dims.get_dim2();
 		int receptor_vol = receptor_size * receptor_size * depth;
-		int height_rem = padded_in.dimension(1) - dilated_receptor_size;
-		int width_rem = padded_in.dimension(2) - dilated_receptor_size;
+		int height_rem = padded_in.dimension(1) - dil_receptor_size;
+		int width_rem = padded_in.dimension(2) - dil_receptor_size;
 		Array4<int> row_offsets({ 0, 0, 0, 0 });
 		Array4<int> row_extents({ 1, output_dims.get_dim1(), output_dims.get_dim2(), output_dims.get_dim3() });
 		Array4<int> patch_offsets({ 0, 0, 0, 0 });
-		Array4<int> patch_extents({ 1, dilated_receptor_size, dilated_receptor_size, depth });
-		Array4<int> strides({ 1, (int) dilation + 1, (int) dilation + 1, 1});
+		Array4<int> patch_extents({ 1, dil_receptor_size, dil_receptor_size, depth });
+		Array4<int> dil_strides({ 1, (int) dilation + 1, (int) dilation + 1, 1});
 		Tensor4<Scalar> out(rows, output_dims.get_dim1(), output_dims.get_dim2(), output_dims.get_dim3());
 		biased_in_vec = std::vector<Matrix<Scalar>>(rows);
-		/* 'Tensor-row' by 'tensor-row', stretch the receptor locations into row vectors, form a matrix of
-		 * them, and multiply them by the weight matrix. */
+		/* 'Tensor-row' by 'tensor-row', stretch the receptor locations into row vectors, form a matrix out of
+		 * them, and multiply it by the weight matrix. */
 		for (int i = 0; i < rows; i++) {
 			row_offsets[0] = i;
 			patch_offsets[0] = i;
@@ -729,7 +731,7 @@ protected:
 				for (int k = 0; k <= width_rem; k += stride) {
 					patch_offsets[2] = k;
 					// If the patch is dilated, skip the internal padding when stretching it into a row.
-					Tensor4<Scalar> patch = padded_in.slice(patch_offsets, patch_extents).stride(strides);
+					Tensor4<Scalar> patch = padded_in.slice(patch_offsets, patch_extents).stride(dil_strides);
 					in_mat_i.row(patch_ind++) = Utils<Scalar>::tensor4d_to_mat(patch);
 				}
 			}
@@ -754,16 +756,16 @@ protected:
 		int rows = out_grads.dimension(0);
 		int padded_height = input_dims.get_dim1() + 2 * padding;
 		int padded_width = input_dims.get_dim2() + 2 * padding;
-		int dilated_receptor_size = receptor_size + (receptor_size - 1) * dilation;
-		int height_rem = padded_height - dilated_receptor_size;
-		int width_rem = padded_width - dilated_receptor_size;
+		int dil_receptor_size = receptor_size + (receptor_size - 1) * dilation;
+		int height_rem = padded_height - dil_receptor_size;
+		int width_rem = padded_width - dil_receptor_size;
 		int depth = input_dims.get_dim3();
-		Dimensions comp_patch_dims((int) receptor_size, (int) receptor_size, depth);
+		Dimensions<int> comp_patch_dims((int) receptor_size, (int) receptor_size, depth);
 		Array4<int> out_grads_row_offsets({ 0, 0, 0, 0 });
 		Array4<int> out_grads_row_extents({ 1, output_dims.get_dim1(), output_dims.get_dim2(),
 				output_dims.get_dim3() });
 		Array4<int> patch_offsets({ 0, 0, 0, 0 });
-		Array4<int> patch_extents({ 1, dilated_receptor_size, dilated_receptor_size, depth });
+		Array4<int> patch_extents({ 1, dil_receptor_size, dil_receptor_size, depth });
 		Array4<int> strides({ 1, (int) dilation + 1, (int) dilation + 1, 1});
 		Tensor4<Scalar> prev_out_grads(rows, padded_height, padded_width, input_dims.get_dim3());
 		prev_out_grads.setZero();
@@ -804,13 +806,13 @@ protected:
 		return (input_dim - receptor_size - (receptor_size - 1) * dilation + 2 * padding) / stride + 1;
 	};
 private:
-	Dimensions input_dims;
-	Dimensions output_dims;
-	const WeightInitialization<Scalar>& weight_init;
+	Dimensions<int> input_dims;
+	Dimensions<int> output_dims;
 	unsigned filters;
+	const WeightInitialization<Scalar>& weight_init;
 	unsigned receptor_size;
-	unsigned stride;
 	unsigned padding;
+	unsigned stride;
 	unsigned dilation;
 	Scalar max_norm_constraint;
 	bool max_norm;
@@ -824,7 +826,7 @@ private:
 template<typename Scalar>
 class PoolingLayer : public Layer<Scalar> {
 public:
-	PoolingLayer(Dimensions input_dims, unsigned receptor_size, unsigned stride) :
+	PoolingLayer(Dimensions<int> input_dims, unsigned receptor_size, unsigned stride) :
 				input_dims(input_dims),
 				output_dims(calculate_output_dim(input_dims.get_dim1(), receptor_size, stride),
 						calculate_output_dim(input_dims.get_dim2(), receptor_size, stride), input_dims.get_dim3()),
@@ -838,10 +840,10 @@ public:
 		assert(stride > 0);
 	};
 	virtual ~PoolingLayer() = default;
-	Dimensions get_input_dims() const {
+	Dimensions<int> get_input_dims() const {
 		return input_dims;
 	};
-	Dimensions get_output_dims() const {
+	Dimensions<int> get_output_dims() const {
 		return output_dims;
 	};
 protected:
@@ -898,7 +900,7 @@ protected:
 		int depth = input_dims.get_dim3();
 		int height_rem = input_dims.get_dim1() - receptor_size;
 		int width_rem = input_dims.get_dim2() - receptor_size;
-		Dimensions patch_dims((int) receptor_size, (int) receptor_size, 1);
+		Dimensions<int> patch_dims((int) receptor_size, (int) receptor_size, 1);
 		Array4<int> patch_offsets({ 0, 0, 0, 0 });
 		Array4<int> patch_extents({ 1, patch_dims.get_dim1(), patch_dims.get_dim2(), patch_dims.get_dim3() });
 		Tensor4<Scalar> prev_out_grads(rows, input_dims.get_dim1(), input_dims.get_dim2(), depth);
@@ -928,8 +930,8 @@ protected:
 	static int calculate_output_dim(int input_dim, int receptor_size, int stride) {
 		return (input_dim - receptor_size) / stride + 1;
 	};
-	Dimensions input_dims;
-	Dimensions output_dims;
+	Dimensions<int> input_dims;
+	Dimensions<int> output_dims;
 	unsigned receptor_size;
 	unsigned stride;
 	int receptor_area;
@@ -943,7 +945,7 @@ protected:
 template<typename Scalar>
 class SumPoolingLayer : public PoolingLayer<Scalar> {
 public:
-	SumPoolingLayer(Dimensions input_dims, unsigned receptor_size = 2, unsigned stride = 2) :
+	SumPoolingLayer(Dimensions<int> input_dims, unsigned receptor_size = 2, unsigned stride = 2) :
 			PoolingLayer<Scalar>::PoolingLayer(input_dims, receptor_size, stride) { };
 	Layer<Scalar>* clone() {
 		return new SumPoolingLayer(*this);
@@ -962,7 +964,7 @@ protected:
 template<typename Scalar>
 class MeanPoolingLayer : public PoolingLayer<Scalar> {
 public:
-	MeanPoolingLayer(Dimensions input_dims, unsigned receptor_size = 2, unsigned stride = 2) :
+	MeanPoolingLayer(Dimensions<int> input_dims, unsigned receptor_size = 2, unsigned stride = 2) :
 			PoolingLayer<Scalar>::PoolingLayer(input_dims, receptor_size, stride) { };
 	Layer<Scalar>* clone() {
 		return new MeanPoolingLayer(*this);
@@ -982,7 +984,7 @@ protected:
 template<typename Scalar>
 class MaxPoolingLayer : public PoolingLayer<Scalar> {
 public:
-	MaxPoolingLayer(Dimensions input_dims, unsigned receptor_size = 2, unsigned stride = 2) :
+	MaxPoolingLayer(Dimensions<int> input_dims, unsigned receptor_size = 2, unsigned stride = 2) :
 			PoolingLayer<Scalar>::PoolingLayer(input_dims, receptor_size, stride) { };
 	Layer<Scalar>* clone() {
 		return new MaxPoolingLayer(*this);

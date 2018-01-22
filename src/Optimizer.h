@@ -16,6 +16,7 @@
 #include <random>
 #include <sstream>
 #include <string>
+#include <type_traits>
 #include <Utils.h>
 #include <vector>
 #include <WeightInitialization.h>
@@ -24,6 +25,7 @@ namespace cppnn {
 
 template<typename Scalar>
 class Optimizer {
+	static_assert(std::is_floating_point<Scalar>::value, "non floating-point scalar type");
 public:
 	Optimizer(const Loss<Scalar>& loss) :
 				loss(loss) { };
@@ -86,7 +88,7 @@ public:
 		assert(x.dimension(0) == y.dimension(0));
 		// Divide the data into training and test partitions.
 		unsigned rows = (unsigned) x.dimension(0);
-		unsigned training_row_num = (unsigned) std::min((Scalar) (rows - 1),  (Scalar) std::max(1.0, rows * k));
+		unsigned training_row_num = (unsigned) std::min((Scalar) (rows - 1),  (Scalar) std::max((Scalar) 1.0, rows * k));
 		unsigned test_row_num = rows - training_row_num;
 		std::vector<unsigned> training_rows(rows);
 		for (unsigned i = 0; i < rows; i++) training_rows[i] = i;

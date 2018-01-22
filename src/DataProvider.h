@@ -8,6 +8,8 @@
 #ifndef DATAPROVIDER_H_
 #define DATAPROVIDER_H_
 
+#include <type_traits>
+
 namespace cppnn {
 
 /**
@@ -15,6 +17,7 @@ namespace cppnn {
  */
 template<typename Scalar>
 class DataProvider {
+	static_assert(std::is_floating_point<Scalar>::value, "non floating-point scalar type");
 public:
 	DataProvider();
 	virtual ~DataProvider();

@@ -16,6 +16,7 @@
 #include <pthread.h>
 #include <sstream>
 #include <string>
+#include <type_traits>
 #include <vector>
 #include <WeightInitialization.h>
 
@@ -35,12 +36,13 @@ class Optimizer;
  */
 template<typename Scalar>
 class NeuralNetwork {
+	static_assert(std::is_floating_point<Scalar>::value, "non floating-point scalar type");
 	friend class Optimizer<Scalar>;
 public:
 	virtual ~NeuralNetwork() = default;
-	virtual bool is_frontier() const = 0;
-	virtual Dimensions get_input_dims() const = 0;
-	virtual Dimensions get_output_dims() const = 0;
+	virtual bool is_foremost() const = 0;
+	virtual Dimensions<int> get_input_dims() const = 0;
+	virtual Dimensions<int> get_output_dims() const = 0;
 	virtual void init() {
 		std::vector<Layer<Scalar>*> layers = get_layers();
 		for (unsigned i = 0; i < layers.size(); i++)
@@ -77,7 +79,7 @@ public:
 		return strm.str();
 	};
 protected:
-	virtual void set_frontier(bool frontier) = 0;
+	virtual void set_foremost(bool foremost) = 0;
 	virtual std::vector<Layer<Scalar>*> get_layers() = 0;
 	virtual Tensor4<Scalar> propagate(Tensor4<Scalar> input, bool training) = 0;
 	virtual Tensor4<Scalar> backpropagate(Tensor4<Scalar> out_grads) = 0;
@@ -93,15 +95,21 @@ protected:
 	static Tensor4<Scalar> pass_back(Layer<Scalar>& layer, Tensor4<Scalar> out_grads) {
 		return layer.pass_back(out_grads);
 	};
-	static void assert_popagation_input(const Tensor4<Scalar>& input, Dimensions expected_dims) {
-		assert(input.dimension(0));
+	static void assert_popagation_input_dims(const Tensor4<Scalar>& input, Dimensions<int> expected_dims) {
+		assert(input.dimension(0) > 0);
 		assert(input.dimension(1) == expected_dims.get_dim1() && input.dimension(2) == expected_dims.get_dim2() &&
 				input.dimension(3) == expected_dims.get_dim3());
 	};
 };
 
+// Forward declarations for friending.
+template<typename Scalar> class ParallelNeuralNetwork;
+template<typename Scalar, bool ParallelModules> class ResidualNeuralNetwork;
+
 template<typename Scalar>
 class SequentialNeuralNetwork : public NeuralNetwork<Scalar> {
+	friend class ParallelNeuralNetwork<Scalar>;
+	friend class ResidualNeuralNetwork<Scalar,false>;
 public:
 	/**
 	 * Constructs the network using the provided vector of layers. The object
@@ -114,28 +122,31 @@ public:
 	 * must match the nodes attribute of the Layer objects pointed to by their
 	 * pointers directly preceding them in the vector.
 	 */
-	SequentialNeuralNetwork(std::vector<Layer<Scalar>*> layers, bool frontier = true) : // TODO use smart Layer pointers
+	SequentialNeuralNetwork(std::vector<Layer<Scalar>*> layers, bool foremost = true) : // TODO use smart Layer pointers
 			layers(layers),
-			frontier(frontier) {
+			foremost(foremost) {
 		assert(layers.size() > 0 && "layers must contain at least 1 element");
+		assert(layers[0] != nullptr);
 		Layer<Scalar>& first_layer = *(layers[0]);
 		input_dims = first_layer.get_input_dims();
 		output_dims = layers[layers.size() - 1]->get_output_dims();
-		Dimensions prev_dims = first_layer.get_output_dims();
+		Dimensions<int> prev_dims = first_layer.get_output_dims();
 		for (unsigned i = 1; i < layers.size(); i++) {
 			assert(layers[i] != nullptr && "layers contains null pointers");
 			assert(prev_dims.equals(layers[i]->get_input_dims()) && "incompatible layer dimensions");
 			prev_dims = layers[i]->get_output_dims();
 		}
-		NeuralNetwork<Scalar>::set_input_layer(first_layer, frontier);
+		NeuralNetwork<Scalar>::set_input_layer(first_layer, foremost);
 	};
+	SequentialNeuralNetwork(Layer<Scalar>* layer, bool foremost = true) :
+			SequentialNeuralNetwork(std::vector<Layer<Scalar>*>({ layer }), foremost) { };
 	// Copy constructor.
 	SequentialNeuralNetwork(const SequentialNeuralNetwork<Scalar>& network) :
 			layers(network.layers.size()) {
 		for (unsigned i = 0; i < layers.size(); i++) {
 			layers[i] = network.layers[i]->clone();
 		}
-		frontier = network.frontier;
+		foremost = network.foremost;
 		input_dims = network.input_dims;
 		output_dims = network.output_dims;
 	};
@@ -155,13 +166,13 @@ public:
 		swap(*this, network);
 		return *this;
 	};
-	bool is_frontier() const {
-		return frontier;
+	bool is_foremost() const {
+		return foremost;
 	};
-	Dimensions get_input_dims() const {
+	Dimensions<int> get_input_dims() const {
 		return input_dims;
 	};
-	Dimensions get_output_dims() const {
+	Dimensions<int> get_output_dims() const {
 		return output_dims;
 	};
 protected:
@@ -170,21 +181,21 @@ protected:
 			SequentialNeuralNetwork<Scalar>& network2) {
 		using std::swap;
 		swap(network1.layers, network2.layers);
-		swap(network1.frontier, network2.frontier);
+		swap(network1.foremost, network2.foremost);
 		swap(network1.input_dims, network2.input_dims);
 		swap(network1.output_dims, network2.output_dims);
 	};
-	void set_frontier(bool frontier) {
-		NeuralNetwork<Scalar>::set_input_layer(*(layers[0]), frontier);
-		this->frontier = frontier;
+	void set_foremost(bool foremost) {
+		NeuralNetwork<Scalar>::set_input_layer(*layers[0], foremost);
+		this->foremost = foremost;
 	};
 	std::vector<Layer<Scalar>*> get_layers() {
 		return layers;
 	};
 	Tensor4<Scalar> propagate(Tensor4<Scalar> input, bool training) {
-		NeuralNetwork<Scalar>::assert_popagation_input(input, input_dims);
+		NeuralNetwork<Scalar>::assert_popagation_input_dims(input, input_dims);
 		for (unsigned i = 0; i < layers.size(); i++) {
-			Layer<Scalar>& layer = *(layers[i]);
+			Layer<Scalar>& layer = *layers[i];
 			input = NeuralNetwork<Scalar>::pass_forward(layer, input, training);
 			if (!training)
 				NeuralNetwork<Scalar>::empty_cache(layer);
@@ -192,84 +203,58 @@ protected:
 		return input;
 	};
 	Tensor4<Scalar> backpropagate(Tensor4<Scalar> out_grads) {
-		NeuralNetwork<Scalar>::assert_popagation_input(out_grads, output_dims);
+		NeuralNetwork<Scalar>::assert_popagation_input_dims(out_grads, output_dims);
 		for (int i = layers.size() - 1; i >= 0; i--) {
 			Layer<Scalar>& layer = *(layers[i]);
-			out_grads = NeuralNetwork<Scalar>::pass_back(*(layers[i]), out_grads);
+			out_grads = NeuralNetwork<Scalar>::pass_back(layer, out_grads);
 			NeuralNetwork<Scalar>::empty_cache(layer);
 		}
 		return out_grads;
 	};
 	std::vector<Layer<Scalar>*> layers;
-	bool frontier;
-	Dimensions input_dims;
-	Dimensions output_dims;
+	bool foremost;
+	Dimensions<int> input_dims;
+	Dimensions<int> output_dims;
 };
-
-// Forward declaration for friending.
-template<typename Scalar> class ParallelNeuralNetwork;
-
-template<typename Scalar>
-class EmbeddedSequentialNeuralNetwork : private SequentialNeuralNetwork<Scalar> {
-	friend class ParallelNeuralNetwork<Scalar>;
-public:
-	EmbeddedSequentialNeuralNetwork(std::vector<Layer<Scalar>*> layers) :
-			SequentialNeuralNetwork<Scalar>::SequentialNeuralNetwork(layers, false) { };
-	EmbeddedSequentialNeuralNetwork(Layer<Scalar>* layer) :
-			EmbeddedSequentialNeuralNetwork(std::vector<Layer<Scalar>*>({ layer })) { };
-	EmbeddedSequentialNeuralNetwork(const EmbeddedSequentialNeuralNetwork<Scalar>& lane) :
-			SequentialNeuralNetwork<Scalar>::SequentialNeuralNetwork(lane) { };
-	EmbeddedSequentialNeuralNetwork(EmbeddedSequentialNeuralNetwork<Scalar>&& lane) :
-			SequentialNeuralNetwork<Scalar>::SequentialNeuralNetwork(lane) { };
-	EmbeddedSequentialNeuralNetwork<Scalar>& operator=(EmbeddedSequentialNeuralNetwork<Scalar> lane) {
-		SequentialNeuralNetwork<Scalar>::swap(*this, lane);
-		return *this;
-	};
-};
-
-template<typename Scalar> class InceptionNeuralNetwork;
 
 template<typename Scalar>
 class ParallelNeuralNetwork : public NeuralNetwork<Scalar> {
-	friend class InceptionNeuralNetwork<Scalar>;
+	friend class ResidualNeuralNetwork<Scalar,true>;
 public:
-	ParallelNeuralNetwork(std::vector<EmbeddedSequentialNeuralNetwork<Scalar>> lanes, bool frontier = true) :
-			lanes(lanes),
-			frontier(frontier) {
+	ParallelNeuralNetwork(std::vector<SequentialNeuralNetwork<Scalar>> lanes, bool foremost = true) :
+			lanes(lanes) {
 		assert(lanes.size() > 0 && "lanes must contain at least 1 element");
-		EmbeddedSequentialNeuralNetwork<Scalar>& first_lane = lanes[0];
-		Dimensions input_dims = first_lane.input_dims;
+		SequentialNeuralNetwork<Scalar>& first_lane = this->lanes[0];
+		Dimensions<int> input_dims = first_lane.input_dims;
 		int output_height = first_lane.output_dims.get_dim1();
 		int output_width = first_lane.output_dims.get_dim2();
 		int output_depth = first_lane.output_dims.get_dim3();
 		for (unsigned i = 1; i < lanes.size(); i++) {
-			EmbeddedSequentialNeuralNetwork<Scalar>& lane = lanes[i];
+			SequentialNeuralNetwork<Scalar>& lane = this->lanes[i];
 			assert(input_dims.equals(lane.input_dims) && output_height == lane.output_dims.get_dim1() &&
 					output_width == lane.output_dims.get_dim2() && "incompatible lane dimensions");
 			output_depth += lane.output_dims.get_dim3();
 		}
-		set_frontier(frontier);
+		set_foremost(foremost);
 		this->input_dims = input_dims;
-		output_dims = Dimensions(output_height, output_width, output_depth);
+		output_dims = Dimensions<int>(output_height, output_width, output_depth);
 	};
-	ParallelNeuralNetwork(EmbeddedSequentialNeuralNetwork<Scalar> lane) :
-			ParallelNeuralNetwork(std::vector<EmbeddedSequentialNeuralNetwork<Scalar>>({ lane })) { };
-	ParallelNeuralNetwork(Layer<Scalar>* layer) :
-			ParallelNeuralNetwork(EmbeddedSequentialNeuralNetwork<Scalar>(layer)) { };
-	bool is_frontier() const {
-		return frontier;
+	ParallelNeuralNetwork(SequentialNeuralNetwork<Scalar> lane, bool foremost = true) :
+			ParallelNeuralNetwork(std::vector<SequentialNeuralNetwork<Scalar>>({ lane }), foremost) { };
+	bool is_foremost() const {
+		return foremost;
 	};
-	Dimensions get_input_dims() const {
+	Dimensions<int> get_input_dims() const {
 		return input_dims;
 	};
-	Dimensions get_output_dims() const {
+	Dimensions<int> get_output_dims() const {
 		return output_dims;
 	};
 protected:
-	void set_frontier(bool frontier) {
+	void set_foremost(bool foremost) {
 		for (unsigned i = 0; i < lanes.size(); i++)
-			lanes[i].set_frontier(frontier);
-		this->frontier = frontier;
+			lanes[i].set_foremost(foremost);
+		this->foremost = foremost;
 	};
 	std::vector<Layer<Scalar>*> get_layers() {
 		std::vector<Layer<Scalar>*> layers;
@@ -281,134 +266,197 @@ protected:
 		return layers;
 	};
 	Tensor4<Scalar> propagate(Tensor4<Scalar> input, bool training) {
-		NeuralNetwork<Scalar>::assert_popagation_input(input, input_dims);
+		NeuralNetwork<Scalar>::assert_popagation_input_dims(input, input_dims);
 		int rows = input.dimension(0);
 		Array4<int> offsets({ 0, 0, 0, 0 });
 		Array4<int> extents({ rows, output_dims.get_dim1(), output_dims.get_dim2(), 0 });
 		Tensor4<Scalar> out(rows, output_dims.get_dim1(), output_dims.get_dim2(), output_dims.get_dim3());
-		for (unsigned i = 0; i < lanes.size(); i++) {
-			EmbeddedSequentialNeuralNetwork<Scalar>& lane = lanes[i];
-			int depth = lane.output_dims.get_dim3();
+		unsigned lane_num = lanes.size();
+		unsigned helper_thread_num = lane_num - 1;
+		pthread_t threads[helper_thread_num];
+		pthread_attr_t attr;
+		if (helper_thread_num > 0) {
+			pthread_attr_init(&attr);
+			pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_JOINABLE);
+		}
+		PropArgs args_arr[lane_num];
+		for (int i = helper_thread_num; i >= 0; i--) {
+			PropArgs args;
+			args.obj = this;
+			args.lane_id = i;
+			args.training = training;
+			args.in = &input;
+			args_arr[i] = args;
+			// Leave the first lane to the main thread.
+			if (i == 0)
+				propagate(&args_arr[i]);
+			else
+				assert(!pthread_create(&threads[i - 1], &attr, propagate, &args_arr[i]));
+		}
+		for (unsigned i = 0; i < lane_num; i++) {
+			if (i != 0)
+				assert(!pthread_join(threads[i - 1], nullptr));
+			int depth = lanes[i].output_dims.get_dim3();
 			extents[3] = depth;
-			out.slice(offsets, extents) = lane.propagate(input, training);
+			out.slice(offsets, extents) = args_arr[i].out;
 			offsets[3] += depth;
 		}
+		if (helper_thread_num > 0)
+			pthread_attr_destroy(&attr);
 		return out;
 	};
 	Tensor4<Scalar> backpropagate(Tensor4<Scalar> out_grads) {
-		NeuralNetwork<Scalar>::assert_popagation_input(out_grads, output_dims);
-		int rows = out_grads.dimension(0);
-		Array4<int> offsets({ 0, 0, 0, 0 });
-		Array4<int> extents({ rows, output_dims.get_dim1(), output_dims.get_dim2(), 0 });
-		Tensor4<Scalar> prev_out_grads(rows, input_dims.get_dim1(), input_dims.get_dim2(), input_dims.get_dim3());
+		NeuralNetwork<Scalar>::assert_popagation_input_dims(out_grads, output_dims);
+		Tensor4<Scalar> prev_out_grads = foremost ? Tensor4<Scalar>(0, 0, 0, 0) :
+				Tensor4<Scalar>(out_grads.dimension(0), input_dims.get_dim1(), input_dims.get_dim2(),
+						input_dims.get_dim3());
 		prev_out_grads.setZero();
-		for (unsigned i = 0; i < lanes.size(); i++) {
-			EmbeddedSequentialNeuralNetwork<Scalar>& lane = lanes[i];
-			int depth = lane.output_dims.get_dim3();
-			extents[3] = depth;
-			Tensor4<Scalar> out_grads_slice_i = out_grads.slice(offsets, extents);
-			prev_out_grads += lane.backpropagate(out_grads_slice_i);
-			offsets[3] += depth;
+		unsigned lane_num = lanes.size();
+		unsigned helper_thread_num = lane_num - 1;
+		pthread_t threads[helper_thread_num];
+		pthread_attr_t attr;
+		if (helper_thread_num > 0) {
+			pthread_attr_init(&attr);
+			pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_JOINABLE);
 		}
+		BackpropArgs args_arr[lane_num];
+		int depth_offset = out_grads.dimension(3);
+		for (int i = helper_thread_num; i >= 0; i--) {
+			depth_offset -= lanes[i].output_dims.get_dim3();
+			BackpropArgs args;
+			args.obj = this;
+			args.lane_id = i;
+			args.depth_offset = depth_offset;
+			args.out_grads = &out_grads;
+			args_arr[i] = args;
+			// Leave the first lane to the main thread.
+			if (i == 0)
+				backpropagate(&args_arr[i]);
+			else
+				assert(!pthread_create(&threads[i - 1], &attr, backpropagate, &args_arr[i]));
+		}
+		for (unsigned i = 0; i < lanes.size(); i++) {
+			if (i != 0)
+				assert(!pthread_join(threads[i - 1], nullptr));
+			if (!foremost)
+				prev_out_grads += args_arr[i].prev_out_grads;
+		}
+		if (helper_thread_num > 0)
+			pthread_attr_destroy(&attr);
 		return prev_out_grads;
 	};
 private:
-	std::vector<EmbeddedSequentialNeuralNetwork<Scalar>> lanes;
-	bool frontier;
-	Dimensions input_dims;
-	Dimensions output_dims;
-	struct Args {
+	std::vector<SequentialNeuralNetwork<Scalar>> lanes;
+	bool foremost;
+	Dimensions<int> input_dims;
+	Dimensions<int> output_dims;
+	static void* propagate(void* args_ptr) {
+		PropArgs& args = *((PropArgs*) args_ptr);
+		args.out = args.obj->lanes[args.lane_id].propagate(*args.in, args.training);
+		return nullptr;
+	};
+	static void* backpropagate(void* args_ptr) {
+		BackpropArgs& args = *((BackpropArgs*) args_ptr);
+		SequentialNeuralNetwork<Scalar>& lane = args.obj->lanes[args.lane_id];
+		Array4<int> offsets({ 0, 0, 0, args.depth_offset });
+		Array4<int> extents({ args.out_grads->dimension(0), lane.output_dims.get_dim1(),
+				lane.output_dims.get_dim2(), lane.output_dims.get_dim3() });
+		Tensor4<Scalar> out_grads_slice = args.out_grads->slice(offsets, extents);
+		args.prev_out_grads = lane.backpropagate(out_grads_slice);
+		return nullptr;
+	};
+	struct PropArgs {
+		ParallelNeuralNetwork<Scalar>* obj;
 		int lane_id;
 		bool training;
-		const Tensor4<Scalar>& in;
-		Tensor4<Scalar>& out;
+		Tensor4<Scalar>* in;
+		Tensor4<Scalar> out;
+	};
+	struct BackpropArgs {
+		ParallelNeuralNetwork<Scalar>* obj;
+		int lane_id;
+		int depth_offset;
+		Tensor4<Scalar>* out_grads;
+		Tensor4<Scalar> prev_out_grads;
 	};
 };
 
-template<typename Scalar>
-class InceptionNeuralNetwork : public NeuralNetwork<Scalar> {
+/**
+ * If ParallelModules is false, it is an ordinary ResNet; if it is true, it is a residual
+ * InceptionNet. The residuality of the modules is always optional, thus it can also be
+ * used to construct vanilla InceptionNets.
+ */
+template<typename Scalar, bool ParallelModules = false>
+class ResidualNeuralNetwork : public NeuralNetwork<Scalar> {
+	typedef typename std::conditional<ParallelModules,ParallelNeuralNetwork<Scalar>,
+			SequentialNeuralNetwork<Scalar>>::type Module;
 public:
-	InceptionNeuralNetwork(std::vector<ParallelNeuralNetwork<Scalar>> modules, bool frontier = true) :
+	ResidualNeuralNetwork(std::vector<std::pair<Module,bool>> modules, bool foremost = true) :
 			modules(modules),
-			frontier(frontier) {
+			foremost(foremost) {
 		assert(modules.size() > 0 && "modules must contain at least 1 element");
-		ParallelNeuralNetwork<Scalar> first_module = modules[0];
+		Module& first_module = this->modules[0].first;
 		input_dims = first_module.get_input_dims();
-		output_dims = modules[modules.size() - 1].get_output_dims();
-		first_module.set_frontier(frontier);
-		Dimensions prev_dims = input_dims;
+		output_dims = this->modules[modules.size() - 1].first.get_output_dims();
+		first_module.set_foremost(foremost);
+		Dimensions<int> prev_dims = input_dims;
 		for (unsigned i = 0; i < modules.size(); i++) {
-			ParallelNeuralNetwork<Scalar> module = modules[i];
-			assert(prev_dims.equals(module.get_input_dims()));
-			prev_dims = module.get_output_dims();
+			std::pair<Module,bool>& module = this->modules[i];
+			Module& module_net = module.first;
+			if (i != 0)
+				module_net.set_foremost(false);
+			assert((!module.second || module_net.get_input_dims().equals(module_net.get_output_dims())) &&
+					"residual module input-output dimension discrepancy");
+			assert(prev_dims.equals(module_net.get_input_dims()) && "incompatible module dimensions");
+			prev_dims = module_net.get_output_dims();
 		}
 	};
-	bool is_frontier() const {
-		return frontier;
+	bool is_foremost() const {
+		return foremost;
 	};
-	Dimensions get_input_dims() const {
+	Dimensions<int> get_input_dims() const {
 		return input_dims;
 	};
-	Dimensions get_output_dims() const {
+	Dimensions<int> get_output_dims() const {
 		return output_dims;
 	};
 protected:
-	void set_frontier(bool frontier) {
-		modules[0].set_frontier(frontier);
+	void set_foremost(bool foremost) {
+		modules[0].first.set_foremost(foremost);
+		this->foremost = foremost;
 	};
 	std::vector<Layer<Scalar>*> get_layers() {
 		std::vector<Layer<Scalar>*> layers;
 		for (unsigned i = 0; i < modules.size(); i++) {
-			std::vector<Layer<Scalar>*> module_layers = modules[i].get_layers();
+			std::vector<Layer<Scalar>*> module_layers = modules[i].first.get_layers();
 			for (unsigned j = 0; j < module_layers.size(); j++)
 				layers.push_back(module_layers[j]);
 		}
 		return layers;
 	};
 	Tensor4<Scalar> propagate(Tensor4<Scalar> input, bool training) {
-		NeuralNetwork<Scalar>::assert_popagation_input(input, input_dims);
-		for (unsigned i = 0; i < modules.size(); i++)
-			input = modules[i].propagate(input, training);
+		NeuralNetwork<Scalar>::assert_popagation_input_dims(input, input_dims);
+		for (unsigned i = 0; i < modules.size(); i++) {
+			std::pair<Module,bool>& module = modules[i];
+			input = module.second ? input + module.first.propagate(input, training) :
+					module.first.propagate(input, training);
+		}
 		return input;
 	};
 	Tensor4<Scalar> backpropagate(Tensor4<Scalar> out_grads) {
-		NeuralNetwork<Scalar>::assert_popagation_input(out_grads, output_dims);
-		for (int i = modules.size() - 1; i >= 0; i--)
-			out_grads = modules[i].backpropagate(out_grads);
+		NeuralNetwork<Scalar>::assert_popagation_input_dims(out_grads, output_dims);
+		for (int i = modules.size() - 1; i >= 0; i--) {
+			std::pair<Module,bool>& module = modules[i];
+			out_grads = module.second ? out_grads + module.first.backpropagate(out_grads) :
+					module.first.backpropagate(out_grads);
+		}
 		return out_grads;
 	};
 private:
-	std::vector<ParallelNeuralNetwork<Scalar>> modules;
-	bool frontier;
-	Dimensions input_dims;
-	Dimensions output_dims;
-};
-
-template<typename Scalar>
-class ResidualNeuralNetwork : public SequentialNeuralNetwork<Scalar> {
-public:
-	ResidualNeuralNetwork(std::vector<Layer<Scalar>*> layers) :
-			SequentialNeuralNetwork<Scalar>::SequentialNeuralNetwork(layers) { };
-	ResidualNeuralNetwork(const ResidualNeuralNetwork<Scalar>& network) :
-			SequentialNeuralNetwork<Scalar>::SequentialNeuralNetwork(network) { };
-	ResidualNeuralNetwork(ResidualNeuralNetwork<Scalar>&& network) :
-			SequentialNeuralNetwork<Scalar>::SequentialNeuralNetwork(network) { };
-	ResidualNeuralNetwork<Scalar>& operator=(ResidualNeuralNetwork<Scalar> network) {
-		SequentialNeuralNetwork<Scalar>::swap(*this, network);
-		return *this;
-	};
-protected:
-	Matrix<Scalar> propagate(Tensor4<Scalar> input, bool training) {
-		NeuralNetwork<Scalar>::assert_popagation_input(input, SequentialNeuralNetwork<Scalar>::input_dims);
-		for (unsigned i = 0; i < SequentialNeuralNetwork<Scalar>::layers.size(); i++)
-			input = NeuralNetwork<Scalar>::pass_forward(*(SequentialNeuralNetwork<Scalar>::layers[i]), input, training);
-		return input;
-	};
-	void backpropagate(Tensor4<Scalar> out_grads) {
-		NeuralNetwork<Scalar>::assert_popagation_input(out_grads, SequentialNeuralNetwork<Scalar>::output_dims);
-		for (int i = SequentialNeuralNetwork<Scalar>::layers.size() - 1; i >= 0; i--)
-			out_grads = NeuralNetwork<Scalar>::pass_back(*(SequentialNeuralNetwork<Scalar>::layers[i]), out_grads);
-	};
+	std::vector<std::pair<Module,bool>> modules;
+	bool foremost;
+	Dimensions<int> input_dims;
+	Dimensions<int> output_dims;
 };
 
 } /* namespace cppnn */

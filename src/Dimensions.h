@@ -8,24 +8,49 @@
 #ifndef DIMENSIONS_H_
 #define DIMENSIONS_H_
 
+#include <cassert>
 #include <string>
 
 namespace cppnn {
 
+template<typename IndexType>
 class Dimensions {
 public:
-	Dimensions();
-	Dimensions(int dim1, int dim2, int dim3);
-	int get_dim1() const;
-	int get_dim2() const;
-	int get_dim3() const;
-	int get_points() const;
-	bool equals(const Dimensions& dims) const;
-	std::string to_string() const;
+	Dimensions(IndexType dim1, IndexType dim2, IndexType dim3) :
+			dim1(dim1),
+			dim2(dim2),
+			dim3(dim3) {
+		assert(dim1 > 0 && dim2 > 0 && dim3 > 0);
+	};
+	Dimensions(IndexType dim1, IndexType dim2) :
+			Dimensions(dim1, dim2, 1) { };
+	Dimensions(IndexType dim1) :
+			Dimensions(dim1, 1) { };
+	Dimensions() :
+			Dimensions(1) { };
+	IndexType get_dim1() const {
+		return dim1;
+	};
+	IndexType get_dim2() const {
+		return dim2;
+	};
+	IndexType get_dim3() const {
+		return dim3;
+	};
+	IndexType get_points() const {
+		return dim1 * dim2 * dim3;
+	};
+	bool equals(const Dimensions<IndexType>& dims) const {
+		return dim1 == dims.dim1 && dim2 == dims.dim2 && dim3 == dims.dim3;
+	};
+	std::string to_string() const {
+		return "[" + std::to_string(dim1) + ", " + std::to_string(dim2) + ", " +
+				std::to_string(dim3) + "]";
+	};
 private:
-	int dim1;
-	int dim2;
-	int dim3;
+	IndexType dim1;
+	IndexType dim2;
+	IndexType dim3;
 };
 
 } /* namespace cppnn */

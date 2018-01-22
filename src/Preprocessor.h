@@ -13,6 +13,7 @@
 #include <cmath>
 #include <Eigen/Dense>
 #include <string>
+#include <type_traits>
 #include <Utils.h>
 #include <vector>
 
@@ -20,6 +21,7 @@ namespace cppnn {
 
 template<typename Scalar>
 class Preprocessor {
+	static_assert(std::is_floating_point<Scalar>::value, "non floating-point scalar type");
 public:
 	virtual ~Preprocessor() = default;
 	virtual void fit(const Tensor4<Scalar>& data) = 0;
@@ -39,7 +41,7 @@ public:
 	virtual void fit(const Tensor4<Scalar>& data) {
 		int rows = data.dimension(0);
 		assert(rows > 0);
-		dims = Dimensions(data.dimension(1), data.dimension(2), data.dimension(3));
+		dims = Dimensions<int>(data.dimension(1), data.dimension(2), data.dimension(3));
 		Array4<int> offsets = { 0, 0, 0, 0 };
 		Array4<int> extents = { rows, dims.get_dim1(), dims.get_dim2(), 1 };
 		means = Matrix<Scalar>(dims.get_dim3(), dims.get_dim1() * dims.get_dim2());
@@ -58,7 +60,7 @@ public:
 		assert(rows > 0);
 		assert(dims.get_dim1() == data.dimension(1) && dims.get_dim2() == data.dimension(2) &&
 				dims.get_dim3() == data.dimension(3) && "mismatched fit and transform input tensor dimensions");
-		Dimensions slice_dims(dims.get_dim1(), dims.get_dim2(), 1);
+		Dimensions<int> slice_dims(dims.get_dim1(), dims.get_dim2(), 1);
 		Array4<int> offsets = { 0, 0, 0, 0 };
 		Array4<int> extents = { rows, slice_dims.get_dim1(), slice_dims.get_dim2(), slice_dims.get_dim3() };
 		for (int i = 0; i < dims.get_dim3(); i++) {
@@ -74,7 +76,7 @@ public:
 protected:
 	bool standardize;
 	Scalar epsilon;
-	Dimensions dims;
+	Dimensions<int> dims;
 	Matrix<Scalar> means;
 	Matrix<Scalar> sd;
 };
@@ -123,7 +125,7 @@ public:
 		if (whiten)
 			data_mat *= (eigen_values.array() + NormalizationPreprocessor<Scalar>::epsilon)
 					.sqrt().inverse().matrix().asDiagonal();
-		data = Utils<Scalar>::mat_to_tensor4d(data_mat, Dimensions(data_mat.cols(), 1, 1));
+		data = Utils<Scalar>::mat_to_tensor4d(data_mat, Dimensions<int>(data_mat.cols(), 1, 1));
 	};
 private:
 	bool whiten;

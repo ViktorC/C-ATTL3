@@ -8,12 +8,14 @@
 #ifndef REGULARIZATIONPENALTY_H_
 #define REGULARIZATIONPENALTY_H_
 
+#include <type_traits>
 #include <Utils.h>
 
 namespace cppnn {
 
 template<typename Scalar>
 class RegularizationPenalty {
+	static_assert(std::is_floating_point<Scalar>::value, "non floating-point scalar type");
 public:
 	virtual ~RegularizationPenalty() = default;
 	virtual Scalar function(const Matrix<Scalar>& weights) const;
@@ -40,7 +42,7 @@ public:
 		return (lambda * weights.cwiseAbs()).sum();
 	};
 	Matrix<Scalar> d_function(const Matrix<Scalar>& weights) const {
-		return weights.unaryExpr([this](Scalar i) { return i >= .0 ? lambda : -lambda; });
+		return weights.unaryExpr([this](Scalar i) { return (Scalar) (i >= .0 ? lambda : -lambda); });
 	};
 private:
 	Scalar lambda;
@@ -71,8 +73,8 @@ public:
 		return (l1_lambda * weights.array().abs() + .5 * l2_lambda * weights.array().square()).sum();
 	};
 	Matrix<Scalar> d_function(const Matrix<Scalar>& weights) const {
-		return weights.unaryExpr([this](Scalar i) { return i >= .0 ? l1_lambda :
-				-l1_lambda; }) + l2_lambda * weights;
+		return weights.unaryExpr([this](Scalar i) { return (Scalar) (i >= .0 ? l1_lambda :
+				-l1_lambda); }) + l2_lambda * weights;
 	};
 private:
 	Scalar l1_lambda;
