@@ -11,6 +11,7 @@
 #include <algorithm>
 #include <cassert>
 #include <Loss.h>
+#include <memory>
 #include <NeuralNetwork.h>
 #include <RegularizationPenalty.h>
 #include <random>
@@ -24,11 +25,16 @@
 namespace cppnn {
 
 template<typename Scalar>
+using LossPtr = std::shared_ptr<Loss<Scalar>>;
+
+template<typename Scalar>
 class Optimizer {
 	static_assert(std::is_floating_point<Scalar>::value, "non floating-point scalar type");
 public:
-	Optimizer(const Loss<Scalar>& loss) :
-				loss(loss) { };
+	Optimizer(LossPtr<Scalar> loss) :
+				loss(loss) {
+		assert(loss.get() != nullptr);
+	};
 	virtual ~Optimizer() = default;
 	bool verify_gradients(NeuralNetwork<Scalar>& net, const Tensor4<Scalar>& x,
 			const Tensor4<Scalar>& y, Scalar step_size = 1e-5, Scalar abs_epsilon = Utils<Scalar>::EPSILON2,
@@ -40,7 +46,7 @@ public:
 		assert(rows == y.dimension(0));
 		assert(step_size > 0);
 		assert(abs_epsilon >= 0 && rel_epsilon > 0);
-		net.backpropagate(loss.d_function(net.propagate(x, true), y) / (Scalar) rows);
+		net.backpropagate(loss.get()->d_function(net.propagate(x, true), y) / (Scalar) rows);
 		bool failure = false;
 		std::vector<Layer<Scalar>*> layers = net.get_layers();
 		for (unsigned i = 0; i < layers.size(); i++) {
@@ -60,9 +66,9 @@ public:
 						/* Compute the numerical gradients in training mode to ensure that the means
 						 * and standard deviations used for batch normalization are the same as those
 						 * used during the analytic gradient computation. */
-						Scalar loss_inc = loss.function(net.propagate(x, true), y).mean();
+						Scalar loss_inc = loss.get()->function(net.propagate(x, true), y).mean();
 						params(j,k) = param - step_size;
-						Scalar loss_dec = loss.function(net.propagate(x, true), y).mean();
+						Scalar loss_dec = loss.get()->function(net.propagate(x, true), y).mean();
 						params(j,k) = param;
 						Scalar num_grad = (loss_inc - loss_dec) / (2 * step_size);
 						std::cout << "\t\tNumerical gradient = " << num_grad;
@@ -184,17 +190,20 @@ protected:
 	static const void enforce_constraints(Layer<Scalar>& layer) {
 		layer.enforce_constraints();
 	};
-	const Loss<Scalar>& loss;
+	LossPtr<Scalar> loss;
 };
+
+template<typename Scalar>
+using RegPenPtr = std::shared_ptr<RegularizationPenalty<Scalar>>;
 
 template<typename Scalar>
 class SGDOptimizer : public Optimizer<Scalar> {
 public:
-	SGDOptimizer(const Loss<Scalar>& loss, const RegularizationPenalty<Scalar>& reg,
-			unsigned batch_size) :
+	SGDOptimizer(LossPtr<Scalar> loss, RegPenPtr<Scalar> reg, unsigned batch_size) :
 				Optimizer<Scalar>::Optimizer(loss),
 				reg(reg),
 				batch_size(batch_size) {
+		assert(reg.get() != nullptr);
 		assert(batch_size > 0);
 	};
 	virtual ~SGDOptimizer() = default;
@@ -228,16 +237,17 @@ protected:
 					batch_x_extents[0] = (int) batch_ind;
 					batch_y_extents[0] = (int) batch_ind;
 					Tensor4<Scalar> out = Optimizer<Scalar>::propagate(net, batch_x.slice(batch_offsets, batch_x_extents));
-					training_loss += Optimizer<Scalar>::loss.function(out, batch_y.slice(batch_offsets, batch_y_extents)).sum();
+					training_loss += Optimizer<Scalar>::loss.get()->function(out, batch_y.slice(batch_offsets, batch_y_extents)).sum();
 					/* As the loss to minimize is the mean of the losses for all the training observations
 					 * (see the last line of the function), the gradient to back-propagate is to be divided by
 					 * the number of observations in the batch. */
-					Optimizer<Scalar>::backpropagate(net, Optimizer<Scalar>::loss.d_function(out,
+					Optimizer<Scalar>::backpropagate(net, Optimizer<Scalar>::loss.get()->d_function(out,
 							batch_y.slice(batch_offsets, batch_y_extents)) / (Scalar) batch_ind);
 				} else {
 					Tensor4<Scalar> out = Optimizer<Scalar>::propagate(net, batch_x);
-					training_loss += Optimizer<Scalar>::loss.function(out, batch_y).sum();
-					Optimizer<Scalar>::backpropagate(net, Optimizer<Scalar>::loss.d_function(out, batch_y) / (Scalar) batch_ind);
+					training_loss += Optimizer<Scalar>::loss.get()->function(out, batch_y).sum();
+					Optimizer<Scalar>::backpropagate(net, Optimizer<Scalar>::loss.get()->d_function(out, batch_y) /
+							(Scalar) batch_ind);
 				}
 				for (unsigned k = 0; k < layers.size(); k++) {
 					Layer<Scalar>& layer = *(layers[k]);
@@ -279,31 +289,30 @@ protected:
 					batch_offsets[0] = 0;
 					batch_x_extents[0] = (int) batch_ind;
 					batch_y_extents[0] = (int) batch_ind;
-					obj_loss += Optimizer<Scalar>::loss.function(net.infer(batch_x.slice(batch_offsets, batch_x_extents)),
+					obj_loss += Optimizer<Scalar>::loss.get()->function(net.infer(batch_x.slice(batch_offsets, batch_x_extents)),
 							batch_y.slice(batch_offsets, batch_y_extents)).sum();
 				} else
-					obj_loss += Optimizer<Scalar>::loss.function(net.infer(batch_x), batch_y).sum();
+					obj_loss += Optimizer<Scalar>::loss.get()->function(net.infer(batch_x), batch_y).sum();
 				batch_ind = 0;
 			}
 		}
 		Scalar mean_obj_loss = obj_loss / test_row_num;
 		Scalar reg_loss = 0;
 		for (unsigned j = 0; j < layers.size(); j++)
-			reg_loss += reg.function(Optimizer<Scalar>::get_params(*(layers[j])));
+			reg_loss += reg.get()->function(Optimizer<Scalar>::get_params(*(layers[j])));
 		std::cout << "\tobj loss: " << std::to_string(mean_obj_loss) << std::endl;
 		std::cout << "\treg loss: " << std::to_string(reg_loss) << std::endl;
 		return mean_obj_loss + reg_loss;
 	};
 	virtual void update_params(Layer<Scalar>& layer, unsigned i, unsigned epoch) = 0;
-	const RegularizationPenalty<Scalar>& reg;
+	RegPenPtr<Scalar> reg;
 	unsigned batch_size;
 };
 
 template<typename Scalar>
 class VanillaSGDOptimizer : public SGDOptimizer<Scalar> {
 public:
-	VanillaSGDOptimizer(const Loss<Scalar>& loss, const RegularizationPenalty<Scalar>& reg, unsigned batch_size = 1,
-			Scalar learning_rate = 1e-3) :
+	VanillaSGDOptimizer(LossPtr<Scalar> loss, RegPenPtr<Scalar> reg, unsigned batch_size = 1, Scalar learning_rate = 1e-3) :
 				SGDOptimizer<Scalar>::SGDOptimizer(loss, reg, batch_size),
 				learning_rate(learning_rate) {
 		assert(learning_rate > 0);
@@ -313,7 +322,7 @@ protected:
 	void update_params(Layer<Scalar>& layer, unsigned i, unsigned epoch) {
 		Matrix<Scalar>& params = Optimizer<Scalar>::get_params(layer);
 		params -= (learning_rate * (Optimizer<Scalar>::get_param_grads(layer) +
-				SGDOptimizer<Scalar>::reg.d_function(params)));
+				SGDOptimizer<Scalar>::reg.get()->d_function(params)));
 	};
 	Scalar learning_rate;
 };
@@ -321,9 +330,8 @@ protected:
 template<typename Scalar>
 class MomentumAcceleratedSGDOptimizer : public SGDOptimizer<Scalar> {
 public:
-	MomentumAcceleratedSGDOptimizer(const Loss<Scalar>& loss, const RegularizationPenalty<Scalar>& reg,
-			unsigned batch_size = 1, Scalar init_learning_rate = 1e-3, Scalar annealing_rate = 1e-3,
-			Scalar momentum = .9) :
+	MomentumAcceleratedSGDOptimizer(LossPtr<Scalar> loss, RegPenPtr<Scalar> reg, unsigned batch_size = 1,
+			Scalar init_learning_rate = 1e-3, Scalar annealing_rate = 1e-3, Scalar momentum = .9) :
 				SGDOptimizer<Scalar>::SGDOptimizer(loss, reg, batch_size),
 				init_learning_rate(init_learning_rate),
 				annealing_rate(annealing_rate),
@@ -350,7 +358,7 @@ protected:
 		Matrix<Scalar>& param_grads = param_grads_vec[i];
 		Matrix<Scalar>& params = Optimizer<Scalar>::get_params(layer);
 		param_grads = momentum * param_grads - learning_rate * (Optimizer<Scalar>::get_param_grads(layer) +
-				SGDOptimizer<Scalar>::reg.d_function(params));
+				SGDOptimizer<Scalar>::reg.get()->d_function(params));
 		params += param_grads;
 	};
 	Scalar calculate_learning_rate(unsigned epoch) {
@@ -365,9 +373,8 @@ protected:
 template<typename Scalar>
 class NesterovMomentumAcceleratedSGDOptimizer : public MomentumAcceleratedSGDOptimizer<Scalar> {
 public:
-	NesterovMomentumAcceleratedSGDOptimizer(const Loss<Scalar>& loss, const RegularizationPenalty<Scalar>& reg,
-			unsigned batch_size = 1, Scalar init_learning_rate = 1e-3, Scalar annealing_rate = 1e-3,
-			Scalar momentum = .9) :
+	NesterovMomentumAcceleratedSGDOptimizer(LossPtr<Scalar> loss, RegPenPtr<Scalar> reg, unsigned batch_size = 1,
+			Scalar init_learning_rate = 1e-3, Scalar annealing_rate = 1e-3, Scalar momentum = .9) :
 				MomentumAcceleratedSGDOptimizer<Scalar>::MomentumAcceleratedSGDOptimizer(loss, reg, batch_size,
 						init_learning_rate, annealing_rate, momentum) { };
 protected:
@@ -378,7 +385,7 @@ protected:
 		Matrix<Scalar> param_grads_bak = param_grads;
 		param_grads = MomentumAcceleratedSGDOptimizer<Scalar>::momentum * param_grads -
 				learning_rate * (Optimizer<Scalar>::get_param_grads(layer) +
-				SGDOptimizer<Scalar>::reg.d_function(params));
+				SGDOptimizer<Scalar>::reg.get()->d_function(params));
 		params += -MomentumAcceleratedSGDOptimizer<Scalar>::momentum * param_grads_bak +
 				(1 + MomentumAcceleratedSGDOptimizer<Scalar>::momentum) * param_grads;
 	};
@@ -387,8 +394,8 @@ protected:
 template<typename Scalar>
 class AdagradOptimizer : public SGDOptimizer<Scalar> {
 public:
-	AdagradOptimizer(const Loss<Scalar>& loss, const RegularizationPenalty<Scalar>& reg, unsigned batch_size = 1,
-			Scalar learning_rate = 1e-2, Scalar epsilon = Utils<Scalar>::EPSILON2) :
+	AdagradOptimizer(LossPtr<Scalar> loss, RegPenPtr<Scalar> reg, unsigned batch_size = 1, Scalar learning_rate = 1e-2,
+			Scalar epsilon = Utils<Scalar>::EPSILON2) :
 				SGDOptimizer<Scalar>::SGDOptimizer(loss, reg, batch_size),
 				learning_rate(learning_rate),
 				epsilon(epsilon) {
@@ -420,7 +427,7 @@ protected:
 		Matrix<Scalar>& param_grad_sqrs = param_grad_sqrs_vec[i];
 		Matrix<Scalar>& params = Optimizer<Scalar>::get_params(layer);
 		Matrix<Scalar> param_grads = Optimizer<Scalar>::get_param_grads(layer) +
-				SGDOptimizer<Scalar>::reg.d_function(params);
+				SGDOptimizer<Scalar>::reg.get()->d_function(params);
 		update_acc_weight_grad_sqrs(param_grad_sqrs, param_grads);
 		params -= (learning_rate * param_grads.array() / (param_grad_sqrs.array().sqrt() + epsilon)).matrix();
 	};
@@ -432,9 +439,8 @@ protected:
 template<typename Scalar>
 class RMSPropOptimizer : public AdagradOptimizer<Scalar> {
 public:
-	RMSPropOptimizer(const Loss<Scalar>& loss, const RegularizationPenalty<Scalar>& reg,
-			unsigned batch_size = 1, Scalar learning_rate = 1e-3, Scalar l2_decay = 1e-1,
-			Scalar epsilon = Utils<Scalar>::EPSILON) :
+	RMSPropOptimizer(LossPtr<Scalar> loss, RegPenPtr<Scalar> reg, unsigned batch_size = 1, Scalar learning_rate = 1e-3,
+			Scalar l2_decay = 1e-1, Scalar epsilon = Utils<Scalar>::EPSILON) :
 				AdagradOptimizer<Scalar>::AdagradOptimizer(loss, reg, batch_size, learning_rate, epsilon),
 				l2_decay(l2_decay) {
 		assert(l2_decay >= 0 && l2_decay <= 1);
@@ -455,8 +461,8 @@ protected:
 template<typename Scalar>
 class AdadeltaOptimizer : public SGDOptimizer<Scalar> {
 public:
-	AdadeltaOptimizer(const Loss<Scalar>& loss, const RegularizationPenalty<Scalar>& reg, unsigned batch_size = 1,
-			Scalar decay = 5e-2, Scalar epsilon = Utils<Scalar>::EPSILON2) :
+	AdadeltaOptimizer(LossPtr<Scalar> loss, RegPenPtr<Scalar> reg, unsigned batch_size = 1, Scalar decay = 5e-2,
+			Scalar epsilon = Utils<Scalar>::EPSILON2) :
 				SGDOptimizer<Scalar>::SGDOptimizer(loss, reg, batch_size),
 				decay(decay),
 				epsilon(epsilon) {
@@ -481,7 +487,7 @@ protected:
 		ParamGradAndUpdateSqrs& pgus = pgus_vec[i];
 		Matrix<Scalar>& params = Optimizer<Scalar>::get_params(layer);
 		Matrix<Scalar> param_grads = Optimizer<Scalar>::get_param_grads(layer) +
-				SGDOptimizer<Scalar>::reg.d_function(params);
+				SGDOptimizer<Scalar>::reg.get()->d_function(params);
 		pgus.param_grad = (1 - decay) * pgus.param_grad + decay * param_grads.cwiseProduct(param_grads);
 		Matrix<Scalar> weight_updates = -param_grads.array() * (pgus.param_update.array() + epsilon).sqrt() /
 				(pgus.param_grad.array() + epsilon).sqrt();
@@ -500,9 +506,8 @@ protected:
 template<typename Scalar>
 class AdamOptimizer : public SGDOptimizer<Scalar> {
 public:
-	AdamOptimizer(const Loss<Scalar>& loss, const RegularizationPenalty<Scalar>& reg, unsigned batch_size = 1,
-			Scalar learning_rate = 1e-3, Scalar l1_decay = 1e-1, Scalar l2_decay = 1e-3,
-			Scalar epsilon = Utils<Scalar>::EPSILON2) :
+	AdamOptimizer(LossPtr<Scalar> loss, RegPenPtr<Scalar> reg, unsigned batch_size = 1, Scalar learning_rate = 1e-3,
+			Scalar l1_decay = 1e-1, Scalar l2_decay = 1e-3, Scalar epsilon = Utils<Scalar>::EPSILON2) :
 				SGDOptimizer<Scalar>::SGDOptimizer(loss, reg, batch_size),
 				learning_rate(learning_rate),
 				l1_decay(l1_decay),
@@ -534,7 +539,7 @@ protected:
 		Scalar l2_corr = 1.0 / (1.0 - pow(1.0 - l2_decay, epoch + 1) + epsilon);
 		Matrix<Scalar>& params = Optimizer<Scalar>::get_params(layer);
 		Matrix<Scalar> param_grads = Optimizer<Scalar>::get_param_grads(layer) +
-				SGDOptimizer<Scalar>::reg.d_function(params);
+				SGDOptimizer<Scalar>::reg.get()->d_function(params);
 		grad_norms.param_grad_l1 = (1 - l1_decay) * grad_norms.param_grad_l1 + l1_decay * param_grads;
 		grad_norms.param_grad_l2 = (1 - l2_decay) * grad_norms.param_grad_l2 +
 				l2_decay * param_grads.cwiseProduct(param_grads);
@@ -555,9 +560,8 @@ protected:
 template<typename Scalar>
 class AdaMaxOptimizer : public AdamOptimizer<Scalar> {
 public:
-	AdaMaxOptimizer(const Loss<Scalar>& loss, const RegularizationPenalty<Scalar>& reg, unsigned batch_size = 1,
-			Scalar learning_rate = 1e-3, Scalar l1_decay = 1e-1, Scalar l2_decay = 1e-3,
-			Scalar epsilon = Utils<Scalar>::EPSILON2) :
+	AdaMaxOptimizer(LossPtr<Scalar> loss, RegPenPtr<Scalar> reg, unsigned batch_size = 1, Scalar learning_rate = 1e-3,
+			Scalar l1_decay = 1e-1, Scalar l2_decay = 1e-3, Scalar epsilon = Utils<Scalar>::EPSILON2) :
 				AdamOptimizer<Scalar>::AdamOptimizer(loss, reg, batch_size, learning_rate,
 						l1_decay, l2_decay, epsilon) { };
 protected:
@@ -567,7 +571,7 @@ protected:
 				AdamOptimizer<Scalar>::epsilon);
 		Matrix<Scalar>& params = Optimizer<Scalar>::get_params(layer);
 		Matrix<Scalar> param_grads = Optimizer<Scalar>::get_param_grads(layer) +
-				SGDOptimizer<Scalar>::reg.d_function(params);
+				SGDOptimizer<Scalar>::reg.get()->d_function(params);
 		grad_norms.param_grad_l1 = (1 - AdamOptimizer<Scalar>::l1_decay) * grad_norms.param_grad_l1 +
 				AdamOptimizer<Scalar>::l1_decay * param_grads;
 		grad_norms.param_grad_l2 = ((1 - AdamOptimizer<Scalar>::l2_decay) * grad_norms.param_grad_l2)
@@ -580,9 +584,8 @@ protected:
 template<typename Scalar>
 class NadamOptimizer : public AdamOptimizer<Scalar> {
 public:
-	NadamOptimizer(const Loss<Scalar>& loss, const RegularizationPenalty<Scalar>& reg, unsigned batch_size = 1,
-			Scalar learning_rate = 1e-3, Scalar l1_decay = 1e-1, Scalar l2_decay = 1e-3,
-			Scalar epsilon = Utils<Scalar>::EPSILON2) :
+	NadamOptimizer(LossPtr<Scalar> loss, RegPenPtr<Scalar> reg, unsigned batch_size = 1, Scalar learning_rate = 1e-3,
+			Scalar l1_decay = 1e-1, Scalar l2_decay = 1e-3, Scalar epsilon = Utils<Scalar>::EPSILON2) :
 				AdamOptimizer<Scalar>::AdamOptimizer(loss, reg, batch_size, learning_rate,
 						l1_decay, l2_decay, epsilon) { };
 protected:
@@ -596,7 +599,7 @@ protected:
 				AdamOptimizer<Scalar>::epsilon);
 		Matrix<Scalar>& params = Optimizer<Scalar>::get_params(layer);
 		Matrix<Scalar> param_grads = Optimizer<Scalar>::get_param_grads(layer) +
-				SGDOptimizer<Scalar>::reg.d_function(params);
+				SGDOptimizer<Scalar>::reg.get()->d_function(params);
 		grad_norms.param_grad_l1 = (1 - AdamOptimizer<Scalar>::l1_decay) * grad_norms.param_grad_l1 +
 				AdamOptimizer<Scalar>::l1_decay * param_grads;
 		grad_norms.param_grad_l2 = (1 - AdamOptimizer<Scalar>::l2_decay) * grad_norms.param_grad_l2 +

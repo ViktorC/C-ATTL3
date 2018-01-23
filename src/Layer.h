@@ -12,6 +12,7 @@
 #include <cassert>
 #include <cmath>
 #include <Dimensions.h>
+#include <memory>
 #include <type_traits>
 #include <Utils.h>
 #include <utility>
@@ -58,9 +59,12 @@ private:
 };
 
 template<typename Scalar>
+using WeightInitPtr = std::shared_ptr<WeightInitialization<Scalar>>;
+
+template<typename Scalar>
 class FCLayer : public Layer<Scalar> {
 public:
-	FCLayer(Dimensions<int> input_dims, unsigned output_size, const WeightInitialization<Scalar>& weight_init,
+	FCLayer(Dimensions<int> input_dims, unsigned output_size, WeightInitPtr<Scalar> weight_init,
 			Scalar max_norm_constraint = 0) :
 				input_dims(input_dims),
 				output_dims(output_size, 1, 1),
@@ -68,7 +72,9 @@ public:
 				max_norm_constraint(max_norm_constraint),
 				max_norm(Utils<Scalar>::decidedly_greater(max_norm_constraint, .0)),
 				weights(input_dims.get_points() + 1, output_size),
-				weight_grads(input_dims.get_points() + 1, output_size) { };
+				weight_grads(input_dims.get_points() + 1, output_size) {
+		assert(weight_init.get() != nullptr);
+	};
 	Layer<Scalar>* clone() {
 		return new FCLayer(*this);
 	};
@@ -80,7 +86,7 @@ public:
 	};
 protected:
 	void init() {
-		weight_init.apply(weights);
+		weight_init.get()->apply(weights);
 		weight_grads.setZero(weight_grads.rows(), weight_grads.cols());
 	};
 	void empty_cache() {
@@ -127,7 +133,7 @@ protected:
 private:
 	Dimensions<int> input_dims;
 	Dimensions<int> output_dims;
-	const WeightInitialization<Scalar>& weight_init;
+	WeightInitPtr<Scalar> weight_init;
 	Scalar max_norm_constraint;
 	bool max_norm;
 	/* Eigen matrices are backed by arrays allocated on the heap, so these
@@ -182,7 +188,8 @@ protected:
 		assert(out_grads.dimension(0) > 0 && out.rows() == out_grads.dimension(0));
 		if (Layer<Scalar>::is_input_layer())
 			return Layer<Scalar>::null_tensor;
-		return Utils<Scalar>::mat_to_tensor4d(d_activate(in, out, Utils<Scalar>::tensor4d_to_mat(out_grads)), dims);
+		return Utils<Scalar>::mat_to_tensor4d(d_activate(in, out,
+				Utils<Scalar>::tensor4d_to_mat(out_grads)), dims);
 	};
 	Dimensions<int> dims;
 	Matrix<Scalar> params;
@@ -489,7 +496,7 @@ protected:
 		for (int i = 0; i < dims.get_dim3(); i++) {
 			offsets[3] = i;
 			Tensor4<Scalar> in_slice_i = in.slice(offsets, extents);
-			Matrix<Scalar> in_ch_i = Utils<Scalar>::tensor4d_to_mat(std::move(in_slice_i));
+			Matrix<Scalar> in_ch_i = Utils<Scalar>::tensor4d_to_mat(in_slice_i);
 			if (training) {
 				Cache& cache = cache_vec[i];
 				RowVector<Scalar> means = in_ch_i.colwise().mean();
@@ -529,7 +536,7 @@ protected:
 		for (int i = 0; i < dims.get_dim3(); i++) {
 			offsets[3] = i;
 			Tensor4<Scalar> out_grads_slice_i = out_grads.slice(offsets, extents);
-			Matrix<Scalar> out_grads_ch_i = Utils<Scalar>::tensor4d_to_mat(std::move(out_grads_slice_i));
+			Matrix<Scalar> out_grads_ch_i = Utils<Scalar>::tensor4d_to_mat(out_grads_slice_i);
 			Cache& cache = cache_vec[i];
 			param_grads.row(2 * i) = out_grads_ch_i.cwiseProduct(cache.std_in).colwise().sum();
 			param_grads.row(2 * i + 1) = out_grads_ch_i.colwise().sum();
@@ -602,15 +609,14 @@ protected:
 		assert(in.dimension(0) > 0);
 		if (training && dropout) {
 			Matrix<Scalar> in_mat = Utils<Scalar>::tensor4d_to_mat(in);
-			Matrix<Scalar> dropout_mask(in_mat.rows(), in_mat.cols());
+			dropout_mask = Matrix<Scalar>(in_mat.rows(), in_mat.cols());
 			dropout_mask.setRandom(in_mat.rows(), in_mat.cols());
 			// Inverted dropout.
 			Scalar scaling_factor = 1 / (1 - dropout_prob + epsilon);
 			dropout_mask = ((dropout_mask.array() + 1) / 2).unaryExpr([this,scaling_factor](Scalar i) {
 				return (Scalar) (i <= dropout_prob ? .0 : scaling_factor);
 			});
-			in = Utils<Scalar>::mat_to_tensor4d(in_mat.cwiseProduct(dropout_mask).eval(), dims);
-			this->dropout_mask = std::move(dropout_mask);
+			return Utils<Scalar>::mat_to_tensor4d(in_mat.cwiseProduct(dropout_mask).eval(), dims);
 		}
 		return in;
 	};
@@ -621,8 +627,8 @@ protected:
 		if (Layer<Scalar>::is_input_layer())
 			return Layer<Scalar>::null_tensor;
 		// The derivative of the dropout 'function'.
-		return Utils<Scalar>::mat_to_tensor4d(Utils<Scalar>::tensor4d_to_mat(out_grads).cwiseProduct(dropout_mask)
-				.eval(), dims);
+		return Utils<Scalar>::mat_to_tensor4d(Utils<Scalar>::tensor4d_to_mat(out_grads)
+				.cwiseProduct(dropout_mask).eval(), dims);
 	};
 private:
 	Dimensions<int> dims;
@@ -638,9 +644,8 @@ private:
 template<typename Scalar>
 class ConvLayer : public Layer<Scalar> {
 public:
-	ConvLayer(Dimensions<int> input_dims, unsigned filters, const WeightInitialization<Scalar>& weight_init,
-			unsigned receptor_size = 3, unsigned padding = 1, unsigned stride = 1, unsigned dilation = 0,
-			Scalar max_norm_constraint = 0) :
+	ConvLayer(Dimensions<int> input_dims, unsigned filters, WeightInitPtr<Scalar> weight_init, unsigned receptor_size = 3,
+			unsigned padding = 1, unsigned stride = 1, unsigned dilation = 0, Scalar max_norm_constraint = 0) :
 				input_dims(input_dims),
 				output_dims(calculate_output_dim(input_dims.get_dim1(), receptor_size, padding, dilation, stride),
 						calculate_output_dim(input_dims.get_dim2(), receptor_size, padding, dilation, stride),
@@ -656,6 +661,7 @@ public:
 				weights(receptor_size * receptor_size * input_dims.get_dim3() + 1, filters),
 				weight_grads(weights.rows(), filters) {
 		assert(filters > 0);
+		assert(weight_init.get() != nullptr);
 		assert(receptor_size > 0);
 		assert(stride > 0);
 		assert(input_dims.get_dim1() + 2 * padding >= receptor_size + (receptor_size - 1) * dilation &&
@@ -674,7 +680,7 @@ protected:
 	void init() {
 		/* For every filter, there is a column in the weight matrix with the same number of
 		 * elements as the size of the receptive field (F * F * D) + 1 for the bias row. */
-		weight_init.apply(weights);
+		weight_init.get()->apply(weights);
 		weight_grads.setZero(weight_grads.rows(), weight_grads.cols());
 	};
 	void empty_cache() {
@@ -809,7 +815,7 @@ private:
 	Dimensions<int> input_dims;
 	Dimensions<int> output_dims;
 	unsigned filters;
-	const WeightInitialization<Scalar>& weight_init;
+	WeightInitPtr<Scalar> weight_init;
 	unsigned receptor_size;
 	unsigned padding;
 	unsigned stride;

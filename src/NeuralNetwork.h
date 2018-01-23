@@ -8,17 +8,17 @@
 #ifndef NEURALNETWORK_H_
 #define NEURALNETWORK_H_
 
-#include <Layer.h>
 #include <cassert>
 #include <Dimensions.h>
 #include <Eigen/Core>
 #include <iomanip>
+#include <Layer.h>
 #include <pthread.h>
 #include <sstream>
 #include <string>
 #include <type_traits>
+#include <utility>
 #include <vector>
-#include <WeightInitialization.h>
 
 namespace cppnn {
 
@@ -111,23 +111,12 @@ class SequentialNeuralNetwork : public NeuralNetwork<Scalar> {
 	friend class ParallelNeuralNetwork<Scalar>;
 	friend class ResidualNeuralNetwork<Scalar,false>;
 public:
-	/**
-	 * Constructs the network using the provided vector of layers. The object
-	 * takes ownership of the pointers held in the vector and deletes them when
-	 * its destructor is invoked.
-	 *
-	 * @param layers A vector of Layer pointers to compose the neural network.
-	 * The vector must contain at least 1 element and no null pointers. The
-	 * the prev_nodes attributes of the Layer objects pointed to by the pointers
-	 * must match the nodes attribute of the Layer objects pointed to by their
-	 * pointers directly preceding them in the vector.
-	 */
-	SequentialNeuralNetwork(std::vector<Layer<Scalar>*> layers, bool foremost = true) : // TODO use smart Layer pointers
+	SequentialNeuralNetwork(std::vector<Layer<Scalar>*> layers, bool foremost = true) :
 			layers(layers),
 			foremost(foremost) {
 		assert(layers.size() > 0 && "layers must contain at least 1 element");
 		assert(layers[0] != nullptr);
-		Layer<Scalar>& first_layer = *(layers[0]);
+		Layer<Scalar>& first_layer = *layers[0];
 		input_dims = first_layer.get_input_dims();
 		output_dims = layers[layers.size() - 1]->get_output_dims();
 		Dimensions<int> prev_dims = first_layer.get_output_dims();
@@ -196,7 +185,7 @@ protected:
 		NeuralNetwork<Scalar>::assert_popagation_input_dims(input, input_dims);
 		for (unsigned i = 0; i < layers.size(); i++) {
 			Layer<Scalar>& layer = *layers[i];
-			input = NeuralNetwork<Scalar>::pass_forward(layer, input, training);
+			input = NeuralNetwork<Scalar>::pass_forward(layer, std::move(input), training);
 			if (!training)
 				NeuralNetwork<Scalar>::empty_cache(layer);
 		}
@@ -206,7 +195,7 @@ protected:
 		NeuralNetwork<Scalar>::assert_popagation_input_dims(out_grads, output_dims);
 		for (int i = layers.size() - 1; i >= 0; i--) {
 			Layer<Scalar>& layer = *(layers[i]);
-			out_grads = NeuralNetwork<Scalar>::pass_back(layer, out_grads);
+			out_grads = NeuralNetwork<Scalar>::pass_back(layer, std::move(out_grads));
 			NeuralNetwork<Scalar>::empty_cache(layer);
 		}
 		return out_grads;
@@ -439,7 +428,7 @@ protected:
 		for (unsigned i = 0; i < modules.size(); i++) {
 			std::pair<Module,bool>& module = modules[i];
 			input = module.second ? input + module.first.propagate(input, training) :
-					module.first.propagate(input, training);
+					module.first.propagate(std::move(input), training);
 		}
 		return input;
 	};
@@ -448,7 +437,7 @@ protected:
 		for (int i = modules.size() - 1; i >= 0; i--) {
 			std::pair<Module,bool>& module = modules[i];
 			out_grads = module.second ? out_grads + module.first.backpropagate(out_grads) :
-					module.first.backpropagate(out_grads);
+					module.first.backpropagate(std::move(out_grads));
 		}
 		return out_grads;
 	};

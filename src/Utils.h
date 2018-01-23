@@ -13,6 +13,7 @@
 #include <Eigen/Dense>
 #include <limits>
 #include <type_traits>
+#include <utility>
 #include <unsupported/Eigen/CXX11/Tensor>
 
 namespace cppnn {
@@ -73,13 +74,35 @@ public:
 			Scalar rel_epsilon = EPSILON1) {
 		return n1 < n2 || almost_equal(n1, n2, abs_epsilon, rel_epsilon);
 	};
-	static Matrix<Scalar> tensor4d_to_mat(Tensor4<Scalar> tensor) {
+	static Matrix<Scalar> tensor4d_to_mat(Tensor4<Scalar>& tensor) {
 		int rows = tensor.dimension(0);
 		return MatrixMap<Scalar>(tensor.data(), rows, tensor.size() / rows);
 	};
-	static Tensor4<Scalar> mat_to_tensor4d(Matrix<Scalar> mat, Dimensions<int> dims) {
+	static Matrix<Scalar> tensor4d_to_mat(const Tensor4<Scalar>& tensor) {
+		// Create a copy of tensor and pass it as an rvalue.
+		Tensor4<Scalar> tensor_copy = tensor;
+		return tensor4d_to_mat(tensor_copy);
+	};
+	static Tensor4<Scalar> mat_to_tensor4d(Matrix<Scalar>& mat, Dimensions<int> dims) {
 		return Tensor4Map<Scalar>(mat.data(), mat.rows(), dims.get_dim1(),
 				dims.get_dim2(), dims.get_dim3());
+	};
+	static Tensor4<Scalar> mat_to_tensor4d(const Matrix<Scalar>& mat, Dimensions<int> dims) {
+		Matrix<Scalar> mat_copy = mat;
+		return mat_to_tensor4d(mat_copy, dims);
+	}
+	static void shuffle_mat_rows(Matrix<Scalar>& mat) {
+		Eigen::PermutationMatrix<Eigen::Dynamic,Eigen::Dynamic> perm(mat.rows());
+		perm.setIdentity();
+		// Shuffle the indices of the identity matrix.
+		std::random_shuffle(perm.indices().data(), perm.indices().data() + perm.indices().size());
+		mat = perm * mat;
+	};
+	static void shuffle_tensor_rows(Tensor4<Scalar>& tensor) {
+		Dimensions<int> tensor_dims(tensor.dimension(1), tensor.dimension(2), tensor.dimension(3));
+		Matrix<Scalar> mat = tensor4d_to_mat(tensor);
+		shuffle_mat_rows(mat);
+		tensor = mat_to_tensor4d(mat, tensor_dims);
 	};
 };
 
