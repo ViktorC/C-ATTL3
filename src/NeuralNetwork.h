@@ -102,6 +102,9 @@ protected:
 	};
 };
 
+template<typename Scalar>
+using LayerPtr = std::unique_ptr<Layer<Scalar>>;
+
 // Forward declarations for friending.
 template<typename Scalar> class ParallelNeuralNetwork;
 template<typename Scalar, bool ParallelModules> class ResidualNeuralNetwork;
@@ -111,29 +114,36 @@ class SequentialNeuralNetwork : public NeuralNetwork<Scalar> {
 	friend class ParallelNeuralNetwork<Scalar>;
 	friend class ResidualNeuralNetwork<Scalar,false>;
 public:
-	SequentialNeuralNetwork(std::vector<Layer<Scalar>*> layers, bool foremost = true) :
-			layers(layers),
+	/**
+	 * Constructs the network using the provided layer pointers. It takes ownership of the layer pointers.
+	 *
+	 * @param layers A vector of unique smart pointers to the layers that constitute the neural network.
+	 * @param foremost Whether the network directly receives its input. If it is set to false, back-propagation
+	 * returns an empty tensor.
+	 */
+	SequentialNeuralNetwork(std::vector<LayerPtr<Scalar>> layers, bool foremost = true) :
+			layers(std::move(layers)),
 			foremost(foremost) {
-		assert(layers.size() > 0 && "layers must contain at least 1 element");
-		assert(layers[0] != nullptr);
-		Layer<Scalar>& first_layer = *layers[0];
+		assert(this->layers.size() > 0 && "layers must contain at least 1 element");
+		assert(this->layers[0] != nullptr);
+		Layer<Scalar>& first_layer = *(this->layers[0]);
 		input_dims = first_layer.get_input_dims();
-		output_dims = layers[layers.size() - 1]->get_output_dims();
+		output_dims = this->layers[this->layers.size() - 1]->get_output_dims();
 		Dimensions<int> prev_dims = first_layer.get_output_dims();
-		for (unsigned i = 1; i < layers.size(); i++) {
-			assert(layers[i] != nullptr && "layers contains null pointers");
-			assert(prev_dims.equals(layers[i]->get_input_dims()) && "incompatible layer dimensions");
-			prev_dims = layers[i]->get_output_dims();
+		for (unsigned i = 1; i < this->layers.size(); i++) {
+			assert(this->layers[i] != nullptr && "layers contains null pointers");
+			assert(prev_dims.equals(this->layers[i]->get_input_dims()) && "incompatible layer dimensions");
+			prev_dims = this->layers[i]->get_output_dims();
 		}
 		NeuralNetwork<Scalar>::set_input_layer(first_layer, foremost);
 	};
-	SequentialNeuralNetwork(Layer<Scalar>* layer, bool foremost = true) :
-			SequentialNeuralNetwork(std::vector<Layer<Scalar>*>({ layer }), foremost) { };
+	SequentialNeuralNetwork(LayerPtr<Scalar> layer, bool foremost = true) :
+			SequentialNeuralNetwork(create_vector(std::move(layer)), foremost) { };
 	// Copy constructor.
 	SequentialNeuralNetwork(const SequentialNeuralNetwork<Scalar>& network) :
 			layers(network.layers.size()) {
 		for (unsigned i = 0; i < layers.size(); i++) {
-			layers[i] = network.layers[i]->clone();
+			layers[i] = LayerPtr<Scalar>(network.layers[i]->clone());
 		}
 		foremost = network.foremost;
 		input_dims = network.input_dims;
@@ -143,12 +153,8 @@ public:
 	SequentialNeuralNetwork(SequentialNeuralNetwork<Scalar>&& network) {
 		swap(*this, network);
 	};
-	// Take ownership of the layer pointers.
-	~SequentialNeuralNetwork() {
-		for (unsigned i = 0; i < layers.size(); i++) {
-			delete layers[i];
-		}
-	};
+	// The smart pointers take care of deleting the layers.
+	~SequentialNeuralNetwork() = default;
 	/* The assignment uses the move or copy constructor to pass the parameter
 	 * based on whether it is an lvalue or an rvalue. */
 	SequentialNeuralNetwork<Scalar>& operator=(SequentialNeuralNetwork<Scalar> network) {
@@ -179,7 +185,10 @@ protected:
 		this->foremost = foremost;
 	};
 	std::vector<Layer<Scalar>*> get_layers() {
-		return layers;
+		std::vector<Layer<Scalar>*> layers_raw(layers.size());
+		for (unsigned i = 0; i < layers.size(); i++)
+			layers_raw[i] = layers[i].get();
+		return layers_raw;
 	};
 	Tensor4<Scalar> propagate(Tensor4<Scalar> input, bool training) {
 		NeuralNetwork<Scalar>::assert_popagation_input_dims(input, input_dims);
@@ -200,7 +209,12 @@ protected:
 		}
 		return out_grads;
 	};
-	std::vector<Layer<Scalar>*> layers;
+	static std::vector<LayerPtr<Scalar>> create_vector(LayerPtr<Scalar> layer) {
+		std::vector<LayerPtr<Scalar>> vec(1);
+		vec[0] = std::move(layer);
+		return vec;
+	};
+	std::vector<LayerPtr<Scalar>> layers;
 	bool foremost;
 	Dimensions<int> input_dims;
 	Dimensions<int> output_dims;

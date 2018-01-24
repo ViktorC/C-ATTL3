@@ -40,15 +40,15 @@ public:
 			data(data),
 			obj(obj),
 			offsets({ 0, 0, 0, 0 }) {
-		assert(data.get() != nullptr);
-		assert(obj.get() != nullptr);
-		assert(rows == obj.get()->dimension(0) && "mismatched data and obj tensor row numbers");
-		rows = (unsigned) data.get()->dimension(0);
-		data_extents = Array4<Scalar>({ 0, data.get()->dimension(1), data.get()->dimension(2), data.get()->dimension(3) });
-		obj_extents = Array4<Scalar>({ 0, obj.get()->dimension(1), obj.get()->dimension(2), obj.get()->dimension(3) });
+		assert(data != nullptr);
+		assert(obj != nullptr);
+		assert(rows == obj->dimension(0) && "mismatched data and obj tensor row numbers");
+		rows = (unsigned) data->dimension(0);
+		data_extents = Array4<Scalar>({ 0, data->dimension(1), data->dimension(2), data->dimension(3) });
+		obj_extents = Array4<Scalar>({ 0, obj->dimension(1), obj->dimension(2), obj->dimension(3) });
 		if (shuffle) {
-			Utils<Scalar>::shuffle_tensor_rows(*data.get());
-			Utils<Scalar>::shuffle_tensor_rows(*obj.get());
+			Utils<Scalar>::shuffle_tensor_rows(*data);
+			Utils<Scalar>::shuffle_tensor_rows(*obj);
 		}
 	};
 	unsigned observations() {
@@ -58,9 +58,9 @@ public:
 		int max_batch_size = std::min((int) batch_size, row - offsets[0]);
 		data_extents[0] = max_batch_size;
 		obj_extents[0] = max_batch_size;
-		Tensor4<Scalar> data_batch = data.get()->slice(offsets, data_extents);
-		Tensor4<Scalar> obj_batch = obj.get()->slice(offsets, obj_extents);
-		offsets[0] = std::min((int) rows, offsets[0] + max_batch_size);
+		Tensor4<Scalar> data_batch = data->slice(offsets, data_extents);
+		Tensor4<Scalar> obj_batch = obj->slice(offsets, obj_extents);
+		offsets[0] = std::min((int) rows, (int) offsets[0] + max_batch_size);
 		return std::make_pair(data_batch, obj_batch);
 	};
 	bool reached_eol() {

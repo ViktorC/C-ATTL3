@@ -59,12 +59,12 @@ private:
 };
 
 template<typename Scalar>
-using WeightInitPtr = std::shared_ptr<WeightInitialization<Scalar>>;
+using WeightInitSharedPtr = std::shared_ptr<WeightInitialization<Scalar>>;
 
 template<typename Scalar>
 class FCLayer : public Layer<Scalar> {
 public:
-	FCLayer(Dimensions<int> input_dims, unsigned output_size, WeightInitPtr<Scalar> weight_init,
+	FCLayer(Dimensions<int> input_dims, unsigned output_size, WeightInitSharedPtr<Scalar> weight_init,
 			Scalar max_norm_constraint = 0) :
 				input_dims(input_dims),
 				output_dims(output_size, 1, 1),
@@ -73,7 +73,7 @@ public:
 				max_norm(Utils<Scalar>::decidedly_greater(max_norm_constraint, .0)),
 				weights(input_dims.get_points() + 1, output_size),
 				weight_grads(input_dims.get_points() + 1, output_size) {
-		assert(weight_init.get() != nullptr);
+		assert(weight_init != nullptr);
 	};
 	Layer<Scalar>* clone() {
 		return new FCLayer(*this);
@@ -86,7 +86,7 @@ public:
 	};
 protected:
 	void init() {
-		weight_init.get()->apply(weights);
+		weight_init->apply(weights);
 		weight_grads.setZero(weight_grads.rows(), weight_grads.cols());
 	};
 	void empty_cache() {
@@ -133,7 +133,7 @@ protected:
 private:
 	Dimensions<int> input_dims;
 	Dimensions<int> output_dims;
-	WeightInitPtr<Scalar> weight_init;
+	WeightInitSharedPtr<Scalar> weight_init;
 	Scalar max_norm_constraint;
 	bool max_norm;
 	/* Eigen matrices are backed by arrays allocated on the heap, so these
@@ -644,7 +644,7 @@ private:
 template<typename Scalar>
 class ConvLayer : public Layer<Scalar> {
 public:
-	ConvLayer(Dimensions<int> input_dims, unsigned filters, WeightInitPtr<Scalar> weight_init, unsigned receptor_size = 3,
+	ConvLayer(Dimensions<int> input_dims, unsigned filters, WeightInitSharedPtr<Scalar> weight_init, unsigned receptor_size = 3,
 			unsigned padding = 1, unsigned stride = 1, unsigned dilation = 0, Scalar max_norm_constraint = 0) :
 				input_dims(input_dims),
 				output_dims(calculate_output_dim(input_dims.get_dim1(), receptor_size, padding, dilation, stride),
@@ -661,7 +661,7 @@ public:
 				weights(receptor_size * receptor_size * input_dims.get_dim3() + 1, filters),
 				weight_grads(weights.rows(), filters) {
 		assert(filters > 0);
-		assert(weight_init.get() != nullptr);
+		assert(weight_init != nullptr);
 		assert(receptor_size > 0);
 		assert(stride > 0);
 		assert(input_dims.get_dim1() + 2 * padding >= receptor_size + (receptor_size - 1) * dilation &&
@@ -680,7 +680,7 @@ protected:
 	void init() {
 		/* For every filter, there is a column in the weight matrix with the same number of
 		 * elements as the size of the receptive field (F * F * D) + 1 for the bias row. */
-		weight_init.get()->apply(weights);
+		weight_init->apply(weights);
 		weight_grads.setZero(weight_grads.rows(), weight_grads.cols());
 	};
 	void empty_cache() {
@@ -815,7 +815,7 @@ private:
 	Dimensions<int> input_dims;
 	Dimensions<int> output_dims;
 	unsigned filters;
-	WeightInitPtr<Scalar> weight_init;
+	WeightInitSharedPtr<Scalar> weight_init;
 	unsigned receptor_size;
 	unsigned padding;
 	unsigned stride;

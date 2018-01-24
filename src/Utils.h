@@ -104,6 +104,9 @@ public:
 		shuffle_mat_rows(mat);
 		tensor = mat_to_tensor4d(mat, tensor_dims);
 	};
+	static Dimensions<int> get_dims(const Tensor4<Scalar> tensor) {
+		return Dimensions<int>(tensor.dimension(1), tensor.dimension(2), tensor.dimension(3));
+	};
 };
 
 }
