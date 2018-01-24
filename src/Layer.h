@@ -833,14 +833,14 @@ template<typename Scalar>
 class PoolingLayer : public Layer<Scalar> {
 public:
 	PoolingLayer(Dimensions<int> input_dims, unsigned receptor_size, unsigned stride) :
-				input_dims(input_dims),
-				output_dims(calculate_output_dim(input_dims.get_dim1(), receptor_size, stride),
-						calculate_output_dim(input_dims.get_dim2(), receptor_size, stride), input_dims.get_dim3()),
-				receptor_size(receptor_size),
-				stride(stride),
-				receptor_area(receptor_size * receptor_size),
-				params(0, 0),
-				param_grads(0, 0) {
+			input_dims(input_dims),
+			output_dims(calculate_output_dim(input_dims.get_dim1(), receptor_size, stride),
+					calculate_output_dim(input_dims.get_dim2(), receptor_size, stride), input_dims.get_dim3()),
+			receptor_size(receptor_size),
+			stride(stride),
+			receptor_area(receptor_size * receptor_size),
+			params(0, 0),
+			param_grads(0, 0) {
 		assert(input_dims.get_dim1() >= (int) receptor_size && input_dims.get_dim2() >= (int) receptor_size);
 		assert(receptor_size > 0);
 		assert(stride > 0);

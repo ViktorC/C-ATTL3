@@ -161,6 +161,15 @@ public:
 		swap(*this, network);
 		return *this;
 	};
+	// For the copy-and-swap idiom.
+	friend void swap(SequentialNeuralNetwork<Scalar>& network1,
+			SequentialNeuralNetwork<Scalar>& network2) {
+		using std::swap;
+		swap(network1.layers, network2.layers);
+		swap(network1.foremost, network2.foremost);
+		swap(network1.input_dims, network2.input_dims);
+		swap(network1.output_dims, network2.output_dims);
+	};
 	bool is_foremost() const {
 		return foremost;
 	};
@@ -171,15 +180,6 @@ public:
 		return output_dims;
 	};
 protected:
-	// For the copy-and-swap idiom.
-	friend void swap(SequentialNeuralNetwork<Scalar>& network1,
-			SequentialNeuralNetwork<Scalar>& network2) {
-		using std::swap;
-		swap(network1.layers, network2.layers);
-		swap(network1.foremost, network2.foremost);
-		swap(network1.input_dims, network2.input_dims);
-		swap(network1.output_dims, network2.output_dims);
-	};
 	void set_foremost(bool foremost) {
 		NeuralNetwork<Scalar>::set_input_layer(*layers[0], foremost);
 		this->foremost = foremost;
