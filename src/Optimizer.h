@@ -37,12 +37,14 @@ public:
 		assert(loss != nullptr);
 	};
 	virtual ~Optimizer() = default;
-	bool verify_gradients(NeuralNetwork<Scalar>& net, const DataProvider<Scalar>& provider, Scalar step_size = 1e-5,
+	bool verify_gradients(NeuralNetwork<Scalar>& net, DataProvider<Scalar>& provider, Scalar step_size = 1e-5,
 			Scalar abs_epsilon = Utils<Scalar>::EPSILON2, Scalar rel_epsilon = Utils<Scalar>::EPSILON3) const {
-		assert(net.get_input_dims().equals(provider.get_obj_dims()));
+		assert(net.get_input_dims().equals(provider.get_obs_dims()));
+		assert(net.get_output_dims().equals(provider.get_obj_dims()));
 		assert(step_size > 0);
 		assert(abs_epsilon >= 0 && rel_epsilon > 0);
 		DataPair<Scalar> data_pair = provider.get_data(provider.instances());
+		provider.reset();
 		/* As the loss to minimize is the mean of the losses for all the training observations, the gradient to
 		 * back-propagate is to be divided by the number of observations in the batch. */
 		net.backpropagate(loss->d_function(net.propagate(data_pair.first, true), data_pair.second) /
@@ -53,7 +55,7 @@ public:
 			Layer<Scalar>& layer = *(layers[i]);
 			if (layer.is_parametric()) {
 				std::cout << "Layer " << std::setw(3) << std::to_string(i + 1) <<
-						"----------------------------" << std::endl;
+						std::string(28, '-') << std::endl;
 				Matrix<Scalar>& params = layer.get_params();
 				const Matrix<Scalar>& param_grads = layer.get_param_grads();
 				for (int j = 0; j < params.rows(); j++) {
@@ -90,6 +92,8 @@ public:
 	};
 	void optimize(NeuralNetwork<Scalar>& net, DataProvider<Scalar>& training_prov, DataProvider<Scalar>& test_prov,
 			unsigned epochs, unsigned early_stop = 0) {
+		assert(net.get_input_dims().equals(training_prov.get_obs_dims()));
+		assert(net.get_output_dims().equals(training_prov.get_obj_dims()));
 		assert(training_prov.get_obs_dims().equals(test_prov.get_obs_dims()));
 		assert(training_prov.get_obj_dims().equals(test_prov.get_obj_dims()));
 		assert(epochs > 0);
@@ -99,7 +103,7 @@ public:
 		unsigned cons_loss_inc = 0;
 		// Start the optimization iterations.
 		for (unsigned i = 0; i <= epochs; i++) {
-			std::cout << "Epoch " << std::setw(3) << i << "----------------------------" << std::endl;
+			std::cout << "Epoch " << std::setw(3) << i << std::string(28, '-') << std::endl;
 			// Train.
 			if (i != 0) {
 				training_prov.reset();

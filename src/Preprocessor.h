@@ -49,7 +49,7 @@ public:
 		for (int i = 0; i < dims.get_dim3(); i++) {
 			offsets[3] = i;
 			Tensor4<Scalar> data_slice_i = data.slice(offsets, extents);
-			Matrix<Scalar> data_mat = Utils<Scalar>::tensor4d_to_mat(data_slice_i);
+			Matrix<Scalar> data_mat = Utils<Scalar>::map_tensor4_to_mat(data_slice_i);
 			means.row(i) = data_mat.colwise().mean();
 			if (standardize)
 				sd.row(i) = (data_mat.rowwise() - means.row(i)).array().square().colwise().mean().sqrt();
@@ -66,11 +66,11 @@ public:
 		for (int i = 0; i < dims.get_dim3(); i++) {
 			offsets[3] = i;
 			Tensor4<Scalar> data_slice_i = data.slice(offsets, extents);
-			Matrix<Scalar> data_ch_i = Utils<Scalar>::tensor4d_to_mat(data_slice_i);
+			Matrix<Scalar> data_ch_i = Utils<Scalar>::map_tensor4_to_mat(data_slice_i);
 			data_ch_i = data_ch_i.rowwise() - means.row(i);
 			if (standardize)
 				data_ch_i *= (sd.row(i).array() + epsilon).inverse().matrix().asDiagonal();
-			data.slice(offsets, extents) = Utils<Scalar>::mat_to_tensor4d(data_ch_i, slice_dims);
+			data.slice(offsets, extents) = Utils<Scalar>::map_mat_to_tensor4(data_ch_i, slice_dims);
 		}
 	};
 protected:
@@ -107,7 +107,7 @@ public:
 		for (int i = 0; i < channels; i++) {
 			offsets[3] = i;
 			Tensor4<Scalar> data_slice_i = data.slice(offsets, extents);
-			Matrix<Scalar> normalized_data = Utils<Scalar>::tensor4d_to_mat(data_slice_i).rowwise() -
+			Matrix<Scalar> normalized_data = Utils<Scalar>::map_tensor4_to_mat(data_slice_i).rowwise() -
 					NormalizationPreprocessor<Scalar>::means.row(i);
 			if (NormalizationPreprocessor<Scalar>::standardize)
 				normalized_data *= (NormalizationPreprocessor<Scalar>::sd.row(i).array() +
@@ -139,12 +139,12 @@ public:
 	void transform(Tensor4<Scalar>& data) const {
 		NormalizationPreprocessor<Scalar>::transform(data);
 		if (reduce_dims) {
-			Matrix<Scalar> data_mat = Utils<Scalar>::tensor4d_to_mat(data);
+			Matrix<Scalar> data_mat = Utils<Scalar>::map_tensor4_to_mat(data);
 			data_mat *= ed_vec[0].eigen_basis;
 			if (whiten)
 				data_mat *= (ed_vec[0].eigen_values.array() + NormalizationPreprocessor<Scalar>::epsilon)
 						.sqrt().inverse().matrix().asDiagonal();
-			data = Utils<Scalar>::mat_to_tensor4d(data_mat, Dimensions<int>(data_mat.cols()));
+			data = Utils<Scalar>::map_mat_to_tensor4(data_mat, Dimensions<int>(data_mat.cols()));
 		} else {
 			int rows = data.dimension(0);
 			Dimensions<int> slice_dims(NormalizationPreprocessor<Scalar>::dims.get_dim1(),
@@ -154,12 +154,12 @@ public:
 			for (int i = 0; i < data.dimension(3); i++) {
 				offsets[3] = i;
 				Tensor4<Scalar> data_slice_i = data.slice(offsets, extents);
-				Matrix<Scalar> data_ch_i = Utils<Scalar>::tensor4d_to_mat(data_slice_i);
+				Matrix<Scalar> data_ch_i = Utils<Scalar>::map_tensor4_to_mat(data_slice_i);
 				data_ch_i *= ed_vec[i].eigen_basis;
 				if (whiten)
 					data_ch_i *= (ed_vec[i].eigen_values.array() + NormalizationPreprocessor<Scalar>::epsilon)
 							.sqrt().inverse().matrix().asDiagonal();
-				data.slice(offsets, extents) = Utils<Scalar>::mat_to_tensor4d(data_ch_i, slice_dims);
+				data.slice(offsets, extents) = Utils<Scalar>::map_mat_to_tensor4(data_ch_i, slice_dims);
 			}
 		}
 	};

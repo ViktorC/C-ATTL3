@@ -9,6 +9,7 @@
 #define DIMENSIONS_H_
 
 #include <cassert>
+#include <sstream>
 #include <string>
 
 namespace cppnn {
@@ -46,6 +47,9 @@ public:
 	std::string to_string() const {
 		return "[" + std::to_string(dim1) + ", " + std::to_string(dim2) + ", " +
 				std::to_string(dim3) + "]";
+	};
+	friend std::ostream& operator<<(std::ostream& os, const Dimensions<IndexType>& dims) {
+		return os << dims.to_string() << std::endl;
 	};
 private:
 	IndexType dim1;

@@ -11,6 +11,7 @@
 #include <algorithm>
 #include <Dimensions.h>
 #include <memory>
+#include <string>
 #include <type_traits>
 #include <utility>
 #include <Utils.h>
@@ -93,7 +94,33 @@ private:
 	Array4<int> obj_extents;
 };
 
-
+//template<typename Scalar>
+//class OnDiskDataProvider : public DataProvider<Scalar> {
+//public:
+//	OnDiskDataProvider(std::string obs_path, std::string obj_path) {
+//
+//	};
+//	Dimensions<int> get_obs_dims() const {
+//
+//	};
+//	Dimensions<int> get_obj_dims() const {
+//
+//	};
+//	unsigned instances() const {
+//
+//	};
+//	bool has_more() const {
+//
+//	};
+//	DataPair<Scalar> get_data(unsigned batch_size) {
+//
+//	};
+//	void reset() {
+//
+//	};
+//private:
+//
+//};
 
 } /* namespace cppnn */
 
