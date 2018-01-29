@@ -22,15 +22,15 @@
 
 /* TODO Possibility to add and remove modules (e.g. layers for sequential networks, inception modules for InceptionNets).
  * TODO Lighter syntax for network creation.
- * TODO Fix Inception-ResNet and implement DenseNet.
+ * TODO Implement DenseNet.
  * TODO Serialization.
  */
 
 namespace cppnn {
 
-// Forward declaration to Optimizer so it can be friended.
-template<typename Scalar>
-class Optimizer;
+// Forward declaration to Optimizer and CompositeNeuralNetwork so they can be friended.
+template<typename Scalar> class Optimizer;
+template<typename Scalar> class CompositeNeuralNetwork;
 
 /**
  * A neural network class that consists of a vector of neuron layers. It allows
@@ -44,8 +44,10 @@ template<typename Scalar>
 class NeuralNetwork {
 	static_assert(std::is_floating_point<Scalar>::value, "non floating-point scalar type");
 	friend class Optimizer<Scalar>;
+	friend class CompositeNeuralNetwork<Scalar>;
 public:
 	virtual ~NeuralNetwork() = default;
+	virtual NeuralNetwork<Scalar>* clone() const = 0;
 	virtual bool is_foremost() const = 0;
 	virtual Dimensions<int> get_input_dims() const = 0;
 	virtual Dimensions<int> get_output_dims() const = 0;
@@ -54,8 +56,8 @@ public:
 		for (unsigned i = 0; i < layers.size(); i++)
 			layers[i]->init();
 	};
-	virtual Tensor4<Scalar> infer(const Tensor4<Scalar>& input) {
-		return propagate(input, false);
+	virtual Tensor4<Scalar> infer(Tensor4<Scalar> input) {
+		return propagate(std::move(input), false);
 	};
 	virtual std::string to_string() {
 		std::stringstream strm;
@@ -112,14 +114,12 @@ protected:
 template<typename Scalar>
 using LayerPtr = std::unique_ptr<Layer<Scalar>>;
 
-// Forward declarations for friending.
+// Forward declaration for friending.
 template<typename Scalar> class ParallelNeuralNetwork;
-template<typename Scalar, bool ParallelModules> class ResidualNeuralNetwork;
 
 template<typename Scalar>
 class SequentialNeuralNetwork : public NeuralNetwork<Scalar> {
 	friend class ParallelNeuralNetwork<Scalar>;
-	friend class ResidualNeuralNetwork<Scalar,false>;
 public:
 	/**
 	 * Constructs the network using the provided layer pointers. It takes ownership of the layer pointers.
@@ -149,9 +149,8 @@ public:
 	// Copy constructor.
 	SequentialNeuralNetwork(const SequentialNeuralNetwork<Scalar>& network) :
 			layers(network.layers.size()) {
-		for (unsigned i = 0; i < layers.size(); i++) {
+		for (unsigned i = 0; i < layers.size(); i++)
 			layers[i] = LayerPtr<Scalar>(network.layers[i]->clone());
-		}
 		foremost = network.foremost;
 		input_dims = network.input_dims;
 		output_dims = network.output_dims;
@@ -163,10 +162,13 @@ public:
 	// The smart pointers take care of deleting the layers.
 	~SequentialNeuralNetwork() = default;
 	/* The assignment uses the move or copy constructor to pass the parameter
-	 * based on whether it is an lvalue or an rvalue. */
+	 * based on whether it is an rvalue or an lvalue. */
 	SequentialNeuralNetwork<Scalar>& operator=(SequentialNeuralNetwork<Scalar> network) {
 		swap(*this, network);
 		return *this;
+	};
+	NeuralNetwork<Scalar>* clone() const {
+		return new SequentialNeuralNetwork(*this);
 	};
 	bool is_foremost() const {
 		return foremost;
@@ -216,9 +218,9 @@ protected:
 		}
 		return out_grads;
 	};
-	static std::vector<LayerPtr<Scalar>> create_vector(LayerPtr<Scalar> layer) {
+	static std::vector<LayerPtr<Scalar>> create_vector(LayerPtr<Scalar>&& layer) {
 		std::vector<LayerPtr<Scalar>> vec(1);
-		vec[0] = std::move(layer);
+		vec[0] = layer;
 		return vec;
 	};
 	std::vector<LayerPtr<Scalar>> layers;
@@ -229,7 +231,6 @@ protected:
 
 template<typename Scalar>
 class ParallelNeuralNetwork : public NeuralNetwork<Scalar> {
-	friend class ResidualNeuralNetwork<Scalar,true>;
 	typedef SequentialNeuralNetwork<Scalar> Lane;
 public:
 	ParallelNeuralNetwork(std::vector<Lane> lanes, bool foremost = true) :
@@ -254,6 +255,9 @@ public:
 			ParallelNeuralNetwork(std::vector<Lane>({ lane }), foremost) { };
 	bool is_foremost() const {
 		return foremost;
+	};
+	NeuralNetwork<Scalar>* clone() const {
+		return new ParallelNeuralNetwork(*this);
 	};
 	Dimensions<int> get_input_dims() const {
 		return input_dims;
@@ -390,6 +394,106 @@ private:
 		Tensor4<Scalar>* out_grads;
 		Tensor4<Scalar> prev_out_grads;
 	};
+};
+
+template<typename Scalar>
+using NeuralNetPtr = std::unique_ptr<NeuralNetwork<Scalar>>;
+
+template<typename Scalar>
+class CompositeNeuralNetwork : public NeuralNetwork<Scalar> {
+public:
+	CompositeNeuralNetwork(std::vector<NeuralNetPtr<Scalar>> nets, bool foremost = true) :
+			nets(std::move(nets)),
+			foremost(foremost) {
+		assert(this->nets.size() > 0 && "nets must contain at least 1 element");
+		assert(this->nets[0] != nullptr);
+		NeuralNetwork<Scalar>& first_net = *(this->nets[0]);
+		input_dims = first_net.get_input_dims();
+		output_dims = this->nets[this->nets.size() - 1]->get_output_dims();
+		Dimensions<int> prev_dims = first_net.get_output_dims();
+		for (unsigned i = 1; i < this->nets.size(); i++) {
+			assert(this->nets[i] != nullptr && "nets contains null pointers");
+			NeuralNetwork<Scalar>& net = *this->nets[i];
+			assert(prev_dims.equals(net.get_input_dims()) && "incompatible network dimensions");
+			net.set_foremost(false);
+			prev_dims = net.get_output_dims();
+		}
+		first_net.set_foremost(foremost);
+	};
+	CompositeNeuralNetwork(NeuralNetPtr<Scalar> net, bool foremost = true) :
+			CompositeNeuralNetwork(create_vector(std::move(net)), foremost) { };
+	CompositeNeuralNetwork(const CompoundNeuralNetwork<Scalar>& network) :
+			nets(network.nets.size()) {
+		for (unsigned i = 0; i < nets.size(); i++)
+			nets[i] = NeuralNetPtr<Scalar>(network.nets[i]->clone());
+		foremost = network.foremost;
+		input_dims = network.input_dims;
+		output_dims = network.output_dims;
+	};
+	CompositeNeuralNetwork(CompoundNeuralNetwork<Scalar>&& network) {
+		swap(*this, network);
+	};
+	~CompositeNeuralNetwork() = default;
+	CompositeNeuralNetwork<Scalar>& operator=(CompositeNeuralNetwork<Scalar> network) {
+		swap(*this, network);
+		return *this;
+	};
+	NeuralNetwork<Scalar>* clone() const {
+		return new CompositeNeuralNetwork(*this);
+	};
+	bool is_foremost() const {
+		return foremost;
+	};
+	Dimensions<int> get_input_dims() const {
+		return input_dims;
+	};
+	Dimensions<int> get_output_dims() const {
+		return output_dims;
+	};
+	// For the copy-and-swap idiom.
+	friend void swap(CompoundNeuralNetwork<Scalar>& network1, CompoundNeuralNetwork<Scalar>& network2) {
+		using std::swap;
+		swap(network1.nets, network2.nets);
+		swap(network1.foremost, network2.foremost);
+		swap(network1.input_dims, network2.input_dims);
+		swap(network1.output_dims, network2.output_dims);
+	};
+protected:
+	void set_foremost(bool foremost) {
+		nets[0]->set_foremost(foremost);
+		this->foremost = foremost;
+	};
+	std::vector<Layer<Scalar>*> get_layers() {
+		std::vector<Layer<Scalar>*> layers;
+		for (unsigned i = 0; i < nets.size(); i++) {
+			std::vector<Layer<Scalar>*> internal_layers = nets[i].get_layers();
+			for (unsigned j = 0; j < internal_layers.size(); j++)
+				layers.push_back(internal_layers[j]);
+		}
+		return layers;
+	};
+	Tensor4<Scalar> propagate(Tensor4<Scalar> input, bool training) {
+		NeuralNetwork<Scalar>::assert_popagation_input_dims(input, input_dims);
+		for (unsigned i = 0; i < nets.size(); i++)
+			input = nets[i]->propagate(std::move(input), training);
+		return input;
+	};
+	Tensor4<Scalar> backpropagate(Tensor4<Scalar> out_grads) {
+		NeuralNetwork<Scalar>::assert_popagation_input_dims(out_grads, output_dims);
+		for (int i = nets.size() - 1; i >= 0; i--)
+			out_grads = nets[i]->backpropagate(std::move(out_grads));
+		return out_grads;
+	};
+	static std::vector<NeuralNetPtr<Scalar>> create_vector(NeuralNetPtr<Scalar>&& net) {
+		std::vector<NeuralNetPtr<Scalar>> vec(1);
+		vec[0] = net;
+		return vec;
+	};
+private:
+	std::vector<NeuralNetPtr<Scalar>> nets;
+	bool foremost;
+	Dimensions<int> input_dims;
+	Dimensions<int> output_dims;
 };
 
 /**

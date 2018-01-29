@@ -11,6 +11,7 @@
 #include <algorithm>
 #include <cassert>
 #include <cmath>
+#include <cstddef>
 #include <Dimensions.h>
 #include <memory>
 #include <type_traits>
@@ -32,7 +33,7 @@ class Layer {
 public:
 	virtual ~Layer() = default;
 	// Clone pattern.
-	virtual Layer<Scalar>* clone() = 0;
+	virtual Layer<Scalar>* clone() const = 0;
 	virtual Dimensions<int> get_input_dims() const = 0;
 	virtual Dimensions<int> get_output_dims() const = 0;
 	bool is_parametric() {
@@ -61,7 +62,7 @@ using WeightInitSharedPtr = std::shared_ptr<WeightInitialization<Scalar>>;
 template<typename Scalar>
 class FCLayer : public Layer<Scalar> {
 public:
-	FCLayer(Dimensions<int> input_dims, unsigned output_size, WeightInitSharedPtr<Scalar> weight_init,
+	FCLayer(Dimensions<int> input_dims, size_t output_size, WeightInitSharedPtr<Scalar> weight_init,
 			Scalar max_norm_constraint = 0) :
 				input_dims(input_dims),
 				output_dims(output_size, 1, 1),
@@ -644,8 +645,8 @@ private:
 template<typename Scalar>
 class ConvLayer : public Layer<Scalar> {
 public:
-	ConvLayer(Dimensions<int> input_dims, unsigned filters, WeightInitSharedPtr<Scalar> weight_init, unsigned receptor_size = 3,
-			unsigned padding = 1, unsigned stride = 1, unsigned dilation = 0, Scalar max_norm_constraint = 0) :
+	ConvLayer(Dimensions<int> input_dims, size_t filters, WeightInitSharedPtr<Scalar> weight_init, size_t receptor_size = 3,
+			size_t padding = 1, size_t stride = 1, size_t dilation = 0, Scalar max_norm_constraint = 0) :
 				input_dims(input_dims),
 				output_dims(calculate_output_dim(input_dims.get_dim1(), receptor_size, padding, dilation, stride),
 						calculate_output_dim(input_dims.get_dim2(), receptor_size, padding, dilation, stride), filters),
@@ -818,12 +819,12 @@ protected:
 private:
 	Dimensions<int> input_dims;
 	Dimensions<int> output_dims;
-	unsigned filters;
+	size_t filters;
 	WeightInitSharedPtr<Scalar> weight_init;
-	unsigned receptor_size;
-	unsigned padding;
-	unsigned stride;
-	unsigned dilation;
+	size_t receptor_size;
+	size_t padding;
+	size_t stride;
+	size_t dilation;
 	Scalar max_norm_constraint;
 	bool max_norm;
 	// The learnable parameters.
@@ -836,7 +837,7 @@ private:
 template<typename Scalar>
 class PoolingLayer : public Layer<Scalar> {
 public:
-	PoolingLayer(Dimensions<int> input_dims, unsigned receptor_size, unsigned stride) :
+	PoolingLayer(Dimensions<int> input_dims, size_t receptor_size, size_t stride) :
 			input_dims(input_dims),
 			output_dims(calculate_output_dim(input_dims.get_dim1(), receptor_size, stride),
 					calculate_output_dim(input_dims.get_dim2(), receptor_size, stride), input_dims.get_dim3()),
@@ -942,8 +943,8 @@ protected:
 	};
 	Dimensions<int> input_dims;
 	Dimensions<int> output_dims;
-	unsigned receptor_size;
-	unsigned stride;
+	size_t receptor_size;
+	size_t stride;
 	int receptor_area;
 	// No actual parameters.
 	Matrix<Scalar> params;

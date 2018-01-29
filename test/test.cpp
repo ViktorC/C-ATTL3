@@ -69,7 +69,7 @@ int main() {
 	cppnn::LossSharedPtr<Scalar> loss(new cppnn::QuadraticLoss<Scalar>());
 	cppnn::RegPenSharedPtr<Scalar> reg(new cppnn::ElasticNetRegularizationPenalty<Scalar>());
 	cppnn::NadamOptimizer<Scalar> opt(loss, reg, 20);
-	std::cout << opt.verify_gradients(nn, test_prov) << std::endl;
-//	opt.optimize(nn, training_prov, test_prov, 500);
+//	std::cout << opt.verify_gradients(nn, test_prov) << std::endl;
+	opt.optimize(nn, training_prov, test_prov, 500);
 	return 0;
 };
