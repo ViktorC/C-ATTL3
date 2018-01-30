@@ -25,10 +25,10 @@ public:
 template<typename Scalar>
 class NoRegularizationPenalty : public RegularizationPenalty<Scalar> {
 public:
-	Scalar function(const Matrix<Scalar>& weights) const {
+	inline Scalar function(const Matrix<Scalar>& weights) const {
 		return 0;
 	};
-	Matrix<Scalar> d_function(const Matrix<Scalar>& weights) const {
+	inline Matrix<Scalar> d_function(const Matrix<Scalar>& weights) const {
 		return Matrix<Scalar>::Zero(weights.rows(), weights.cols());
 	};
 };
@@ -38,10 +38,10 @@ class L1RegularizationPenalty : public RegularizationPenalty<Scalar> {
 public:
 	L1RegularizationPenalty(Scalar lambda = 1e-2) :
 			lambda(lambda) { };
-	Scalar function(const Matrix<Scalar>& weights) const {
+	inline Scalar function(const Matrix<Scalar>& weights) const {
 		return (lambda * weights.cwiseAbs()).sum();
 	};
-	Matrix<Scalar> d_function(const Matrix<Scalar>& weights) const {
+	inline Matrix<Scalar> d_function(const Matrix<Scalar>& weights) const {
 		return weights.unaryExpr([this](Scalar i) { return (Scalar) (i >= .0 ? lambda : -lambda); });
 	};
 private:
@@ -53,10 +53,10 @@ class L2RegularizationPenalty : public RegularizationPenalty<Scalar> {
 public:
 	L2RegularizationPenalty(Scalar lambda = 1e-2) :
 			lambda(lambda) { };
-	Scalar function(const Matrix<Scalar>& weights) const {
+	inline Scalar function(const Matrix<Scalar>& weights) const {
 		return (.5 * lambda * weights.array().square()).sum();
 	};
-	Matrix<Scalar> d_function(const Matrix<Scalar>& weights) const {
+	inline Matrix<Scalar> d_function(const Matrix<Scalar>& weights) const {
 		return lambda * weights;
 	};
 private:
@@ -69,10 +69,10 @@ public:
 	ElasticNetRegularizationPenalty(Scalar l1_lambda = 1e-2, Scalar l2_lambda = 1e-2) :
 			l1_lambda(l1_lambda),
 			l2_lambda(l2_lambda) { };
-	Scalar function(const Matrix<Scalar>& weights) const {
+	inline Scalar function(const Matrix<Scalar>& weights) const {
 		return (l1_lambda * weights.array().abs() + .5 * l2_lambda * weights.array().square()).sum();
 	};
-	Matrix<Scalar> d_function(const Matrix<Scalar>& weights) const {
+	inline Matrix<Scalar> d_function(const Matrix<Scalar>& weights) const {
 		return weights.unaryExpr([this](Scalar i) { return (Scalar) (i >= .0 ? l1_lambda :
 				-l1_lambda); }) + l2_lambda * weights;
 	};

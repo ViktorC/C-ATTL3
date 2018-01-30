@@ -29,14 +29,14 @@ public:
 template<typename Scalar>
 class QuadraticLoss : public Loss<Scalar> {
 public:
-	ColVector<Scalar> function(const Tensor4<Scalar>& out, const Tensor4<Scalar>& obj) const {
+	inline ColVector<Scalar> function(const Tensor4<Scalar>& out, const Tensor4<Scalar>& obj) const {
 		assert(out.dimension(0) == obj.dimension(0) && out.dimension(1) == obj.dimension(1) &&
 				out.dimension(2) == obj.dimension(2) && out.dimension(3) == obj.dimension(3));
 		assert(out.dimension(2) == 1 && out.dimension(3) == 1);
 		return (Utils<Scalar>::map_tensor4_to_mat(out) - Utils<Scalar>::map_tensor4_to_mat(obj))
 				.array().square().rowwise().sum();
 	};
-	Tensor4<Scalar> d_function(const Tensor4<Scalar>& out, const Tensor4<Scalar>& obj) const {
+	inline Tensor4<Scalar> d_function(const Tensor4<Scalar>& out, const Tensor4<Scalar>& obj) const {
 		assert(out.dimension(0) == obj.dimension(0) && out.dimension(1) == obj.dimension(1) &&
 				out.dimension(2) == obj.dimension(2) && out.dimension(3) == obj.dimension(3));
 		assert(out.dimension(2) == 1 && out.dimension(3) == 1);
@@ -54,7 +54,7 @@ class HingeLoss : public Loss<Scalar> {
 public:
 	HingeLoss(bool squared = false) :
 		squared(squared) { };
-	ColVector<Scalar> function(const Tensor4<Scalar>& out, const Tensor4<Scalar>& obj) const {
+	inline ColVector<Scalar> function(const Tensor4<Scalar>& out, const Tensor4<Scalar>& obj) const {
 		assert(out.dimension(0) == obj.dimension(0) && out.dimension(1) == obj.dimension(1) &&
 				out.dimension(2) == obj.dimension(2) && out.dimension(3) == obj.dimension(3));
 		assert(out.dimension(2) == 1 && out.dimension(3) == 1);
@@ -85,7 +85,7 @@ public:
 		}
 		return loss;
 	};
-	Tensor4<Scalar> d_function(const Tensor4<Scalar>& out, const Tensor4<Scalar>& obj) const {
+	inline Tensor4<Scalar> d_function(const Tensor4<Scalar>& out, const Tensor4<Scalar>& obj) const {
 		assert(out.dimension(0) == obj.dimension(0) && out.dimension(1) == obj.dimension(1) &&
 				out.dimension(2) == obj.dimension(2) && out.dimension(3) == obj.dimension(3));
 		assert(out.dimension(2) == 1 && out.dimension(3) == 1);
@@ -135,14 +135,14 @@ class CrossEntropyLoss : public Loss<Scalar> {
 public:
 	CrossEntropyLoss(Scalar epsilon = Utils<Scalar>::EPSILON2) :
 		epsilon(epsilon) { };
-	ColVector<Scalar> function(const Tensor4<Scalar>& out, const Tensor4<Scalar>& obj) const {
+	inline ColVector<Scalar> function(const Tensor4<Scalar>& out, const Tensor4<Scalar>& obj) const {
 		assert(out.dimension(0) == obj.dimension(0) && out.dimension(1) == obj.dimension(1) &&
 				out.dimension(2) == obj.dimension(2) && out.dimension(3) == obj.dimension(3));
 		assert(out.dimension(2) == 1 && out.dimension(3) == 1);
 		return (Utils<Scalar>::map_tensor4_to_mat(out).array().log() * Utils<Scalar>::map_tensor4_to_mat(obj).array())
 				.matrix().rowwise().sum() * -1;
 	};
-	Tensor4<Scalar> d_function(const Tensor4<Scalar>& out, const Tensor4<Scalar>& obj) const {
+	inline Tensor4<Scalar> d_function(const Tensor4<Scalar>& out, const Tensor4<Scalar>& obj) const {
 		assert(out.dimension(0) == obj.dimension(0) && out.dimension(1) == obj.dimension(1) &&
 				out.dimension(2) == obj.dimension(2) && out.dimension(3) == obj.dimension(3));
 		assert(out.dimension(2) == 1 && out.dimension(3) == 1);
@@ -162,7 +162,7 @@ class MultiLabelHingeLoss : public Loss<Scalar> {
 public:
 	MultiLabelHingeLoss(bool squared = false) :
 		squared(squared) { };
-	ColVector<Scalar> function(const Tensor4<Scalar>& out, const Tensor4<Scalar>& obj) const {
+	inline ColVector<Scalar> function(const Tensor4<Scalar>& out, const Tensor4<Scalar>& obj) const {
 		assert(out.dimension(0) == obj.dimension(0) && out.dimension(1) == obj.dimension(1) &&
 				out.dimension(2) == obj.dimension(2) && out.dimension(3) == obj.dimension(3));
 		assert(out.dimension(2) == 1 && out.dimension(3) == 1);
@@ -181,7 +181,7 @@ public:
 		}
 		return loss;
 	};
-	Tensor4<Scalar> d_function(const Tensor4<Scalar>& out, const Tensor4<Scalar>& obj) const {
+	inline Tensor4<Scalar> d_function(const Tensor4<Scalar>& out, const Tensor4<Scalar>& obj) const {
 		assert(out.dimension(0) == obj.dimension(0) && out.dimension(1) == obj.dimension(1) &&
 				out.dimension(2) == obj.dimension(2) && out.dimension(3) == obj.dimension(3));
 		assert(out.dimension(2) == 1 && out.dimension(3) == 1);
@@ -215,7 +215,7 @@ class MultiLabelLogLoss : public Loss<Scalar> {
 public:
 	MultiLabelLogLoss(Scalar epsilon = Utils<Scalar>::EPSILON2) :
 		epsilon(epsilon) { };
-	ColVector<Scalar> function(const Tensor4<Scalar>& out, const Tensor4<Scalar>& obj) const {
+	inline ColVector<Scalar> function(const Tensor4<Scalar>& out, const Tensor4<Scalar>& obj) const {
 		assert(out.dimension(0) == obj.dimension(0) && out.dimension(1) == obj.dimension(1) &&
 				out.dimension(2) == obj.dimension(2) && out.dimension(3) == obj.dimension(3));
 		assert(out.dimension(2) == 1 && out.dimension(3) == 1);
@@ -234,7 +234,7 @@ public:
 		}
 		return loss;
 	};
-	Tensor4<Scalar> d_function(const Matrix<Scalar>& out, const Matrix<Scalar>& obj) const {
+	inline Tensor4<Scalar> d_function(const Matrix<Scalar>& out, const Matrix<Scalar>& obj) const {
 		assert(out.dimension(0) == obj.dimension(0) && out.dimension(1) == obj.dimension(1) &&
 				out.dimension(2) == obj.dimension(2) && out.dimension(3) == obj.dimension(3));
 		assert(out.dimension(2) == 1 && out.dimension(3) == 1);

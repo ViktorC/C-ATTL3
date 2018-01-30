@@ -29,7 +29,7 @@ class ZeroWeightInitialization : public WeightInitialization<Scalar> {
 public:
 	ZeroWeightInitialization(Scalar bias = 0) :
 			bias(bias) { };
-	void apply(Matrix<Scalar>& weights) const {
+	inline void apply(Matrix<Scalar>& weights) const {
 		weights.setZero(weights.rows(), weights.cols());
 	};
 private:
@@ -41,7 +41,7 @@ class OneWeightInitialization : public WeightInitialization<Scalar> {
 public:
 	OneWeightInitialization(Scalar bias = 0) :
 			bias(bias) { };
-	void apply(Matrix<Scalar>& weights) const {
+	inline void apply(Matrix<Scalar>& weights) const {
 		weights.setOnes(weights.rows(), weights.cols());
 		weights.row(weights.rows() - 1).setZero();
 	};
@@ -55,7 +55,7 @@ public:
 	GaussianWeightInitialization(Scalar bias) :
 		bias(bias) { };
 	virtual ~GaussianWeightInitialization() = default;
-	virtual void apply(Matrix<Scalar>& weights) const {
+	inline virtual void apply(Matrix<Scalar>& weights) const {
 		int rows = weights.rows();
 		int cols = weights.cols();
 		std::default_random_engine gen;
@@ -80,7 +80,7 @@ public:
 	LeCunWeightInitialization(Scalar bias = 0) :
 		GaussianWeightInitialization<Scalar>::GaussianWeightInitialization(bias) { };
 protected:
-	Scalar sd(unsigned fan_ins, unsigned fan_outs) const {
+	inline Scalar sd(unsigned fan_ins, unsigned fan_outs) const {
 		return sqrt(1.0 / (Scalar) fan_ins);
 	};
 };
@@ -91,7 +91,7 @@ public:
 	GlorotWeightInitialization(Scalar bias = 0) :
 		GaussianWeightInitialization<Scalar>::GaussianWeightInitialization(bias) { };
 protected:
-	Scalar sd(unsigned fan_ins, unsigned fan_outs) const {
+	inline Scalar sd(unsigned fan_ins, unsigned fan_outs) const {
 		return sqrt(2.0 / (Scalar) (fan_ins + fan_outs));
 	};
 };
@@ -102,7 +102,7 @@ public:
 	HeWeightInitialization(Scalar bias = 0) :
 		GaussianWeightInitialization<Scalar>::GaussianWeightInitialization(bias) { };
 protected:
-	Scalar sd(unsigned fan_ins, unsigned fan_outs) const {
+	inline Scalar sd(unsigned fan_ins, unsigned fan_outs) const {
 		return sqrt(2.0 / (Scalar) fan_ins);
 	};
 };
@@ -113,7 +113,7 @@ public:
 	OrthogonalWeightInitialization(Scalar bias = 0, Scalar sd = 1) :
 			GaussianWeightInitialization<Scalar>::GaussianWeightInitialization(bias),
 			_sd(sd) { };
-	void apply(Matrix<Scalar>& weights) const {
+	inline void apply(Matrix<Scalar>& weights) const {
 		GaussianWeightInitialization<Scalar>::apply(weights);
 		int rows = weights.rows() - 1;
 		int cols = weights.cols();

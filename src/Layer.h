@@ -73,7 +73,7 @@ public:
 				weight_grads(input_dims.get_points() + 1, output_size) {
 		assert(weight_init != nullptr);
 	};
-	Layer<Scalar>* clone() {
+	Layer<Scalar>* clone() const {
 		return new FCLayer(*this);
 	};
 	Dimensions<int> get_input_dims() const {
@@ -87,7 +87,7 @@ protected:
 		weight_init->apply(weights);
 		weight_grads.setZero(weight_grads.rows(), weight_grads.cols());
 	};
-	void empty_cache() {
+	inline void empty_cache() {
 		biased_in = Matrix<Scalar>(0, 0);
 	};
 	Matrix<Scalar>& get_params() {
@@ -96,14 +96,14 @@ protected:
 	const Matrix<Scalar>& get_param_grads() const {
 		return weight_grads;
 	};
-	void enforce_constraints() {
+	inline void enforce_constraints() {
 		if (max_norm) {
 			Scalar l2_norm = weights.squaredNorm();
 			if (l2_norm > max_norm_constraint)
 				weights *= (max_norm_constraint / l2_norm);
 		}
 	};
-	Tensor4<Scalar> pass_forward(Tensor4<Scalar> in, bool training) {
+	inline Tensor4<Scalar> pass_forward(Tensor4<Scalar> in, bool training) {
 		assert(in.dimension(1) == input_dims.get_dim1() && in.dimension(2) == input_dims.get_dim2() &&
 				in.dimension(3) == input_dims.get_dim3());
 		assert(in.dimension(0) > 0);
@@ -114,7 +114,7 @@ protected:
 		biased_in.col(input_size).setOnes();
 		return Utils<Scalar>::map_mat_to_tensor4((biased_in * weights).eval(), output_dims);
 	};
-	Tensor4<Scalar> pass_back(Tensor4<Scalar> out_grads) {
+	inline Tensor4<Scalar> pass_back(Tensor4<Scalar> out_grads) {
 		assert(out_grads.dimension(1) == output_dims.get_dim1() && out_grads.dimension(2) == output_dims.get_dim2() &&
 				out_grads.dimension(3) == output_dims.get_dim3());
 		assert(out_grads.dimension(0) > 0 && biased_in.rows() == out_grads.dimension(0));
@@ -161,7 +161,7 @@ protected:
 	virtual Matrix<Scalar> d_activate(const Matrix<Scalar>& in, const Matrix<Scalar>& out,
 			const Matrix<Scalar>& out_grads) = 0;
 	void init() { };
-	void empty_cache() {
+	inline void empty_cache() {
 		in = Matrix<Scalar>(0, 0);
 		out = Matrix<Scalar>(0, 0);
 	};
@@ -172,7 +172,7 @@ protected:
 		return param_grads;
 	};
 	void enforce_constraints() { };
-	Tensor4<Scalar> pass_forward(Tensor4<Scalar> in, bool training) {
+	inline Tensor4<Scalar> pass_forward(Tensor4<Scalar> in, bool training) {
 		assert(in.dimension(1) == dims.get_dim1() && in.dimension(2) == dims.get_dim2() &&
 				in.dimension(3) == dims.get_dim3());
 		assert(in.dimension(0) > 0);
@@ -180,7 +180,7 @@ protected:
 		out = activate(this->in);
 		return Utils<Scalar>::map_mat_to_tensor4(out, dims);
 	};
-	Tensor4<Scalar> pass_back(Tensor4<Scalar> out_grads) {
+	inline Tensor4<Scalar> pass_back(Tensor4<Scalar> out_grads) {
 		assert(out_grads.dimension(1) == dims.get_dim1() && out_grads.dimension(2) == dims.get_dim2() &&
 				out_grads.dimension(3) == dims.get_dim3());
 		assert(out_grads.dimension(0) > 0 && out.rows() == out_grads.dimension(0));
@@ -202,14 +202,14 @@ class IdentityActivationLayer : public ActivationLayer<Scalar> {
 public:
 	IdentityActivationLayer(Dimensions<int> dims) :
 			ActivationLayer<Scalar>::ActivationLayer(dims) { };
-	Layer<Scalar>* clone() {
+	Layer<Scalar>* clone() const {
 		return new IdentityActivationLayer(*this);
 	};
 protected:
-	Matrix<Scalar> activate(const Matrix<Scalar>& in) {
+	inline Matrix<Scalar> activate(const Matrix<Scalar>& in) {
 		return in;
 	};
-	Matrix<Scalar> d_activate(const Matrix<Scalar>& in, const Matrix<Scalar>& out,
+	inline Matrix<Scalar> d_activate(const Matrix<Scalar>& in, const Matrix<Scalar>& out,
 			const Matrix<Scalar>& out_grads) {
 		return out_grads;
 	};
@@ -221,14 +221,14 @@ public:
 	ScalingActivationLayer(Dimensions<int> dims, Scalar scale) :
 			ActivationLayer<Scalar>::ActivationLayer(dims),
 			scale(scale) { };
-	Layer<Scalar>* clone() {
+	Layer<Scalar>* clone() const {
 		return new ScalingActivationLayer(*this);
 	};
 protected:
-	Matrix<Scalar> activate(const Matrix<Scalar>& in) {
+	inline Matrix<Scalar> activate(const Matrix<Scalar>& in) {
 		return in * scale;
 	};
-	Matrix<Scalar> d_activate(const Matrix<Scalar>& in, const Matrix<Scalar>& out,
+	inline Matrix<Scalar> d_activate(const Matrix<Scalar>& in, const Matrix<Scalar>& out,
 			const Matrix<Scalar>& out_grads) {
 		return out_grads * scale;
 	};
@@ -241,14 +241,14 @@ class BinaryStepActivationLayer : public ActivationLayer<Scalar> {
 public:
 	BinaryStepActivationLayer(Dimensions<int> dims) :
 			ActivationLayer<Scalar>::ActivationLayer(dims) { };
-	Layer<Scalar>* clone() {
+	Layer<Scalar>* clone() const {
 		return new BinaryStepActivationLayer(*this);
 	};
 protected:
-	Matrix<Scalar> activate(const Matrix<Scalar>& in) {
+	inline Matrix<Scalar> activate(const Matrix<Scalar>& in) {
 		return in.unaryExpr([](Scalar i) { return (Scalar) (i >= .0 ? 1.0 : .0); });
 	};
-	Matrix<Scalar> d_activate(const Matrix<Scalar>& in, const Matrix<Scalar>& out,
+	inline Matrix<Scalar> d_activate(const Matrix<Scalar>& in, const Matrix<Scalar>& out,
 			const Matrix<Scalar>& out_grads) {
 		return Matrix<Scalar>::Zero(in.rows(), in.cols());
 	};
@@ -259,14 +259,14 @@ class SigmoidActivationLayer : public ActivationLayer<Scalar> {
 public:
 	SigmoidActivationLayer(Dimensions<int> dims) :
 			ActivationLayer<Scalar>::ActivationLayer(dims) { };
-	Layer<Scalar>* clone() {
+	Layer<Scalar>* clone() const {
 		return new SigmoidActivationLayer(*this);
 	};
 protected:
-	Matrix<Scalar> activate(const Matrix<Scalar>& in) {
+	inline Matrix<Scalar> activate(const Matrix<Scalar>& in) {
 		return ((-in).array().exp() + 1).inverse();
 	};
-	Matrix<Scalar> d_activate(const Matrix<Scalar>& in, const Matrix<Scalar>& out,
+	inline Matrix<Scalar> d_activate(const Matrix<Scalar>& in, const Matrix<Scalar>& out,
 			const Matrix<Scalar>& out_grads) {
 		return (out.array() *  (-out.array() + 1)) * out_grads.array();
 	};
@@ -277,14 +277,14 @@ class TanhActivationLayer : public ActivationLayer<Scalar> {
 public:
 	TanhActivationLayer(Dimensions<int> dims) :
 			ActivationLayer<Scalar>::ActivationLayer(dims) { };
-	Layer<Scalar>* clone() {
+	Layer<Scalar>* clone() const {
 		return new TanhActivationLayer(*this);
 	};
 protected:
-	Matrix<Scalar> activate(const Matrix<Scalar>& in) {
+	inline Matrix<Scalar> activate(const Matrix<Scalar>& in) {
 		return in.array().tanh();
 	};
-	Matrix<Scalar> d_activate(const Matrix<Scalar>& in, const Matrix<Scalar>& out,
+	inline Matrix<Scalar> d_activate(const Matrix<Scalar>& in, const Matrix<Scalar>& out,
 			const Matrix<Scalar>& out_grads) {
 		return (-out.array() * out.array() + 1) * out_grads.array();
 	};
@@ -296,17 +296,17 @@ public:
 	SoftmaxActivationLayer(Dimensions<int> dims, Scalar epsilon = Utils<Scalar>::EPSILON2) :
 			ActivationLayer<Scalar>::ActivationLayer(dims),
 			epsilon(epsilon) { };
-	Layer<Scalar>* clone() {
+	Layer<Scalar>* clone() const {
 		return new SoftmaxActivationLayer(*this);
 	};
 protected:
-	Matrix<Scalar> activate(const Matrix<Scalar>& in) {
+	inline Matrix<Scalar> activate(const Matrix<Scalar>& in) {
 		/* First subtract the value of the greatest coefficient from each element row-wise
 		 * to avoid an overflow due to raising e to great powers. */
 		Matrix<Scalar> out = (in.array().colwise() - in.array().rowwise().maxCoeff()).exp();
 		return out.array().colwise() / (out.array().rowwise().sum() + epsilon);
 	};
-	Matrix<Scalar> d_activate(const Matrix<Scalar>& in, const Matrix<Scalar>& out,
+	inline Matrix<Scalar> d_activate(const Matrix<Scalar>& in, const Matrix<Scalar>& out,
 			const Matrix<Scalar>& out_grads) {
 		Matrix<Scalar> d_in(in.rows(), in.cols());
 		for (int i = 0; i < d_in.rows(); i++) {
@@ -325,14 +325,14 @@ class ReLUActivationLayer : public ActivationLayer<Scalar> {
 public:
 	ReLUActivationLayer(Dimensions<int> dims) :
 			ActivationLayer<Scalar>::ActivationLayer(dims) { };
-	Layer<Scalar>* clone() {
+	Layer<Scalar>* clone() const {
 		return new ReLUActivationLayer(*this);
 	};
 protected:
-	Matrix<Scalar> activate(const Matrix<Scalar>& in) {
+	inline Matrix<Scalar> activate(const Matrix<Scalar>& in) {
 		return in.cwiseMax(.0);
 	};
-	Matrix<Scalar> d_activate(const Matrix<Scalar>& in, const Matrix<Scalar>& out,
+	inline Matrix<Scalar> d_activate(const Matrix<Scalar>& in, const Matrix<Scalar>& out,
 			const Matrix<Scalar>& out_grads) {
 		return in.unaryExpr([](Scalar i) { return (Scalar) (i >= .0 ? 1.0 : .0); })
 				.cwiseProduct(out_grads);
@@ -345,14 +345,14 @@ public:
 	LeakyReLUActivationLayer(Dimensions<int> dims, Scalar alpha = 1e-1) :
 			ActivationLayer<Scalar>::ActivationLayer(dims),
 			alpha(alpha) { };
-	Layer<Scalar>* clone() {
+	Layer<Scalar>* clone() const {
 		return new LeakyReLUActivationLayer(*this);
 	};
 protected:
-	Matrix<Scalar> activate(const Matrix<Scalar>& in) {
+	inline Matrix<Scalar> activate(const Matrix<Scalar>& in) {
 		return in.cwiseMax(in * alpha);
 	};
-	Matrix<Scalar> d_activate(const Matrix<Scalar>& in, const Matrix<Scalar>& out,
+	inline Matrix<Scalar> d_activate(const Matrix<Scalar>& in, const Matrix<Scalar>& out,
 			const Matrix<Scalar>& out_grads) {
 		return in.unaryExpr([this](Scalar i) { return (Scalar) (i >= .0 ? 1.0 : alpha); })
 				.cwiseProduct(out_grads);
@@ -367,14 +367,14 @@ public:
 	ELUActivationLayer(Dimensions<int> dims, Scalar alpha = 1e-1) :
 			ActivationLayer<Scalar>::ActivationLayer(dims),
 			alpha(alpha) { };
-	Layer<Scalar>* clone() {
+	Layer<Scalar>* clone() const {
 		return new ELUActivationLayer(*this);
 	};
 protected:
-	Matrix<Scalar> activate(const Matrix<Scalar>& in) {
+	inline Matrix<Scalar> activate(const Matrix<Scalar>& in) {
 		return in.unaryExpr([this](Scalar i) { return (Scalar) (i > .0 ? i : (alpha * (exp(i) - 1))); });
 	};
-	Matrix<Scalar> d_activate(const Matrix<Scalar>& in, const Matrix<Scalar>& out,
+	inline Matrix<Scalar> d_activate(const Matrix<Scalar>& in, const Matrix<Scalar>& out,
 			const Matrix<Scalar>& out_grads) {
 		Matrix<Scalar> d_in(in.rows(), in.cols());
 		for (int i = 0; i < in.cols(); i++) {
@@ -396,7 +396,7 @@ public:
 		ActivationLayer<Scalar>::params.resize(1, dims.get_points());
 		ActivationLayer<Scalar>::param_grads.resize(1, dims.get_points());
 	};
-	Layer<Scalar>* clone() {
+	Layer<Scalar>* clone() const {
 		return new PReLUActivationLayer(*this);
 	};
 protected:
@@ -404,10 +404,10 @@ protected:
 		ActivationLayer<Scalar>::params.setConstant(init_alpha);
 		ActivationLayer<Scalar>::param_grads.setZero(1, ActivationLayer<Scalar>::dims.get_points());
 	};
-	Matrix<Scalar> activate(const Matrix<Scalar>& in) {
+	inline Matrix<Scalar> activate(const Matrix<Scalar>& in) {
 		return in.cwiseMax(in * ActivationLayer<Scalar>::params.row(0).asDiagonal());
 	};
-	Matrix<Scalar> d_activate(const Matrix<Scalar>& in, const Matrix<Scalar>& out,
+	inline Matrix<Scalar> d_activate(const Matrix<Scalar>& in, const Matrix<Scalar>& out,
 			const Matrix<Scalar>& out_grads) {
 		ActivationLayer<Scalar>::param_grads.row(0).setZero();
 		Matrix<Scalar> d_in = Matrix<Scalar>(in.rows(), in.cols());
@@ -446,7 +446,7 @@ public:
 				"norm avg decay must not be less than 0 or greater than 1");
 		assert(epsilon > 0 && "epsilon must be greater than 0");
 	};
-	Layer<Scalar>* clone() {
+	Layer<Scalar>* clone() const {
 		return new BatchNormLayer(*this);
 	};
 	Dimensions<int> get_input_dims() const {
@@ -468,7 +468,7 @@ protected:
 		avg_inv_sds.setZero(avg_means.rows(), avg_inv_sds.cols());
 		avgs_init = false;
 	};
-	void empty_cache() {
+	inline void empty_cache() {
 		for (unsigned i = 0; i < cache_vec.size(); i++) {
 			Cache& cache = cache_vec[i];
 			cache.inv_in_sd = RowVector<Scalar>(0);
@@ -482,7 +482,7 @@ protected:
 		return param_grads;
 	};
 	void enforce_constraints() { };
-	Tensor4<Scalar> pass_forward(Tensor4<Scalar> in, bool training) {
+	inline Tensor4<Scalar> pass_forward(Tensor4<Scalar> in, bool training) {
 		assert(in.dimension(1) == dims.get_dim1() && in.dimension(2) == dims.get_dim2() &&
 				in.dimension(3) == dims.get_dim3());
 		assert(in.dimension(0) > 0);
@@ -519,7 +519,7 @@ protected:
 		}
 		return out;
 	};
-	Tensor4<Scalar> pass_back(Tensor4<Scalar> out_grads) {
+	inline Tensor4<Scalar> pass_back(Tensor4<Scalar> out_grads) {
 		assert(out_grads.dimension(1) == dims.get_dim1() && out_grads.dimension(2) == dims.get_dim2() &&
 				out_grads.dimension(3) == dims.get_dim3());
 		assert(out_grads.dimension(0) > 0 && cache_vec[0].std_in.rows() == out_grads.dimension(0));
@@ -583,7 +583,7 @@ public:
 		assert(dropout_prob <= 1 && "dropout prob must not be greater than 1");
 		assert(epsilon > 0 && "epsilon must be greater than 0");
 	};
-	Layer<Scalar>* clone() {
+	Layer<Scalar>* clone() const {
 		return new DropoutLayer(*this);
 	};
 	Dimensions<int> get_input_dims() const {
@@ -594,7 +594,7 @@ public:
 	};
 protected:
 	void init() { };
-	void empty_cache() {
+	inline void empty_cache() {
 		dropout_mask = Matrix<Scalar>(0, 0);
 	};
 	Matrix<Scalar>& get_params() {
@@ -603,7 +603,7 @@ protected:
 	const Matrix<Scalar>& get_param_grads() const {
 		return param_grads;
 	};
-	void enforce_constraints() { };
+	inline void enforce_constraints() { };
 	Tensor4<Scalar> pass_forward(Tensor4<Scalar> in, bool training) {
 		assert(in.dimension(1) == dims.get_dim1() && in.dimension(2) == dims.get_dim2() &&
 				in.dimension(3) == dims.get_dim3());
@@ -621,7 +621,7 @@ protected:
 		}
 		return in;
 	};
-	Tensor4<Scalar> pass_back(Tensor4<Scalar> out_grads) {
+	inline Tensor4<Scalar> pass_back(Tensor4<Scalar> out_grads) {
 		assert(out_grads.dimension(1) == dims.get_dim1() && out_grads.dimension(2) == dims.get_dim2() &&
 				out_grads.dimension(3) == dims.get_dim3());
 		assert(out_grads.dimension(0) > 0 && dropout_mask.rows() == out_grads.dimension(0));
@@ -667,7 +667,7 @@ public:
 		assert(input_dims.get_dim1() + 2 * padding >= receptor_size + (receptor_size - 1) * dilation &&
 				input_dims.get_dim2() + 2 * padding >= receptor_size + (receptor_size - 1) * dilation);
 	};
-	Layer<Scalar>* clone() {
+	Layer<Scalar>* clone() const {
 		return new ConvLayer(*this);
 	};
 	Dimensions<int> get_input_dims() const {
@@ -683,7 +683,7 @@ protected:
 		weight_init->apply(weights);
 		weight_grads.setZero(weight_grads.rows(), weight_grads.cols());
 	};
-	void empty_cache() {
+	inline void empty_cache() {
 		biased_in_vec = std::vector<Matrix<Scalar>>(0);
 	};
 	Matrix<Scalar>& get_params() {
@@ -699,7 +699,7 @@ protected:
 				weights *= (max_norm_constraint / l2_norm);
 		}
 	};
-	Tensor4<Scalar> pass_forward(Tensor4<Scalar> in, bool training) {
+	inline Tensor4<Scalar> pass_forward(Tensor4<Scalar> in, bool training) {
 		assert(in.dimension(1) == input_dims.get_dim1() && in.dimension(2) == input_dims.get_dim2() &&
 				in.dimension(3) == input_dims.get_dim3());
 		assert(in.dimension(0) > 0);
@@ -757,7 +757,7 @@ protected:
 		}
 		return out;
 	};
-	Tensor4<Scalar> pass_back(Tensor4<Scalar> out_grads) {
+	inline Tensor4<Scalar> pass_back(Tensor4<Scalar> out_grads) {
 		assert(out_grads.dimension(1) == output_dims.get_dim1() && out_grads.dimension(2) == output_dims.get_dim2() &&
 				out_grads.dimension(3) == output_dims.get_dim3());
 		assert(out_grads.dimension(0) > 0 && biased_in_vec.size() == (unsigned) out_grads.dimension(0));
@@ -869,7 +869,7 @@ protected:
 		return param_grads;
 	};
 	void enforce_constraints() { };
-	Tensor4<Scalar> pass_forward(Tensor4<Scalar> in, bool training) {
+	inline Tensor4<Scalar> pass_forward(Tensor4<Scalar> in, bool training) {
 		assert(in.dimension(1) == input_dims.get_dim1() && in.dimension(2) == input_dims.get_dim2() &&
 				in.dimension(3) == input_dims.get_dim3());
 		assert(in.dimension(0) > 0);
@@ -901,7 +901,7 @@ protected:
 		}
 		return out;
 	};
-	Tensor4<Scalar> pass_back(Tensor4<Scalar> out_grads) {
+	inline Tensor4<Scalar> pass_back(Tensor4<Scalar> out_grads) {
 		assert(out_grads.dimension(1) == output_dims.get_dim1() && out_grads.dimension(2) == output_dims.get_dim2() &&
 				out_grads.dimension(3) == output_dims.get_dim3());
 		assert(out_grads.dimension(0) > 0 && rows == out_grads.dimension(0));
@@ -958,15 +958,15 @@ class SumPoolingLayer : public PoolingLayer<Scalar> {
 public:
 	SumPoolingLayer(Dimensions<int> input_dims, size_t receptor_size = 2, size_t stride = 2) :
 			PoolingLayer<Scalar>::PoolingLayer(input_dims, receptor_size, stride) { };
-	Layer<Scalar>* clone() {
+	Layer<Scalar>* clone() const {
 		return new SumPoolingLayer(*this);
 	};
 protected:
 	void init_cache() { };
-	Scalar reduce(const RowVector<Scalar>& patch, unsigned patch_ind) {
+	inline Scalar reduce(const RowVector<Scalar>& patch, unsigned patch_ind) {
 		return patch.sum();
 	};
-	RowVector<Scalar> d_reduce(Scalar grad, unsigned patch_ind) {
+	inline RowVector<Scalar> d_reduce(Scalar grad, unsigned patch_ind) {
 		return RowVector<Scalar>::Constant(PoolingLayer<Scalar>::receptor_area, grad);
 	};
 	void empty_cache() { };
@@ -977,15 +977,15 @@ class MeanPoolingLayer : public PoolingLayer<Scalar> {
 public:
 	MeanPoolingLayer(Dimensions<int> input_dims, size_t receptor_size = 2, size_t stride = 2) :
 			PoolingLayer<Scalar>::PoolingLayer(input_dims, receptor_size, stride) { };
-	Layer<Scalar>* clone() {
+	Layer<Scalar>* clone() const {
 		return new MeanPoolingLayer(*this);
 	};
 protected:
 	void init_cache() { };
-	Scalar reduce(const RowVector<Scalar>& patch, unsigned patch_ind) {
+	inline Scalar reduce(const RowVector<Scalar>& patch, unsigned patch_ind) {
 		return patch.mean();
 	};
-	RowVector<Scalar> d_reduce(Scalar grad, unsigned patch_ind) {
+	inline RowVector<Scalar> d_reduce(Scalar grad, unsigned patch_ind) {
 		return RowVector<Scalar>::Constant(PoolingLayer<Scalar>::receptor_area,
 				grad / (Scalar) PoolingLayer<Scalar>::receptor_area);
 	};
@@ -997,7 +997,7 @@ class MaxPoolingLayer : public PoolingLayer<Scalar> {
 public:
 	MaxPoolingLayer(Dimensions<int> input_dims, unsigned receptor_size = 2, unsigned stride = 2) :
 			PoolingLayer<Scalar>::PoolingLayer(input_dims, receptor_size, stride) { };
-	Layer<Scalar>* clone() {
+	Layer<Scalar>* clone() const {
 		return new MaxPoolingLayer(*this);
 	};
 protected:
@@ -1005,7 +1005,7 @@ protected:
 		max_inds = std::vector<unsigned>(PoolingLayer<Scalar>::rows *
 				PoolingLayer<Scalar>::output_dims.get_points());
 	};
-	Scalar reduce(const RowVector<Scalar>& patch, unsigned patch_ind) {
+	inline Scalar reduce(const RowVector<Scalar>& patch, unsigned patch_ind) {
 		int max_ind = 0;
 		Scalar max = Utils<Scalar>::MIN;
 		for (int i = 0; i < patch.cols(); i++) {
@@ -1018,12 +1018,12 @@ protected:
 		max_inds[patch_ind] = max_ind;
 		return max;
 	};
-	RowVector<Scalar> d_reduce(Scalar grad, unsigned patch_ind) {
+	inline RowVector<Scalar> d_reduce(Scalar grad, unsigned patch_ind) {
 		RowVector<Scalar> d_patch = RowVector<Scalar>::Zero(PoolingLayer<Scalar>::receptor_area);
 		d_patch(max_inds[patch_ind]) = grad;
 		return d_patch;
 	};
-	void empty_cache() {
+	inline void empty_cache() {
 		max_inds = std::vector<unsigned>(0);
 	};
 private:

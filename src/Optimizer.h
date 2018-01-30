@@ -128,25 +128,25 @@ protected:
 	virtual void fit(NeuralNetwork<Scalar>& net) = 0;
 	virtual Scalar train(NeuralNetwork<Scalar>& net, DataProvider<Scalar>& training_prov, unsigned epoch) = 0;
 	virtual Scalar test(NeuralNetwork<Scalar>& net, DataProvider<Scalar>& test_prov, unsigned epoch) = 0;
-	static std::vector<Layer<Scalar>*> get_layers(NeuralNetwork<Scalar>& net) {
+	inline static std::vector<Layer<Scalar>*> get_layers(NeuralNetwork<Scalar>& net) {
 		return net.get_layers();
 	};
-	static Tensor4<Scalar> propagate(NeuralNetwork<Scalar>& net, Tensor4<Scalar> in) {
+	inline static Tensor4<Scalar> propagate(NeuralNetwork<Scalar>& net, Tensor4<Scalar> in) {
 		return net.propagate(std::move(in), true);
 	};
-	static void backpropagate(NeuralNetwork<Scalar>& net, Tensor4<Scalar> out_grads) {
+	inline static void backpropagate(NeuralNetwork<Scalar>& net, Tensor4<Scalar> out_grads) {
 		net.backpropagate(std::move(out_grads));
 	};
-	static bool is_parametric(Layer<Scalar>& layer) {
+	inline static bool is_parametric(Layer<Scalar>& layer) {
 		return layer.is_parametric();
 	};
-	static Matrix<Scalar>& get_params(Layer<Scalar>& layer) {
+	inline static Matrix<Scalar>& get_params(Layer<Scalar>& layer) {
 		return layer.get_params();
 	};
-	static const Matrix<Scalar>& get_param_grads(Layer<Scalar>& layer) {
+	inline static const Matrix<Scalar>& get_param_grads(Layer<Scalar>& layer) {
 		return layer.get_param_grads();
 	};
-	static const void enforce_constraints(Layer<Scalar>& layer) {
+	inline static const void enforce_constraints(Layer<Scalar>& layer) {
 		layer.enforce_constraints();
 	};
 	LossSharedPtr<Scalar> loss;
@@ -167,7 +167,7 @@ public:
 	};
 	virtual ~SGDOptimizer() = default;
 protected:
-	Scalar train(NeuralNetwork<Scalar>& net, DataProvider<Scalar>& training_prov, unsigned epoch) {
+	inline Scalar train(NeuralNetwork<Scalar>& net, DataProvider<Scalar>& training_prov, unsigned epoch) {
 		// TODO Handle overflow.
 		Scalar training_loss = 0;
 		Scalar instances = (Scalar) training_prov.instances();
@@ -192,7 +192,7 @@ protected:
 		}
 		return training_loss / instances;
 	};
-	Scalar test(NeuralNetwork<Scalar>& net, DataProvider<Scalar>& test_prov, unsigned epoch) {
+	inline Scalar test(NeuralNetwork<Scalar>& net, DataProvider<Scalar>& test_prov, unsigned epoch) {
 		// TODO Handle overflow.
 		Scalar obj_loss = 0;
 		std::vector<Layer<Scalar>*> layers = Optimizer<Scalar>::get_layers(net);
@@ -225,8 +225,8 @@ public:
 		assert(learning_rate > 0);
 	};
 protected:
-	void fit(NeuralNetwork<Scalar>& net) { };
-	void update_params(Layer<Scalar>& layer, unsigned i, unsigned epoch) {
+	inline void fit(NeuralNetwork<Scalar>& net) { };
+	inline void update_params(Layer<Scalar>& layer, unsigned i, unsigned epoch) {
 		Matrix<Scalar>& params = Optimizer<Scalar>::get_params(layer);
 		params -= (learning_rate * (Optimizer<Scalar>::get_param_grads(layer) +
 				SGDOptimizer<Scalar>::reg->d_function(params)));
@@ -250,7 +250,7 @@ public:
 	};
 	virtual ~MomentumAcceleratedSGDOptimizer() = default;
 protected:
-	void fit(NeuralNetwork<Scalar>& net) {
+	inline void fit(NeuralNetwork<Scalar>& net) {
 		std::vector<Layer<Scalar>*> layers = Optimizer<Scalar>::get_layers(net);
 		param_grads_vec = std::vector<Matrix<Scalar>>(layers.size());
 		for (unsigned i = 0; i < param_grads_vec.size(); i++) {
@@ -261,7 +261,7 @@ protected:
 			param_grads.setZero(param_grads.rows(), param_grads.cols());
 		}
 	};
-	void update_params(Layer<Scalar>& layer, unsigned i, unsigned epoch) {
+	inline void update_params(Layer<Scalar>& layer, unsigned i, unsigned epoch) {
 		Scalar learning_rate = calculate_learning_rate(epoch);
 		Matrix<Scalar>& param_grads = param_grads_vec[i];
 		Matrix<Scalar>& params = Optimizer<Scalar>::get_params(layer);
@@ -287,7 +287,7 @@ public:
 				MomentumAcceleratedSGDOptimizer<Scalar>::MomentumAcceleratedSGDOptimizer(loss, reg, batch_size,
 						init_learning_rate, annealing_rate, momentum) { };
 protected:
-	void update_params(Layer<Scalar>& layer, unsigned i, unsigned epoch) {
+	inline void update_params(Layer<Scalar>& layer, unsigned i, unsigned epoch) {
 		Scalar learning_rate = MomentumAcceleratedSGDOptimizer<Scalar>::calculate_learning_rate(epoch);
 		Matrix<Scalar>& param_grads = MomentumAcceleratedSGDOptimizer<Scalar>::param_grads_vec[i];
 		Matrix<Scalar>& params = Optimizer<Scalar>::get_params(layer);
@@ -313,7 +313,7 @@ public:
 	};
 	virtual ~AdagradOptimizer() = default;
 protected:
-	void fit(NeuralNetwork<Scalar>& net) {
+	inline void fit(NeuralNetwork<Scalar>& net) {
 		std::vector<Layer<Scalar>*> layers = Optimizer<Scalar>::get_layers(net);
 		param_grad_sqrs_vec = std::vector<Matrix<Scalar>>(layers.size());
 		for (unsigned i = 0; i < param_grad_sqrs_vec.size(); i++) {
@@ -324,15 +324,15 @@ protected:
 			param_grad_sqrs.setZero(param_grad_sqrs.rows(), param_grad_sqrs.cols());
 		}
 	};
-	virtual void update_acc_weight_grad_sqrs(Matrix<Scalar>& acc_weight_grad_sqrs,
+	inline virtual void update_acc_weight_grad_sqrs(Matrix<Scalar>& acc_weight_grad_sqrs,
 			const Matrix<Scalar>& param_grads) {
 		acc_weight_grad_sqrs += param_grads.cwiseProduct(param_grads);
 	};
-	virtual void update_acc_batch_norm_grad_sqrs(RowVector<Scalar>& acc_batch_norm_grad_sqrs,
+	inline virtual void update_acc_batch_norm_grad_sqrs(RowVector<Scalar>& acc_batch_norm_grad_sqrs,
 			const RowVector<Scalar>& batch_norm_grads) {
 		acc_batch_norm_grad_sqrs += batch_norm_grads.cwiseProduct(batch_norm_grads);
 	};
-	void update_params(Layer<Scalar>& layer, unsigned i, unsigned epoch) {
+	inline void update_params(Layer<Scalar>& layer, unsigned i, unsigned epoch) {
 		Matrix<Scalar>& param_grad_sqrs = param_grad_sqrs_vec[i];
 		Matrix<Scalar>& params = Optimizer<Scalar>::get_params(layer);
 		Matrix<Scalar> param_grads = Optimizer<Scalar>::get_param_grads(layer) +
@@ -355,11 +355,11 @@ public:
 		assert(l2_decay >= 0 && l2_decay <= 1);
 	};
 protected:
-	void update_acc_weight_grad_sqrs(Matrix<Scalar>& acc_weight_grad_sqrs,
+	inline void update_acc_weight_grad_sqrs(Matrix<Scalar>& acc_weight_grad_sqrs,
 			const Matrix<Scalar>& param_grads) {
 		acc_weight_grad_sqrs = (1 - l2_decay) * acc_weight_grad_sqrs + l2_decay * param_grads.cwiseProduct(param_grads);
 	};
-	void update_acc_batch_norm_grad_sqrs(RowVector<Scalar>& acc_batch_norm_grad_sqrs,
+	inline void update_acc_batch_norm_grad_sqrs(RowVector<Scalar>& acc_batch_norm_grad_sqrs,
 			const RowVector<Scalar>& batch_norm_grads) {
 		acc_batch_norm_grad_sqrs = (1 - l2_decay) * acc_batch_norm_grad_sqrs +
 				l2_decay * batch_norm_grads.cwiseProduct(batch_norm_grads);
@@ -379,7 +379,7 @@ public:
 		assert(epsilon > 0);
 	};
 protected:
-	void fit(NeuralNetwork<Scalar>& net) {
+	inline void fit(NeuralNetwork<Scalar>& net) {
 		std::vector<Layer<Scalar>*> layers = Optimizer<Scalar>::get_layers(net);
 		pgus_vec = std::vector<ParamGradAndUpdateSqrs>(layers.size());
 		for (unsigned i = 0; i < pgus_vec.size(); i++) {
@@ -392,7 +392,7 @@ protected:
 			pgus.param_update.setZero(pgus.param_update.rows(), pgus.param_update.cols());
 		}
 	};
-	void update_params(Layer<Scalar>& layer, unsigned i, unsigned epoch) {
+	inline void update_params(Layer<Scalar>& layer, unsigned i, unsigned epoch) {
 		ParamGradAndUpdateSqrs& pgus = pgus_vec[i];
 		Matrix<Scalar>& params = Optimizer<Scalar>::get_params(layer);
 		Matrix<Scalar> param_grads = Optimizer<Scalar>::get_param_grads(layer) +
@@ -430,7 +430,7 @@ public:
 	};
 	virtual ~AdamOptimizer() = default;
 protected:
-	void fit(NeuralNetwork<Scalar>& net) {
+	inline void fit(NeuralNetwork<Scalar>& net) {
 		std::vector<Layer<Scalar>*> layers = Optimizer<Scalar>::get_layers(net);
 		pgn_vec = std::vector<ParamGradNorms>(layers.size());
 		for (unsigned i = 0; i < pgn_vec.size(); i++) {
@@ -443,7 +443,7 @@ protected:
 			vel.param_grad_l2.setZero(vel.param_grad_l2.rows(), vel.param_grad_l2.cols());
 		}
 	};
-	void update_params(Layer<Scalar>& layer, unsigned i, unsigned epoch) {
+	inline void update_params(Layer<Scalar>& layer, unsigned i, unsigned epoch) {
 		ParamGradNorms& grad_norms = pgn_vec[i];
 		Scalar l1_corr = 1.0 / (1.0 - pow(1.0 - l1_decay, epoch + 1) + epsilon);
 		Scalar l2_corr = 1.0 / (1.0 - pow(1.0 - l2_decay, epoch + 1) + epsilon);
@@ -476,7 +476,7 @@ public:
 				AdamOptimizer<Scalar>::AdamOptimizer(loss, reg, batch_size, learning_rate,
 						l1_decay, l2_decay, epsilon) { };
 protected:
-	void update_params(Layer<Scalar>& layer, unsigned i, unsigned epoch) {
+	inline void update_params(Layer<Scalar>& layer, unsigned i, unsigned epoch) {
 		typename AdamOptimizer<Scalar>::ParamGradNorms& grad_norms = AdamOptimizer<Scalar>::pgn_vec[i];
 		Scalar l1_corr = 1.0 / (1.0 - pow(1.0 - AdamOptimizer<Scalar>::l1_decay, epoch + 1) +
 				AdamOptimizer<Scalar>::epsilon);
@@ -501,7 +501,7 @@ public:
 				AdamOptimizer<Scalar>::AdamOptimizer(loss, reg, batch_size, learning_rate,
 						l1_decay, l2_decay, epsilon) { };
 protected:
-	void update_params(Layer<Scalar>& layer, unsigned i, unsigned epoch) {
+	inline void update_params(Layer<Scalar>& layer, unsigned i, unsigned epoch) {
 		typename AdamOptimizer<Scalar>::ParamGradNorms& grad_norms = AdamOptimizer<Scalar>::pgn_vec[i];
 		Scalar l1_corr = 1.0 / (1.0 - pow(1.0 - AdamOptimizer<Scalar>::l1_decay, epoch + 1) +
 				AdamOptimizer<Scalar>::epsilon);

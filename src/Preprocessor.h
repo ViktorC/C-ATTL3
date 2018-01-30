@@ -38,7 +38,7 @@ public:
 		assert(epsilon > 0 && "epsilon must be greater than 0");
 	};
 	virtual ~NormalizationPreprocessor() = default;
-	virtual void fit(const Tensor4<Scalar>& data) {
+	inline virtual void fit(const Tensor4<Scalar>& data) {
 		int rows = data.dimension(0);
 		assert(rows > 0);
 		dims = Dimensions<int>(data.dimension(1), data.dimension(2), data.dimension(3));
@@ -55,7 +55,7 @@ public:
 				sd.row(i) = (data_mat.rowwise() - means.row(i)).array().square().colwise().mean().sqrt();
 		}
 	};
-	virtual void transform(Tensor4<Scalar>& data) const {
+	inline virtual void transform(Tensor4<Scalar>& data) const {
 		int rows = data.dimension(0);
 		assert(rows > 0);
 		assert(dims.get_dim1() == data.dimension(1) && dims.get_dim2() == data.dimension(2) &&
@@ -94,7 +94,7 @@ public:
 				"the minimum relative variance to be retained must be greater "
 				"then 0 and less than or equal to 1");
 	};
-	void fit(const Tensor4<Scalar>& data) {
+	inline void fit(const Tensor4<Scalar>& data) {
 		assert((!reduce_dims || data.dimension(3) == 1) &&
 				"cannot reduce the dimensionality of multi-channel tensors");
 		NormalizationPreprocessor<Scalar>::fit(data);
@@ -136,7 +136,7 @@ public:
 				ed_vec[i].eigen_values = eigen_values.bottomRows(dims_to_retain).transpose();
 		}
 	};
-	void transform(Tensor4<Scalar>& data) const {
+	inline void transform(Tensor4<Scalar>& data) const {
 		NormalizationPreprocessor<Scalar>::transform(data);
 		if (reduce_dims) {
 			Matrix<Scalar> data_mat = Utils<Scalar>::map_tensor4_to_mat(data);

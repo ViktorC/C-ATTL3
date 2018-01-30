@@ -29,19 +29,19 @@ public:
 			Dimensions(dim1, 1) { };
 	Dimensions() :
 			Dimensions(1) { };
-	IndexType get_dim1() const {
+	inline IndexType get_dim1() const {
 		return dim1;
 	};
-	IndexType get_dim2() const {
+	inline IndexType get_dim2() const {
 		return dim2;
 	};
-	IndexType get_dim3() const {
+	inline IndexType get_dim3() const {
 		return dim3;
 	};
-	IndexType get_points() const {
+	inline IndexType get_points() const {
 		return dim1 * dim2 * dim3;
 	};
-	bool equals(const Dimensions<IndexType>& dims) const {
+	inline bool equals(const Dimensions<IndexType>& dims) const {
 		return dim1 == dims.dim1 && dim2 == dims.dim2 && dim3 == dims.dim3;
 	};
 	std::string to_string() const {
