@@ -956,7 +956,7 @@ protected:
 template<typename Scalar>
 class SumPoolingLayer : public PoolingLayer<Scalar> {
 public:
-	SumPoolingLayer(Dimensions<int> input_dims, unsigned receptor_size = 2, unsigned stride = 2) :
+	SumPoolingLayer(Dimensions<int> input_dims, size_t receptor_size = 2, size_t stride = 2) :
 			PoolingLayer<Scalar>::PoolingLayer(input_dims, receptor_size, stride) { };
 	Layer<Scalar>* clone() {
 		return new SumPoolingLayer(*this);
@@ -975,7 +975,7 @@ protected:
 template<typename Scalar>
 class MeanPoolingLayer : public PoolingLayer<Scalar> {
 public:
-	MeanPoolingLayer(Dimensions<int> input_dims, unsigned receptor_size = 2, unsigned stride = 2) :
+	MeanPoolingLayer(Dimensions<int> input_dims, size_t receptor_size = 2, size_t stride = 2) :
 			PoolingLayer<Scalar>::PoolingLayer(input_dims, receptor_size, stride) { };
 	Layer<Scalar>* clone() {
 		return new MeanPoolingLayer(*this);

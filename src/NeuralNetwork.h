@@ -399,8 +399,11 @@ private:
 template<typename Scalar>
 using NeuralNetPtr = std::unique_ptr<NeuralNetwork<Scalar>>;
 
+template<typename Scalar> class ResidualNeuralNetwork;
+
 template<typename Scalar>
 class CompositeNeuralNetwork : public NeuralNetwork<Scalar> {
+	friend class ResidualNeuralNetwork<Scalar>;
 public:
 	CompositeNeuralNetwork(std::vector<NeuralNetPtr<Scalar>> nets, bool foremost = true) :
 			nets(std::move(nets)),
@@ -422,7 +425,7 @@ public:
 	};
 	CompositeNeuralNetwork(NeuralNetPtr<Scalar> net, bool foremost = true) :
 			CompositeNeuralNetwork(create_vector(std::move(net)), foremost) { };
-	CompositeNeuralNetwork(const CompoundNeuralNetwork<Scalar>& network) :
+	CompositeNeuralNetwork(const CompositeNeuralNetwork<Scalar>& network) :
 			nets(network.nets.size()) {
 		for (unsigned i = 0; i < nets.size(); i++)
 			nets[i] = NeuralNetPtr<Scalar>(network.nets[i]->clone());
@@ -430,7 +433,7 @@ public:
 		input_dims = network.input_dims;
 		output_dims = network.output_dims;
 	};
-	CompositeNeuralNetwork(CompoundNeuralNetwork<Scalar>&& network) {
+	CompositeNeuralNetwork(CompositeNeuralNetwork<Scalar>&& network) {
 		swap(*this, network);
 	};
 	~CompositeNeuralNetwork() = default;
@@ -451,7 +454,7 @@ public:
 		return output_dims;
 	};
 	// For the copy-and-swap idiom.
-	friend void swap(CompoundNeuralNetwork<Scalar>& network1, CompoundNeuralNetwork<Scalar>& network2) {
+	friend void swap(CompositeNeuralNetwork<Scalar>& network1, CompositeNeuralNetwork<Scalar>& network2) {
 		using std::swap;
 		swap(network1.nets, network2.nets);
 		swap(network1.foremost, network2.foremost);
@@ -497,14 +500,12 @@ private:
 };
 
 /**
- * If ParallelModules is false, it is an ordinary ResNet; if it is true, it is a residual
- * InceptionNet. The residuality of the modules is always optional, thus it can also be
- * used to construct vanilla InceptionNets.
+ * This class can be used to build InceptionNets, ResNets, Inception-ResNets, or non-residual composite
+ * neural networks.
  */
-template<typename Scalar, bool ParallelModules = false>
+template<typename Scalar>
 class ResidualNeuralNetwork : public NeuralNetwork<Scalar> {
-	typedef typename std::conditional<ParallelModules,ParallelNeuralNetwork<Scalar>,
-			SequentialNeuralNetwork<Scalar>>::type Module;
+	typedef CompositeNeuralNetwork<Scalar> Module;
 public:
 	ResidualNeuralNetwork(std::vector<std::pair<Module,bool>> modules, bool foremost = true) :
 			modules(modules),
