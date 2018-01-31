@@ -231,6 +231,11 @@ protected:
 };
 
 template<typename Scalar>
+class DenseNeuralNetwork : public SequentialNeuralNetwork<Scalar> {
+
+};
+
+template<typename Scalar>
 class ParallelNeuralNetwork : public NeuralNetwork<Scalar> {
 	typedef SequentialNeuralNetwork<Scalar> Lane;
 public:
@@ -314,7 +319,7 @@ protected:
 				assert(!pthread_join(threads[i - 1], nullptr));
 			int depth = lanes[i].output_dims.get_dim3();
 			extents[3] = depth;
-			out.slice(offsets, extents) = std::move(args_arr[i].out);
+			out.slice(offsets, extents) = args_arr[i].out;
 			offsets[3] += depth;
 		}
 		if (helper_thread_num > 0)

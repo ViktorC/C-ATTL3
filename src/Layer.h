@@ -457,7 +457,7 @@ public:
 	};
 protected:
 	void init() {
-		for (int i = 0; i < dims.get_dim3(); i += 2) {
+		for (int i = 0; i < params.rows(); i += 2) {
 			// Gamma
 			params.row(i).setOnes();
 			// Beta

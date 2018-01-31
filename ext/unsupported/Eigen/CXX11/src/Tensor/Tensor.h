@@ -398,7 +398,7 @@ class Tensor : public TensorBase<Tensor<Scalar_, NumIndices_, Options_, IndexTyp
       internal::TensorExecutor<const Assign, DefaultDevice>::run(assign, DefaultDevice());
     }
     EIGEN_DEVICE_FUNC
-    EIGEN_STRONG_INLINE Tensor(Tensor&& other) : Tensor()
+    EIGEN_STRONG_INLINE Tensor(Self&& other) : Tensor()
     {
       m_storage.swap(other.m_storage);
     }
@@ -413,7 +413,7 @@ class Tensor : public TensorBase<Tensor<Scalar_, NumIndices_, Options_, IndexTyp
       return *this;
     }
     EIGEN_DEVICE_FUNC
-    EIGEN_STRONG_INLINE Tensor& operator=(Tensor&& other)
+    EIGEN_STRONG_INLINE Tensor& operator=(Self&& other)
     {
       m_storage.swap(other.m_storage);
       return *this;
