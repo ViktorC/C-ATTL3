@@ -21,11 +21,8 @@
 #include <utility>
 #include <vector>
 
-/* TODO Possibility to add and remove modules (e.g. layers for sequential networks, inception modules for InceptionNets).
- * TODO Lighter syntax for network creation.
- * TODO Implement DenseNet.
- * TODO Serialization.
- */
+// TODO Possibility to add and remove modules (e.g. layers for sequential networks, inception modules for InceptionNets).
+// TODO Serialization.
 
 namespace cppnn {
 
@@ -231,8 +228,109 @@ protected:
 };
 
 template<typename Scalar>
-class DenseNeuralNetwork : public SequentialNeuralNetwork<Scalar> {
-
+class DenseNeuralNetwork : public NeuralNetwork<Scalar> {
+public:
+	DenseNeuralNetwork(std::vector<LayerPtr<Scalar>> layers, bool foremost = true) :
+			layers(std::move(layers)),
+			foremost(foremost) {
+		assert(this->layers.size() > 0 && "layers must contain at least 1 element");
+		assert(this->layers[0] != nullptr);
+		Layer<Scalar>& first_layer = *(this->layers[0]);
+		input_dims = first_layer.get_input_dims();
+		Dimensions<int> first_layer_output_dims = first_layer.get_output_dims();
+		int output_height = first_layer_output_dims.get_dim1();
+		int output_width = first_layer_output_dims.get_dim2();
+		int output_depth = first_layer_output_dims.get_dim3() + input_dims.get_dim3();
+		assert(input_dims.get_dim1() == output_height && input_dims.get_dim2() == output_width);
+		for (unsigned i = 1; i < this->layers.size(); i++) {
+			assert(this->layers[i] != nullptr && "layers contains null pointers");
+			Layer<Scalar>& layer = *this->layers[i];
+			assert(layer.get_input_dims().equals(output_height, output_width, output_depth) &&
+					"incompatible layer dimensions");
+			output_depth += layer.get_output_dims().get_dim3();
+		}
+		output_dims = Dimensions<int>(output_height, output_width, output_depth);
+		NeuralNetwork<Scalar>::set_input_layer(first_layer, foremost);
+	};
+	DenseNeuralNetwork(const DenseNeuralNetwork<Scalar>& network) :
+			layers(network.layers.size()) {
+		for (unsigned i = 0; i < layers.size(); i++)
+			layers[i] = LayerPtr<Scalar>(network.layers[i]->clone());
+		foremost = network.foremost;
+		input_dims = network.input_dims;
+		output_dims = network.output_dims;
+	};
+	DenseNeuralNetwork(DenseNeuralNetwork<Scalar>&& network) {
+		swap(*this, network);
+	};
+	~DenseNeuralNetwork() = default;
+	DenseNeuralNetwork<Scalar>& operator=(DenseNeuralNetwork<Scalar> network) {
+		swap(*this, network);
+		return *this;
+	};
+	NeuralNetwork<Scalar>* clone() const {
+		return new DenseNeuralNetwork(*this);
+	};
+	bool is_foremost() const {
+		return foremost;
+	};
+	Dimensions<int> get_input_dims() const {
+		return input_dims;
+	};
+	Dimensions<int> get_output_dims() const {
+		return output_dims;
+	};
+	friend void swap(DenseNeuralNetwork<Scalar>& network1,
+			DenseNeuralNetwork<Scalar>& network2) {
+		using std::swap;
+		swap(network1.layers, network2.layers);
+		swap(network1.foremost, network2.foremost);
+		swap(network1.input_dims, network2.input_dims);
+		swap(network1.output_dims, network2.output_dims);
+	};
+protected:
+	inline std::vector<Layer<Scalar>*> get_layers() {
+		std::vector<Layer<Scalar>*> layers_raw(layers.size());
+		for (unsigned i = 0; i < layers.size(); i++)
+			layers_raw[i] = layers[i].get();
+		return layers_raw;
+	};
+	inline Tensor4<Scalar> propagate(Tensor4<Scalar> input, bool training) {
+		NeuralNetwork<Scalar>::assert_popagation_input_dims(input, input_dims);
+		int rows = input.dimension(0);
+		Array4<int> offsets({ 0, 0, 0, 0 });
+		Array4<int> extents({ rows, input_dims.get_dim1(), input_dims.get_dim2(), 0 });
+		for (unsigned i = 0; i < layers.size(); i++) {
+			Layer<Scalar>& layer = *layers[i];
+			int input_depth = input.dimension(3);
+			int layer_output_depth = layer.get_output_dims().get_dim3();
+			Tensor4<Scalar> out_i(rows, input_dims.get_dim1(), input_dims.get_dim2(),
+					input_depth + layer_output_depth);
+			offsets[4] = 0;
+			extents[4] = input_depth;
+			out_i.slice(offsets, extents) = input;
+			offsets[4] = input_depth;
+			extents[4] = layer_output_depth;
+			out_i.slice(offsets, extents) = NeuralNetwork<Scalar>::pass_forward(layer, std::move(input), training);
+			if (!training)
+				NeuralNetwork<Scalar>::empty_cache(layer);
+			input = Tensor4<Scalar>(std::move(out_i));
+		}
+		return input;
+	};
+	inline Tensor4<Scalar> backpropagate(Tensor4<Scalar> out_grads) {
+		NeuralNetwork<Scalar>::assert_popagation_input_dims(out_grads, output_dims);
+		for (int i = layers.size() - 1; i >= 0; i--) {
+			Layer<Scalar>& layer = *(layers[i]);
+			out_grads = NeuralNetwork<Scalar>::pass_back(layer, std::move(out_grads));
+			NeuralNetwork<Scalar>::empty_cache(layer);
+		}
+		return out_grads;
+	};
+	std::vector<LayerPtr<Scalar>> layers;
+	bool foremost;
+	Dimensions<int> input_dims;
+	Dimensions<int> output_dims;
 };
 
 template<typename Scalar>

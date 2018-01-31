@@ -44,6 +44,9 @@ public:
 	inline bool equals(const Dimensions<IndexType>& dims) const {
 		return dim1 == dims.dim1 && dim2 == dims.dim2 && dim3 == dims.dim3;
 	};
+	inline bool equals(IndexType dim1, IndexType dim2, IndexType dim3) {
+		return this->dim1 == dim1 && this->dim2 == dim2 && this->dim3 == dim3;
+	};
 	std::string to_string() const {
 		return "[" + std::to_string(dim1) + ", " + std::to_string(dim2) + ", " +
 				std::to_string(dim3) + "]";
