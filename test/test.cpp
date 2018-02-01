@@ -38,21 +38,23 @@ int main() {
 	InMemoryDataProvider<Scalar> test_prov(std::move(test_obs_ptr), std::move(test_obj_ptr));
 	WeightInitSharedPtr<Scalar> init(new HeWeightInitialization<Scalar>());
 	std::vector<std::pair<CompositeNeuralNetwork<Scalar>,bool>> res_modules;
-	std::vector<NeuralNetPtr<Scalar>> nets;
-	std::vector<SequentialNeuralNetwork<Scalar>> parallel_modules;
-	parallel_modules.push_back(SequentialNeuralNetwork<Scalar>(LayerPtr<Scalar>(new ConvLayer<Scalar>(training_prov.get_obs_dims(), 5, init, 1, 0))));	// 0
-	parallel_modules.push_back(SequentialNeuralNetwork<Scalar>(LayerPtr<Scalar>(new ConvLayer<Scalar>(training_prov.get_obs_dims(), 3, init, 5, 2))));	// 1
-	nets.push_back(NeuralNetPtr<Scalar>(new ParallelNeuralNetwork<Scalar>(parallel_modules)));
+	std::vector<NeuralNetPtr<Scalar>> comp_mods;
+	std::vector<NeuralNetPtr<Scalar>> parallel_lanes;
+	parallel_lanes.push_back(NeuralNetPtr<Scalar>(new SequentialNeuralNetwork<Scalar>(
+			LayerPtr<Scalar>(new ConvLayer<Scalar>(training_prov.get_obs_dims(), 5, init, 1, 0)))));													// 0
+	parallel_lanes.push_back(NeuralNetPtr<Scalar>(new SequentialNeuralNetwork<Scalar>(
+			LayerPtr<Scalar>(new ConvLayer<Scalar>(training_prov.get_obs_dims(), 3, init, 5, 2)))));													// 1
+	comp_mods.push_back(NeuralNetPtr<Scalar>(new ParallelNeuralNetwork<Scalar>(std::move(parallel_lanes))));
 	std::vector<LayerPtr<Scalar>> layers1(7);
-	layers1[0] = LayerPtr<Scalar>(new MaxPoolingLayer<Scalar>(nets[0]->get_output_dims()));																// 2
+	layers1[0] = LayerPtr<Scalar>(new MaxPoolingLayer<Scalar>(comp_mods[0]->get_output_dims()));														// 2
 	layers1[1] = LayerPtr<Scalar>(new LeakyReLUActivationLayer<Scalar>(layers1[0]->get_output_dims()));													// 3
 	layers1[2] = LayerPtr<Scalar>(new BatchNormLayer<Scalar>(layers1[1]->get_output_dims()));															// 4
 	layers1[3] = LayerPtr<Scalar>(new ConvLayer<Scalar>(layers1[2]->get_output_dims(), 8, init));														// 5
 	layers1[4] = LayerPtr<Scalar>(new MaxPoolingLayer<Scalar>(layers1[3]->get_output_dims()));															// 6
 	layers1[5] = LayerPtr<Scalar>(new LeakyReLUActivationLayer<Scalar>(layers1[4]->get_output_dims()));													// 7
 	layers1[6] = LayerPtr<Scalar>(new BatchNormLayer<Scalar>(layers1[5]->get_output_dims()));															// 8
-	nets.push_back(NeuralNetPtr<Scalar>(new SequentialNeuralNetwork<Scalar>(std::move(layers1))));
-	res_modules.push_back(std::make_pair(CompositeNeuralNetwork<Scalar>(std::move(nets)), false));
+	comp_mods.push_back(NeuralNetPtr<Scalar>(new SequentialNeuralNetwork<Scalar>(std::move(layers1))));
+	res_modules.push_back(std::make_pair(CompositeNeuralNetwork<Scalar>(std::move(comp_mods)), false));
 	std::vector<LayerPtr<Scalar>> layers2(3);
 	layers2[0] = LayerPtr<Scalar>(new ConvLayer<Scalar>(res_modules[0].first.get_output_dims(), 8, init));												// 9
 	layers2[1] = LayerPtr<Scalar>(new LeakyReLUActivationLayer<Scalar>(layers2[0]->get_output_dims()));													// 10
