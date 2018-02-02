@@ -10,6 +10,7 @@
 
 #include <algorithm>
 #include <Dimensions.h>
+#include <fstream>
 #include <memory>
 #include <string>
 #include <type_traits>
@@ -119,7 +120,10 @@ private:
 //
 //	};
 //private:
-//
+//	std::string obs_path;
+//	std::string obj_path;
+//	std::ifstream obs_stream;
+//	std::ifstream obj_stream;
 //};
 
 } /* namespace cattle */

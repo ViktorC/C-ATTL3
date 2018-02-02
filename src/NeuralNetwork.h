@@ -667,14 +667,14 @@ protected:
 		Array4<int> extents({ rows, input_dims.get_height(), input_dims.get_width(), 0 });
 		for (unsigned i = 0; i < modules.size(); i++) {
 			Module& module = modules[i];
-			int input_depth = module.get_input_dims().get_depth();
+			int layer_input_depth = module.get_input_dims().get_depth();
 			int layer_output_depth = module.get_output_dims().get_depth();
 			Tensor4<Scalar> out_i(rows, input_dims.get_height(), input_dims.get_width(),
-					input_depth + layer_output_depth);
+					layer_input_depth + layer_output_depth);
 			offsets[3] = 0;
-			extents[3] = input_depth;
+			extents[3] = layer_input_depth;
 			out_i.slice(offsets, extents) = input;
-			offsets[3] = input_depth;
+			offsets[3] = layer_input_depth;
 			extents[3] = layer_output_depth;
 			out_i.slice(offsets, extents) = module.propagate(std::move(input), training);
 			input = Tensor4<Scalar>(std::move(out_i));
@@ -687,14 +687,14 @@ protected:
 		Array4<int> extents({ out_grads.dimension(0), input_dims.get_height(), input_dims.get_width(), 0 });
 		for (int i = modules.size() - 1; i >= 0; i--) {
 			Module& module = modules[i];
-			int output_depth = module.get_output_dims().get_depth();
-			int new_offset = out_grads.dimension(3) - output_depth;
-			offsets[3] = new_offset;
-			extents[3] = output_depth;
+			int layer_input_depth = module.get_input_dims().get_depth();
+			int layer_output_depth = module.get_output_dims().get_depth();
+			offsets[3] = layer_input_depth;
+			extents[3] = layer_output_depth;
 			Tensor4<Scalar> out_grads_i = out_grads.slice(offsets, extents);
 			offsets[3] = 0;
-			extents[3] = new_offset;
-			out_grads = out_grads.slice(offsets, extents) + module.backpropagate(std::move(out_grads_i));
+			extents[3] = layer_input_depth;
+			out_grads = Tensor4<Scalar>(out_grads.slice(offsets, extents) + module.backpropagate(std::move(out_grads_i)));
 		}
 		return out_grads;
 	};
