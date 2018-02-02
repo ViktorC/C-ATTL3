@@ -10,56 +10,83 @@
 
 #include <cassert>
 #include <sstream>
+#include <stdexcept>
 #include <string>
 
-namespace cppnn {
+namespace cattle {
 
 template<typename IndexType>
 class Dimensions {
 public:
-	Dimensions(IndexType dim1, IndexType dim2, IndexType dim3) :
-			dim1(dim1),
-			dim2(dim2),
-			dim3(dim3) {
-		assert(dim1 > 0 && dim2 > 0 && dim3 > 0);
+	Dimensions(IndexType height, IndexType width, IndexType depth) :
+			height(height),
+			width(width),
+			depth(depth) {
+		assert(height > 0 && width > 0 && depth > 0);
 	};
-	Dimensions(IndexType dim1, IndexType dim2) :
-			Dimensions(dim1, dim2, 1) { };
-	Dimensions(IndexType dim1) :
-			Dimensions(dim1, 1) { };
+	Dimensions(IndexType height, IndexType width) :
+			Dimensions(height, width, 1) { };
+	Dimensions(IndexType height) :
+			Dimensions(height, 1) { };
 	Dimensions() :
 			Dimensions(1) { };
-	inline IndexType get_dim1() const {
-		return dim1;
+	inline IndexType get_height() const {
+		return height;
 	};
-	inline IndexType get_dim2() const {
-		return dim2;
+	inline IndexType get_width() const {
+		return width;
 	};
-	inline IndexType get_dim3() const {
-		return dim3;
+	inline IndexType get_depth() const {
+		return depth;
 	};
-	inline IndexType get_points() const {
-		return dim1 * dim2 * dim3;
+	inline IndexType get_volume() const {
+		return height * width * depth;
 	};
 	inline bool equals(const Dimensions<IndexType>& dims) const {
-		return dim1 == dims.dim1 && dim2 == dims.dim2 && dim3 == dims.dim3;
+		return height == dims.height && width == dims.width && depth == dims.depth;
 	};
-	inline bool equals(IndexType dim1, IndexType dim2, IndexType dim3) {
-		return this->dim1 == dim1 && this->dim2 == dim2 && this->dim3 == dim3;
+	inline bool equals(IndexType height, IndexType width, IndexType depth) {
+		return this->height == height && this->width == width && this->depth == depth;
 	};
 	std::string to_string() const {
-		return "[" + std::to_string(dim1) + ", " + std::to_string(dim2) + ", " +
-				std::to_string(dim3) + "]";
+		return "[" + std::to_string(height) + ", " + std::to_string(width) + ", " +
+				std::to_string(depth) + "]";
+	};
+	inline Dimensions<IndexType> add_along_depth(const Dimensions<IndexType> dims) {
+		assert(height == dims.height && width == dims.width);
+		return Dimensions<IndexType>(height, width, depth + dims.depth);
+	};
+	inline Dimensions<IndexType> subtract_along_depth(const Dimensions<IndexType> dims) {
+		assert(height == dims.height && width == dims.width);
+		return Dimensions<IndexType>(height, width, depth - dims.depth);
+	};
+	inline Dimensions<IndexType> operator+(const Dimensions<IndexType> dims) {
+		return Dimensions<IndexType>(height + dims.height, width + dims.width, depth + dims.depth);
+	};
+	inline Dimensions<IndexType> operator-(const Dimensions<IndexType> dims) {
+		return Dimensions<IndexType>(height - dims.height, width - dims.width, depth - dims.depth);
+	};
+	inline IndexType operator()(int i) {
+		switch (i) {
+			case 0:
+				return height;
+			case 1:
+				return width;
+			case 2:
+				return depth;
+			default:
+				throw std::invalid_argument("illegal index value: " + i);
+		}
 	};
 	friend std::ostream& operator<<(std::ostream& os, const Dimensions<IndexType>& dims) {
 		return os << dims.to_string() << std::endl;
 	};
 private:
-	IndexType dim1;
-	IndexType dim2;
-	IndexType dim3;
+	IndexType height;
+	IndexType width;
+	IndexType depth;
 };
 
-} /* namespace cppnn */
+} /* namespace cattle */
 
 #endif /* DIMENSIONS_H_ */

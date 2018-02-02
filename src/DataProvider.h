@@ -16,7 +16,7 @@
 #include <utility>
 #include <Utils.h>
 
-namespace cppnn {
+namespace cattle {
 
 template<typename Scalar>
 using Tensor4Ptr = std::unique_ptr<Tensor4<Scalar>>;
@@ -122,6 +122,6 @@ private:
 //
 //};
 
-} /* namespace cppnn */
+} /* namespace cattle */
 
 #endif /* DATAPROVIDER_H_ */

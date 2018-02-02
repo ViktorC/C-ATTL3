@@ -16,7 +16,7 @@
 #include <utility>
 #include <unsupported/Eigen/CXX11/Tensor>
 
-namespace cppnn {
+namespace cattle {
 
 template<typename Scalar>
 using RowVector = Eigen::Matrix<Scalar,1,Eigen::Dynamic,Eigen::RowMajor,1,Eigen::Dynamic>;
@@ -81,9 +81,9 @@ public:
 		return MatrixMap<Scalar>(tensor.data(), rows, tensor.size() / rows);
 	};
 	inline static Tensor4<Scalar> map_mat_to_tensor4(Matrix<Scalar> mat, Dimensions<int> dims) {
-		assert(dims.get_points() == mat.cols());
-		return Tensor4Map<Scalar>(mat.data(), mat.rows(), dims.get_dim1(),
-				dims.get_dim2(), dims.get_dim3());
+		assert(dims.get_volume() == mat.cols());
+		return Tensor4Map<Scalar>(mat.data(), mat.rows(), dims.get_height(),
+				dims.get_width(), dims.get_depth());
 	};
 	inline static void shuffle_mat_rows(Matrix<Scalar>& mat) {
 		Eigen::PermutationMatrix<Eigen::Dynamic,Eigen::Dynamic> perm(mat.rows());

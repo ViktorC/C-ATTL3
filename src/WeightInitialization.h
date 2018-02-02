@@ -14,7 +14,7 @@
 #include <string>
 #include <type_traits>
 
-namespace cppnn {
+namespace cattle {
 
 template<typename Scalar>
 class WeightInitialization {
@@ -130,6 +130,6 @@ private:
 	};
 };
 
-} /* namespace cppnn */
+} /* namespace cattle */
 
 #endif /* WEIGHTINITIALIZATION_H_ */

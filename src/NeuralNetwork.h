@@ -24,7 +24,7 @@
 // TODO Possibility to add and remove modules (e.g. layers for sequential networks, inception modules for InceptionNets).
 // TODO Serialization.
 
-namespace cppnn {
+namespace cattle {
 
 // Forward declaration to Optimizer and CompositeNeuralNetwork so they can be friended.
 template<typename Scalar> class Optimizer;
@@ -106,8 +106,8 @@ protected:
 	};
 	inline static void assert_popagation_input_dims(const Tensor4<Scalar>& input, Dimensions<int> expected_dims) {
 		assert(input.dimension(0) > 0);
-		assert(input.dimension(1) == expected_dims.get_dim1() && input.dimension(2) == expected_dims.get_dim2() &&
-				input.dimension(3) == expected_dims.get_dim3());
+		assert(input.dimension(1) == expected_dims.get_height() && input.dimension(2) == expected_dims.get_width() &&
+				input.dimension(3) == expected_dims.get_depth());
 	};
 };
 
@@ -237,15 +237,15 @@ public:
 		assert(this->lanes[0] != nullptr && "lanes contains null pointers");
 		NeuralNetwork<Scalar>& first_lane = *this->lanes[0];
 		Dimensions<int> input_dims = first_lane.get_input_dims();
-		int output_height = first_lane.get_output_dims().get_dim1();
-		int output_width = first_lane.get_output_dims().get_dim2();
-		int output_depth = first_lane.get_output_dims().get_dim3();
+		int output_height = first_lane.get_output_dims().get_height();
+		int output_width = first_lane.get_output_dims().get_width();
+		int output_depth = first_lane.get_output_dims().get_depth();
 		for (unsigned i = 1; i < this->lanes.size(); i++) {
 			assert(this->lanes[i] != nullptr && "lanes contains null pointers");
 			NeuralNetwork<Scalar>& lane = *this->lanes[i];
-			assert(input_dims.equals(lane.get_input_dims()) && output_height == lane.get_output_dims().get_dim1() &&
-					output_width == lane.get_output_dims().get_dim2() && "incompatible lane dimensions");
-			output_depth += lane.get_output_dims().get_dim3();
+			assert(input_dims.equals(lane.get_input_dims()) && output_height == lane.get_output_dims().get_height() &&
+					output_width == lane.get_output_dims().get_width() && "incompatible lane dimensions");
+			output_depth += lane.get_output_dims().get_depth();
 		}
 		set_foremost(foremost);
 		this->input_dims = input_dims;
@@ -312,8 +312,8 @@ protected:
 		NeuralNetwork<Scalar>::assert_popagation_input_dims(input, input_dims);
 		int rows = input.dimension(0);
 		Array4<int> offsets({ 0, 0, 0, 0 });
-		Array4<int> extents({ rows, output_dims.get_dim1(), output_dims.get_dim2(), 0 });
-		Tensor4<Scalar> out(rows, output_dims.get_dim1(), output_dims.get_dim2(), output_dims.get_dim3());
+		Array4<int> extents({ rows, output_dims.get_height(), output_dims.get_width(), 0 });
+		Tensor4<Scalar> out(rows, output_dims.get_height(), output_dims.get_width(), output_dims.get_depth());
 		unsigned lane_num = lanes.size();
 		unsigned helper_thread_num = lane_num - 1;
 		pthread_t threads[helper_thread_num];
@@ -339,7 +339,7 @@ protected:
 		for (unsigned i = 0; i < lane_num; i++) {
 			if (i != 0)
 				assert(!pthread_join(threads[i - 1], nullptr));
-			int depth = lanes[i]->get_output_dims().get_dim3();
+			int depth = lanes[i]->get_output_dims().get_depth();
 			extents[3] = depth;
 			out.slice(offsets, extents) = args_arr[i].out;
 			offsets[3] += depth;
@@ -351,8 +351,8 @@ protected:
 	inline Tensor4<Scalar> backpropagate(Tensor4<Scalar> out_grads) {
 		NeuralNetwork<Scalar>::assert_popagation_input_dims(out_grads, output_dims);
 		Tensor4<Scalar> prev_out_grads = foremost ? Utils<Scalar>::NULL_TENSOR :
-				Tensor4<Scalar>(out_grads.dimension(0), input_dims.get_dim1(), input_dims.get_dim2(),
-						input_dims.get_dim3());
+				Tensor4<Scalar>(out_grads.dimension(0), input_dims.get_height(), input_dims.get_width(),
+						input_dims.get_depth());
 		prev_out_grads.setZero();
 		unsigned lane_num = lanes.size();
 		unsigned helper_thread_num = lane_num - 1;
@@ -365,7 +365,7 @@ protected:
 		BackpropArgs args_arr[lane_num];
 		int depth_offset = out_grads.dimension(3);
 		for (int i = helper_thread_num; i >= 0; i--) {
-			depth_offset -= lanes[i]->get_output_dims().get_dim3();
+			depth_offset -= lanes[i]->get_output_dims().get_depth();
 			BackpropArgs args;
 			args.obj = this;
 			args.lane_id = i;
@@ -402,8 +402,8 @@ private:
 		BackpropArgs& args = *((BackpropArgs*) args_ptr);
 		NeuralNetwork<Scalar>& lane = *args.obj->lanes[args.lane_id];
 		Array4<int> offsets({ 0, 0, 0, args.depth_offset });
-		Array4<int> extents({ args.out_grads->dimension(0), lane.get_output_dims().get_dim1(),
-				lane.get_output_dims().get_dim2(), lane.get_output_dims().get_dim3() });
+		Array4<int> extents({ args.out_grads->dimension(0), lane.get_output_dims().get_height(),
+				lane.get_output_dims().get_width(), lane.get_output_dims().get_depth() });
 		Tensor4<Scalar> out_grads_slice = args.out_grads->slice(offsets, extents);
 		args.prev_out_grads = lane.backpropagate(std::move(out_grads_slice));
 		return nullptr;
@@ -620,15 +620,15 @@ public:
 		Module& first_module = this->modules[0];
 		input_dims = first_module.get_input_dims();
 		Dimensions<int> first_module_output_dims = first_module.get_output_dims();
-		int output_height = first_module_output_dims.get_dim1();
-		int output_width = first_module_output_dims.get_dim2();
-		int output_depth = first_module_output_dims.get_dim3() + input_dims.get_dim3();
-		assert(input_dims.get_dim1() == output_height && input_dims.get_dim2() == output_width);
+		int output_height = first_module_output_dims.get_height();
+		int output_width = first_module_output_dims.get_width();
+		int output_depth = first_module_output_dims.get_depth() + input_dims.get_depth();
+		assert(input_dims.get_height() == output_height && input_dims.get_width() == output_width);
 		for (unsigned i = 1; i < this->modules.size(); i++) {
 			Module& module = this->modules[i];
 			assert(module.get_input_dims().equals(output_height, output_width, output_depth) &&
 					"incompatible module dimensions");
-			output_depth += module.get_output_dims().get_dim3();
+			output_depth += module.get_output_dims().get_depth();
 			module.set_foremost(false);
 		}
 		output_dims = Dimensions<int>(output_height, output_width, output_depth);
@@ -664,18 +664,18 @@ protected:
 		NeuralNetwork<Scalar>::assert_popagation_input_dims(input, input_dims);
 		int rows = input.dimension(0);
 		Array4<int> offsets({ 0, 0, 0, 0 });
-		Array4<int> extents({ rows, input_dims.get_dim1(), input_dims.get_dim2(), 0 });
+		Array4<int> extents({ rows, input_dims.get_height(), input_dims.get_width(), 0 });
 		for (unsigned i = 0; i < modules.size(); i++) {
-			Module& module = *modules[i];
-			int input_depth = module.get_input_dims().get_dim3();
-			int layer_output_depth = module.get_output_dims().get_dim3();
-			Tensor4<Scalar> out_i(rows, input_dims.get_dim1(), input_dims.get_dim2(),
+			Module& module = modules[i];
+			int input_depth = module.get_input_dims().get_depth();
+			int layer_output_depth = module.get_output_dims().get_depth();
+			Tensor4<Scalar> out_i(rows, input_dims.get_height(), input_dims.get_width(),
 					input_depth + layer_output_depth);
-			offsets[4] = 0;
-			extents[4] = input_depth;
+			offsets[3] = 0;
+			extents[3] = input_depth;
 			out_i.slice(offsets, extents) = input;
-			offsets[4] = input_depth;
-			extents[4] = layer_output_depth;
+			offsets[3] = input_depth;
+			extents[3] = layer_output_depth;
 			out_i.slice(offsets, extents) = module.propagate(std::move(input), training);
 			input = Tensor4<Scalar>(std::move(out_i));
 		}
@@ -684,16 +684,16 @@ protected:
 	inline Tensor4<Scalar> backpropagate(Tensor4<Scalar> out_grads) {
 		NeuralNetwork<Scalar>::assert_popagation_input_dims(out_grads, output_dims);
 		Array4<int> offsets({ 0, 0, 0, 0 });
-		Array4<int> extents({ out_grads.dimension(0), input_dims.get_dim1(), input_dims.get_dim2(), 0 });
+		Array4<int> extents({ out_grads.dimension(0), input_dims.get_height(), input_dims.get_width(), 0 });
 		for (int i = modules.size() - 1; i >= 0; i--) {
-			Module& module = *modules[i];
-			int output_depth = module.get_output_dims().get_dim3();
-			int new_offset = out_grads.dimension(4) - output_depth;
-			offsets[4] = new_offset;
-			extents[4] = output_depth;
+			Module& module = modules[i];
+			int output_depth = module.get_output_dims().get_depth();
+			int new_offset = out_grads.dimension(3) - output_depth;
+			offsets[3] = new_offset;
+			extents[3] = output_depth;
 			Tensor4<Scalar> out_grads_i = out_grads.slice(offsets, extents);
-			offsets[4] = 0;
-			extents[4] = new_offset;
+			offsets[3] = 0;
+			extents[3] = new_offset;
 			out_grads = out_grads.slice(offsets, extents) + module.backpropagate(std::move(out_grads_i));
 		}
 		return out_grads;
@@ -704,6 +704,6 @@ protected:
 	Dimensions<int> output_dims;
 };
 
-} /* namespace cppnn */
+} /* namespace cattle */
 
 #endif /* NEURALNETWORK_H_ */

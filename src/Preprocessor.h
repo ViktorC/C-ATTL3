@@ -17,7 +17,7 @@
 #include <Utils.h>
 #include <vector>
 
-namespace cppnn {
+namespace cattle {
 
 template<typename Scalar>
 class Preprocessor {
@@ -43,10 +43,10 @@ public:
 		assert(rows > 0);
 		dims = Dimensions<int>(data.dimension(1), data.dimension(2), data.dimension(3));
 		Array4<int> offsets = { 0, 0, 0, 0 };
-		Array4<int> extents = { rows, dims.get_dim1(), dims.get_dim2(), 1 };
-		means = Matrix<Scalar>(dims.get_dim3(), dims.get_dim1() * dims.get_dim2());
+		Array4<int> extents = { rows, dims.get_height(), dims.get_width(), 1 };
+		means = Matrix<Scalar>(dims.get_depth(), dims.get_height() * dims.get_width());
 		sd = Matrix<Scalar>(means.rows(), means.cols());
-		for (int i = 0; i < dims.get_dim3(); i++) {
+		for (int i = 0; i < dims.get_depth(); i++) {
 			offsets[3] = i;
 			Tensor4<Scalar> data_slice_i = data.slice(offsets, extents);
 			Matrix<Scalar> data_mat = Utils<Scalar>::map_tensor4_to_mat(data_slice_i);
@@ -58,12 +58,12 @@ public:
 	inline virtual void transform(Tensor4<Scalar>& data) const {
 		int rows = data.dimension(0);
 		assert(rows > 0);
-		assert(dims.get_dim1() == data.dimension(1) && dims.get_dim2() == data.dimension(2) &&
-				dims.get_dim3() == data.dimension(3) && "mismatched fit and transform input tensor dimensions");
-		Dimensions<int> slice_dims(dims.get_dim1(), dims.get_dim2(), 1);
+		assert(dims.get_height() == data.dimension(1) && dims.get_width() == data.dimension(2) &&
+				dims.get_depth() == data.dimension(3) && "mismatched fit and transform input tensor dimensions");
+		Dimensions<int> slice_dims(dims.get_height(), dims.get_width(), 1);
 		Array4<int> offsets = { 0, 0, 0, 0 };
-		Array4<int> extents = { rows, slice_dims.get_dim1(), slice_dims.get_dim2(), slice_dims.get_dim3() };
-		for (int i = 0; i < dims.get_dim3(); i++) {
+		Array4<int> extents = { rows, slice_dims.get_height(), slice_dims.get_width(), slice_dims.get_depth() };
+		for (int i = 0; i < dims.get_depth(); i++) {
 			offsets[3] = i;
 			Tensor4<Scalar> data_slice_i = data.slice(offsets, extents);
 			Matrix<Scalar> data_ch_i = Utils<Scalar>::map_tensor4_to_mat(data_slice_i);
@@ -99,10 +99,10 @@ public:
 				"cannot reduce the dimensionality of multi-channel tensors");
 		NormalizationPreprocessor<Scalar>::fit(data);
 		int rows = data.dimension(0);
-		int channels = NormalizationPreprocessor<Scalar>::dims.get_dim3();
+		int channels = NormalizationPreprocessor<Scalar>::dims.get_depth();
 		Array4<int> offsets({ 0, 0, 0, 0 });
-		Array4<int> extents({ rows, NormalizationPreprocessor<Scalar>::dims.get_dim1(),
-				NormalizationPreprocessor<Scalar>::dims.get_dim2(), 1 });
+		Array4<int> extents({ rows, NormalizationPreprocessor<Scalar>::dims.get_height(),
+				NormalizationPreprocessor<Scalar>::dims.get_width(), 1 });
 		ed_vec = std::vector<EigenDecomposition>(channels);
 		for (int i = 0; i < channels; i++) {
 			offsets[3] = i;
@@ -147,10 +147,10 @@ public:
 			data = Utils<Scalar>::map_mat_to_tensor4(data_mat, Dimensions<int>(data_mat.cols()));
 		} else {
 			int rows = data.dimension(0);
-			Dimensions<int> slice_dims(NormalizationPreprocessor<Scalar>::dims.get_dim1(),
-					NormalizationPreprocessor<Scalar>::dims.get_dim2(), 1);
+			Dimensions<int> slice_dims(NormalizationPreprocessor<Scalar>::dims.get_height(),
+					NormalizationPreprocessor<Scalar>::dims.get_width(), 1);
 			Array4<int> offsets({ 0, 0, 0, 0 });
-			Array4<int> extents({ rows, slice_dims.get_dim1(), slice_dims.get_dim2(), slice_dims.get_dim3() });
+			Array4<int> extents({ rows, slice_dims.get_height(), slice_dims.get_width(), slice_dims.get_depth() });
 			for (int i = 0; i < data.dimension(3); i++) {
 				offsets[3] = i;
 				Tensor4<Scalar> data_slice_i = data.slice(offsets, extents);
@@ -174,6 +174,6 @@ private:
 	std::vector<EigenDecomposition> ed_vec;
 };
 
-} /* namespace cppnn */
+} /* namespace cattle */
 
 #endif /* PREPROCESSOR_H_ */

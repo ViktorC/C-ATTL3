@@ -23,7 +23,7 @@
 #include <vector>
 #include <WeightInitialization.h>
 
-namespace cppnn {
+namespace cattle {
 
 template<typename Scalar>
 using LossSharedPtr = std::shared_ptr<Loss<Scalar>>;
@@ -524,6 +524,6 @@ protected:
 
 // TODO: Conjugate Gradient, L-BFGS, (LMA), Particle Swarm, GA, PBIL
 
-} /* namespace cppnn */
+} /* namespace cattle */
 
 #endif /* OPTIMIZER_H_ */

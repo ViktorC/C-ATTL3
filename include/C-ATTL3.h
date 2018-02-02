@@ -5,8 +5,8 @@
  *      Author: Viktor Csomor
  */
 
-#ifndef INCLUDE_CPPNN_H_
-#define INCLUDE_CPPNN_H_
+#ifndef INCLUDE_C_ATTL3_H_
+#define IINCLUDE_C_ATTL3_H_
 
 #include <../src/DataProvider.h>
 #include <../src/Dimensions.h>
@@ -19,4 +19,4 @@
 #include <../src/Utils.h>
 #include <../src/WeightInitialization.h>
 
-#endif /* INCLUDE_CPPNN_H_ */
+#endif /* ININCLUDE_C_ATTL3_H_

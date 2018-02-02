@@ -15,7 +15,7 @@
 #include <type_traits>
 #include <Utils.h>
 
-namespace cppnn {
+namespace cattle {
 
 template<typename Scalar>
 class Loss {
@@ -259,6 +259,6 @@ private:
 	Scalar epsilon;
 };
 
-} /* namespace cppnn */
+} /* namespace cattle */
 
 #endif /* LOSS_H_ */

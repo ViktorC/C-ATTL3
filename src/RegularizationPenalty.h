@@ -11,7 +11,7 @@
 #include <type_traits>
 #include <Utils.h>
 
-namespace cppnn {
+namespace cattle {
 
 template<typename Scalar>
 class RegularizationPenalty {
@@ -81,6 +81,6 @@ private:
 	Scalar l2_lambda;
 };
 
-} /* namespace cppnn */
+} /* namespace cattle */
 
 #endif /* REGULARIZATIONPENALTY_H_ */
