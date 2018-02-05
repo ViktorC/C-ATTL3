@@ -24,11 +24,11 @@ namespace cattle {
 
 // Forward declarations.
 template<typename IndexType, typename LhsExpr, typename OpType>
-class UnaryDimensionsExpression;
+class UnaryDimExpression;
 template<typename IndexType, typename LhsExpr, typename RhsExpr, typename OpType>
-class BinaryDimensionsExpression;
+class BinaryDimExpression;
 template<typename IndexType, typename LhsExpr, typename RhsExpr, typename OpType>
-class BinaryDepthWiseDimensionsExpression;
+class BinaryDepthWiseDimExpression;
 
 // Arithmetic operations.
 template<typename Number> class SumOp {
@@ -45,9 +45,9 @@ public: inline static Number apply(Number lhs, Number rhs) { return lhs / rhs; }
 };
 
 template<typename Derived, typename IndexType>
-class DimensionsExpression {
-	typedef DimensionsExpression<Derived,IndexType> Self;
-	template<typename OtherDerived> using Other = DimensionsExpression<OtherDerived,IndexType>;
+class DimExpression {
+	typedef DimExpression<Derived,IndexType> Self;
+	template<typename OtherDerived> using Other = DimExpression<OtherDerived,IndexType>;
 public:
 	inline IndexType operator()(size_t i) const {
 		return static_cast<const Derived&>(*this)(i);
@@ -82,44 +82,44 @@ public:
 		return static_cast<const Derived&>(*this);
 	};
 	template<typename OtherDerived>
-	inline BinaryDepthWiseDimensionsExpression<IndexType,Self,Other<OtherDerived>,SumOp<IndexType>>
+	inline BinaryDepthWiseDimExpression<IndexType,Self,Other<OtherDerived>,SumOp<IndexType>>
 	add_along_depth(const Other<OtherDerived>& dims) {
-		return BinaryDepthWiseDimensionsExpression<IndexType,Self,Other<OtherDerived>,SumOp<IndexType>>(*this, dims);
+		return BinaryDepthWiseDimExpression<IndexType,Self,Other<OtherDerived>,SumOp<IndexType>>(*this, dims);
 	};
 	template<typename OtherDerived>
-	inline BinaryDepthWiseDimensionsExpression<IndexType,Self,Other<OtherDerived>,SubOp<IndexType>>
+	inline BinaryDepthWiseDimExpression<IndexType,Self,Other<OtherDerived>,SubOp<IndexType>>
 	subtract_along_depth(const Other<OtherDerived>& dims) {
-		return BinaryDepthWiseDimensionsExpression<IndexType,Self,Other<OtherDerived>,SubOp<IndexType>>(*this, dims);
+		return BinaryDepthWiseDimExpression<IndexType,Self,Other<OtherDerived>,SubOp<IndexType>>(*this, dims);
 	};
 	template<typename OtherDerived>
-	inline BinaryDimensionsExpression<IndexType,Self,Other<OtherDerived>,SumOp<IndexType>>
+	inline BinaryDimExpression<IndexType,Self,Other<OtherDerived>,SumOp<IndexType>>
 	operator+(const Other<OtherDerived>& dims) {
-		return BinaryDimensionsExpression<IndexType,Self,Other<OtherDerived>,SumOp<IndexType>>(*this, dims);
+		return BinaryDimExpression<IndexType,Self,Other<OtherDerived>,SumOp<IndexType>>(*this, dims);
 	};
 	template<typename OtherDerived>
-	inline BinaryDimensionsExpression<IndexType,Self,Other<OtherDerived>,SubOp<IndexType>>
+	inline BinaryDimExpression<IndexType,Self,Other<OtherDerived>,SubOp<IndexType>>
 	operator-(const Other<OtherDerived>& dims) {
-		return BinaryDimensionsExpression<IndexType,Self,Other<OtherDerived>,SubOp<IndexType>>(*this, dims);
+		return BinaryDimExpression<IndexType,Self,Other<OtherDerived>,SubOp<IndexType>>(*this, dims);
 	};
-	inline UnaryDimensionsExpression<IndexType,Self,SumOp<IndexType>>
+	inline UnaryDimExpression<IndexType,Self,SumOp<IndexType>>
 	operator+(const IndexType& n) {
-		return UnaryDimensionsExpression<IndexType,Self,SumOp<IndexType>>(*this, n);
+		return UnaryDimExpression<IndexType,Self,SumOp<IndexType>>(*this, n);
 	};
-	inline UnaryDimensionsExpression<IndexType,Self,SubOp<IndexType>>
+	inline UnaryDimExpression<IndexType,Self,SubOp<IndexType>>
 	operator-(const IndexType& n) {
-		return UnaryDimensionsExpression<IndexType,Self,SubOp<IndexType>>(*this, n);
+		return UnaryDimExpression<IndexType,Self,SubOp<IndexType>>(*this, n);
 	};
-	inline UnaryDimensionsExpression<IndexType,Self,DivOp<IndexType>>
+	inline UnaryDimExpression<IndexType,Self,DivOp<IndexType>>
 	operator/(const IndexType& n) {
-		return UnaryDimensionsExpression<IndexType,Self,DivOp<IndexType>>(*this, n);
+		return UnaryDimExpression<IndexType,Self,DivOp<IndexType>>(*this, n);
 	};
-	inline UnaryDimensionsExpression<IndexType,Self,MulOp<IndexType>>
+	inline UnaryDimExpression<IndexType,Self,MulOp<IndexType>>
 	operator*(const IndexType& n) {
-		return UnaryDimensionsExpression<IndexType,Self,MulOp<IndexType>>(*this, n);
+		return UnaryDimExpression<IndexType,Self,MulOp<IndexType>>(*this, n);
 	};
-	inline friend UnaryDimensionsExpression<IndexType,Self,MulOp<IndexType>>
+	inline friend UnaryDimExpression<IndexType,Self,MulOp<IndexType>>
 	operator*(const IndexType& n, Self& dims) {
-		return UnaryDimensionsExpression<IndexType,Self,MulOp<IndexType>>(dims, n);
+		return UnaryDimExpression<IndexType,Self,MulOp<IndexType>>(dims, n);
 	};
 	inline friend std::ostream& operator<<(std::ostream& os, const Self& dims) {
 		return os << dims.to_string() << std::endl;
@@ -127,10 +127,10 @@ public:
 };
 
 template<typename IndexType, typename LhsExpr, typename OpType>
-class UnaryDimensionsExpression :
-		public DimensionsExpression<UnaryDimensionsExpression<IndexType,LhsExpr,OpType>,IndexType> {
+class UnaryDimExpression :
+		public DimExpression<UnaryDimExpression<IndexType,LhsExpr,OpType>,IndexType> {
 public:
-	inline UnaryDimensionsExpression(LhsExpr& lhs, const IndexType& rhs) :
+	inline UnaryDimExpression(LhsExpr& lhs, const IndexType& rhs) :
 			lhs(lhs),
 			rhs(rhs) { };
 	inline IndexType operator()(size_t i) const {
@@ -160,10 +160,10 @@ private:
 };
 
 template<typename IndexType, typename LhsExpr, typename RhsExpr, typename OpType>
-class BinaryDimensionsExpression :
-		public DimensionsExpression<BinaryDimensionsExpression<IndexType,LhsExpr,RhsExpr,OpType>,IndexType> {
+class BinaryDimExpression :
+		public DimExpression<BinaryDimExpression<IndexType,LhsExpr,RhsExpr,OpType>,IndexType> {
 public:
-	inline BinaryDimensionsExpression(const LhsExpr& lhs, const RhsExpr& rhs) :
+	inline BinaryDimExpression(const LhsExpr& lhs, const RhsExpr& rhs) :
 			lhs(lhs),
 			rhs(rhs) { };
 	inline IndexType operator()(size_t i) const {
@@ -192,11 +192,14 @@ protected:
 	const RhsExpr& rhs;
 };
 
+/**
+ * This only delays the evaluation and temporary storage of depth.
+ */
 template<typename IndexType, typename LhsExpr, typename RhsExpr, typename OpType>
-class BinaryDepthWiseDimensionsExpression :
-		public DimensionsExpression<BinaryDepthWiseDimensionsExpression<IndexType,LhsExpr,RhsExpr,OpType>,IndexType> {
+class BinaryDepthWiseDimExpression :
+		public DimExpression<BinaryDepthWiseDimExpression<IndexType,LhsExpr,RhsExpr,OpType>,IndexType> {
 public:
-	inline BinaryDepthWiseDimensionsExpression(const LhsExpr& lhs, const RhsExpr& rhs) :
+	inline BinaryDepthWiseDimExpression(const LhsExpr& lhs, const RhsExpr& rhs) :
 			lhs(lhs),
 			rhs(rhs),
 			height(lhs.get_height()),
@@ -232,7 +235,7 @@ protected:
 };
 
 template<typename IndexType>
-class Dimensions : public DimensionsExpression<Dimensions<IndexType>,IndexType> {
+class Dimensions : public DimExpression<Dimensions<IndexType>,IndexType> {
 public:
 	Dimensions(IndexType height, IndexType width, IndexType depth) :
 			height(height),
@@ -247,7 +250,7 @@ public:
 	Dimensions() :
 			Dimensions(1) { };
 	template<typename OtherDerived>
-	Dimensions(const DimensionsExpression<OtherDerived,IndexType>& dims) :
+	Dimensions(const DimExpression<OtherDerived,IndexType>& dims) :
 			Dimensions(dims.get_height(), dims.get_width(), dims.get_depth()) { };
 	inline IndexType operator()(size_t i) const {
 		switch (i) {

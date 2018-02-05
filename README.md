@@ -119,4 +119,4 @@ Once a neural network has been trained, it can be used for inference effortlessl
 	// Inference
 	Tensor4<Scalar> prediction = nn.infer(input);
 
-Planned features include additional data providers, network serialization and de-serialization, LSTM and GRU layers, and GPU support via the use of cuBLAS and cuDNN.
+Planned features include additional data providers, network serialization and de-serialization, LSTM and GRU layers, evolutionary and second order optimization algorithms, and GPU support via the use of cuBLAS and cuDNN.

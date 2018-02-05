@@ -310,8 +310,8 @@ protected:
 			const Matrix<Scalar>& out_grads) {
 		Matrix<Scalar> d_in(in.rows(), in.cols());
 		for (int i = 0; i < d_in.rows(); i++) {
-			Matrix<Scalar> jacobian = out.row(i).asDiagonal();
-			jacobian -= out.row(i).transpose() * out.row(i);
+			RowVector<Scalar> row_i = out.row(i);
+			auto jacobian = (row_i.asDiagonal() - (row_i.transpose() * row_i));
 			d_in.row(i) = out_grads.row(i) * jacobian;
 		}
 		return d_in;
