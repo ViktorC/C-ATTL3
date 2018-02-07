@@ -27,6 +27,9 @@ using ColVector = Eigen::Matrix<Scalar,Eigen::Dynamic,1,Eigen::ColMajor,Eigen::D
 template<typename Scalar>
 using Matrix = Eigen::Matrix<Scalar,Eigen::Dynamic,Eigen::Dynamic,Eigen::ColMajor,Eigen::Dynamic,Eigen::Dynamic>;
 
+template<typename Scalar, int rows, int cols>
+using MatrixFixed = Eigen::Matrix<Scalar,rows,cols,Eigen::ColMajor,rows,cols>;
+
 template<typename Scalar>
 using MatrixMap = Eigen::Map<Matrix<Scalar>>;
 
@@ -52,6 +55,12 @@ public:
 	static constexpr Scalar EPSILON3 = 1e-4;
 	static const Matrix<Scalar> NULL_MATRIX;
 	static const Tensor4<Scalar> NULL_TENSOR;
+	inline static int num_of_eigen_threads() {
+		return Eigen::nbThreads();
+	};
+	inline static void set_num_of_eigen_threads(int num_of_threads) {
+		Eigen::setNbThreads(num_of_threads);
+	};
 	inline static bool almost_equal(Scalar n1, Scalar n2, Scalar abs_epsilon = EPSILON1,
 			Scalar rel_epsilon = EPSILON1) {
 		Scalar diff = std::abs(n1 - n2);
