@@ -397,10 +397,18 @@ class Tensor : public TensorBase<Tensor<Scalar_, NumIndices_, Options_, IndexTyp
       resize(TensorEvaluator<const Assign, DefaultDevice>(assign, DefaultDevice()).dimensions());
       internal::TensorExecutor<const Assign, DefaultDevice>::run(assign, DefaultDevice());
     }
+
     EIGEN_DEVICE_FUNC
-    EIGEN_STRONG_INLINE Tensor(Self&& other) : Tensor()
+    EIGEN_STRONG_INLINE Tensor(Self&& other)
+      : Tensor()
     {
       m_storage.swap(other.m_storage);
+    }
+    EIGEN_DEVICE_FUNC
+    EIGEN_STRONG_INLINE Tensor& operator=(Self&& other)
+    {
+      m_storage.swap(other.m_storage);
+      return *this;
     }
 
     EIGEN_DEVICE_FUNC
@@ -410,12 +418,6 @@ class Tensor : public TensorBase<Tensor<Scalar_, NumIndices_, Options_, IndexTyp
       Assign assign(*this, other);
       resize(TensorEvaluator<const Assign, DefaultDevice>(assign, DefaultDevice()).dimensions());
       internal::TensorExecutor<const Assign, DefaultDevice>::run(assign, DefaultDevice());
-      return *this;
-    }
-    EIGEN_DEVICE_FUNC
-    EIGEN_STRONG_INLINE Tensor& operator=(Self&& other)
-    {
-      m_storage.swap(other.m_storage);
       return *this;
     }
     template<typename OtherDerived>
