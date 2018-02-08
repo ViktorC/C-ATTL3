@@ -9,6 +9,7 @@
 #define NEURALNETWORK_H_
 
 #include <cassert>
+#include <cstddef>
 #include <Dimensions.h>
 #include <Eigen/Core>
 #include <iomanip>
@@ -223,6 +224,115 @@ protected:
 	bool foremost;
 	Dimensions<int> input_dims;
 	Dimensions<int> output_dims;
+};
+
+template<typename Scalar>
+using KernelPtr = std::unique_ptr<FCLayer<Scalar>>;
+template<typename Scalar>
+using ActivationPtr = std::unique_ptr<ActivationLayer<Scalar>>;
+
+template<typename Scalar>
+class RecurrentNeuralNetwork : public NeuralNetwork<Scalar> {
+	RecurrentNeuralNetwork(KernelPtr<Scalar> u_kernel, KernelPtr<Scalar> v_kernel, KernelPtr<Scalar> w_kernel,
+			ActivationPtr<Scalar> state_act, ActivationPtr<Scalar> output_act, bool foremost = true) :
+				u_kernel(std::move(u_kernel)),
+				v_kernel(std::move(v_kernel)),
+				w_kernel(std::move(w_kernel)),
+				state_act(std::move(state_act)),
+				output_act(std::move(output_act)),
+				foremost(foremost) {
+		assert(this->u_kernel != nullptr);
+		assert(this->v_kernel != nullptr);
+		assert(this->w_kernel != nullptr);
+		assert(this->state_act != nullptr);
+		assert(this->output_act != nullptr);
+	};
+	// Copy constructor.
+	RecurrentNeuralNetwork(const RecurrentNeuralNetwork<Scalar>& network) :
+			layers(network.layers.size()) {
+		for (unsigned i = 0; i < layers.size(); i++)
+			layers[i] = LayerPtr<Scalar>(network.layers[i]->clone());
+		foremost = network.foremost;
+		input_dims = network.input_dims;
+		output_dims = network.output_dims;
+	};
+	// Move constructor.
+	RecurrentNeuralNetwork(RecurrentNeuralNetwork<Scalar>&& network) {
+		swap(*this, network);
+	};
+	// The smart pointers take care of deleting the layers.
+	~RecurrentNeuralNetwork() = default;
+	/* The assignment uses the move or copy constructor to pass the parameter
+	 * based on whether it is an rvalue or an lvalue. */
+	SequentialNeuralNetwork<Scalar>& operator=(SequentialNeuralNetwork<Scalar> network) {
+		swap(*this, network);
+		return *this;
+	};
+	NeuralNetwork<Scalar>* clone() const {
+		return new RecurrentNeuralNetwork(*this);
+	};
+	bool is_foremost() const {
+		return foremost;
+	};
+	Dimensions<int> get_input_dims() const {
+		return input_dims;
+	};
+	Dimensions<int> get_output_dims() const {
+		return output_dims;
+	};
+	// For the copy-and-swap idiom.
+	friend void swap(RecurrentNeuralNetwork<Scalar>& network1,
+			RecurrentNeuralNetwork<Scalar>& network2) {
+		using std::swap;
+		swap(network1.layers, network2.layers);
+		swap(network1.foremost, network2.foremost);
+		swap(network1.input_dims, network2.input_dims);
+		swap(network1.output_dims, network2.output_dims);
+	};
+protected:
+	inline void set_foremost(bool foremost) {
+		NeuralNetwork<Scalar>::set_input_layer(*layers[0], foremost);
+		this->foremost = foremost;
+	};
+	inline std::vector<Layer<Scalar>*> get_layers() {
+		std::vector<Layer<Scalar>*> layers_raw(layers.size());
+		for (unsigned i = 0; i < layers.size(); i++)
+			layers_raw[i] = layers[i].get();
+		return layers_raw;
+	};
+	inline Tensor4<Scalar> propagate(Tensor4<Scalar> input, bool training) {
+		NeuralNetwork<Scalar>::assert_popagation_input_dims(input, input_dims);
+		for (unsigned i = 0; i < layers.size(); i++) {
+			Layer<Scalar>& layer = *layers[i];
+			input = NeuralNetwork<Scalar>::pass_forward(layer, std::move(input), training);
+			if (!training)
+				NeuralNetwork<Scalar>::empty_cache(layer);
+		}
+		return input;
+	};
+	inline Tensor4<Scalar> backpropagate(Tensor4<Scalar> out_grads) {
+		NeuralNetwork<Scalar>::assert_popagation_input_dims(out_grads, output_dims);
+		for (int i = layers.size() - 1; i >= 0; i--) {
+			Layer<Scalar>& layer = *(layers[i]);
+			out_grads = NeuralNetwork<Scalar>::pass_back(layer, std::move(out_grads));
+			NeuralNetwork<Scalar>::empty_cache(layer);
+		}
+		return out_grads;
+	};
+	static std::vector<LayerPtr<Scalar>> create_vector(LayerPtr<Scalar>&& layer) {
+		std::vector<LayerPtr<Scalar>> vec(1);
+		vec[0] = std::move(layer);
+		return vec;
+	};
+	KernelPtr<Scalar> u_kernel;
+	KernelPtr<Scalar> v_kernel;
+	KernelPtr<Scalar> w_kernel;
+	ActivationPtr<Scalar> state_act;
+	ActivationPtr<Scalar> output_act;
+	size_t state_size;
+	Dimensions<int> input_dims;
+	Dimensions<int> output_dims;
+	bool foremost;
 };
 
 template<typename Scalar>
