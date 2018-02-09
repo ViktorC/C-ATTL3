@@ -37,7 +37,7 @@ public:
 		assert(loss != nullptr);
 	};
 	virtual ~Optimizer() = default;
-	bool verify_gradients(NeuralNetwork<Scalar>& net, DataProvider<Scalar>& provider, Scalar step_size = 1e-5,
+	inline bool verify_gradients(NeuralNetwork<Scalar>& net, DataProvider<Scalar>& provider, Scalar step_size = 1e-5,
 			Scalar abs_epsilon = Utils<Scalar>::EPSILON2, Scalar rel_epsilon = Utils<Scalar>::EPSILON3) const {
 		assert(net.get_input_dims().equals(provider.get_obs_dims()));
 		assert(net.get_output_dims().equals(provider.get_obj_dims()));
@@ -90,7 +90,7 @@ public:
 			layers[i]->empty_cache();
 		return !failure;
 	};
-	void optimize(NeuralNetwork<Scalar>& net, DataProvider<Scalar>& training_prov, DataProvider<Scalar>& test_prov,
+	inline void optimize(NeuralNetwork<Scalar>& net, DataProvider<Scalar>& training_prov, DataProvider<Scalar>& test_prov,
 			unsigned epochs, unsigned early_stop = 0) {
 		assert(net.get_input_dims().equals(training_prov.get_obs_dims()));
 		assert(net.get_output_dims().equals(training_prov.get_obj_dims()));
@@ -522,7 +522,7 @@ protected:
 	};
 };
 
-// TODO: Conjugate Gradient, L-BFGS, (LMA), Particle Swarm, GA, PBIL
+// TODO: Hessian-free w/ Conjugate Gradient, L-BFGS, Supervised Descent Method, Particle Swarm, GA, PBIL
 
 } /* namespace cattle */
 

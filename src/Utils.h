@@ -27,9 +27,6 @@ using ColVector = Eigen::Matrix<Scalar,Eigen::Dynamic,1,Eigen::ColMajor,Eigen::D
 template<typename Scalar>
 using Matrix = Eigen::Matrix<Scalar,Eigen::Dynamic,Eigen::Dynamic,Eigen::ColMajor,Eigen::Dynamic,Eigen::Dynamic>;
 
-template<typename Scalar, int rows, int cols>
-using MatrixFixed = Eigen::Matrix<Scalar,rows,cols,Eigen::ColMajor,rows,cols>;
-
 template<typename Scalar>
 using MatrixMap = Eigen::Map<Matrix<Scalar>>;
 
@@ -85,14 +82,21 @@ public:
 			Scalar rel_epsilon = EPSILON1) {
 		return n1 < n2 || almost_equal(n1, n2, abs_epsilon, rel_epsilon);
 	};
+	inline static Matrix<Scalar> map_tensor4_to_mat(Tensor4<Scalar> tensor, int rows, int cols) {
+		assert(rows > 0 && cols > 0 && rows * cols = tensor.size());
+		return MatrixMap<Scalar>(tensor.data(), rows, cols);
+	};
 	inline static Matrix<Scalar> map_tensor4_to_mat(Tensor4<Scalar> tensor) {
 		int rows = tensor.dimension(0);
-		return MatrixMap<Scalar>(tensor.data(), rows, tensor.size() / rows);
+		return map_tensor4_to_mat(std::move(tensor), rows, tensor.size() / rows);
 	};
 	inline static Tensor4<Scalar> map_mat_to_tensor4(Matrix<Scalar> mat, Dimensions<int> dims) {
 		assert(dims.get_volume() == mat.cols());
 		return Tensor4Map<Scalar>(mat.data(), mat.rows(), dims.get_height(),
 				dims.get_width(), dims.get_depth());
+	};
+	inline static Tensor4<Scalar> map_mat_to_tensor4(Matrix<Scalar> mat) {
+		return map_mat_to_tensor4(std::move(mat), Dimensions<int>(mat.cols(), 1, 1));
 	};
 	inline static void shuffle_mat_rows(Matrix<Scalar>& mat) {
 		Eigen::PermutationMatrix<Eigen::Dynamic,Eigen::Dynamic> perm(mat.rows());

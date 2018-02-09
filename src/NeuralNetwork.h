@@ -215,7 +215,7 @@ protected:
 		}
 		return out_grads;
 	};
-	static std::vector<LayerPtr<Scalar>> create_vector(LayerPtr<Scalar>&& layer) {
+	static std::vector<LayerPtr<Scalar>> create_vector(LayerPtr<Scalar> layer) {
 		std::vector<LayerPtr<Scalar>> vec(1);
 		vec[0] = std::move(layer);
 		return vec;
@@ -235,18 +235,32 @@ using ActivationPtr = std::unique_ptr<ActivationLayer<Scalar>>;
 template<typename Scalar>
 class RecurrentNeuralNetwork : public NeuralNetwork<Scalar> {
 	RecurrentNeuralNetwork(KernelPtr<Scalar> u_kernel, KernelPtr<Scalar> v_kernel, KernelPtr<Scalar> w_kernel,
-			ActivationPtr<Scalar> state_act, ActivationPtr<Scalar> output_act, bool foremost = true) :
+			ActivationPtr<Scalar> state_act, ActivationPtr<Scalar> output_act, size_t seq_length, size_t batch_size = 1,
+			bool mul_integration = false, bool foremost = true) :
 				u_kernel(std::move(u_kernel)),
 				v_kernel(std::move(v_kernel)),
 				w_kernel(std::move(w_kernel)),
 				state_act(std::move(state_act)),
 				output_act(std::move(output_act)),
+				seq_length(seq_length),
+				batch_size(batch_size),
+				mul_integration(mul_integration),
 				foremost(foremost) {
+		assert(batch_size > 0);
 		assert(this->u_kernel != nullptr);
 		assert(this->v_kernel != nullptr);
 		assert(this->w_kernel != nullptr);
 		assert(this->state_act != nullptr);
 		assert(this->output_act != nullptr);
+		assert(this->w_kernel->get_input_dims().equals(this->w_kernel->get_output_dims()));
+		assert(this->u_kernel->get_output_dims().equals(this->w_kernel->get_output_dims()));
+		assert(this->v_kernel->get_input_dims().equals(this->w_kernel->get_output_dims()));
+		assert(this->state_act->get_input_dims().equals(this->w_kernel->get_output_dims()));
+		assert(this->output_act->get_input_dims().equals(this->v_kernel->get_output_dims()));
+		input_dims = this->u_kernel->get_input_dims();
+		output_dims = this->output_act->get_output_dims();
+		state = Matrix<Scalar>::Zero(batch_size, this->u_kernel->get_output_dims().get_volume());
+		set_foremost(foremost);
 	};
 	// Copy constructor.
 	RecurrentNeuralNetwork(const RecurrentNeuralNetwork<Scalar>& network) {
@@ -255,18 +269,17 @@ class RecurrentNeuralNetwork : public NeuralNetwork<Scalar> {
 		w_kernel = KernelPtr<Scalar>(network.w_kernel->clone());
 		state_act = ActivationPtr<Scalar>(network.state_act->clone());
 		output_act = ActivationPtr<Scalar>(network.output_act->clone());
+		batch_size = network.batch_size;
+		mul_integration = network.mul_integration;
 		foremost = network.foremost;
 		input_dims = network.input_dims;
 		output_dims = network.output_dims;
+		state = network.state;
 	};
-	// Move constructor.
 	RecurrentNeuralNetwork(RecurrentNeuralNetwork<Scalar>&& network) {
 		swap(*this, network);
 	};
-	// The smart pointers take care of deleting the layers.
 	~RecurrentNeuralNetwork() = default;
-	/* The assignment uses the move or copy constructor to pass the parameter
-	 * based on whether it is an rvalue or an lvalue. */
 	RecurrentNeuralNetwork<Scalar>& operator=(RecurrentNeuralNetwork<Scalar> network) {
 		swap(*this, network);
 		return *this;
@@ -292,33 +305,54 @@ class RecurrentNeuralNetwork : public NeuralNetwork<Scalar> {
 		swap(network1.w_kernel, network2.w_kernel);
 		swap(network1.state_act, network2.state_act);
 		swap(network1.output_act, network2.output_act);
+		swap(network1.seq_length, network2.seq_length);
+		swap(network1.batch_size, network2.batch_size);
+		swap(network1.mul_integration, network2.mul_integration);
 		swap(network1.foremost, network2.foremost);
 		swap(network1.input_dims, network2.input_dims);
 		swap(network1.output_dims, network2.output_dims);
+		swap(network1.state, network2.state);
 	};
 protected:
 	inline void set_foremost(bool foremost) {
-		NeuralNetwork<Scalar>::set_input_layer(*layers[0], foremost);
+		NeuralNetwork<Scalar>::set_input_layer(*w_kernel, foremost);
 		this->foremost = foremost;
 	};
 	inline std::vector<Layer<Scalar>*> get_layers() {
-		std::vector<Layer<Scalar>*> layers_raw(layers.size());
-		for (unsigned i = 0; i < layers.size(); i++)
-			layers_raw[i] = layers[i].get();
+		std::vector<Layer<Scalar>*> layers_raw(5);
+		layers_raw[0] = u_kernel->get();
+		layers_raw[1] = v_kernel->get();
+		layers_raw[2] = w_kernel->get();
+		layers_raw[3] = state_act->get();
+		layers_raw[4] = output_act->get();
 		return layers_raw;
 	};
 	inline Tensor4<Scalar> propagate(Tensor4<Scalar> input, bool training) {
 		NeuralNetwork<Scalar>::assert_popagation_input_dims(input, input_dims);
-		for (unsigned i = 0; i < layers.size(); i++) {
-			Layer<Scalar>& layer = *layers[i];
-			input = NeuralNetwork<Scalar>::pass_forward(layer, std::move(input), training);
+		assert(input.dimension(0) == (int) seq_length);
+		assert(input.dimension(1) == (int) batch_size);
+		for (size_t i = 0; i < seq_length; i++) {
+			input = NeuralNetwork<Scalar>::pass_forward(*u_kernel, std::move(input), training);
 			if (!training)
-				NeuralNetwork<Scalar>::empty_cache(layer);
+				NeuralNetwork<Scalar>::empty_cache(*u_kernel);
+			input += NeuralNetwork<Scalar>::pass_forward(*w_kernel, Utils<Scalar>::map_mat_to_tensor4(std::move(state)), training);
+			if (!training)
+				NeuralNetwork<Scalar>::empty_cache(*w_kernel);
+			state = NeuralNetwork<Scalar>::pass_forward(*state_act, std::move(input), training);
+			if (!training)
+				NeuralNetwork<Scalar>::empty_cache(*state_act);
+			input = NeuralNetwork<Scalar>::pass_forward(*v_kernel, state, training);
+			if (!training)
+				NeuralNetwork<Scalar>::empty_cache(*v_kernel);
+			input = NeuralNetwork<Scalar>::pass_forward(*output_act, std::move(input), training);
+			if (!training)
+				NeuralNetwork<Scalar>::empty_cache(*output_act);
+//			return input;
 		}
-		return input;
 	};
 	inline Tensor4<Scalar> backpropagate(Tensor4<Scalar> out_grads) {
 		NeuralNetwork<Scalar>::assert_popagation_input_dims(out_grads, output_dims);
+		assert(out_grads.dimension(0) == (int) batch_size);
 		for (int i = layers.size() - 1; i >= 0; i--) {
 			Layer<Scalar>& layer = *(layers[i]);
 			out_grads = NeuralNetwork<Scalar>::pass_back(layer, std::move(out_grads));
@@ -326,19 +360,19 @@ protected:
 		}
 		return out_grads;
 	};
-	static std::vector<LayerPtr<Scalar>> create_vector(LayerPtr<Scalar>&& layer) {
-		std::vector<LayerPtr<Scalar>> vec(1);
-		vec[0] = std::move(layer);
-		return vec;
-	};
 	KernelPtr<Scalar> u_kernel;
 	KernelPtr<Scalar> v_kernel;
 	KernelPtr<Scalar> w_kernel;
 	ActivationPtr<Scalar> state_act;
 	ActivationPtr<Scalar> output_act;
+	size_t seq_length;
+	size_t batch_size;
+	bool mul_integration;
+	bool foremost;
 	Dimensions<int> input_dims;
 	Dimensions<int> output_dims;
-	bool foremost;
+	// State.
+	Matrix<Scalar> state;
 };
 
 template<typename Scalar>
