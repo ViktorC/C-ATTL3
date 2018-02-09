@@ -228,6 +228,7 @@ protected:
 
 template<typename Scalar>
 using KernelPtr = std::unique_ptr<FCLayer<Scalar>>;
+
 template<typename Scalar>
 using ActivationPtr = std::unique_ptr<ActivationLayer<Scalar>>;
 
@@ -248,10 +249,12 @@ class RecurrentNeuralNetwork : public NeuralNetwork<Scalar> {
 		assert(this->output_act != nullptr);
 	};
 	// Copy constructor.
-	RecurrentNeuralNetwork(const RecurrentNeuralNetwork<Scalar>& network) :
-			layers(network.layers.size()) {
-		for (unsigned i = 0; i < layers.size(); i++)
-			layers[i] = LayerPtr<Scalar>(network.layers[i]->clone());
+	RecurrentNeuralNetwork(const RecurrentNeuralNetwork<Scalar>& network) {
+		u_kernel = KernelPtr<Scalar>(network.u_kernel->clone());
+		v_kernel = KernelPtr<Scalar>(network.v_kernel->clone());
+		w_kernel = KernelPtr<Scalar>(network.w_kernel->clone());
+		state_act = ActivationPtr<Scalar>(network.state_act->clone());
+		output_act = ActivationPtr<Scalar>(network.output_act->clone());
 		foremost = network.foremost;
 		input_dims = network.input_dims;
 		output_dims = network.output_dims;
@@ -264,7 +267,7 @@ class RecurrentNeuralNetwork : public NeuralNetwork<Scalar> {
 	~RecurrentNeuralNetwork() = default;
 	/* The assignment uses the move or copy constructor to pass the parameter
 	 * based on whether it is an rvalue or an lvalue. */
-	SequentialNeuralNetwork<Scalar>& operator=(SequentialNeuralNetwork<Scalar> network) {
+	RecurrentNeuralNetwork<Scalar>& operator=(RecurrentNeuralNetwork<Scalar> network) {
 		swap(*this, network);
 		return *this;
 	};
@@ -284,7 +287,11 @@ class RecurrentNeuralNetwork : public NeuralNetwork<Scalar> {
 	friend void swap(RecurrentNeuralNetwork<Scalar>& network1,
 			RecurrentNeuralNetwork<Scalar>& network2) {
 		using std::swap;
-		swap(network1.layers, network2.layers);
+		swap(network1.u_kernel, network2.u_kernel);
+		swap(network1.v_kernel, network2.v_kernel);
+		swap(network1.w_kernel, network2.w_kernel);
+		swap(network1.state_act, network2.state_act);
+		swap(network1.output_act, network2.output_act);
 		swap(network1.foremost, network2.foremost);
 		swap(network1.input_dims, network2.input_dims);
 		swap(network1.output_dims, network2.output_dims);
@@ -329,7 +336,6 @@ protected:
 	KernelPtr<Scalar> w_kernel;
 	ActivationPtr<Scalar> state_act;
 	ActivationPtr<Scalar> output_act;
-	size_t state_size;
 	Dimensions<int> input_dims;
 	Dimensions<int> output_dims;
 	bool foremost;
