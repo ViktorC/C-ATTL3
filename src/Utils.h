@@ -9,7 +9,6 @@
 #define UTILS_H_
 
 #include <algorithm>
-#include <array>
 #include <cstddef>
 #include <Dimensions.h>
 #include <Eigen/Dense>
@@ -37,9 +36,6 @@ using Tensor = Eigen::Tensor<Scalar,Rank,Eigen::ColMajor,int>;
 
 template<typename Scalar, size_t Rank>
 using TensorMap = Eigen::TensorMap<Tensor<Scalar,Rank>>;
-
-template<typename Scalar, size_t Length>
-using Array = std::array<Scalar,Length>;
 
 template<typename Scalar>
 class Utils {
@@ -88,6 +84,7 @@ public:
 	};
 	template<size_t Rank>
 	inline static Tensor<Scalar,Rank> get_null_tensor() {
+		static_assert(Rank > 1, "illegal tensor rank");
 		switch (Rank) {
 		case 2:
 			return NULL_TENSOR2;
@@ -101,6 +98,7 @@ public:
 	};
 	template<size_t Rank>
 	inline static Dimensions<int,Rank> get_dims(const Tensor<Scalar,Rank>& tensor) {
+		static_assert(Rank > 1, "illegal tensor rank");
 		return Dimensions<int,Rank>(tensor.dimensions());
 	};
 	template<size_t Rank>
@@ -140,10 +138,11 @@ public:
 	};
 	template<size_t Rank>
 	inline static void shuffle_tensor_rows(Tensor<Scalar,Rank>& tensor) {
-		Dimensions<int,Rank> dims = get_dims(tensor);
-		Matrix<Scalar> mat = map_tensor_to_mat(tensor);
+		static_assert(Rank > 1, "illegal tensor rank");
+		Dimensions<int,Rank - 1> dims = get_dims<Rank>(tensor).demote();
+		Matrix<Scalar> mat = map_tensor_to_mat<Rank>(std::move(tensor));
 		shuffle_mat_rows(mat);
-		tensor = map_mat_to_tensor(mat, dims);
+		tensor = map_mat_to_tensor<Rank>(std::move(mat), dims);
 	};
 };
 

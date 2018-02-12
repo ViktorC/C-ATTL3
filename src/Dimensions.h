@@ -9,13 +9,13 @@
 #define DIMENSIONS_H_
 
 #include <algorithm>
+#include <array>
 #include <cassert>
 #include <cstddef>
 #include <initializer_list>
 #include <sstream>
 #include <stdexcept>
 #include <string>
-#include <Utils.h>
 #include <vector>
 
 namespace cattle {
@@ -59,11 +59,11 @@ public:
 	inline operator const Derived&() const {
 		return static_cast<const Derived&>(*this);
 	};
-	inline const IndexType& operator()(size_t i) const {
+	inline IndexType operator()(size_t i) const {
 		return static_cast<const Derived&>(*this)(i);
 	};
 	inline IndexType get_volume() const {
-		int volume = 0;
+		int volume = 1;
 		for (size_t i = 0; i < Rank; i++)
 			volume *= (*this)(i);
 		return volume;
@@ -139,7 +139,7 @@ public:
 	inline UnaryDimExpression(LhsExpr& lhs, const IndexType& rhs) :
 			lhs(lhs),
 			rhs(rhs) { };
-	inline const IndexType& operator()(size_t i) const {
+	inline IndexType operator()(size_t i) const {
 		if (i < 0 || i >= Rank)
 			throw std::invalid_argument("illegal index value: " + i);
 		return OpType::apply(lhs(i), rhs);
@@ -156,7 +156,7 @@ public:
 	inline BinaryDimExpression(const LhsExpr& lhs, const RhsExpr& rhs) :
 			lhs(lhs),
 			rhs(rhs) { };
-	inline const IndexType& operator()(size_t i) const {
+	inline IndexType operator()(size_t i) const {
 		if (i < 0 || i >= Rank)
 			throw std::invalid_argument("illegal index value: " + i);
 		return OpType::apply(lhs(i), rhs(i));
@@ -176,7 +176,7 @@ public:
 			rank(rank) {
 		assert(rank <= Rank);
 	};
-	inline const IndexType& operator()(size_t i) const {
+	inline IndexType operator()(size_t i) const {
 		if (i < 0 || i >= Rank)
 			throw std::invalid_argument("illegal index value: " + i);
 		return i == rank ? OpType::apply(lhs(i), rhs(i)) : lhs(i);
@@ -189,37 +189,39 @@ protected:
 
 template<typename IndexType, size_t Rank>
 class Dimensions : public DimExpression<Dimensions<IndexType,Rank>,IndexType,Rank> {
+	friend class Dimensions<IndexType,Rank - 1>;
+	friend class Dimensions<IndexType,Rank + 1>;
 public:
 	Dimensions() :
 			values(Rank, 1) { };
 	Dimensions(const std::initializer_list<IndexType>& values) :
 			Dimensions() {
-		assert(values.size() < Rank);
+		assert(values.size() <= Rank);
 		std::copy(values.begin(), values.end(), this->values.begin());
 	};
 	template<typename OtherDerived>
 	Dimensions(const DimExpression<OtherDerived,IndexType,Rank>& dims) :
 			Dimensions() {
 		for (size_t i = 0; i < Rank; i++)
-			values[i] = dims[i];
+			values[i] = dims(i);
 	};
-	Dimensions(const Array<IndexType,Rank>& array) :
+	Dimensions(const std::array<IndexType,Rank>& array) :
 			Dimensions() {
-		assert(array.size() < Rank);
+		assert(array.size() <= Rank);
 		std::copy(array.begin(), array.end(), values.begin());
 	};
 	inline Dimensions<IndexType,Rank + 1> promote() const {
 		Dimensions<IndexType,Rank + 1> promoted;
-		std::copy(values.begin(), values.end(), promoted.begin() + 1);
+		std::copy(values.begin(), values.end(), promoted.values.begin() + 1);
 		return promoted;
 	};
 	inline Dimensions<IndexType,Rank - 1> demote() const {
 		static_assert(Rank > 1, "rank must be greater than 1 for demotion");
 		Dimensions<IndexType,Rank - 1> demoted;
-		std::copy(values.begin() + 1, values.end(), demoted.begin());
+		std::copy(values.begin() + 1, values.end(), demoted.values.begin());
 		return demoted;
 	};
-	inline const IndexType& operator()(size_t i) const {
+	inline IndexType operator()(size_t i) const {
 		if (i < 0 || i >= Rank)
 			throw std::invalid_argument("illegal index value: " + i);
 		return values[i];
@@ -229,31 +231,14 @@ public:
 			throw std::invalid_argument("illegal index value: " + i);
 		return values[i];
 	};
-	inline operator Array<IndexType,Rank>() const {
-		Array<IndexType,Rank> array;
+	inline operator std::array<IndexType,Rank>() const {
+		std::array<IndexType,Rank> array;
 		std::copy(values.begin(), values.end(), array.begin());
 		return array;
 	};
 private:
 	std::vector<IndexType> values;
 };
-
-//// Partial specializations to provide convenient constructors.
-//template<typename IndexType>
-//class Dimensions<IndexType,1> {
-//	Dimensions(IndexType dim0) :
-//			Dimensions({ dim0 }) { };
-//};
-//template<typename IndexType>
-//class Dimensions<IndexType,2> {
-//	Dimensions(IndexType dim0, IndexType dim1) :
-//			Dimensions({ dim0, dim1 }) { };
-//};
-//template<typename IndexType>
-//class Dimensions<IndexType,3> {
-//	Dimensions(IndexType dim0, IndexType dim1, IndexType dim2) :
-//			Dimensions({ dim0, dim1, dim2 }) { };
-//};
 
 } /* namespace cattle */
 

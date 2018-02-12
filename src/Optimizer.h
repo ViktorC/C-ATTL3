@@ -45,7 +45,7 @@ public:
 		assert(net.get_output_dims() == provider.get_obj_dims());
 		assert(step_size > 0);
 		assert(abs_epsilon >= 0 && rel_epsilon > 0);
-		DataPair<Scalar,Rank> data_pair = provider.get_data(provider.instances());
+		DataPair<Scalar,Rank + 1> data_pair = provider.get_data(provider.instances());
 		provider.reset();
 		/* As the loss to minimize is the mean of the losses for all the training observations, the gradient to
 		 * back-propagate is to be divided by the number of observations in the batch. */
@@ -133,7 +133,7 @@ protected:
 	inline static std::vector<Layer<Scalar,Rank>*> get_layers(NeuralNetwork<Scalar,Rank>& net) {
 		return net.get_layers();
 	};
-	inline static Tensor<Scalar,Rank + 1> propagate(NeuralNetwork<Scalar>& net, Tensor<Scalar,Rank + 1> in) {
+	inline static Tensor<Scalar,Rank + 1> propagate(NeuralNetwork<Scalar,Rank>& net, Tensor<Scalar,Rank + 1> in) {
 		return net.propagate(std::move(in), true);
 	};
 	inline static void backpropagate(NeuralNetwork<Scalar,Rank>& net, Tensor<Scalar,Rank + 1> out_grads) {
@@ -176,7 +176,7 @@ protected:
 		std::vector<Layer<Scalar,Rank>*> layers = Optimizer<Scalar,Rank>::get_layers(net);
 		// Perform an entire training epoch.
 		while (training_prov.has_more()) {
-			DataPair<Scalar,Rank> data_pair = training_prov.get_data(batch_size);
+			DataPair<Scalar,Rank + 1> data_pair = training_prov.get_data(batch_size);
 			Tensor<Scalar,Rank + 1> out = Optimizer<Scalar,Rank>::propagate(net, std::move(data_pair.first));
 			training_loss += Optimizer<Scalar,Rank>::loss->function(out, data_pair.second).sum();
 			/* Again, the loss on a batch is the mean of the losses on the observations in the batch and not their
@@ -200,7 +200,7 @@ protected:
 		std::vector<Layer<Scalar,Rank>*> layers = Optimizer<Scalar,Rank>::get_layers(net);
 		// Perform an entire test epoch.
 		while (test_prov.has_more()) {
-			DataPair<Scalar,Rank> data_pair = test_prov.get_data(batch_size);
+			DataPair<Scalar,Rank + 1> data_pair = test_prov.get_data(batch_size);
 			obj_loss += Optimizer<Scalar,Rank>::loss->function(net.infer(std::move(data_pair.first)),
 					data_pair.second).sum();
 		}
@@ -319,7 +319,7 @@ protected:
 		std::vector<Layer<Scalar,Rank>*> layers = Optimizer<Scalar,Rank>::get_layers(net);
 		param_grad_sqrs_vec = std::vector<Matrix<Scalar>>(layers.size());
 		for (unsigned i = 0; i < param_grad_sqrs_vec.size(); i++) {
-			Layer<Scalar>& layer = *(layers[i]);
+			Layer<Scalar,Rank>& layer = *(layers[i]);
 			Matrix<Scalar>& param_grad_sqrs = param_grad_sqrs_vec[i];
 			param_grad_sqrs = Matrix<Scalar>(Optimizer<Scalar,Rank>::get_param_grads(layer).rows(),
 					Optimizer<Scalar,Rank>::get_param_grads(layer).cols());
@@ -385,7 +385,7 @@ protected:
 		std::vector<Layer<Scalar,Rank>*> layers = Optimizer<Scalar,Rank>::get_layers(net);
 		pgus_vec = std::vector<ParamGradAndUpdateSqrs>(layers.size());
 		for (unsigned i = 0; i < pgus_vec.size(); i++) {
-			Layer<Scalar>& layer = *(layers[i]);
+			Layer<Scalar,Rank>& layer = *(layers[i]);
 			ParamGradAndUpdateSqrs& pgus = pgus_vec[i];
 			pgus.param_grad = Matrix<Scalar>(Optimizer<Scalar,Rank>::get_param_grads(layer).rows(),
 					Optimizer<Scalar,Rank>::get_param_grads(layer).cols());
@@ -436,7 +436,7 @@ protected:
 		std::vector<Layer<Scalar,Rank>*> layers = Optimizer<Scalar,Rank>::get_layers(net);
 		pgn_vec = std::vector<ParamGradNorms>(layers.size());
 		for (unsigned i = 0; i < pgn_vec.size(); i++) {
-			Layer<Scalar>& layer = *(layers[i]);
+			Layer<Scalar,Rank>& layer = *(layers[i]);
 			ParamGradNorms& vel = pgn_vec[i];
 			vel.param_grad_l1 = Matrix<Scalar>(Optimizer<Scalar,Rank>::get_param_grads(layer).rows(),
 					Optimizer<Scalar,Rank>::get_param_grads(layer).cols());

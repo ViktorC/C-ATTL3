@@ -9,6 +9,7 @@
 #define PREPROCESSOR_H_
 
 #include <algorithm>
+#include <array>
 #include <cassert>
 #include <cmath>
 #include <cstddef>
@@ -43,9 +44,9 @@ public:
 	inline virtual void fit(const Tensor<Scalar,Rank + 1>& data) {
 		int rows = data.dimension(0);
 		assert(rows > 0);
-		dims = Utils<Scalar>::get_dims(data);
+		dims = Utils<Scalar>::template get_dims<Rank + 1>(data);
 		if (Rank < 3) {
-			Matrix<Scalar> data_mat = Utils<Scalar>::map_tensor_to_mat(data);
+			Matrix<Scalar> data_mat = Utils<Scalar>::template map_tensor_to_mat<Rank + 1>(data);
 			means = data_mat.colwise().mean();
 			if (standardize)
 				sd = (data_mat.rowwise() - means).array().square().colwise().mean().sqrt();
@@ -53,12 +54,12 @@ public:
 			int depth = data.dimension(3);
 			means = Matrix<Scalar>(depth, dims.get_volume() / depth);
 			sd = Matrix<Scalar>(means.rows(), means.cols());
-			Array<int,4> offsets({ 0, 0, 0, 0 });
-			Array<int,4> extents({ rows, dims(0), dims(1), 1 });
+			std::array<int,4> offsets({ 0, 0, 0, 0 });
+			std::array<int,4> extents({ rows, dims(0), dims(1), 1 });
 			for (int i = 0; i < depth; i++) {
 				offsets[3] = i;
 				Tensor<Scalar,4> data_slice_i = data.slice(offsets, extents);
-				Matrix<Scalar> data_mat = Utils<Scalar>::map_tensor_to_mat(std::move(data_slice_i));
+				Matrix<Scalar> data_mat = Utils<Scalar>::template map_tensor_to_mat<4>(std::move(data_slice_i));
 				means.row(i) = data_mat.colwise().mean();
 				if (standardize)
 					sd.row(i) = (data_mat.rowwise() - means.row(i)).array().square().colwise().mean().sqrt();
@@ -67,28 +68,28 @@ public:
 	};
 	inline virtual void transform(Tensor<Scalar,Rank + 1>& data) const {
 		int rows = data.dimension(0);
-		Dimensions<int,3> demoted_dims = Utils<Scalar>::get_dims(data).demote();
+		Dimensions<int,3> demoted_dims = Utils<Scalar>::template get_dims<Rank + 1>(data).demote();
 		assert(demoted_dims == dims && "mismatched fit and transform input tensor dimensions");
 		assert(rows > 0);
 		if (Rank < 3) {
-			Matrix<Scalar> data_mat = Utils<Scalar>::map_tensor_to_mat(std::move(data));
+			Matrix<Scalar> data_mat = Utils<Scalar>::template map_tensor_to_mat<Rank + 1>(std::move(data));
 			data_mat = data_mat.rowwise() - means;
 			if (standardize)
 				data_mat *= (sd.array() + epsilon).inverse().matrix().asDiagonal();
-			data = Utils<Scalar>::map_mat_to_tensor<Rank + 1>(data_mat, demoted_dims);
+			data = Utils<Scalar>::template map_mat_to_tensor<Rank + 1>(data_mat, demoted_dims);
 		} else {
 			int depth = data.dimension(3);
 			Dimensions<int,3> slice_dims(dims(0), dims(1), 1);
-			Array<int,4> offsets = { 0, 0, 0, 0 };
-			Array<int,4> extents = { rows, slice_dims(0), slice_dims(1), slice_dims(2) };
+			std::array<int,4> offsets = { 0, 0, 0, 0 };
+			std::array<int,4> extents = { rows, slice_dims(0), slice_dims(1), slice_dims(2) };
 			for (int i = 0; i < depth; i++) {
 				offsets[3] = i;
 				Tensor<Scalar,4> data_slice_i = data.slice(offsets, extents);
-				Matrix<Scalar> data_ch_i = Utils<Scalar>::map_tensor_to_mat(std::move(data_slice_i));
+				Matrix<Scalar> data_ch_i = Utils<Scalar>::template map_tensor_to_mat<4>(std::move(data_slice_i));
 				data_ch_i = data_ch_i.rowwise() - means.row(i);
 				if (standardize)
 					data_ch_i *= (sd.row(i).array() + epsilon).inverse().matrix().asDiagonal();
-				data.slice(offsets, extents) = Utils<Scalar>::map_mat_to_tensor<4>(data_ch_i, slice_dims);
+				data.slice(offsets, extents) = Utils<Scalar>::template map_mat_to_tensor<4>(data_ch_i, slice_dims);
 			}
 		}
 	};
@@ -122,8 +123,8 @@ public:
 			assert((!reduce_dims || data.dimension(3) == 1) && "cannot reduce the dimensionality of multi-channel tensors");
 			int channels = NormalizationPreprocessor<Scalar,Rank>::dims(2);
 			ed_vec = std::vector<EigenDecomposition>(channels);
-			Array<int,4> offsets({ 0, 0, 0, 0 });
-			Array<int,4> extents({ data.dimension(0), NormalizationPreprocessor<Scalar,Rank>::dims(0),
+			std::array<int,4> offsets({ 0, 0, 0, 0 });
+			std::array<int,4> extents({ data.dimension(0), NormalizationPreprocessor<Scalar,Rank>::dims(0),
 					NormalizationPreprocessor<Scalar,Rank>::dims(1), 1 });
 			for (int i = 0; i < channels; i++) {
 				offsets[3] = i;
@@ -134,21 +135,21 @@ public:
 	};
 	inline void transform(Tensor<Scalar,Rank + 1>& data) const {
 		NormalizationPreprocessor<Scalar,Rank>::transform(data);
-		if (reduce) {
-			Dimensions<int,1> output_dims({ Utils<Scalar>::get_dims(data).demote().get_volume() });
+		if (reduce_dims) {
+			Dimensions<int,1> output_dims({ Utils<Scalar>::template get_dims<Rank + 1>(data).demote().get_volume() });
 			data = _transform(std::move(data), output_dims, 0);
 		} else {
 			if (Rank < 3)
-				data = _transform(std::move(data), Utils<Scalar>::get_dims(data).demote(), 0);
+				data = _transform(std::move(data), Utils<Scalar>::template get_dims<Rank + 1>(data).demote(), 0);
 			else {
 				int rows = data.dimension(0);
 				Dimensions<int,Rank> slice_dims(NormalizationPreprocessor<Scalar,Rank>::dims.get_height(),
 						NormalizationPreprocessor<Scalar,Rank>::dims.get_width(), 1);
-				Array<int,4> offsets({ 0, 0, 0, 0 });
-				Array<int,4> extents({ rows, slice_dims(0), slice_dims(1), slice_dims(2) });
+				std::array<int,4> offsets({ 0, 0, 0, 0 });
+				std::array<int,4> extents({ rows, slice_dims(0), slice_dims(1), slice_dims(2) });
 				for (int i = 0; i < data.dimension(3); i++) {
 					offsets[3] = i;
-					Tensor4<Scalar> data_slice_i = data.slice(offsets, extents);
+					Tensor<Scalar,4> data_slice_i = data.slice(offsets, extents);
 					data.slice(offsets, extents) = _transform(std::move(data_slice_i), slice_dims, i);
 				}
 			}
@@ -156,7 +157,7 @@ public:
 	};
 private:
 	inline void _fit(Tensor<Scalar,Rank + 1> data, int i) {
-		Matrix<Scalar> normalized_data = Utils<Scalar>::map_tensor_to_mat(std::move(data)).rowwise() -
+		Matrix<Scalar> normalized_data = Utils<Scalar>::template map_tensor_to_mat<Rank + 1>(std::move(data)).rowwise() -
 				NormalizationPreprocessor<Scalar,Rank>::means.row(i);
 		if (NormalizationPreprocessor<Scalar,Rank>::standardize)
 			normalized_data *= (NormalizationPreprocessor<Scalar,Rank>::sd.row(i).array() +
@@ -186,12 +187,12 @@ private:
 	};
 	inline Tensor<Scalar,Rank + 1> _transform(Tensor<Scalar,Rank + 1> data, const Dimensions<int,Rank>& output_dims,
 			int i) const {
-		Matrix<Scalar> data_mat = Utils<Scalar>::map_tensor_to_mat(std::move(data));
+		Matrix<Scalar> data_mat = Utils<Scalar>::template map_tensor_to_mat<Rank + 1>(std::move(data));
 		data_mat *= ed_vec[i].eigen_basis;
 		if (whiten)
 			data_mat *= (ed_vec[i].eigen_values.array() + NormalizationPreprocessor<Scalar,Rank>::epsilon)
 					.sqrt().inverse().matrix().asDiagonal();
-		return Utils<Scalar>::map_mat_to_tensor(data_mat, output_dims);
+		return Utils<Scalar>::template map_mat_to_tensor<Rank + 1>(data_mat, output_dims);
 	};
 	bool whiten;
 	Scalar min_rel_var_to_retain;

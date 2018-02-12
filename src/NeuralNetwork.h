@@ -8,6 +8,7 @@
 #ifndef NEURALNETWORK_H_
 #define NEURALNETWORK_H_
 
+#include <array>
 #include <cassert>
 #include <cstddef>
 #include <Dimensions.h>
@@ -29,7 +30,7 @@ namespace cattle {
 
 // Forward declaration to Optimizer and CompositeNeuralNetwork so they can be friended.
 template<typename Scalar, size_t Rank> class Optimizer;
-template<typename Scalar, size_t Rank> class ParallelNeuralNetwork;
+template<typename Scalar> class ParallelNeuralNetwork;
 template<typename Scalar, size_t Rank> class CompositeNeuralNetwork;
 
 /**
@@ -45,7 +46,7 @@ class NeuralNetwork {
 	static_assert(std::is_floating_point<Scalar>::value, "non floating-point scalar type");
 	static_assert(Rank > 0 && Rank < 4, "illegal neural network rank");
 	friend class Optimizer<Scalar,Rank>;
-	friend class ParallelNeuralNetwork<Scalar,Rank>;
+	friend class ParallelNeuralNetwork<Scalar>;
 	friend class CompositeNeuralNetwork<Scalar,Rank>;
 public:
 	virtual ~NeuralNetwork() = default;
@@ -132,7 +133,7 @@ public:
 		Dimensions<int,Rank> prev_dims = first_layer.get_output_dims();
 		for (unsigned i = 1; i < this->layers.size(); i++) {
 			assert(this->layers[i] != nullptr && "layers contains null pointers");
-			assert(prev_dims.equals(this->layers[i]->get_input_dims()) && "incompatible layer dimensions");
+			assert(prev_dims == this->layers[i]->get_input_dims() && "incompatible layer dimensions");
 			prev_dims = this->layers[i]->get_output_dims();
 		}
 		NeuralNetwork<Scalar,Rank>::set_input_layer(first_layer, foremost);
@@ -194,7 +195,7 @@ protected:
 	};
 	inline Tensor<Scalar,Rank + 1> propagate(Tensor<Scalar,Rank + 1> input, bool training) {
 		assert(input.dimension(0));
-		assert(input_dims == Utils<Scalar>::get_dims(input).demote());
+		assert(input_dims == Utils<Scalar>::template get_dims<Rank + 1>(input).demote());
 		for (unsigned i = 0; i < layers.size(); i++) {
 			Layer<Scalar,Rank>& layer = *layers[i];
 			input = NeuralNetwork<Scalar,Rank>::pass_forward(layer, std::move(input), training);
@@ -205,7 +206,7 @@ protected:
 	};
 	inline Tensor<Scalar,Rank + 1> backpropagate(Tensor<Scalar,Rank + 1> out_grads) {
 		assert(out_grads.dimension(0));
-		assert(output_dims == Utils<Scalar>::get_dims(out_grads).demote());
+		assert(output_dims == Utils<Scalar>::template get_dims<Rank + 1>(out_grads).demote());
 		for (int i = layers.size() - 1; i >= 0; i--) {
 			Layer<Scalar,Rank>& layer = *(layers[i]);
 			out_grads = NeuralNetwork<Scalar,Rank>::pass_back(layer, std::move(out_grads));
@@ -225,10 +226,10 @@ protected:
 };
 
 template<typename Scalar, size_t Rank>
-using KernelPtr = std::unique_ptr<FCLayer<Scalar>>;
+using KernelPtr = std::unique_ptr<FCLayer<Scalar,Rank>>;
 
 template<typename Scalar, size_t Rank>
-using ActivationPtr = std::unique_ptr<ActivationLayer<Scalar>>;
+using ActivationPtr = std::unique_ptr<ActivationLayer<Scalar,Rank>>;
 
 //template<typename Scalar, size_t Rank>
 //class RecurrentNeuralNetwork : public NeuralNetwork<Scalar,Rank> {
@@ -327,13 +328,13 @@ using ActivationPtr = std::unique_ptr<ActivationLayer<Scalar>>;
 //	};
 //	inline Tensor<Scalar,Rank + 1> propagate(Tensor<Scalar,Rank + 1> input, bool training) {
 //		assert(input.dimension(0));
-//		assert(input_dims == Utils<Scalar>::get_dims(input).demote());
+//		assert(input_dims == Utils<Scalar>::template get_dims<Rank + 1>(input).demote());
 //		int samples = input.dimension(0);
 //		int time_steps = input.dimension(1);
 //		assert(time_steps == (int) seq_length);
 //		states = std::vector<Matrix<Scalar>>(input.dimension(0));
-//		Array4<int> offsets({ 0, 0, 0, 0 });
-//		Array4<int> extents({ samples, input_dims(0), input_dims(1),
+//		std::array4<int> offsets({ 0, 0, 0, 0 });
+//		std::array4<int> extents({ samples, input_dims(0), input_dims(1),
 //				input_dims(2) });
 //		for (int i = 0; i < time_steps; i++) {
 //			offsets[1] = i;
@@ -359,7 +360,7 @@ using ActivationPtr = std::unique_ptr<ActivationLayer<Scalar>>;
 //	};
 //	inline Tensor<Scalar,Rank + 1> backpropagate(Tensor<Scalar,Rank + 1> out_grads) {
 //		assert(out_grads.dimension(0));
-//		assert(output_dims == Utils<Scalar>::get_dims(out_grads).demote());
+//		assert(output_dims == Utils<Scalar>::template get_dims<Rank + 1>(out_grads).demote());
 //		for (int i = layers.size() - 1; i >= 0; i--) {
 //			Layer<Scalar>& layer = *(layers[i]);
 //			out_grads = NeuralNetwork<Scalar>::pass_back(layer, std::move(out_grads));
@@ -398,14 +399,14 @@ public:
 		int output_depth = first_lane.get_output_dims()(2);
 		for (unsigned i = 1; i < this->lanes.size(); i++) {
 			assert(this->lanes[i] != nullptr && "lanes contains null pointers");
-			NeuralNetwork<Scalar,Rank>& lane = *this->lanes[i];
-			assert(input_dims.equals(lane.get_input_dims()) && output_height == lane.get_output_dims()(0) &&
+			NeuralNetwork<Scalar,3>& lane = *this->lanes[i];
+			assert(input_dims == lane.get_input_dims() && output_height == lane.get_output_dims()(0) &&
 					output_width == lane.get_output_dims()(1) && "incompatible lane dimensions");
 			output_depth += lane.get_output_dims()(2);
 		}
 		set_foremost(foremost);
 		this->input_dims = input_dims;
-		output_dims = Dimensions<int,3>(output_height, output_width, output_depth);
+		output_dims = Dimensions<int,3>({ output_height, output_width, output_depth });
 	};
 	ParallelNeuralNetwork(NeuralNetPtr<Scalar,3>&& lane, bool foremost = true) :
 			ParallelNeuralNetwork(create_vector(std::move(lane)), foremost) { };
@@ -461,10 +462,10 @@ protected:
 	};
 	inline Tensor<Scalar,4> propagate(Tensor<Scalar,4> input, bool training) {
 		assert(input.dimension(0));
-		assert(input_dims == Utils<Scalar>::get_dims(input).demote());
+		assert(input_dims == Utils<Scalar>::template get_dims<4>(input).demote());
 		int rows = input.dimension(0);
-		Array<int,4> offsets({ 0, 0, 0, 0 });
-		Array<int,4> extents({ rows, output_dims(1), output_dims(1), 0 });
+		std::array<int,4> offsets({ 0, 0, 0, 0 });
+		std::array<int,4> extents({ rows, output_dims(1), output_dims(1), 0 });
 		Tensor<Scalar,4> out(rows, output_dims(0), output_dims(1), output_dims(2));
 		unsigned lane_num = lanes.size();
 		unsigned helper_thread_num = lane_num - 1;
@@ -502,8 +503,8 @@ protected:
 	};
 	inline Tensor<Scalar,4> backpropagate(Tensor<Scalar,4> out_grads) {
 		assert(out_grads.dimension(0));
-		assert(output_dims == Utils<Scalar>::get_dims(out_grads).demote());
-		Tensor<Scalar,4> prev_out_grads = foremost ? Utils<Scalar>::get_null_tensor() :
+		assert(output_dims == Utils<Scalar>::template get_dims<4>(out_grads).demote());
+		Tensor<Scalar,4> prev_out_grads = foremost ? Utils<Scalar>::template get_null_tensor<4>() :
 				Tensor<Scalar,4>(out_grads.dimension(0), input_dims(0), input_dims(1), input_dims(2));
 		prev_out_grads.setZero();
 		unsigned lane_num = lanes.size();
@@ -557,23 +558,23 @@ private:
 	};
 	static void* backpropagate(void* args_ptr) {
 		BackpropArgs& args = *((BackpropArgs*) args_ptr);
-		NeuralNetwork<Scalar,Rank>& lane = *args.obj->lanes[args.lane_id];
-		Array<int,4> offsets({ 0, 0, 0, args.depth_offset });
-		Array<int,4> extents({ args.out_grads->dimension(0), lane.get_output_dims()(0),
+		NeuralNetwork<Scalar,3>& lane = *args.obj->lanes[args.lane_id];
+		std::array<int,4> offsets({ 0, 0, 0, args.depth_offset });
+		std::array<int,4> extents({ args.out_grads->dimension(0), lane.get_output_dims()(0),
 				lane.get_output_dims()(1), lane.get_output_dims()(2) });
 		Tensor<Scalar,4> out_grads_slice = args.out_grads->slice(offsets, extents);
 		args.prev_out_grads = lane.backpropagate(std::move(out_grads_slice));
 		return nullptr;
 	};
 	struct PropArgs {
-		ParallelNeuralNetwork<Scalar,3>* obj;
+		ParallelNeuralNetwork<Scalar>* obj;
 		int lane_id;
 		bool training;
 		Tensor<Scalar,4>* in;
 		Tensor<Scalar,4> out;
 	};
 	struct BackpropArgs {
-		ParallelNeuralNetwork<Scalar,3>* obj;
+		ParallelNeuralNetwork<Scalar>* obj;
 		int lane_id;
 		int depth_offset;
 		Tensor<Scalar,4>* out_grads;
@@ -582,12 +583,12 @@ private:
 };
 
 template<typename Scalar, size_t Rank> class ResidualNeuralNetwork;
-template<typename Scalar, size_t Rank> class DenseNeuralNetwork;
+template<typename Scalar> class DenseNeuralNetwork;
 
 template<typename Scalar, size_t Rank>
 class CompositeNeuralNetwork : public NeuralNetwork<Scalar,Rank> {
 	friend class ResidualNeuralNetwork<Scalar,Rank>;
-	friend class DenseNeuralNetwork<Scalar,Rank>;
+	friend class DenseNeuralNetwork<Scalar>;
 public:
 	CompositeNeuralNetwork(std::vector<NeuralNetPtr<Scalar,Rank>> blocks, bool foremost = true) :
 			blocks(std::move(blocks)),
@@ -597,7 +598,7 @@ public:
 		NeuralNetwork<Scalar,Rank>& first_block = *(this->blocks[0]);
 		input_dims = first_block.get_input_dims();
 		output_dims = this->blocks[this->blocks.size() - 1]->get_output_dims();
-		Dimensions<int> prev_dims = first_block.get_output_dims();
+		Dimensions<int,Rank> prev_dims = first_block.get_output_dims();
 		for (unsigned i = 1; i < this->blocks.size(); i++) {
 			assert(this->blocks[i] != nullptr && "blocks contains null pointers");
 			NeuralNetwork<Scalar,Rank>& block = *this->blocks[i];
@@ -661,14 +662,14 @@ protected:
 	};
 	inline Tensor<Scalar,Rank + 1> propagate(Tensor<Scalar,Rank + 1> input, bool training) {
 		assert(input.dimension(0));
-		assert(input_dims == Utils<Scalar>::get_dims(input).demote());
+		assert(input_dims == Utils<Scalar>::template get_dims<Rank + 1>(input).demote());
 		for (unsigned i = 0; i < blocks.size(); i++)
 			input = blocks[i]->propagate(std::move(input), training);
 		return input;
 	};
 	inline Tensor<Scalar,Rank + 1> backpropagate(Tensor<Scalar,Rank + 1> out_grads) {
 		assert(out_grads.dimension(0));
-		assert(output_dims == Utils<Scalar>::get_dims(out_grads).demote());
+		assert(output_dims == Utils<Scalar>::template get_dims<Rank + 1>(out_grads).demote());
 		for (int i = blocks.size() - 1; i >= 0; i--)
 			out_grads = blocks[i]->backpropagate(std::move(out_grads));
 		return out_grads;
@@ -701,15 +702,15 @@ public:
 		input_dims = first_module.get_input_dims();
 		output_dims = this->modules[modules.size() - 1].first.get_output_dims();
 		first_module.set_foremost(foremost);
-		Dimensions<int> prev_dims = input_dims;
+		Dimensions<int,Rank> prev_dims = input_dims;
 		for (unsigned i = 0; i < modules.size(); i++) {
 			std::pair<Module,bool>& module = this->modules[i];
 			Module& module_net = module.first;
 			if (i != 0)
 				module_net.set_foremost(false);
-			assert((!module.second || module_net.get_input_dims().equals(module_net.get_output_dims())) &&
+			assert((!module.second || module_net.get_input_dims() == module_net.get_output_dims()) &&
 					"residual module input-output dimension discrepancy");
-			assert(prev_dims.equals(module_net.get_input_dims()) && "incompatible module dimensions");
+			assert(prev_dims == module_net.get_input_dims() && "incompatible module dimensions");
 			prev_dims = module_net.get_output_dims();
 		}
 	};
@@ -741,7 +742,7 @@ protected:
 	};
 	inline Tensor<Scalar,Rank + 1> propagate(Tensor<Scalar,Rank + 1> input, bool training) {
 		assert(input.dimension(0));
-		assert(input_dims == Utils<Scalar>::get_dims(input).demote());
+		assert(input_dims == Utils<Scalar>::template get_dims<Rank + 1>(input).demote());
 		for (unsigned i = 0; i < modules.size(); i++) {
 			std::pair<Module,bool>& module = modules[i];
 			if (module.second) // If it is a residual module, propagate the sum of the input and the output.
@@ -753,7 +754,7 @@ protected:
 	};
 	inline Tensor<Scalar,Rank + 1> backpropagate(Tensor<Scalar,Rank + 1> out_grads) {
 		assert(out_grads.dimension(0));
-		assert(output_dims == Utils<Scalar>::get_dims(out_grads).demote());
+		assert(output_dims == Utils<Scalar>::template get_dims<Rank + 1>(out_grads).demote());
 		for (int i = modules.size() - 1; i >= 0; i--) {
 			std::pair<Module,bool>& module = modules[i];
 			if (module.second)
@@ -780,19 +781,20 @@ public:
 		assert(this->modules.size() > 0 && "modules must contain at least 1 element");
 		Module& first_module = this->modules[0];
 		input_dims = first_module.get_input_dims();
-		Dimensions<int> first_module_output_dims = first_module.get_output_dims();
+		Dimensions<int,3> first_module_output_dims = first_module.get_output_dims();
 		int output_height = first_module_output_dims(0);
 		int output_width = first_module_output_dims(1);
 		int output_depth = first_module_output_dims(2) + input_dims(2);
 		assert(input_dims(0) == output_height && input_dims(1) == output_width);
 		for (unsigned i = 1; i < this->modules.size(); i++) {
 			Module& module = this->modules[i];
-			assert(module.get_input_dims().equals(output_height, output_width, output_depth) &&
-					"incompatible module dimensions");
+			const Dimensions<int,3>& module_input_dims = module.get_input_dims();
+			assert(module_input_dims(0) == output_height && module_input_dims(1) == output_width &&
+					module_input_dims(2) == output_depth && "incompatible module dimensions");
 			output_depth += module.get_output_dims()(2);
 			module.set_foremost(false);
 		}
-		output_dims = Dimensions<int>(output_height, output_width, output_depth);
+		output_dims = Dimensions<int,3>(output_height, output_width, output_depth);
 		first_module.set_foremost(foremost);
 	};
 	NeuralNetwork<Scalar,3>* clone() const {
@@ -823,10 +825,10 @@ protected:
 	};
 	inline Tensor<Scalar,4> propagate(Tensor<Scalar,4> input, bool training) {
 		assert(input.dimension(0));
-		assert(input_dims == Utils<Scalar>::get_dims(input).demote());
+		assert(input_dims == Utils<Scalar>::template get_dims<4>(input).demote());
 		int rows = input.dimension(0);
-		Array<int,4> offsets({ 0, 0, 0, 0 });
-		Array<int,4> extents({ rows, input_dims(0), input_dims(1), 0 });
+		std::array<int,4> offsets({ 0, 0, 0, 0 });
+		std::array<int,4> extents({ rows, input_dims(0), input_dims(1), 0 });
 		for (unsigned i = 0; i < modules.size(); i++) {
 			Module& module = modules[i];
 			int layer_input_depth = module.get_input_dims()(2);
@@ -845,9 +847,9 @@ protected:
 	};
 	inline Tensor<Scalar,4> backpropagate(Tensor<Scalar,4> out_grads) {
 		assert(out_grads.dimension(0));
-		assert(output_dims == Utils<Scalar>::get_dims(out_grads).demote());
-		Array<int,4> offsets({ 0, 0, 0, 0 });
-		Array<int,4> extents({ out_grads.dimension(0), input_dims(0), input_dims(1), 0 });
+		assert(output_dims == Utils<Scalar>::template get_dims<4>(out_grads).demote());
+		std::array<int,4> offsets({ 0, 0, 0, 0 });
+		std::array<int,4> extents({ out_grads.dimension(0), input_dims(0), input_dims(1), 0 });
 		for (int i = modules.size() - 1; i >= 0; i--) {
 			Module& module = modules[i];
 			int layer_input_depth = module.get_input_dims()(2);

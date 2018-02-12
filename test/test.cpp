@@ -18,6 +18,7 @@
 #include <Preprocessor.h>
 #include <RegularizationPenalty.h>
 #include <utility>
+#include <Utils.h>
 #include <vector>
 #include <WeightInitialization.h>
 
@@ -26,14 +27,13 @@ static constexpr size_t RANK = 3;
 
 int main() {
 	using namespace cattle;
-	std::cout << "Number of threads: " << Eigen::nbThreads() << std::endl;
-	TensorPtr<Scalar,RANK> training_obs_ptr = TensorPtr<Scalar,RANK>(new Tensor<Scalar,RANK>(80, 32, 32, 3));
-	TensorPtr<Scalar,RANK> training_obj_ptr = TensorPtr<Scalar,RANK>(new Tensor<Scalar,RANK>(80, 1, 1, 1));
+	TensorPtr<Scalar,RANK + 1> training_obs_ptr = TensorPtr<Scalar,RANK + 1>(new Tensor<Scalar,RANK + 1>(80, 32, 32, 3));
+	TensorPtr<Scalar,RANK + 1> training_obj_ptr = TensorPtr<Scalar,RANK + 1>(new Tensor<Scalar,RANK + 1>(80, 1, 1, 1));
 	training_obs_ptr->setRandom();
 	training_obj_ptr->setRandom();
 	InMemoryDataProvider<Scalar,RANK> training_prov(std::move(training_obs_ptr), std::move(training_obj_ptr));
-	TensorPtr<Scalar,RANK> test_obs_ptr = TensorPtr<Scalar,RANK>(new Tensor<Scalar,RANK>(20, 32, 32, 3));
-	TensorPtr<Scalar,RANK> test_obj_ptr = TensorPtr<Scalar,RANK>(new Tensor<Scalar,RANK>(20, 1, 1, 1));
+	TensorPtr<Scalar,RANK + 1> test_obs_ptr = TensorPtr<Scalar,RANK + 1>(new Tensor<Scalar,RANK + 1>(20, 32, 32, 3));
+	TensorPtr<Scalar,RANK + 1> test_obj_ptr = TensorPtr<Scalar,RANK + 1>(new Tensor<Scalar,RANK + 1>(20, 1, 1, 1));
 	test_obs_ptr->setRandom();
 	test_obj_ptr->setRandom();
 	InMemoryDataProvider<Scalar,RANK> test_prov(std::move(test_obs_ptr), std::move(test_obj_ptr));
@@ -45,7 +45,7 @@ int main() {
 			LayerPtr<Scalar,RANK>(new ConvLayer<Scalar,RANK>(training_prov.get_obs_dims(), 5, init, 1, 0)))));				// 0
 	parallel_lanes.push_back(NeuralNetPtr<Scalar,RANK>(new SequentialNeuralNetwork<Scalar,RANK>(
 			LayerPtr<Scalar,RANK>(new ConvLayer<Scalar,RANK>(training_prov.get_obs_dims(), 3, init, 5, 2)))));				// 1
-	comp_mods.push_back(NeuralNetPtr<Scalar,RANK>(new ParallelNeuralNetwork<Scalar,RANK>(std::move(parallel_lanes))));
+	comp_mods.push_back(NeuralNetPtr<Scalar,RANK>(new ParallelNeuralNetwork<Scalar>(std::move(parallel_lanes))));
 	std::vector<LayerPtr<Scalar,RANK>> layers1(7);
 	layers1[0] = LayerPtr<Scalar,RANK>(new MaxPoolingLayer<Scalar,RANK>(comp_mods[0]->get_output_dims()));					// 2
 	layers1[1] = LayerPtr<Scalar,RANK>(new LeakyReLUActivationLayer<Scalar,RANK>(layers1[0]->get_output_dims()));			// 3
@@ -77,7 +77,7 @@ int main() {
 	layers4[2] = LayerPtr<Scalar,RANK>(new FCLayer<Scalar,RANK>(layers4[1]->get_output_dims(), 50, init));					// 18
 	layers4[3] = LayerPtr<Scalar,RANK>(new LeakyReLUActivationLayer<Scalar,RANK>(layers4[2]->get_output_dims()));			// 19
 	layers4[4] = LayerPtr<Scalar,RANK>(new FCLayer<Scalar,RANK>(layers4[3]->get_output_dims(), 1, init));					// 20
-	res_modules.push_back(std::make_pair(CompositeNeuralNetwork<Scalar>(NeuralNetPtr<Scalar,RANK>(
+	res_modules.push_back(std::make_pair(CompositeNeuralNetwork<Scalar,RANK>(NeuralNetPtr<Scalar,RANK>(
 			new SequentialNeuralNetwork<Scalar,RANK>(std::move(layers4)))), false));
 	ResidualNeuralNetwork<Scalar,RANK> nn(res_modules);
 	nn.init();

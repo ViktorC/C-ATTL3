@@ -9,6 +9,7 @@
 #define DATAPROVIDER_H_
 
 #include <algorithm>
+#include <array>
 #include <cstddef>
 #include <Dimensions.h>
 #include <fstream>
@@ -46,7 +47,7 @@ public:
 template<typename Scalar, size_t Rank>
 class InMemoryDataProvider : public DataProvider<Scalar,Rank> {
 public:
-	InMemoryDataProvider(TensorPtr<Scalar,Rank> obs, TensorPtr<Scalar,Rank> obj, bool shuffle = true) :
+	InMemoryDataProvider(TensorPtr<Scalar,Rank + 1> obs, TensorPtr<Scalar,Rank + 1> obj, bool shuffle = true) :
 			obs(std::move(obs)),
 			obj(std::move(obj)),
 			offsets() {
@@ -56,18 +57,18 @@ public:
 		assert(this->obs->dimension(0) == this->obj->dimension(0) && "mismatched data and obj tensor row numbers");
 		rows = (unsigned) this->obs->dimension(0);
 		offsets.fill(0);
-		data_extents = Utils<Scalar>::get_dims(this->obs).promote();
-		obj_extents = Utils<Scalar>::get_dims(this->obj).promote();
+		data_extents = Utils<Scalar>::template get_dims<Rank + 1>(*this->obs);
+		obj_extents = Utils<Scalar>::template get_dims<Rank + 1>(*this->obj);
 		if (shuffle) {
-			Utils<Scalar>::shuffle_tensor_rows(*this->obs);
-			Utils<Scalar>::shuffle_tensor_rows(*this->obj);
+			Utils<Scalar>::template shuffle_tensor_rows<Rank + 1>(*this->obs);
+			Utils<Scalar>::template shuffle_tensor_rows<Rank + 1>(*this->obj);
 		}
 	};
 	Dimensions<int,Rank> get_obs_dims() const {
-		return Utils<Scalar>::get_dims(*obs);
+		return Utils<Scalar>::template get_dims<Rank + 1>(*obs).demote();
 	};
 	Dimensions<int,Rank> get_obj_dims() const {
-		return Utils<Scalar>::get_dims(*obj);
+		return Utils<Scalar>::template get_dims<Rank + 1>(*obj).demote();
 	};
 	unsigned instances() const {
 		return rows;
@@ -91,9 +92,9 @@ private:
 	TensorPtr<Scalar,Rank + 1> obs;
 	TensorPtr<Scalar,Rank + 1> obj;
 	unsigned rows;
-	Array<int,Rank + 1> offsets;
-	Array<int,Rank + 1> data_extents;
-	Array<int,Rank + 1> obj_extents;
+	std::array<int,Rank + 1> offsets;
+	std::array<int,Rank + 1> data_extents;
+	std::array<int,Rank + 1> obj_extents;
 };
 
 //template<typename Scalar, size_t Rank>

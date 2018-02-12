@@ -9,6 +9,7 @@
 #define LAYER_H_
 
 #include <algorithm>
+#include <array>
 #include <cassert>
 #include <cmath>
 #include <cstddef>
@@ -109,26 +110,26 @@ protected:
 		}
 	};
 	inline DataBatch pass_forward(DataBatch in, bool training) {
-		assert(Utils<Scalar>::get_dims(in).demote() == input_dims);
+		assert(Utils<Scalar>::template get_dims<Rank + 1>(in).demote() == input_dims);
 		assert(in.dimension(0) > 0);
 		unsigned input_size = input_dims.get_volume();
 		// Add a 1-column to the input for the bias trick.
 		biased_in = Matrix<Scalar>(in.dimension(0), input_size + 1);
-		biased_in.leftCols(input_size) = Utils<Scalar>::map_tensor_to_mat(std::move(in));
+		biased_in.leftCols(input_size) = Utils<Scalar>::template map_tensor_to_mat<Rank + 1>(std::move(in));
 		biased_in.col(input_size).setOnes();
-		return Utils<Scalar>::map_mat_to_tensor<Rank + 1>((biased_in * weights).eval(), output_dims);
+		return Utils<Scalar>::template map_mat_to_tensor<Rank + 1>((biased_in * weights).eval(), output_dims);
 	};
 	inline DataBatch pass_back(DataBatch out_grads) {
-		assert(Utils<Scalar>::get_dims(out_grads).demote() == output_dims);
+		assert(Utils<Scalar>::template get_dims<Rank + 1>(out_grads).demote() == output_dims);
 		assert(out_grads.dimension(0) > 0 && biased_in.rows() == out_grads.dimension(0));
-		Matrix<Scalar> out_grads_mat = Utils<Scalar>::map_tensor_to_mat(std::move(out_grads));
+		Matrix<Scalar> out_grads_mat = Utils<Scalar>::template map_tensor_to_mat<Rank + 1>(std::move(out_grads));
 		// Compute the gradients of the outputs with respect to the weights.
 		weight_grads = biased_in.transpose() * out_grads_mat;
 		if (Layer<Scalar,Rank>::is_input_layer())
-			return Utils<Scalar>::get_null_tensor<Rank + 1>();
+			return Utils<Scalar>::template get_null_tensor<Rank + 1>();
 		/* Remove the bias row from the weight matrix, transpose it, and compute gradients w.r.t. the
 		 * previous layer's output. */
-		return Utils<Scalar>::map_mat_to_tensor<Rank + 1>((out_grads_mat * weights.topRows(input_dims.get_volume())
+		return Utils<Scalar>::template map_mat_to_tensor<Rank + 1>((out_grads_mat * weights.topRows(input_dims.get_volume())
 				.transpose()).eval(), input_dims);
 	};
 private:
@@ -177,19 +178,19 @@ protected:
 	};
 	void enforce_constraints() { };
 	inline DataBatch pass_forward(DataBatch in, bool training) {
-		assert(Utils<Scalar>::get_dims(in).demote() == input_dims);
+		assert(Utils<Scalar>::template get_dims<Rank + 1>(in).demote() == dims);
 		assert(in.dimension(0) > 0);
-		this->in = Utils<Scalar>::map_tensor_to_mat(std::move(in));
+		this->in = Utils<Scalar>::template map_tensor_to_mat<Rank + 1>(std::move(in));
 		out = activate(this->in);
-		return Utils<Scalar>::map_mat_to_tensor<Rank + 1>(out, dims);
+		return Utils<Scalar>::template map_mat_to_tensor<Rank + 1>(out, dims);
 	};
 	inline DataBatch pass_back(DataBatch out_grads) {
-		assert(Utils<Scalar>::get_dims(out_grads).demote() == output_dims);
+		assert(Utils<Scalar>::template get_dims<Rank + 1>(out_grads).demote() == dims);
 		assert(out_grads.dimension(0) > 0 && out.rows() == out_grads.dimension(0));
 		if (Layer<Scalar,Rank>::is_input_layer())
-			return Utils<Scalar>::get_null_tensor<Rank + 1>();
-		return Utils<Scalar>::map_mat_to_tensor<Rank + 1>(d_activate(in, out,
-				Utils<Scalar>::map_tensor_to_mat(std::move(out_grads))), dims);
+			return Utils<Scalar>::template get_null_tensor<Rank + 1>();
+		return Utils<Scalar>::template map_mat_to_tensor<Rank + 1>(d_activate(in, out,
+				Utils<Scalar>::template map_tensor_to_mat<Rank + 1>(std::move(out_grads))), dims);
 	};
 	Dimensions<int,Rank> dims;
 	Matrix<Scalar> params;
@@ -432,10 +433,9 @@ private:
 };
 
 template<typename Scalar, size_t Rank>
-class BatchNormLayer : public Layer<Scalar,Rank> {
-	typedef Tensor<Scalar,Rank + 1> DataBatch;
+class BatchNormLayerBase : public Layer<Scalar,Rank> {
 public:
-	BatchNormLayer(Dimensions<int,Rank> dims, Scalar norm_avg_decay = .1, Scalar epsilon = Utils<Scalar>::EPSILON3) :
+	BatchNormLayerBase(Dimensions<int,Rank> dims, Scalar norm_avg_decay, Scalar epsilon) :
 			dims(dims),
 			depth(Rank == 3 ? dims(2) : 1),
 			norm_avg_decay(norm_avg_decay),
@@ -445,14 +445,12 @@ public:
 			avgs_init(false),
 			params(2 * depth, dims.get_volume() / depth),
 			param_grads(2 * depth, dims.get_volume() / depth),
-			cache_vec(dims.get_depth()) {
+			cache_vec(depth) {
 		assert(norm_avg_decay >= 0 && norm_avg_decay <= 1 &&
 				"norm avg decay must not be less than 0 or greater than 1");
 		assert(epsilon > 0 && "epsilon must be greater than 0");
 	};
-	Layer<Scalar,Rank>* clone() const {
-		return new BatchNormLayer(*this);
-	};
+	virtual ~BatchNormLayerBase() = default;
 	const Dimensions<int,Rank>& get_input_dims() const {
 		return dims;
 	};
@@ -460,6 +458,7 @@ public:
 		return dims;
 	};
 protected:
+	typedef Tensor<Scalar,Rank + 1> DataBatch;
 	void init() {
 		for (int i = 0; i < params.rows(); i += 2) {
 			// Gamma
@@ -486,54 +485,8 @@ protected:
 		return param_grads;
 	};
 	void enforce_constraints() { };
-	inline DataBatch pass_forward(DataBatch in, bool training) {
-		assert(Utils<Scalar>::get_dims(in).demote() == dims);
-		assert(in.dimension(0) > 0);
-		if (depth == 1)
-			return _pass_forward(std::move(in), dims, training, 0);
-		else { // Multi-channel image data; depth-wise normalization.
-			int rows = in.dimension(0);
-			DataBatch out(rows, dims(0), dims(1), dims(2));
-			Dimensions<int,3> slice_dims(dims(0), dims(1), 1);
-			Array<int,4> offsets({ 0, 0, 0, 0 });
-			Array<int,4> extents({ rows, slice_dims(0), slice_dims(1), slice_dims(2) });
-			for (int i = 0; i < dims.get_depth(); i++) {
-				offsets[3] = i;
-				DataBatch in_slice_i = in.slice(offsets, extents);
-				out.slice(offsets, extents) = _pass_forward(std::move(in_slice_i), slice_dims, training, i);
-			}
-			return out;
-		}
-	};
-	inline DataBatch pass_back(DataBatch out_grads) {
-		assert(Utils<Scalar>::get_dims(out_grads).demote() == dims);
-		assert(out_grads.dimension(0) > 0 && cache_vec[0].std_in.rows() == out_grads.dimension(0));
-		if (depth == 1)
-			return _pass_back(std::move(out_grads), dims, 0);
-		else {
-			int rows = out_grads.dimension(0);
-			DataBatch prev_out_grads;
-			if (!Layer<Scalar,Rank>::is_input_layer())
-				prev_out_grads = DataBatch(rows, dims.get_height(), dims.get_width(), dims.get_depth());
-			Dimensions<int,3> slice_dims(dims.get_height(), dims.get_width(), 1);
-			Array<int,4> offsets({ 0, 0, 0, 0 });
-			Array<int,4> extents({ rows, slice_dims(0), slice_dims(1), slice_dims(2) });
-			/* Back-propagate the gradient through the batch normalization 'function' and also calculate the
-			 * gradients on the betas and gammas. */
-			for (int i = 0; i < dims.get_depth(); i++) {
-				offsets[3] = i;
-				DataBatch out_grads_slice_i = out_grads.slice(offsets, extents);
-				if (Layer<Scalar,Rank>::is_input_layer())
-					_pass_back(std::move(out_grads_slice_i), dims, 0);
-				else
-					prev_out_grads.slice(offsets, extents) = d_normalize(std::move(out_grads_slice_i), dims, 0);
-			}
-			return prev_out_grads;
-		}
-	};
-private:
 	inline DataBatch _pass_forward(DataBatch in, const Dimensions<int,Rank>& output_dims, bool training, int i) {
-		Matrix<Scalar> in_ch_i = Utils<Scalar>::map_tensor_to_mat(std::move(in));
+		Matrix<Scalar> in_ch_i = Utils<Scalar>::template map_tensor_to_mat<Rank + 1>(std::move(in));
 		if (training) {
 			Cache& cache = cache_vec[i];
 			RowVector<Scalar> means = in_ch_i.colwise().mean();
@@ -553,21 +506,22 @@ private:
 			}
 		} else // For testing, use the moving averages.
 			in_ch_i = (in_ch_i.rowwise() - avg_means.row(i)) * avg_inv_sds.row(i).asDiagonal();
-		return Utils<Scalar>::map_mat_to_tensor<Rank + 1>(((in_ch_i * params.row(2 * i).asDiagonal())
+		return Utils<Scalar>::template map_mat_to_tensor<Rank + 1>(((in_ch_i * params.row(2 * i).asDiagonal())
 				.rowwise() + params.row(2 * i + 1)).eval(), output_dims);
 	};
 	inline DataBatch _pass_back(DataBatch out_grads, const Dimensions<int,Rank>& output_dims, int i) {
+		int rows = out_grads.dimension(0);
 		Cache& cache = cache_vec[i];
 		Matrix<Scalar> std_in_grads_i;
 		{ // Manage memory by scope restriction.
-			Matrix<Scalar> out_grads_ch_map_i = Utils<Scalar>::map_tensor_to_mat(std::move(out_grads));
+			Matrix<Scalar> out_grads_ch_map_i = Utils<Scalar>::template map_tensor_to_mat<Rank + 1>(std::move(out_grads));
 			param_grads.row(2 * i) = out_grads_ch_map_i.cwiseProduct(cache.std_in).colwise().sum();
 			param_grads.row(2 * i + 1) = out_grads_ch_map_i.colwise().sum();
 			if (Layer<Scalar,Rank>::is_input_layer())
-				return Utils<Scalar>::get_null_tensor<Rank + 1>();
+				return Utils<Scalar>::template get_null_tensor<Rank + 1>();
 			std_in_grads_i = out_grads_ch_map_i * params.row(2 * i).asDiagonal();
 		}
-		return Utils<Scalar>::map_mat_to_tensor<Rank + 1>(((((rows * std_in_grads_i).rowwise() -
+		return Utils<Scalar>::template map_mat_to_tensor<Rank + 1>(((((rows * std_in_grads_i).rowwise() -
 				std_in_grads_i.colwise().sum()) - cache.std_in *
 				(cache.std_in.cwiseProduct(std_in_grads_i).colwise().sum().asDiagonal())) *
 				((1.0 / rows) * cache.inv_in_sd).asDiagonal()).eval(), output_dims);
@@ -589,6 +543,86 @@ private:
 		Matrix<Scalar> std_in;
 	};
 	std::vector<Cache> cache_vec;
+};
+
+template<typename Scalar, size_t Rank>
+class BatchNormLayer : public BatchNormLayerBase<Scalar,Rank> {
+	typedef BatchNormLayerBase<Scalar,Rank> Base;
+public:
+	BatchNormLayer(Dimensions<int,Rank> dims, Scalar norm_avg_decay = .1, Scalar epsilon = Utils<Scalar>::EPSILON3) :
+			Base::template BatchNormLayerBase(dims, norm_avg_decay, epsilon) { };
+	Layer<Scalar,Rank>* clone() const {
+		return new BatchNormLayer(*this);
+	};
+protected:
+	inline typename Base::DataBatch pass_forward(typename Base::DataBatch in, bool training) {
+		assert(Utils<Scalar>::template get_dims<Rank + 1>(in).demote() == Base::dims);
+		assert(in.dimension(0) > 0);
+		return Base::_pass_forward(std::move(in), Base::dims, training, 0);
+	};
+	inline typename Base::DataBatch pass_back(typename Base::DataBatch out_grads) {
+		assert(Utils<Scalar>::template get_dims<Rank + 1>(out_grads).demote() == Base::dims);
+		assert(out_grads.dimension(0) > 0 && Base::cache_vec[0].std_in.rows() == out_grads.dimension(0));
+		return _pass_back(std::move(out_grads), Base::dims, 0);
+	};
+};
+
+// Partial specialization for multi-channel tensors.
+template<typename Scalar>
+class BatchNormLayer<Scalar,3> : public BatchNormLayerBase<Scalar,3> {
+	typedef BatchNormLayerBase<Scalar,3> Base;
+public:
+	BatchNormLayer(Dimensions<int,3> dims, Scalar norm_avg_decay = .1, Scalar epsilon = Utils<Scalar>::EPSILON3) :
+			Base::template BatchNormLayerBase(dims, norm_avg_decay, epsilon) { };
+	Layer<Scalar,3>* clone() const {
+		return new BatchNormLayer(*this);
+	};
+protected:
+	inline typename Base::DataBatch pass_forward(typename Base::DataBatch in, bool training) {
+		assert(Utils<Scalar>::template get_dims<4>(in).demote() == Base::dims);
+		assert(in.dimension(0) > 0);
+		if (Base::depth == 1)
+			return Base::_pass_forward(std::move(in), Base::dims, training, 0);
+		else { // Multi-channel image data; depth-wise normalization.
+			int rows = in.dimension(0);
+			typename Base::DataBatch out(rows, Base::dims(0), Base::dims(1), Base::dims(2));
+			Dimensions<int,3> slice_dims({ Base::dims(0), Base::dims(1), 1 });
+			std::array<int,4> offsets({ 0, 0, 0, 0 });
+			std::array<int,4> extents({ rows, slice_dims(0), slice_dims(1), slice_dims(2) });
+			for (int i = 0; i < Base::depth; i++) {
+				offsets[3] = i;
+				typename Base::DataBatch in_slice_i = in.slice(offsets, extents);
+				out.slice(offsets, extents) = Base::_pass_forward(std::move(in_slice_i), slice_dims, training, i);
+			}
+			return out;
+		}
+	};
+	inline typename Base::DataBatch pass_back(typename Base::DataBatch out_grads) {
+		assert(Utils<Scalar>::template get_dims<4>(out_grads).demote() == Base::dims);
+		assert(out_grads.dimension(0) > 0 && Base::cache_vec[0].std_in.rows() == out_grads.dimension(0));
+		if (Base::depth == 1)
+			return Base::_pass_back(std::move(out_grads), Base::dims, 0);
+		else {
+			int rows = out_grads.dimension(0);
+			typename Base::DataBatch prev_out_grads;
+			if (!Layer<Scalar,3>::is_input_layer())
+				prev_out_grads = typename Base::DataBatch(rows, Base::dims(0), Base::dims(1), Base::dims(2));
+			Dimensions<int,3> slice_dims({ Base::dims(0), Base::dims(1), 1 });
+			std::array<int,4> offsets({ 0, 0, 0, 0 });
+			std::array<int,4> extents({ rows, slice_dims(0), slice_dims(1), slice_dims(2) });
+			/* Back-propagate the gradient through the batch normalization 'function' and also calculate the
+			 * gradients on the betas and gammas. */
+			for (int i = 0; i < Base::depth; i++) {
+				offsets[3] = i;
+				typename Base::DataBatch out_grads_slice_i = out_grads.slice(offsets, extents);
+				if (Layer<Scalar,3>::is_input_layer())
+					Base::_pass_back(std::move(out_grads_slice_i), Base::dims, 0);
+				else
+					prev_out_grads.slice(offsets, extents) = Base::_pass_back(std::move(out_grads_slice_i), Base::dims, 0);
+			}
+			return prev_out_grads;
+		}
+	};
 };
 
 template<typename Scalar, size_t Rank>
@@ -627,10 +661,10 @@ protected:
 	};
 	inline void enforce_constraints() { };
 	inline DataBatch pass_forward(DataBatch in, bool training) {
-		assert(Utils<Scalar>::get_dims(in).demote() == dims);
+		assert(Utils<Scalar>::template get_dims<Rank + 1>(in).demote() == dims);
 		assert(in.dimension(0) > 0);
 		if (training && dropout) {
-			Matrix<Scalar> in_mat = Utils<Scalar>::map_tensor_to_mat(std::move(in));
+			Matrix<Scalar> in_mat = Utils<Scalar>::template map_tensor_to_mat<Rank + 1>(std::move(in));
 			dropout_mask = Matrix<Scalar>(in_mat.rows(), in_mat.cols());
 			dropout_mask.setRandom(in_mat.rows(), in_mat.cols());
 			// Inverted dropout.
@@ -638,17 +672,17 @@ protected:
 			dropout_mask = ((dropout_mask.array() + 1) / 2).unaryExpr([this,scaling_factor](Scalar i) {
 				return (Scalar) (i <= dropout_prob ? .0 : scaling_factor);
 			});
-			return Utils<Scalar>::map_mat_to_tensor<Rank + 1>(in_mat.cwiseProduct(dropout_mask).eval(), dims);
+			return Utils<Scalar>::template map_mat_to_tensor<Rank + 1>(in_mat.cwiseProduct(dropout_mask).eval(), dims);
 		}
 		return in;
 	};
 	inline DataBatch pass_back(DataBatch out_grads) {
-		assert(Utils<Scalar>::get_dims(out_grads).demote() == dims);
+		assert(Utils<Scalar>::template get_dims<Rank + 1>(out_grads).demote() == dims);
 		assert(out_grads.dimension(0) > 0 && dropout_mask.rows() == out_grads.dimension(0));
 		if (Layer<Scalar,Rank>::is_input_layer())
-			return Utils<Scalar>::get_null_tensor<Rank + 1>();
+			return Utils<Scalar>::template get_null_tensor<Rank + 1>();
 		// The derivative of the dropout 'function'.
-		return Utils<Scalar>::map_mat_to_tensor<Rank + 1>(Utils<Scalar>::map_tensor_to_mat(std::move(out_grads))
+		return Utils<Scalar>::template map_mat_to_tensor<Rank + 1>(Utils<Scalar>::template map_tensor_to_mat<Rank + 1>(std::move(out_grads))
 				.cwiseProduct(dropout_mask).eval(), dims);
 	};
 private:
@@ -663,16 +697,14 @@ private:
 };
 
 template<typename Scalar, size_t Rank>
-class ConvLayer : public Layer<Scalar,Rank> {
+class ConvLayerBase : public Layer<Scalar,Rank> {
 	static_assert(Rank == 2 || Rank == 3, "illegal convolutaional layer rank");
-	typedef Tensor<Scalar,Rank + 1> DataBatch;
-	typedef Array<Rank + 1> RankwiseArray;
 public:
-	ConvLayer(Dimensions<int,Rank> input_dims, size_t filters, WeightInitSharedPtr<Scalar> weight_init, size_t receptor_size = 3,
-			size_t padding = 1, size_t stride = 1, size_t dilation = 0, Scalar max_norm_constraint = 0) :
+	ConvLayerBase(Dimensions<int,Rank> input_dims, size_t filters, WeightInitSharedPtr<Scalar> weight_init, size_t receptor_size,
+			size_t padding, size_t stride, size_t dilation, Scalar max_norm_constraint) :
 				input_dims(input_dims),
-				output_dims(calculate_output_dim(input_dims(1), receptor_size, padding, dilation, stride),
-						calculate_output_dim(input_dims(2), receptor_size, padding, dilation, stride), filters),
+				output_dims({ calculate_output_dim(input_dims(1), receptor_size, padding, dilation, stride),
+						calculate_output_dim(input_dims(2), receptor_size, padding, dilation, stride), (int) filters }),
 				filters(filters),
 				weight_init(weight_init),
 				receptor_size(receptor_size),
@@ -681,8 +713,11 @@ public:
 				dilation(dilation),
 				max_norm_constraint(max_norm_constraint),
 				max_norm(Utils<Scalar>::decidedly_greater(max_norm_constraint, .0)),
+				padded_height(input_dims(0) + 2 * padding),
+				padded_width(input_dims(1) + 2 * padding),
+				dil_receptor_size(receptor_size + (receptor_size - 1) * dilation),
 				weights(receptor_size * receptor_size * (Rank == 3 ? input_dims(3) : 1) + 1, filters),
-				weight_grads(weights.rows(), filters) {
+				weight_grads(weights.rows(), (int) filters) {
 		assert(filters > 0);
 		assert(weight_init != nullptr);
 		assert(receptor_size > 0);
@@ -690,9 +725,7 @@ public:
 		assert(input_dims(1) + 2 * padding >= receptor_size + (receptor_size - 1) * dilation &&
 				input_dims(2) + 2 * padding >= receptor_size + (receptor_size - 1) * dilation);
 	};
-	Layer<Scalar,Rank>* clone() const {
-		return new ConvLayer(*this);
-	};
+	virtual ~ConvLayerBase() = default;
 	const Dimensions<int,Rank>& get_input_dims() const {
 		return input_dims;
 	};
@@ -700,6 +733,8 @@ public:
 		return output_dims;
 	};
 protected:
+	typedef Tensor<Scalar,Rank + 1> DataBatch;
+	typedef std::array<int,Rank + 1> RankwiseArray;
 	void init() {
 		/* For every filter, there is a column in the weight matrix with the same number of
 		 * elements as the size of the receptive field (F * F * D) + 1 for the bias row. */
@@ -722,48 +757,18 @@ protected:
 				weights *= (max_norm_constraint / l2_norm);
 		}
 	};
-	inline DataBatch pass_forward(DataBatch in, bool training) {
-		assert(Utils<Scalar>::get_dims(in).demote() == input_dims);
-		assert(in.dimension(0) > 0);
-		// Spatial padding.
-		Array<std::pair<int,int>,Rank + 1> paddings;
-		paddings[0] = std::make_pair(0, 0);
-		paddings[1] = std::make_pair(padding, padding);
-		paddings[2] = std::make_pair(padding, padding);
-		if (Rank == 3)
-			paddings[3] = std::make_pair(0, 0);
-		DataBatch padded_in = in.pad(paddings);
-		// Free the memory occupied by the now-expendable input tensor.
-		in = Utils<Scalar>::get_null_tensor<Rank + 1>();
-		// Prepare the base offsets and extents for slicing and dilation.
-		int dil_receptor_size = receptor_size + (receptor_size - 1) * dilation;
+	inline void _pass_forward(const DataBatch& padded_in, DataBatch& out, const RankwiseArray& row_extents,
+			const RankwiseArray& patch_extents, const RankwiseArray& dil_strides, bool training) {
 		int rows = padded_in.dimension(0);
-		int depth = Rank == 3 ? input_dims(2) : 1;
+		int depth = input_dims.get_volume() / (input_dims(0) * input_dims(1));
 		int patches = output_dims(0) * output_dims(1);
 		int receptor_vol = receptor_size * receptor_size * depth;
-		int height_rem = padded_in.dimension(1) - dil_receptor_size;
-		int width_rem = padded_in.dimension(2) - dil_receptor_size;
+		int height_rem = padded_height - dil_receptor_size;
+		int width_rem = padded_width - dil_receptor_size;
 		RankwiseArray row_offsets;
-		RankwiseArray row_extents = output_dims.promote();
 		RankwiseArray patch_offsets;
-		RankwiseArray patch_extents;
-		RankwiseArray dil_strides;
-		RankwiseArray output_batch_dims = row_extents;
-		output_batch_dims[0] = rows;
 		row_offsets.fill(0);
 		patch_offsets.fill(0);
-		patch_extents[0] = 1;
-		patch_extents[1] = dil_receptor_size;
-		patch_extents[2] = dil_receptor_size;
-		dil_strides[0] = 1;
-		dil_strides[1] = (int) dilation + 1;
-		dil_strides[2] = (int) dilation + 1;
-		if (Rank == 3) {
-			patch_extents[3] = depth;
-			dil_strides[3] = 1;
-		}
-		biased_in_vec = std::vector<Matrix<Scalar>>(rows);
-		DataBatch out(output_batch_dims);
 		/* 'Tensor-row' by 'tensor-row', stretch the receptor locations into row vectors, form a matrix out of
 		 * them, and multiply it by the weight matrix. */
 		for (int i = 0; i < rows; i++) {
@@ -776,11 +781,12 @@ protected:
 				for (int k = 0; k <= width_rem; k += stride) {
 					patch_offsets[2] = k;
 					// If the patch is dilated, skip the internal padding when stretching it into a row.
-					auto padded_in_slice = padded_in.slice(patch_offsets, patch_extents);
+					DataBatch patch;
 					if (dilation > 0)
-						padded_in_slice = padded_in_slice.stride(dil_strides);
-					RankwiseArray patch = padded_in_slice;
-					in_mat_i.row(patch_ind++) = Utils<Scalar>::map_tensor_to_mat(std::move(patch));
+						patch = padded_in.slice(patch_offsets, patch_extents).stride(dil_strides);
+					else
+						patch = padded_in.slice(patch_offsets, patch_extents);
+					in_mat_i.row(patch_ind++) = Utils<Scalar>::template map_tensor_to_mat<Rank + 1>(std::move(patch));
 				}
 			}
 			assert(patch_ind == patches);
@@ -792,49 +798,19 @@ protected:
 			/* Flatten the matrix product into a row vector, reshape it into a 'single-row' sub-tensor, and
 			 * assign it to the output tensor's corresponding 'row'. */
 			Matrix<Scalar> out_i = biased_in_vec[i] * weights;
-			out.slice(row_offsets, row_extents) = Utils<Scalar>::map_mat_to_tensor<Rank + 1>(MatrixMap<Scalar>(out_i.data(),
+			out.slice(row_offsets, row_extents) = Utils<Scalar>::template map_mat_to_tensor<Rank + 1>(MatrixMap<Scalar>(out_i.data(),
 					1, out_i.rows() * out_i.cols()).matrix(), output_dims);
 		}
-		return out;
 	};
-	inline DataBatch pass_back(DataBatch out_grads) {
-		assert(Utils<Scalar>::get_dims(out_grads).demote() == output_dims);
-		assert(out_grads.dimension(0) > 0 && biased_in_vec.size() == (unsigned) out_grads.dimension(0));
+	inline void _pass_back(const DataBatch& out_grads, DataBatch& prev_out_grads, const Dimensions<int,Rank> comp_patch_dims,
+			const RankwiseArray& out_grads_row_extents, const RankwiseArray& patch_extents, const RankwiseArray& strides) {
 		int rows = out_grads.dimension(0);
-		int padded_height = input_dims(0) + 2 * padding;
-		int padded_width = input_dims(1) + 2 * padding;
-		int dil_receptor_size = receptor_size + (receptor_size - 1) * dilation;
 		int height_rem = padded_height - dil_receptor_size;
 		int width_rem = padded_width - dil_receptor_size;
-		int depth = Rank == 3 ? input_dims(2) : 1;
-		Dimensions<int,Rank> comp_patch_dims;
 		RankwiseArray out_grads_row_offsets;
-		RankwiseArray out_grads_row_extents = output_dims.promote();
 		RankwiseArray patch_offsets;
-		RankwiseArray patch_extents;
-		RankwiseArray strides;
-		RankwiseArray prev_out_grads_dims;
-		comp_patch_dims(0) = (int) receptor_size;
-		comp_patch_dims(1) = (int) receptor_size;
 		out_grads_row_offsets.fill(0);
 		patch_offsets.fill(0);
-		patch_extents[0] = 1;
-		patch_extents[1] = dil_receptor_size;
-		patch_extents[2] = dil_receptor_size;
-		strides[0] = 1;
-		strides[1] = (int) dilation + 1;
-		strides[2] = (int) dilation + 1;
-		prev_out_grads_dims[0] = rows;
-		prev_out_grads_dims[1] = padded_height;
-		prev_out_grads_dims[2] = padded_width;
-		if (Rank == 3) {
-			comp_patch_dims(2) = depth;
-			patch_extents[3] = depth;
-			strides[3] = 1;
-			prev_out_grads_dims[3] = depth;
-		}
-		DataBatch prev_out_grads(prev_out_grads_dims);
-		prev_out_grads.setZero();
 		weight_grads.setZero(weight_grads.rows(), weight_grads.cols());
 		for (int i = 0; i < rows; i++) {
 			out_grads_row_offsets[0] = i;
@@ -860,37 +836,21 @@ protected:
 				for (int k = 0; k <= width_rem; k += stride) {
 					patch_offsets[2] = k;
 					// Accumulate the gradients where the receptor-patch-tensors overlap.
-					auto prev_out_grads_slice = prev_out_grads.slice(patch_offsets, patch_extents);
 					if (dilation > 0) {
-						prev_out_grads_slice.stride(strides) += Utils<Scalar>::map_mat_to_tensor<Rank + 1>(
-								prev_out_grads_mat_i.row(patch_ind++), comp_patch_dims);
+						prev_out_grads.slice(patch_offsets, patch_extents).stride(strides) +=
+								Utils<Scalar>::template map_mat_to_tensor<Rank + 1>(prev_out_grads_mat_i.row(patch_ind++), comp_patch_dims);
 					} else {
-						prev_out_grads_slice += Utils<Scalar>::map_mat_to_tensor<Rank + 1>(
+						prev_out_grads.slice(patch_offsets, patch_extents) += Utils<Scalar>::template map_mat_to_tensor<Rank + 1>(
 								prev_out_grads_mat_i.row(patch_ind++), comp_patch_dims);
 					}
 				}
 			}
 			assert(patch_ind == prev_out_grads_mat_i.rows());
 		}
-		// Cut off the padding.
-		RankwiseArray no_padding_offsets;
-		RankwiseArray no_padding_extents;
-		no_padding_offsets[0] = 0;
-		no_padding_offsets[1] = (int) padding;
-		no_padding_offsets[2] = (int) padding;
-		no_padding_extents[0] = rows;
-		no_padding_extents[1] = input_dims(0);
-		no_padding_extents[2] = input_dims(1);
-		if (Rank == 3) {
-			no_padding_offsets[3] = 0;
-			no_padding_extents[3] = depth;
-		}
-		return prev_out_grads.slice(no_padding_offsets, no_padding_extents);
 	};
 	static int calculate_output_dim(int input_dim, int receptor_size, int padding, int dilation, int stride) {
 		return (input_dim - receptor_size - (receptor_size - 1) * dilation + 2 * padding) / stride + 1;
 	};
-private:
 	Dimensions<int,Rank> input_dims;
 	Dimensions<int,Rank> output_dims;
 	size_t filters;
@@ -901,6 +861,9 @@ private:
 	size_t dilation;
 	Scalar max_norm_constraint;
 	bool max_norm;
+	int padded_height;
+	int padded_width;
+	int dil_receptor_size;
 	// The learnable parameters.
 	Matrix<Scalar> weights;
 	Matrix<Scalar> weight_grads;
@@ -908,26 +871,134 @@ private:
 	std::vector<Matrix<Scalar>> biased_in_vec;
 };
 
+// Convolutional layer for 2D input data.
 template<typename Scalar, size_t Rank>
-class PoolingLayer : public Layer<Scalar,Rank> {
-	static_assert(Rank == 2 || Rank == 3, "illegal pooling layer rank");
-	typedef Tensor<Scalar,Rank + 1> DataBatch;
-	typedef Array<int,Rank + 1> RankwiseArray;
+class ConvLayer : public ConvLayerBase<Scalar,Rank> {
+	typedef ConvLayerBase<Scalar,Rank> Base;
 public:
-	PoolingLayer(Dimensions<int,Rank> input_dims, size_t receptor_size, size_t stride) :
+	ConvLayer(Dimensions<int,Rank> input_dims, size_t filters, WeightInitSharedPtr<Scalar> weight_init, size_t receptor_size = 3,
+			size_t padding = 1, size_t stride = 1, size_t dilation = 0, Scalar max_norm_constraint = 0) :
+				Base::ConvLayerBase(input_dims, filters, weight_init, receptor_size, padding, stride, dilation,
+						max_norm_constraint) { };
+	Layer<Scalar,Rank>* clone() const {
+		return new ConvLayer(*this);
+	};
+protected:
+	inline typename Base::DataBatch pass_forward(typename Base::DataBatch in, bool training) {
+		assert(Utils<Scalar>::template get_dims<3>(in).demote() == Base::input_dims);
+		assert(in.dimension(0) > 0);
+		// Spatial padding.
+		std::array<std::pair<int,int>,3> paddings;
+		paddings[0] = std::make_pair(0, 0);
+		paddings[1] = std::make_pair(Base::padding, Base::padding);
+		paddings[2] = std::make_pair(Base::padding, Base::padding);
+		typename Base::DataBatch padded_in = in.pad(paddings);
+		// Free the memory occupied by the now-expendable input tensor.
+		in = Utils<Scalar>::template get_null_tensor<3>();
+		// Prepare the base offsets and extents for slicing and dilation.
+		int dil_receptor_size = Base::receptor_size + (Base::receptor_size - 1) * Base::dilation;
+		typename Base::RankwiseArray row_extents({ 1, Base::output_dims(0), Base::output_dims(1) });
+		typename Base::RankwiseArray patch_extents({ 1, dil_receptor_size, dil_receptor_size });
+		typename Base::RankwiseArray dil_strides({ 1, (int) Base::dilation + 1, (int) Base::dilation + 1 });
+		typename Base::DataBatch out({ in.dimension(0), Base::output_dims(0), Base::output_dims(1) });
+		Base::biased_in_vec = std::vector<Matrix<Scalar>>(padded_in.dimension(0));
+		Base::_pass_forward(padded_in, out, row_extents, patch_extents, dil_strides, training);
+		return out;
+	};
+	inline typename Base::DataBatch pass_back(typename Base::DataBatch out_grads) {
+		assert(Utils<Scalar>::template get_dims<3>(out_grads).demote() == Base::output_dims);
+		assert(out_grads.dimension(0) > 0 && Base::biased_in_vec.size() == (unsigned) out_grads.dimension(0));
+		int rows = out_grads.dimension(0);
+		Dimensions<int,2> comp_patch_dims({ (int) Base::receptor_size, (int) Base::receptor_size });
+		typename Base::RankwiseArray out_grads_row_extents({ 1, Base::output_dims(0), Base::output_dims(1) });
+		typename Base::RankwiseArray patch_extents({ 1, Base::dil_receptor_size, Base::dil_receptor_size });
+		typename Base::RankwiseArray strides({ 1, (int) Base::dilation + 1, (int) Base::dilation + 1 });
+		typename Base::DataBatch prev_out_grads({ rows, Base::padded_height, Base::padded_width });
+		prev_out_grads.setZero();
+		Base::weight_grads.setZero(Base::weight_grads.rows(), Base::weight_grads.cols());
+		Base::_pass_back(out_grads, prev_out_grads, comp_patch_dims, out_grads_row_extents, patch_extents, strides);
+		// Cut off the padding.
+		typename Base::RankwiseArray no_padding_offsets({ 0, (int) Base::padding, (int) Base::padding });
+		typename Base::RankwiseArray no_padding_extents({ rows, Base::input_dims(0), Base::input_dims(1) });
+		return prev_out_grads.slice(no_padding_offsets, no_padding_extents);
+	};
+};
+
+// Partial specialization for 3D convolution.
+template<typename Scalar>
+class ConvLayer<Scalar,3> : public ConvLayerBase<Scalar,3> {
+	typedef ConvLayerBase<Scalar,3> Base;
+public:
+	ConvLayer(Dimensions<int,3> input_dims, size_t filters, WeightInitSharedPtr<Scalar> weight_init, size_t receptor_size = 3,
+			size_t padding = 1, size_t stride = 1, size_t dilation = 0, Scalar max_norm_constraint = 0) :
+				Base::ConvLayerBase(input_dims, filters, weight_init, receptor_size, padding, stride, dilation,
+						max_norm_constraint) { };
+	Layer<Scalar,3>* clone() const {
+		return new ConvLayer(*this);
+	};
+protected:
+	inline typename Base::DataBatch pass_forward(typename Base::DataBatch in, bool training) {
+		assert(Utils<Scalar>::template get_dims<4>(in).demote() == Base::input_dims);
+		assert(in.dimension(0) > 0);
+		// Spatial padding.
+		std::array<std::pair<int,int>,4> paddings;
+		paddings[0] = std::make_pair(0, 0);
+		paddings[1] = std::make_pair(Base::padding, Base::padding);
+		paddings[2] = std::make_pair(Base::padding, Base::padding);
+		paddings[3] = std::make_pair(0, 0);
+		typename Base::DataBatch padded_in = in.pad(paddings);
+		// Free the memory occupied by the now-expendable input tensor.
+		in = Utils<Scalar>::template get_null_tensor<4>();
+		// Prepare the base offsets and extents for slicing and dilation.
+		int dil_receptor_size = Base::receptor_size + (Base::receptor_size - 1) * Base::dilation;
+		typename Base::RankwiseArray row_extents({ 1, Base::output_dims(0), Base::output_dims(1), Base::output_dims(2) });
+		typename Base::RankwiseArray patch_extents({ 1, dil_receptor_size, dil_receptor_size, padded_in.dimension(3) });
+		typename Base::RankwiseArray dil_strides({ 1, (int) Base::dilation + 1, (int) Base::dilation + 1, 1 });
+		typename Base::DataBatch out(in.dimension(0), Base::output_dims(0), Base::output_dims(1), Base::output_dims(2));
+		Base::biased_in_vec = std::vector<Matrix<Scalar>>(padded_in.dimension(0));
+		Base::_pass_forward(padded_in, out, row_extents, patch_extents, dil_strides, training);
+		return out;
+	};
+	inline typename Base::DataBatch pass_back(typename Base::DataBatch out_grads) {
+		assert(Utils<Scalar>::template get_dims<4>(out_grads).demote() == Base::output_dims);
+		assert(out_grads.dimension(0) > 0 && Base::biased_in_vec.size() == (unsigned) out_grads.dimension(0));
+		int rows = out_grads.dimension(0);
+		int depth = Base::input_dims(2);
+		Dimensions<int,3> comp_patch_dims({ (int) Base::receptor_size, (int) Base::receptor_size, depth });
+		typename Base::RankwiseArray out_grads_row_extents({ 1, Base::output_dims(0), Base::output_dims(1), Base::output_dims(2) });
+		typename Base::RankwiseArray patch_extents({ 1, Base::dil_receptor_size, Base::dil_receptor_size, depth });
+		typename Base::RankwiseArray strides({ 1, (int) Base::dilation + 1, (int) Base::dilation + 1, 1 });
+		typename Base::DataBatch prev_out_grads(rows, Base::padded_height, Base::padded_width, depth);
+		prev_out_grads.setZero();
+		Base::weight_grads.setZero(Base::weight_grads.rows(), Base::weight_grads.cols());
+		Base::_pass_back(out_grads, prev_out_grads, comp_patch_dims, out_grads_row_extents, patch_extents, strides);
+		// Cut off the padding.
+		typename Base::RankwiseArray no_padding_offsets({ 0, (int) Base::padding, (int) Base::padding, 0 });
+		typename Base::RankwiseArray no_padding_extents({ rows, Base::input_dims(0), Base::input_dims(1), Base::input_dims(2) });
+		return prev_out_grads.slice(no_padding_offsets, no_padding_extents);
+	};
+};
+
+template<typename Scalar, size_t Rank>
+class PoolingLayerBase : public Layer<Scalar,Rank> {
+	static_assert(Rank == 2 || Rank == 3, "illegal pooling layer rank");
+public:
+	PoolingLayerBase(Dimensions<int,Rank> input_dims, size_t receptor_size, size_t stride) :
 			input_dims(input_dims),
-			output_dims(calculate_output_dim(input_dims(0), receptor_size, stride),
-					calculate_output_dim(input_dims(1), receptor_size, stride), input_dims(2)),
+			output_dims({ calculate_output_dim(input_dims(0), receptor_size, stride),
+					calculate_output_dim(input_dims(1), receptor_size, stride), input_dims(2) }),
 			receptor_size(receptor_size),
 			stride(stride),
 			receptor_area(receptor_size * receptor_size),
+			height_rem(input_dims(0) - receptor_size),
+			width_rem(input_dims(1) - receptor_size),
 			params(0, 0),
 			param_grads(0, 0) {
 		assert(input_dims(0) >= (int) receptor_size && input_dims(1) >= (int) receptor_size);
 		assert(receptor_size > 0);
 		assert(stride > 0);
 	};
-	virtual ~PoolingLayer() = default;
+	virtual ~PoolingLayerBase() = default;
 	const Dimensions<int,Rank>& get_input_dims() const {
 		return input_dims;
 	};
@@ -935,9 +1006,8 @@ public:
 		return output_dims;
 	};
 protected:
-	virtual void init_cache() = 0;
-	virtual Scalar reduce(const RowVector<Scalar>& patch, unsigned patch_ind) = 0;
-	virtual RowVector<Scalar> d_reduce(Scalar grad, unsigned patch_ind) = 0;
+	typedef Tensor<Scalar,Rank + 1> DataBatch;
+	typedef std::array<int,Rank + 1> RankwiseArray;
 	void init() { };
 	Matrix<Scalar>& get_params() {
 		return params;
@@ -946,102 +1016,6 @@ protected:
 		return param_grads;
 	};
 	void enforce_constraints() { };
-	inline DataBatch pass_forward(DataBatch in, bool training) {
-		assert(Utils<Scalar>::get_dims(in).demote() == input_dims);
-		assert(in.dimension(0) > 0);
-		rows = in.dimension(0);
-		int depth = Rank == 3 ? input_dims(2) : 1;
-		int height_rem = input_dims(0) - receptor_size;
-		int width_rem = input_dims(1) - receptor_size;
-		RankwiseArray patch_offsets;
-		RankwiseArray patch_extents;
-		RankwiseArray out_batch_dims = output_dims.promote();
-		patch_offsets.fill(0);
-		patch_extents[0] = 1;
-		patch_extents[1] = (int) receptor_size;
-		patch_extents[2] = (int) receptor_size;
-		out_batch_dims[0] = rows;
-		if (Rank == 3)
-			patch_extents[3] = 1;
-		DataBatch out(out_batch_dims);
-		init_cache();
-		int patch_ind = 0;
-		for (int i = 0; i < rows; i++) {
-			patch_offsets[0] = i;
-			int out_j = 0;
-			for (int j = 0; j <= height_rem; j += stride, out_j++) {
-				patch_offsets[1] = j;
-				int out_k = 0;
-				for (int k = 0; k <= width_rem; k += stride, out_k++) {
-					patch_offsets[2] = k;
-					if (Rank == 2) {
-						// Reduce the patches to scalars.
-						DataBatch patch = in.slice(patch_offsets, patch_extents);
-						out(i,out_j,out_k) = reduce(Utils<Scalar>::map_tensor_to_mat(std::move(patch)), patch_ind++);
-					} else {
-						for (int l = 0; l < depth; l++) {
-							patch_offsets[3] = l;
-							DataBatch patch = in.slice(patch_offsets, patch_extents);
-							out(i,out_j,out_k,l) = reduce(Utils<Scalar>::map_tensor_to_mat(std::move(patch)), patch_ind++);
-						}
-					}
-				}
-			}
-		}
-		return out;
-	};
-	inline DataBatch pass_back(DataBatch out_grads) {
-		assert(Utils<Scalar>::get_dims(out_grads).demote() == output_dims);
-		assert(out_grads.dimension(0) > 0 && rows == out_grads.dimension(0));
-		if (Layer<Scalar,Rank>::is_input_layer())
-			return Utils<Scalar>::get_null_tensor<Rank + 1>();
-		int rows = out_grads.dimension(0);
-		int depth = Rank == 3 ? input_dims(2) : 1;
-		int height_rem = input_dims(0) - receptor_size;
-		int width_rem = input_dims(1) - receptor_size;
-		Dimensions<int,Rank> patch_dims;
-		RankwiseArray patch_offsets;
-		RankwiseArray patch_extents = patch_dims.promote();
-		RankwiseArray prev_out_grad_dims;
-		patch_dims(0) = (int) receptor_size;
-		patch_dims(1) = (int) receptor_size;
-		patch_offsets.fill(0);
-		prev_out_grad_dims[0] = rows;
-		prev_out_grad_dims[1] = input_dims(0);
-		prev_out_grad_dims[2] = input_dims(1);
-		if (Rank == 3) {
-			patch_dims(2) = 1;
-			prev_out_grad_dims[3] = depth;
-		}
-		DataBatch prev_out_grads(prev_out_grad_dims);
-		prev_out_grads.setZero();
-		int patch_ind = 0;
-		for (int i = 0; i < rows; i++) {
-			patch_offsets[0] = i;
-			int out_grads_j = 0;
-			for (int j = 0; j <= height_rem; j += stride, out_grads_j++) {
-				patch_offsets[1] = j;
-				int out_grads_k = 0;
-				for (int k = 0; k <= width_rem; k += stride, out_grads_k++) {
-					patch_offsets[2] = k;
-					if (Rank == 2) {
-						/* Expand the scalars back into patches and accumulate the gradients where the patches
-						 * overlap. */
-						prev_out_grads.slice(patch_offsets, patch_extents) += Utils<Scalar>::map_mat_to_tensor4(
-								d_reduce(out_grads(i,out_grads_j,out_grads_k), patch_ind++), patch_dims);
-					} else {
-						for (int l = 0; l < depth; l++) {
-							patch_offsets[3] = l;
-							prev_out_grads.slice(patch_offsets, patch_extents) +=
-									Utils<Scalar>::map_mat_to_tensor4(d_reduce(out_grads(i,out_grads_j,out_grads_k,l),
-											patch_ind++), patch_dims);
-						}
-					}
-				}
-			}
-		}
-		return prev_out_grads;
-	};
 	static int calculate_output_dim(int input_dim, int receptor_size, int stride) {
 		return (input_dim - receptor_size) / stride + 1;
 	};
@@ -1050,11 +1024,153 @@ protected:
 	size_t receptor_size;
 	size_t stride;
 	int receptor_area;
+	int height_rem;
+	int width_rem;
 	// No actual parameters.
 	Matrix<Scalar> params;
 	Matrix<Scalar> param_grads;
 	// Keep track of the input rows.
 	int rows;
+};
+
+// 2D pooling layer.
+template<typename Scalar, size_t Rank>
+class PoolingLayer : public PoolingLayerBase<Scalar,Rank> {
+	typedef PoolingLayerBase<Scalar,Rank> Base;
+public:
+	PoolingLayer(Dimensions<int,Rank> input_dims, size_t receptor_size, size_t stride) :
+			Base::PoolingLayerBase(input_dims, receptor_size, stride) { };
+	virtual ~PoolingLayer() = default;
+protected:
+	virtual void init_cache() = 0;
+	virtual Scalar reduce(const RowVector<Scalar>& patch, unsigned patch_ind) = 0;
+	virtual RowVector<Scalar> d_reduce(Scalar grad, unsigned patch_ind) = 0;
+	inline typename Base::DataBatch pass_forward(typename Base::DataBatch in, bool training) {
+		assert(Utils<Scalar>::template get_dims<3>(in).demote() == Base::input_dims);
+		assert(in.dimension(0) > 0);
+		Base::rows = in.dimension(0);
+		typename Base::RankwiseArray patch_offsets({ 0, 0, 0 });
+		typename Base::RankwiseArray patch_extents({ 1, (int) Base::receptor_size, (int) Base::receptor_size });
+		typename Base::DataBatch out(Base::rows, Base::output_dims(0), Base::output_dims(1));
+		init_cache();
+		int patch_ind = 0;
+		for (int i = 0; i < Base::rows; i++) {
+			patch_offsets[0] = i;
+			int out_j = 0;
+			for (int j = 0; j <= Base::height_rem; j += Base::stride, out_j++) {
+				patch_offsets[1] = j;
+				int out_k = 0;
+				for (int k = 0; k <= Base::width_rem; k += Base::stride, out_k++) {
+					patch_offsets[2] = k;
+					// Reduce the patches to scalars.
+					typename Base::DataBatch patch = in.slice(patch_offsets, patch_extents);
+					out(i,out_j,out_k) = reduce(Utils<Scalar>::template map_tensor_to_mat<3>(std::move(patch)), patch_ind++);
+				}
+			}
+		}
+		return out;
+	};
+	inline typename Base::DataBatch pass_back(typename Base::DataBatch out_grads) {
+		assert(Utils<Scalar>::template get_dims<3>(out_grads).demote() == Base::output_dims);
+		assert(out_grads.dimension(0) > 0 && Base::rows == out_grads.dimension(0));
+		if (Layer<Scalar,2>::is_input_layer())
+			return Utils<Scalar>::template get_null_tensor<3>();
+		int depth = Base::input_dims(2);
+		Dimensions<int,2> patch_dims({ (int) Base::receptor_size, (int) Base::receptor_size });
+		typename Base::RankwiseArray patch_offsets({ 0, 0, 0});
+		typename Base::RankwiseArray patch_extents({ 1, patch_dims(0), patch_dims(1) });
+		typename Base::DataBatch prev_out_grads(Base::rows, Base::input_dims(0), Base::input_dims(1));
+		prev_out_grads.setZero();
+		int patch_ind = 0;
+		for (int i = 0; i < Base::rows; i++) {
+			patch_offsets[0] = i;
+			int out_grads_j = 0;
+			for (int j = 0; j <= Base::height_rem; j += Base::stride, out_grads_j++) {
+				patch_offsets[1] = j;
+				int out_grads_k = 0;
+				for (int k = 0; k <= Base::width_rem; k += Base::stride, out_grads_k++) {
+					patch_offsets[2] = k;
+					// Expand the scalars back into patches and accumulate the gradients where the patches overlap.
+					prev_out_grads.slice(patch_offsets, patch_extents) += Utils<Scalar>::template map_mat_to_tensor<3>(
+							d_reduce(out_grads(i,out_grads_j,out_grads_k), patch_ind++), patch_dims);
+				}
+			}
+		}
+		return prev_out_grads;
+	};
+};
+
+// 3D pooling layer.
+template<typename Scalar>
+class PoolingLayer<Scalar,3> : public PoolingLayerBase<Scalar,3> {
+	typedef PoolingLayerBase<Scalar,3> Base;
+public:
+	PoolingLayer(Dimensions<int,3> input_dims, size_t receptor_size, size_t stride) :
+			Base::PoolingLayerBase(input_dims, receptor_size, stride) { };
+	virtual ~PoolingLayer() = default;
+protected:
+	virtual void init_cache() = 0;
+	virtual Scalar reduce(const RowVector<Scalar>& patch, unsigned patch_ind) = 0;
+	virtual RowVector<Scalar> d_reduce(Scalar grad, unsigned patch_ind) = 0;
+	inline typename Base::DataBatch pass_forward(typename Base::DataBatch in, bool training) {
+		assert(Utils<Scalar>::template get_dims<4>(in).demote() == Base::input_dims);
+		assert(in.dimension(0) > 0);
+		Base::rows = in.dimension(0);
+		int depth = Base::input_dims(2);
+		typename Base::RankwiseArray patch_offsets({ 0, 0, 0, 0 });
+		typename Base::RankwiseArray patch_extents({ 1, (int) Base::receptor_size, (int) Base::receptor_size, 1 });
+		typename Base::DataBatch out(Base::rows, Base::output_dims(0), Base::output_dims(1), Base::output_dims(2));
+		init_cache();
+		int patch_ind = 0;
+		for (int i = 0; i < Base::rows; i++) {
+			patch_offsets[0] = i;
+			int out_j = 0;
+			for (int j = 0; j <= Base::height_rem; j += Base::stride, out_j++) {
+				patch_offsets[1] = j;
+				int out_k = 0;
+				for (int k = 0; k <= Base::width_rem; k += Base::stride, out_k++) {
+					patch_offsets[2] = k;
+					for (int l = 0; l < depth; l++) {
+						patch_offsets[3] = l;
+						typename Base::DataBatch patch = in.slice(patch_offsets, patch_extents);
+						out(i,out_j,out_k,l) = reduce(Utils<Scalar>::template map_tensor_to_mat<4>(std::move(patch)), patch_ind++);
+					}
+				}
+			}
+		}
+		return out;
+	};
+	inline typename Base::DataBatch pass_back(typename Base::DataBatch out_grads) {
+		assert(Utils<Scalar>::template get_dims<4>(out_grads).demote() == Base::output_dims);
+		assert(out_grads.dimension(0) > 0 && Base::rows == out_grads.dimension(0));
+		if (Layer<Scalar,3>::is_input_layer())
+			return Utils<Scalar>::template get_null_tensor<4>();
+		int depth = Base::input_dims(2);
+		Dimensions<int,3> patch_dims({ (int) Base::receptor_size, (int) Base::receptor_size, 1 });
+		typename Base::RankwiseArray patch_offsets({ 0, 0, 0, 0});
+		typename Base::RankwiseArray patch_extents({ 1, patch_dims(0), patch_dims(1), patch_dims(2) });
+		typename Base::DataBatch prev_out_grads(Base::rows, Base::input_dims(0), Base::input_dims(1), depth);
+		prev_out_grads.setZero();
+		int patch_ind = 0;
+		for (int i = 0; i < Base::rows; i++) {
+			patch_offsets[0] = i;
+			int out_grads_j = 0;
+			for (int j = 0; j <= Base::height_rem; j += Base::stride, out_grads_j++) {
+				patch_offsets[1] = j;
+				int out_grads_k = 0;
+				for (int k = 0; k <= Base::width_rem; k += Base::stride, out_grads_k++) {
+					patch_offsets[2] = k;
+					for (int l = 0; l < depth; l++) {
+						patch_offsets[3] = l;
+						prev_out_grads.slice(patch_offsets, patch_extents) +=
+								Utils<Scalar>::template map_mat_to_tensor<4>(d_reduce(out_grads(i,out_grads_j,out_grads_k,l),
+										patch_ind++), patch_dims);
+					}
+				}
+			}
+		}
+		return prev_out_grads;
+	};
 };
 
 template<typename Scalar, size_t Rank>
@@ -1071,7 +1187,7 @@ protected:
 		return patch.sum();
 	};
 	inline RowVector<Scalar> d_reduce(Scalar grad, unsigned patch_ind) {
-		return RowVector<Scalar>::Constant(PoolingLayer<Scalar,Rank>::receptor_area, grad);
+		return RowVector<Scalar>::Constant(PoolingLayerBase<Scalar,Rank>::receptor_area, grad);
 	};
 	void empty_cache() { };
 };
@@ -1090,8 +1206,8 @@ protected:
 		return patch.mean();
 	};
 	inline RowVector<Scalar> d_reduce(Scalar grad, unsigned patch_ind) {
-		return RowVector<Scalar>::Constant(PoolingLayer<Scalar,Rank>::receptor_area,
-				grad / (Scalar) PoolingLayer<Scalar,Rank>::receptor_area);
+		return RowVector<Scalar>::Constant(PoolingLayerBase<Scalar,Rank>::receptor_area,
+				grad / (Scalar) PoolingLayerBase<Scalar,Rank>::receptor_area);
 	};
 	void empty_cache() { };
 };
@@ -1106,8 +1222,8 @@ public:
 	};
 protected:
 	void init_cache() {
-		max_inds = std::vector<unsigned>(PoolingLayer<Scalar,Rank>::rows *
-				PoolingLayer<Scalar,Rank>::output_dims.get_volume());
+		max_inds = std::vector<unsigned>(PoolingLayerBase<Scalar,Rank>::rows *
+				PoolingLayerBase<Scalar,Rank>::output_dims.get_volume());
 	};
 	inline Scalar reduce(const RowVector<Scalar>& patch, unsigned patch_ind) {
 		int max_ind = 0;
@@ -1123,7 +1239,7 @@ protected:
 		return max;
 	};
 	inline RowVector<Scalar> d_reduce(Scalar grad, unsigned patch_ind) {
-		RowVector<Scalar> d_patch = RowVector<Scalar>::Zero(PoolingLayer<Scalar,Rank>::receptor_area);
+		RowVector<Scalar> d_patch = RowVector<Scalar>::Zero(PoolingLayerBase<Scalar,Rank>::receptor_area);
 		d_patch(max_inds[patch_ind]) = grad;
 		return d_patch;
 	};
