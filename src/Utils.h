@@ -9,6 +9,8 @@
 #define UTILS_H_
 
 #include <algorithm>
+#include <array>
+#include <cstddef>
 #include <Dimensions.h>
 #include <Eigen/Dense>
 #include <limits>
@@ -30,14 +32,14 @@ using Matrix = Eigen::Matrix<Scalar,Eigen::Dynamic,Eigen::Dynamic,Eigen::ColMajo
 template<typename Scalar>
 using MatrixMap = Eigen::Map<Matrix<Scalar>>;
 
-template<typename Scalar>
-using Tensor4 = Eigen::Tensor<Scalar,4,Eigen::ColMajor,int>;
+template<typename Scalar, size_t Rank>
+using Tensor = Eigen::Tensor<Scalar,Rank,Eigen::ColMajor,int>;
 
-template<typename Scalar>
-using Tensor4Map = Eigen::TensorMap<Tensor4<Scalar>>;
+template<typename Scalar, size_t Rank>
+using TensorMap = Eigen::TensorMap<Tensor<Scalar,Rank>>;
 
-template<typename Scalar>
-using Array4 = Eigen::array<Scalar,4>;
+template<typename Scalar, size_t Length>
+using Array = std::array<Scalar,Length>;
 
 template<typename Scalar>
 class Utils {
@@ -51,7 +53,9 @@ public:
 	static constexpr Scalar EPSILON2 = 1e-8;
 	static constexpr Scalar EPSILON3 = 1e-4;
 	static const Matrix<Scalar> NULL_MATRIX;
-	static const Tensor4<Scalar> NULL_TENSOR;
+	static const Tensor<Scalar,2> NULL_TENSOR2;
+	static const Tensor<Scalar,3> NULL_TENSOR3;
+	static const Tensor<Scalar,4> NULL_TENSOR4;
 	inline static int num_of_eigen_threads() {
 		return Eigen::nbThreads();
 	};
@@ -82,21 +86,50 @@ public:
 			Scalar rel_epsilon = EPSILON1) {
 		return n1 < n2 || almost_equal(n1, n2, abs_epsilon, rel_epsilon);
 	};
-	inline static Matrix<Scalar> map_tensor4_to_mat(Tensor4<Scalar> tensor, int rows, int cols) {
+	template<size_t Rank>
+	inline static Tensor<Scalar,Rank> get_null_tensor() {
+		switch (Rank) {
+		case 2:
+			return NULL_TENSOR2;
+		case 3:
+			return NULL_TENSOR3;
+		case 4:
+			return NULL_TENSOR4;
+		default:
+			return Tensor<Scalar,Rank>();
+		}
+	};
+	template<size_t Rank>
+	inline static Dimensions<int,Rank> get_dims(const Tensor<Scalar,Rank>& tensor) {
+		return Dimensions<int,Rank>(tensor.dimensions());
+	};
+	template<size_t Rank>
+	inline static Matrix<Scalar> map_tensor_to_mat(Tensor<Scalar,Rank> tensor, int rows, int cols) {
+		static_assert(Rank > 1, "tensor rank too low for conversion to matrix");
 		assert(rows > 0 && cols > 0 && rows * cols = tensor.size());
 		return MatrixMap<Scalar>(tensor.data(), rows, cols);
 	};
-	inline static Matrix<Scalar> map_tensor4_to_mat(Tensor4<Scalar> tensor) {
+	template<size_t Rank>
+	inline static Matrix<Scalar> map_tensor_to_mat(Tensor<Scalar,Rank> tensor) {
+		static_assert(Rank > 1, "tensor rank too low for conversion to matrix");
 		int rows = tensor.dimension(0);
-		return map_tensor4_to_mat(std::move(tensor), rows, tensor.size() / rows);
+		return MatrixMap<Scalar>(tensor.data(), rows, tensor.size() / rows);
 	};
-	inline static Tensor4<Scalar> map_mat_to_tensor4(Matrix<Scalar> mat, Dimensions<int> dims) {
+	template<size_t Rank>
+	inline static Tensor<Scalar,Rank> map_mat_to_tensor(Matrix<Scalar> mat, const Dimensions<int,Rank - 1>& dims) {
+		static_assert(Rank > 1, "rank too low for conversion to tensor");
 		assert(dims.get_volume() == mat.cols());
-		return Tensor4Map<Scalar>(mat.data(), mat.rows(), dims.get_height(),
-				dims.get_width(), dims.get_depth());
+		Dimensions<int,Rank> promoted = dims.promote();
+		promoted(0) = mat.rows();
+		return TensorMap<Scalar,Rank>(mat.data(), promoted);
 	};
-	inline static Tensor4<Scalar> map_mat_to_tensor4(Matrix<Scalar> mat) {
-		return map_mat_to_tensor4(std::move(mat), Dimensions<int>(mat.cols(), 1, 1));
+	template<size_t Rank>
+	inline static Tensor<Scalar,Rank> map_mat_to_tensor(Matrix<Scalar> mat) {
+		static_assert(Rank > 1, "rank too low for conversion to tensor");
+		Dimensions<int,Rank> dims;
+		dims(0) = mat.rows();
+		dims(1) = mat.cols();
+		return TensorMap<Scalar,Rank>(mat.data(), dims);
 	};
 	inline static void shuffle_mat_rows(Matrix<Scalar>& mat) {
 		Eigen::PermutationMatrix<Eigen::Dynamic,Eigen::Dynamic> perm(mat.rows());
@@ -105,22 +138,23 @@ public:
 		std::random_shuffle(perm.indices().data(), perm.indices().data() + perm.indices().size());
 		mat = perm * mat;
 	};
-	inline static void shuffle_tensor_rows(Tensor4<Scalar>& tensor) {
-		Dimensions<int> tensor_dims(tensor.dimension(1), tensor.dimension(2), tensor.dimension(3));
-		Matrix<Scalar> mat = map_tensor4_to_mat(tensor);
+	template<size_t Rank>
+	inline static void shuffle_tensor_rows(Tensor<Scalar,Rank>& tensor) {
+		Dimensions<int,Rank> dims = get_dims(tensor);
+		Matrix<Scalar> mat = map_tensor_to_mat(tensor);
 		shuffle_mat_rows(mat);
-		tensor = map_mat_to_tensor4(mat, tensor_dims);
-	};
-	inline static Dimensions<int> get_dims(const Tensor4<Scalar>& tensor) {
-		return Dimensions<int>(tensor.dimension(1), tensor.dimension(2), tensor.dimension(3));
+		tensor = map_mat_to_tensor(mat, dims);
 	};
 };
 
 template<typename Scalar>
 const Matrix<Scalar> Utils<Scalar>::NULL_MATRIX = Matrix<Scalar>();
-
 template<typename Scalar>
-const Tensor4<Scalar> Utils<Scalar>::NULL_TENSOR = Tensor4<Scalar>();
+const Tensor<Scalar,2> Utils<Scalar>::NULL_TENSOR2 = Tensor<Scalar,2>();
+template<typename Scalar>
+const Tensor<Scalar,3> Utils<Scalar>::NULL_TENSOR3 = Tensor<Scalar,3>();
+template<typename Scalar>
+const Tensor<Scalar,4> Utils<Scalar>::NULL_TENSOR4 = Tensor<Scalar,4>();
 
 }
 

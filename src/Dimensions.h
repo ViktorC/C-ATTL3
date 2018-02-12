@@ -8,276 +8,252 @@
 #ifndef DIMENSIONS_H_
 #define DIMENSIONS_H_
 
+#include <algorithm>
 #include <cassert>
 #include <cstddef>
+#include <initializer_list>
 #include <sstream>
 #include <stdexcept>
 #include <string>
+#include <Utils.h>
+#include <vector>
 
 namespace cattle {
 
 /**
- * NOTE: Expression templates are absolutely unwarranted for such small objects (especially since they are very
- * unlikely to be used in any complex expressions). They have only been implemented for the sake of practical
- * learning.
+ * NOTE: Expression templates are absolutely unwarranted for this class as its objects are very unlikely to
+ * be used in complex expressions. They have only been implemented for the sake of practical learning.
  */
 
 // Forward declarations.
-template<typename IndexType, typename LhsExpr, typename OpType>
+template<typename IndexType, size_t Rank, typename LhsExpr, typename OpType>
 class UnaryDimExpression;
-template<typename IndexType, typename LhsExpr, typename RhsExpr, typename OpType>
+template<typename IndexType, size_t Rank, typename LhsExpr, typename RhsExpr, typename OpType>
 class BinaryDimExpression;
-template<typename IndexType, typename LhsExpr, typename RhsExpr, typename OpType>
-class BinaryDepthWiseDimExpression;
+template<typename IndexType, size_t Rank, typename LhsExpr, typename RhsExpr, typename OpType>
+class BinaryRankWiseDimExpression;
 
 // Arithmetic operations.
-template<typename Number> class SumOp {
-public: inline static Number apply(Number lhs, Number rhs) { return lhs + rhs; };
+template<typename Operand> class SumOp {
+public: inline static Operand apply(Operand lhs, Operand rhs) { return lhs + rhs; };
 };
-template<typename Number> class SubOp {
-public: inline static Number apply(Number lhs, Number rhs) { return lhs - rhs; };
+template<typename Operand> class SubOp {
+public: inline static Operand apply(Operand lhs, Operand rhs) { return lhs - rhs; };
 };
-template<typename Number> class MulOp {
-public: inline static Number apply(Number lhs, Number rhs) { return lhs * rhs; };
+template<typename Operand> class MulOp {
+public: inline static Operand apply(Operand lhs, Operand rhs) { return lhs * rhs; };
 };
-template<typename Number> class DivOp {
-public: inline static Number apply(Number lhs, Number rhs) { return lhs / rhs; };
+template<typename Operand> class DivOp {
+public: inline static Operand apply(Operand lhs, Operand rhs) { return lhs / rhs; };
 };
 
-template<typename Derived, typename IndexType>
+template<typename Derived, typename IndexType, size_t Rank>
 class DimExpression {
-	typedef DimExpression<Derived,IndexType> Self;
-	template<typename OtherDerived> using Other = DimExpression<OtherDerived,IndexType>;
+	static_assert(Rank > 0, "illegal rank");
+	typedef DimExpression<Derived,IndexType,Rank> Self;
+	template<typename OtherDerived> using Other = DimExpression<OtherDerived,IndexType,Rank>;
 public:
-	inline IndexType operator()(size_t i) const {
-		return static_cast<const Derived&>(*this)(i);
-	};
-	inline IndexType get_height() const {
-		return static_cast<const Derived&>(*this).get_height();
-	};
-	inline IndexType get_width() const {
-		return static_cast<const Derived&>(*this).get_width();
-	};
-	inline IndexType get_depth() const {
-		return static_cast<const Derived&>(*this).get_depth();
-	};
-	inline IndexType get_volume() const {
-		return get_height() * get_width() * get_depth();
-	};
-	inline std::string to_string() const {
-		return "[" + std::to_string(get_height()) + ", " + std::to_string(get_width()) + ", " +
-				std::to_string(get_depth()) + "]";
-	};
-	template<typename OtherDerived>
-	inline bool equals(const Other<OtherDerived>& dims) const {
-		return get_height() == dims.get_height() && get_width() == dims.get_width() && get_depth() == dims.get_depth();
-	};
-	inline bool equals(IndexType height, IndexType width, IndexType depth) {
-		return get_height() == height && get_width() == width && get_depth() == depth;
-	};
 	inline operator Derived&() {
 		return static_cast<Derived&>(*this);
 	};
 	inline operator const Derived&() const {
 		return static_cast<const Derived&>(*this);
 	};
-	template<typename OtherDerived>
-	inline BinaryDepthWiseDimExpression<IndexType,Self,Other<OtherDerived>,SumOp<IndexType>>
-	add_along_depth(const Other<OtherDerived>& dims) {
-		return BinaryDepthWiseDimExpression<IndexType,Self,Other<OtherDerived>,SumOp<IndexType>>(*this, dims);
+	inline const IndexType& operator()(size_t i) const {
+		return static_cast<const Derived&>(*this)(i);
+	};
+	inline IndexType get_volume() const {
+		int volume = 0;
+		for (size_t i = 0; i < Rank; i++)
+			volume *= (*this)(i);
+		return volume;
+	};
+	inline std::string to_string() const {
+		std::stringstream strm;
+		strm << "[" + std::to_string((*this)(0));
+		for (size_t i = 1; i < Rank; i++)
+			strm << "," << std::to_string((*this)(i));
+		strm << "]";
+		return strm.str();
 	};
 	template<typename OtherDerived>
-	inline BinaryDepthWiseDimExpression<IndexType,Self,Other<OtherDerived>,SubOp<IndexType>>
-	subtract_along_depth(const Other<OtherDerived>& dims) {
-		return BinaryDepthWiseDimExpression<IndexType,Self,Other<OtherDerived>,SubOp<IndexType>>(*this, dims);
+	inline BinaryRankWiseDimExpression<IndexType,Rank,Self,Other<OtherDerived>,SumOp<IndexType>>
+	add_along_rank(const Other<OtherDerived>& dims, size_t rank) {
+		return BinaryRankWiseDimExpression<IndexType,Rank,Self,
+				Other<OtherDerived>,SumOp<IndexType>>(*this, dims, rank);
 	};
 	template<typename OtherDerived>
-	inline BinaryDimExpression<IndexType,Self,Other<OtherDerived>,SumOp<IndexType>>
+	inline BinaryRankWiseDimExpression<IndexType,Rank,Self,Other<OtherDerived>,SubOp<IndexType>>
+	subtract_along_rank(const Other<OtherDerived>& dims, size_t rank) {
+		return BinaryRankWiseDimExpression<IndexType,Rank,Self,
+				Other<OtherDerived>,SubOp<IndexType>>(*this, dims, rank);
+	};
+	template<typename OtherDerived>
+	inline BinaryDimExpression<IndexType,Rank,Self,Other<OtherDerived>,SumOp<IndexType>>
 	operator+(const Other<OtherDerived>& dims) {
-		return BinaryDimExpression<IndexType,Self,Other<OtherDerived>,SumOp<IndexType>>(*this, dims);
+		return BinaryDimExpression<IndexType,Rank,Self,Other<OtherDerived>,SumOp<IndexType>>(*this, dims);
 	};
 	template<typename OtherDerived>
-	inline BinaryDimExpression<IndexType,Self,Other<OtherDerived>,SubOp<IndexType>>
+	inline BinaryDimExpression<IndexType,Rank,Self,Other<OtherDerived>,SubOp<IndexType>>
 	operator-(const Other<OtherDerived>& dims) {
-		return BinaryDimExpression<IndexType,Self,Other<OtherDerived>,SubOp<IndexType>>(*this, dims);
+		return BinaryDimExpression<IndexType,Rank,Self,Other<OtherDerived>,SubOp<IndexType>>(*this, dims);
 	};
-	inline UnaryDimExpression<IndexType,Self,SumOp<IndexType>>
+	inline UnaryDimExpression<IndexType,Rank,Self,SumOp<IndexType>>
 	operator+(const IndexType& n) {
-		return UnaryDimExpression<IndexType,Self,SumOp<IndexType>>(*this, n);
+		return UnaryDimExpression<IndexType,Rank,Self,SumOp<IndexType>>(*this, n);
 	};
-	inline UnaryDimExpression<IndexType,Self,SubOp<IndexType>>
+	inline UnaryDimExpression<IndexType,Rank,Self,SubOp<IndexType>>
 	operator-(const IndexType& n) {
-		return UnaryDimExpression<IndexType,Self,SubOp<IndexType>>(*this, n);
+		return UnaryDimExpression<IndexType,Rank,Self,SubOp<IndexType>>(*this, n);
 	};
-	inline UnaryDimExpression<IndexType,Self,DivOp<IndexType>>
+	inline UnaryDimExpression<IndexType,Rank,Self,DivOp<IndexType>>
 	operator/(const IndexType& n) {
-		return UnaryDimExpression<IndexType,Self,DivOp<IndexType>>(*this, n);
+		return UnaryDimExpression<IndexType,Rank,Self,DivOp<IndexType>>(*this, n);
 	};
-	inline UnaryDimExpression<IndexType,Self,MulOp<IndexType>>
+	inline UnaryDimExpression<IndexType,Rank,Self,MulOp<IndexType>>
 	operator*(const IndexType& n) {
-		return UnaryDimExpression<IndexType,Self,MulOp<IndexType>>(*this, n);
+		return UnaryDimExpression<IndexType,Rank,Self,MulOp<IndexType>>(*this, n);
 	};
-	inline friend UnaryDimExpression<IndexType,Self,MulOp<IndexType>>
+	inline friend UnaryDimExpression<IndexType,Rank,Self,MulOp<IndexType>>
 	operator*(const IndexType& n, Self& dims) {
-		return UnaryDimExpression<IndexType,Self,MulOp<IndexType>>(dims, n);
+		return UnaryDimExpression<IndexType,Rank,Self,MulOp<IndexType>>(dims, n);
+	};
+	template<typename OtherDerived>
+	inline bool operator==(const Other<OtherDerived>& dims) const {
+		bool equal = true;
+		for (size_t i = 0; i < Rank; i++) {
+			if ((*this)(i) != dims(i))
+				equal = false;
+		}
+		return equal;
 	};
 	inline friend std::ostream& operator<<(std::ostream& os, const Self& dims) {
 		return os << dims.to_string() << std::endl;
 	};
 };
 
-template<typename IndexType, typename LhsExpr, typename OpType>
+template<typename IndexType, size_t Rank, typename LhsExpr, typename OpType>
 class UnaryDimExpression :
-		public DimExpression<UnaryDimExpression<IndexType,LhsExpr,OpType>,IndexType> {
+		public DimExpression<UnaryDimExpression<IndexType,Rank,LhsExpr,OpType>,IndexType,Rank> {
 public:
 	inline UnaryDimExpression(LhsExpr& lhs, const IndexType& rhs) :
 			lhs(lhs),
 			rhs(rhs) { };
-	inline IndexType operator()(size_t i) const {
-		switch (i) {
-			case 0:
-				return OpType::apply(lhs.get_height(), rhs);
-			case 1:
-				return OpType::apply(lhs.get_width(), rhs);
-			case 2:
-				return OpType::apply(lhs.get_depth(), rhs);
-			default:
-				throw std::invalid_argument("illegal index value: " + i);
-		}
-	};
-	inline IndexType get_height() const {
-		return OpType::apply(lhs.get_height(), rhs);
-	};
-	inline IndexType get_width() const {
-		return OpType::apply(lhs.get_width(), rhs);
-	};
-	inline IndexType get_depth() const {
-		return OpType::apply(lhs.get_depth(), rhs);
+	inline const IndexType& operator()(size_t i) const {
+		if (i < 0 || i >= Rank)
+			throw std::invalid_argument("illegal index value: " + i);
+		return OpType::apply(lhs(i), rhs);
 	};
 private:
 	const LhsExpr& lhs;
 	IndexType rhs;
 };
 
-template<typename IndexType, typename LhsExpr, typename RhsExpr, typename OpType>
+template<typename IndexType, size_t Rank, typename LhsExpr, typename RhsExpr, typename OpType>
 class BinaryDimExpression :
-		public DimExpression<BinaryDimExpression<IndexType,LhsExpr,RhsExpr,OpType>,IndexType> {
+		public DimExpression<BinaryDimExpression<IndexType,Rank,LhsExpr,RhsExpr,OpType>,IndexType,Rank> {
 public:
 	inline BinaryDimExpression(const LhsExpr& lhs, const RhsExpr& rhs) :
 			lhs(lhs),
 			rhs(rhs) { };
-	inline IndexType operator()(size_t i) const {
-		switch (i) {
-			case 0:
-				return OpType::apply(lhs.get_height(), rhs.get_height());
-			case 1:
-				return OpType::apply(lhs.get_width(), rhs.get_width());
-			case 2:
-				return OpType::apply(lhs.get_depth(), rhs.get_depth());
-			default:
-				throw std::invalid_argument("illegal index value: " + i);
-		}
-	};
-	inline IndexType get_height() const {
-		return OpType::apply(lhs.get_height(), rhs.get_height());
-	};
-	inline IndexType get_width() const {
-		return OpType::apply(lhs.get_width(), rhs.get_width());
-	};
-	inline IndexType get_depth() const {
-		return OpType::apply(lhs.get_depth(), rhs.get_depth());
+	inline const IndexType& operator()(size_t i) const {
+		if (i < 0 || i >= Rank)
+			throw std::invalid_argument("illegal index value: " + i);
+		return OpType::apply(lhs(i), rhs(i));
 	};
 protected:
 	const LhsExpr& lhs;
 	const RhsExpr& rhs;
 };
 
-/**
- * This only delays the evaluation and temporary storage of depth.
- */
-template<typename IndexType, typename LhsExpr, typename RhsExpr, typename OpType>
-class BinaryDepthWiseDimExpression :
-		public DimExpression<BinaryDepthWiseDimExpression<IndexType,LhsExpr,RhsExpr,OpType>,IndexType> {
+template<typename IndexType, size_t Rank, typename LhsExpr, typename RhsExpr, typename OpType>
+class BinaryRankWiseDimExpression :
+		public DimExpression<BinaryRankWiseDimExpression<IndexType,Rank,LhsExpr,RhsExpr,OpType>,IndexType,Rank> {
 public:
-	inline BinaryDepthWiseDimExpression(const LhsExpr& lhs, const RhsExpr& rhs) :
+	inline BinaryRankWiseDimExpression(const LhsExpr& lhs, const RhsExpr& rhs, size_t rank) :
 			lhs(lhs),
 			rhs(rhs),
-			height(lhs.get_height()),
-			width(lhs.get_width()) {
-		assert(height == rhs.get_height() && width == rhs.get_width());
+			rank(rank) {
+		assert(rank <= Rank);
 	};
-	inline IndexType operator()(size_t i) const {
-		switch (i) {
-			case 0:
-				return height;
-			case 1:
-				return width;
-			case 2:
-				return OpType::apply(lhs.get_depth(), rhs.get_depth());
-			default:
-				throw std::invalid_argument("illegal index value: " + i);
-		}
-	};
-	inline IndexType get_height() const {
-		return height;
-	};
-	inline IndexType get_width() const {
-		return width;
-	};
-	inline IndexType get_depth() const {
-		return OpType::apply(lhs.get_depth(), rhs.get_depth());
+	inline const IndexType& operator()(size_t i) const {
+		if (i < 0 || i >= Rank)
+			throw std::invalid_argument("illegal index value: " + i);
+		return i == rank ? OpType::apply(lhs(i), rhs(i)) : lhs(i);
 	};
 protected:
 	const LhsExpr& lhs;
 	const RhsExpr& rhs;
-	IndexType height;
-	IndexType width;
+	size_t rank;
 };
 
-template<typename IndexType>
-class Dimensions : public DimExpression<Dimensions<IndexType>,IndexType> {
+template<typename IndexType, size_t Rank>
+class Dimensions : public DimExpression<Dimensions<IndexType,Rank>,IndexType,Rank> {
 public:
-	Dimensions(IndexType height, IndexType width, IndexType depth) :
-			height(height),
-			width(width),
-			depth(depth) {
-		assert(height > 0 && width > 0 && depth > 0);
-	};
-	Dimensions(IndexType height, IndexType width) :
-			Dimensions(height, width, 1) { };
-	Dimensions(IndexType height) :
-			Dimensions(height, 1) { };
 	Dimensions() :
-			Dimensions(1) { };
+			values(Rank, 1) { };
+	Dimensions(const std::initializer_list<IndexType>& values) :
+			Dimensions() {
+		assert(values.size() < Rank);
+		std::copy(values.begin(), values.end(), this->values.begin());
+	};
 	template<typename OtherDerived>
-	Dimensions(const DimExpression<OtherDerived,IndexType>& dims) :
-			Dimensions(dims.get_height(), dims.get_width(), dims.get_depth()) { };
-	inline IndexType operator()(size_t i) const {
-		switch (i) {
-			case 0:
-				return height;
-			case 1:
-				return width;
-			case 2:
-				return depth;
-			default:
-				throw std::invalid_argument("illegal index value: " + i);
-		}
+	Dimensions(const DimExpression<OtherDerived,IndexType,Rank>& dims) :
+			Dimensions() {
+		for (size_t i = 0; i < Rank; i++)
+			values[i] = dims[i];
 	};
-	inline IndexType get_height() const {
-		return height;
+	Dimensions(const Array<IndexType,Rank>& array) :
+			Dimensions() {
+		assert(array.size() < Rank);
+		std::copy(array.begin(), array.end(), values.begin());
 	};
-	inline IndexType get_width() const {
-		return width;
+	inline Dimensions<IndexType,Rank + 1> promote() const {
+		Dimensions<IndexType,Rank + 1> promoted;
+		std::copy(values.begin(), values.end(), promoted.begin() + 1);
+		return promoted;
 	};
-	inline IndexType get_depth() const {
-		return depth;
+	inline Dimensions<IndexType,Rank - 1> demote() const {
+		static_assert(Rank > 1, "rank must be greater than 1 for demotion");
+		Dimensions<IndexType,Rank - 1> demoted;
+		std::copy(values.begin() + 1, values.end(), demoted.begin());
+		return demoted;
+	};
+	inline const IndexType& operator()(size_t i) const {
+		if (i < 0 || i >= Rank)
+			throw std::invalid_argument("illegal index value: " + i);
+		return values[i];
+	};
+	inline IndexType& operator()(size_t i) {
+		if (i < 0 || i >= Rank)
+			throw std::invalid_argument("illegal index value: " + i);
+		return values[i];
+	};
+	inline operator Array<IndexType,Rank>() const {
+		Array<IndexType,Rank> array;
+		std::copy(values.begin(), values.end(), array.begin());
+		return array;
 	};
 private:
-	IndexType height;
-	IndexType width;
-	IndexType depth;
+	std::vector<IndexType> values;
 };
+
+//// Partial specializations to provide convenient constructors.
+//template<typename IndexType>
+//class Dimensions<IndexType,1> {
+//	Dimensions(IndexType dim0) :
+//			Dimensions({ dim0 }) { };
+//};
+//template<typename IndexType>
+//class Dimensions<IndexType,2> {
+//	Dimensions(IndexType dim0, IndexType dim1) :
+//			Dimensions({ dim0, dim1 }) { };
+//};
+//template<typename IndexType>
+//class Dimensions<IndexType,3> {
+//	Dimensions(IndexType dim0, IndexType dim1, IndexType dim2) :
+//			Dimensions({ dim0, dim1, dim2 }) { };
+//};
 
 } /* namespace cattle */
 
