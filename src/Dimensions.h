@@ -16,6 +16,7 @@
 #include <sstream>
 #include <stdexcept>
 #include <string>
+#include <type_traits>
 #include <vector>
 
 namespace cattle {
@@ -118,6 +119,10 @@ public:
 	operator*(const IndexType& n, Self& dims) {
 		return UnaryDimExpression<IndexType,Rank,Self,MulOp<IndexType>>(dims, n);
 	};
+	template<typename OtherDerived, typename OtherIndexType, size_t OtherRank>
+	inline bool operator==(const DimExpression<OtherDerived,OtherIndexType,OtherRank>& dims) const {
+		return false;
+	};
 	template<typename OtherDerived>
 	inline bool operator==(const Other<OtherDerived>& dims) const {
 		bool equal = true;
@@ -199,16 +204,16 @@ public:
 		assert(values.size() <= Rank);
 		std::copy(values.begin(), values.end(), this->values.begin());
 	};
+	Dimensions(const std::array<IndexType,Rank>& array) :
+			Dimensions() {
+		assert(array.size() <= Rank);
+		std::copy(array.begin(), array.end(), values.begin());
+	};
 	template<typename OtherDerived>
 	Dimensions(const DimExpression<OtherDerived,IndexType,Rank>& dims) :
 			Dimensions() {
 		for (size_t i = 0; i < Rank; i++)
 			values[i] = dims(i);
-	};
-	Dimensions(const std::array<IndexType,Rank>& array) :
-			Dimensions() {
-		assert(array.size() <= Rank);
-		std::copy(array.begin(), array.end(), values.begin());
 	};
 	inline Dimensions<IndexType,Rank + 1> promote() const {
 		Dimensions<IndexType,Rank + 1> promoted;

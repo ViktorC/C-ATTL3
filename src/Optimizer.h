@@ -151,7 +151,7 @@ protected:
 	inline static const void enforce_constraints(Layer<Scalar,Rank>& layer) {
 		layer.enforce_constraints();
 	};
-	LossSharedPtr<Scalar,Rank> loss;
+	const LossSharedPtr<Scalar,Rank> loss;
 };
 
 template<typename Scalar>
@@ -213,8 +213,8 @@ protected:
 		return mean_obj_loss + reg_loss;
 	};
 	virtual void update_params(Layer<Scalar,Rank>& layer, unsigned i, unsigned epoch) = 0;
-	RegPenSharedPtr<Scalar> reg;
-	unsigned batch_size;
+	const RegPenSharedPtr<Scalar> reg;
+	const unsigned batch_size;
 };
 
 template<typename Scalar, size_t Rank>
@@ -233,7 +233,7 @@ protected:
 		params -= (learning_rate * (Optimizer<Scalar,Rank>::get_param_grads(layer) +
 				SGDOptimizer<Scalar,Rank>::reg->d_function(params)));
 	};
-	Scalar learning_rate;
+	const Scalar learning_rate;
 };
 
 template<typename Scalar, size_t Rank>
@@ -274,31 +274,30 @@ protected:
 	Scalar calculate_learning_rate(unsigned epoch) {
 		return init_learning_rate / (1.0 + annealing_rate * epoch);
 	};
-	Scalar init_learning_rate;
-	Scalar annealing_rate;
-	Scalar momentum;
+	const Scalar init_learning_rate;
+	const Scalar annealing_rate;
+	const Scalar momentum;
 	std::vector<Matrix<Scalar>> param_grads_vec;
 };
 
 template<typename Scalar, size_t Rank>
 class NesterovMomentumAcceleratedSGDOptimizer : public MomentumAcceleratedSGDOptimizer<Scalar,Rank> {
+	typedef MomentumAcceleratedSGDOptimizer<Scalar,Rank> Base;
 public:
 	NesterovMomentumAcceleratedSGDOptimizer(LossSharedPtr<Scalar,Rank> loss, RegPenSharedPtr<Scalar> reg,
 			unsigned batch_size = 1, Scalar init_learning_rate = 1e-3, Scalar annealing_rate = 1e-3,
 			Scalar momentum = .9) :
-				MomentumAcceleratedSGDOptimizer<Scalar,Rank>::MomentumAcceleratedSGDOptimizer(loss, reg, batch_size,
-						init_learning_rate, annealing_rate, momentum) { };
+				Base::MomentumAcceleratedSGDOptimizer(loss, reg, batch_size, init_learning_rate,
+						annealing_rate, momentum) { };
 protected:
 	inline void update_params(Layer<Scalar,Rank>& layer, unsigned i, unsigned epoch) {
-		Scalar learning_rate = MomentumAcceleratedSGDOptimizer<Scalar,Rank>::calculate_learning_rate(epoch);
-		Matrix<Scalar>& param_grads = MomentumAcceleratedSGDOptimizer<Scalar,Rank>::param_grads_vec[i];
+		Scalar learning_rate = Base::calculate_learning_rate(epoch);
+		Matrix<Scalar>& param_grads = Base::param_grads_vec[i];
 		Matrix<Scalar>& params = Optimizer<Scalar,Rank>::get_params(layer);
 		Matrix<Scalar> param_grads_bak = param_grads;
-		param_grads = MomentumAcceleratedSGDOptimizer<Scalar,Rank>::momentum * param_grads -
-				learning_rate * (Optimizer<Scalar,Rank>::get_param_grads(layer) +
+		param_grads = Base::momentum * param_grads - learning_rate * (Optimizer<Scalar,Rank>::get_param_grads(layer) +
 				SGDOptimizer<Scalar,Rank>::reg->d_function(params));
-		params += -MomentumAcceleratedSGDOptimizer<Scalar,Rank>::momentum * param_grads_bak +
-				(1 + MomentumAcceleratedSGDOptimizer<Scalar,Rank>::momentum) * param_grads;
+		params += -Base::momentum * param_grads_bak + (1 + Base::momentum) * param_grads;
 	};
 };
 
@@ -342,8 +341,8 @@ protected:
 		update_acc_weight_grad_sqrs(param_grad_sqrs, param_grads);
 		params -= (learning_rate * param_grads.array() / (param_grad_sqrs.array().sqrt() + epsilon)).matrix();
 	};
-	Scalar learning_rate;
-	Scalar epsilon;
+	const Scalar learning_rate;
+	const Scalar epsilon;
 	std::vector<Matrix<Scalar>> param_grad_sqrs_vec;
 };
 
@@ -366,7 +365,7 @@ protected:
 		acc_batch_norm_grad_sqrs = (1 - l2_decay) * acc_batch_norm_grad_sqrs +
 				l2_decay * batch_norm_grads.cwiseProduct(batch_norm_grads);
 	};
-	Scalar l2_decay;
+	const Scalar l2_decay;
 };
 
 template<typename Scalar, size_t Rank>
@@ -405,8 +404,8 @@ protected:
 		params += weight_updates;
 		pgus.param_update = (1 - decay) * pgus.param_update + decay * weight_updates.cwiseProduct(weight_updates);
 	};
-	Scalar decay;
-	Scalar epsilon;
+	const Scalar decay;
+	const Scalar epsilon;
 	struct ParamGradAndUpdateSqrs {
 		Matrix<Scalar> param_grad;
 		Matrix<Scalar> param_update;
@@ -458,10 +457,10 @@ protected:
 		params -= (learning_rate * (grad_norms.param_grad_l1 * l1_corr).array() /
 				((grad_norms.param_grad_l2 * l2_corr).array().sqrt() + epsilon)).matrix();
 	};
-	Scalar learning_rate;
-	Scalar l1_decay;
-	Scalar l2_decay;
-	Scalar epsilon;
+	const Scalar learning_rate;
+	const Scalar l1_decay;
+	const Scalar l2_decay;
+	const Scalar epsilon;
 	struct ParamGradNorms {
 		Matrix<Scalar> param_grad_l1;
 		Matrix<Scalar> param_grad_l2;
@@ -471,56 +470,50 @@ protected:
 
 template<typename Scalar, size_t Rank>
 class AdaMaxOptimizer : public AdamOptimizer<Scalar,Rank> {
+	typedef AdamOptimizer<Scalar,Rank> Base;
 public:
 	AdaMaxOptimizer(LossSharedPtr<Scalar,Rank> loss, RegPenSharedPtr<Scalar> reg, unsigned batch_size = 1,
 			Scalar learning_rate = 1e-3, Scalar l1_decay = 1e-1, Scalar l2_decay = 1e-3,
 			Scalar epsilon = Utils<Scalar>::EPSILON2) :
-				AdamOptimizer<Scalar,Rank>::AdamOptimizer(loss, reg, batch_size, learning_rate,
+				Base::AdamOptimizer(loss, reg, batch_size, learning_rate,
 						l1_decay, l2_decay, epsilon) { };
 protected:
 	inline void update_params(Layer<Scalar,Rank>& layer, unsigned i, unsigned epoch) {
-		typename AdamOptimizer<Scalar,Rank>::ParamGradNorms& grad_norms = AdamOptimizer<Scalar,Rank>::pgn_vec[i];
-		Scalar l1_corr = 1.0 / (1.0 - pow(1.0 - AdamOptimizer<Scalar,Rank>::l1_decay, epoch + 1) +
-				AdamOptimizer<Scalar,Rank>::epsilon);
+		typename Base::ParamGradNorms& grad_norms = Base::pgn_vec[i];
+		Scalar l1_corr = 1.0 / (1.0 - pow(1.0 - Base::l1_decay, epoch + 1) + Base::epsilon);
 		Matrix<Scalar>& params = Optimizer<Scalar,Rank>::get_params(layer);
 		Matrix<Scalar> param_grads = Optimizer<Scalar,Rank>::get_param_grads(layer) +
 				SGDOptimizer<Scalar,Rank>::reg->d_function(params);
-		grad_norms.param_grad_l1 = (1 - AdamOptimizer<Scalar,Rank>::l1_decay) * grad_norms.param_grad_l1 +
-				AdamOptimizer<Scalar,Rank>::l1_decay * param_grads;
-		grad_norms.param_grad_l2 = ((1 - AdamOptimizer<Scalar,Rank>::l2_decay) * grad_norms.param_grad_l2)
-				.cwiseMax(param_grads.cwiseAbs());
-		params -= (AdamOptimizer<Scalar,Rank>::learning_rate * (grad_norms.param_grad_l1 * l1_corr).array() /
-				(grad_norms.param_grad_l2.array() + AdamOptimizer<Scalar,Rank>::epsilon)).matrix();
+		grad_norms.param_grad_l1 = (1 - Base::l1_decay) * grad_norms.param_grad_l1 + Base::l1_decay * param_grads;
+		grad_norms.param_grad_l2 = ((1 - Base::l2_decay) * grad_norms.param_grad_l2).cwiseMax(param_grads.cwiseAbs());
+		params -= (Base::learning_rate * (grad_norms.param_grad_l1 * l1_corr).array() /
+				(grad_norms.param_grad_l2.array() + Base::epsilon)).matrix();
 	};
 };
 
 template<typename Scalar, size_t Rank>
 class NadamOptimizer : public AdamOptimizer<Scalar,Rank> {
+	typedef AdamOptimizer<Scalar,Rank> Base;
 public:
 	NadamOptimizer(LossSharedPtr<Scalar,Rank> loss, RegPenSharedPtr<Scalar> reg, unsigned batch_size = 1,
 			Scalar learning_rate = 1e-3, Scalar l1_decay = 1e-1, Scalar l2_decay = 1e-3,
 			Scalar epsilon = Utils<Scalar>::EPSILON2) :
-				AdamOptimizer<Scalar,Rank>::AdamOptimizer(loss, reg, batch_size, learning_rate,
-						l1_decay, l2_decay, epsilon) { };
+				Base::AdamOptimizer(loss, reg, batch_size, learning_rate, l1_decay, l2_decay, epsilon) { };
 protected:
 	inline void update_params(Layer<Scalar,Rank>& layer, unsigned i, unsigned epoch) {
-		typename AdamOptimizer<Scalar,Rank>::ParamGradNorms& grad_norms = AdamOptimizer<Scalar,Rank>::pgn_vec[i];
-		Scalar l1_corr = 1.0 / (1.0 - pow(1.0 - AdamOptimizer<Scalar,Rank>::l1_decay, epoch + 1) +
-				AdamOptimizer<Scalar,Rank>::epsilon);
-		Scalar l1_next_corr = 1.0 / (1.0 - pow(1.0 - AdamOptimizer<Scalar,Rank>::l1_decay, epoch + 2) +
-				AdamOptimizer<Scalar,Rank>::epsilon);
-		Scalar l2_corr = 1.0 / (1.0 - pow(1.0 - AdamOptimizer<Scalar,Rank>::l2_decay, epoch + 1) +
-				AdamOptimizer<Scalar,Rank>::epsilon);
+		typename Base::ParamGradNorms& grad_norms = Base::pgn_vec[i];
+		Scalar l1_corr = 1.0 / (1.0 - pow(1.0 - Base::l1_decay, epoch + 1) + Base::epsilon);
+		Scalar l1_next_corr = 1.0 / (1.0 - pow(1.0 - Base::l1_decay, epoch + 2) + Base::epsilon);
+		Scalar l2_corr = 1.0 / (1.0 - pow(1.0 - Base::l2_decay, epoch + 1) + Base::epsilon);
 		Matrix<Scalar>& params = Optimizer<Scalar,Rank>::get_params(layer);
 		Matrix<Scalar> param_grads = Optimizer<Scalar,Rank>::get_param_grads(layer) +
 				SGDOptimizer<Scalar,Rank>::reg->d_function(params);
-		grad_norms.param_grad_l1 = (1 - AdamOptimizer<Scalar,Rank>::l1_decay) * grad_norms.param_grad_l1 +
-				AdamOptimizer<Scalar,Rank>::l1_decay * param_grads;
-		grad_norms.param_grad_l2 = (1 - AdamOptimizer<Scalar,Rank>::l2_decay) * grad_norms.param_grad_l2 +
-				AdamOptimizer<Scalar,Rank>::l2_decay * param_grads.cwiseProduct(param_grads);
-		params -= (AdamOptimizer<Scalar,Rank>::learning_rate * (AdamOptimizer<Scalar,Rank>::l1_decay * l1_corr * param_grads +
-				(1.0 - AdamOptimizer<Scalar,Rank>::l1_decay) * l1_next_corr * grad_norms.param_grad_l1).array() /
-				((grad_norms.param_grad_l2 * l2_corr).array().sqrt() + AdamOptimizer<Scalar,Rank>::epsilon)).matrix();
+		grad_norms.param_grad_l1 = (1 - Base::l1_decay) * grad_norms.param_grad_l1 + Base::l1_decay * param_grads;
+		grad_norms.param_grad_l2 = (1 - Base::l2_decay) * grad_norms.param_grad_l2 + Base::l2_decay *
+				param_grads.cwiseProduct(param_grads);
+		params -= (Base::learning_rate * (Base::l1_decay * l1_corr * param_grads +
+				(1.0 - Base::l1_decay) * l1_next_corr * grad_norms.param_grad_l1).array() /
+				((grad_norms.param_grad_l2 * l2_corr).array().sqrt() + Base::epsilon)).matrix();
 	};
 };
 

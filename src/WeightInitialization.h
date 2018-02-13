@@ -33,7 +33,7 @@ public:
 		weights.setZero(weights.rows(), weights.cols());
 	};
 private:
-	Scalar bias;
+	const Scalar bias;
 };
 
 template<typename Scalar>
@@ -46,7 +46,7 @@ public:
 		weights.row(weights.rows() - 1).setZero();
 	};
 private:
-	Scalar bias;
+	const Scalar bias;
 };
 
 template<typename Scalar>
@@ -70,8 +70,8 @@ public:
 		}
 	};
 protected:
-	Scalar bias;
 	virtual Scalar sd(unsigned fan_ins, unsigned fan_outs) const = 0;
+	const Scalar bias;
 };
 
 template<typename Scalar>
@@ -123,11 +123,12 @@ public:
 				svd.compute(weights, Eigen::ComputeFullU).matrixU().block(0, 0, rows, cols) :
 				svd.compute(weights, Eigen::ComputeFullV).matrixV().block(0, 0, rows, cols);
 	};
-private:
-	Scalar _sd;
+protected:
 	Scalar sd(unsigned fan_ins, unsigned fan_outs) const {
 		return _sd;
 	};
+private:
+	const Scalar _sd;
 };
 
 } /* namespace cattle */

@@ -55,7 +55,7 @@ public:
 		assert(this->obj != nullptr);
 		assert(this->obs->dimension(0) > 0);
 		assert(this->obs->dimension(0) == this->obj->dimension(0) && "mismatched data and obj tensor row numbers");
-		rows = (unsigned) this->obs->dimension(0);
+		rows = (size_t) this->obs->dimension(0);
 		offsets.fill(0);
 		data_extents = Utils<Scalar>::template get_dims<Rank + 1>(*this->obs);
 		obj_extents = Utils<Scalar>::template get_dims<Rank + 1>(*this->obj);
@@ -91,7 +91,7 @@ public:
 private:
 	TensorPtr<Scalar,Rank + 1> obs;
 	TensorPtr<Scalar,Rank + 1> obj;
-	unsigned rows;
+	size_t rows;
 	std::array<int,Rank + 1> offsets;
 	std::array<int,Rank + 1> data_extents;
 	std::array<int,Rank + 1> obj_extents;

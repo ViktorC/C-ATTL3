@@ -60,7 +60,7 @@ public:
 		return lambda * weights;
 	};
 private:
-	Scalar lambda;
+	const Scalar lambda;
 };
 
 template<typename Scalar>
@@ -77,8 +77,8 @@ public:
 				-l1_lambda); }) + l2_lambda * weights;
 	};
 private:
-	Scalar l1_lambda;
-	Scalar l2_lambda;
+	const Scalar l1_lambda;
+	const Scalar l2_lambda;
 };
 
 } /* namespace cattle */
