@@ -32,8 +32,8 @@ int main() {
 	training_obs_ptr->setRandom();
 	training_obj_ptr->setRandom();
 	InMemoryDataProvider<Scalar,RANK> training_prov(std::move(training_obs_ptr), std::move(training_obj_ptr));
-	TensorPtr<Scalar,RANK + 1> test_obs_ptr = TensorPtr<Scalar,RANK + 1>(new Tensor<Scalar,RANK + 1>(20, 32, 32, 3));
-	TensorPtr<Scalar,RANK + 1> test_obj_ptr = TensorPtr<Scalar,RANK + 1>(new Tensor<Scalar,RANK + 1>(20, 1, 1, 1));
+	TensorPtr<Scalar,RANK + 1> test_obs_ptr = TensorPtr<Scalar,RANK + 1>(new Tensor<Scalar,RANK + 1>(5, 32, 32, 3));
+	TensorPtr<Scalar,RANK + 1> test_obj_ptr = TensorPtr<Scalar,RANK + 1>(new Tensor<Scalar,RANK + 1>(5, 1, 1, 1));
 	test_obs_ptr->setRandom();
 	test_obj_ptr->setRandom();
 	InMemoryDataProvider<Scalar,RANK> test_prov(std::move(test_obs_ptr), std::move(test_obj_ptr));
@@ -84,7 +84,7 @@ int main() {
 	LossSharedPtr<Scalar,RANK> loss(new QuadraticLoss<Scalar,RANK>());
 	RegPenSharedPtr<Scalar> reg(new ElasticNetRegularizationPenalty<Scalar>());
 	NadamOptimizer<Scalar,RANK> opt(loss, reg, 20);
-//	std::cout << opt.verify_gradients(nn, test_prov) << std::endl;
-	opt.optimize(nn, training_prov, test_prov, 500);
+	std::cout << opt.verify_gradients(nn, test_prov) << std::endl;
+//	opt.optimize(nn, training_prov, test_prov, 500);
 	return 0;
 };

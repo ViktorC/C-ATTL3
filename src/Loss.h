@@ -33,16 +33,14 @@ class QuadraticLoss : public Loss<Scalar,Rank> {
 public:
 	inline ColVector<Scalar> function(const Tensor<Scalar,Rank + 1>& out, const Tensor<Scalar,Rank + 1>& obj) const {
 		assert(Utils<Scalar>::template get_dims<Rank + 1>(out) == Utils<Scalar>::template get_dims<Rank + 1>(obj));
-		assert((Rank < 2 || out.dimension(2) == 1) && (Rank < 3 || out.dimension(3) == 1));
 		return (Utils<Scalar>::template map_tensor_to_mat<Rank + 1>(out) - Utils<Scalar>::template map_tensor_to_mat<Rank + 1>(obj))
 				.array().square().rowwise().sum();
 	};
 	inline Tensor<Scalar,Rank + 1> d_function(const Tensor<Scalar,Rank + 1>& out, const Tensor<Scalar,Rank + 1>& obj) const {
 		assert(Utils<Scalar>::template get_dims<Rank + 1>(out) == Utils<Scalar>::template get_dims<Rank + 1>(obj));
-		assert((Rank < 2 || out.dimension(2) == 1) && (Rank < 3 || out.dimension(3) == 1));
 		return Utils<Scalar>::template map_mat_to_tensor<Rank + 1>((2 * (Utils<Scalar>::template map_tensor_to_mat<Rank + 1>(out) -
-				Utils<Scalar>::template map_tensor_to_mat<Rank + 1>(obj))).eval(), Utils<Scalar>::template get_dims<Rank + 1>(out)
-				.demote());
+				Utils<Scalar>::template map_tensor_to_mat<Rank + 1>(obj))).eval(),
+				Utils<Scalar>::template get_dims<Rank + 1>(out).demote());
 	}
 };
 
@@ -56,7 +54,6 @@ public:
 		squared(squared) { };
 	inline ColVector<Scalar> function(const Tensor<Scalar,Rank + 1>& out, const Tensor<Scalar,Rank + 1>& obj) const {
 		assert(Utils<Scalar>::template get_dims<Rank + 1>(out) == Utils<Scalar>::template get_dims<Rank + 1>(obj));
-		assert((Rank < 2 || out.dimension(2) == 1) && (Rank < 3 || out.dimension(3) == 1));
 		Matrix<Scalar> out_mat = Utils<Scalar>::template map_tensor_to_mat<Rank + 1>(out);
 		Matrix<Scalar> obj_mat = Utils<Scalar>::template map_tensor_to_mat<Rank + 1>(obj);
 		ColVector<Scalar> loss(out_mat.rows());
@@ -86,7 +83,6 @@ public:
 	};
 	inline Tensor<Scalar,Rank + 1> d_function(const Tensor<Scalar,Rank + 1>& out, const Tensor<Scalar,Rank + 1>& obj) const {
 		assert(Utils<Scalar>::template get_dims<Rank + 1>(out) == Utils<Scalar>::template get_dims<Rank + 1>(obj));
-		assert((Rank < 2 || out.dimension(2) == 1) && (Rank < 3 || out.dimension(3) == 1));
 		Matrix<Scalar> out_mat = Utils<Scalar>::template map_tensor_to_mat<Rank + 1>(out);
 		Matrix<Scalar> obj_mat = Utils<Scalar>::template map_tensor_to_mat<Rank + 1>(obj);
 		Matrix<Scalar> out_grads(out_mat.rows(), out_mat.cols());
@@ -118,8 +114,8 @@ public:
 			}
 			out_grads(i,correct_class_ind) = -total_out_grad;
 		}
-		return Utils<Scalar>::template map_mat_to_tensor<Rank + 1>(out_grads, Utils<Scalar>::template get_dims<Rank + 1>(out)
-				.demote());
+		return Utils<Scalar>::template map_mat_to_tensor<Rank + 1>(out_grads,
+				Utils<Scalar>::template get_dims<Rank + 1>(out).demote());
 	};
 private:
 	bool squared;
@@ -135,16 +131,14 @@ public:
 		epsilon(epsilon) { };
 	inline ColVector<Scalar> function(const Tensor<Scalar,Rank + 1>& out, const Tensor<Scalar,Rank + 1>& obj) const {
 		assert(Utils<Scalar>::template get_dims<Rank + 1>(out) == Utils<Scalar>::template get_dims<Rank + 1>(obj));
-		assert((Rank < 2 || out.dimension(2) == 1) && (Rank < 3 || out.dimension(3) == 1));
-		return (Utils<Scalar>::template map_tensor_to_mat<Rank + 1>(out).array().log() * Utils<Scalar>::template map_tensor_to_mat<Rank + 1>(obj).array())
-				.matrix().rowwise().sum() * -1;
+		return (Utils<Scalar>::template map_tensor_to_mat<Rank + 1>(out).array().log() *
+				Utils<Scalar>::template map_tensor_to_mat<Rank + 1>(obj).array()).matrix().rowwise().sum() * -1;
 	};
 	inline Tensor<Scalar,Rank + 1> d_function(const Tensor<Scalar,Rank + 1>& out, const Tensor<Scalar,Rank + 1>& obj) const {
 		assert(Utils<Scalar>::template get_dims<Rank + 1>(out) == Utils<Scalar>::template get_dims<Rank + 1>(obj));
-		assert((Rank < 2 || out.dimension(2) == 1) && (Rank < 3 || out.dimension(3) == 1));
 		return Utils<Scalar>::template map_mat_to_tensor<Rank + 1>((-Utils<Scalar>::template map_tensor_to_mat<Rank + 1>(obj).array() /
-				(Utils<Scalar>::template map_tensor_to_mat<Rank + 1>(out).array() + epsilon)).eval(), Utils<Scalar>::template get_dims<Rank + 1>(out)
-				.demote());
+				(Utils<Scalar>::template map_tensor_to_mat<Rank + 1>(out).array() + epsilon)).eval(),
+				Utils<Scalar>::template get_dims<Rank + 1>(out).demote());
 	}
 private:
 	Scalar epsilon;
@@ -160,7 +154,6 @@ public:
 		squared(squared) { };
 	inline ColVector<Scalar> function(const Tensor<Scalar,Rank + 1>& out, const Tensor<Scalar,Rank + 1>& obj) const {
 		assert(Utils<Scalar>::template get_dims<Rank + 1>(out) == Utils<Scalar>::template get_dims<Rank + 1>(obj));
-		assert((Rank < 2 || out.dimension(2) == 1) && (Rank < 3 || out.dimension(3) == 1));
 		Matrix<Scalar> out_mat = Utils<Scalar>::template map_tensor_to_mat<Rank + 1>(out);
 		Matrix<Scalar> obj_mat = Utils<Scalar>::template map_tensor_to_mat<Rank + 1>(obj);
 		ColVector<Scalar> loss(out_mat.rows());
@@ -178,7 +171,6 @@ public:
 	};
 	inline Tensor<Scalar,Rank + 1> d_function(const Tensor<Scalar,Rank + 1>& out, const Tensor<Scalar,Rank + 1>& obj) const {
 		assert(Utils<Scalar>::template get_dims<Rank + 1>(out) == Utils<Scalar>::template get_dims<Rank + 1>(obj));
-		assert((Rank < 2 || out.dimension(2) == 1) && (Rank < 3 || out.dimension(3) == 1));
 		Matrix<Scalar> out_mat = Utils<Scalar>::template map_tensor_to_mat<Rank + 1>(out);
 		Matrix<Scalar> obj_mat = Utils<Scalar>::template map_tensor_to_mat<Rank + 1>(obj);
 		Matrix<Scalar> out_grads(out_mat.rows(), out_mat.cols());
@@ -194,8 +186,8 @@ public:
 					out_grads(i,j) = 0;
 			}
 		}
-		return Utils<Scalar>::template map_mat_to_tensor<Rank + 1>(out_grads, Utils<Scalar>::template get_dims<Rank + 1>(out)
-				.demote());
+		return Utils<Scalar>::template map_mat_to_tensor<Rank + 1>(out_grads,
+				Utils<Scalar>::template get_dims<Rank + 1>(out).demote());
 	};
 private:
 	bool squared;
@@ -211,7 +203,6 @@ public:
 		epsilon(epsilon) { };
 	inline ColVector<Scalar> function(const Tensor<Scalar,Rank + 1>& out, const Tensor<Scalar,Rank + 1>& obj) const {
 		assert(Utils<Scalar>::template get_dims<Rank + 1>(out) == Utils<Scalar>::template get_dims<Rank + 1>(obj));
-		assert((Rank < 2 || out.dimension(2) == 1) && (Rank < 3 || out.dimension(3) == 1));
 		Matrix<Scalar> out_mat = Utils<Scalar>::template map_tensor_to_mat<Rank + 1>(out);
 		Matrix<Scalar> obj_mat = Utils<Scalar>::template map_tensor_to_mat<Rank + 1>(obj);
 		ColVector<Scalar> loss(out_mat.rows());
@@ -229,7 +220,6 @@ public:
 	};
 	inline Tensor<Scalar,Rank + 1> d_function(const Tensor<Scalar,Rank + 1>& out, const Tensor<Scalar,Rank + 1>& obj) const {
 		assert(Utils<Scalar>::template get_dims<Rank + 1>(out) == Utils<Scalar>::template get_dims<Rank + 1>(obj));
-		assert((Rank < 2 || out.dimension(2) == 1) && (Rank < 3 || out.dimension(3) == 1));
 		Matrix<Scalar> out_mat = Utils<Scalar>::template map_tensor_to_mat<Rank + 1>(out);
 		Matrix<Scalar> obj_mat = Utils<Scalar>::template map_tensor_to_mat<Rank + 1>(obj);
 		int rows = out_mat.rows();
@@ -244,8 +234,8 @@ public:
 				out_grads(i,j) = 1 / (denominator * rows);
 			}
 		}
-		return Utils<Scalar>::template map_mat_to_tensor<Rank + 1>(out_grads, Utils<Scalar>::template get_dims<Rank + 1>(out)
-				.demote());
+		return Utils<Scalar>::template map_mat_to_tensor<Rank + 1>(out_grads,
+				Utils<Scalar>::template get_dims<Rank + 1>(out).demote());
 	}
 private:
 	Scalar epsilon;

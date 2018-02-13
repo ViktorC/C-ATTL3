@@ -208,7 +208,7 @@ protected:
 		assert(out_grads.dimension(0));
 		assert(output_dims == Utils<Scalar>::template get_dims<Rank + 1>(out_grads).demote());
 		for (int i = layers.size() - 1; i >= 0; i--) {
-			Layer<Scalar,Rank>& layer = *(layers[i]);
+			Layer<Scalar,Rank>& layer = *layers[i];
 			out_grads = NeuralNetwork<Scalar,Rank>::pass_back(layer, std::move(out_grads));
 			NeuralNetwork<Scalar,Rank>::empty_cache(layer);
 		}
