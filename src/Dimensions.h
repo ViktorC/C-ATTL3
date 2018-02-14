@@ -79,44 +79,44 @@ public:
 	};
 	template<typename OtherDerived>
 	inline BinaryRankWiseDimExpression<IndexType,Rank,Self,Other<OtherDerived>,SumOp<IndexType>>
-	add_along_rank(const Other<OtherDerived>& dims, size_t rank) {
+	add_along_rank(const Other<OtherDerived>& dims, size_t rank) const {
 		return BinaryRankWiseDimExpression<IndexType,Rank,Self,
 				Other<OtherDerived>,SumOp<IndexType>>(*this, dims, rank);
 	};
 	template<typename OtherDerived>
 	inline BinaryRankWiseDimExpression<IndexType,Rank,Self,Other<OtherDerived>,SubOp<IndexType>>
-	subtract_along_rank(const Other<OtherDerived>& dims, size_t rank) {
+	subtract_along_rank(const Other<OtherDerived>& dims, size_t rank) const {
 		return BinaryRankWiseDimExpression<IndexType,Rank,Self,
 				Other<OtherDerived>,SubOp<IndexType>>(*this, dims, rank);
 	};
 	template<typename OtherDerived>
 	inline BinaryDimExpression<IndexType,Rank,Self,Other<OtherDerived>,SumOp<IndexType>>
-	operator+(const Other<OtherDerived>& dims) {
+	operator+(const Other<OtherDerived>& dims) const {
 		return BinaryDimExpression<IndexType,Rank,Self,Other<OtherDerived>,SumOp<IndexType>>(*this, dims);
 	};
 	template<typename OtherDerived>
 	inline BinaryDimExpression<IndexType,Rank,Self,Other<OtherDerived>,SubOp<IndexType>>
-	operator-(const Other<OtherDerived>& dims) {
+	operator-(const Other<OtherDerived>& dims) const {
 		return BinaryDimExpression<IndexType,Rank,Self,Other<OtherDerived>,SubOp<IndexType>>(*this, dims);
 	};
 	inline UnaryDimExpression<IndexType,Rank,Self,SumOp<IndexType>>
-	operator+(const IndexType& n) {
+	operator+(const IndexType& n) const {
 		return UnaryDimExpression<IndexType,Rank,Self,SumOp<IndexType>>(*this, n);
 	};
 	inline UnaryDimExpression<IndexType,Rank,Self,SubOp<IndexType>>
-	operator-(const IndexType& n) {
+	operator-(const IndexType& n) const {
 		return UnaryDimExpression<IndexType,Rank,Self,SubOp<IndexType>>(*this, n);
 	};
 	inline UnaryDimExpression<IndexType,Rank,Self,DivOp<IndexType>>
-	operator/(const IndexType& n) {
+	operator/(const IndexType& n) const {
 		return UnaryDimExpression<IndexType,Rank,Self,DivOp<IndexType>>(*this, n);
 	};
 	inline UnaryDimExpression<IndexType,Rank,Self,MulOp<IndexType>>
-	operator*(const IndexType& n) {
+	operator*(const IndexType& n) const {
 		return UnaryDimExpression<IndexType,Rank,Self,MulOp<IndexType>>(*this, n);
 	};
 	inline friend UnaryDimExpression<IndexType,Rank,Self,MulOp<IndexType>>
-	operator*(const IndexType& n, Self& dims) {
+	operator*(const IndexType& n, const Self& dims) {
 		return UnaryDimExpression<IndexType,Rank,Self,MulOp<IndexType>>(dims, n);
 	};
 	template<typename OtherDerived, typename OtherIndexType, size_t OtherRank>
@@ -141,7 +141,7 @@ template<typename IndexType, size_t Rank, typename LhsExpr, typename OpType>
 class UnaryDimExpression :
 		public DimExpression<UnaryDimExpression<IndexType,Rank,LhsExpr,OpType>,IndexType,Rank> {
 public:
-	inline UnaryDimExpression(LhsExpr& lhs, const IndexType& rhs) :
+	inline UnaryDimExpression(const LhsExpr& lhs, const IndexType& rhs) :
 			lhs(lhs),
 			rhs(rhs) { };
 	inline IndexType operator()(size_t i) const {
@@ -179,7 +179,7 @@ public:
 			lhs(lhs),
 			rhs(rhs),
 			rank(rank) {
-		assert(rank <= Rank);
+		assert(rank < Rank);
 	};
 	inline IndexType operator()(size_t i) const {
 		if (i < 0 || i >= Rank)
@@ -215,15 +215,17 @@ public:
 		for (size_t i = 0; i < Rank; i++)
 			values[i] = dims(i);
 	};
-	inline Dimensions<IndexType,Rank + 1> promote() const {
-		Dimensions<IndexType,Rank + 1> promoted;
-		std::copy(values.begin(), values.end(), promoted.values.begin() + 1);
+	template<size_t Ranks = 1>
+	inline Dimensions<IndexType,Rank + Ranks> promote() const {
+		Dimensions<IndexType,Rank + Ranks> promoted;
+		std::copy(values.begin(), values.end(), promoted.values.begin() + Ranks);
 		return promoted;
 	};
-	inline Dimensions<IndexType,Rank - 1> demote() const {
-		static_assert(Rank > 1, "rank must be greater than 1 for demotion");
-		Dimensions<IndexType,Rank - 1> demoted;
-		std::copy(values.begin() + 1, values.end(), demoted.values.begin());
+	template<size_t Ranks = 1>
+	inline Dimensions<IndexType,Rank - Ranks> demote() const {
+		static_assert(Rank > Ranks, "rank must be greater than the number of ranks to demote by");
+		Dimensions<IndexType,Rank - Ranks> demoted;
+		std::copy(values.begin() + Ranks, values.end(), demoted.values.begin());
 		return demoted;
 	};
 	inline IndexType operator()(size_t i) const {

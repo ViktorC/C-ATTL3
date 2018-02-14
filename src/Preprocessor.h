@@ -21,18 +21,21 @@
 
 namespace cattle {
 
-template<typename Scalar, size_t Rank>
+template<typename Scalar, size_t Rank, bool Sequential>
 class Preprocessor {
 	static_assert(std::is_floating_point<Scalar>::value, "non floating-point scalar type");
 	static_assert(Rank > 0 && Rank < 4, "illegal pre-processor rank");
+protected:
+	static constexpr size_t DATA_DIMS = Rank + !Sequential + 1;
 public:
 	virtual ~Preprocessor() = default;
-	virtual void fit(const Tensor<Scalar,Rank + 1>& data) = 0;
-	virtual void transform(Tensor<Scalar,Rank + 1>& data) const = 0;
+	virtual void fit(const Tensor<Scalar,DATA_DIMS>& data) = 0;
+	virtual void transform(Tensor<Scalar,DATA_DIMS>& data) const = 0;
 };
 
-template<typename Scalar, size_t Rank>
-class NormalizationPreprocessor : public Preprocessor<Scalar,Rank> {
+template<typename Scalar, size_t Rank, bool Sequential>
+class NormalizationPreprocessor : public Preprocessor<Scalar,Rank,Sequential> {
+	typedef Preprocessor<Scalar,Rank,Sequential> Base;
 public:
 	NormalizationPreprocessor(bool standardize = false, Scalar epsilon = Utils<Scalar>::EPSILON2) :
 			standardize(standardize),
@@ -40,25 +43,25 @@ public:
 		assert(epsilon > 0 && "epsilon must be greater than 0");
 	};
 	virtual ~NormalizationPreprocessor() = default;
-	inline virtual void fit(const Tensor<Scalar,Rank + 1>& data) {
+	inline virtual void fit(const Tensor<Scalar,Base::DATA_DIMS>& data) {
 		int rows = data.dimension(0);
 		assert(rows > 0);
-		dims = Utils<Scalar>::template get_dims<Rank + 1>(data).demote();
-		Matrix<Scalar> data_mat = Utils<Scalar>::template map_tensor_to_mat<Rank + 1>(data);
+		dims = Utils<Scalar>::template get_dims<Base::DATA_DIMS>(data).demote<Base::DATA_DIMS - Rank>();
+		Matrix<Scalar> data_mat = Utils<Scalar>::template map_tensor_to_mat<Base::DATA_DIMS>(data);
 		means = data_mat.colwise().mean();
 		if (standardize)
 			sd = (data_mat.rowwise() - means).array().square().colwise().mean().sqrt();
 	};
-	inline virtual void transform(Tensor<Scalar,Rank + 1>& data) const {
+	inline virtual void transform(Tensor<Scalar,Base::DATA_DIMS>& data) const {
 		int rows = data.dimension(0);
 		assert(rows > 0);
-		Dimensions<int,Rank> demoted_dims = Utils<Scalar>::template get_dims<Rank + 1>(data).demote();
+		Dimensions<int,Rank> demoted_dims = Utils<Scalar>::template get_dims<Base::DATA_DIMS>(data).demote<>();
 		assert(demoted_dims == dims && "mismatched fit and transform input tensor dimensions");
-		Matrix<Scalar> data_mat = Utils<Scalar>::template map_tensor_to_mat<Rank + 1>(std::move(data));
+		Matrix<Scalar> data_mat = Utils<Scalar>::template map_tensor_to_mat<Base::DATA_DIMS>(std::move(data));
 		data_mat = data_mat.rowwise() - means;
 		if (standardize)
 			data_mat *= (sd.array() + epsilon).inverse().matrix().asDiagonal();
-		data = Utils<Scalar>::template map_mat_to_tensor<Rank + 1>(data_mat, demoted_dims);
+		data = Utils<Scalar>::template map_mat_to_tensor<Base::DATA_DIMS>(data_mat, demoted_dims);
 	};
 protected:
 	const bool standardize;
@@ -69,8 +72,9 @@ protected:
 };
 
 // Partial template specialization for batches of 3D tensors (with multiple channels).
-template<typename Scalar>
-class NormalizationPreprocessor<Scalar,3> {
+template<typename Scalar, bool Sequential>
+class NormalizationPreprocessor<Scalar,3,Sequential> {
+	typedef Preprocessor<Scalar,Rank,Sequential> Base;
 public:
 	NormalizationPreprocessor(bool standardize = false, Scalar epsilon = Utils<Scalar>::EPSILON2) :
 			standardize(standardize),
@@ -78,10 +82,10 @@ public:
 		assert(epsilon > 0 && "epsilon must be greater than 0");
 	};
 	virtual ~NormalizationPreprocessor() = default;
-	inline virtual void fit(const Tensor<Scalar,4>& data) {
+	inline virtual void fit(const Tensor<Scalar,Base::DATA_DIMS>& data) {
 		int rows = data.dimension(0);
 		assert(rows > 0);
-		dims = Utils<Scalar>::template get_dims<4>(data).demote();
+		dims = Utils<Scalar>::template get_dims<Base::DATA_DIMS>(data).demote<Base::DATA_DIMS - Rank>();
 		int depth = dims(2);
 		means = Matrix<Scalar>(depth, dims.get_volume() / depth);
 		sd = Matrix<Scalar>(means.rows(), means.cols());
@@ -98,7 +102,7 @@ public:
 	};
 	inline virtual void transform(Tensor<Scalar,4>& data) const {
 		int rows = data.dimension(0);
-		Dimensions<int,3> demoted_dims = Utils<Scalar>::template get_dims<4>(data).demote();
+		Dimensions<int,3> demoted_dims = Utils<Scalar>::template get_dims<4>(data).demote<>();
 		assert(demoted_dims == dims && "mismatched fit and transform input tensor dimensions");
 		assert(rows > 0);
 		int depth = data.dimension(3);
@@ -167,7 +171,7 @@ protected:
 	inline Tensor<Scalar,Rank + 1> _transform(Tensor<Scalar,Rank + 1> data, int i) const {
 		Dimensions<int,Rank> output_dims;
 		if (!reduce_dims)
-			output_dims = Utils<Scalar>::template get_dims<Rank + 1>(data).demote();
+			output_dims = Utils<Scalar>::template get_dims<Rank + 1>(data).demote<>();
 		Matrix<Scalar> data_mat = Utils<Scalar>::template map_tensor_to_mat<Rank + 1>(std::move(data));
 		data_mat *= ed_vec[i].eigen_basis;
 		if (whiten)
