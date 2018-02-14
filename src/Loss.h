@@ -51,7 +51,7 @@ public:
 		return Utils<Scalar>::template map_mat_to_tensor<Base::DATA_DIMS>((2 *
 				(Utils<Scalar>::template map_tensor_to_mat<Base::DATA_DIMS>(out) -
 				Utils<Scalar>::template map_tensor_to_mat<Base::DATA_DIMS>(obj))).eval(),
-				Utils<Scalar>::template get_dims<Base::DATA_DIMS>(out).demote<>());
+				Utils<Scalar>::template get_dims<Base::DATA_DIMS>(out).template demote<>());
 	}
 };
 
@@ -131,7 +131,7 @@ public:
 			out_grads(i,correct_class_ind) = -total_out_grad;
 		}
 		return Utils<Scalar>::template map_mat_to_tensor<Base::DATA_DIMS>(out_grads,
-				Utils<Scalar>::template get_dims<Base::DATA_DIMS>(out).demote<>());
+				Utils<Scalar>::template get_dims<Base::DATA_DIMS>(out).template demote<>());
 	};
 private:
 	bool squared;
@@ -161,7 +161,7 @@ public:
 		return Utils<Scalar>::template map_mat_to_tensor<Base::DATA_DIMS>(
 				(-Utils<Scalar>::template map_tensor_to_mat<Base::DATA_DIMS>(obj).array() /
 				(Utils<Scalar>::template map_tensor_to_mat<Base::DATA_DIMS>(out).array() + epsilon)).eval(),
-				Utils<Scalar>::template get_dims<Base::DATA_DIMS>(out).demote<>());
+				Utils<Scalar>::template get_dims<Base::DATA_DIMS>(out).template demote<>());
 	}
 private:
 	Scalar epsilon;
@@ -215,7 +215,7 @@ public:
 			}
 		}
 		return Utils<Scalar>::template map_mat_to_tensor<Base::DATA_DIMS>(out_grads,
-				Utils<Scalar>::template get_dims<Base::DATA_DIMS>(out).demote<>());
+				Utils<Scalar>::template get_dims<Base::DATA_DIMS>(out).template demote<>());
 	};
 private:
 	bool squared;
@@ -268,7 +268,7 @@ public:
 			}
 		}
 		return Utils<Scalar>::template map_mat_to_tensor<Base::DATA_DIMS>(out_grads,
-				Utils<Scalar>::template get_dims<Base::DATA_DIMS>(out).demote<>());
+				Utils<Scalar>::template get_dims<Base::DATA_DIMS>(out).template demote<>());
 	}
 private:
 	Scalar epsilon;

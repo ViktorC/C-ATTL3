@@ -133,7 +133,7 @@ public:
 		return equal;
 	};
 	inline friend std::ostream& operator<<(std::ostream& os, const Self& dims) {
-		return os << dims.to_string() << std::endl;
+		return os << dims.to_string();
 	};
 };
 

@@ -49,8 +49,9 @@ class InMemoryDataProvider : public DataProvider<Scalar,Rank,Sequential> {
 	static constexpr size_t SEQ_DIMS = Rank + Sequential;
 	static constexpr size_t DATA_DIMS = SEQ_DIMS + 1;
 	typedef Tensor<Scalar,DATA_DIMS> Data;
+	typedef TensorPtr<Scalar,Rank,Sequential> DataPtr;
 public:
-	InMemoryDataProvider(Data obs, Data obj, bool shuffle = true) :
+	InMemoryDataProvider(DataPtr obs, DataPtr obj, bool shuffle = true) :
 			obs(std::move(obs)),
 			obj(std::move(obj)),
 			offsets() {
@@ -61,8 +62,8 @@ public:
 		assert(this->obs->dimension(0) == this->obj->dimension(0) && "mismatched data and obj tensor row numbers");
 		Dimensions<int,DATA_DIMS> obs_dims = Utils<Scalar>::template get_dims<DATA_DIMS>(*this->obs);
 		Dimensions<int,DATA_DIMS> obj_dims = Utils<Scalar>::template get_dims<DATA_DIMS>(*this->obj);
-		this->obs_dims = obs_dims.demote<>();
-		this->obj_dims = obj_dims.demote<>();
+		this->obs_dims = obs_dims.template demote<>();
+		this->obj_dims = obj_dims.template demote<>();
 		rows = (size_t) this->obs->dimension(0);
 		offsets.fill(0);
 		data_extents = obs_dims;
@@ -97,8 +98,8 @@ public:
 		offsets[0] = 0;
 	};
 private:
-	Data obs;
-	Data obj;
+	DataPtr obs;
+	DataPtr obj;
 	Dimensions<int,SEQ_DIMS> obs_dims;
 	Dimensions<int,SEQ_DIMS> obj_dims;
 	size_t rows;

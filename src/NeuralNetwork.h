@@ -54,7 +54,7 @@ protected:
 	typedef Tensor<Scalar,DATA_DIMS> Data;
 public:
 	virtual ~NeuralNetwork() = default;
-	virtual NeuralNetwork<Scalar,Rank>* clone() const = 0;
+	virtual NeuralNetwork<Scalar,Rank,Sequential>* clone() const = 0;
 	virtual bool is_foremost() const = 0;
 	virtual Dimensions<int,SEQ_DIMS> get_input_dims() const = 0;
 	virtual Dimensions<int,SEQ_DIMS> get_output_dims() const = 0;
@@ -117,8 +117,8 @@ template<typename Scalar, size_t Rank>
 using LayerPtr = std::unique_ptr<Layer<Scalar,Rank>>;
 
 template<typename Scalar, size_t Rank>
-class FeedforwardNeuralNetwork : public NeuralNetwork<Scalar,Rank,true> {
-	typedef NeuralNetwork<Scalar,Rank,true> Base;
+class FeedforwardNeuralNetwork : public NeuralNetwork<Scalar,Rank,false> {
+	typedef NeuralNetwork<Scalar,Rank,false> Base;
 public:
 	/**
 	 * Constructs the network using the provided layer pointers. It takes ownership of the layer pointers.
@@ -200,7 +200,7 @@ protected:
 	};
 	inline typename Base::Data propagate(typename Base::Data input, bool training) {
 		Utils<Scalar>::template check_tensor_dims<Rank + 1>(input);
-		assert(input_dims == Utils<Scalar>::template get_dims<Rank + 1>(input).demote<>());
+		assert(input_dims == Utils<Scalar>::template get_dims<Rank + 1>(input).template demote<>());
 		for (unsigned i = 0; i < layers.size(); i++) {
 			Layer<Scalar,Rank>& layer = *layers[i];
 			input = Base::pass_forward(layer, std::move(input), training);
@@ -211,7 +211,7 @@ protected:
 	};
 	inline typename Base::Data backpropagate(typename Base::Data out_grads) {
 		Utils<Scalar>::template check_tensor_dims<Rank + 1>(out_grads);
-		assert(output_dims == Utils<Scalar>::template get_dims<Rank + 1>(out_grads).demote<>());
+		assert(output_dims == Utils<Scalar>::template get_dims<Rank + 1>(out_grads).template demote<>());
 		for (int i = layers.size() - 1; i >= 0; i--) {
 			Layer<Scalar,Rank>& layer = *layers[i];
 			out_grads = Base::pass_back(layer, std::move(out_grads));
@@ -337,7 +337,7 @@ using ActivationPtr = std::unique_ptr<ActivationLayer<Scalar,Rank>>;
 //	};
 //	inline Tensor<Scalar,3> propagate(Tensor<Scalar,3> input, bool training) {
 //		Utils<Scalar>::template check_tensor_dims<3>(input);
-//		assert(input_dims == Utils<Scalar>::template get_dims<3>(input).demote<>());
+//		assert(input_dims == Utils<Scalar>::template get_dims<3>(input).template demote<>());
 //		int samples = input.dimension(0);
 //		int time_steps = input.dimension(2);
 //		assert(time_steps == (int) seq_length);
@@ -378,7 +378,7 @@ using ActivationPtr = std::unique_ptr<ActivationLayer<Scalar,Rank>>;
 //	};
 //	inline Tensor<Scalar,3> backpropagate(Tensor<Scalar,3> out_grads) {
 //		Utils<Scalar>::template check_tensor_dims<3>(out_grads);
-//		assert(output_dims == Utils<Scalar>::template get_dims<3>(out_grads).demote<>());
+//		assert(output_dims == Utils<Scalar>::template get_dims<3>(out_grads).template demote<>());
 //
 //		return out_grads;
 //	};
@@ -414,17 +414,18 @@ public:
 		assert(this->lanes[0] != nullptr && "lanes contains null pointers");
 		Base& first_lane = *this->lanes[0];
 		const Dimensions<int,Base::SEQ_DIMS>& input_dims = first_lane.get_input_dims();
-		Dimensions<int,Base::SEQ_DIMS> output_dims = input_dims;
+		Dimensions<int,Base::SEQ_DIMS> output_dims = first_lane.get_output_dims();
 		for (unsigned i = 1; i < this->lanes.size(); i++) {
 			assert(this->lanes[i] != nullptr && "lanes contains null pointers");
 			Base& lane = *this->lanes[i];
+			assert(input_dims == lane.get_input_dims());
 			const Dimensions<int,Base::SEQ_DIMS>& lane_output_dims = lane.get_output_dims();
-			assert(output_dims == lane.get_input_dims() && output_dims(Sequential) == lane_output_dims(Sequential) &&
-					output_dims(Sequential + 1) == lane_output_dims(Sequential + 1) && "incompatible lane dimensions");
-			output_dims = output_dims.add_along_rank(lane_output_dims, Sequential + 3);
+			for (size_t i = 0; i < Base::SEQ_DIMS - 1; i++)
+				assert(output_dims(i) == lane_output_dims(i));
+			output_dims(Base::SEQ_DIMS - 1) += lane_output_dims(Base::SEQ_DIMS - 1);
 		}
 		set_foremost(foremost);
-		this->input_dims = input_dims;
+		this->input_dims = first_lane.get_input_dims();
 		this->output_dims = output_dims;
 	};
 	ParallelNeuralNetwork(Base&& lane, bool foremost = true) :
@@ -481,10 +482,10 @@ protected:
 	};
 	inline typename Base::Data propagate(typename Base::Data input, bool training) {
 		Utils<Scalar>::template check_tensor_dims<Base::DATA_DIMS>(input);
-		assert(input_dims == Utils<Scalar>::template get_dims<Base::DATA_DIMS>(input).demote<>());
+		assert(input_dims == Utils<Scalar>::template get_dims<Base::DATA_DIMS>(input).template demote<>());
 		int rows = input.dimension(0);
 		std::array<int,Base::DATA_DIMS> offsets;
-		std::array<int,Base::DATA_DIMS> extents = output_dims.promote<>();
+		std::array<int,Base::DATA_DIMS> extents = output_dims.template promote<>();
 		offsets.fill(0);
 		extents[0] = rows;
 		typename Base::Data out(extents);
@@ -524,14 +525,14 @@ protected:
 	};
 	inline typename Base::Data backpropagate(typename Base::Data out_grads) {
 		Utils<Scalar>::template check_tensor_dims<Base::DATA_DIMS>(out_grads);
-		assert(output_dims == Utils<Scalar>::template get_dims<Base::DATA_DIMS>(out_grads).demote<>());
+		assert(output_dims == Utils<Scalar>::template get_dims<Base::DATA_DIMS>(out_grads).template demote<>());
 		typename Base::Data prev_out_grads;
 		if (foremost)
 			prev_out_grads = Utils<Scalar>::template get_null_tensor<Base::DATA_DIMS>();
 		else {
-			Dimensions<int,Base::DATA_DIMS> input_dims = input_dims.promote<>();
-			input_dims(0) = out_grads.dimension(0);
-			prev_out_grads = typename Base::Data(input_dims);
+			Dimensions<int,Base::DATA_DIMS> prev_out_grads_dims = input_dims.template promote<>();
+			prev_out_grads_dims(0) = out_grads.dimension(0);
+			prev_out_grads = typename Base::Data(prev_out_grads_dims);
 			prev_out_grads.setZero();
 		}
 		unsigned lane_num = lanes.size();
@@ -587,7 +588,7 @@ private:
 		BackpropArgs& args = *((BackpropArgs*) args_ptr);
 		Base& lane = *args.obj->lanes[args.lane_id];
 		std::array<int,Base::DATA_DIMS> offsets;
-		std::array<int,Base::DATA_DIMS> extents = lane.get_output_dims().promote<>();
+		std::array<int,Base::DATA_DIMS> extents = lane.get_output_dims().template promote<>();
 		offsets.fill(0);
 		offsets[Base::SEQ_DIMS] = args.depth_offset;
 		extents[0] = args.out_grads->dimension(0);
@@ -694,14 +695,14 @@ protected:
 	};
 	inline typename Base::Data propagate(typename Base::Data input, bool training) {
 		Utils<Scalar>::template check_tensor_dims<Base::DATA_DIMS>(input);
-		assert(input_dims == Utils<Scalar>::template get_dims<Base::DATA_DIMS>(input).demote<>());
+		assert(input_dims == Utils<Scalar>::template get_dims<Base::DATA_DIMS>(input).template demote<>());
 		for (unsigned i = 0; i < blocks.size(); i++)
 			input = blocks[i]->propagate(std::move(input), training);
 		return input;
 	};
 	inline typename Base::Data backpropagate(typename Base::Data out_grads) {
 		Utils<Scalar>::template check_tensor_dims<Base::DATA_DIMS>(out_grads);
-		assert(output_dims == Utils<Scalar>::template get_dims<Base::DATA_DIMS>(out_grads).demote<>());
+		assert(output_dims == Utils<Scalar>::template get_dims<Base::DATA_DIMS>(out_grads).template demote<>());
 		for (int i = blocks.size() - 1; i >= 0; i--)
 			out_grads = blocks[i]->backpropagate(std::move(out_grads));
 		return out_grads;
@@ -775,7 +776,7 @@ protected:
 	};
 	inline typename Base::Data propagate(typename Base::Data input, bool training) {
 		Utils<Scalar>::template check_tensor_dims<Base::DATA_DIMS>(input);
-		assert(input_dims == Utils<Scalar>::template get_dims<Base::DATA_DIMS>(input).demote<>());
+		assert(input_dims == Utils<Scalar>::template get_dims<Base::DATA_DIMS>(input).template demote<>());
 		for (unsigned i = 0; i < modules.size(); i++) {
 			std::pair<Module,bool>& module = modules[i];
 			if (module.second) // If it is a residual module, propagate the sum of the input and the output.
@@ -787,7 +788,7 @@ protected:
 	};
 	inline Tensor<Scalar,Rank + 1> backpropagate(Tensor<Scalar,Rank + 1> out_grads) {
 		Utils<Scalar>::template check_tensor_dims<Base::DATA_DIMS>(out_grads);
-		assert(output_dims == Utils<Scalar>::template get_dims<Base::DATA_DIMS>(out_grads).demote<>());
+		assert(output_dims == Utils<Scalar>::template get_dims<Base::DATA_DIMS>(out_grads).template demote<>());
 		for (int i = modules.size() - 1; i >= 0; i--) {
 			std::pair<Module,bool>& module = modules[i];
 			if (module.second)
@@ -857,10 +858,10 @@ protected:
 	};
 	inline typename Base::Data propagate(typename Base::Data input, bool training) {
 		Utils<Scalar>::template check_tensor_dims<Base::DATA_DIMS>(input);
-		assert(input_dims == Utils<Scalar>::template get_dims<Base::DATA_DIMS>(input).demote<>());
+		assert(input_dims == Utils<Scalar>::template get_dims<Base::DATA_DIMS>(input).template demote<>());
 		int rows = input.dimension(0);
 		std::array<int,Base::DATA_DIMS> offsets;
-		std::array<int,Base::DATA_DIMS> extents = input_dims.promote<>();
+		std::array<int,Base::DATA_DIMS> extents = input_dims.template promote<>();
 		offsets.fill(0);
 		extents[0] = rows;
 		for (unsigned i = 0; i < modules.size(); i++) {
@@ -882,9 +883,9 @@ protected:
 	};
 	inline typename Base::Data backpropagate(typename Base::Data out_grads) {
 		Utils<Scalar>::template check_tensor_dims<Base::DATA_DIMS>(out_grads);
-		assert(output_dims == Utils<Scalar>::template get_dims<Base::DATA_DIMS>(out_grads).demote<>());
+		assert(output_dims == Utils<Scalar>::template get_dims<Base::DATA_DIMS>(out_grads).template demote<>());
 		std::array<int,Base::DATA_DIMS> offsets;
-		std::array<int,Base::DATA_DIMS> extents = input_dims.promote<>();
+		std::array<int,Base::DATA_DIMS> extents = input_dims.template promote<>();
 		offsets.fill(0);
 		extents[0] = out_grads.dimension(0);
 		for (int i = modules.size() - 1; i >= 0; i--) {

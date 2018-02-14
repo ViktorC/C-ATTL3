@@ -131,10 +131,8 @@ public:
 	};
 protected:
 	virtual void fit(Net& net) = 0;
-	virtual Scalar train(Net& net, Provider& training_prov,
-			unsigned epoch) = 0;
-	virtual Scalar test(Net& net, Provider& test_prov,
-			unsigned epoch) = 0;
+	virtual Scalar train(Net& net, Provider& training_prov, unsigned epoch) = 0;
+	virtual Scalar test(Net& net, Provider& test_prov, unsigned epoch) = 0;
 	inline static std::vector<Layer<Scalar,Rank>*> get_layers(Net& net) {
 		return net.get_layers();
 	};
@@ -182,7 +180,7 @@ protected:
 		std::vector<Layer<Scalar,Rank>*> layers = Base::get_layers(net);
 		// Perform an entire training epoch.
 		while (training_prov.has_more()) {
-			DataPair<Scalar,Rank> data_pair = training_prov.get_data(batch_size);
+			DataPair<Scalar,Rank,Sequential> data_pair = training_prov.get_data(batch_size);
 			typename Base::Data out = Base::propagate(net, std::move(data_pair.first));
 			training_loss += Base::loss->function(out, data_pair.second).sum();
 			/* Again, the loss on a batch is the mean of the losses on the observations in the batch and not their
@@ -199,13 +197,13 @@ protected:
 		}
 		return training_loss / instances;
 	};
-	inline Scalar test(typename Base::Net& net, typename Base::Net& test_prov, unsigned epoch) {
+	inline Scalar test(typename Base::Net& net, typename Base::Provider& test_prov, unsigned epoch) {
 		// TODO Handle overflow.
 		Scalar obj_loss = 0;
 		std::vector<Layer<Scalar,Rank>*> layers = Base::get_layers(net);
 		// Perform an entire test epoch.
 		while (test_prov.has_more()) {
-			DataPair<Scalar,Rank> data_pair = test_prov.get_data(batch_size);
+			DataPair<Scalar,Rank,Sequential> data_pair = test_prov.get_data(batch_size);
 			obj_loss += Base::loss->function(net.infer(std::move(data_pair.first)), data_pair.second).sum();
 		}
 		Scalar mean_obj_loss = obj_loss / test_prov.instances();

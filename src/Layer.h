@@ -76,7 +76,7 @@ public:
 		return output_dims;
 	};
 protected:
-	KernelLayer(const Dimension<int,Rank>& input_dims, Dimension<int,Rank> output_dims, WeightInitSharedPtr<Scalar> weight_init,
+	KernelLayer(const Dimensions<int,Rank>& input_dims, Dimensions<int,Rank> output_dims, WeightInitSharedPtr<Scalar> weight_init,
 			size_t weight_rows, size_t weight_cols, Scalar max_norm_constraint) :
 				input_dims(input_dims),
 				output_dims(output_dims),
@@ -132,7 +132,7 @@ protected:
 		biased_in = Matrix<Scalar>(0, 0);
 	};
 	inline DataBatch pass_forward(DataBatch in, bool training) {
-		assert(Utils<Scalar>::template get_dims<Rank + 1>(in).demote<>() == Base::input_dims);
+		assert(Utils<Scalar>::template get_dims<Rank + 1>(in).template demote<>() == Base::input_dims);
 		assert(in.dimension(0) > 0);
 		unsigned input_size = Base::input_dims.get_volume();
 		// Add a 1-column to the input for the bias trick.
@@ -142,7 +142,7 @@ protected:
 		return Utils<Scalar>::template map_mat_to_tensor<Rank + 1>((biased_in * Base::weights).eval(), Base::output_dims);
 	};
 	inline DataBatch pass_back(DataBatch out_grads) {
-		assert(Utils<Scalar>::template get_dims<Rank + 1>(out_grads).demote<>() == Base::output_dims);
+		assert(Utils<Scalar>::template get_dims<Rank + 1>(out_grads).template demote<>() == Base::output_dims);
 		assert(out_grads.dimension(0) > 0 && biased_in.rows() == out_grads.dimension(0));
 		Matrix<Scalar> out_grads_mat = Utils<Scalar>::template map_tensor_to_mat<Rank + 1>(std::move(out_grads));
 		// Compute the gradients of the outputs with respect to the weights.
@@ -195,7 +195,7 @@ protected:
 		biased_in_vec = std::vector<Matrix<Scalar>>(0);
 	};
 	inline DataBatch pass_forward(DataBatch in, bool training) {
-		assert(Utils<Scalar>::template get_dims<4>(in).demote<>() == Base::input_dims);
+		assert(Utils<Scalar>::template get_dims<4>(in).template demote<>() == Base::input_dims);
 		assert(in.dimension(0) > 0);
 		// Spatial padding.
 		std::array<std::pair<int,int>,4> paddings;
@@ -256,7 +256,7 @@ protected:
 		return out;
 	};
 	inline DataBatch pass_back(DataBatch out_grads) {
-		assert(Utils<Scalar>::template get_dims<4>(out_grads).demote<>() == Base::output_dims);
+		assert(Utils<Scalar>::template get_dims<4>(out_grads).template demote<>() == Base::output_dims);
 		assert(out_grads.dimension(0) > 0 && biased_in_vec.size() == (unsigned) out_grads.dimension(0));
 		int rows = out_grads.dimension(0);
 		int depth = Base::input_dims(2);
@@ -270,7 +270,7 @@ protected:
 		RankwiseArray strides({ 1, (int) dilation + 1, (int) dilation + 1, 1 });
 		DataBatch prev_out_grads(rows, padded_height, padded_width, depth);
 		prev_out_grads.setZero();
-		weight_grads.setZero(Base::weight_grads.rows(), Base::weight_grads.cols());
+		Base::weight_grads.setZero(Base::weight_grads.rows(), Base::weight_grads.cols());
 		for (int i = 0; i < rows; i++) {
 			out_grads_row_offsets[0] = i;
 			Matrix<Scalar> prev_out_grads_mat_i;
@@ -359,14 +359,14 @@ protected:
 	};
 	void enforce_constraints() { };
 	inline DataBatch pass_forward(DataBatch in, bool training) {
-		assert(Utils<Scalar>::template get_dims<Rank + 1>(in).demote<>() == dims);
+		assert(Utils<Scalar>::template get_dims<Rank + 1>(in).template demote<>() == dims);
 		assert(in.dimension(0) > 0);
 		this->in = Utils<Scalar>::template map_tensor_to_mat<Rank + 1>(std::move(in));
 		out = activate(this->in);
 		return Utils<Scalar>::template map_mat_to_tensor<Rank + 1>(out, dims);
 	};
 	inline DataBatch pass_back(DataBatch out_grads) {
-		assert(Utils<Scalar>::template get_dims<Rank + 1>(out_grads).demote<>() == dims);
+		assert(Utils<Scalar>::template get_dims<Rank + 1>(out_grads).template demote<>() == dims);
 		assert(out_grads.dimension(0) > 0 && out.rows() == out_grads.dimension(0));
 		if (Layer<Scalar,Rank>::is_input_layer())
 			return Utils<Scalar>::template get_null_tensor<Rank + 1>();
@@ -652,7 +652,7 @@ protected:
 	};
 	void enforce_constraints() { };
 	inline DataBatch pass_forward(DataBatch in, bool training) {
-		assert(Utils<Scalar>::template get_dims<4>(in).demote<>() == input_dims);
+		assert(Utils<Scalar>::template get_dims<4>(in).template demote<>() == input_dims);
 		assert(in.dimension(0) > 0);
 		rows = in.dimension(0);
 		int depth = input_dims(2);
@@ -680,7 +680,7 @@ protected:
 		return out;
 	};
 	inline DataBatch pass_back(DataBatch out_grads) {
-		assert(Utils<Scalar>::template get_dims<4>(out_grads).demote<>() == output_dims);
+		assert(Utils<Scalar>::template get_dims<4>(out_grads).template demote<>() == output_dims);
 		assert(out_grads.dimension(0) > 0 && rows == out_grads.dimension(0));
 		if (Layer<Scalar,3>::is_input_layer())
 			return Utils<Scalar>::template get_null_tensor<4>();
@@ -930,12 +930,12 @@ public:
 	};
 protected:
 	inline typename Base::DataBatch pass_forward(typename Base::DataBatch in, bool training) {
-		assert(Utils<Scalar>::template get_dims<Rank + 1>(in).demote<>() == Base::dims);
+		assert(Utils<Scalar>::template get_dims<Rank + 1>(in).template demote<>() == Base::dims);
 		assert(in.dimension(0) > 0);
 		return Base::_pass_forward(std::move(in), Base::dims, training, 0);
 	};
 	inline typename Base::DataBatch pass_back(typename Base::DataBatch out_grads) {
-		assert(Utils<Scalar>::template get_dims<Rank + 1>(out_grads).demote<>() == Base::dims);
+		assert(Utils<Scalar>::template get_dims<Rank + 1>(out_grads).template demote<>() == Base::dims);
 		assert(out_grads.dimension(0) > 0 && Base::cache_vec[0].std_in.rows() == out_grads.dimension(0));
 		return Base::_pass_back(std::move(out_grads), Base::dims, 0);
 	};
@@ -953,7 +953,7 @@ public:
 	};
 protected:
 	inline typename Base::DataBatch pass_forward(typename Base::DataBatch in, bool training) {
-		assert(Utils<Scalar>::template get_dims<4>(in).demote<>() == Base::dims);
+		assert(Utils<Scalar>::template get_dims<4>(in).template demote<>() == Base::dims);
 		assert(in.dimension(0) > 0);
 		if (Base::depth == 1)
 			return Base::_pass_forward(std::move(in), Base::dims, training, 0);
@@ -972,7 +972,7 @@ protected:
 		}
 	};
 	inline typename Base::DataBatch pass_back(typename Base::DataBatch out_grads) {
-		assert(Utils<Scalar>::template get_dims<4>(out_grads).demote<>() == Base::dims);
+		assert(Utils<Scalar>::template get_dims<4>(out_grads).template demote<>() == Base::dims);
 		assert(out_grads.dimension(0) > 0 && Base::cache_vec[0].std_in.rows() == out_grads.dimension(0));
 		if (Base::depth == 1)
 			return Base::_pass_back(std::move(out_grads), Base::dims, 0);
@@ -1035,7 +1035,7 @@ protected:
 	};
 	inline void enforce_constraints() { };
 	inline DataBatch pass_forward(DataBatch in, bool training) {
-		assert(Utils<Scalar>::template get_dims<Rank + 1>(in).demote<>() == dims);
+		assert(Utils<Scalar>::template get_dims<Rank + 1>(in).template demote<>() == dims);
 		assert(in.dimension(0) > 0);
 		if (training && dropout) {
 			Matrix<Scalar> in_mat = Utils<Scalar>::template map_tensor_to_mat<Rank + 1>(std::move(in));
@@ -1051,7 +1051,7 @@ protected:
 		return in;
 	};
 	inline DataBatch pass_back(DataBatch out_grads) {
-		assert(Utils<Scalar>::template get_dims<Rank + 1>(out_grads).demote<>() == dims);
+		assert(Utils<Scalar>::template get_dims<Rank + 1>(out_grads).template demote<>() == dims);
 		assert(out_grads.dimension(0) > 0 && dropout_mask.rows() == out_grads.dimension(0));
 		if (Layer<Scalar,Rank>::is_input_layer())
 			return Utils<Scalar>::template get_null_tensor<Rank + 1>();
