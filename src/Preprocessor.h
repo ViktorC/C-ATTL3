@@ -51,9 +51,9 @@ public:
 	};
 	inline virtual void transform(Tensor<Scalar,Rank + 1>& data) const {
 		int rows = data.dimension(0);
+		assert(rows > 0);
 		Dimensions<int,Rank> demoted_dims = Utils<Scalar>::template get_dims<Rank + 1>(data).demote();
 		assert(demoted_dims == dims && "mismatched fit and transform input tensor dimensions");
-		assert(rows > 0);
 		Matrix<Scalar> data_mat = Utils<Scalar>::template map_tensor_to_mat<Rank + 1>(std::move(data));
 		data_mat = data_mat.rowwise() - means;
 		if (standardize)
@@ -164,12 +164,16 @@ protected:
 		if (whiten) // The eigen values are only needed if whitening is enabled.
 			ed_vec[i].eigen_values = eigen_values.bottomRows(dims_to_retain).transpose();
 	};
-	inline Tensor<Scalar,Rank + 1> _transform(Tensor<Scalar,Rank + 1> data, const Dimensions<int,Rank>& output_dims,
-			int i) const {
+	inline Tensor<Scalar,Rank + 1> _transform(Tensor<Scalar,Rank + 1> data, int i) const {
+		Dimensions<int,Rank> output_dims;
+		if (!reduce_dims)
+			output_dims = Utils<Scalar>::template get_dims<Rank + 1>(data).demote();
 		Matrix<Scalar> data_mat = Utils<Scalar>::template map_tensor_to_mat<Rank + 1>(std::move(data));
 		data_mat *= ed_vec[i].eigen_basis;
 		if (whiten)
 			data_mat *= (ed_vec[i].eigen_values.array() + Base::epsilon).sqrt().inverse().matrix().asDiagonal();
+		if (reduce_dims)
+			output_dims(0) = data_mat.cols();
 		return Utils<Scalar>::template map_mat_to_tensor<Rank + 1>(data_mat, output_dims);
 	};
 	bool whiten;
@@ -197,7 +201,7 @@ public:
 	};
 	inline void transform(Tensor<Scalar,Rank + 1>& data) const {
 		BaseBase::transform(data);
-		data = Base::_transform(std::move(data), Utils<Scalar>::template get_dims<Rank + 1>(data).demote(), 0);
+		data = Base::_transform(std::move(data), 0);
 	};
 };
 
@@ -227,16 +231,15 @@ public:
 		BaseBase::transform(data);
 		if (Base::reduce_dims) {
 			Dimensions<int,3> output_dims({ data.dimension(1) * data.dimension(2), 1, 1 });
-			data = Base::_transform(std::move(data), output_dims, 0);
+			data = Base::_transform(std::move(data), 0);
 		} else {
 			int rows = data.dimension(0);
-			Dimensions<int,3> slice_dims({ BaseBase::dims(0), BaseBase::dims(1), 1 });
 			std::array<int,4> offsets({ 0, 0, 0, 0 });
-			std::array<int,4> extents({ rows, slice_dims(0), slice_dims(1), slice_dims(2) });
+			std::array<int,4> extents({ rows, BaseBase::dims(0), BaseBase::dims(1), 1 });
 			for (int i = 0; i < BaseBase::dims(2); i++) {
 				offsets[3] = i;
 				Tensor<Scalar,4> data_slice_i = data.slice(offsets, extents);
-				data.slice(offsets, extents) = Base::_transform(std::move(data_slice_i), slice_dims, i);
+				data.slice(offsets, extents) = Base::_transform(std::move(data_slice_i), i);
 			}
 		}
 	};
