@@ -1,12 +1,12 @@
 /*
- * CppNN.h
+ * Cattle.h
  *
  *  Created on: 18.01.2018
  *      Author: Viktor Csomor
  */
 
-#ifndef INCLUDE_C_ATTL3_H_
-#define IINCLUDE_C_ATTL3_H_
+#ifndef INCLUDE_CATTLE_H_
+#define INCLUDE_CATTLE_H_
 
 #include <../src/DataProvider.h>
 #include <../src/Dimensions.h>
@@ -19,4 +19,4 @@
 #include <../src/Utils.h>
 #include <../src/WeightInitialization.h>
 
-#endif /* ININCLUDE_C_ATTL3_H_
+#endif /* INCLUDE_CATTLE_H_

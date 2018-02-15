@@ -52,12 +52,13 @@ protected:
 	static constexpr size_t SEQ_DIMS = Rank + Sequential;
 	static constexpr size_t DATA_DIMS = SEQ_DIMS + 1;
 	typedef Tensor<Scalar,DATA_DIMS> Data;
+	typedef Dimensions<int,SEQ_DIMS> Dims;
 public:
 	virtual ~NeuralNetwork() = default;
 	virtual NeuralNetwork<Scalar,Rank,Sequential>* clone() const = 0;
 	virtual bool is_foremost() const = 0;
-	virtual Dimensions<int,SEQ_DIMS> get_input_dims() const = 0;
-	virtual Dimensions<int,SEQ_DIMS> get_output_dims() const = 0;
+	virtual Dims get_input_dims() const = 0;
+	virtual Dims get_output_dims() const = 0;
 	virtual void init() {
 		std::vector<Layer<Scalar,Rank>*> layers = get_layers();
 		for (unsigned i = 0; i < layers.size(); i++)
@@ -119,6 +120,7 @@ using LayerPtr = std::unique_ptr<Layer<Scalar,Rank>>;
 template<typename Scalar, size_t Rank>
 class FeedforwardNeuralNetwork : public NeuralNetwork<Scalar,Rank,false> {
 	typedef NeuralNetwork<Scalar,Rank,false> Base;
+	typedef FeedforwardNeuralNetwork<Scalar,Rank> Self;
 public:
 	/**
 	 * Constructs the network using the provided layer pointers. It takes ownership of the layer pointers.
@@ -135,7 +137,7 @@ public:
 		Layer<Scalar,Rank>& first_layer = *(this->layers[0]);
 		input_dims = first_layer.get_input_dims();
 		output_dims = this->layers[this->layers.size() - 1]->get_output_dims();
-		Dimensions<int,Rank> prev_dims = first_layer.get_output_dims();
+		typename Base::Dims prev_dims = first_layer.get_output_dims();
 		for (unsigned i = 1; i < this->layers.size(); i++) {
 			assert(this->layers[i] != nullptr && "layers contains null pointers");
 			assert(prev_dims == this->layers[i]->get_input_dims() && "incompatible layer dimensions");
@@ -146,7 +148,7 @@ public:
 	FeedforwardNeuralNetwork(LayerPtr<Scalar,Rank> layer, bool foremost = true) :
 			FeedforwardNeuralNetwork(create_vector(std::move(layer)), foremost) { };
 	// Copy constructor.
-	FeedforwardNeuralNetwork(const FeedforwardNeuralNetwork<Scalar,Rank>& network) :
+	FeedforwardNeuralNetwork(const Self& network) :
 			layers(network.layers.size()) {
 		for (unsigned i = 0; i < layers.size(); i++)
 			layers[i] = LayerPtr<Scalar,Rank>(network.layers[i]->clone());
@@ -155,14 +157,14 @@ public:
 		output_dims = network.output_dims;
 	};
 	// Move constructor.
-	FeedforwardNeuralNetwork(FeedforwardNeuralNetwork<Scalar,Rank>&& network) {
+	FeedforwardNeuralNetwork(Self&& network) {
 		swap(*this, network);
 	};
 	// The smart pointers take care of deleting the layers.
 	~FeedforwardNeuralNetwork() = default;
 	/* The assignment uses the move or copy constructor to pass the parameter
 	 * based on whether it is an rvalue or an lvalue. */
-	FeedforwardNeuralNetwork<Scalar,Rank>& operator=(FeedforwardNeuralNetwork<Scalar,Rank> network) {
+	Self& operator=(Self network) {
 		swap(*this, network);
 		return *this;
 	};
@@ -172,15 +174,14 @@ public:
 	bool is_foremost() const {
 		return foremost;
 	};
-	Dimensions<int,Rank> get_input_dims() const {
+	typename Base::Dims get_input_dims() const {
 		return input_dims;
 	};
-	Dimensions<int,Rank> get_output_dims() const {
+	typename Base::Dims get_output_dims() const {
 		return output_dims;
 	};
 	// For the copy-and-swap idiom.
-	friend void swap(FeedforwardNeuralNetwork<Scalar,Rank>& network1,
-			FeedforwardNeuralNetwork<Scalar,Rank>& network2) {
+	friend void swap(Self& network1, Self& network2) {
 		using std::swap;
 		swap(network1.layers, network2.layers);
 		swap(network1.foremost, network2.foremost);
@@ -226,8 +227,8 @@ protected:
 	};
 	std::vector<LayerPtr<Scalar,Rank>> layers;
 	bool foremost;
-	Dimensions<int,Rank> input_dims;
-	Dimensions<int,Rank> output_dims;
+	typename Base::Dims input_dims;
+	typename Base::Dims output_dims;
 };
 
 template<typename Scalar, size_t Rank>
@@ -236,168 +237,204 @@ using KernelPtr = std::unique_ptr<KernelLayer<Scalar,Rank>>;
 template<typename Scalar, size_t Rank>
 using ActivationPtr = std::unique_ptr<ActivationLayer<Scalar,Rank>>;
 
-//template<typename Scalar, size_t Rank>
-//class RecurrentNeuralNetwork : public NeuralNetwork<Scalar,Rank,false> {
-//	typedef NeuralNetwork<Scalar,Rank,false> Base;
-//public:
-//	RecurrentNeuralNetwork(KernelPtr<Scalar,Rank> u_kernel, KernelPtr<Scalar,Rank> v_kernel, KernelPtr<Scalar,Rank> w_kernel,
-//			ActivationPtr<Scalar,Rank> state_act, ActivationPtr<Scalar,Rank> output_act, size_t seq_length,
-//			bool stateful = false, bool mul_integration = false, bool foremost = true) :
-//				u_kernel(std::move(u_kernel)),
-//				v_kernel(std::move(v_kernel)),
-//				w_kernel(std::move(w_kernel)),
-//				state_act(std::move(state_act)),
-//				output_act(std::move(output_act)),
-//				seq_length(seq_length),
-//				stateful(stateful),
-//				mul_integration(mul_integration),
-//				foremost(foremost),
-//				batch_size(-1) {
-//		assert(seq_length > 0);
-//		assert(this->u_kernel != nullptr);
-//		assert(this->v_kernel != nullptr);
-//		assert(this->w_kernel != nullptr);
-//		assert(this->state_act != nullptr);
-//		assert(this->output_act != nullptr);
-//		Dimensions<int,Rank> layer_input_dims = this->u_kernel->get_input_dims();
-//		Dimensions<int,Rank> layer_output_dims = this->u_kernel->get_output_dims();
-//		assert(layer_input_dims(1) == 1 && layer_output_dims(1) == 1);
-//		assert(layer_output_dims == this->w_kernel->get_output_dims());
-//		assert(layer_output_dims == this->v_kernel->get_input_dims());
-//		assert(layer_output_dims == this->state_act->get_input_dims());
-//		assert(this->w_kernel->get_input_dims() == this->w_kernel->get_output_dims());
-//		assert(this->output_act->get_input_dims() == this->v_kernel->get_output_dims());
-//		input_dims = Dimensions<int,Rank>({ layer_input_dims(0), seq_length });
-//		output_dims = Dimensions<int,Rank>({ layer_output_dims(0), seq_length });
-//		set_foremost(foremost);
-//	};
-//	// Copy constructor.
-//	RecurrentNeuralNetwork(const RecurrentNeuralNetwork<Scalar>& network) {
-//		u_kernel = KernelPtr<Scalar>(network.u_kernel->clone());
-//		v_kernel = KernelPtr<Scalar>(network.v_kernel->clone());
-//		w_kernel = KernelPtr<Scalar>(network.w_kernel->clone());
-//		state_act = ActivationPtr<Scalar>(network.state_act->clone());
-//		output_act = ActivationPtr<Scalar>(network.output_act->clone());
-//		seq_length = network.seq_length;
-//		mul_integration = network.mul_integration;
-//		foremost = network.foremost;
-//		input_dims = network.input_dims;
-//		output_dims = network.output_dims;
-//		state = network.state;
-//	};
-//	RecurrentNeuralNetwork(RecurrentNeuralNetwork<Scalar>&& network) {
-//		swap(*this, network);
-//	};
-//	~RecurrentNeuralNetwork() = default;
-//	RecurrentNeuralNetwork<Scalar>& operator=(RecurrentNeuralNetwork<Scalar> network) {
-//		swap(*this, network);
-//		return *this;
-//	};
-//	Base* clone() const {
-//		return new RecurrentNeuralNetwork(*this);
-//	};
-//	bool is_foremost() const {
-//		return foremost;
-//	};
-//	Dimensions<int,1> get_input_dims() const {
-//		return input_dims;
-//	};
-//	Dimensions<int,1> get_output_dims() const {
-//		return output_dims;
-//	};
-//	// For the copy-and-swap idiom.
-//	friend void swap(RecurrentNeuralNetwork<Scalar>& network1,
-//			RecurrentNeuralNetwork<Scalar>& network2) {
-//		using std::swap;
-//		swap(network1.u_kernel, network2.u_kernel);
-//		swap(network1.v_kernel, network2.v_kernel);
-//		swap(network1.w_kernel, network2.w_kernel);
-//		swap(network1.state_act, network2.state_act);
-//		swap(network1.output_act, network2.output_act);
-//		swap(network1.seq_length, network2.seq_length);
-//		swap(network1.mul_integration, network2.mul_integration);
-//		swap(network1.foremost, network2.foremost);
-//		swap(network1.input_dims, network2.input_dims);
-//		swap(network1.output_dims, network2.output_dims);
-//		swap(network1.state, network2.state);
-//	};
-//protected:
-//	inline void set_foremost(bool foremost) {
-//		Base::set_input_layer(*w_kernel, foremost);
-//		this->foremost = foremost;
-//	};
-//	inline std::vector<Layer<Scalar,1>*> get_layers() {
-//		std::vector<Layer<Scalar,1>*> layers_raw(5);
-//		layers_raw[0] = u_kernel->get();
-//		layers_raw[1] = v_kernel->get();
-//		layers_raw[2] = w_kernel->get();
-//		layers_raw[3] = state_act->get();
-//		layers_raw[4] = output_act->get();
-//		return layers_raw;
-//	};
-//	inline Tensor<Scalar,3> propagate(Tensor<Scalar,3> input, bool training) {
-//		Utils<Scalar>::template check_tensor_dims<3>(input);
-//		assert(input_dims == Utils<Scalar>::template get_dims<3>(input).template demote<>());
-//		int samples = input.dimension(0);
-//		int time_steps = input.dimension(2);
-//		assert(time_steps == (int) seq_length);
-//		if (!stateful || samples != batch_size) {
-//			states = Tensor<2,Scalar>(samples, output_dims(0));
-//			states.setZero();
-//		}
-//		batch_size == samples;
-//		std::array<int,3> offsets({ 0, 0, 0 });
-//		std::array<int,3> input_extents({ samples, input_dims(0), 1 });
-//		std::array<int,3> output_extents({ samples, output_dims(0), 1 });
-//		Tensor<Scalar,3> out(samples, output_dims(1), time_steps);
-//		for (int i = 0; i < time_steps; i++) {
-//			offsets[2] = i;
-//			Tensor<Scalar,3> in_i = input.slice(offsets, input_extents);
-//			Tensor<Scalar,2> trans_in_i = Utils<Scalar>::template map_tensor_to_tensor<3,2>(std::move(in_i),
-//					Dimensions<int,2>({ samples, input_dims(0) }));
-//			Tensor<Scalar,2> out_i = Base::pass_forward(*u_kernel, std::move(trans_in_i), training);
-//			if (!training)
-//				Base::empty_cache(*u_kernel);
-//			if (mul_integration)
-//				out_i = out_i * Base::pass_forward(*w_kernel, states, training);
-//			else
-//				out_i += Base::pass_forward(*w_kernel, states, training);
-//			if (!training)
-//				Base::empty_cache(*w_kernel);
-//			states = Base::pass_forward(*state_act, std::move(out_i), training);
-//			if (!training)
-//				Base::empty_cache(*state_act);
-//			out_i = Base::pass_forward(*v_kernel, states, training);
-//			if (!training)
-//				Base::empty_cache(*v_kernel);
-//			out_i = Base::pass_forward(*output_act, std::move(input), training);
-//			if (!training)
-//				Base::empty_cache(*output_act);
-//			out.slice(offsets, output_extents) = out_i;
-//		}
-//	};
-//	inline Tensor<Scalar,3> backpropagate(Tensor<Scalar,3> out_grads) {
-//		Utils<Scalar>::template check_tensor_dims<3>(out_grads);
-//		assert(output_dims == Utils<Scalar>::template get_dims<3>(out_grads).template demote<>());
-//
-//		return out_grads;
-//	};
-//private:
-//	const KernelPtr<Scalar,Rank> u_kernel;
-//	const KernelPtr<Scalar,Rank> v_kernel;
-//	const KernelPtr<Scalar,Rank> w_kernel;
-//	const ActivationPtr<Scalar,Rank> state_act;
-//	const ActivationPtr<Scalar,Rank> output_act;
-//	const size_t seq_length;
-//	const bool stateful;
-//	const bool mul_integration;
-//	const bool foremost;
-//	const Dimensions<int,Rank + 1> input_dims;
-//	const Dimensions<int,Rank + 1> output_dims;
-//	// State.
-//	Tensor<Scalar,Rank + 1> states;
-//	int batch_size;
-//};
+template<typename Scalar, size_t Rank>
+class RecurrentNeuralNetwork : public NeuralNetwork<Scalar,Rank,true> {
+	typedef NeuralNetwork<Scalar,Rank,true> Base;
+	typedef RecurrentNeuralNetwork<Scalar,Rank> Self;
+public:
+	RecurrentNeuralNetwork(KernelPtr<Scalar,Rank> u_kernel, KernelPtr<Scalar,Rank> v_kernel,
+			KernelPtr<Scalar,Rank> w_kernel, ActivationPtr<Scalar,Rank> state_act, ActivationPtr<Scalar,Rank> output_act,
+			size_t input_seq_length, size_t output_seq_length, size_t output_seq_delay, bool stateful = false,
+			bool mul_integration = false, bool foremost = true) :
+				u_kernel(std::move(u_kernel)),
+				v_kernel(std::move(v_kernel)),
+				w_kernel(std::move(w_kernel)),
+				state_act(std::move(state_act)),
+				output_act(std::move(output_act)),
+				input_seq_length(input_seq_length),
+				output_seq_length(output_seq_length),
+				output_seq_delay(output_seq_delay),
+				stateful(stateful),
+				mul_integration(mul_integration),
+				foremost(foremost),
+				batch_size(-1) {
+		assert(input_seq_length > 0 && output_seq_length > 0 && output_seq_length + output_seq_delay >= input_seq_length &&
+				"illegal input-output sequence sizes");
+		assert(this->u_kernel && this->v_kernel && this->w_kernel && this->state_act && this->output_act);
+		typename Base::Dims layer_input_dims = this->u_kernel->get_input_dims();
+		typename Base::Dims layer_output_dims = this->u_kernel->get_output_dims();
+		assert(layer_output_dims == this->w_kernel->get_output_dims() &&
+				layer_output_dims == this->v_kernel->get_input_dims() &&
+				layer_output_dims == this->state_act->get_input_dims() &&
+				this->w_kernel->get_input_dims() == this->w_kernel->get_output_dims() &&
+				this->output_act->get_input_dims() == this->v_kernel->get_output_dims());
+		typename Base::Dims input_dims = layer_input_dims.template promote<>();
+		typename Base::Dims output_dims = layer_output_dims.template promote<>();
+		input_dims(0) = input_seq_length;
+		output_dims(0) = output_seq_length;
+		this->input_dims = input_dims;
+		this->output_dims = output_dims;
+		set_foremost(foremost);
+	};
+	// Copy constructor.
+	RecurrentNeuralNetwork(const Self& network) {
+		u_kernel = KernelPtr<Scalar,Rank>(network.u_kernel->clone());
+		v_kernel = KernelPtr<Scalar,Rank>(network.v_kernel->clone());
+		w_kernel = KernelPtr<Scalar,Rank>(network.w_kernel->clone());
+		state_act = ActivationPtr<Scalar,Rank>(network.state_act->clone());
+		output_act = ActivationPtr<Scalar,Rank>(network.output_act->clone());
+		input_seq_length = network.input_seq_length;
+		output_seq_length = network.output_seq_length;
+		output_seq_delay = network.output_seq_delay;
+		stateful = network.stateful;
+		mul_integration = network.mul_integration;
+		foremost = network.foremost;
+		input_dims = network.input_dims;
+		output_dims = network.output_dims;
+		state = network.state;
+	};
+	RecurrentNeuralNetwork(Self&& network) {
+		swap(*this, network);
+	};
+	~RecurrentNeuralNetwork() = default;
+	Self& operator=(Self network) {
+		swap(*this, network);
+		return *this;
+	};
+	Base* clone() const {
+		return new RecurrentNeuralNetwork(*this);
+	};
+	bool is_foremost() const {
+		return foremost;
+	};
+	typename Base::Dims get_input_dims() const {
+		return input_dims;
+	};
+	typename Base::Dims get_output_dims() const {
+		return output_dims;
+	};
+	// For the copy-and-swap idiom.
+	friend void swap(Self& network1, Self& network2) {
+		using std::swap;
+		swap(network1.u_kernel, network2.u_kernel);
+		swap(network1.v_kernel, network2.v_kernel);
+		swap(network1.w_kernel, network2.w_kernel);
+		swap(network1.state_act, network2.state_act);
+		swap(network1.output_act, network2.output_act);
+		swap(network1.input_seq_length, network2.input_seq_length);
+		swap(network1.output_seq_length, network2.output_seq_length);
+		swap(network1.output_seq_delay, network2.output_seq_delay);
+		swap(network1.stateful, network2.stateful);
+		swap(network1.mul_integration, network2.mul_integration);
+		swap(network1.foremost, network2.foremost);
+		swap(network1.input_dims, network2.input_dims);
+		swap(network1.output_dims, network2.output_dims);
+		swap(network1.state, network2.state);
+	};
+protected:
+	inline void set_foremost(bool foremost) {
+		Base::set_input_layer(*w_kernel, foremost);
+		this->foremost = foremost;
+	};
+	inline std::vector<Layer<Scalar,Rank>*> get_layers() {
+		std::vector<Layer<Scalar,Rank>*> layers_raw(5);
+		layers_raw[0] = u_kernel->get();
+		layers_raw[1] = v_kernel->get();
+		layers_raw[2] = w_kernel->get();
+		layers_raw[3] = state_act->get();
+		layers_raw[4] = output_act->get();
+		return layers_raw;
+	};
+	inline typename Base::Data propagate(typename Base::Data input, bool training) {
+		Utils<Scalar>::template check_tensor_dims<Base::DATA_DIMS>(input);
+		Dimensions<int,Base::DATA_DIMS> data_dims = Utils<Scalar>::template get_dims<Base::DATA_DIMS>(input);
+		assert(input_dims == data_dims.template demote<>());
+		int samples = data_dims(0);
+		if (!training || !stateful || samples != batch_size) {
+			Dimensions<int,Rank + 1> dims = u_kernel->get_output_dims().template promote<>();
+			dims(0) = samples;
+			state = Tensor<Scalar,Rank + 1>(dims);
+			state.setZero();
+		}
+		batch_size == samples;
+		std::array<int,Base::DATA_DIMS> offsets;
+		std::array<int,Base::DATA_DIMS> input_extents = data_dims;
+		std::array<int,Base::DATA_DIMS> output_extents = output_dims.template promote<>();
+		offsets.fill(0);
+		input_extents(1) = 1;
+		output_extents(0) = samples;
+		output_extents(1) = 1;
+		typename Base::Data out;
+		if (output_seq_length > 1) {
+			Dimensions<int,Base::DATA_DIMS> out_dims = output_dims.template promote<>();
+			out_dims(0) = samples;
+			out = typename Base::Data(out_dims);
+		}
+		int time_steps = output_seq_length + output_seq_delay;
+		for (int i = 0; i < time_steps; i++) {
+			offsets[1] = i;
+			if (i < input_seq_length) {
+				typename Base::Data in_i_seq = input.slice(offsets, input_extents);
+				Dimensions<int,Rank + 1> dims = input_dims;
+				dims(0) = samples;
+				Tensor<Scalar,Rank + 1> in_i = Base::pass_forward(*u_kernel,
+						Utils<Scalar>::template map_tensor_to_tensor<Base::DATA_DIMS,Rank + 1>(std::move(in_i_seq),
+								samples), training);
+				if (!training)
+					Base::empty_cache(*u_kernel);
+				if (mul_integration)
+					in_i *= Base::pass_forward(*w_kernel, state, training);
+				else
+					in_i += Base::pass_forward(*w_kernel, state, training);
+				if (!training)
+					Base::empty_cache(*w_kernel);
+				state = Base::pass_forward(*state_act, std::move(in_i), training);
+			} else
+				state = Base::pass_forward(*state_act, std::move(state), training);
+			if (!training)
+				Base::empty_cache(*state_act);
+			if (i >= output_seq_delay) {
+				Tensor<Scalar,Rank + 1> out_i = Base::pass_forward(*v_kernel, state, training);
+				if (!training)
+					Base::empty_cache(*v_kernel);
+				out_i = Base::pass_forward(*output_act, std::move(out_i), training);
+				if (!training)
+					Base::empty_cache(*output_act);
+				if (output_seq_length == 1 && i == time_steps - 1) {
+					Dimensions<int,Base::DATA_DIMS> out_dims = output_dims.template promote<>();
+					out_dims(0) = samples;
+					return Utils<Scalar>::template map_tensor_to_tensor<Rank + 1,Base::DATA_DIMS>(out_i,
+							out_dims);
+				} else
+					out.slice(offsets, output_extents) = out_i;
+			}
+		}
+		return out;
+	};
+	inline typename Base::Data backpropagate(typename Base::Data out_grads) {
+		Utils<Scalar>::template check_tensor_dims<Base::DATA_DIMS>(out_grads);
+		assert(output_dims == Utils<Scalar>::template get_dims<Base::DATA_DIMS>(out_grads).template demote<>());
+
+		return out_grads;
+	};
+private:
+	const KernelPtr<Scalar,Rank> u_kernel;
+	const KernelPtr<Scalar,Rank> v_kernel;
+	const KernelPtr<Scalar,Rank> w_kernel;
+	const ActivationPtr<Scalar,Rank> state_act;
+	const ActivationPtr<Scalar,Rank> output_act;
+	const size_t input_seq_length;
+	const size_t output_seq_length;
+	const size_t output_seq_delay;
+	const bool stateful;
+	const bool mul_integration;
+	const bool foremost;
+	const typename Base::Dims input_dims;
+	const typename Base::Dims output_dims;
+	// State.
+	Tensor<Scalar,Rank + 1> state;
+	int batch_size;
+};
 
 template<typename Scalar, size_t Rank, bool Sequential>
 using NeuralNetPtr = std::unique_ptr<NeuralNetwork<Scalar,Rank,Sequential>>;
@@ -413,13 +450,13 @@ public:
 		assert(this->lanes.size() > 0 && "lanes must contain at least 1 element");
 		assert(this->lanes[0] != nullptr && "lanes contains null pointers");
 		Base& first_lane = *this->lanes[0];
-		const Dimensions<int,Base::SEQ_DIMS>& input_dims = first_lane.get_input_dims();
-		Dimensions<int,Base::SEQ_DIMS> output_dims = first_lane.get_output_dims();
+		const typename Base::Dims& input_dims = first_lane.get_input_dims();
+		typename Base::Dims output_dims = first_lane.get_output_dims();
 		for (unsigned i = 1; i < this->lanes.size(); i++) {
 			assert(this->lanes[i] != nullptr && "lanes contains null pointers");
 			Base& lane = *this->lanes[i];
 			assert(input_dims == lane.get_input_dims());
-			const Dimensions<int,Base::SEQ_DIMS>& lane_output_dims = lane.get_output_dims();
+			const typename Base::Dims& lane_output_dims = lane.get_output_dims();
 			for (size_t i = 0; i < Base::SEQ_DIMS - 1; i++)
 				assert(output_dims(i) == lane_output_dims(i));
 			output_dims(Base::SEQ_DIMS - 1) += lane_output_dims(Base::SEQ_DIMS - 1);
@@ -452,10 +489,10 @@ public:
 	Base* clone() const {
 		return new ParallelNeuralNetwork(*this);
 	};
-	Dimensions<int,Base::SEQ_DIMS> get_input_dims() const {
+	typename Base::Dims get_input_dims() const {
 		return input_dims;
 	};
-	Dimensions<int,Base::SEQ_DIMS> get_output_dims() const {
+	typename Base::Dims get_output_dims() const {
 		return output_dims;
 	};
 	friend void swap(Self& network1, Self& network2) {
@@ -577,8 +614,8 @@ protected:
 private:
 	std::vector<Lane> lanes;
 	bool foremost;
-	Dimensions<int,Base::SEQ_DIMS> input_dims;
-	Dimensions<int,Base::SEQ_DIMS> output_dims;
+	typename Base::Dims input_dims;
+	typename Base::Dims output_dims;
 	static void* propagate(void* args_ptr) {
 		PropArgs& args = *((PropArgs*) args_ptr);
 		args.out = args.obj->lanes[args.lane_id]->propagate(*args.in, args.training);
@@ -631,7 +668,7 @@ public:
 		Base& first_block = *(this->blocks[0]);
 		input_dims = first_block.get_input_dims();
 		output_dims = this->blocks[this->blocks.size() - 1]->get_output_dims();
-		Dimensions<int,Rank> prev_dims = first_block.get_output_dims();
+		typename Base::Dims prev_dims = first_block.get_output_dims();
 		for (unsigned i = 1; i < this->blocks.size(); i++) {
 			assert(this->blocks[i] != nullptr && "blocks contains null pointers");
 			Base& block = *this->blocks[i];
@@ -666,10 +703,10 @@ public:
 	bool is_foremost() const {
 		return foremost;
 	};
-	Dimensions<int,Base::SEQ_DIMS> get_input_dims() const {
+	typename Base::Dims get_input_dims() const {
 		return input_dims;
 	};
-	Dimensions<int,Base::SEQ_DIMS> get_output_dims() const {
+	typename Base::Dims get_output_dims() const {
 		return output_dims;
 	};
 	friend void swap(Self& network1, Self& network2) {
@@ -715,8 +752,8 @@ protected:
 private:
 	std::vector<Block> blocks;
 	bool foremost;
-	Dimensions<int,Base::SEQ_DIMS> input_dims;
-	Dimensions<int,Base::SEQ_DIMS> output_dims;
+	typename Base::Dims input_dims;
+	typename Base::Dims output_dims;
 };
 
 /**
@@ -736,7 +773,7 @@ public:
 		input_dims = first_module.get_input_dims();
 		output_dims = this->modules[modules.size() - 1].first.get_output_dims();
 		first_module.set_foremost(foremost);
-		Dimensions<int,Base::SEQ_DIMS> prev_dims = input_dims;
+		typename Base::Dims prev_dims = input_dims;
 		for (unsigned i = 0; i < modules.size(); i++) {
 			std::pair<Module,bool>& module = this->modules[i];
 			Module& module_net = module.first;
@@ -754,10 +791,10 @@ public:
 	bool is_foremost() const {
 		return foremost;
 	};
-	Dimensions<int,Base::SEQ_DIMS> get_input_dims() const {
+	typename Base::Dims get_input_dims() const {
 		return input_dims;
 	};
-	Dimensions<int,Base::SEQ_DIMS> get_output_dims() const {
+	typename Base::Dims get_output_dims() const {
 		return output_dims;
 	};
 protected:
@@ -801,8 +838,8 @@ protected:
 private:
 	std::vector<std::pair<Module,bool>> modules;
 	bool foremost;
-	Dimensions<int,Base::SEQ_DIMS> input_dims;
-	Dimensions<int,Base::SEQ_DIMS> output_dims;
+	typename Base::Dims input_dims;
+	typename Base::Dims output_dims;
 };
 
 template<typename Scalar, bool Sequential>
@@ -816,13 +853,13 @@ public:
 		assert(this->modules.size() > 0 && "modules must contain at least 1 element");
 		Module& first_module = this->modules[0];
 		input_dims = first_module.get_input_dims();
-		Dimensions<int,Base::SEQ_DIMS> output_dims = first_module.get_output_dims()
+		typename Base::Dims output_dims = first_module.get_output_dims()
 				.add_along_rank(input_dims, Sequential + 2);
 		assert(input_dims(Sequential) == output_dims(Sequential) &&
 				input_dims(Sequential + 1) == output_dims(Sequential + 1));
 		for (unsigned i = 1; i < this->modules.size(); i++) {
 			Module& module = this->modules[i];
-			const Dimensions<int,Base::SEQ_DIMS>& module_input_dims = module.get_input_dims();
+			const typename Base::Dims& module_input_dims = module.get_input_dims();
 			assert(module_input_dims == output_dims && "incompatible module dimensions");
 			output_dims = output_dims.add_along_rank(module.get_output_dims(), Sequential + 2);
 			module.set_foremost(false);
@@ -836,10 +873,10 @@ public:
 	bool is_foremost() const {
 		return foremost;
 	};
-	Dimensions<int,Base::SEQ_DIMS> get_input_dims() const {
+	typename Base::Dims get_input_dims() const {
 		return input_dims;
 	};
-	Dimensions<int,Base::SEQ_DIMS> get_output_dims() const {
+	typename Base::Dims get_output_dims() const {
 		return output_dims;
 	};
 protected:
@@ -904,8 +941,8 @@ protected:
 	};
 	std::vector<Module> modules;
 	bool foremost;
-	Dimensions<int,Base::SEQ_DIMS> input_dims;
-	Dimensions<int,Base::SEQ_DIMS> output_dims;
+	typename Base::Dims input_dims;
+	typename Base::Dims output_dims;
 };
 
 } /* namespace cattle */

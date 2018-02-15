@@ -18,6 +18,9 @@
 
 namespace cattle {
 
+// TODO Switch to column-first iteration.
+// TODO CTC loss.
+
 template<typename Scalar, size_t Rank, bool Sequential>
 class Loss {
 	static_assert(std::is_floating_point<Scalar>::value, "non floating-point scalar type");

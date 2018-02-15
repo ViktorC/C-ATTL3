@@ -22,7 +22,7 @@
 namespace cattle {
 
 /**
- * NOTE: Expression templates are absolutely unwarranted for this class as its objects are very unlikely to
+ * NOTE: Expression templates are unwarranted for this class as its objects are very unlikely to
  * be used in complex expressions. They have only been implemented for the sake of practical learning.
  */
 

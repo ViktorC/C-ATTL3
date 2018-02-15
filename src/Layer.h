@@ -231,8 +231,8 @@ protected:
 					patch_offsets[1] = j;
 					for (int k = 0; k <= width_rem; k += stride) {
 						patch_offsets[2] = k;
-						// If the patch is dilated, skip the internal padding when stretching it into a row.
 						DataBatch patch;
+						// If the patch is dilated, skip the 'internal padding' when stretching it into a row.
 						if (dilation > 0)
 							patch = padded_in.slice(patch_offsets, patch_extents).stride(dil_strides);
 						else
@@ -241,7 +241,7 @@ protected:
 					}
 				}
 				assert(patch_ind == patches);
-				// Set the additional column's elements to 1.
+				// Set the appended column's elements to 1.
 				biased_in_vec[i] = Matrix<Scalar>(patches, receptor_vol + 1);
 				Matrix<Scalar>& biased_in = biased_in_vec[i];
 				biased_in.col(receptor_vol).setOnes();
@@ -886,6 +886,8 @@ protected:
 		int rows = out_grads.dimension(0);
 		Cache& cache = cache_vec[i];
 		Matrix<Scalar> std_in_grads_i;
+		/* Back-propagate the gradient through the batch normalization 'function' and also calculate the
+		 * gradients on the betas and gammas. */
 		{ // Manage memory by scope restriction.
 			Matrix<Scalar> out_grads_ch_map_i = Utils<Scalar>::template map_tensor_to_mat<Rank + 1>(std::move(out_grads));
 			param_grads.row(2 * i) = out_grads_ch_map_i.cwiseProduct(cache.std_in).colwise().sum();
@@ -984,8 +986,6 @@ protected:
 			Dimensions<int,3> slice_dims({ Base::dims(0), Base::dims(1), 1 });
 			std::array<int,4> offsets({ 0, 0, 0, 0 });
 			std::array<int,4> extents({ rows, slice_dims(0), slice_dims(1), slice_dims(2) });
-			/* Back-propagate the gradient through the batch normalization 'function' and also calculate the
-			 * gradients on the betas and gammas. */
 			for (int i = 0; i < Base::depth; i++) {
 				offsets[3] = i;
 				typename Base::DataBatch out_grads_slice_i = out_grads.slice(offsets, extents);

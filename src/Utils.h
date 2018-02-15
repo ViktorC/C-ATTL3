@@ -52,6 +52,7 @@ public:
 	static const Tensor<Scalar,2> NULL_TENSOR2;
 	static const Tensor<Scalar,3> NULL_TENSOR3;
 	static const Tensor<Scalar,4> NULL_TENSOR4;
+	static const Tensor<Scalar,5> NULL_TENSOR5;
 	inline static int num_of_eigen_threads() {
 		return Eigen::nbThreads();
 	};
@@ -83,8 +84,8 @@ public:
 		return n1 < n2 || almost_equal(n1, n2, abs_epsilon, rel_epsilon);
 	};
 	template<size_t Rank>
-	inline static Tensor<Scalar,Rank> get_null_tensor() {
-		static_assert(Rank > 1, "illegal tensor rank");
+	inline static const Tensor<Scalar,Rank>& get_null_tensor() {
+		static_assert(Rank > 1 && Rank < 6, "illegal null tensor rank");
 		switch (Rank) {
 		case 2:
 			return NULL_TENSOR2;
@@ -92,8 +93,8 @@ public:
 			return NULL_TENSOR3;
 		case 4:
 			return NULL_TENSOR4;
-		default:
-			return Tensor<Scalar,Rank>();
+		case 5:
+			return NULL_TENSOR5;
 		}
 	};
 	template<size_t Rank>
