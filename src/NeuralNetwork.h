@@ -49,10 +49,9 @@ class NeuralNetwork {
 	friend class ParallelNeuralNetwork<Scalar,Sequential>;
 	friend class CompositeNeuralNetwork<Scalar,Rank,Sequential>;
 protected:
-	static constexpr size_t SEQ_DIMS = Rank + Sequential;
-	static constexpr size_t DATA_DIMS = SEQ_DIMS + 1;
+	static constexpr size_t DATA_DIMS = Rank + Sequential + 1;
 	typedef Tensor<Scalar,DATA_DIMS> Data;
-	typedef Dimensions<int,SEQ_DIMS> Dims;
+	typedef Dimensions<int,Rank> Dims;
 public:
 	virtual ~NeuralNetwork() = default;
 	virtual NeuralNetwork<Scalar,Rank,Sequential>* clone() const = 0;
@@ -439,223 +438,13 @@ private:
 template<typename Scalar, size_t Rank, bool Sequential>
 using NeuralNetPtr = std::unique_ptr<NeuralNetwork<Scalar,Rank,Sequential>>;
 
-template<typename Scalar, bool Sequential>
-class ParallelNeuralNetwork : public NeuralNetwork<Scalar,3,Sequential> {
-	typedef NeuralNetwork<Scalar,3,Sequential> Base;
-	typedef ParallelNeuralNetwork<Scalar,Sequential> Self;
-	typedef NeuralNetPtr<Scalar,3,Sequential> Lane;
-public:
-	ParallelNeuralNetwork(std::vector<Lane> lanes, bool foremost = true) :
-			lanes(std::move(lanes)) {
-		assert(this->lanes.size() > 0 && "lanes must contain at least 1 element");
-		assert(this->lanes[0] != nullptr && "lanes contains null pointers");
-		Base& first_lane = *this->lanes[0];
-		const typename Base::Dims& input_dims = first_lane.get_input_dims();
-		typename Base::Dims output_dims = first_lane.get_output_dims();
-		for (unsigned i = 1; i < this->lanes.size(); i++) {
-			assert(this->lanes[i] != nullptr && "lanes contains null pointers");
-			Base& lane = *this->lanes[i];
-			assert(input_dims == lane.get_input_dims());
-			const typename Base::Dims& lane_output_dims = lane.get_output_dims();
-			for (size_t i = 0; i < Base::SEQ_DIMS - 1; i++)
-				assert(output_dims(i) == lane_output_dims(i));
-			output_dims(Base::SEQ_DIMS - 1) += lane_output_dims(Base::SEQ_DIMS - 1);
-		}
-		set_foremost(foremost);
-		this->input_dims = first_lane.get_input_dims();
-		this->output_dims = output_dims;
-	};
-	ParallelNeuralNetwork(Base&& lane, bool foremost = true) :
-			ParallelNeuralNetwork(create_vector(std::move(lane)), foremost) { };
-	ParallelNeuralNetwork(const Self& network) :
-			lanes(network.lanes.size()) {
-		for (unsigned i = 0; i < lanes.size(); i++)
-			lanes[i] = Lane(network.lanes[i]->clone());
-		foremost = network.foremost;
-		input_dims = network.input_dims;
-		output_dims = network.output_dims;
-	};
-	ParallelNeuralNetwork(Self&& network) {
-		swap(*this, network);
-	};
-	~ParallelNeuralNetwork() = default;
-	Self& operator=(Self network) {
-		swap(*this, network);
-		return *this;
-	};
-	bool is_foremost() const {
-		return foremost;
-	};
-	Base* clone() const {
-		return new ParallelNeuralNetwork(*this);
-	};
-	typename Base::Dims get_input_dims() const {
-		return input_dims;
-	};
-	typename Base::Dims get_output_dims() const {
-		return output_dims;
-	};
-	friend void swap(Self& network1, Self& network2) {
-		using std::swap;
-		swap(network1.lanes, network2.lanes);
-		swap(network1.foremost, network2.foremost);
-		swap(network1.input_dims, network2.input_dims);
-		swap(network1.output_dims, network2.output_dims);
-	};
-protected:
-	inline void set_foremost(bool foremost) {
-		for (unsigned i = 0; i < lanes.size(); i++)
-			lanes[i]->set_foremost(foremost);
-		this->foremost = foremost;
-	};
-	inline std::vector<Layer<Scalar,3>*> get_layers() {
-		std::vector<Layer<Scalar,3>*> layers;
-		for (unsigned i = 0; i < lanes.size(); i++) {
-			std::vector<Layer<Scalar,3>*> lane_layers = lanes[i]->get_layers();
-			for (unsigned j = 0; j < lane_layers.size(); j++)
-				layers.push_back(lane_layers[j]);
-		}
-		return layers;
-	};
-	inline typename Base::Data propagate(typename Base::Data input, bool training) {
-		Utils<Scalar>::template check_tensor_dims<Base::DATA_DIMS>(input);
-		assert(input_dims == Utils<Scalar>::template get_dims<Base::DATA_DIMS>(input).template demote<>());
-		int rows = input.dimension(0);
-		std::array<int,Base::DATA_DIMS> offsets;
-		std::array<int,Base::DATA_DIMS> extents = output_dims.template promote<>();
-		offsets.fill(0);
-		extents[0] = rows;
-		typename Base::Data out(extents);
-		unsigned lane_num = lanes.size();
-		unsigned helper_thread_num = lane_num - 1;
-		pthread_t threads[helper_thread_num];
-		pthread_attr_t attr;
-		if (helper_thread_num > 0) {
-			pthread_attr_init(&attr);
-			pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_JOINABLE);
-		}
-		PropArgs args_arr[lane_num];
-		for (int i = helper_thread_num; i >= 0; i--) {
-			PropArgs args;
-			args.obj = this;
-			args.lane_id = i;
-			args.training = training;
-			args.in = &input;
-			args_arr[i] = args;
-			// Leave the first lane to the main thread.
-			if (i == 0)
-				propagate(&args_arr[i]);
-			else
-				assert(!pthread_create(&threads[i - 1], &attr, propagate, &args_arr[i]));
-		}
-		for (unsigned i = 0; i < lane_num; i++) {
-			if (i != 0)
-				assert(!pthread_join(threads[i - 1], nullptr));
-			int depth = lanes[i]->get_output_dims()(Sequential + 2);
-			extents[Sequential + 3] = depth;
-			out.slice(offsets, extents) = args_arr[i].out;
-			offsets[Sequential + 3] += depth;
-		}
-		if (helper_thread_num > 0)
-			pthread_attr_destroy(&attr);
-		return out;
-	};
-	inline typename Base::Data backpropagate(typename Base::Data out_grads) {
-		Utils<Scalar>::template check_tensor_dims<Base::DATA_DIMS>(out_grads);
-		assert(output_dims == Utils<Scalar>::template get_dims<Base::DATA_DIMS>(out_grads).template demote<>());
-		typename Base::Data prev_out_grads;
-		if (foremost)
-			prev_out_grads = Utils<Scalar>::template get_null_tensor<Base::DATA_DIMS>();
-		else {
-			Dimensions<int,Base::DATA_DIMS> prev_out_grads_dims = input_dims.template promote<>();
-			prev_out_grads_dims(0) = out_grads.dimension(0);
-			prev_out_grads = typename Base::Data(prev_out_grads_dims);
-			prev_out_grads.setZero();
-		}
-		unsigned lane_num = lanes.size();
-		unsigned helper_thread_num = lane_num - 1;
-		pthread_t threads[helper_thread_num];
-		pthread_attr_t attr;
-		if (helper_thread_num > 0) {
-			pthread_attr_init(&attr);
-			pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_JOINABLE);
-		}
-		BackpropArgs args_arr[lane_num];
-		int depth_offset = out_grads.dimension(Base::SEQ_DIMS);
-		for (int i = helper_thread_num; i >= 0; i--) {
-			depth_offset -= lanes[i]->get_output_dims()(Sequential + 2);
-			BackpropArgs args;
-			args.obj = this;
-			args.lane_id = i;
-			args.depth_offset = depth_offset;
-			args.out_grads = &out_grads;
-			args_arr[i] = args;
-			// Leave the first lane to the main thread.
-			if (i == 0)
-				backpropagate(&args_arr[i]);
-			else
-				assert(!pthread_create(&threads[i - 1], &attr, backpropagate, &args_arr[i]));
-		}
-		for (unsigned i = 0; i < lanes.size(); i++) {
-			if (i != 0)
-				assert(!pthread_join(threads[i - 1], nullptr));
-			if (!foremost)
-				prev_out_grads += args_arr[i].prev_out_grads;
-		}
-		if (helper_thread_num > 0)
-			pthread_attr_destroy(&attr);
-		return prev_out_grads;
-	};
-	static std::vector<Lane> create_vector(Lane&& net) {
-		std::vector<Lane> vec(1);
-		vec[0] = std::move(net);
-		return vec;
-	};
-private:
-	std::vector<Lane> lanes;
-	bool foremost;
-	typename Base::Dims input_dims;
-	typename Base::Dims output_dims;
-	static void* propagate(void* args_ptr) {
-		PropArgs& args = *((PropArgs*) args_ptr);
-		args.out = args.obj->lanes[args.lane_id]->propagate(*args.in, args.training);
-		return nullptr;
-	};
-	static void* backpropagate(void* args_ptr) {
-		BackpropArgs& args = *((BackpropArgs*) args_ptr);
-		Base& lane = *args.obj->lanes[args.lane_id];
-		std::array<int,Base::DATA_DIMS> offsets;
-		std::array<int,Base::DATA_DIMS> extents = lane.get_output_dims().template promote<>();
-		offsets.fill(0);
-		offsets[Base::SEQ_DIMS] = args.depth_offset;
-		extents[0] = args.out_grads->dimension(0);
-		typename Base::Data out_grads_slice = args.out_grads->slice(offsets, extents);
-		args.prev_out_grads = lane.backpropagate(std::move(out_grads_slice));
-		return nullptr;
-	};
-	struct PropArgs {
-		Self* obj;
-		int lane_id;
-		bool training;
-		typename Base::Data* in;
-		typename Base::Data out;
-	};
-	struct BackpropArgs {
-		Self* obj;
-		int lane_id;
-		int depth_offset;
-		typename Base::Data* out_grads;
-		typename Base::Data prev_out_grads;
-	};
-};
-
-template<typename Scalar, size_t Rank, bool Sequential> class ResidualNeuralNetwork;
-template<typename Scalar, bool Sequential> class DenseNeuralNetwork;
+template<typename Scalar, size_t Rank> class ResidualNeuralNetwork;
+template<typename Scalar> class DenseNeuralNetwork;
 
 template<typename Scalar, size_t Rank, bool Sequential>
 class CompositeNeuralNetwork : public NeuralNetwork<Scalar,Rank,Sequential> {
-	friend class ResidualNeuralNetwork<Scalar,Rank,Sequential>;
-	friend class DenseNeuralNetwork<Scalar,Sequential>;
+	friend class ResidualNeuralNetwork<Scalar,Rank>;
+	friend class DenseNeuralNetwork<Scalar>;
 	typedef NeuralNetwork<Scalar,Rank,Sequential> Base;
 	typedef CompositeNeuralNetwork<Scalar,Rank,Sequential> Self;
 	typedef NeuralNetPtr<Scalar,Rank,Sequential> Block;
@@ -756,14 +545,220 @@ private:
 	typename Base::Dims output_dims;
 };
 
+template<typename Scalar>
+class ParallelNeuralNetwork : public NeuralNetwork<Scalar,3,false> {
+	typedef NeuralNetwork<Scalar,3,false> Base;
+	typedef ParallelNeuralNetwork<Scalar> Self;
+	typedef NeuralNetPtr<Scalar,3,false> Lane;
+public:
+	ParallelNeuralNetwork(std::vector<Lane> lanes, bool foremost = true) :
+			lanes(std::move(lanes)) {
+		assert(this->lanes.size() > 0 && "lanes must contain at least 1 element");
+		assert(this->lanes[0] != nullptr && "lanes contains null pointers");
+		Base& first_lane = *this->lanes[0];
+		const typename Base::Dims& input_dims = first_lane.get_input_dims();
+		typename Base::Dims output_dims = first_lane.get_output_dims();
+		for (unsigned i = 1; i < this->lanes.size(); i++) {
+			assert(this->lanes[i] != nullptr && "lanes contains null pointers");
+			Base& lane = *this->lanes[i];
+			assert(input_dims == lane.get_input_dims());
+			const typename Base::Dims& lane_output_dims = lane.get_output_dims();
+			assert(output_dims(0) == lane_output_dims(0) &&
+					output_dims(1) == lane_output_dims(1));
+			output_dims(2) += lane_output_dims(2);
+		}
+		set_foremost(foremost);
+		this->input_dims = first_lane.get_input_dims();
+		this->output_dims = output_dims;
+	};
+	ParallelNeuralNetwork(Base&& lane, bool foremost = true) :
+			ParallelNeuralNetwork(create_vector(std::move(lane)), foremost) { };
+	ParallelNeuralNetwork(const Self& network) :
+			lanes(network.lanes.size()) {
+		for (unsigned i = 0; i < lanes.size(); i++)
+			lanes[i] = Lane(network.lanes[i]->clone());
+		foremost = network.foremost;
+		input_dims = network.input_dims;
+		output_dims = network.output_dims;
+	};
+	ParallelNeuralNetwork(Self&& network) {
+		swap(*this, network);
+	};
+	~ParallelNeuralNetwork() = default;
+	Self& operator=(Self network) {
+		swap(*this, network);
+		return *this;
+	};
+	bool is_foremost() const {
+		return foremost;
+	};
+	Base* clone() const {
+		return new ParallelNeuralNetwork(*this);
+	};
+	typename Base::Dims get_input_dims() const {
+		return input_dims;
+	};
+	typename Base::Dims get_output_dims() const {
+		return output_dims;
+	};
+	friend void swap(Self& network1, Self& network2) {
+		using std::swap;
+		swap(network1.lanes, network2.lanes);
+		swap(network1.foremost, network2.foremost);
+		swap(network1.input_dims, network2.input_dims);
+		swap(network1.output_dims, network2.output_dims);
+	};
+protected:
+	inline void set_foremost(bool foremost) {
+		for (unsigned i = 0; i < lanes.size(); i++)
+			lanes[i]->set_foremost(foremost);
+		this->foremost = foremost;
+	};
+	inline std::vector<Layer<Scalar,3>*> get_layers() {
+		std::vector<Layer<Scalar,3>*> layers;
+		for (unsigned i = 0; i < lanes.size(); i++) {
+			std::vector<Layer<Scalar,3>*> lane_layers = lanes[i]->get_layers();
+			for (unsigned j = 0; j < lane_layers.size(); j++)
+				layers.push_back(lane_layers[j]);
+		}
+		return layers;
+	};
+	inline typename Base::Data propagate(typename Base::Data input, bool training) {
+		Utils<Scalar>::template check_tensor_dims<4>(input);
+		assert(input_dims == Utils<Scalar>::template get_dims<4>(input).template demote<>());
+		int rows = input.dimension(0);
+		std::array<int,4> offsets({ 0, 0, 0, 0 });
+		std::array<int,4> extents({ rows, output_dims(0), output_dims(1), output_dims(2) });
+		typename Base::Data out(extents);
+		unsigned lane_num = lanes.size();
+		unsigned helper_thread_num = lane_num - 1;
+		pthread_t threads[helper_thread_num];
+		pthread_attr_t attr;
+		if (helper_thread_num > 0) {
+			pthread_attr_init(&attr);
+			pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_JOINABLE);
+		}
+		PropArgs args_arr[lane_num];
+		for (int i = helper_thread_num; i >= 0; i--) {
+			PropArgs args;
+			args.obj = this;
+			args.lane_id = i;
+			args.training = training;
+			args.in = &input;
+			args_arr[i] = args;
+			// Leave the first lane to the main thread.
+			if (i == 0)
+				propagate(&args_arr[i]);
+			else
+				assert(!pthread_create(&threads[i - 1], &attr, propagate, &args_arr[i]));
+		}
+		for (unsigned i = 0; i < lane_num; i++) {
+			if (i != 0)
+				assert(!pthread_join(threads[i - 1], nullptr));
+			int depth = lanes[i]->get_output_dims()(Sequential + 2);
+			extents[3] = depth;
+			out.slice(offsets, extents) = args_arr[i].out;
+			offsets[3] += depth;
+		}
+		if (helper_thread_num > 0)
+			pthread_attr_destroy(&attr);
+		return out;
+	};
+	inline typename Base::Data backpropagate(typename Base::Data out_grads) {
+		Utils<Scalar>::template check_tensor_dims<4>(out_grads);
+		assert(output_dims == Utils<Scalar>::template get_dims<4>(out_grads).template demote<>());
+		typename Base::Data prev_out_grads;
+		if (foremost)
+			prev_out_grads = Utils<Scalar>::template get_null_tensor<4>();
+		else {
+			prev_out_grads = typename Base::Data(out_grads.dimension(0), input_dims(0),
+					input_dims(1), input_dims(2));
+			prev_out_grads.setZero();
+		}
+		unsigned lane_num = lanes.size();
+		unsigned helper_thread_num = lane_num - 1;
+		pthread_t threads[helper_thread_num];
+		pthread_attr_t attr;
+		if (helper_thread_num > 0) {
+			pthread_attr_init(&attr);
+			pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_JOINABLE);
+		}
+		BackpropArgs args_arr[lane_num];
+		int depth_offset = out_grads.dimension(3);
+		for (int i = helper_thread_num; i >= 0; i--) {
+			depth_offset -= lanes[i]->get_output_dims()(2);
+			BackpropArgs args;
+			args.obj = this;
+			args.lane_id = i;
+			args.depth_offset = depth_offset;
+			args.out_grads = &out_grads;
+			args_arr[i] = args;
+			// Leave the first lane to the main thread.
+			if (i == 0)
+				backpropagate(&args_arr[i]);
+			else
+				assert(!pthread_create(&threads[i - 1], &attr, backpropagate, &args_arr[i]));
+		}
+		for (unsigned i = 0; i < lanes.size(); i++) {
+			if (i != 0)
+				assert(!pthread_join(threads[i - 1], nullptr));
+			if (!foremost)
+				prev_out_grads += args_arr[i].prev_out_grads;
+		}
+		if (helper_thread_num > 0)
+			pthread_attr_destroy(&attr);
+		return prev_out_grads;
+	};
+	static std::vector<Lane> create_vector(Lane&& net) {
+		std::vector<Lane> vec(1);
+		vec[0] = std::move(net);
+		return vec;
+	};
+private:
+	std::vector<Lane> lanes;
+	bool foremost;
+	typename Base::Dims input_dims;
+	typename Base::Dims output_dims;
+	static void* propagate(void* args_ptr) {
+		PropArgs& args = *((PropArgs*) args_ptr);
+		args.out = args.obj->lanes[args.lane_id]->propagate(*args.in, args.training);
+		return nullptr;
+	};
+	static void* backpropagate(void* args_ptr) {
+		BackpropArgs& args = *((BackpropArgs*) args_ptr);
+		Base& lane = *args.obj->lanes[args.lane_id];
+		const Dimensions<int> lane_output_dims = lane.get_output_dims();
+		std::array<int,4> offsets({ 0, 0, 0, args.depth_offset });
+		std::array<int,4> extents({ args.out_grads->dimension(0), lane_output_dims(0),
+				lane_output_dims(1), lane_output_dims(2) });
+		typename Base::Data out_grads_slice = args.out_grads->slice(offsets, extents);
+		args.prev_out_grads = lane.backpropagate(std::move(out_grads_slice));
+		return nullptr;
+	};
+	struct PropArgs {
+		Self* obj;
+		int lane_id;
+		bool training;
+		typename Base::Data* in;
+		typename Base::Data out;
+	};
+	struct BackpropArgs {
+		Self* obj;
+		int lane_id;
+		int depth_offset;
+		typename Base::Data* out_grads;
+		typename Base::Data prev_out_grads;
+	};
+};
+
 /**
  * This class can be used to build InceptionNets, ResNets, Inception-ResNets, or non-residual composite
  * neural networks.
  */
-template<typename Scalar, size_t Rank, bool Sequential>
-class ResidualNeuralNetwork : public NeuralNetwork<Scalar,Rank,Sequential> {
-	typedef NeuralNetwork<Scalar,Rank,Sequential> Base;
-	typedef CompositeNeuralNetwork<Scalar,Rank,Sequential> Module;
+template<typename Scalar, size_t Rank>
+class ResidualNeuralNetwork : public NeuralNetwork<Scalar,Rank,false> {
+	typedef NeuralNetwork<Scalar,Rank,false> Base;
+	typedef CompositeNeuralNetwork<Scalar,Rank,false> Module;
 public:
 	ResidualNeuralNetwork(std::vector<std::pair<Module,bool>> modules, bool foremost = true) :
 			modules(modules),
@@ -842,10 +837,10 @@ private:
 	typename Base::Dims output_dims;
 };
 
-template<typename Scalar, bool Sequential>
-class DenseNeuralNetwork : public NeuralNetwork<Scalar,3,Sequential> {
-	typedef NeuralNetwork<Scalar,3,Sequential> Base;
-	typedef CompositeNeuralNetwork<Scalar,3,Sequential> Module;
+template<typename Scalar>
+class DenseNeuralNetwork : public NeuralNetwork<Scalar,3,false> {
+	typedef NeuralNetwork<Scalar,3,false> Base;
+	typedef CompositeNeuralNetwork<Scalar,3,false> Module;
 public:
 	DenseNeuralNetwork(std::vector<Module> modules, bool foremost = true) :
 			modules(modules),
@@ -853,15 +848,14 @@ public:
 		assert(this->modules.size() > 0 && "modules must contain at least 1 element");
 		Module& first_module = this->modules[0];
 		input_dims = first_module.get_input_dims();
-		typename Base::Dims output_dims = first_module.get_output_dims()
-				.add_along_rank(input_dims, Sequential + 2);
-		assert(input_dims(Sequential) == output_dims(Sequential) &&
-				input_dims(Sequential + 1) == output_dims(Sequential + 1));
+		typename Base::Dims output_dims = first_module.get_output_dims();
+		output_dims(2) += input_dims(2);
+		assert(input_dims(0) == output_dims(0) && input_dims(1) == output_dims(1));
 		for (unsigned i = 1; i < this->modules.size(); i++) {
 			Module& module = this->modules[i];
 			const typename Base::Dims& module_input_dims = module.get_input_dims();
 			assert(module_input_dims == output_dims && "incompatible module dimensions");
-			output_dims = output_dims.add_along_rank(module.get_output_dims(), Sequential + 2);
+			output_dims(2) += module.get_output_dims()(2);
 			module.set_foremost(false);
 		}
 		this->output_dims = output_dims;
@@ -894,46 +888,41 @@ protected:
 		return layers;
 	};
 	inline typename Base::Data propagate(typename Base::Data input, bool training) {
-		Utils<Scalar>::template check_tensor_dims<Base::DATA_DIMS>(input);
-		assert(input_dims == Utils<Scalar>::template get_dims<Base::DATA_DIMS>(input).template demote<>());
-		int rows = input.dimension(0);
-		std::array<int,Base::DATA_DIMS> offsets;
-		std::array<int,Base::DATA_DIMS> extents = input_dims.template promote<>();
-		offsets.fill(0);
-		extents[0] = rows;
+		Utils<Scalar>::template check_tensor_dims<4>(input);
+		assert(input_dims == Utils<Scalar>::template get_dims<4>(input).template demote<>());
+		std::array<int,4> offsets({ 0, 0, 0, 0 });
+		std::array<int,4> extents({ input.dimension(0), input_dims(0), input_dims(1), input_dims(2) });
 		for (unsigned i = 0; i < modules.size(); i++) {
 			Module& module = modules[i];
-			int layer_input_depth = module.get_input_dims()(Sequential + 2);
-			int layer_output_depth = module.get_output_dims()(Sequential + 2);
-			std::array<int,Base::DATA_DIMS> out_i_sizes = extents;
-			out_i_sizes[Base::SEQ_DIMS] = layer_input_depth + layer_output_depth;
+			int layer_input_depth = module.get_input_dims()(2);
+			int layer_output_depth = module.get_output_dims()(2);
+			std::array<int,4> out_i_sizes = extents;
+			out_i_sizes[3] = layer_input_depth + layer_output_depth;
 			typename Base::Data out_i(out_i_sizes);
-			offsets[Base::SEQ_DIMS] = 0;
-			extents[Base::SEQ_DIMS] = layer_input_depth;
+			offsets[3] = 0;
+			extents[3] = layer_input_depth;
 			out_i.slice(offsets, extents) = input;
-			offsets[Base::SEQ_DIMS] = layer_input_depth;
-			extents[Base::SEQ_DIMS] = layer_output_depth;
+			offsets[3] = layer_input_depth;
+			extents[3] = layer_output_depth;
 			out_i.slice(offsets, extents) = module.propagate(std::move(input), training);
 			input = typename Base::Data(std::move(out_i));
 		}
 		return input;
 	};
 	inline typename Base::Data backpropagate(typename Base::Data out_grads) {
-		Utils<Scalar>::template check_tensor_dims<Base::DATA_DIMS>(out_grads);
-		assert(output_dims == Utils<Scalar>::template get_dims<Base::DATA_DIMS>(out_grads).template demote<>());
-		std::array<int,Base::DATA_DIMS> offsets;
-		std::array<int,Base::DATA_DIMS> extents = input_dims.template promote<>();
-		offsets.fill(0);
-		extents[0] = out_grads.dimension(0);
+		Utils<Scalar>::template check_tensor_dims<4>(out_grads);
+		assert(output_dims == Utils<Scalar>::template get_dims<4>(out_grads).template demote<>());
+		std::array<int,4> offsets({ 0, 0, 0, 0 });
+		std::array<int,4> extents({ out_grads.dimension(0), input_dims(0), input_dims(1), input_dims(2) });
 		for (int i = modules.size() - 1; i >= 0; i--) {
 			Module& module = modules[i];
-			int layer_input_depth = module.get_input_dims()(Sequential + 2);
-			int layer_output_depth = module.get_output_dims()(Sequential + 2);
-			offsets[Base::SEQ_DIMS] = layer_input_depth;
-			extents[Base::SEQ_DIMS] = layer_output_depth;
+			int layer_input_depth = module.get_input_dims()(2);
+			int layer_output_depth = module.get_output_dims()(2);
+			offsets[3] = layer_input_depth;
+			extents[3] = layer_output_depth;
 			typename Base::Data out_grads_i = out_grads.slice(offsets, extents);
-			offsets[Base::SEQ_DIMS] = 0;
-			extents[Base::SEQ_DIMS] = layer_input_depth;
+			offsets[3] = 0;
+			extents[3] = layer_input_depth;
 			out_grads = typename Base::Data(out_grads.slice(offsets, extents) +
 					module.backpropagate(std::move(out_grads_i)));
 		}
