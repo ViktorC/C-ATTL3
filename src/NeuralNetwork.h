@@ -112,9 +112,6 @@ protected:
 	inline static Data pass_back(Layer<Scalar,Rank>& layer, Data&& out_grads) {
 		return layer.pass_back(std::move(out_grads));
 	}
-	inline static Matrix<Scalar>& get_param_grads(Layer<Scalar,Rank>& layer) {
-		return layer.get_param_grads();
-	}
 };
 
 template<typename Scalar, size_t Rank>
@@ -251,11 +248,7 @@ public:
 			KernelPtr<Scalar,Rank> w_kernel, ActivationPtr<Scalar,Rank> state_act, ActivationPtr<Scalar,Rank> output_act,
 			OutputSeqSizeFunc output_seq_size_func, bool stateful = false, bool mul_integration = false,
 			bool foremost = true) :
-				u_kernel(std::move(u_kernel)),
-				v_kernel(std::move(v_kernel)),
-				w_kernel(std::move(w_kernel)),
-				state_act(std::move(state_act)),
-				output_act(std::move(output_act)),
+				main_cell(),
 				output_seq_size_func(output_seq_size_func),
 				stateful(stateful),
 				mul_integration(mul_integration),
@@ -264,14 +257,19 @@ public:
 				input_seq_length(-1),
 				output_seq_length(-1),
 				output_seq_delay(-1) {
-		assert(this->u_kernel && this->v_kernel && this->w_kernel && this->state_act && this->output_act);
-		typename Base::Dims layer_input_dims = this->u_kernel->get_input_dims();
-		typename Base::Dims layer_output_dims = this->u_kernel->get_output_dims();
-		assert(layer_output_dims == this->w_kernel->get_output_dims() &&
-				layer_output_dims == this->v_kernel->get_input_dims() &&
-				layer_output_dims == this->state_act->get_input_dims() &&
-				this->w_kernel->get_input_dims() == this->w_kernel->get_output_dims() &&
-				this->output_act->get_input_dims() == this->v_kernel->get_output_dims());
+		assert(u_kernel && v_kernel && w_kernel && state_act && output_act);
+		typename Base::Dims layer_input_dims = u_kernel->get_input_dims();
+		typename Base::Dims layer_output_dims = u_kernel->get_output_dims();
+		assert(layer_output_dims == w_kernel->get_output_dims() &&
+				layer_output_dims == v_kernel->get_input_dims() &&
+				layer_output_dims == state_act->get_input_dims() &&
+				w_kernel->get_input_dims() == w_kernel->get_output_dims() &&
+				output_act->get_input_dims() == v_kernel->get_output_dims());
+		main_cell.u_kernel = std::move(u_kernel);
+		main_cell.v_kernel = std::move(v_kernel);
+		main_cell.w_kernel = std::move(w_kernel);
+		main_cell.state_act = std::move(state_act);
+		main_cell.output_act = std::move(output_act);
 		input_dims = std::move(layer_input_dims);
 		output_dims = std::move(layer_output_dims);
 		set_foremost(foremost);
@@ -384,6 +382,7 @@ protected:
 		this->input_seq_length = input_seq_length;
 		this->output_seq_length = output_seq_length;
 		this->output_seq_delay = output_seq_delay;
+		cells = std::vector<Cell>(input_seq_length - 1);
 		RankwiseArray offsets;
 		RankwiseArray input_extents = data_dims;
 		RankwiseArray output_extents = output_dims.template promote<2>();
@@ -400,34 +399,49 @@ protected:
 		time_step_dims(0) = samples;
 		int time_steps = output_seq_length + output_seq_delay;
 		for (int i = 0; i < time_steps; i++) {
+			Cell& cell;
+			if (i = 0 || !training)
+				cell = main_cell;
+			else {
+				cell = cells[i - 1];
+				if (i < input_seq_length)
+					cell.u_kernel = KernelPtr<Scalar,Rank>(main_cell.u_kernel->clone());
+				cell.w_kernel = KernelPtr<Scalar,Rank>(main_cell.w_kernel->clone());
+				cell.state_act = ActivationPtr<Scalar,Rank>(main_cell.state_act->clone());
+				if (i >= output_seq_delay) {
+					cell.v_kernel = KernelPtr<Scalar,Rank>(main_cell.v_kernel->clone());
+					cell.output_act = ActivationPtr<Scalar,Rank>(main_cell.output_act->clone());
+				}
+			}
 			offsets[1] = i;
 			if (i < input_seq_length) {
 				typename Base::Data in_i_seq = input.slice(offsets, input_extents);
 				Dimensions<int,Rank + 1> dims = input_dims;
 				dims(0) = samples;
-				Tensor<Scalar,Rank + 1> in_i = Base::pass_forward(*u_kernel,
+				Tensor<Scalar,Rank + 1> in_i = Base::pass_forward(*cell.u_kernel,
 						Utils<Scalar>::template map_tensor_to_tensor<Base::DATA_DIMS,Rank + 1>(std::move(in_i_seq),
 								time_step_dims), training);
 				if (!training)
-					Base::empty_cache(*u_kernel);
+					Base::empty_cache(*cell.u_kernel);
 				if (mul_integration)
-					in_i *= Base::pass_forward(*w_kernel, state, training);
+					in_i *= Base::pass_forward(*cell.w_kernel, std::move(state), training);
 				else
-					in_i += Base::pass_forward(*w_kernel, state, training);
+					in_i += Base::pass_forward(*cell.w_kernel, std::move(state), training);
 				if (!training)
-					Base::empty_cache(*w_kernel);
-				state = Base::pass_forward(*state_act, std::move(in_i), training);
+					Base::empty_cache(*cell.w_kernel);
+				state = Base::pass_forward(*cell.state_act, std::move(in_i), training);
 			} else
-				state = Base::pass_forward(*state_act, std::move(state), training);
+				state = Base::pass_forward(*cell.state_act, Base::pass_forward(*cell.w_kernel, std::move(state),
+						training), training);
 			if (!training)
-				Base::empty_cache(*state_act);
+				Base::empty_cache(*cell.state_act);
 			if (i >= output_seq_delay) {
-				Tensor<Scalar,Rank + 1> out_i = Base::pass_forward(*v_kernel, state, training);
+				Tensor<Scalar,Rank + 1> out_i = Base::pass_forward(*cell.v_kernel, state, training);
 				if (!training)
-					Base::empty_cache(*v_kernel);
-				out_i = Base::pass_forward(*output_act, std::move(out_i), training);
+					Base::empty_cache(*cell.v_kernel);
+				out_i = Base::pass_forward(*cell.output_act, std::move(out_i), training);
 				if (!training)
-					Base::empty_cache(*output_act);
+					Base::empty_cache(*cell.output_act);
 				if (output_seq_length == 1 && i == time_steps - 1)
 					return Utils<Scalar>::template map_tensor_to_tensor<Rank + 1,Base::DATA_DIMS>(out_i,
 							output_extents);
@@ -443,11 +457,6 @@ protected:
 		assert(output_dims == data_dims.template demote<2>() && batch_size == data_dims(0) &&
 				output_seq_length == data_dims(1));
 		int time_steps = output_seq_length + output_seq_delay;
-		Matrix<Scalar> u_grads;
-		Matrix<Scalar> v_grads;
-		Matrix<Scalar> w_grads;
-		Matrix<Scalar> state_act_grads;
-		Matrix<Scalar> out_act_grads;
 		for (int i = time_steps - 1; i >= 0; i++) {
 			if (i >= output_seq_delay) {
 
@@ -456,11 +465,14 @@ protected:
 		return out_grads;
 	}
 private:
-	const KernelPtr<Scalar,Rank> u_kernel;
-	const KernelPtr<Scalar,Rank> v_kernel;
-	const KernelPtr<Scalar,Rank> w_kernel;
-	const ActivationPtr<Scalar,Rank> state_act;
-	const ActivationPtr<Scalar,Rank> output_act;
+	struct Cell {
+		KernelPtr<Scalar,Rank> u_kernel;
+		KernelPtr<Scalar,Rank> v_kernel;
+		KernelPtr<Scalar,Rank> w_kernel;
+		ActivationPtr<Scalar,Rank> state_act;
+		ActivationPtr<Scalar,Rank> output_act;
+	};
+	const Cell main_cell;
 	const OutputSeqSizeFunc output_seq_size_func;
 	const bool stateful;
 	const bool mul_integration;
@@ -468,6 +480,7 @@ private:
 	const typename Base::Dims input_dims;
 	const typename Base::Dims output_dims;
 	// State.
+	std::vector<Cell> cells;
 	Tensor<Scalar,Rank + 1> state;
 	int batch_size;
 	int input_seq_length;
