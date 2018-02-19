@@ -34,11 +34,11 @@ public:
 template<typename Scalar, size_t Rank>
 class NormalizationPreprocessor : public Preprocessor<Scalar,Rank,false> {
 public:
-	NormalizationPreprocessor(bool standardize = false, Scalar epsilon = Utils<Scalar>::EPSILON2) :
+	inline NormalizationPreprocessor(bool standardize = false, Scalar epsilon = Utils<Scalar>::EPSILON2) :
 			standardize(standardize),
 			epsilon(epsilon) {
 		assert(epsilon > 0 && "epsilon must be greater than 0");
-	};
+	}
 	virtual ~NormalizationPreprocessor() = default;
 	inline virtual void fit(const Tensor<Scalar,Rank + 1>& data) {
 		int rows = data.dimension(0);
@@ -48,7 +48,7 @@ public:
 		means = data_mat.colwise().mean();
 		if (standardize)
 			sd = (data_mat.rowwise() - means).array().square().colwise().mean().sqrt();
-	};
+	}
 	inline virtual void transform(Tensor<Scalar,Rank + 1>& data) const {
 		int rows = data.dimension(0);
 		assert(rows > 0);
@@ -59,7 +59,7 @@ public:
 		if (standardize)
 			data_mat *= (sd.array() + epsilon).inverse().matrix().asDiagonal();
 		data = Utils<Scalar>::template map_mat_to_tensor<Rank + 1>(data_mat, demoted_dims);
-	};
+	}
 protected:
 	const bool standardize;
 	const Scalar epsilon;
@@ -72,11 +72,11 @@ protected:
 template<typename Scalar>
 class NormalizationPreprocessor<Scalar,3> {
 public:
-	NormalizationPreprocessor(bool standardize = false, Scalar epsilon = Utils<Scalar>::EPSILON2) :
+	inline NormalizationPreprocessor(bool standardize = false, Scalar epsilon = Utils<Scalar>::EPSILON2) :
 			standardize(standardize),
 			epsilon(epsilon) {
 		assert(epsilon > 0 && "epsilon must be greater than 0");
-	};
+	}
 	virtual ~NormalizationPreprocessor() = default;
 	inline virtual void fit(const Tensor<Scalar,4>& data) {
 		int rows = data.dimension(0);
@@ -95,7 +95,7 @@ public:
 			if (standardize)
 				sd.row(i) = (data_mat.rowwise() - means.row(i)).array().square().colwise().mean().sqrt();
 		}
-	};
+	}
 	inline virtual void transform(Tensor<Scalar,4>& data) const {
 		int rows = data.dimension(0);
 		Dimensions<int,3> demoted_dims = Utils<Scalar>::template get_dims<4>(data).demote();
@@ -114,7 +114,7 @@ public:
 				data_ch_i *= (sd.row(i).array() + epsilon).inverse().matrix().asDiagonal();
 			data.slice(offsets, extents) = Utils<Scalar>::template map_mat_to_tensor<4>(data_ch_i, slice_dims);
 		}
-	};
+	}
 protected:
 	const bool standardize;
 	const Scalar epsilon;
@@ -127,7 +127,7 @@ template<typename Scalar, size_t Rank>
 class PCAPreprocessorBase : public NormalizationPreprocessor<Scalar,Rank> {
 protected:
 	typedef NormalizationPreprocessor<Scalar,Rank> Base;
-	PCAPreprocessorBase(bool standardize, bool whiten, Scalar min_rel_var_to_retain, Scalar epsilon) :
+	inline PCAPreprocessorBase(bool standardize, bool whiten, Scalar min_rel_var_to_retain, Scalar epsilon) :
 				Base::NormalizationPreprocessor(standardize, epsilon),
 				whiten(whiten),
 				min_rel_var_to_retain(min_rel_var_to_retain),
@@ -135,7 +135,7 @@ protected:
 		assert(min_rel_var_to_retain > 0 && min_rel_var_to_retain <= 1 &&
 				"the minimum relative variance to be retained must be greater "
 				"then 0 and less than or equal to 1");
-	};
+	}
 	inline void _fit(Tensor<Scalar,Rank + 1> data, int i) {
 		Matrix<Scalar> normalized_data = Utils<Scalar>::template map_tensor_to_mat<Rank + 1>(std::move(data)).rowwise() -
 				Base::means.row(i);
@@ -163,7 +163,7 @@ protected:
 		ed_vec[i].eigen_basis = eigen_solver.eigenvectors().rightCols(dims_to_retain);
 		if (whiten) // The eigen values are only needed if whitening is enabled.
 			ed_vec[i].eigen_values = eigen_values.bottomRows(dims_to_retain).transpose();
-	};
+	}
 	inline Tensor<Scalar,Rank + 1> _transform(Tensor<Scalar,Rank + 1> data, int i) const {
 		Dimensions<int,Rank> output_dims;
 		if (!reduce_dims)
@@ -175,7 +175,7 @@ protected:
 		if (reduce_dims)
 			output_dims(0) = data_mat.cols();
 		return Utils<Scalar>::template map_mat_to_tensor<Rank + 1>(data_mat, output_dims);
-	};
+	}
 	bool whiten;
 	Scalar min_rel_var_to_retain;
 	bool reduce_dims;
@@ -191,18 +191,18 @@ class PCAPreprocessor : public PCAPreprocessorBase<Scalar,Rank> {
 	typedef PCAPreprocessorBase<Scalar,Rank> Base;
 	typedef typename Base::Base BaseBase;
 public:
-	PCAPreprocessor(bool standardize = false, bool whiten = false, Scalar min_rel_var_to_retain = 1,
+	inline PCAPreprocessor(bool standardize = false, bool whiten = false, Scalar min_rel_var_to_retain = 1,
 			Scalar epsilon = Utils<Scalar>::EPSILON2) :
-				Base::PCAPreprocessorBase(standardize, whiten, min_rel_var_to_retain, epsilon) { };
+				Base::PCAPreprocessorBase(standardize, whiten, min_rel_var_to_retain, epsilon) { }
 	inline void fit(const Tensor<Scalar,Rank + 1>& data) {
 		BaseBase::fit(data);
 		Base::ed_vec = std::vector<typename Base::EigenDecomposition>(1);
 		Base::_fit(data, 0);
-	};
+	}
 	inline void transform(Tensor<Scalar,Rank + 1>& data) const {
 		BaseBase::transform(data);
 		data = Base::_transform(std::move(data), 0);
-	};
+	}
 };
 
 // 3D partial template specialization of the PCA preprocessor.
@@ -211,9 +211,9 @@ class PCAPreprocessor<Scalar,3> : public PCAPreprocessorBase<Scalar,3> {
 	typedef PCAPreprocessorBase<Scalar,3> Base;
 	typedef typename Base::Base BaseBase;
 public:
-	PCAPreprocessor(bool standardize = false, bool whiten = false, Scalar min_rel_var_to_retain = 1,
+	inline PCAPreprocessor(bool standardize = false, bool whiten = false, Scalar min_rel_var_to_retain = 1,
 			Scalar epsilon = Utils<Scalar>::EPSILON2) :
-				Base::PCAPreprocessorBase(standardize, whiten, min_rel_var_to_retain, epsilon) { };
+				Base::PCAPreprocessorBase(standardize, whiten, min_rel_var_to_retain, epsilon) { }
 	inline void fit(const Tensor<Scalar,4>& data) {
 		assert((!Base::reduce_dims || data.dimension(3) == 1) && "cannot reduce the dimensionality of multi-channel tensors");
 		BaseBase::fit(data);
@@ -226,7 +226,7 @@ public:
 			Tensor<Scalar,4> data_slice_i = data.slice(offsets, extents);
 			Base::_fit(std::move(data_slice_i), i);
 		}
-	};
+	}
 	inline void transform(Tensor<Scalar,4>& data) const {
 		BaseBase::transform(data);
 		if (Base::reduce_dims) {
@@ -242,7 +242,7 @@ public:
 				data.slice(offsets, extents) = Base::_transform(std::move(data_slice_i), i);
 			}
 		}
-	};
+	}
 };
 
 } /* namespace cattle */

@@ -51,7 +51,7 @@ class InMemoryDataProvider : public DataProvider<Scalar,Rank,Sequential> {
 	typedef Tensor<Scalar,DATA_DIMS> Data;
 	typedef TensorPtr<Scalar,Rank,Sequential> DataPtr;
 public:
-	InMemoryDataProvider(DataPtr obs, DataPtr obj, bool shuffle = true) :
+	inline InMemoryDataProvider(DataPtr obs, DataPtr obj, bool shuffle = true) :
 			obs(std::move(obs)),
 			obj(std::move(obj)),
 			offsets() {
@@ -72,20 +72,20 @@ public:
 			Utils<Scalar>::template shuffle_tensor_rows<DATA_DIMS>(*this->obs);
 			Utils<Scalar>::template shuffle_tensor_rows<DATA_DIMS>(*this->obj);
 		}
-	};
-	const Dimensions<int,SEQ_DIMS>& get_obs_dims() const {
+	}
+	inline const Dimensions<int,SEQ_DIMS>& get_obs_dims() const {
 		return obs_dims;
-	};
-	const Dimensions<int,SEQ_DIMS>& get_obj_dims() const {
+	}
+	inline const Dimensions<int,SEQ_DIMS>& get_obj_dims() const {
 		return obj_dims;
-	};
-	unsigned instances() const {
+	}
+	inline unsigned instances() const {
 		return rows;
-	};
-	bool has_more() const {
+	}
+	inline bool has_more() const {
 		return offsets[0] < (int) rows;
-	};
-	DataPair<Scalar,Rank,Sequential> get_data(unsigned batch_size) {
+	}
+	inline DataPair<Scalar,Rank,Sequential> get_data(unsigned batch_size) {
 		int max_batch_size = std::min((int) batch_size, (int) (rows - offsets[0]));
 		data_extents[0] = max_batch_size;
 		obj_extents[0] = max_batch_size;
@@ -93,10 +93,10 @@ public:
 		Data obj_batch = obj->slice(offsets, obj_extents);
 		offsets[0] = std::min((int) rows, (int) offsets[0] + max_batch_size);
 		return std::make_pair(data_batch, obj_batch);
-	};
+	}
 	void reset() {
 		offsets[0] = 0;
-	};
+	}
 private:
 	DataPtr obs;
 	DataPtr obj;

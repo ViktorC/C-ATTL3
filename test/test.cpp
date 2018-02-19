@@ -46,8 +46,7 @@ int main() {
 			LayerPtr<Scalar,RANK>(new ConvLayer<Scalar>(training_prov.get_obs_dims(), 5, init, 1, 0)))));				// 0
 	parallel_lanes.push_back(NeuralNetPtr<Scalar,RANK,SEQ>(new FeedforwardNeuralNetwork<Scalar,RANK>(
 			LayerPtr<Scalar,RANK>(new ConvLayer<Scalar>(training_prov.get_obs_dims(), 3, init, 5, 2)))));				// 1
-	comp_mods.push_back(NeuralNetPtr<Scalar,RANK,SEQ>(new ParallelNeuralNetwork<Scalar,SEQ>(std::move(parallel_lanes))));
-	std::cout << comp_mods[0]->get_output_dims() << std::endl;
+	comp_mods.push_back(NeuralNetPtr<Scalar,RANK,SEQ>(new ParallelNeuralNetwork<Scalar>(std::move(parallel_lanes))));
 	std::vector<LayerPtr<Scalar,RANK>> layers1(7);
 	layers1[0] = LayerPtr<Scalar,RANK>(new MaxPoolingLayer<Scalar>(comp_mods[0]->get_output_dims()));					// 2
 	layers1[1] = LayerPtr<Scalar,RANK>(new LeakyReLUActivationLayer<Scalar,RANK>(layers1[0]->get_output_dims()));		// 3
@@ -81,7 +80,7 @@ int main() {
 	layers4[4] = LayerPtr<Scalar,RANK>(new FCLayer<Scalar,RANK>(layers4[3]->get_output_dims(), 1, init));				// 20
 	res_modules.push_back(std::make_pair(CompositeNeuralNetwork<Scalar,RANK,SEQ>(NeuralNetPtr<Scalar,RANK,SEQ>(
 			new FeedforwardNeuralNetwork<Scalar,RANK>(std::move(layers4)))), false));
-	ResidualNeuralNetwork<Scalar,RANK,SEQ> nn(res_modules);
+	ResidualNeuralNetwork<Scalar,RANK> nn(res_modules);
 	nn.init();
 	LossSharedPtr<Scalar,RANK,SEQ> loss(new QuadraticLoss<Scalar,RANK,SEQ>());
 	RegPenSharedPtr<Scalar> reg(new ElasticNetRegularizationPenalty<Scalar>());
@@ -89,4 +88,4 @@ int main() {
 	std::cout << opt.verify_gradients(nn, test_prov) << std::endl;
 //	opt.optimize(nn, training_prov, test_prov, 500);
 	return 0;
-};
+}

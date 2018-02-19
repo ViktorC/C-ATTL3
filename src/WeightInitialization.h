@@ -27,11 +27,11 @@ public:
 template<typename Scalar>
 class ZeroWeightInitialization : public WeightInitialization<Scalar> {
 public:
-	ZeroWeightInitialization(Scalar bias = 0) :
-			bias(bias) { };
+	inline ZeroWeightInitialization(Scalar bias = 0) :
+			bias(bias) { }
 	inline void apply(Matrix<Scalar>& weights) const {
 		weights.setZero(weights.rows(), weights.cols());
-	};
+	}
 private:
 	const Scalar bias;
 };
@@ -39,12 +39,12 @@ private:
 template<typename Scalar>
 class OneWeightInitialization : public WeightInitialization<Scalar> {
 public:
-	OneWeightInitialization(Scalar bias = 0) :
-			bias(bias) { };
+	inline OneWeightInitialization(Scalar bias = 0) :
+			bias(bias) { }
 	inline void apply(Matrix<Scalar>& weights) const {
 		weights.setOnes(weights.rows(), weights.cols());
 		weights.row(weights.rows() - 1).setZero();
-	};
+	}
 private:
 	const Scalar bias;
 };
@@ -52,8 +52,8 @@ private:
 template<typename Scalar>
 class GaussianWeightInitialization : public WeightInitialization<Scalar> {
 public:
-	GaussianWeightInitialization(Scalar bias) :
-		bias(bias) { };
+	inline GaussianWeightInitialization(Scalar bias) :
+		bias(bias) { }
 	virtual ~GaussianWeightInitialization() = default;
 	inline virtual void apply(Matrix<Scalar>& weights) const {
 		int rows = weights.rows();
@@ -68,7 +68,7 @@ public:
 					weights(i,j) = dist(gen);
 			}
 		}
-	};
+	}
 protected:
 	virtual Scalar sd(unsigned fan_ins, unsigned fan_outs) const = 0;
 	const Scalar bias;
@@ -77,42 +77,42 @@ protected:
 template<typename Scalar>
 class LeCunWeightInitialization : public GaussianWeightInitialization<Scalar> {
 public:
-	LeCunWeightInitialization(Scalar bias = 0) :
-		GaussianWeightInitialization<Scalar>::GaussianWeightInitialization(bias) { };
+	inline LeCunWeightInitialization(Scalar bias = 0) :
+		GaussianWeightInitialization<Scalar>::GaussianWeightInitialization(bias) { }
 protected:
 	inline Scalar sd(unsigned fan_ins, unsigned fan_outs) const {
 		return sqrt(1.0 / (Scalar) fan_ins);
-	};
+	}
 };
 
 template<typename Scalar>
 class GlorotWeightInitialization : public GaussianWeightInitialization<Scalar> {
 public:
-	GlorotWeightInitialization(Scalar bias = 0) :
-		GaussianWeightInitialization<Scalar>::GaussianWeightInitialization(bias) { };
+	inline GlorotWeightInitialization(Scalar bias = 0) :
+		GaussianWeightInitialization<Scalar>::GaussianWeightInitialization(bias) { }
 protected:
 	inline Scalar sd(unsigned fan_ins, unsigned fan_outs) const {
 		return sqrt(2.0 / (Scalar) (fan_ins + fan_outs));
-	};
+	}
 };
 
 template<typename Scalar>
 class HeWeightInitialization : public GaussianWeightInitialization<Scalar> {
 public:
-	HeWeightInitialization(Scalar bias = 0) :
-		GaussianWeightInitialization<Scalar>::GaussianWeightInitialization(bias) { };
+	inline HeWeightInitialization(Scalar bias = 0) :
+		GaussianWeightInitialization<Scalar>::GaussianWeightInitialization(bias) { }
 protected:
 	inline Scalar sd(unsigned fan_ins, unsigned fan_outs) const {
 		return sqrt(2.0 / (Scalar) fan_ins);
-	};
+	}
 };
 
 template<typename Scalar>
 class OrthogonalWeightInitialization : public GaussianWeightInitialization<Scalar> {
 public:
-	OrthogonalWeightInitialization(Scalar bias = 0, Scalar sd = 1) :
+	inline OrthogonalWeightInitialization(Scalar bias = 0, Scalar sd = 1) :
 			GaussianWeightInitialization<Scalar>::GaussianWeightInitialization(bias),
-			_sd(sd) { };
+			_sd(sd) { }
 	inline void apply(Matrix<Scalar>& weights) const {
 		GaussianWeightInitialization<Scalar>::apply(weights);
 		int rows = weights.rows() - 1;
@@ -122,11 +122,11 @@ public:
 		weights.block(0, 0, rows, cols) = more_rows ?
 				svd.compute(weights, Eigen::ComputeFullU).matrixU().block(0, 0, rows, cols) :
 				svd.compute(weights, Eigen::ComputeFullV).matrixV().block(0, 0, rows, cols);
-	};
+	}
 protected:
 	Scalar sd(unsigned fan_ins, unsigned fan_outs) const {
 		return _sd;
-	};
+	}
 private:
 	const Scalar _sd;
 };

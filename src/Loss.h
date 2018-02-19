@@ -46,7 +46,7 @@ public:
 		return (Utils<Scalar>::template map_tensor_to_mat<Base::DATA_DIMS>(out) -
 				Utils<Scalar>::template map_tensor_to_mat<Base::DATA_DIMS>(obj))
 				.array().square().rowwise().sum();
-	};
+	}
 	inline Tensor<Scalar,Base::DATA_DIMS> d_function(const Tensor<Scalar,Base::DATA_DIMS>& out,
 			const Tensor<Scalar,Base::DATA_DIMS>& obj) const {
 		assert(Utils<Scalar>::template get_dims<Base::DATA_DIMS>(out) ==
@@ -97,7 +97,7 @@ public:
 			loss(i) = loss_i;
 		}
 		return loss;
-	};
+	}
 	inline Tensor<Scalar,Base::DATA_DIMS> d_function(const Tensor<Scalar,Base::DATA_DIMS>& out,
 			const Tensor<Scalar,Base::DATA_DIMS>& obj) const {
 		assert(Utils<Scalar>::template get_dims<Base::DATA_DIMS>(out) ==
@@ -135,7 +135,7 @@ public:
 		}
 		return Utils<Scalar>::template map_mat_to_tensor<Base::DATA_DIMS>(out_grads,
 				Utils<Scalar>::template get_dims<Base::DATA_DIMS>(out).template demote<>());
-	};
+	}
 private:
 	bool squared;
 };
@@ -156,7 +156,7 @@ public:
 		return (Utils<Scalar>::template map_tensor_to_mat<Base::DATA_DIMS>(out).array().log() *
 				Utils<Scalar>::template map_tensor_to_mat<Base::DATA_DIMS>(obj).array())
 				.matrix().rowwise().sum() * -1;
-	};
+	}
 	inline Tensor<Scalar,Base::DATA_DIMS> d_function(const Tensor<Scalar,Base::DATA_DIMS>& out,
 			const Tensor<Scalar,Base::DATA_DIMS>& obj) const {
 		assert(Utils<Scalar>::template get_dims<Base::DATA_DIMS>(out) ==
@@ -197,7 +197,7 @@ public:
 			loss(i) = loss_i;
 		}
 		return loss;
-	};
+	}
 	inline Tensor<Scalar,Base::DATA_DIMS> d_function(const Tensor<Scalar,Base::DATA_DIMS>& out,
 			const Tensor<Scalar,Base::DATA_DIMS>& obj) const {
 		assert(Utils<Scalar>::template get_dims<Base::DATA_DIMS>(out) ==
@@ -219,7 +219,7 @@ public:
 		}
 		return Utils<Scalar>::template map_mat_to_tensor<Base::DATA_DIMS>(out_grads,
 				Utils<Scalar>::template get_dims<Base::DATA_DIMS>(out).template demote<>());
-	};
+	}
 private:
 	bool squared;
 };
@@ -251,7 +251,7 @@ public:
 			loss(i) = loss_i;
 		}
 		return loss;
-	};
+	}
 	inline Tensor<Scalar,Base::DATA_DIMS> d_function(const Tensor<Scalar,Base::DATA_DIMS>& out,
 			const Tensor<Scalar,Base::DATA_DIMS>& obj) const {
 		assert(Utils<Scalar>::template get_dims<Base::DATA_DIMS>(out) ==
