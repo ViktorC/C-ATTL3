@@ -31,8 +31,8 @@ class DimExpression;
 
 template<typename IndexType, size_t Rank>
 class Dimensions : public DimExpression<Dimensions<IndexType,Rank>,IndexType,Rank> {
-	friend class Dimensions<IndexType,Rank - 1>;
-	friend class Dimensions<IndexType,Rank + 1>;
+	template<typename OtherIndexType, size_t OtherRank>
+	friend class Dimensions;
 public:
 	inline Dimensions() :
 			values(Rank, 1) { }
@@ -49,7 +49,7 @@ public:
 	template<typename OtherDerived>
 	inline Dimensions(const DimExpression<OtherDerived,IndexType,Rank>& dims) :
 			Dimensions() {
-		for (size_t i = 0; i < Rank; i++)
+		for (size_t i = 0; i < Rank; ++i)
 			values[i] = dims(i);
 	}
 	template<size_t Ranks = 1>
@@ -170,14 +170,14 @@ public:
 	}
 	inline IndexType get_volume() const {
 		int volume = 1;
-		for (size_t i = 0; i < Rank; i++)
+		for (size_t i = 0; i < Rank; ++i)
 			volume *= (*this)(i);
 		return volume;
 	}
 	inline std::string to_string() const {
 		std::stringstream strm;
 		strm << "[" + std::to_string((*this)(0));
-		for (size_t i = 1; i < Rank; i++)
+		for (size_t i = 1; i < Rank; ++i)
 			strm << "," << std::to_string((*this)(i));
 		strm << "]";
 		return strm.str();
@@ -231,7 +231,7 @@ public:
 	template<typename OtherDerived>
 	inline bool operator==(const Other<OtherDerived>& dims) const {
 		bool equal = true;
-		for (size_t i = 0; i < Rank; i++) {
+		for (size_t i = 0; i < Rank; ++i) {
 			if ((*this)(i) != dims(i))
 				equal = false;
 		}

@@ -100,7 +100,7 @@ public:
 	template<size_t Rank>
 	inline static void check_tensor_dims(const Tensor<Scalar,Rank>& tensor) {
 		std::array<int,Rank> dimensions = tensor.dimensions();
-		for (size_t i = 0; i < Rank; i++)
+		for (size_t i = 0; i < Rank; ++i)
 			assert(dimensions[i] > 0 && "illegal tensor dimension");
 	}
 	template<size_t Rank>
@@ -140,7 +140,7 @@ public:
 	inline static Tensor<Scalar,NewRank> map_tensor_to_tensor(Tensor<Scalar,Rank> tensor, const Dimensions<int,NewRank>& dims) {
 		static_assert(Rank > 0 && NewRank > 0, "illegal tensor rank");
 		assert(tensor.size() == dims.get_volume());
-		return TensorMap<Scalar,Rank>(tensor.data(), dims);
+		return TensorMap<Scalar,NewRank>(tensor.data(), dims);
 	}
 	inline static void shuffle_mat_rows(Matrix<Scalar>& mat) {
 		Eigen::PermutationMatrix<Eigen::Dynamic,Eigen::Dynamic> perm(mat.rows());

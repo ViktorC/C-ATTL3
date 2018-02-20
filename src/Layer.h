@@ -22,6 +22,8 @@
 
 namespace cattle {
 
+// TODO Optional GPU acceleration using cuBLAS and cuDNN.
+
 // Forward declarations to NeuralNetwork and Optimizer so they can be friended.
 template<typename Scalar, size_t Rank, bool Sequential> class NeuralNetwork;
 template<typename Scalar, size_t Rank, bool Sequential> class Optimizer;
@@ -53,7 +55,7 @@ protected:
 	virtual void init() = 0;
 	virtual void empty_cache() = 0;
 	virtual Matrix<Scalar>& get_params() = 0;
-	virtual const Matrix<Scalar>& get_param_grads() const = 0;
+	virtual Matrix<Scalar>& get_param_grads() = 0;
 	virtual void enforce_constraints() = 0;
 	// Rank is increased by one to allow for batch training.
 	virtual DataBatch pass_forward(DataBatch in, bool training) = 0;
@@ -94,7 +96,7 @@ protected:
 	inline Matrix<Scalar>& get_params() {
 		return weights;
 	}
-	inline const Matrix<Scalar>& get_param_grads() const {
+	inline Matrix<Scalar>& get_param_grads() {
 		return weight_grads;
 	}
 	inline void enforce_constraints() {
@@ -222,7 +224,7 @@ protected:
 		biased_in_vec = std::vector<Matrix<Scalar>>(padded_in.dimension(0));
 		/* 'Tensor-row' by 'tensor-row', stretch the receptor locations into row vectors, form a matrix out of
 		 * them, and multiply it by the weight matrix. */
-		for (int i = 0; i < rows; i++) {
+		for (int i = 0; i < rows; ++i) {
 			row_offsets[0] = i;
 			patch_offsets[0] = i;
 			int patch_ind = 0;
@@ -272,7 +274,7 @@ protected:
 		DataBatch prev_out_grads(rows, padded_height, padded_width, depth);
 		prev_out_grads.setZero();
 		Base::weight_grads.setZero(Base::weight_grads.rows(), Base::weight_grads.cols());
-		for (int i = 0; i < rows; i++) {
+		for (int i = 0; i < rows; ++i) {
 			out_grads_row_offsets[0] = i;
 			Matrix<Scalar> prev_out_grads_mat_i;
 			{
@@ -355,7 +357,7 @@ protected:
 	inline Matrix<Scalar>& get_params() {
 		return params;
 	}
-	inline const Matrix<Scalar>& get_param_grads() const {
+	inline Matrix<Scalar>& get_param_grads() {
 		return param_grads;
 	}
 	inline void enforce_constraints() { }
@@ -494,7 +496,7 @@ protected:
 	inline Matrix<Scalar> d_activate(const Matrix<Scalar>& in, const Matrix<Scalar>& out,
 			const Matrix<Scalar>& out_grads) {
 		Matrix<Scalar> d_in(in.rows(), in.cols());
-		for (int i = 0; i < d_in.rows(); i++) {
+		for (int i = 0; i < d_in.rows(); ++i) {
 			RowVector<Scalar> row_i = out.row(i);
 			auto jacobian = (row_i.asDiagonal() - (row_i.transpose() * row_i));
 			d_in.row(i) = out_grads.row(i) * jacobian;
@@ -562,8 +564,8 @@ protected:
 	inline Matrix<Scalar> d_activate(const Matrix<Scalar>& in, const Matrix<Scalar>& out,
 			const Matrix<Scalar>& out_grads) {
 		Matrix<Scalar> d_in(in.rows(), in.cols());
-		for (int i = 0; i < in.cols(); i++) {
-			for (int j = 0; j < in.rows(); j++)
+		for (int i = 0; i < in.cols(); ++i) {
+			for (int j = 0; j < in.rows(); ++j)
 				d_in(j,i) = (in(j,i) > .0 ? 1.0 : (out(j,i) + alpha)) * out_grads(j,i);
 		}
 		return d_in;
@@ -596,8 +598,8 @@ protected:
 			const Matrix<Scalar>& out_grads) {
 		ActivationLayer<Scalar,Rank>::param_grads.row(0).setZero();
 		Matrix<Scalar> d_in = Matrix<Scalar>(in.rows(), in.cols());
-		for (int i = 0; i < in.cols(); i++) {
-			for (int j = 0; j < in.rows(); j++) {
+		for (int i = 0; i < in.cols(); ++i) {
+			for (int j = 0; j < in.rows(); ++j) {
 				Scalar in_ji = in(j,i);
 				if (in_ji >= 0)
 					d_in(j,i) = out_grads(j,i);
@@ -648,7 +650,7 @@ protected:
 	inline Matrix<Scalar>& get_params() {
 		return params;
 	}
-	inline const Matrix<Scalar>& get_param_grads() const {
+	inline Matrix<Scalar>& get_param_grads() {
 		return param_grads;
 	}
 	inline void enforce_constraints() { };
@@ -662,15 +664,15 @@ protected:
 		DataBatch out(rows, output_dims(0), output_dims(1), output_dims(2));
 		init_cache();
 		int patch_ind = 0;
-		for (int i = 0; i < rows; i++) {
+		for (int i = 0; i < rows; ++i) {
 			patch_offsets[0] = i;
 			int out_j = 0;
-			for (int j = 0; j <= height_rem; j += stride, out_j++) {
+			for (int j = 0; j <= height_rem; j += stride, ++out_j) {
 				patch_offsets[1] = j;
 				int out_k = 0;
-				for (int k = 0; k <= width_rem; k += stride, out_k++) {
+				for (int k = 0; k <= width_rem; k += stride, ++out_k) {
 					patch_offsets[2] = k;
-					for (int l = 0; l < depth; l++) {
+					for (int l = 0; l < depth; ++l) {
 						patch_offsets[3] = l;
 						DataBatch patch = in.slice(patch_offsets, patch_extents);
 						out(i,out_j,out_k,l) = reduce(Utils<Scalar>::template map_tensor_to_mat<4>(std::move(patch)), patch_ind++);
@@ -692,15 +694,15 @@ protected:
 		DataBatch prev_out_grads(rows, input_dims(0), input_dims(1), depth);
 		prev_out_grads.setZero();
 		int patch_ind = 0;
-		for (int i = 0; i < rows; i++) {
+		for (int i = 0; i < rows; ++i) {
 			patch_offsets[0] = i;
 			int out_grads_j = 0;
-			for (int j = 0; j <= height_rem; j += stride, out_grads_j++) {
+			for (int j = 0; j <= height_rem; j += stride, ++out_grads_j) {
 				patch_offsets[1] = j;
 				int out_grads_k = 0;
-				for (int k = 0; k <= width_rem; k += stride, out_grads_k++) {
+				for (int k = 0; k <= width_rem; k += stride, ++out_grads_k) {
 					patch_offsets[2] = k;
-					for (int l = 0; l < depth; l++) {
+					for (int l = 0; l < depth; ++l) {
 						patch_offsets[3] = l;
 						prev_out_grads.slice(patch_offsets, patch_extents) +=
 								Utils<Scalar>::template map_mat_to_tensor<4>(d_reduce(out_grads(i,out_grads_j,out_grads_k,l),
@@ -783,7 +785,7 @@ protected:
 	inline Scalar reduce(const RowVector<Scalar>& patch, unsigned patch_ind) {
 		int max_ind = 0;
 		Scalar max = Utils<Scalar>::MIN;
-		for (int i = 0; i < patch.cols(); i++) {
+		for (int i = 0; i < patch.cols(); ++i) {
 			Scalar val_i = patch(i);
 			if (val_i > max) {
 				max = val_i;
@@ -846,7 +848,7 @@ protected:
 		avgs_init = false;
 	}
 	inline void empty_cache() {
-		for (unsigned i = 0; i < cache_vec.size(); i++) {
+		for (unsigned i = 0; i < cache_vec.size(); ++i) {
 			Cache& cache = cache_vec[i];
 			cache.inv_in_sd = RowVector<Scalar>(0);
 			cache.std_in = Matrix<Scalar>(0, 0);
@@ -855,7 +857,7 @@ protected:
 	inline Matrix<Scalar>& get_params() {
 		return params;
 	}
-	inline const Matrix<Scalar>& get_param_grads() const {
+	inline Matrix<Scalar>& get_param_grads() {
 		return param_grads;
 	}
 	inline void enforce_constraints() { }
@@ -966,7 +968,7 @@ protected:
 			Dimensions<int,3> slice_dims({ Base::dims(0), Base::dims(1), 1 });
 			std::array<int,4> offsets({ 0, 0, 0, 0 });
 			std::array<int,4> extents({ rows, slice_dims(0), slice_dims(1), slice_dims(2) });
-			for (int i = 0; i < Base::depth; i++) {
+			for (int i = 0; i < Base::depth; ++i) {
 				offsets[3] = i;
 				typename Base::DataBatch in_slice_i = in.slice(offsets, extents);
 				out.slice(offsets, extents) = Base::_pass_forward(std::move(in_slice_i), slice_dims, training, i);
@@ -987,7 +989,7 @@ protected:
 			Dimensions<int,3> slice_dims({ Base::dims(0), Base::dims(1), 1 });
 			std::array<int,4> offsets({ 0, 0, 0, 0 });
 			std::array<int,4> extents({ rows, slice_dims(0), slice_dims(1), slice_dims(2) });
-			for (int i = 0; i < Base::depth; i++) {
+			for (int i = 0; i < Base::depth; ++i) {
 				offsets[3] = i;
 				typename Base::DataBatch out_grads_slice_i = out_grads.slice(offsets, extents);
 				if (Layer<Scalar,3>::is_input_layer())
@@ -1031,7 +1033,7 @@ protected:
 	inline Matrix<Scalar>& get_params() {
 		return params;
 	}
-	inline const Matrix<Scalar>& get_param_grads() const {
+	inline Matrix<Scalar>& get_param_grads() {
 		return param_grads;
 	}
 	inline void enforce_constraints() { }

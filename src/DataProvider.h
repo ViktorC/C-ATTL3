@@ -21,6 +21,9 @@
 
 namespace cattle {
 
+// TODO OnDiskDataProvider.
+// TODO Specialized data providers for the MNIST, CIFAR, and ImageNet data sets.
+
 template<typename Scalar, size_t Rank, bool Sequential>
 using TensorPtr = std::unique_ptr<Tensor<Scalar,Rank + Sequential + 1>>;
 
@@ -36,8 +39,8 @@ class DataProvider {
 	static_assert(Rank > 0 && Rank < 4, "illegal data provider rank");
 public:
 	virtual ~DataProvider() = default;
-	virtual const Dimensions<int,Rank + Sequential>& get_obs_dims() const = 0;
-	virtual const Dimensions<int,Rank + Sequential>& get_obj_dims() const = 0;
+	virtual const Dimensions<int,Rank>& get_obs_dims() const = 0;
+	virtual const Dimensions<int,Rank>& get_obj_dims() const = 0;
 	virtual unsigned instances() const = 0;
 	virtual bool has_more() const = 0;
 	virtual DataPair<Scalar,Rank,Sequential> get_data(unsigned batch_size) = 0;
@@ -46,8 +49,7 @@ public:
 
 template<typename Scalar, size_t Rank, bool Sequential>
 class InMemoryDataProvider : public DataProvider<Scalar,Rank,Sequential> {
-	static constexpr size_t SEQ_DIMS = Rank + Sequential;
-	static constexpr size_t DATA_DIMS = SEQ_DIMS + 1;
+	static constexpr size_t DATA_DIMS = Rank + Sequential + 1;
 	typedef Tensor<Scalar,DATA_DIMS> Data;
 	typedef TensorPtr<Scalar,Rank,Sequential> DataPtr;
 public:
@@ -62,8 +64,8 @@ public:
 		assert(this->obs->dimension(0) == this->obj->dimension(0) && "mismatched data and obj tensor row numbers");
 		Dimensions<int,DATA_DIMS> obs_dims = Utils<Scalar>::template get_dims<DATA_DIMS>(*this->obs);
 		Dimensions<int,DATA_DIMS> obj_dims = Utils<Scalar>::template get_dims<DATA_DIMS>(*this->obj);
-		this->obs_dims = obs_dims.template demote<>();
-		this->obj_dims = obj_dims.template demote<>();
+		this->obs_dims = obs_dims.template demote<Sequential + 1>();
+		this->obj_dims = obj_dims.template demote<Sequential + 1>();
 		rows = (size_t) this->obs->dimension(0);
 		offsets.fill(0);
 		data_extents = obs_dims;
@@ -73,10 +75,10 @@ public:
 			Utils<Scalar>::template shuffle_tensor_rows<DATA_DIMS>(*this->obj);
 		}
 	}
-	inline const Dimensions<int,SEQ_DIMS>& get_obs_dims() const {
+	inline const Dimensions<int,Rank>& get_obs_dims() const {
 		return obs_dims;
 	}
-	inline const Dimensions<int,SEQ_DIMS>& get_obj_dims() const {
+	inline const Dimensions<int,Rank>& get_obj_dims() const {
 		return obj_dims;
 	}
 	inline unsigned instances() const {
@@ -100,8 +102,8 @@ public:
 private:
 	DataPtr obs;
 	DataPtr obj;
-	Dimensions<int,SEQ_DIMS> obs_dims;
-	Dimensions<int,SEQ_DIMS> obj_dims;
+	Dimensions<int,Rank> obs_dims;
+	Dimensions<int,Rank> obj_dims;
 	size_t rows;
 	std::array<int,DATA_DIMS> offsets;
 	std::array<int,DATA_DIMS> data_extents;

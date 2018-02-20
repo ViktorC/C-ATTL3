@@ -18,6 +18,7 @@
 
 namespace cattle {
 
+// TODO Loss for sequential data.
 // TODO Switch to column-first iteration.
 // TODO CTC loss.
 
@@ -74,10 +75,10 @@ public:
 		Matrix<Scalar> out_mat = Utils<Scalar>::template map_tensor_to_mat<Base::DATA_DIMS>(out);
 		Matrix<Scalar> obj_mat = Utils<Scalar>::template map_tensor_to_mat<Base::DATA_DIMS>(obj);
 		ColVector<Scalar> loss(out_mat.rows());
-		for (int i = 0; i < obj_mat.rows(); i++) {
+		for (int i = 0; i < obj_mat.rows(); ++i) {
 			unsigned ones = 0;
 			int correct_class_ind = -1;
-			for (int j = 0; j < obj_mat.cols(); j++) {
+			for (int j = 0; j < obj_mat.cols(); ++j) {
 				Scalar obj_ij = obj_mat(i,j);
 				assert((Utils<Scalar>::almost_equal(obj_ij, .0) || Utils<Scalar>::almost_equal(obj_ij, 1.0)));
 				if (Utils<Scalar>::almost_equal(obj_ij, 1.0)) {
@@ -88,7 +89,7 @@ public:
 			assert(ones == 1);
 			Scalar loss_i = 0;
 			Scalar correct_class_score = out_mat(i,correct_class_ind);
-			for (int j = 0; j < obj_mat.cols(); j++) {
+			for (int j = 0; j < obj_mat.cols(); ++j) {
 				if (j == correct_class_ind)
 					continue;
 				Scalar loss_ij = std::max(.0, out_mat(i,j) - correct_class_score + 1);
@@ -105,10 +106,10 @@ public:
 		Matrix<Scalar> out_mat = Utils<Scalar>::template map_tensor_to_mat<Base::DATA_DIMS>(out);
 		Matrix<Scalar> obj_mat = Utils<Scalar>::template map_tensor_to_mat<Base::DATA_DIMS>(obj);
 		Matrix<Scalar> out_grads(out_mat.rows(), out_mat.cols());
-		for (int i = 0; i < out_mat.rows(); i++) {
+		for (int i = 0; i < out_mat.rows(); ++i) {
 			unsigned ones = 0;
 			int correct_class_ind = -1;
-			for (int j = 0; j < out_mat.cols(); j++) {
+			for (int j = 0; j < out_mat.cols(); ++j) {
 				Scalar obj_ij = obj_mat(i,j);
 				assert((Utils<Scalar>::almost_equal(obj_ij, .0) || Utils<Scalar>::almost_equal(obj_ij, 1.0)));
 				if (Utils<Scalar>::almost_equal(obj_ij, 1.0)) {
@@ -119,7 +120,7 @@ public:
 			assert(ones == 1);
 			Scalar total_out_grad = 0;
 			Scalar correct_class_score = out_mat(i,correct_class_ind);
-			for (int j = 0; j < out_mat.cols(); j++) {
+			for (int j = 0; j < out_mat.cols(); ++j) {
 				if (j == correct_class_ind)
 					continue;
 				Scalar out_ij = out_mat(i,j);
@@ -186,9 +187,9 @@ public:
 		Matrix<Scalar> out_mat = Utils<Scalar>::template map_tensor_to_mat<Base::DATA_DIMS>(out);
 		Matrix<Scalar> obj_mat = Utils<Scalar>::template map_tensor_to_mat<Base::DATA_DIMS>(obj);
 		ColVector<Scalar> loss(out_mat.rows());
-		for (int i = 0; i < obj_mat.rows(); i++) {
+		for (int i = 0; i < obj_mat.rows(); ++i) {
 			Scalar loss_i = 0;
-			for (int j = 0; j < obj_mat.cols(); j++) {
+			for (int j = 0; j < obj_mat.cols(); ++j) {
 				Scalar obj_ij = obj_mat(i,j);
 				assert((Utils<Scalar>::almost_equal(obj_ij, -1.0) || Utils<Scalar>::almost_equal(obj_ij, 1.0)));
 				Scalar loss_ij = std::max(.0, 1 - obj_ij * out_mat(i,j));
@@ -205,8 +206,8 @@ public:
 		Matrix<Scalar> out_mat = Utils<Scalar>::template map_tensor_to_mat<Base::DATA_DIMS>(out);
 		Matrix<Scalar> obj_mat = Utils<Scalar>::template map_tensor_to_mat<Base::DATA_DIMS>(obj);
 		Matrix<Scalar> out_grads(out_mat.rows(), out_mat.cols());
-		for (int i = 0; i < out_mat.rows(); i++) {
-			for (int j = 0; j < out_mat.cols(); j++) {
+		for (int i = 0; i < out_mat.rows(); ++i) {
+			for (int j = 0; j < out_mat.cols(); ++j) {
 				Scalar obj_ij = obj_mat(i,j);
 				assert((Utils<Scalar>::almost_equal(obj_ij, -1.0) || Utils<Scalar>::almost_equal(obj_ij, 1.0)));
 				Scalar out_ij = out_mat(i,j);
@@ -240,9 +241,9 @@ public:
 		Matrix<Scalar> out_mat = Utils<Scalar>::template map_tensor_to_mat<Base::DATA_DIMS>(out);
 		Matrix<Scalar> obj_mat = Utils<Scalar>::template map_tensor_to_mat<Base::DATA_DIMS>(obj);
 		ColVector<Scalar> loss(out_mat.rows());
-		for (int i = 0; i < out_mat.rows(); i++) {
+		for (int i = 0; i < out_mat.rows(); ++i) {
 			Scalar loss_i = 0;
-			for (int j = 0; j < out_mat.cols(); j++) {
+			for (int j = 0; j < out_mat.cols(); ++j) {
 				Scalar obj_ij = obj_mat(i,j);
 				assert(Utils<Scalar>::almost_equal(obj_ij, .0) || Utils<Scalar>::almost_equal(obj_ij, 1.0));
 				Scalar out_ij = out_mat(i,j);
@@ -260,8 +261,8 @@ public:
 		Matrix<Scalar> obj_mat = Utils<Scalar>::template map_tensor_to_mat<Base::DATA_DIMS>(obj);
 		int rows = out_mat.rows();
 		Matrix<Scalar> out_grads(rows, out_mat.cols());
-		for (int i = 0; i < rows; i++) {
-			for (int j = 0; j < out_grads.cols(); j++) {
+		for (int i = 0; i < rows; ++i) {
+			for (int j = 0; j < out_grads.cols(); ++j) {
 				Scalar obj_ij = obj_mat(i,j);
 				assert(Utils<Scalar>::almost_equal(obj_ij, .0) || Utils<Scalar>::almost_equal(obj_ij, 1.0));
 				Scalar denominator = out_mat(i,j) - (Scalar) (Utils<Scalar>::almost_equal(obj_ij, .0));

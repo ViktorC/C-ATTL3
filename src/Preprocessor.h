@@ -21,6 +21,8 @@
 
 namespace cattle {
 
+// TODO Fix for sequential data.
+
 template<typename Scalar, size_t Rank, bool Sequential>
 class Preprocessor {
 	static_assert(std::is_floating_point<Scalar>::value, "non floating-point scalar type");
@@ -87,7 +89,7 @@ public:
 		sd = Matrix<Scalar>(means.rows(), means.cols());
 		std::array<int,4> offsets({ 0, 0, 0, 0 });
 		std::array<int,4> extents({ rows, dims(0), dims(1), 1 });
-		for (int i = 0; i < depth; i++) {
+		for (int i = 0; i < depth; ++i) {
 			offsets[3] = i;
 			Tensor<Scalar,4> data_slice_i = data.slice(offsets, extents);
 			Matrix<Scalar> data_mat = Utils<Scalar>::template map_tensor_to_mat<4>(std::move(data_slice_i));
@@ -105,7 +107,7 @@ public:
 		Dimensions<int,3> slice_dims({ dims(0), dims(1), 1 });
 		std::array<int,4> offsets = { 0, 0, 0, 0 };
 		std::array<int,4> extents = { rows, slice_dims(0), slice_dims(1), slice_dims(2) };
-		for (int i = 0; i < depth; i++) {
+		for (int i = 0; i < depth; ++i) {
 			offsets[3] = i;
 			Tensor<Scalar,4> data_slice_i = data.slice(offsets, extents);
 			Matrix<Scalar> data_ch_i = Utils<Scalar>::template map_tensor_to_mat<4>(std::move(data_slice_i));
@@ -151,7 +153,7 @@ protected:
 		if (reduce_dims) {
 			const Scalar min_var_to_retain = eigen_values.sum() * min_rel_var_to_retain;
 			Scalar var = 0;
-			for (; dims_to_retain < eigen_values.rows(); dims_to_retain++) {
+			for (; dims_to_retain < eigen_values.rows(); ++dims_to_retain) {
 				// The eigen values are in ascending order.
 				var += eigen_values(eigen_values.rows() - (1 + dims_to_retain));
 				if (Utils<Scalar>::decidedly_greater(var, min_var_to_retain))
@@ -221,7 +223,7 @@ public:
 		Base::ed_vec = std::vector<typename Base::EigenDecomposition>(channels);
 		std::array<int,4> offsets({ 0, 0, 0, 0 });
 		std::array<int,4> extents({ data.dimension(0), BaseBase::dims(0), BaseBase::dims(1), 1 });
-		for (int i = 0; i < channels; i++) {
+		for (int i = 0; i < channels; ++i) {
 			offsets[3] = i;
 			Tensor<Scalar,4> data_slice_i = data.slice(offsets, extents);
 			Base::_fit(std::move(data_slice_i), i);
@@ -236,7 +238,7 @@ public:
 			int rows = data.dimension(0);
 			std::array<int,4> offsets({ 0, 0, 0, 0 });
 			std::array<int,4> extents({ rows, BaseBase::dims(0), BaseBase::dims(1), 1 });
-			for (int i = 0; i < BaseBase::dims(2); i++) {
+			for (int i = 0; i < BaseBase::dims(2); ++i) {
 				offsets[3] = i;
 				Tensor<Scalar,4> data_slice_i = data.slice(offsets, extents);
 				data.slice(offsets, extents) = Base::_transform(std::move(data_slice_i), i);

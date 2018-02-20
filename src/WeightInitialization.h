@@ -60,11 +60,11 @@ public:
 		int cols = weights.cols();
 		std::default_random_engine gen;
 		std::normal_distribution<Scalar> dist(0, sd(rows -  1, cols));
-		for (int i = 0; i < rows; i++) {
+		for (int i = 0; i < rows; ++i) {
 			if (i == rows - 1) { // Bias row.
 				weights.row(i).setConstant(bias);
 			} else {
-				for (int j = 0; j < cols; j++)
+				for (int j = 0; j < cols; ++j)
 					weights(i,j) = dist(gen);
 			}
 		}

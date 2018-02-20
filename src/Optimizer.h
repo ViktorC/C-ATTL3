@@ -26,6 +26,13 @@
 
 namespace cattle {
 
+// TODO Hessian-free w/ Conjugate Gradient
+// TODO L-BFGS
+// TODO Supervised Descent Method
+// TODO Particle Swarm
+// TODO GA
+// TODO PBIL
+
 template<typename Scalar, size_t Rank, bool Sequential>
 using LossSharedPtr = std::shared_ptr<Loss<Scalar,Rank,Sequential>>;
 
@@ -57,15 +64,15 @@ public:
 				(Scalar) provider.instances());
 		bool failure = false;
 		std::vector<Layer<Scalar,Rank>*> layers = net.get_layers();
-		for (unsigned i = 0; i < layers.size(); i++) {
+		for (unsigned i = 0; i < layers.size(); ++i) {
 			Layer<Scalar,Rank>& layer = *(layers[i]);
 			if (layer.is_parametric()) {
 				std::cout << "Layer " << std::setw(3) << std::to_string(i + 1) <<
 						std::string(28, '-') << std::endl;
 				Matrix<Scalar>& params = layer.get_params();
 				const Matrix<Scalar>& param_grads = layer.get_param_grads();
-				for (int j = 0; j < params.rows(); j++) {
-					for (int k = 0; k < params.cols(); k++) {
+				for (int j = 0; j < params.rows(); ++j) {
+					for (int k = 0; k < params.cols(); ++k) {
 						std::cout << "\tParam[" << i << "," << j << "," << k << "]:" << std::endl;
 						Scalar ana_grad = param_grads(j,k);
 						std::cout << "\t\tAnalytic gradient = " << ana_grad << std::endl;
@@ -92,7 +99,7 @@ public:
 			}
 		}
 		// Empty the layer caches.
-		for (unsigned i = 0; i < layers.size(); i++)
+		for (unsigned i = 0; i < layers.size(); ++i)
 			layers[i]->empty_cache();
 		return !failure;
 	}
@@ -107,7 +114,7 @@ public:
 		Scalar prev_test_loss = Utils<Scalar>::MAX;
 		unsigned cons_loss_inc = 0;
 		// Start the optimization iterations.
-		for (unsigned i = 0; i <= epochs; i++) {
+		for (unsigned i = 0; i <= epochs; ++i) {
 			std::cout << "Epoch " << std::setw(3) << i << std::string(28, '-') << std::endl;
 			// Train.
 			if (i != 0) {
@@ -187,7 +194,7 @@ protected:
 			 * sum (see the last line of the function), thus the gradients of the loss function w.r.t the output of
 			 * the network have to be divided by the number of instances in the batch. */
 			Base::backpropagate(net, Base::loss->d_function(out, data_pair.second) / instances);
-			for (unsigned k = 0; k < layers.size(); k++) {
+			for (unsigned k = 0; k < layers.size(); ++k) {
 				Layer<Scalar,Rank>& layer = *(layers[k]);
 				if (Base::is_parametric(layer)) {
 					update_params(layer, k, epoch - 1);
@@ -208,7 +215,7 @@ protected:
 		}
 		Scalar mean_obj_loss = obj_loss / test_prov.instances();
 		Scalar reg_loss = 0;
-		for (unsigned j = 0; j < layers.size(); j++)
+		for (unsigned j = 0; j < layers.size(); ++j)
 			reg_loss += reg->function(Base::get_params(*(layers[j])));
 		std::cout << "\tobj loss: " << std::to_string(mean_obj_loss) << std::endl;
 		std::cout << "\treg loss: " << std::to_string(reg_loss) << std::endl;
@@ -257,7 +264,7 @@ protected:
 	inline void fit(NeuralNetwork<Scalar,Rank,Sequential>& net) {
 		std::vector<Layer<Scalar,Rank>*> layers = Optimizer<Scalar,Rank,Sequential>::get_layers(net);
 		param_grads_vec = std::vector<Matrix<Scalar>>(layers.size());
-		for (unsigned i = 0; i < param_grads_vec.size(); i++) {
+		for (unsigned i = 0; i < param_grads_vec.size(); ++i) {
 			Layer<Scalar,Rank>& layer = *(layers[i]);
 			Matrix<Scalar>& param_grads = param_grads_vec[i];
 			param_grads = Matrix<Scalar>(Optimizer<Scalar,Rank,Sequential>::get_param_grads(layer).rows(),
@@ -319,7 +326,7 @@ protected:
 	inline void fit(NeuralNetwork<Scalar,Rank,Sequential>& net) {
 		std::vector<Layer<Scalar,Rank>*> layers = Optimizer<Scalar,Rank,Sequential>::get_layers(net);
 		param_grad_sqrs_vec = std::vector<Matrix<Scalar>>(layers.size());
-		for (unsigned i = 0; i < param_grad_sqrs_vec.size(); i++) {
+		for (unsigned i = 0; i < param_grad_sqrs_vec.size(); ++i) {
 			Layer<Scalar,Rank>& layer = *(layers[i]);
 			Matrix<Scalar>& param_grad_sqrs = param_grad_sqrs_vec[i];
 			param_grad_sqrs = Matrix<Scalar>(Optimizer<Scalar,Rank,Sequential>::get_param_grads(layer).rows(),
@@ -386,7 +393,7 @@ protected:
 	inline void fit(NeuralNetwork<Scalar,Rank,Sequential>& net) {
 		std::vector<Layer<Scalar,Rank>*> layers = Optimizer<Scalar,Rank,Sequential>::get_layers(net);
 		pgus_vec = std::vector<ParamGradAndUpdateSqrs>(layers.size());
-		for (unsigned i = 0; i < pgus_vec.size(); i++) {
+		for (unsigned i = 0; i < pgus_vec.size(); ++i) {
 			Layer<Scalar,Rank>& layer = *(layers[i]);
 			ParamGradAndUpdateSqrs& pgus = pgus_vec[i];
 			pgus.param_grad = Matrix<Scalar>(Optimizer<Scalar,Rank,Sequential>::get_param_grads(layer).rows(),
@@ -437,7 +444,7 @@ protected:
 	inline void fit(NeuralNetwork<Scalar,Rank,Sequential>& net) {
 		std::vector<Layer<Scalar,Rank>*> layers = Optimizer<Scalar,Rank,Sequential>::get_layers(net);
 		pgn_vec = std::vector<ParamGradNorms>(layers.size());
-		for (unsigned i = 0; i < pgn_vec.size(); i++) {
+		for (unsigned i = 0; i < pgn_vec.size(); ++i) {
 			Layer<Scalar,Rank>& layer = *(layers[i]);
 			ParamGradNorms& vel = pgn_vec[i];
 			vel.param_grad_l1 = Matrix<Scalar>(Optimizer<Scalar,Rank,Sequential>::get_param_grads(layer).rows(),
@@ -519,8 +526,6 @@ protected:
 				((grad_norms.param_grad_l2 * l2_corr).array().sqrt() + Base::epsilon)).matrix();
 	}
 };
-
-// TODO: Hessian-free w/ Conjugate Gradient, L-BFGS, Supervised Descent Method, Particle Swarm, GA, PBIL
 
 } /* namespace cattle */
 
