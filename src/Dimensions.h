@@ -22,17 +22,122 @@
 namespace cattle {
 
 /**
- * NOTE: Expression templates are unwarranted for this class as its objects are very unlikely to
+ * NOTE: Expression templates are rather unwarranted for this class as its objects are unlikely to
  * be used in complex expressions. They have only been implemented for the sake of practical learning.
  */
 
-// Forward declarations.
+template<typename Derived, typename IndexType, size_t Rank>
+class DimExpression;
+
+template<typename IndexType, size_t Rank>
+class Dimensions : public DimExpression<Dimensions<IndexType,Rank>,IndexType,Rank> {
+	friend class Dimensions<IndexType,Rank - 1>;
+	friend class Dimensions<IndexType,Rank + 1>;
+public:
+	inline Dimensions() :
+			values(Rank, 1) { }
+	inline Dimensions(const std::initializer_list<IndexType>& values) :
+			Dimensions() {
+		assert(values.size() <= Rank);
+		std::copy(values.begin(), values.end(), this->values.begin());
+	}
+	inline Dimensions(const std::array<IndexType,Rank>& array) :
+			Dimensions() {
+		assert(array.size() <= Rank);
+		std::copy(array.begin(), array.end(), values.begin());
+	}
+	template<typename OtherDerived>
+	inline Dimensions(const DimExpression<OtherDerived,IndexType,Rank>& dims) :
+			Dimensions() {
+		for (size_t i = 0; i < Rank; i++)
+			values[i] = dims(i);
+	}
+	template<size_t Ranks = 1>
+	inline Dimensions<IndexType,Rank + Ranks> promote() const {
+		Dimensions<IndexType,Rank + Ranks> promoted;
+		std::copy(values.begin(), values.end(), promoted.values.begin() + Ranks);
+		return promoted;
+	}
+	template<size_t Ranks = 1>
+	inline Dimensions<IndexType,Rank - Ranks> demote() const {
+		static_assert(Rank > Ranks, "rank must be greater than the number of ranks to demote by");
+		Dimensions<IndexType,Rank - Ranks> demoted;
+		std::copy(values.begin() + Ranks, values.end(), demoted.values.begin());
+		return demoted;
+	}
+	inline IndexType operator()(size_t i) const {
+		if (i < 0 || i >= Rank)
+			throw std::invalid_argument("illegal index value: " + i);
+		return values[i];
+	}
+	inline IndexType& operator()(size_t i) {
+		if (i < 0 || i >= Rank)
+			throw std::invalid_argument("illegal index value: " + i);
+		return values[i];
+	}
+	inline operator std::array<IndexType,Rank>() const {
+		std::array<IndexType,Rank> array;
+		std::copy(values.begin(), values.end(), array.begin());
+		return array;
+	}
+private:
+	std::vector<IndexType> values;
+};
+
 template<typename IndexType, size_t Rank, typename LhsExpr, typename OpType>
-class UnaryDimExpression;
+class UnaryDimExpression :
+		public DimExpression<UnaryDimExpression<IndexType,Rank,LhsExpr,OpType>,IndexType,Rank> {
+public:
+	inline UnaryDimExpression(const LhsExpr& lhs, const IndexType& rhs) :
+			lhs(lhs),
+			rhs(rhs) { };
+	inline IndexType operator()(size_t i) const {
+		if (i < 0 || i >= Rank)
+			throw std::invalid_argument("illegal index value: " + i);
+		return OpType::apply(lhs(i), rhs);
+	}
+private:
+	const LhsExpr& lhs;
+	IndexType rhs;
+};
+
 template<typename IndexType, size_t Rank, typename LhsExpr, typename RhsExpr, typename OpType>
-class BinaryDimExpression;
+class BinaryDimExpression :
+		public DimExpression<BinaryDimExpression<IndexType,Rank,LhsExpr,RhsExpr,OpType>,IndexType,Rank> {
+public:
+	inline BinaryDimExpression(const LhsExpr& lhs, const RhsExpr& rhs) :
+			lhs(lhs),
+			rhs(rhs) { };
+	inline IndexType operator()(size_t i) const {
+		if (i < 0 || i >= Rank)
+			throw std::invalid_argument("illegal index value: " + i);
+		return OpType::apply(lhs(i), rhs(i));
+	}
+protected:
+	const LhsExpr& lhs;
+	const RhsExpr& rhs;
+};
+
 template<typename IndexType, size_t Rank, typename LhsExpr, typename RhsExpr, typename OpType>
-class BinaryRankWiseDimExpression;
+class BinaryRankWiseDimExpression :
+		public DimExpression<BinaryRankWiseDimExpression<IndexType,Rank,LhsExpr,RhsExpr,OpType>,IndexType,Rank> {
+public:
+	inline BinaryRankWiseDimExpression(const LhsExpr& lhs, const RhsExpr& rhs, size_t rank) :
+			lhs(lhs),
+			rhs(rhs),
+			rank(rank) {
+		assert(rank < Rank);
+	}
+	inline IndexType operator()(size_t i) const {
+		if (i < 0 || i >= Rank)
+			throw std::invalid_argument("illegal index value: " + i);
+		return i == rank ? OpType::apply(lhs(i), rhs(i)) : lhs(i);
+	}
+protected:
+	const LhsExpr& lhs;
+	const RhsExpr& rhs;
+	size_t rank;
+};
 
 // Arithmetic operations.
 template<typename Operand> class SumOp {
@@ -135,116 +240,6 @@ public:
 	inline friend std::ostream& operator<<(std::ostream& os, const Self& dims) {
 		return os << dims.to_string();
 	}
-};
-
-template<typename IndexType, size_t Rank, typename LhsExpr, typename OpType>
-class UnaryDimExpression :
-		public DimExpression<UnaryDimExpression<IndexType,Rank,LhsExpr,OpType>,IndexType,Rank> {
-public:
-	inline UnaryDimExpression(const LhsExpr& lhs, const IndexType& rhs) :
-			lhs(lhs),
-			rhs(rhs) { };
-	inline IndexType operator()(size_t i) const {
-		if (i < 0 || i >= Rank)
-			throw std::invalid_argument("illegal index value: " + i);
-		return OpType::apply(lhs(i), rhs);
-	}
-private:
-	const LhsExpr& lhs;
-	IndexType rhs;
-};
-
-template<typename IndexType, size_t Rank, typename LhsExpr, typename RhsExpr, typename OpType>
-class BinaryDimExpression :
-		public DimExpression<BinaryDimExpression<IndexType,Rank,LhsExpr,RhsExpr,OpType>,IndexType,Rank> {
-public:
-	inline BinaryDimExpression(const LhsExpr& lhs, const RhsExpr& rhs) :
-			lhs(lhs),
-			rhs(rhs) { };
-	inline IndexType operator()(size_t i) const {
-		if (i < 0 || i >= Rank)
-			throw std::invalid_argument("illegal index value: " + i);
-		return OpType::apply(lhs(i), rhs(i));
-	}
-protected:
-	const LhsExpr& lhs;
-	const RhsExpr& rhs;
-};
-
-template<typename IndexType, size_t Rank, typename LhsExpr, typename RhsExpr, typename OpType>
-class BinaryRankWiseDimExpression :
-		public DimExpression<BinaryRankWiseDimExpression<IndexType,Rank,LhsExpr,RhsExpr,OpType>,IndexType,Rank> {
-public:
-	inline BinaryRankWiseDimExpression(const LhsExpr& lhs, const RhsExpr& rhs, size_t rank) :
-			lhs(lhs),
-			rhs(rhs),
-			rank(rank) {
-		assert(rank < Rank);
-	}
-	inline IndexType operator()(size_t i) const {
-		if (i < 0 || i >= Rank)
-			throw std::invalid_argument("illegal index value: " + i);
-		return i == rank ? OpType::apply(lhs(i), rhs(i)) : lhs(i);
-	}
-protected:
-	const LhsExpr& lhs;
-	const RhsExpr& rhs;
-	size_t rank;
-};
-
-template<typename IndexType, size_t Rank>
-class Dimensions : public DimExpression<Dimensions<IndexType,Rank>,IndexType,Rank> {
-	friend class Dimensions<IndexType,Rank - 1>;
-	friend class Dimensions<IndexType,Rank + 1>;
-public:
-	inline Dimensions() :
-			values(Rank, 1) { }
-	inline Dimensions(const std::initializer_list<IndexType>& values) :
-			Dimensions() {
-		assert(values.size() <= Rank);
-		std::copy(values.begin(), values.end(), this->values.begin());
-	}
-	inline Dimensions(const std::array<IndexType,Rank>& array) :
-			Dimensions() {
-		assert(array.size() <= Rank);
-		std::copy(array.begin(), array.end(), values.begin());
-	}
-	template<typename OtherDerived>
-	inline Dimensions(const DimExpression<OtherDerived,IndexType,Rank>& dims) :
-			Dimensions() {
-		for (size_t i = 0; i < Rank; i++)
-			values[i] = dims(i);
-	}
-	template<size_t Ranks = 1>
-	inline Dimensions<IndexType,Rank + Ranks> promote() const {
-		Dimensions<IndexType,Rank + Ranks> promoted;
-		std::copy(values.begin(), values.end(), promoted.values.begin() + Ranks);
-		return promoted;
-	}
-	template<size_t Ranks = 1>
-	inline Dimensions<IndexType,Rank - Ranks> demote() const {
-		static_assert(Rank > Ranks, "rank must be greater than the number of ranks to demote by");
-		Dimensions<IndexType,Rank - Ranks> demoted;
-		std::copy(values.begin() + Ranks, values.end(), demoted.values.begin());
-		return demoted;
-	}
-	inline IndexType operator()(size_t i) const {
-		if (i < 0 || i >= Rank)
-			throw std::invalid_argument("illegal index value: " + i);
-		return values[i];
-	}
-	inline IndexType& operator()(size_t i) {
-		if (i < 0 || i >= Rank)
-			throw std::invalid_argument("illegal index value: " + i);
-		return values[i];
-	}
-	inline operator std::array<IndexType,Rank>() const {
-		std::array<IndexType,Rank> array;
-		std::copy(values.begin(), values.end(), array.begin());
-		return array;
-	}
-private:
-	std::vector<IndexType> values;
 };
 
 } /* namespace cattle */

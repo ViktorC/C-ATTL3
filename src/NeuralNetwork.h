@@ -112,6 +112,9 @@ protected:
 	inline static Data pass_back(Layer<Scalar,Rank>& layer, Data&& out_grads) {
 		return layer.pass_back(std::move(out_grads));
 	}
+	inline static Matrix<Scalar>& get_param_grads(Layer<Scalar,Rank>& layer) {
+		return layer.get_param_grads();
+	}
 };
 
 template<typename Scalar, size_t Rank>
@@ -339,13 +342,18 @@ protected:
 		this->foremost = foremost;
 	}
 	inline std::vector<Layer<Scalar,Rank>*> get_layers() {
-		std::vector<Layer<Scalar,Rank>*> layers_raw(5);
-		layers_raw[0] = u_kernel->get();
-		layers_raw[1] = v_kernel->get();
-		layers_raw[2] = w_kernel->get();
-		layers_raw[3] = state_act->get();
-		layers_raw[4] = output_act->get();
-		return layers_raw;
+		size_t num_cells = cells.size() + 1;
+		std::vector<Layer<Scalar,Rank>*> layers(5 * num_cells);
+		for (int i = 0; i < num_cells; i++) {
+			Cell& cell = i == 0 ? main_cell : cells[i - 1];
+			int offset = 5 * i;
+			layers[offset] = cell.u_kernel->get();
+			layers[offset + 1] = cell.v_kernel->get();
+			layers[offset + 2] = cell.w_kernel->get();
+			layers[offset + 3] = cell.state_act->get();
+			layers[offset + 4] = cell.output_act->get();
+		}
+		return layers;
 	}
 	inline typename Base::Data propagate(typename Base::Data input, bool training) {
 		Utils<Scalar>::template check_tensor_dims<Base::DATA_DIMS>(input);
@@ -353,6 +361,7 @@ protected:
 		assert(input_dims == data_dims.template demote<2>());
 		int samples = data_dims(0);
 		int input_seq_length = data_dims(1);
+		// Calculate the output sequence length and delay based on the input sequence length.
 		std::pair<size_t,size_t> output_seq_info = output_seq_size_func((size_t) input_seq_length);
 		int output_seq_length = (int) output_seq_info.first;
 		int output_seq_delay = (int) output_seq_info.second;
@@ -382,45 +391,67 @@ protected:
 		this->input_seq_length = input_seq_length;
 		this->output_seq_length = output_seq_length;
 		this->output_seq_delay = output_seq_delay;
-		cells = std::vector<Cell>(input_seq_length - 1);
 		RankwiseArray offsets;
 		RankwiseArray input_extents = data_dims;
 		RankwiseArray output_extents = output_dims.template promote<2>();
 		offsets.fill(0);
 		input_extents(1) = 1;
-		output_extents(0) = samples;
 		typename Base::Data out;
+		// If the output is a single time step prediction, there is no need to create an output tensor.
 		if (output_seq_length > 1) {
+			output_extents(0) = samples;
 			output_extents(1) = output_seq_length;
 			out = typename Base::Data(output_extents);
+			output_extents(1) = 1;
 		}
-		output_extents(1) = 1;
 		Dimensions<int,Rank + 1> time_step_dims = input_dims.template promote<>();
 		time_step_dims(0) = samples;
 		int time_steps = output_seq_length + output_seq_delay;
 		for (int i = 0; i < time_steps; i++) {
 			Cell& cell;
-			if (i = 0 || !training)
+			// In inference mode, do not unroll the network.
+			if (!training)
 				cell = main_cell;
-			else {
-				cell = cells[i - 1];
-				if (i < input_seq_length)
-					cell.u_kernel = KernelPtr<Scalar,Rank>(main_cell.u_kernel->clone());
-				cell.w_kernel = KernelPtr<Scalar,Rank>(main_cell.w_kernel->clone());
-				cell.state_act = ActivationPtr<Scalar,Rank>(main_cell.state_act->clone());
-				if (i >= output_seq_delay) {
-					cell.v_kernel = KernelPtr<Scalar,Rank>(main_cell.v_kernel->clone());
-					cell.output_act = ActivationPtr<Scalar,Rank>(main_cell.output_act->clone());
+			else if (i = 0) {
+				if (time_steps > 1) {
+					// Empty the caches of the main layer to reduce the amount of data to copy.
+					Base::empty_cache(*main_cell.u_kernel);
+					Base::empty_cache(*main_cell.v_kernel);
+					Base::empty_cache(*main_cell.w_kernel);
+					Base::empty_cache(*main_cell.state_act);
+					Base::empty_cache(*main_cell.output_act);
+					cells = std::vector<Cell>(time_steps - 1);
+					// Unroll the network by creating n -1 copies of the main cell;
+					for (int j = 1; j < time_steps; j++) {
+						cell = cells[j - 1];
+						if (i < input_seq_length)
+							cell.u_kernel = KernelPtr<Scalar,Rank>(main_cell.u_kernel->clone());
+						cell.w_kernel = KernelPtr<Scalar,Rank>(main_cell.w_kernel->clone());
+						cell.state_act = ActivationPtr<Scalar,Rank>(main_cell.state_act->clone());
+						if (i >= output_seq_delay) {
+							cell.v_kernel = KernelPtr<Scalar,Rank>(main_cell.v_kernel->clone());
+							cell.output_act = ActivationPtr<Scalar,Rank>(main_cell.output_act->clone());
+						}
+					}
 				}
-			}
+				cell = main_cell;
+			} else
+				cell = cells[i - 1];
 			offsets[1] = i;
+			// If there is an input for the time step...
 			if (i < input_seq_length) {
-				typename Base::Data in_i_seq = input.slice(offsets, input_extents);
+				typename Base::Data in_i_seq;
+				if (input_seq_length == 1)
+					in_i_seq = Utils<Scalar>::template map_tensor_to_tensor<Base::DATA_DIMS,Rank + 1>(std::move(input),
+							input_extents);
+				else
+					in_i_seq = input.slice(offsets, input_extents);
 				Dimensions<int,Rank + 1> dims = input_dims;
 				dims(0) = samples;
 				Tensor<Scalar,Rank + 1> in_i = Base::pass_forward(*cell.u_kernel,
 						Utils<Scalar>::template map_tensor_to_tensor<Base::DATA_DIMS,Rank + 1>(std::move(in_i_seq),
 								time_step_dims), training);
+				// If in inference mode, empty the caches after passing the data through each layer.
 				if (!training)
 					Base::empty_cache(*cell.u_kernel);
 				if (mul_integration)
@@ -435,6 +466,7 @@ protected:
 						training), training);
 			if (!training)
 				Base::empty_cache(*cell.state_act);
+			// If there is an output for the time step...
 			if (i >= output_seq_delay) {
 				Tensor<Scalar,Rank + 1> out_i = Base::pass_forward(*cell.v_kernel, state, training);
 				if (!training)
@@ -442,11 +474,11 @@ protected:
 				out_i = Base::pass_forward(*cell.output_act, std::move(out_i), training);
 				if (!training)
 					Base::empty_cache(*cell.output_act);
-				if (output_seq_length == 1 && i == time_steps - 1)
+				// If the output is a single time step prediction, just return it.
+				if (output_seq_length == 1)
 					return Utils<Scalar>::template map_tensor_to_tensor<Rank + 1,Base::DATA_DIMS>(out_i,
 							output_extents);
-				else
-					out.slice(offsets, output_extents) = out_i;
+				out.slice(offsets, output_extents) = out_i;
 			}
 		}
 		return out;
@@ -456,13 +488,40 @@ protected:
 		Dimensions<int,Base::DATA_DIMS> data_dims = Utils<Scalar>::template get_dims<Base::DATA_DIMS>(out_grads);
 		assert(output_dims == data_dims.template demote<2>() && batch_size == data_dims(0) &&
 				output_seq_length == data_dims(1));
+		RankwiseArray offsets;
+		RankwiseArray output_extents = data_dims;
+		RankwiseArray input_extents = input_dims.template promote<2>();
+		offsets.fill(0);
+		output_extents(1) = 1;
+		typename Base::Data prev_out_grads;
+		if (input_seq_length > 1) {
+			input_extents(0) = samples;
+			input_extents(1) = input_seq_length;
+			prev_out_grads = typename Base::Data(input_extents);
+			input_extents(1) = 1;
+		}
 		int time_steps = output_seq_length + output_seq_delay;
 		for (int i = time_steps - 1; i >= 0; i++) {
+			Cell& cell = i == 0 ? main_cell : cells[i - 1];
+			offsets[1] = i;
 			if (i >= output_seq_delay) {
-
+				Tensor<Scalar,Rank + 1> out_grads_i;
+				if (output_seq_length == 1)
+					out_grads_i = Utils<Scalar>::template map_tensor_to_tensor<Base::DATA_DIMS,Rank + 1>(
+							std::move(out_grads), output_extents);
+				else
+					out_grads_i = out_grads.slice(offsets, output_extents);
+				out_grads_i = Base::pass_back(*cell.v_kernel, std::move(out_grads_i));
+			}
+			if (i < input_seq_length) {
+				if (input_seq_length == 1)
+					return Utils<Scalar>::map_tensor_to_tensor<Rank + 1,Base::DATA_DIMS>(
+							Base::pass_back(*cell.u_kernel, std::move()), input_extents);
+				prev_out_grads.slice(offsets, input_extents) = Base::pass_back(*cell.u_kernel,
+						std::move());
 			}
 		}
-		return out_grads;
+		return prev_out_grads;
 	}
 private:
 	struct Cell {
@@ -771,6 +830,20 @@ private:
 	bool foremost;
 	typename Base::Dims input_dims;
 	typename Base::Dims output_dims;
+	struct PropArgs {
+		Self* obj;
+		int lane_id;
+		bool training;
+		typename Base::Data* in;
+		typename Base::Data out;
+	};
+	struct BackpropArgs {
+		Self* obj;
+		int lane_id;
+		int depth_offset;
+		typename Base::Data* out_grads;
+		typename Base::Data prev_out_grads;
+	};
 	inline static void* propagate(void* args_ptr) {
 		PropArgs& args = *((PropArgs*) args_ptr);
 		args.out = args.obj->lanes[args.lane_id]->propagate(*args.in, args.training);
@@ -787,20 +860,6 @@ private:
 		args.prev_out_grads = lane.backpropagate(std::move(out_grads_slice));
 		return nullptr;
 	}
-	struct PropArgs {
-		Self* obj;
-		int lane_id;
-		bool training;
-		typename Base::Data* in;
-		typename Base::Data out;
-	};
-	struct BackpropArgs {
-		Self* obj;
-		int lane_id;
-		int depth_offset;
-		typename Base::Data* out_grads;
-		typename Base::Data prev_out_grads;
-	};
 };
 
 /**
