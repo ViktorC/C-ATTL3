@@ -19,8 +19,8 @@
 namespace cattle {
 
 // TODO Loss for sequential data.
-// TODO Switch to column-first iteration.
 // TODO CTC loss.
+// TODO Switch to column-first iteration.
 
 template<typename Scalar, size_t Rank, bool Sequential>
 class Loss {

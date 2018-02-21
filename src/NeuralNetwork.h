@@ -25,14 +25,13 @@
 #include <vector>
 
 // TODO Truncated BPTT and multiplicative integration for RecurrentNeuralNetwork.
-// TODO LSTM and GRU networks.
 // TODO Sequential feed forward network.
+// TODO LSTM and GRU networks.
 // TODO Possibility to add and remove modules (e.g. layers for sequential networks, inception modules for InceptionNets).
 // TODO Serialization.
 
 namespace cattle {
 
-// Forward declaration to Optimizer and CompositeNeuralNetwork so they can be friended.
 template<typename Scalar, size_t Rank, bool Sequential> class Optimizer;
 template<typename Scalar, size_t Rank, bool Sequential> class CompositeNeuralNetwork;
 template<typename Scalar> class ParallelNeuralNetwork;
@@ -509,7 +508,7 @@ protected:
 		output_offsets.fill(0);
 		output_offsets[1] = output_seq_length - 1;
 		input_offsets.fill(0);
-		output_offsets[1] = input_seq_length - 1;
+		input_offsets[1] = input_seq_length - 1;
 		output_extents[1] = 1;
 		input_extents[0] = batch_size;
 		typename Base::Data prev_out_grads;
@@ -565,12 +564,11 @@ protected:
 			Base::empty_cache(*cell.w_kernel);
 		}
 		// Roll the network up and accumulate the gradients.
-		// FIXME Evaluate once instead of time_steps - 1 times.
-		Matrix<Scalar>& u_param_grads = Base::get_param_grads(*main_cell.u_kernel);
-		Matrix<Scalar>& v_param_grads = Base::get_param_grads(*main_cell.v_kernel);
-		Matrix<Scalar>& w_param_grads = Base::get_param_grads(*main_cell.w_kernel);
-		Matrix<Scalar>& state_act_param_grads = Base::get_param_grads(*main_cell.state_act);
-		Matrix<Scalar>& output_act_param_grads = Base::get_param_grads(*main_cell.output_act);
+		auto u_param_grads = Base::get_param_grads(*main_cell.u_kernel);
+		auto v_param_grads = Base::get_param_grads(*main_cell.v_kernel);
+		auto w_param_grads = Base::get_param_grads(*main_cell.w_kernel);
+		auto state_act_param_grads = Base::get_param_grads(*main_cell.state_act);
+		auto output_act_param_grads = Base::get_param_grads(*main_cell.output_act);
 		for (int i = 1; i < time_steps; ++i) {
 			Cell& cell = cells[i - 1];
 			w_param_grads += Base::get_param_grads(*cell.w_kernel);
@@ -582,6 +580,11 @@ protected:
 				output_act_param_grads += Base::get_param_grads(*cell.output_act);
 			}
 		}
+		Base::get_param_grads(*main_cell.u_kernel) = u_param_grads;
+		Base::get_param_grads(*main_cell.v_kernel) = v_param_grads;
+		Base::get_param_grads(*main_cell.w_kernel) = w_param_grads;
+		Base::get_param_grads(*main_cell.state_act) = state_act_param_grads;
+		Base::get_param_grads(*main_cell.output_act) = output_act_param_grads;
 		return prev_out_grads;
 	}
 private:
