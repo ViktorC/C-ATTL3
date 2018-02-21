@@ -507,7 +507,9 @@ protected:
 		RankwiseArray input_offsets;
 		RankwiseArray input_extents = input_dims.template promote<2>();
 		output_offsets.fill(0);
+		output_offsets[1] = output_seq_length - 1;
 		input_offsets.fill(0);
+		output_offsets[1] = input_seq_length - 1;
 		output_extents[1] = 1;
 		input_extents[0] = batch_size;
 		typename Base::Data prev_out_grads;
@@ -530,7 +532,7 @@ protected:
 					out_grads_seq_i = std::move(out_grads);
 				else {
 					out_grads_seq_i = out_grads.slice(output_offsets, output_extents);
-					output_offsets[1] += 1;
+					output_offsets[1] -= 1;
 				}
 				Tensor<Scalar,Rank + 1> out_grads_i = Base::pass_back(*cell.output_act,
 						Utils<Scalar>::template map_tensor_to_tensor<Base::DATA_DIMS,Rank + 1>(
@@ -554,7 +556,7 @@ protected:
 					prev_out_grads.slice(input_offsets, input_extents) =
 							Utils<Scalar>::template map_tensor_to_tensor<Rank + 1,Base::DATA_DIMS>(
 									Base::pass_back(*cell.u_kernel, state_grads), input_extents);
-					input_offsets[1] += 1;
+					input_offsets[1] -= 1;
 				}
 				Base::empty_cache(*cell.u_kernel);
 			}
