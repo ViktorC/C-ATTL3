@@ -25,28 +25,28 @@
 static int test_rnn() {
 	using namespace cattle;
 	typedef double Scalar;
-	const int RANK = 1;
+	const int RANK = 3;
 	const bool SEQ = true;
-	TensorPtr<Scalar,RANK,SEQ> training_obs_ptr = TensorPtr<Scalar,RANK,SEQ>(new Tensor<Scalar,RANK + SEQ + 1>(80, 5, 3));
-	TensorPtr<Scalar,RANK,SEQ> training_obj_ptr = TensorPtr<Scalar,RANK,SEQ>(new Tensor<Scalar,RANK + SEQ + 1>(80, 1, 1));
+	TensorPtr<Scalar,RANK,SEQ> training_obs_ptr = TensorPtr<Scalar,RANK,SEQ>(new Tensor<Scalar,RANK + SEQ + 1>(80, 5, 16, 16, 3));
+	TensorPtr<Scalar,RANK,SEQ> training_obj_ptr = TensorPtr<Scalar,RANK,SEQ>(new Tensor<Scalar,RANK + SEQ + 1>(80, 3, 2, 1, 1));
 	training_obs_ptr->setRandom();
 	training_obj_ptr->setRandom();
 	InMemoryDataProvider<Scalar,RANK,SEQ> training_prov(std::move(training_obs_ptr), std::move(training_obj_ptr));
-	TensorPtr<Scalar,RANK,SEQ> test_obs_ptr = TensorPtr<Scalar,RANK,SEQ>(new Tensor<Scalar,RANK + SEQ + 1>(20, 5, 3));
-	TensorPtr<Scalar,RANK,SEQ> test_obj_ptr = TensorPtr<Scalar,RANK,SEQ>(new Tensor<Scalar,RANK + SEQ + 1>(20, 1, 1));
+	TensorPtr<Scalar,RANK,SEQ> test_obs_ptr = TensorPtr<Scalar,RANK,SEQ>(new Tensor<Scalar,RANK + SEQ + 1>(20, 5, 16, 16, 3));
+	TensorPtr<Scalar,RANK,SEQ> test_obj_ptr = TensorPtr<Scalar,RANK,SEQ>(new Tensor<Scalar,RANK + SEQ + 1>(20, 3, 2, 1, 1));
 	test_obs_ptr->setRandom();
 	test_obj_ptr->setRandom();
 	InMemoryDataProvider<Scalar,RANK,SEQ> test_prov(std::move(test_obs_ptr), std::move(test_obj_ptr));
 	WeightInitSharedPtr<Scalar> init(new OrthogonalWeightInitialization<Scalar>());
-	KernelPtr<Scalar,RANK> u_kernel = KernelPtr<Scalar,RANK>(new FCLayer<Scalar,RANK>(training_prov.get_obs_dims(), 30, init));
-	KernelPtr<Scalar,RANK> v_kernel = KernelPtr<Scalar,RANK>(new FCLayer<Scalar,RANK>(u_kernel->get_output_dims(), 1, init));
-	KernelPtr<Scalar,RANK> w_kernel = KernelPtr<Scalar,RANK>(new FCLayer<Scalar,RANK>(u_kernel->get_output_dims(), 30, init));
+	KernelPtr<Scalar,RANK> u_kernel = KernelPtr<Scalar,RANK>(new ConvLayer<Scalar>(training_prov.get_obs_dims(), 5, init));
+	KernelPtr<Scalar,RANK> v_kernel = KernelPtr<Scalar,RANK>(new FCLayer<Scalar,RANK>(u_kernel->get_output_dims(), 2, init));
+	KernelPtr<Scalar,RANK> w_kernel = KernelPtr<Scalar,RANK>(new ConvLayer<Scalar>(u_kernel->get_output_dims(), 5, init));
 	ActivationPtr<Scalar,RANK> state_act = ActivationPtr<Scalar,RANK>(
 			new SigmoidActivationLayer<Scalar,RANK>(u_kernel->get_output_dims()));
 	ActivationPtr<Scalar,RANK> output_act = ActivationPtr<Scalar,RANK>(
 			new IdentityActivationLayer<Scalar,RANK>(v_kernel->get_output_dims()));
 	RecurrentNeuralNetwork<Scalar,RANK> rnn(std::move(u_kernel), std::move(v_kernel), std::move(w_kernel), std::move(state_act),
-			std::move(output_act), [](int input_seq_length) { return std::make_pair(1, input_seq_length - 1); });
+			std::move(output_act), [](int input_seq_length) { return std::make_pair(3, input_seq_length - 3); });
 	rnn.init();
 	LossSharedPtr<Scalar,RANK,SEQ> loss(new QuadraticLoss<Scalar,RANK,SEQ>());
 	RegPenSharedPtr<Scalar> reg(new ElasticNetRegularizationPenalty<Scalar>());
@@ -124,5 +124,5 @@ static int test_cnn() {
 }
 
 int main() {
-	return test_rnn() | test_cnn();
+	return test_rnn();
 }
