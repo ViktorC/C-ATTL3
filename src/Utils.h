@@ -98,7 +98,7 @@ public:
 		}
 	}
 	template<size_t Rank>
-	inline static void check_tensor_dims(const Tensor<Scalar,Rank>& tensor) {
+	inline static void check_tensor_validity(const Tensor<Scalar,Rank>& tensor) {
 		std::array<int,Rank> dimensions = tensor.dimensions();
 		for (size_t i = 0; i < Rank; ++i)
 			assert(dimensions[i] > 0 && "illegal tensor dimension");

@@ -59,8 +59,8 @@ public:
 			offsets() {
 		assert(this->obs != nullptr);
 		assert(this->obj != nullptr);
-		Utils<Scalar>::template check_tensor_dims<DATA_DIMS>(*this->obs);
-		Utils<Scalar>::template check_tensor_dims<DATA_DIMS>(*this->obj);
+		Utils<Scalar>::template check_tensor_validity<DATA_DIMS>(*this->obs);
+		Utils<Scalar>::template check_tensor_validity<DATA_DIMS>(*this->obj);
 		assert(this->obs->dimension(0) == this->obj->dimension(0) && "mismatched data and obj tensor row numbers");
 		Dimensions<int,DATA_DIMS> obs_dims = Utils<Scalar>::template get_dims<DATA_DIMS>(*this->obs);
 		Dimensions<int,DATA_DIMS> obj_dims = Utils<Scalar>::template get_dims<DATA_DIMS>(*this->obj);

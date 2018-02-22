@@ -46,7 +46,7 @@ static int test_rnn() {
 	ActivationPtr<Scalar,RANK> output_act = ActivationPtr<Scalar,RANK>(
 			new IdentityActivationLayer<Scalar,RANK>(v_kernel->get_output_dims()));
 	RecurrentNeuralNetwork<Scalar,RANK> rnn(std::move(u_kernel), std::move(v_kernel), std::move(w_kernel), std::move(state_act),
-			std::move(output_act), [](int input_seq_length) { return std::make_pair(3, input_seq_length - 3); });
+			std::move(output_act), [](int input_seq_length) { return std::make_pair(3, input_seq_length - 3); }, false, true);
 	rnn.init();
 	LossSharedPtr<Scalar,RANK,SEQ> loss(new QuadraticLoss<Scalar,RANK,SEQ>());
 	RegPenSharedPtr<Scalar> reg(new ElasticNetRegularizationPenalty<Scalar>());
