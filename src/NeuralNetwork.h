@@ -31,9 +31,10 @@
 
 namespace cattle {
 
-template<typename Scalar, size_t Rank, bool Sequential> class Optimizer;
 template<typename Scalar, size_t Rank, bool Sequential> class CompositeNeuralNetwork;
+template<typename Scalar, size_t Rank> class SequentialNeuralNetwork;
 template<typename Scalar> class ParallelNeuralNetwork;
+template<typename Scalar, size_t Rank, bool Sequential> class Optimizer;
 
 /**
  * A neural network class that consists of a vector of neuron layers. It allows
@@ -47,9 +48,10 @@ template<typename Scalar, size_t Rank, bool Sequential>
 class NeuralNetwork {
 	static_assert(std::is_floating_point<Scalar>::value, "non floating-point scalar type");
 	static_assert(Rank > 0 && Rank < 4, "illegal neural network rank");
-	friend class Optimizer<Scalar,Rank,Sequential>;
 	friend class CompositeNeuralNetwork<Scalar,Rank,Sequential>;
+	friend class SequentialNeuralNetwork<Scalar,Rank>;
 	friend class ParallelNeuralNetwork<Scalar>;
+	friend class Optimizer<Scalar,Rank,Sequential>;
 protected:
 	static constexpr size_t DATA_DIMS = Rank + Sequential + 1;
 	typedef Tensor<Scalar,DATA_DIMS> Data;
