@@ -98,9 +98,8 @@ public:
 				}
 			}
 		}
-		// Empty the layer caches.
-		for (unsigned i = 0; i < layers.size(); ++i)
-			layers[i]->empty_cache();
+		// Empty the network caches.
+		net.empty_caches();
 		return !failure;
 	}
 	inline void optimize(Net& net, Provider& training_prov, Provider& test_prov, unsigned epochs, unsigned early_stop = 0) {

@@ -49,8 +49,8 @@ public:
 
 template<typename Scalar, size_t Rank, bool Sequential>
 class InMemoryDataProvider : public DataProvider<Scalar,Rank,Sequential> {
-	static constexpr size_t DATA_DIMS = Rank + Sequential + 1;
-	typedef Tensor<Scalar,DATA_DIMS> Data;
+	static constexpr size_t DATA_RANKS = Rank + Sequential + 1;
+	typedef Tensor<Scalar,DATA_RANKS> Data;
 	typedef TensorPtr<Scalar,Rank,Sequential> DataPtr;
 public:
 	inline InMemoryDataProvider(DataPtr obs, DataPtr obj, bool shuffle = true) :
@@ -59,11 +59,11 @@ public:
 			offsets() {
 		assert(this->obs != nullptr);
 		assert(this->obj != nullptr);
-		Utils<Scalar>::template check_tensor_validity<DATA_DIMS>(*this->obs);
-		Utils<Scalar>::template check_tensor_validity<DATA_DIMS>(*this->obj);
+		Utils<Scalar>::template check_dim_validity<DATA_RANKS>(*this->obs);
+		Utils<Scalar>::template check_dim_validity<DATA_RANKS>(*this->obj);
 		assert(this->obs->dimension(0) == this->obj->dimension(0) && "mismatched data and obj tensor row numbers");
-		Dimensions<int,DATA_DIMS> obs_dims = Utils<Scalar>::template get_dims<DATA_DIMS>(*this->obs);
-		Dimensions<int,DATA_DIMS> obj_dims = Utils<Scalar>::template get_dims<DATA_DIMS>(*this->obj);
+		Dimensions<int,DATA_RANKS> obs_dims = Utils<Scalar>::template get_dims<DATA_RANKS>(*this->obs);
+		Dimensions<int,DATA_RANKS> obj_dims = Utils<Scalar>::template get_dims<DATA_RANKS>(*this->obj);
 		this->obs_dims = obs_dims.template demote<Sequential + 1>();
 		this->obj_dims = obj_dims.template demote<Sequential + 1>();
 		rows = (size_t) this->obs->dimension(0);
@@ -71,8 +71,8 @@ public:
 		data_extents = obs_dims;
 		obj_extents = obj_dims;
 		if (shuffle) {
-			Utils<Scalar>::template shuffle_tensor_rows<DATA_DIMS>(*this->obs);
-			Utils<Scalar>::template shuffle_tensor_rows<DATA_DIMS>(*this->obj);
+			Utils<Scalar>::template shuffle_tensor_rows<DATA_RANKS>(*this->obs);
+			Utils<Scalar>::template shuffle_tensor_rows<DATA_RANKS>(*this->obj);
 		}
 	}
 	inline const Dimensions<int,Rank>& get_obs_dims() const {
@@ -105,9 +105,9 @@ private:
 	Dimensions<int,Rank> obs_dims;
 	Dimensions<int,Rank> obj_dims;
 	size_t rows;
-	std::array<int,DATA_DIMS> offsets;
-	std::array<int,DATA_DIMS> data_extents;
-	std::array<int,DATA_DIMS> obj_extents;
+	std::array<int,DATA_RANKS> offsets;
+	std::array<int,DATA_RANKS> data_extents;
+	std::array<int,DATA_RANKS> obj_extents;
 };
 
 } /* namespace cattle */

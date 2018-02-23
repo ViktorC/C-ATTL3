@@ -98,7 +98,7 @@ public:
 		}
 	}
 	template<size_t Rank>
-	inline static void check_tensor_validity(const Tensor<Scalar,Rank>& tensor) {
+	inline static void check_dim_validity(const Tensor<Scalar,Rank>& tensor) {
 		std::array<int,Rank> dimensions = tensor.dimensions();
 		for (size_t i = 0; i < Rank; ++i)
 			assert(dimensions[i] > 0 && "illegal tensor dimension");
@@ -141,6 +141,26 @@ public:
 		static_assert(Rank > 0 && NewRank > 0, "illegal tensor rank");
 		assert(tensor.size() == dims.get_volume());
 		return TensorMap<Scalar,NewRank>(tensor.data(), dims);
+	}
+	template<size_t Rank>
+	inline static Tensor<Scalar,Rank - 1> join_two_lowest_ranks(Tensor<Scalar,Rank> tensor) {
+		static_assert(Rank > 1, "illegal tensor rank");
+		Dimensions<int,Rank> dims = get_dims<Rank>(tensor);
+		int lowest_dim = dims(0);
+		Dimensions<int,Rank - 1> joined_dims = dims.template demote<>();
+		joined_dims(0) *= lowest_dim;
+		return TensorMap<Scalar,Rank - 1>(tensor.data(), joined_dims);
+	}
+	template<size_t Rank>
+	inline static Tensor<Scalar,Rank + 1> split_two_lowest_ranks(Tensor<Scalar,Rank> tensor, size_t rank0_size,
+			size_t rank1_size) {
+		static_assert(Rank > 0, "illegal tensor rank");
+		Dimensions<int,Rank> dims = get_dims<Rank>(tensor);
+		assert(dims(0) == rank0_size * rank1_size);
+		Dimensions<int,Rank + 1> split_dims = dims.template promote<>();
+		split_dims(0) = rank0_size;
+		split_dims(1) = rank1_size;
+		return TensorMap<Scalar,Rank + 1>(tensor.data(), split_dims);
 	}
 	inline static void shuffle_mat_rows(Matrix<Scalar>& mat) {
 		Eigen::PermutationMatrix<Eigen::Dynamic,Eigen::Dynamic> perm(mat.rows());
