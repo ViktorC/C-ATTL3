@@ -1258,8 +1258,8 @@ protected:
 		assert(input_dims == Utils<Scalar>::template get_dims<Base::DATA_RANKS>(input).template demote<2>());
 		batch_size = input.dimension(0);
 		int seq_length = input.dimension(1);
-		return Utils<Scalar>::template split_two_lowest_ranks<Base::DATA_RANKS - 1>(
-				net->propagate(Utils<Scalar>::template join_two_lowest_ranks<Base::DATA_RANKS>(std::move(input)), training),
+		return Utils<Scalar>::template split_first_rank<Base::DATA_RANKS - 1>(
+				net->propagate(Utils<Scalar>::template join_first_two_ranks<Base::DATA_RANKS>(std::move(input)), training),
 				batch_size, seq_length);
 	}
 	inline typename Base::Data backpropagate(typename Base::Data out_grads) {
@@ -1267,8 +1267,8 @@ protected:
 		assert(output_dims == Utils<Scalar>::template get_dims<Base::DATA_RANKS>(out_grads).template demote<2>());
 		assert(batch_size == out_grads.dimension(0));
 		int seq_length = out_grads.dimension(1);
-		return Utils<Scalar>::template split_two_lowest_ranks<Base::DATA_RANKS - 1>(
-				net->backpropagate(Utils<Scalar>::template join_two_lowest_ranks<Base::DATA_RANKS>(std::move(out_grads))),
+		return Utils<Scalar>::template split_first_rank<Base::DATA_RANKS - 1>(
+				net->backpropagate(Utils<Scalar>::template join_first_two_ranks<Base::DATA_RANKS>(std::move(out_grads))),
 				batch_size, seq_length);
 	}
 private:

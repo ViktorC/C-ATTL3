@@ -102,7 +102,7 @@ public:
 		net.empty_caches();
 		return !failure;
 	}
-	inline void optimize(Net& net, Provider& training_prov, Provider& test_prov, unsigned epochs, unsigned early_stop = 0) {
+	inline Scalar optimize(Net& net, Provider& training_prov, Provider& test_prov, unsigned epochs, unsigned early_stop = 0) {
 		assert(net.get_input_dims() == training_prov.get_obs_dims());
 		assert(net.get_output_dims() == training_prov.get_obj_dims());
 		assert(training_prov.get_obs_dims() == test_prov.get_obs_dims());
@@ -128,12 +128,13 @@ public:
 				cons_loss_inc++;
 				std::cout << " *****INCREASED LOSS*****";
 				if (early_stop > 0 && cons_loss_inc >= early_stop)
-					break;
+					return prev_test_loss;
 			} else
 				cons_loss_inc = 0;
 			std::cout << std::endl << std::endl;
 			prev_test_loss = test_loss;
 		}
+		return prev_test_loss;
 	}
 protected:
 	virtual void fit(Net& net) = 0;

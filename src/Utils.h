@@ -26,7 +26,8 @@ template <typename Scalar>
 using ColVector = Eigen::Matrix<Scalar,Eigen::Dynamic,1,Eigen::ColMajor,Eigen::Dynamic,1>;
 
 template<typename Scalar>
-using Matrix = Eigen::Matrix<Scalar,Eigen::Dynamic,Eigen::Dynamic,Eigen::ColMajor,Eigen::Dynamic,Eigen::Dynamic>;
+using Matrix = Eigen::Matrix<Scalar,Eigen::Dynamic,Eigen::Dynamic,Eigen::ColMajor,
+		Eigen::Dynamic,Eigen::Dynamic>;
 
 template<typename Scalar>
 using MatrixMap = Eigen::Map<Matrix<Scalar>>;
@@ -121,7 +122,8 @@ public:
 		return MatrixMap<Scalar>(tensor.data(), rows, tensor.size() / rows);
 	}
 	template<size_t Rank>
-	inline static Tensor<Scalar,Rank> map_mat_to_tensor(Matrix<Scalar> mat, const Dimensions<int,Rank - 1>& dims) {
+	inline static Tensor<Scalar,Rank> map_mat_to_tensor(Matrix<Scalar> mat,
+			const Dimensions<int,Rank - 1>& dims) {
 		static_assert(Rank > 1, "rank too low for conversion to tensor");
 		assert(dims.get_volume() == mat.cols());
 		Dimensions<int,Rank> promoted = dims.template promote<>();
@@ -137,13 +139,14 @@ public:
 		return TensorMap<Scalar,Rank>(mat.data(), dims);
 	}
 	template<size_t Rank, size_t NewRank>
-	inline static Tensor<Scalar,NewRank> map_tensor_to_tensor(Tensor<Scalar,Rank> tensor, const Dimensions<int,NewRank>& dims) {
+	inline static Tensor<Scalar,NewRank> map_tensor_to_tensor(Tensor<Scalar,Rank> tensor,
+			const Dimensions<int,NewRank>& dims) {
 		static_assert(Rank > 0 && NewRank > 0, "illegal tensor rank");
 		assert(tensor.size() == dims.get_volume());
 		return TensorMap<Scalar,NewRank>(tensor.data(), dims);
 	}
 	template<size_t Rank>
-	inline static Tensor<Scalar,Rank - 1> join_two_lowest_ranks(Tensor<Scalar,Rank> tensor) {
+	inline static Tensor<Scalar,Rank - 1> join_first_two_ranks(Tensor<Scalar,Rank> tensor) {
 		static_assert(Rank > 1, "illegal tensor rank");
 		Dimensions<int,Rank> dims = get_dims<Rank>(tensor);
 		int lowest_dim = dims(0);
@@ -152,7 +155,7 @@ public:
 		return TensorMap<Scalar,Rank - 1>(tensor.data(), joined_dims);
 	}
 	template<size_t Rank>
-	inline static Tensor<Scalar,Rank + 1> split_two_lowest_ranks(Tensor<Scalar,Rank> tensor, size_t rank0_size,
+	inline static Tensor<Scalar,Rank + 1> split_first_rank(Tensor<Scalar,Rank> tensor, size_t rank0_size,
 			size_t rank1_size) {
 		static_assert(Rank > 0, "illegal tensor rank");
 		Dimensions<int,Rank> dims = get_dims<Rank>(tensor);
