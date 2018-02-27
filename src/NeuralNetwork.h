@@ -8,6 +8,7 @@
 #ifndef NEURALNETWORK_H_
 #define NEURALNETWORK_H_
 
+#include <algorithm>
 #include <array>
 #include <cassert>
 #include <cstddef>
@@ -233,6 +234,216 @@ private:
 	bool foremost;
 	typename Base::Dims input_dims;
 	typename Base::Dims output_dims;
+};
+
+template<typename Scalar>
+class ParallelNeuralNetwork : public NeuralNetwork<Scalar,3,false> {
+	typedef NeuralNetwork<Scalar,3,false> Base;
+	typedef ParallelNeuralNetwork<Scalar> Self;
+	typedef NeuralNetPtr<Scalar,3,false> Lane;
+public:
+	inline ParallelNeuralNetwork(std::vector<Lane> lanes, bool foremost = true) :
+			lanes(std::move(lanes)) {
+		assert(this->lanes.size() > 0 && "lanes must contain at least 1 element");
+		assert(this->lanes[0] != nullptr && "lanes contains null pointers");
+		Base& first_lane = *this->lanes[0];
+		const typename Base::Dims& input_dims = first_lane.get_input_dims();
+		typename Base::Dims output_dims = first_lane.get_output_dims();
+		for (unsigned i = 1; i < this->lanes.size(); ++i) {
+			assert(this->lanes[i] != nullptr && "lanes contains null pointers");
+			Base& lane = *this->lanes[i];
+			assert(input_dims == lane.get_input_dims());
+			const typename Base::Dims& lane_output_dims = lane.get_output_dims();
+			assert(output_dims(0) == lane_output_dims(0) &&
+					output_dims(1) == lane_output_dims(1));
+			output_dims(2) += lane_output_dims(2);
+		}
+		set_foremost(foremost);
+		this->input_dims = first_lane.get_input_dims();
+		this->output_dims = output_dims;
+	}
+	inline ParallelNeuralNetwork(Base&& lane, bool foremost = true) :
+			ParallelNeuralNetwork(create_vector(std::move(lane)), foremost) { }
+	inline ParallelNeuralNetwork(const Self& network) :
+			lanes(network.lanes.size()) {
+		for (unsigned i = 0; i < lanes.size(); ++i)
+			lanes[i] = Lane(network.lanes[i]->clone());
+		foremost = network.foremost;
+		input_dims = network.input_dims;
+		output_dims = network.output_dims;
+	}
+	inline ParallelNeuralNetwork(Self&& network) {
+		swap(*this, network);
+	}
+	~ParallelNeuralNetwork() = default;
+	inline Self& operator=(Self network) {
+		swap(*this, network);
+		return *this;
+	}
+	inline bool is_foremost() const {
+		return foremost;
+	}
+	inline Base* clone() const {
+		return new ParallelNeuralNetwork(*this);
+	}
+	inline typename Base::Dims get_input_dims() const {
+		return input_dims;
+	}
+	inline typename Base::Dims get_output_dims() const {
+		return output_dims;
+	}
+	inline friend void swap(Self& network1, Self& network2) {
+		using std::swap;
+		swap(network1.lanes, network2.lanes);
+		swap(network1.foremost, network2.foremost);
+		swap(network1.input_dims, network2.input_dims);
+		swap(network1.output_dims, network2.output_dims);
+	}
+protected:
+	inline void set_foremost(bool foremost) {
+		for (unsigned i = 0; i < lanes.size(); ++i)
+			lanes[i]->set_foremost(foremost);
+		this->foremost = foremost;
+	}
+	inline void empty_caches() {
+		for (unsigned i = 0; i < lanes.size(); ++i)
+			lanes[i]->empty_caches();
+	}
+	inline std::vector<Layer<Scalar,3>*> get_layers() {
+		std::vector<Layer<Scalar,3>*> layers;
+		for (unsigned i = 0; i < lanes.size(); ++i) {
+			std::vector<Layer<Scalar,3>*> lane_layers = lanes[i]->get_layers();
+			for (unsigned j = 0; j < lane_layers.size(); ++j)
+				layers.push_back(lane_layers[j]);
+		}
+		return layers;
+	}
+	inline typename Base::Data propagate(typename Base::Data input, bool training) {
+		Utils<Scalar>::template check_dim_validity<4>(input);
+		assert(input_dims == Utils<Scalar>::template get_dims<4>(input).template demote<>());
+		int rows = input.dimension(0);
+		std::array<int,4> offsets({ 0, 0, 0, 0 });
+		std::array<int,4> extents({ rows, output_dims(0), output_dims(1), output_dims(2) });
+		typename Base::Data out(extents);
+		unsigned lane_num = lanes.size();
+		unsigned helper_thread_num = lane_num - 1;
+		pthread_t threads[helper_thread_num];
+		pthread_attr_t attr;
+		if (helper_thread_num > 0) {
+			pthread_attr_init(&attr);
+			pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_JOINABLE);
+		}
+		PropArgs args_arr[lane_num];
+		for (int i = helper_thread_num; i >= 0; --i) {
+			PropArgs args;
+			args.obj = this;
+			args.lane_id = i;
+			args.training = training;
+			args.in = &input;
+			args_arr[i] = args;
+			// Leave the first lane to the main thread.
+			if (i == 0)
+				propagate(&args_arr[i]);
+			else
+				assert(!pthread_create(&threads[i - 1], &attr, propagate, &args_arr[i]));
+		}
+		for (unsigned i = 0; i < lane_num; ++i) {
+			if (i != 0)
+				assert(!pthread_join(threads[i - 1], nullptr));
+			int depth = lanes[i]->get_output_dims()(2);
+			extents[3] = depth;
+			out.slice(offsets, extents) = args_arr[i].out;
+			offsets[3] += depth;
+		}
+		if (helper_thread_num > 0)
+			pthread_attr_destroy(&attr);
+		return out;
+	}
+	inline typename Base::Data backpropagate(typename Base::Data out_grads) {
+		Utils<Scalar>::template check_dim_validity<4>(out_grads);
+		assert(output_dims == Utils<Scalar>::template get_dims<4>(out_grads).template demote<>());
+		typename Base::Data prev_out_grads;
+		if (foremost)
+			prev_out_grads = Utils<Scalar>::template get_null_tensor<4>();
+		else {
+			prev_out_grads = typename Base::Data(out_grads.dimension(0), input_dims(0),
+					input_dims(1), input_dims(2));
+			prev_out_grads.setZero();
+		}
+		unsigned lane_num = lanes.size();
+		unsigned helper_thread_num = lane_num - 1;
+		pthread_t threads[helper_thread_num];
+		pthread_attr_t attr;
+		if (helper_thread_num > 0) {
+			pthread_attr_init(&attr);
+			pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_JOINABLE);
+		}
+		BackpropArgs args_arr[lane_num];
+		int depth_offset = out_grads.dimension(3);
+		for (int i = helper_thread_num; i >= 0; --i) {
+			depth_offset -= lanes[i]->get_output_dims()(2);
+			BackpropArgs args;
+			args.obj = this;
+			args.lane_id = i;
+			args.depth_offset = depth_offset;
+			args.out_grads = &out_grads;
+			args_arr[i] = args;
+			// Leave the first lane to the main thread.
+			if (i == 0)
+				backpropagate(&args_arr[i]);
+			else
+				assert(!pthread_create(&threads[i - 1], &attr, backpropagate, &args_arr[i]));
+		}
+		for (unsigned i = 0; i < lanes.size(); ++i) {
+			if (i != 0)
+				assert(!pthread_join(threads[i - 1], nullptr));
+			if (!foremost)
+				prev_out_grads += args_arr[i].prev_out_grads;
+		}
+		if (helper_thread_num > 0)
+			pthread_attr_destroy(&attr);
+		return prev_out_grads;
+	}
+	inline static std::vector<Lane> create_vector(Lane&& net) {
+		std::vector<Lane> vec(1);
+		vec[0] = std::move(net);
+		return vec;
+	}
+private:
+	std::vector<Lane> lanes;
+	bool foremost;
+	typename Base::Dims input_dims;
+	typename Base::Dims output_dims;
+	struct PropArgs {
+		Self* obj;
+		int lane_id;
+		bool training;
+		typename Base::Data* in;
+		typename Base::Data out;
+	};
+	struct BackpropArgs {
+		Self* obj;
+		int lane_id;
+		int depth_offset;
+		typename Base::Data* out_grads;
+		typename Base::Data prev_out_grads;
+	};
+	inline static void* propagate(void* args_ptr) {
+		PropArgs& args = *((PropArgs*) args_ptr);
+		args.out = args.obj->lanes[args.lane_id]->propagate(*args.in, args.training);
+		return nullptr;
+	}
+	inline static void* backpropagate(void* args_ptr) {
+		BackpropArgs& args = *((BackpropArgs*) args_ptr);
+		Base& lane = *args.obj->lanes[args.lane_id];
+		const typename Base::Dims& lane_output_dims = lane.get_output_dims();
+		std::array<int,4> offsets({ 0, 0, 0, args.depth_offset });
+		std::array<int,4> extents({ args.out_grads->dimension(0), lane_output_dims(0),
+				lane_output_dims(1), lane_output_dims(2) });
+		typename Base::Data out_grads_slice = args.out_grads->slice(offsets, extents);
+		args.prev_out_grads = lane.backpropagate(std::move(out_grads_slice));
+		return nullptr;
+	}
 };
 
 template<typename Scalar, size_t Rank>
@@ -548,55 +759,46 @@ protected:
 	typename Base::Dims output_dims;
 };
 
-template<typename Scalar>
-class ParallelNeuralNetwork : public NeuralNetwork<Scalar,3,false> {
-	typedef NeuralNetwork<Scalar,3,false> Base;
-	typedef ParallelNeuralNetwork<Scalar> Self;
-	typedef NeuralNetPtr<Scalar,3,false> Lane;
+/**
+ * Enables the use of non-sequential networks on sequential data by joining the 'samples' and 'time steps' ranks of
+ * the tensors and splitting them again once the internal, non-sequential network is done processing them.
+ */
+template<typename Scalar, size_t Rank>
+class SequentialNeuralNetwork : public NeuralNetwork<Scalar,Rank,true> {
+	typedef NeuralNetwork<Scalar,Rank,true> Base;
+	typedef SequentialNeuralNetwork<Scalar,Rank> Self;
+	typedef NeuralNetPtr<Scalar,Rank,false> Net;
+	typedef std::array<int,Base::DATA_RANKS> RankwiseArray;
 public:
-	inline ParallelNeuralNetwork(std::vector<Lane> lanes, bool foremost = true) :
-			lanes(std::move(lanes)) {
-		assert(this->lanes.size() > 0 && "lanes must contain at least 1 element");
-		assert(this->lanes[0] != nullptr && "lanes contains null pointers");
-		Base& first_lane = *this->lanes[0];
-		const typename Base::Dims& input_dims = first_lane.get_input_dims();
-		typename Base::Dims output_dims = first_lane.get_output_dims();
-		for (unsigned i = 1; i < this->lanes.size(); ++i) {
-			assert(this->lanes[i] != nullptr && "lanes contains null pointers");
-			Base& lane = *this->lanes[i];
-			assert(input_dims == lane.get_input_dims());
-			const typename Base::Dims& lane_output_dims = lane.get_output_dims();
-			assert(output_dims(0) == lane_output_dims(0) &&
-					output_dims(1) == lane_output_dims(1));
-			output_dims(2) += lane_output_dims(2);
-		}
+	inline SequentialNeuralNetwork(Net network, bool foremost = true) :
+			net(std::move(network)),
+			foremost(foremost),
+			batch_size(-1) {
+		assert(net);
+		input_dims = net->get_input_dims();
+		output_dims = net->get_output_dims();
 		set_foremost(foremost);
-		this->input_dims = first_lane.get_input_dims();
-		this->output_dims = output_dims;
 	}
-	inline ParallelNeuralNetwork(Base&& lane, bool foremost = true) :
-			ParallelNeuralNetwork(create_vector(std::move(lane)), foremost) { }
-	inline ParallelNeuralNetwork(const Self& network) :
-			lanes(network.lanes.size()) {
-		for (unsigned i = 0; i < lanes.size(); ++i)
-			lanes[i] = Lane(network.lanes[i]->clone());
+	inline SequentialNeuralNetwork(const Self& network) {
+		net = Net(network.net->clone());
 		foremost = network.foremost;
 		input_dims = network.input_dims;
 		output_dims = network.output_dims;
+		batch_size = network.batch_size;
 	}
-	inline ParallelNeuralNetwork(Self&& network) {
+	inline SequentialNeuralNetwork(Self&& network) {
 		swap(*this, network);
 	}
-	~ParallelNeuralNetwork() = default;
+	~SequentialNeuralNetwork() = default;
 	inline Self& operator=(Self network) {
 		swap(*this, network);
 		return *this;
 	}
+	inline Base* clone() const {
+		return new SequentialNeuralNetwork(*this);
+	}
 	inline bool is_foremost() const {
 		return foremost;
-	}
-	inline Base* clone() const {
-		return new ParallelNeuralNetwork(*this);
 	}
 	inline typename Base::Dims get_input_dims() const {
 		return input_dims;
@@ -606,156 +808,66 @@ public:
 	}
 	inline friend void swap(Self& network1, Self& network2) {
 		using std::swap;
-		swap(network1.lanes, network2.lanes);
+		swap(network1.net, network2.net);
 		swap(network1.foremost, network2.foremost);
 		swap(network1.input_dims, network2.input_dims);
 		swap(network1.output_dims, network2.output_dims);
+		swap(network1.batch_size, network2.batch_size);
 	}
 protected:
 	inline void set_foremost(bool foremost) {
-		for (unsigned i = 0; i < lanes.size(); ++i)
-			lanes[i]->set_foremost(foremost);
+		net->set_foremost(foremost);
 		this->foremost = foremost;
 	}
 	inline void empty_caches() {
-		for (unsigned i = 0; i < lanes.size(); ++i)
-			lanes[i]->empty_caches();
+		net->empty_caches();
 	}
-	inline std::vector<Layer<Scalar,3>*> get_layers() {
-		std::vector<Layer<Scalar,3>*> layers;
-		for (unsigned i = 0; i < lanes.size(); ++i) {
-			std::vector<Layer<Scalar,3>*> lane_layers = lanes[i]->get_layers();
-			for (unsigned j = 0; j < lane_layers.size(); ++j)
-				layers.push_back(lane_layers[j]);
-		}
-		return layers;
+	inline std::vector<Layer<Scalar,Rank>*> get_layers() {
+		return net->get_layers();
 	}
 	inline typename Base::Data propagate(typename Base::Data input, bool training) {
-		Utils<Scalar>::template check_dim_validity<4>(input);
-		assert(input_dims == Utils<Scalar>::template get_dims<4>(input).template demote<>());
-		int rows = input.dimension(0);
-		std::array<int,4> offsets({ 0, 0, 0, 0 });
-		std::array<int,4> extents({ rows, output_dims(0), output_dims(1), output_dims(2) });
-		typename Base::Data out(extents);
-		unsigned lane_num = lanes.size();
-		unsigned helper_thread_num = lane_num - 1;
-		pthread_t threads[helper_thread_num];
-		pthread_attr_t attr;
-		if (helper_thread_num > 0) {
-			pthread_attr_init(&attr);
-			pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_JOINABLE);
-		}
-		PropArgs args_arr[lane_num];
-		for (int i = helper_thread_num; i >= 0; --i) {
-			PropArgs args;
-			args.obj = this;
-			args.lane_id = i;
-			args.training = training;
-			args.in = &input;
-			args_arr[i] = args;
-			// Leave the first lane to the main thread.
-			if (i == 0)
-				propagate(&args_arr[i]);
-			else
-				assert(!pthread_create(&threads[i - 1], &attr, propagate, &args_arr[i]));
-		}
-		for (unsigned i = 0; i < lane_num; ++i) {
-			if (i != 0)
-				assert(!pthread_join(threads[i - 1], nullptr));
-			int depth = lanes[i]->get_output_dims()(2);
-			extents[3] = depth;
-			out.slice(offsets, extents) = args_arr[i].out;
-			offsets[3] += depth;
-		}
-		if (helper_thread_num > 0)
-			pthread_attr_destroy(&attr);
-		return out;
+		Utils<Scalar>::template check_dim_validity<Base::DATA_RANKS>(input);
+		assert(input_dims == Utils<Scalar>::template get_dims<Base::DATA_RANKS>(input).template demote<2>());
+		batch_size = input.dimension(0);
+		int seq_length = input.dimension(1);
+		return Utils<Scalar>::template split_first_rank<Base::DATA_RANKS - 1>(
+				net->propagate(Utils<Scalar>::template join_first_two_ranks<Base::DATA_RANKS>(std::move(input)), training),
+				batch_size, seq_length);
 	}
 	inline typename Base::Data backpropagate(typename Base::Data out_grads) {
-		Utils<Scalar>::template check_dim_validity<4>(out_grads);
-		assert(output_dims == Utils<Scalar>::template get_dims<4>(out_grads).template demote<>());
-		typename Base::Data prev_out_grads;
-		if (foremost)
-			prev_out_grads = Utils<Scalar>::template get_null_tensor<4>();
-		else {
-			prev_out_grads = typename Base::Data(out_grads.dimension(0), input_dims(0),
-					input_dims(1), input_dims(2));
-			prev_out_grads.setZero();
-		}
-		unsigned lane_num = lanes.size();
-		unsigned helper_thread_num = lane_num - 1;
-		pthread_t threads[helper_thread_num];
-		pthread_attr_t attr;
-		if (helper_thread_num > 0) {
-			pthread_attr_init(&attr);
-			pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_JOINABLE);
-		}
-		BackpropArgs args_arr[lane_num];
-		int depth_offset = out_grads.dimension(3);
-		for (int i = helper_thread_num; i >= 0; --i) {
-			depth_offset -= lanes[i]->get_output_dims()(2);
-			BackpropArgs args;
-			args.obj = this;
-			args.lane_id = i;
-			args.depth_offset = depth_offset;
-			args.out_grads = &out_grads;
-			args_arr[i] = args;
-			// Leave the first lane to the main thread.
-			if (i == 0)
-				backpropagate(&args_arr[i]);
-			else
-				assert(!pthread_create(&threads[i - 1], &attr, backpropagate, &args_arr[i]));
-		}
-		for (unsigned i = 0; i < lanes.size(); ++i) {
-			if (i != 0)
-				assert(!pthread_join(threads[i - 1], nullptr));
-			if (!foremost)
-				prev_out_grads += args_arr[i].prev_out_grads;
-		}
-		if (helper_thread_num > 0)
-			pthread_attr_destroy(&attr);
-		return prev_out_grads;
-	}
-	inline static std::vector<Lane> create_vector(Lane&& net) {
-		std::vector<Lane> vec(1);
-		vec[0] = std::move(net);
-		return vec;
+		Utils<Scalar>::template check_dim_validity<Base::DATA_RANKS>(out_grads);
+		assert(output_dims == Utils<Scalar>::template get_dims<Base::DATA_RANKS>(out_grads).template demote<2>());
+		assert(batch_size == out_grads.dimension(0));
+		int seq_length = out_grads.dimension(1);
+		return Utils<Scalar>::template split_first_rank<Base::DATA_RANKS - 1>(
+				net->backpropagate(Utils<Scalar>::template join_first_two_ranks<Base::DATA_RANKS>(std::move(out_grads))),
+				batch_size, seq_length);
 	}
 private:
-	std::vector<Lane> lanes;
+	Net net;
 	bool foremost;
 	typename Base::Dims input_dims;
 	typename Base::Dims output_dims;
-	struct PropArgs {
-		Self* obj;
-		int lane_id;
-		bool training;
-		typename Base::Data* in;
-		typename Base::Data out;
-	};
-	struct BackpropArgs {
-		Self* obj;
-		int lane_id;
-		int depth_offset;
-		typename Base::Data* out_grads;
-		typename Base::Data prev_out_grads;
-	};
-	inline static void* propagate(void* args_ptr) {
-		PropArgs& args = *((PropArgs*) args_ptr);
-		args.out = args.obj->lanes[args.lane_id]->propagate(*args.in, args.training);
-		return nullptr;
-	}
-	inline static void* backpropagate(void* args_ptr) {
-		BackpropArgs& args = *((BackpropArgs*) args_ptr);
-		Base& lane = *args.obj->lanes[args.lane_id];
-		const typename Base::Dims& lane_output_dims = lane.get_output_dims();
-		std::array<int,4> offsets({ 0, 0, 0, args.depth_offset });
-		std::array<int,4> extents({ args.out_grads->dimension(0), lane_output_dims(0),
-				lane_output_dims(1), lane_output_dims(2) });
-		typename Base::Data out_grads_slice = args.out_grads->slice(offsets, extents);
-		args.prev_out_grads = lane.backpropagate(std::move(out_grads_slice));
-		return nullptr;
-	}
+	int batch_size;
+};
+
+template<typename Scalar, size_t Rank>
+class UnidirectionalNeuralNetwork : public NeuralNetwork<Scalar,Rank,true> {
+public:
+	virtual ~UnidirectionalNeuralNetwork() = default;
+protected:
+	virtual bool is_reversed() const;
+	virtual void reverse();
+};
+
+template<typename Scalar, size_t Rank>
+using UnidirNeuralNetPtr = UnidirectionalNeuralNetwork<Scalar,Rank>;
+
+template<typename Scalar, size_t Rank>
+class BidirectionalNeuralNetwork : public NeuralNetwork<Scalar,Rank,true> {
+	typedef NeuralNetwork<Scalar,Rank,true> Base;
+public:
+
 };
 
 template<typename Scalar, size_t Rank>
@@ -765,19 +877,22 @@ template<typename Scalar, size_t Rank>
 using ActivationPtr = std::unique_ptr<ActivationLayer<Scalar,Rank>>;
 
 template<typename Scalar, size_t Rank>
-class RecurrentNeuralNetwork : public NeuralNetwork<Scalar,Rank,true> {
-	typedef NeuralNetwork<Scalar,Rank,true> Base;
+class RecurrentNeuralNetwork : public UnidirectionalNeuralNetwork<Scalar,Rank> {
+	typedef NeuralNetwork<Scalar,Rank,true> Root;
 	typedef RecurrentNeuralNetwork<Scalar,Rank> Self;
-	typedef std::array<int,Base::DATA_RANKS> RankwiseArray;
+	typedef std::array<int,Root::DATA_RANKS> RankwiseIntArray;
+	typedef std::array<bool,Root::DATA_RANKS> RankwiseBoolArray;
 	typedef std::function<std::pair<size_t,size_t>(size_t)> OutputSeqSizeFunc;
 public:
 	inline RecurrentNeuralNetwork(KernelPtr<Scalar,Rank> input_kernel, KernelPtr<Scalar,Rank> state_kernel,
 			KernelPtr<Scalar,Rank> output_kernel, ActivationPtr<Scalar,Rank> state_act, ActivationPtr<Scalar,Rank> output_act,
-			OutputSeqSizeFunc output_seq_size_func, bool stateful = false, bool mul_int = false, bool foremost = true) :
+			OutputSeqSizeFunc output_seq_size_func, bool stateful = false, bool mul_int = false, bool reversed = false,
+			bool foremost = true) :
 				main_cell(),
 				output_seq_size_func(output_seq_size_func),
 				stateful(stateful),
 				mul_int(mul_int),
+				reversed(reversed),
 				foremost(foremost),
 				cells(0),
 				batch_size(-1),
@@ -785,9 +900,9 @@ public:
 				output_seq_length(-1),
 				output_seq_delay(-1) {
 		assert(input_kernel && state_kernel && output_kernel && state_act && output_act);
-		typename Base::Dims input_layer_input_dims = input_kernel->get_input_dims();
-		typename Base::Dims input_layer_output_dims = input_kernel->get_output_dims();
-		typename Base::Dims output_layer_output_dims = output_kernel->get_output_dims();
+		typename Root::Dims input_layer_input_dims = input_kernel->get_input_dims();
+		typename Root::Dims input_layer_output_dims = input_kernel->get_output_dims();
+		typename Root::Dims output_layer_output_dims = output_kernel->get_output_dims();
 		assert(input_layer_output_dims == state_kernel->get_output_dims() &&
 				input_layer_output_dims == output_kernel->get_input_dims() &&
 				input_layer_output_dims == state_act->get_input_dims() &&
@@ -803,7 +918,21 @@ public:
 		set_foremost(foremost);
 	}
 	// Copy constructor.
-	inline RecurrentNeuralNetwork(const Self& network) {
+	inline RecurrentNeuralNetwork(const Self& network) :
+			main_cell(),
+			output_seq_size_func(network.output_seq_size_func),
+			stateful(network.stateful),
+			mul_int(network.mul_int),
+			reversed(network.reversed),
+			foremost(network.foremost),
+			input_dims(network.input_dims),
+			output_dims(network.output_dims),
+			cells(network.cells.size()),
+			state(network.state),
+			batch_size(network.batch_size),
+			input_seq_length(network.input_seq_length),
+			output_seq_length(network.output_seq_length),
+			output_seq_delay(network.output_seq_delay) {
 		main_cell.input_kernel = KernelPtr<Scalar,Rank>((KernelLayer<Scalar,Rank>*) network.main_cell.input_kernel->clone());
 		main_cell.state_kernel = KernelPtr<Scalar,Rank>((KernelLayer<Scalar,Rank>*) network.main_cell.state_kernel->clone());
 		main_cell.output_kernel = KernelPtr<Scalar,Rank>((KernelLayer<Scalar,Rank>*) network.main_cell.output_kernel->clone());
@@ -813,15 +942,7 @@ public:
 				network.main_cell.read_act->clone());
 		main_cell.state_cache = network.main_cell.state_cache;
 		main_cell.u_cache = network.main_cell.u_cache;
-		output_seq_size_func = network.output_seq_size_func;
-		stateful = network.stateful;
-		mul_int = network.mul_int;
-		foremost = network.foremost;
-		input_dims = network.input_dims;
-		output_dims = network.output_dims;
-		size_t cells_size = network.cells.size();
-		cells = std::vector<Cell>(cells_size);
-		for (size_t i = 0; i < cells_size; i++) {
+		for (size_t i = 0; i < cells.size(); i++) {
 			Cell& c1 = cells[i];
 			const Cell& c2 = network.cells[i];
 			c1.input_kernel = KernelPtr<Scalar,Rank>((KernelLayer<Scalar,Rank>*) c2.input_kernel->clone());
@@ -832,11 +953,6 @@ public:
 			c1.state_cache = c2.state_cache;
 			c1.u_cache = c2.u_cache;
 		}
-		state = network.state;
-		batch_size = network.batch_size;
-		input_seq_length = network.input_seq_length;
-		output_seq_length = network.output_seq_length;
-		output_seq_delay = network.output_seq_delay;
 	}
 	inline RecurrentNeuralNetwork(Self&& network) {
 		swap(*this, network);
@@ -846,16 +962,22 @@ public:
 		swap(*this, network);
 		return *this;
 	}
-	inline Base* clone() const {
+	inline Root* clone() const {
 		return new RecurrentNeuralNetwork(*this);
+	}
+	inline bool is_reversed() const {
+		return reversed;
+	}
+	inline void reverse() {
+		this->reversed = !this->reversed;
 	}
 	inline bool is_foremost() const {
 		return foremost;
 	}
-	inline typename Base::Dims get_input_dims() const {
+	inline typename Root::Dims get_input_dims() const {
 		return input_dims;
 	}
-	inline typename Base::Dims get_output_dims() const {
+	inline typename Root::Dims get_output_dims() const {
 		return output_dims;
 	}
 	// For the copy-and-swap idiom.
@@ -865,6 +987,7 @@ public:
 		swap(network1.output_seq_size_func, network2.output_seq_size_func);
 		swap(network1.stateful, network2.stateful);
 		swap(network1.mul_int, network2.mul_int);
+		swap(network1.reversed, network2.reversed);
 		swap(network1.foremost, network2.foremost);
 		swap(network1.input_dims, network2.input_dims);
 		swap(network1.output_dims, network2.output_dims);
@@ -877,15 +1000,15 @@ public:
 	}
 protected:
 	inline void set_foremost(bool foremost) {
-		Base::set_input_layer(*main_cell.input_kernel, foremost);
+		Root::set_input_layer(*main_cell.input_kernel, foremost);
 		this->foremost = foremost;
 	}
 	inline void empty_caches() {
-		Base::empty_cache(*main_cell.input_kernel);
-		Base::empty_cache(*main_cell.state_kernel);
-		Base::empty_cache(*main_cell.output_kernel);
-		Base::empty_cache(*main_cell.state_act);
-		Base::empty_cache(*main_cell.output_act);
+		Root::empty_cache(*main_cell.input_kernel);
+		Root::empty_cache(*main_cell.state_kernel);
+		Root::empty_cache(*main_cell.output_kernel);
+		Root::empty_cache(*main_cell.state_act);
+		Root::empty_cache(*main_cell.output_act);
 		cells = std::vector<Cell>(0);
 	}
 	inline std::vector<Layer<Scalar,Rank>*> get_layers() {
@@ -897,9 +1020,9 @@ protected:
 		layers[4] = main_cell.output_act.get();
 		return layers;
 	}
-	inline typename Base::Data propagate(typename Base::Data input, bool training) {
-		Utils<Scalar>::template check_dim_validity<Base::DATA_RANKS>(input);
-		Dimensions<int,Base::DATA_RANKS> data_dims = Utils<Scalar>::template get_dims<Base::DATA_RANKS>(input);
+	inline typename Root::Data propagate(typename Root::Data input, bool training) {
+		Utils<Scalar>::template check_dim_validity<Root::DATA_RANKS>(input);
+		Dimensions<int,Root::DATA_RANKS> data_dims = Utils<Scalar>::template get_dims<Root::DATA_RANKS>(input);
 		assert(input_dims == data_dims.template demote<2>());
 		int samples = data_dims(0);
 		int input_seq_length = data_dims(1);
@@ -907,18 +1030,25 @@ protected:
 		std::pair<size_t,size_t> output_seq_info = output_seq_size_func((size_t) input_seq_length);
 		int output_seq_length = (int) output_seq_info.first;
 		int output_seq_delay = (int) output_seq_info.second;
-		assert(output_seq_length > 0 && output_seq_length + output_seq_delay >= input_seq_length);
-		int time_steps = output_seq_length + output_seq_delay;
+		assert(output_seq_length > 0);
+		if (reversed) {
+			RankwiseBoolArray reverse;
+			reverse.fill(false);
+			reverse[1] = true;
+			input = input.reverse(reverse);
+		}
+		int output_end = output_seq_length + output_seq_delay;
+		int time_steps = std::max(input_seq_length, output_end);
 		// If in training mode, unroll the updated network.
 		if (training) {
 			cells = std::vector<Cell>(time_steps - 1);
 			if (time_steps > 1) {
 				// Empty the caches of the main cell to reduce the amount of data to copy.
-				Base::empty_cache(*main_cell.input_kernel);
-				Base::empty_cache(*main_cell.state_kernel);
-				Base::empty_cache(*main_cell.output_kernel);
-				Base::empty_cache(*main_cell.state_act);
-				Base::empty_cache(*main_cell.output_act);
+				Root::empty_cache(*main_cell.input_kernel);
+				Root::empty_cache(*main_cell.state_kernel);
+				Root::empty_cache(*main_cell.output_kernel);
+				Root::empty_cache(*main_cell.state_act);
+				Root::empty_cache(*main_cell.output_act);
 				// Unroll the network by creating n -1 copies of the main cell;
 				for (int j = 1; j < time_steps; ++j) {
 					Cell& cell = cells[j - 1];
@@ -930,7 +1060,7 @@ protected:
 					if (j < input_seq_length)
 						cell.input_kernel = KernelPtr<Scalar,Rank>(
 								(KernelLayer<Scalar,Rank>*) main_cell.input_kernel->clone());
-					if (j >= output_seq_delay) {
+					if (j >= output_seq_delay && j < output_end) {
 						cell.output_kernel = KernelPtr<Scalar,Rank>(
 								(KernelLayer<Scalar,Rank>*) main_cell.output_kernel->clone());
 						cell.output_act = ActivationPtr<Scalar,Rank>(
@@ -960,19 +1090,19 @@ protected:
 				new_state = state.slice(offsets, extents);
 			state = std::move(new_state);
 		}
-		RankwiseArray input_offsets;
-		RankwiseArray input_extents = data_dims;
-		RankwiseArray output_offsets;
-		RankwiseArray output_extents = output_dims.template promote<2>();
+		RankwiseIntArray input_offsets;
+		RankwiseIntArray input_extents = data_dims;
+		RankwiseIntArray output_offsets;
+		RankwiseIntArray output_extents = output_dims.template promote<2>();
 		input_offsets.fill(0);
 		output_offsets.fill(0);
 		input_extents[1] = 1;
 		output_extents[0] = samples;
-		typename Base::Data out;
+		typename Root::Data out;
 		// If the output is a single time step prediction, there is no need to create an output tensor.
 		if (output_seq_length > 1) {
 			output_extents[1] = output_seq_length;
-			out = typename Base::Data(output_extents);
+			out = typename Root::Data(output_extents);
 		}
 		output_extents[1] = 1;
 		Dimensions<int,Rank + 1> input_time_step_dims = input_dims.template promote<>();
@@ -987,13 +1117,13 @@ protected:
 			} else
 				cell = &cells[i - 1];
 			// Always apply the state kernel.
-			state = Base::pass_forward(*cell->state_kernel, std::move(state), training);
+			state = Root::pass_forward(*cell->state_kernel, std::move(state), training);
 			// If in inference mode, empty the caches after passing the data through each layer.
 			if (!training)
-				Base::empty_cache(*cell->state_kernel);
+				Root::empty_cache(*cell->state_kernel);
 			// If there is an input for the time step...
 			if (i < input_seq_length) {
-				typename Base::Data in_i_seq;
+				typename Root::Data in_i_seq;
 				if (input_seq_length == 1)
 					in_i_seq = std::move(input);
 				else {
@@ -1005,42 +1135,42 @@ protected:
 						/* If multiplicative integration is enabled, cache the factors of the multiplication so that
 						 * the function can be differentiated in the backward pass. */
 						cell->state_cache = state;
-						cell->u_cache = Base::pass_forward(*cell->input_kernel,
-								Utils<Scalar>::template map_tensor_to_tensor<Base::DATA_RANKS,Rank + 1>(std::move(in_i_seq),
+						cell->u_cache = Root::pass_forward(*cell->input_kernel,
+								Utils<Scalar>::template map_tensor_to_tensor<Root::DATA_RANKS,Rank + 1>(std::move(in_i_seq),
 										input_time_step_dims), training);
 						state *= cell->u_cache;
 					} else
-						state *= Base::pass_forward(*cell->input_kernel,
-								Utils<Scalar>::template map_tensor_to_tensor<Base::DATA_RANKS,Rank + 1>(std::move(in_i_seq),
+						state *= Root::pass_forward(*cell->input_kernel,
+								Utils<Scalar>::template map_tensor_to_tensor<Root::DATA_RANKS,Rank + 1>(std::move(in_i_seq),
 										input_time_step_dims), training);
 				} else
-					state += Base::pass_forward(*cell->input_kernel,
-							Utils<Scalar>::template map_tensor_to_tensor<Base::DATA_RANKS,Rank + 1>(std::move(in_i_seq),
+					state += Root::pass_forward(*cell->input_kernel,
+							Utils<Scalar>::template map_tensor_to_tensor<Root::DATA_RANKS,Rank + 1>(std::move(in_i_seq),
 								input_time_step_dims), training);
 				if (!training)
-					Base::empty_cache(*cell->input_kernel);
+					Root::empty_cache(*cell->input_kernel);
 			}
-			state = Base::pass_forward(*cell->state_act, std::move(state), training);
+			state = Root::pass_forward(*cell->state_act, std::move(state), training);
 			if (!training)
-				Base::empty_cache(*cell->state_act);
+				Root::empty_cache(*cell->state_act);
 			// If there is an output for the time step...
-			if (i >= output_seq_delay) {
-				Tensor<Scalar,Rank + 1> out_i = Base::pass_forward(*cell->output_kernel, state, training);
+			if (i >= output_seq_delay && i < output_end) {
+				Tensor<Scalar,Rank + 1> out_i = Root::pass_forward(*cell->output_kernel, state, training);
 				if (!training)
-					Base::empty_cache(*cell->output_kernel);
+					Root::empty_cache(*cell->output_kernel);
 				// If the output is a single time step prediction, just return it.
 				if (output_seq_length == 1)
-					out = Utils<Scalar>::template map_tensor_to_tensor<Rank + 1,Base::DATA_RANKS>(
-							Base::pass_forward(*cell->output_act, std::move(out_i), training),
+					out = Utils<Scalar>::template map_tensor_to_tensor<Rank + 1,Root::DATA_RANKS>(
+							Root::pass_forward(*cell->output_act, std::move(out_i), training),
 							output_extents);
 				else {
 					out.slice(output_offsets, output_extents) = Utils<Scalar>::template map_tensor_to_tensor<
-							Rank + 1,Base::DATA_RANKS>(Base::pass_forward(*cell->output_act, std::move(out_i),
+							Rank + 1,Root::DATA_RANKS>(Root::pass_forward(*cell->output_act, std::move(out_i),
 									training), output_extents);
 					output_offsets[1] += 1;
 				}
 				if (!training)
-					Base::empty_cache(*cell->output_act);
+					Root::empty_cache(*cell->output_act);
 			}
 		}
 		batch_size = samples;
@@ -1049,114 +1179,121 @@ protected:
 		this->output_seq_delay = output_seq_delay;
 		return out;
 	}
-	inline typename Base::Data backpropagate(typename Base::Data out_grads) {
-		Utils<Scalar>::template check_dim_validity<Base::DATA_RANKS>(out_grads);
-		Dimensions<int,Base::DATA_RANKS> data_dims = Utils<Scalar>::template get_dims<Base::DATA_RANKS>(out_grads);
+	inline typename Root::Data backpropagate(typename Root::Data out_grads) {
+		Utils<Scalar>::template check_dim_validity<Root::DATA_RANKS>(out_grads);
+		Dimensions<int,Root::DATA_RANKS> data_dims = Utils<Scalar>::template get_dims<Root::DATA_RANKS>(out_grads);
 		assert(output_dims == data_dims.template demote<2>() && batch_size == data_dims(0) &&
 				output_seq_length == data_dims(1));
-		RankwiseArray output_offsets;
-		RankwiseArray output_extents = data_dims;
-		RankwiseArray input_offsets;
-		RankwiseArray input_extents = input_dims.template promote<2>();
+		if (reversed) {
+			RankwiseBoolArray reverse;
+			reverse.fill(false);
+			reverse[1] = true;
+			out_grads = out_grads.reverse(reverse);
+		}
+		RankwiseIntArray output_offsets;
+		RankwiseIntArray output_extents = data_dims;
+		RankwiseIntArray input_offsets;
+		RankwiseIntArray input_extents = input_dims.template promote<2>();
 		output_offsets.fill(0);
 		output_offsets[1] = output_seq_length - 1;
 		input_offsets.fill(0);
 		input_offsets[1] = input_seq_length - 1;
 		output_extents[1] = 1;
 		input_extents[0] = batch_size;
-		typename Base::Data prev_out_grads;
+		typename Root::Data prev_out_grads;
 		if (input_seq_length > 1) {
 			input_extents[1] = input_seq_length;
-			prev_out_grads = typename Base::Data(input_extents);
+			prev_out_grads = typename Root::Data(input_extents);
 		}
 		input_extents[1] = 1;
 		Tensor<Scalar,Rank + 1> state_grads(state.dimensions());
 		state_grads.setZero();
 		Dimensions<int,Rank + 1> out_time_step_dims = output_dims.template promote<>();
 		out_time_step_dims(0) = batch_size;
-		int time_steps = output_seq_length + output_seq_delay;
+		int output_end = output_seq_length + output_seq_delay;
+		int time_steps = std::max(input_seq_length, output_end);
 		for (int i = time_steps - 1; i >= 0; --i) {
 			Cell& cell = i == 0 ? main_cell : cells[i - 1];
 			// If there was an output at the time step...
-			if (i >= output_seq_delay) {
-				typename Base::Data out_grads_seq_i;
+			if (i >= output_seq_delay && i < output_end) {
+				typename Root::Data out_grads_seq_i;
 				if (output_seq_length == 1)
 					out_grads_seq_i = std::move(out_grads);
 				else {
 					out_grads_seq_i = out_grads.slice(output_offsets, output_extents);
 					output_offsets[1] -= 1;
 				}
-				Tensor<Scalar,Rank + 1> out_grads_i = Base::pass_back(*cell.output_act,
-						Utils<Scalar>::template map_tensor_to_tensor<Base::DATA_RANKS,Rank + 1>(
+				Tensor<Scalar,Rank + 1> out_grads_i = Root::pass_back(*cell.output_act,
+						Utils<Scalar>::template map_tensor_to_tensor<Root::DATA_RANKS,Rank + 1>(
 								std::move(out_grads_seq_i), out_time_step_dims));
-				Base::empty_cache(*cell.output_act);
-				state_grads += Base::pass_back(*cell.output_kernel, std::move(out_grads_i));
-				Base::empty_cache(*cell.output_kernel);
+				Root::empty_cache(*cell.output_act);
+				state_grads += Root::pass_back(*cell.output_kernel, std::move(out_grads_i));
+				Root::empty_cache(*cell.output_kernel);
 			}
 			// Always back-propagate the state gradient.
-			state_grads = Base::pass_back(*cell.state_act, std::move(state_grads));
-			Base::empty_cache(*cell.state_act);
+			state_grads = Root::pass_back(*cell.state_act, std::move(state_grads));
+			Root::empty_cache(*cell.state_act);
 			// If there was an input at the time step...
 			if (i < input_seq_length) {
 				// If it is the foremost layer, the gradients do not need to be propagated further back.
 				if (foremost) {
 					if (mul_int) { // Multiplicative integration.
-						Base::pass_back(*cell.input_kernel, cell.state_cache * state_grads);
+						Root::pass_back(*cell.input_kernel, cell.state_cache * state_grads);
 						cell.state_cache = Utils<Scalar>::template get_null_tensor<Rank + 1>();
 					} else // Additive integration.
-						Base::pass_back(*cell.input_kernel, state_grads);
+						Root::pass_back(*cell.input_kernel, state_grads);
 				} else if (input_seq_length == 1) {
 					if (mul_int) {
-						prev_out_grads = Utils<Scalar>::template map_tensor_to_tensor<Rank + 1,Base::DATA_RANKS>(
-								Base::pass_back(*cell.input_kernel, cell.state_cache * state_grads), input_extents);
+						prev_out_grads = Utils<Scalar>::template map_tensor_to_tensor<Rank + 1,Root::DATA_RANKS>(
+								Root::pass_back(*cell.input_kernel, cell.state_cache * state_grads), input_extents);
 						cell.state_cache = Utils<Scalar>::template get_null_tensor<Rank + 1>();
 					} else
-						prev_out_grads = Utils<Scalar>::template map_tensor_to_tensor<Rank + 1,Base::DATA_RANKS>(
-								Base::pass_back(*cell.input_kernel, state_grads), input_extents);
+						prev_out_grads = Utils<Scalar>::template map_tensor_to_tensor<Rank + 1,Root::DATA_RANKS>(
+								Root::pass_back(*cell.input_kernel, state_grads), input_extents);
 				} else {
 					if (mul_int) {
 						prev_out_grads.slice(input_offsets, input_extents) =
-								Utils<Scalar>::template map_tensor_to_tensor<Rank + 1,Base::DATA_RANKS>(
-										Base::pass_back(*cell.input_kernel, cell.state_cache * state_grads), input_extents);
+								Utils<Scalar>::template map_tensor_to_tensor<Rank + 1,Root::DATA_RANKS>(
+										Root::pass_back(*cell.input_kernel, cell.state_cache * state_grads), input_extents);
 						cell.state_cache = Utils<Scalar>::template get_null_tensor<Rank + 1>();
 					} else
 						prev_out_grads.slice(input_offsets, input_extents) =
-								Utils<Scalar>::template map_tensor_to_tensor<Rank + 1,Base::DATA_RANKS>(
-										Base::pass_back(*cell.input_kernel, state_grads), input_extents);
+								Utils<Scalar>::template map_tensor_to_tensor<Rank + 1,Root::DATA_RANKS>(
+										Root::pass_back(*cell.input_kernel, state_grads), input_extents);
 					input_offsets[1] -= 1;
 				}
-				Base::empty_cache(*cell.input_kernel);
+				Root::empty_cache(*cell.input_kernel);
 			}
 			// Compute the gradients w.r.t. the state kernel.
 			if (mul_int) {
-				state_grads = Base::pass_back(*cell.state_kernel, cell.u_cache * state_grads);
+				state_grads = Root::pass_back(*cell.state_kernel, cell.u_cache * state_grads);
 				cell.u_cache = Utils<Scalar>::template get_null_tensor<Rank + 1>();
 			} else
-				state_grads = Base::pass_back(*cell.state_kernel, std::move(state_grads));
-			Base::empty_cache(*cell.state_kernel);
+				state_grads = Root::pass_back(*cell.state_kernel, std::move(state_grads));
+			Root::empty_cache(*cell.state_kernel);
 		}
 		// Roll the network up and accumulate the gradients.
-		auto u_param_grads = Base::get_param_grads(*main_cell.input_kernel);
-		auto w_param_grads = Base::get_param_grads(*main_cell.state_kernel);
-		auto v_param_grads = Base::get_param_grads(*main_cell.output_kernel);
-		auto state_act_param_grads = Base::get_param_grads(*main_cell.state_act);
-		auto output_act_param_grads = Base::get_param_grads(*main_cell.output_act);
+		auto u_param_grads = Root::get_param_grads(*main_cell.input_kernel);
+		auto w_param_grads = Root::get_param_grads(*main_cell.state_kernel);
+		auto v_param_grads = Root::get_param_grads(*main_cell.output_kernel);
+		auto state_act_param_grads = Root::get_param_grads(*main_cell.state_act);
+		auto output_act_param_grads = Root::get_param_grads(*main_cell.output_act);
 		for (int i = 1; i < time_steps; ++i) {
 			Cell& cell = cells[i - 1];
-			w_param_grads += Base::get_param_grads(*cell.state_kernel);
-			state_act_param_grads += Base::get_param_grads(*cell.state_act);
+			w_param_grads += Root::get_param_grads(*cell.state_kernel);
+			state_act_param_grads += Root::get_param_grads(*cell.state_act);
 			if (i < input_seq_length)
-				u_param_grads += Base::get_param_grads(*cell.input_kernel);
-			if (i >= output_seq_delay) {
-				v_param_grads += Base::get_param_grads(*cell.output_kernel);
-				output_act_param_grads += Base::get_param_grads(*cell.output_act);
+				u_param_grads += Root::get_param_grads(*cell.input_kernel);
+			if (i >= output_seq_delay && i < output_end) {
+				v_param_grads += Root::get_param_grads(*cell.output_kernel);
+				output_act_param_grads += Root::get_param_grads(*cell.output_act);
 			}
 		}
-		Base::get_param_grads(*main_cell.input_kernel) = u_param_grads;
-		Base::get_param_grads(*main_cell.state_kernel) = w_param_grads;
-		Base::get_param_grads(*main_cell.output_kernel) = v_param_grads;
-		Base::get_param_grads(*main_cell.state_act) = state_act_param_grads;
-		Base::get_param_grads(*main_cell.output_act) = output_act_param_grads;
+		Root::get_param_grads(*main_cell.input_kernel) = u_param_grads;
+		Root::get_param_grads(*main_cell.state_kernel) = w_param_grads;
+		Root::get_param_grads(*main_cell.output_kernel) = v_param_grads;
+		Root::get_param_grads(*main_cell.state_act) = state_act_param_grads;
+		Root::get_param_grads(*main_cell.output_act) = output_act_param_grads;
 		cells = std::vector<Cell>(0);
 		return prev_out_grads;
 	}
@@ -1175,9 +1312,10 @@ private:
 	OutputSeqSizeFunc output_seq_size_func;
 	bool stateful;
 	bool mul_int;
+	bool reversed;
 	bool foremost;
-	typename Base::Dims input_dims;
-	typename Base::Dims output_dims;
+	typename Root::Dims input_dims;
+	typename Root::Dims output_dims;
 	// State.
 	std::vector<Cell> cells;
 	Tensor<Scalar,Rank + 1> state;
@@ -1217,26 +1355,25 @@ public:
 				forget_act && input_act && candidate_act && state_act && output_act);
 		typename Base::Dims in_forget_kernel_input_dims = input_forget_kernel->get_input_dims();
 		typename Base::Dims out_forget_kernel_input_dims = output_forget_kernel->get_input_dims();
-		typename Base::Dims forget_kernel_output_dims = input_forget_kernel->get_output_dims();
-		assert(out_forget_kernel_input_dims == forget_kernel_output_dims &&
+		assert(out_forget_kernel_input_dims == input_forget_kernel->get_output_dims() &&
 				in_forget_kernel_input_dims == input_write_kernel->get_input_dims() &&
 				in_forget_kernel_input_dims == input_candidate_kernel->get_input_dims() &&
 				in_forget_kernel_input_dims == input_write_kernel->get_input_dims() &&
 				out_forget_kernel_input_dims == output_write_kernel->get_input_dims() &&
 				out_forget_kernel_input_dims == output_candidate_kernel->get_input_dims() &&
 				out_forget_kernel_input_dims == output_write_kernel->get_input_dims() &&
-				forget_kernel_output_dims == output_forget_kernel->get_output_dims() &&
-				forget_kernel_output_dims == input_write_kernel->get_output_dims() &&
-				forget_kernel_output_dims == output_write_kernel->get_output_dims() &&
-				forget_kernel_output_dims == input_candidate_kernel->get_output_dims() &&
-				forget_kernel_output_dims == output_candidate_kernel->get_output_dims() &&
-				forget_kernel_output_dims == input_read_kernel->get_output_dims() &&
-				forget_kernel_output_dims == output_read_kernel->get_output_dims() &&
-				forget_kernel_output_dims == forget_act->get_input_dims() &&
-				forget_kernel_output_dims == write_act->get_input_dims() &&
-				forget_kernel_output_dims == candidate_act->get_input_dims() &&
-				forget_kernel_output_dims == state_act->get_input_dims() &&
-				forget_kernel_output_dims == read_act->get_input_dims());
+				out_forget_kernel_input_dims == output_forget_kernel->get_output_dims() &&
+				out_forget_kernel_input_dims == input_write_kernel->get_output_dims() &&
+				out_forget_kernel_input_dims == output_write_kernel->get_output_dims() &&
+				out_forget_kernel_input_dims == input_candidate_kernel->get_output_dims() &&
+				out_forget_kernel_input_dims == output_candidate_kernel->get_output_dims() &&
+				out_forget_kernel_input_dims == input_read_kernel->get_output_dims() &&
+				out_forget_kernel_input_dims == output_read_kernel->get_output_dims() &&
+				out_forget_kernel_input_dims == forget_act->get_input_dims() &&
+				out_forget_kernel_input_dims == write_act->get_input_dims() &&
+				out_forget_kernel_input_dims == candidate_act->get_input_dims() &&
+				out_forget_kernel_input_dims == state_act->get_input_dims() &&
+				out_forget_kernel_input_dims == read_act->get_input_dims());
 		main_cell.input_forget_kernel = std::move(input_forget_kernel);
 		main_cell.output_forget_kernel = std::move(output_forget_kernel);
 		main_cell.input_write_kernel = std::move(input_write_kernel);
@@ -1250,8 +1387,8 @@ public:
 		main_cell.candidate_act = std::move(candidate_act);
 		main_cell.state_act = std::move(state_act);
 		main_cell.read_act = std::move(read_act);
-		input_dims = std::move(u_layer_input_dims);
-		output_dims = std::move(v_layer_output_dims);
+		input_dims = std::move(in_forget_kernel_input_dims);
+		output_dims = std::move(out_forget_kernel_input_dims);
 		set_foremost(foremost);
 	}
 	// Copy constructor.
@@ -1293,19 +1430,32 @@ public:
 		for (size_t i = 0; i < cells_size; i++) {
 			Cell& c1 = cells[i];
 			const Cell& c2 = network.cells[i];
-			c1.input_forget_kernel = KernelPtr<Scalar,Rank>((KernelLayer<Scalar,Rank>*) c2.input_forget_kernel->clone());
-			c1.output_forget_kernel = KernelPtr<Scalar,Rank>((KernelLayer<Scalar,Rank>*) c2.output_forget_kernel->clone());
-			c1.input_write_kernel = KernelPtr<Scalar,Rank>((KernelLayer<Scalar,Rank>*) c2.input_write_kernel->clone());
-			c1.output_write_kernel = KernelPtr<Scalar,Rank>((KernelLayer<Scalar,Rank>*) c2.output_write_kernel->clone());
-			c1.input_candidate_kernel = KernelPtr<Scalar,Rank>((KernelLayer<Scalar,Rank>*) c2.input_candidate_kernel->clone());
-			c1.output_candidate_kernel = KernelPtr<Scalar,Rank>((KernelLayer<Scalar,Rank>*) c2.output_candidate_kernel->clone());
-			c1.input_read_kernel = KernelPtr<Scalar,Rank>((KernelLayer<Scalar,Rank>*) c2.input_read_kernel->clone());
-			c1.output_read_kernel = KernelPtr<Scalar,Rank>((KernelLayer<Scalar,Rank>*) c2.output_read_kernel->clone());
-			c1.write_act = ActivationPtr<Scalar,Rank>((ActivationLayer<Scalar,Rank>*) c2.write_act->clone());
-			c1.forget_act = ActivationPtr<Scalar,Rank>((ActivationLayer<Scalar,Rank>*) c2.forget_act->clone());
-			c1.candidate_act = ActivationPtr<Scalar,Rank>((ActivationLayer<Scalar,Rank>*) c2.candidate_act->clone());
-			c1.state_act = ActivationPtr<Scalar,Rank>((ActivationLayer<Scalar,Rank>*) c2.state_act->clone());
-			c1.read_act = ActivationPtr<Scalar,Rank>((ActivationLayer<Scalar,Rank>*) c2.read_act->clone());
+			c1.input_forget_kernel = KernelPtr<Scalar,Rank>((KernelLayer<Scalar,Rank>*)
+					c2.input_forget_kernel->clone());
+			c1.output_forget_kernel = KernelPtr<Scalar,Rank>((KernelLayer<Scalar,Rank>*)
+					c2.output_forget_kernel->clone());
+			c1.input_write_kernel = KernelPtr<Scalar,Rank>((KernelLayer<Scalar,Rank>*)
+					c2.input_write_kernel->clone());
+			c1.output_write_kernel = KernelPtr<Scalar,Rank>((KernelLayer<Scalar,Rank>*)
+					c2.output_write_kernel->clone());
+			c1.input_candidate_kernel = KernelPtr<Scalar,Rank>((KernelLayer<Scalar,Rank>*)
+					c2.input_candidate_kernel->clone());
+			c1.output_candidate_kernel = KernelPtr<Scalar,Rank>((KernelLayer<Scalar,Rank>*)
+					c2.output_candidate_kernel->clone());
+			c1.input_read_kernel = KernelPtr<Scalar,Rank>((KernelLayer<Scalar,Rank>*)
+					c2.input_read_kernel->clone());
+			c1.output_read_kernel = KernelPtr<Scalar,Rank>((KernelLayer<Scalar,Rank>*)
+					c2.output_read_kernel->clone());
+			c1.write_act = ActivationPtr<Scalar,Rank>((ActivationLayer<Scalar,Rank>*)
+					c2.write_act->clone());
+			c1.forget_act = ActivationPtr<Scalar,Rank>((ActivationLayer<Scalar,Rank>*)
+					c2.forget_act->clone());
+			c1.candidate_act = ActivationPtr<Scalar,Rank>((ActivationLayer<Scalar,Rank>*)
+					c2.candidate_act->clone());
+			c1.state_act = ActivationPtr<Scalar,Rank>((ActivationLayer<Scalar,Rank>*)
+					c2.state_act->clone());
+			c1.read_act = ActivationPtr<Scalar,Rank>((ActivationLayer<Scalar,Rank>*)
+					c2.read_act->clone());
 		}
 		state = network.state;
 		batch_size = network.batch_size;
@@ -1399,34 +1549,58 @@ protected:
 		std::pair<size_t,size_t> output_seq_info = output_seq_size_func((size_t) input_seq_length);
 		int output_seq_length = (int) output_seq_info.first;
 		int output_seq_delay = (int) output_seq_info.second;
-		assert(output_seq_length > 0 && output_seq_length + output_seq_delay >= input_seq_length);
-		int time_steps = output_seq_length + output_seq_delay;
+		assert(output_seq_length > 0);
+		int output_end = output_seq_length + output_seq_delay;
+		int time_steps = std::min(input_seq_length, output_end);
 		// If in training mode, unroll the updated network.
 		if (training) {
 			cells = std::vector<Cell>(time_steps - 1);
 			if (time_steps > 1) {
 				// Empty the caches of the main cell to reduce the amount of data to copy.
-				Base::empty_cache(*main_cell.forget_kernel);
-				Base::empty_cache(*main_cell.input_kernel);
-				Base::empty_cache(*main_cell.candidate_kernel);
+				Base::empty_cache(*main_cell.input_forget_kernel);
+				Base::empty_cache(*main_cell.output_forget_kernel);
+				Base::empty_cache(*main_cell.input_write_kernel);
+				Base::empty_cache(*main_cell.output_write_kernel);
+				Base::empty_cache(*main_cell.input_candidate_kernel);
+				Base::empty_cache(*main_cell.output_candidate_kernel);
+				Base::empty_cache(*main_cell.input_read_kernel);
+				Base::empty_cache(*main_cell.output_read_kernel);
+				Base::empty_cache(*main_cell.forget_act);
+				Base::empty_cache(*main_cell.write_act);
+				Base::empty_cache(*main_cell.candidate_act);
 				Base::empty_cache(*main_cell.state_act);
 				Base::empty_cache(*main_cell.read_act);
 				// Unroll the network by creating n -1 copies of the main cell;
 				for (int j = 1; j < time_steps; ++j) {
 					Cell& cell = cells[j - 1];
-					cell.candidate_kernel = KernelPtr<Scalar,Rank>(
-							(KernelLayer<Scalar,Rank>*) main_cell.candidate_kernel->clone());
-					cell.state_act = ActivationPtr<Scalar,Rank>(
-							(ActivationLayer<Scalar,Rank>*) main_cell.state_act->clone());
+					cell.output_forget_kernel = KernelPtr<Scalar,Rank>((KernelLayer<Scalar,Rank>*)
+							main_cell.output_forget_kernel->clone());
+					cell.output_write_kernel = KernelPtr<Scalar,Rank>((KernelLayer<Scalar,Rank>*)
+							main_cell.output_write_kernel->clone());
+					cell.output_candidate_kernel = KernelPtr<Scalar,Rank>((KernelLayer<Scalar,Rank>*)
+							main_cell.output_candidate_kernel->clone());
+					cell.output_read_kernel = KernelPtr<Scalar,Rank>((KernelLayer<Scalar,Rank>*)
+							main_cell.output_read_kernel->clone());
+					cell.write_act = ActivationPtr<Scalar,Rank>((ActivationLayer<Scalar,Rank>*)
+							main_cell.write_act->clone());
+					cell.forget_act = ActivationPtr<Scalar,Rank>((ActivationLayer<Scalar,Rank>*)
+							main_cell.forget_act->clone());
+					cell.candidate_act = ActivationPtr<Scalar,Rank>((ActivationLayer<Scalar,Rank>*)
+							main_cell.candidate_act->clone());
+					cell.state_act = ActivationPtr<Scalar,Rank>((ActivationLayer<Scalar,Rank>*)
+							main_cell.state_act->clone());
+					cell.read_act = ActivationPtr<Scalar,Rank>((ActivationLayer<Scalar,Rank>*)
+							main_cell.read_act->clone());
 					// Only copy the kernels and activations that will actually be used.
-					if (j < input_seq_length)
-						cell.forget_kernel = KernelPtr<Scalar,Rank>(
-								(KernelLayer<Scalar,Rank>*) main_cell.forget_kernel->clone());
-					if (j >= output_seq_delay) {
-						cell.input_kernel = KernelPtr<Scalar,Rank>(
-								(KernelLayer<Scalar,Rank>*) main_cell.input_kernel->clone());
-						cell.read_act = ActivationPtr<Scalar,Rank>(
-								(ActivationLayer<Scalar,Rank>*) main_cell.read_act->clone());
+					if (j < input_seq_length) {
+						cell.input_forget_kernel = KernelPtr<Scalar,Rank>((KernelLayer<Scalar,Rank>*)
+								main_cell.input_forget_kernel->clone());
+						cell.input_write_kernel = KernelPtr<Scalar,Rank>((KernelLayer<Scalar,Rank>*)
+								main_cell.input_write_kernel->clone());
+						cell.input_candidate_kernel = KernelPtr<Scalar,Rank>((KernelLayer<Scalar,Rank>*)
+								main_cell.input_candidate_kernel->clone());
+						cell.input_read_kernel = KernelPtr<Scalar,Rank>((KernelLayer<Scalar,Rank>*)
+								main_cell.input_read_kernel->clone());
 					}
 				}
 			}
@@ -1566,7 +1740,8 @@ protected:
 		state_grads.setZero();
 		Dimensions<int,Rank + 1> out_time_step_dims = output_dims.template promote<>();
 		out_time_step_dims(0) = batch_size;
-		int time_steps = output_seq_length + output_seq_delay;
+		int output_end = output_seq_length + output_seq_delay;
+		int time_steps = std::min(input_seq_length, output_end);
 		for (int i = time_steps - 1; i >= 0; --i) {
 			Cell& cell = i == 0 ? main_cell : cells[i - 1];
 			// If there was an output at the time step...
@@ -1705,98 +1880,6 @@ private:
 	int input_seq_length;
 	int output_seq_length;
 	int output_seq_delay;
-};
-
-/**
- * Enables the use of non-sequential networks on sequential data by joining the 'samples' and 'time steps' ranks of
- * the tensors and splitting them again once the internal, non-sequential network is done processing them.
- */
-template<typename Scalar, size_t Rank>
-class SequentialNeuralNetwork : public NeuralNetwork<Scalar,Rank,true> {
-	typedef NeuralNetwork<Scalar,Rank,true> Base;
-	typedef SequentialNeuralNetwork<Scalar,Rank> Self;
-	typedef NeuralNetPtr<Scalar,Rank,false> Net;
-	typedef std::array<int,Base::DATA_RANKS> RankwiseArray;
-public:
-	inline SequentialNeuralNetwork(Net network, bool foremost = true) :
-			net(std::move(network)),
-			foremost(foremost),
-			batch_size(-1) {
-		assert(net);
-		input_dims = net->get_input_dims();
-		output_dims = net->get_output_dims();
-		set_foremost(foremost);
-	}
-	inline SequentialNeuralNetwork(const Self& network) {
-		net = Net(network.net->clone());
-		foremost = network.foremost;
-		input_dims = network.input_dims;
-		output_dims = network.output_dims;
-		batch_size = network.batch_size;
-	}
-	inline SequentialNeuralNetwork(Self&& network) {
-		swap(*this, network);
-	}
-	~SequentialNeuralNetwork() = default;
-	inline Self& operator=(Self network) {
-		swap(*this, network);
-		return *this;
-	}
-	inline Base* clone() const {
-		return new SequentialNeuralNetwork(*this);
-	}
-	inline bool is_foremost() const {
-		return foremost;
-	}
-	inline typename Base::Dims get_input_dims() const {
-		return input_dims;
-	}
-	inline typename Base::Dims get_output_dims() const {
-		return output_dims;
-	}
-	inline friend void swap(Self& network1, Self& network2) {
-		using std::swap;
-		swap(network1.net, network2.net);
-		swap(network1.foremost, network2.foremost);
-		swap(network1.input_dims, network2.input_dims);
-		swap(network1.output_dims, network2.output_dims);
-		swap(network1.batch_size, network2.batch_size);
-	}
-protected:
-	inline void set_foremost(bool foremost) {
-		net->set_foremost(foremost);
-		this->foremost = foremost;
-	}
-	inline void empty_caches() {
-		net->empty_caches();
-	}
-	inline std::vector<Layer<Scalar,Rank>*> get_layers() {
-		return net->get_layers();
-	}
-	inline typename Base::Data propagate(typename Base::Data input, bool training) {
-		Utils<Scalar>::template check_dim_validity<Base::DATA_RANKS>(input);
-		assert(input_dims == Utils<Scalar>::template get_dims<Base::DATA_RANKS>(input).template demote<2>());
-		batch_size = input.dimension(0);
-		int seq_length = input.dimension(1);
-		return Utils<Scalar>::template split_first_rank<Base::DATA_RANKS - 1>(
-				net->propagate(Utils<Scalar>::template join_first_two_ranks<Base::DATA_RANKS>(std::move(input)), training),
-				batch_size, seq_length);
-	}
-	inline typename Base::Data backpropagate(typename Base::Data out_grads) {
-		Utils<Scalar>::template check_dim_validity<Base::DATA_RANKS>(out_grads);
-		assert(output_dims == Utils<Scalar>::template get_dims<Base::DATA_RANKS>(out_grads).template demote<2>());
-		assert(batch_size == out_grads.dimension(0));
-		int seq_length = out_grads.dimension(1);
-		return Utils<Scalar>::template split_first_rank<Base::DATA_RANKS - 1>(
-				net->backpropagate(Utils<Scalar>::template join_first_two_ranks<Base::DATA_RANKS>(std::move(out_grads))),
-				batch_size, seq_length);
-	}
-private:
-	Net net;
-	bool foremost;
-	typename Base::Dims input_dims;
-	typename Base::Dims output_dims;
-	int batch_size;
 };
 
 } /* namespace cattle */

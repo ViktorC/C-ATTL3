@@ -49,9 +49,8 @@ public:
 protected:
 	/* Only expose methods that allow for the modification of the
 	 * layer's state to friends and sub-classes. */
-	inline bool is_input_layer() {
-		return input_layer;
-	}
+	virtual bool is_input_layer() const;
+	virtual void set_input_layer(bool input_layer);
 	virtual void init() = 0;
 	virtual void empty_cache() = 0;
 	virtual Matrix<Scalar>& get_params() = 0;
@@ -60,8 +59,6 @@ protected:
 	// Rank is increased by one to allow for batch training.
 	virtual Data pass_forward(Data in, bool training) = 0;
 	virtual Data pass_back(Data out_grads) = 0;
-private:
-	bool input_layer = false;
 };
 
 template<typename Scalar>
@@ -85,9 +82,16 @@ protected:
 				weight_init(weight_init),
 				max_norm_constraint(max_norm_constraint),
 				max_norm(Utils<Scalar>::decidedly_greater(max_norm_constraint, .0)),
+				input_layer(input_layer),
 				weights(weight_rows, weight_cols),
 				weight_grads(weight_rows, weight_cols) {
 		assert(weight_init != nullptr);
+	}
+	inline bool is_input_layer() const {
+		return input_layer;
+	}
+	inline void set_input_layer(bool input_layer) {
+		this->input_layer = input_layer;
 	}
 	inline void init() {
 		weight_init->apply(weights);
@@ -111,6 +115,7 @@ protected:
 	const WeightInitSharedPtr<Scalar> weight_init;
 	const Scalar max_norm_constraint;
 	const bool max_norm;
+	bool input_layer;
 	/* Eigen matrices are backed by arrays allocated on the heap, so these
 	 * members do not burden the stack. */
 	Matrix<Scalar> weights;
@@ -149,7 +154,7 @@ protected:
 		Matrix<Scalar> out_grads_mat = Utils<Scalar>::template map_tensor_to_mat<Rank + 1>(std::move(out_grads));
 		// Compute the gradients of the outputs with respect to the weights.
 		Base::weight_grads = biased_in.transpose() * out_grads_mat;
-		if (Layer<Scalar,Rank>::is_input_layer())
+		if (Base::is_input_layer())
 			return Utils<Scalar>::template get_null_tensor<Rank + 1>();
 		/* Remove the bias row from the weight matrix, transpose it, and compute gradients w.r.t. the
 		 * previous layer's output. */
@@ -283,7 +288,7 @@ protected:
 						Base::output_dims(1), filters);
 				// Accumulate the gradients of the outputs w.r.t. the weights for each observation a.k.a 'tensor-row'.
 				Base::weight_grads += biased_in_vec[i].transpose() * out_grads_mat_map_i;
-				if (Layer<Scalar,3>::is_input_layer())
+				if (Base::is_input_layer())
 					continue;
 				/* Remove the bias row from the weight matrix, transpose it, and compute the gradients w.r.t. the
 				 * previous layer's output. */
@@ -336,6 +341,7 @@ class ActivationLayer : public Layer<Scalar,Rank> {
 public:
 	inline ActivationLayer(const Dimensions<int,Rank>& dims) :
 			dims(dims),
+			input_layer(false),
 			params(0, 0),
 			param_grads(0, 0) { }
 	virtual ~ActivationLayer() = default;
@@ -349,6 +355,12 @@ protected:
 	virtual Matrix<Scalar> activate(const Matrix<Scalar>& in) = 0;
 	virtual Matrix<Scalar> d_activate(const Matrix<Scalar>& in, const Matrix<Scalar>& out,
 			const Matrix<Scalar>& out_grads) = 0;
+	inline bool is_input_layer() const {
+		return input_layer;
+	}
+	inline void set_input_layer(bool input_layer) {
+		this->input_layer = input_layer;
+	}
 	inline void init() { }
 	inline void empty_cache() {
 		in = Matrix<Scalar>(0, 0);
@@ -371,12 +383,13 @@ protected:
 	inline Data pass_back(Data out_grads) {
 		assert(Utils<Scalar>::template get_dims<Rank + 1>(out_grads).template demote<>() == dims);
 		assert(out_grads.dimension(0) > 0 && out.rows() == out_grads.dimension(0));
-		if (Layer<Scalar,Rank>::is_input_layer())
+		if (input_layer)
 			return Utils<Scalar>::template get_null_tensor<Rank + 1>();
 		return Utils<Scalar>::template map_mat_to_tensor<Rank + 1>(d_activate(in, out,
 				Utils<Scalar>::template map_tensor_to_mat<Rank + 1>(std::move(out_grads))), dims);
 	}
 	const Dimensions<int,Rank> dims;
+	bool input_layer;
 	Matrix<Scalar> params;
 	Matrix<Scalar> param_grads;
 	// Staged computation caches
@@ -631,6 +644,7 @@ public:
 			receptor_area(receptor_size * receptor_size),
 			height_rem(input_dims(0) - receptor_size),
 			width_rem(input_dims(1) - receptor_size),
+			input_layer(input_layer),
 			params(0, 0),
 			param_grads(0, 0) {
 		assert(input_dims(0) >= (int) receptor_size && input_dims(1) >= (int) receptor_size);
@@ -647,6 +661,12 @@ protected:
 	virtual void init_cache() = 0;
 	virtual Scalar reduce(const RowVector<Scalar>& patch, unsigned patch_ind) = 0;
 	virtual RowVector<Scalar> d_reduce(Scalar grad, unsigned patch_ind) = 0;
+	inline bool is_input_layer() const {
+		return input_layer;
+	}
+	inline void set_input_layer(bool input_layer) {
+		this->input_layer = input_layer;
+	}
 	inline void init() { }
 	inline Matrix<Scalar>& get_params() {
 		return params;
@@ -686,7 +706,7 @@ protected:
 	inline Data pass_back(Data out_grads) {
 		assert(Utils<Scalar>::template get_dims<4>(out_grads).template demote<>() == output_dims);
 		assert(out_grads.dimension(0) > 0 && rows == out_grads.dimension(0));
-		if (Layer<Scalar,3>::is_input_layer())
+		if (input_layer)
 			return Utils<Scalar>::template get_null_tensor<4>();
 		int depth = input_dims(2);
 		Dimensions<int,3> patch_dims({ (int) receptor_size, (int) receptor_size, 1 });
@@ -724,6 +744,7 @@ protected:
 	const int receptor_area;
 	const int height_rem;
 	const int width_rem;
+	bool input_layer;
 	// No actual parameters.
 	Matrix<Scalar> params;
 	Matrix<Scalar> param_grads;
@@ -826,6 +847,7 @@ protected:
 			depth(depth),
 			norm_avg_decay(norm_avg_decay),
 			epsilon(epsilon),
+			input_layer(false),
 			avg_means(depth, dims.get_volume() / depth),
 			avg_inv_sds(depth, dims.get_volume() / depth),
 			avgs_init(false),
@@ -835,6 +857,12 @@ protected:
 		assert(norm_avg_decay >= 0 && norm_avg_decay <= 1 &&
 				"norm avg decay must not be less than 0 or greater than 1");
 		assert(epsilon > 0 && "epsilon must be greater than 0");
+	}
+	inline bool is_input_layer() const {
+		return input_layer;
+	}
+	inline void set_input_layer(bool input_layer) {
+		this->input_layer = input_layer;
 	}
 	inline void init() {
 		for (int i = 0; i < params.rows(); i += 2) {
@@ -896,7 +924,7 @@ protected:
 			Matrix<Scalar> out_grads_ch_map_i = Utils<Scalar>::template map_tensor_to_mat<Rank + 1>(std::move(out_grads));
 			param_grads.row(2 * i) = out_grads_ch_map_i.cwiseProduct(cache.std_in).colwise().sum();
 			param_grads.row(2 * i + 1) = out_grads_ch_map_i.colwise().sum();
-			if (Layer<Scalar,Rank>::is_input_layer())
+			if (input_layer)
 				return Utils<Scalar>::template get_null_tensor<Rank + 1>();
 			std_in_grads_i = out_grads_ch_map_i * params.row(2 * i).asDiagonal();
 		}
@@ -909,6 +937,7 @@ protected:
 	const int depth;
 	const Scalar norm_avg_decay;
 	const Scalar epsilon;
+	bool input_layer;
 	// Dynamic batch normalization parameters.
 	Matrix<Scalar> avg_means;
 	Matrix<Scalar> avg_inv_sds;
@@ -1012,6 +1041,7 @@ public:
 			dropout_prob(dropout_prob),
 			epsilon(epsilon),
 			dropout(Utils<Scalar>::decidedly_greater(dropout_prob, .0)),
+			input_layer(false),
 			params(0, 0),
 			param_grads(0, 0) {
 		assert(dropout_prob <= 1 && "dropout prob must not be greater than 1");
@@ -1027,6 +1057,12 @@ public:
 		return dims;
 	}
 protected:
+	inline bool is_input_layer() const {
+		return input_layer;
+	}
+	inline void set_input_layer(bool input_layer) {
+		this->input_layer = input_layer;
+	}
 	inline void init() { }
 	inline void empty_cache() {
 		dropout_mask = Matrix<Scalar>(0, 0);
@@ -1057,7 +1093,7 @@ protected:
 	inline Data pass_back(Data out_grads) {
 		assert(Utils<Scalar>::template get_dims<Rank + 1>(out_grads).template demote<>() == dims);
 		assert(out_grads.dimension(0) > 0 && dropout_mask.rows() == out_grads.dimension(0));
-		if (Layer<Scalar,Rank>::is_input_layer())
+		if (input_layer)
 			return Utils<Scalar>::template get_null_tensor<Rank + 1>();
 		// The derivative of the dropout 'function'.
 		return Utils<Scalar>::template map_mat_to_tensor<Rank + 1>(Utils<Scalar>::template map_tensor_to_mat<Rank + 1>(std::move(out_grads))
@@ -1068,6 +1104,7 @@ private:
 	const Scalar dropout_prob;
 	const Scalar epsilon;
 	const bool dropout;
+	bool input_layer;
 	Matrix<Scalar> params;
 	Matrix<Scalar> param_grads;
 	// Staged computation cache_vec

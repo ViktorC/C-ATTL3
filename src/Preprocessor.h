@@ -191,18 +191,18 @@ protected:
 template<typename Scalar, size_t Rank>
 class PCAPreprocessor : public PCAPreprocessorBase<Scalar,Rank> {
 	typedef PCAPreprocessorBase<Scalar,Rank> Base;
-	typedef typename Base::Base BaseBase;
+	typedef typename Base::Base Root;
 public:
 	inline PCAPreprocessor(bool standardize = false, bool whiten = false, Scalar min_rel_var_to_retain = 1,
 			Scalar epsilon = Utils<Scalar>::EPSILON2) :
 				Base::PCAPreprocessorBase(standardize, whiten, min_rel_var_to_retain, epsilon) { }
 	inline void fit(const Tensor<Scalar,Rank + 1>& data) {
-		BaseBase::fit(data);
+		Root::fit(data);
 		Base::ed_vec = std::vector<typename Base::EigenDecomposition>(1);
 		Base::_fit(data, 0);
 	}
 	inline void transform(Tensor<Scalar,Rank + 1>& data) const {
-		BaseBase::transform(data);
+		Root::transform(data);
 		data = Base::_transform(std::move(data), 0);
 	}
 };
@@ -211,18 +211,18 @@ public:
 template<typename Scalar>
 class PCAPreprocessor<Scalar,3> : public PCAPreprocessorBase<Scalar,3> {
 	typedef PCAPreprocessorBase<Scalar,3> Base;
-	typedef typename Base::Base BaseBase;
+	typedef typename Base::Base Root;
 public:
 	inline PCAPreprocessor(bool standardize = false, bool whiten = false, Scalar min_rel_var_to_retain = 1,
 			Scalar epsilon = Utils<Scalar>::EPSILON2) :
 				Base::PCAPreprocessorBase(standardize, whiten, min_rel_var_to_retain, epsilon) { }
 	inline void fit(const Tensor<Scalar,4>& data) {
 		assert((!Base::reduce_dims || data.dimension(3) == 1) && "cannot reduce the dimensionality of multi-channel tensors");
-		BaseBase::fit(data);
-		int channels = BaseBase::dims(2);
+		Root::fit(data);
+		int channels = Root::dims(2);
 		Base::ed_vec = std::vector<typename Base::EigenDecomposition>(channels);
 		std::array<int,4> offsets({ 0, 0, 0, 0 });
-		std::array<int,4> extents({ data.dimension(0), BaseBase::dims(0), BaseBase::dims(1), 1 });
+		std::array<int,4> extents({ data.dimension(0), Root::dims(0), Root::dims(1), 1 });
 		for (int i = 0; i < channels; ++i) {
 			offsets[3] = i;
 			Tensor<Scalar,4> data_slice_i = data.slice(offsets, extents);
@@ -230,15 +230,15 @@ public:
 		}
 	}
 	inline void transform(Tensor<Scalar,4>& data) const {
-		BaseBase::transform(data);
+		Root::transform(data);
 		if (Base::reduce_dims) {
 			Dimensions<int,3> output_dims({ data.dimension(1) * data.dimension(2), 1, 1 });
 			data = Base::_transform(std::move(data), 0);
 		} else {
 			int rows = data.dimension(0);
 			std::array<int,4> offsets({ 0, 0, 0, 0 });
-			std::array<int,4> extents({ rows, BaseBase::dims(0), BaseBase::dims(1), 1 });
-			for (int i = 0; i < BaseBase::dims(2); ++i) {
+			std::array<int,4> extents({ rows, Root::dims(0), Root::dims(1), 1 });
+			for (int i = 0; i < Root::dims(2); ++i) {
 				offsets[3] = i;
 				Tensor<Scalar,4> data_slice_i = data.slice(offsets, extents);
 				data.slice(offsets, extents) = Base::_transform(std::move(data_slice_i), i);
