@@ -1194,11 +1194,14 @@ class LSTMNeuralNetwork : public NeuralNetwork<Scalar,Rank,true> {
 	typedef std::array<int,Base::DATA_RANKS> RankwiseArray;
 	typedef std::function<std::pair<size_t,size_t>(size_t)> OutputSeqSizeFunc;
 public:
-	inline LSTMNeuralNetwork(KernelPtr<Scalar,Rank> input_kernel, KernelPtr<Scalar,Rank> forget_kernel,
-			KernelPtr<Scalar,Rank> candidate_kernel, KernelPtr<Scalar,Rank> output_kernel, ActivationPtr<Scalar,Rank> input_act,
-			ActivationPtr<Scalar,Rank> forget_act, ActivationPtr<Scalar,Rank> candidate_act, ActivationPtr<Scalar,Rank> state_act,
-			ActivationPtr<Scalar,Rank> output_act, OutputSeqSizeFunc output_seq_size_func, bool stateful = false,
-			bool mul_int = false, bool foremost = true) :
+	inline LSTMNeuralNetwork(KernelPtr<Scalar,Rank> h_forget_kernel, KernelPtr<Scalar,Rank> x_forget_kernel,
+			KernelPtr<Scalar,Rank> h_input_kernel, KernelPtr<Scalar,Rank> x_input_kernel,
+			KernelPtr<Scalar,Rank> h_candidate_kernel, KernelPtr<Scalar,Rank> x_candidate_kernel,
+			KernelPtr<Scalar,Rank> h_output_kernel, KernelPtr<Scalar,Rank> x_output_kernel,
+			ActivationPtr<Scalar,Rank> forget_act, ActivationPtr<Scalar,Rank> input_act,
+			ActivationPtr<Scalar,Rank> candidate_act, ActivationPtr<Scalar,Rank> state_act,
+			ActivationPtr<Scalar,Rank> output_act, OutputSeqSizeFunc output_seq_size_func,
+			bool stateful = false, bool mul_int = false, bool foremost = true) :
 				main_cell(),
 				output_seq_size_func(output_seq_size_func),
 				stateful(stateful),
@@ -1209,19 +1212,21 @@ public:
 				input_seq_length(-1),
 				output_seq_length(-1),
 				output_seq_delay(-1) {
-		assert(input_kernel && forget_kernel && candidate_kernel && output_kernel && input_act && forget_act && candidate_act &&
-				state_act && output_act);
-		typename Base::Dims u_layer_input_dims = u_kernel->get_input_dims();
-		typename Base::Dims u_layer_output_dims = u_kernel->get_output_dims();
-		typename Base::Dims v_layer_output_dims = v_kernel->get_output_dims();
-		assert(u_layer_output_dims == w_kernel->get_output_dims() &&
-				u_layer_output_dims == v_kernel->get_input_dims() &&
-				u_layer_output_dims == state_act->get_input_dims() &&
-				v_layer_output_dims == output_act->get_input_dims() &&
-				w_kernel->get_input_dims() == w_kernel->get_output_dims());
-		main_cell.forget_kernel = std::move(u_kernel);
-		main_cell.input_kernel = std::move(v_kernel);
-		main_cell.candidate_kernel = std::move(w_kernel);
+		assert(h_forget_kernel && x_forget_kernel && h_input_kernel && x_input_kernel &&
+				h_candidate_kernel && x_candidate_kernel && h_output_kernel && x_output_kernel &&
+				forget_act && input_act && candidate_act && state_act && output_act);
+		assert(h_forget_kernel->get_input_dims() == output_act->get_output_dims());
+		main_cell.h_forget_kernel = std::move(h_forget_kernel);
+		main_cell.h_input_kernel = std::move(h_input_kernel);
+		main_cell.h_candidate_kernel = std::move(h_candidate_kernel);
+		main_cell.h_output_kernel = std::move(h_output_kernel);
+		main_cell.x_forget_kernel = std::move(x_forget_kernel);
+		main_cell.x_input_kernel = std::move(x_input_kernel);
+		main_cell.x_candidate_kernel = std::move(x_candidate_kernel);
+		main_cell.x_output_kernel = std::move(x_output_kernel);
+		main_cell.forget_act = std::move(forget_act);
+		main_cell.input_act = std::move(input_act);
+		main_cell.candidate_act = std::move(candidate_act);
 		main_cell.state_act = std::move(state_act);
 		main_cell.output_act = std::move(output_act);
 		input_dims = std::move(u_layer_input_dims);
@@ -1230,15 +1235,32 @@ public:
 	}
 	// Copy constructor.
 	inline LSTMNeuralNetwork(const Self& network) {
-		main_cell.forget_kernel = KernelPtr<Scalar,Rank>((KernelLayer<Scalar,Rank>*) network.main_cell.forget_kernel->clone());
-		main_cell.input_kernel = KernelPtr<Scalar,Rank>((KernelLayer<Scalar,Rank>*) network.main_cell.input_kernel->clone());
-		main_cell.candidate_kernel = KernelPtr<Scalar,Rank>((KernelLayer<Scalar,Rank>*) network.main_cell.candidate_kernel->clone());
+		main_cell.h_forget_kernel = KernelPtr<Scalar,Rank>((KernelLayer<Scalar,Rank>*)
+				network.main_cell.h_forget_kernel->clone());
+		main_cell.x_forget_kernel = KernelPtr<Scalar,Rank>((KernelLayer<Scalar,Rank>*)
+				network.main_cell.x_forget_kernel->clone());
+		main_cell.h_input_kernel = KernelPtr<Scalar,Rank>((KernelLayer<Scalar,Rank>*)
+				network.main_cell.h_input_kernel->clone());
+		main_cell.x_input_kernel = KernelPtr<Scalar,Rank>((KernelLayer<Scalar,Rank>*)
+				network.main_cell.x_input_kernel->clone());
+		main_cell.h_candidate_kernel = KernelPtr<Scalar,Rank>((KernelLayer<Scalar,Rank>*)
+				network.main_cell.h_candidate_kernel->clone());
+		main_cell.x_candidate_kernel = KernelPtr<Scalar,Rank>((KernelLayer<Scalar,Rank>*)
+				network.main_cell.x_candidate_kernel->clone());
+		main_cell.h_output_kernel = KernelPtr<Scalar,Rank>((KernelLayer<Scalar,Rank>*)
+				network.main_cell.h_output_kernel->clone());
+		main_cell.x_output_kernel = KernelPtr<Scalar,Rank>((KernelLayer<Scalar,Rank>*)
+				network.main_cell.x_output_kernel->clone());
+		main_cell.forget_act = ActivationPtr<Scalar,Rank>((ActivationLayer<Scalar,Rank>*)
+				network.main_cell.forget_act->clone());
+		main_cell.input_act = ActivationPtr<Scalar,Rank>((ActivationLayer<Scalar,Rank>*)
+				network.main_cell.input_act->clone());
+		main_cell.candidate_act = ActivationPtr<Scalar,Rank>((ActivationLayer<Scalar,Rank>*)
+				network.main_cell.candidate_act->clone());
 		main_cell.state_act = ActivationPtr<Scalar,Rank>((ActivationLayer<Scalar,Rank>*)
 				network.main_cell.state_act->clone());
 		main_cell.output_act = ActivationPtr<Scalar,Rank>((ActivationLayer<Scalar,Rank>*)
 				network.main_cell.output_act->clone());
-		main_cell.state_cache = network.main_cell.state_cache;
-		main_cell.u_cache = network.main_cell.u_cache;
 		output_seq_size_func = network.output_seq_size_func;
 		stateful = network.stateful;
 		mul_int = network.mul_int;
@@ -1250,13 +1272,19 @@ public:
 		for (size_t i = 0; i < cells_size; i++) {
 			Cell& c1 = cells[i];
 			const Cell& c2 = network.cells[i];
-			c1.forget_kernel = KernelPtr<Scalar,Rank>((KernelLayer<Scalar,Rank>*) c2.forget_kernel->clone());
-			c1.input_kernel = KernelPtr<Scalar,Rank>((KernelLayer<Scalar,Rank>*) c2.input_kernel->clone());
-			c1.candidate_kernel = KernelPtr<Scalar,Rank>((KernelLayer<Scalar,Rank>*) c2.candidate_kernel->clone());
+			c1.h_forget_kernel = KernelPtr<Scalar,Rank>((KernelLayer<Scalar,Rank>*) c2.h_forget_kernel->clone());
+			c1.x_forget_kernel = KernelPtr<Scalar,Rank>((KernelLayer<Scalar,Rank>*) c2.x_forget_kernel->clone());
+			c1.h_input_kernel = KernelPtr<Scalar,Rank>((KernelLayer<Scalar,Rank>*) c2.h_input_kernel->clone());
+			c1.x_input_kernel = KernelPtr<Scalar,Rank>((KernelLayer<Scalar,Rank>*) c2.x_input_kernel->clone());
+			c1.h_candidate_kernel = KernelPtr<Scalar,Rank>((KernelLayer<Scalar,Rank>*) c2.h_candidate_kernel->clone());
+			c1.x_candidate_kernel = KernelPtr<Scalar,Rank>((KernelLayer<Scalar,Rank>*) c2.x_candidate_kernel->clone());
+			c1.h_output_kernel = KernelPtr<Scalar,Rank>((KernelLayer<Scalar,Rank>*) c2.h_output_kernel->clone());
+			c1.x_output_kernel = KernelPtr<Scalar,Rank>((KernelLayer<Scalar,Rank>*) c2.x_output_kernel->clone());
+			c1.input_act = ActivationPtr<Scalar,Rank>((ActivationLayer<Scalar,Rank>*) c2.input_act->clone());
+			c1.forget_act = ActivationPtr<Scalar,Rank>((ActivationLayer<Scalar,Rank>*) c2.forget_act->clone());
+			c1.candidate_act = ActivationPtr<Scalar,Rank>((ActivationLayer<Scalar,Rank>*) c2.candidate_act->clone());
 			c1.state_act = ActivationPtr<Scalar,Rank>((ActivationLayer<Scalar,Rank>*) c2.state_act->clone());
 			c1.output_act = ActivationPtr<Scalar,Rank>((ActivationLayer<Scalar,Rank>*) c2.output_act->clone());
-			c1.state_cache = c2.state_cache;
-			c1.u_cache = c2.u_cache;
 		}
 		state = network.state;
 		batch_size = network.batch_size;
@@ -1303,24 +1331,37 @@ public:
 	}
 protected:
 	inline void set_foremost(bool foremost) {
-		Base::set_input_layer(*main_cell.forget_kernel, foremost);
+		Base::set_input_layer(*main_cell.h_forget_kernel, foremost);
+		Base::set_input_layer(*main_cell.x_forget_kernel, foremost);
 		this->foremost = foremost;
 	}
 	inline void empty_caches() {
-		Base::empty_cache(*main_cell.forget_kernel);
-		Base::empty_cache(*main_cell.input_kernel);
-		Base::empty_cache(*main_cell.candidate_kernel);
+		Base::empty_cache(*main_cell.h_forget_kernel);
+		Base::empty_cache(*main_cell.x_forget_kernel);
+		Base::empty_cache(*main_cell.h_input_kernel);
+		Base::empty_cache(*main_cell.x_input_kernel);
+		Base::empty_cache(*main_cell.h_candidate_kernel);
+		Base::empty_cache(*main_cell.x_candidate_kernel);
+		Base::empty_cache(*main_cell.h_output_kernel);
+		Base::empty_cache(*main_cell.x_output_kernel);
+		Base::empty_cache(*main_cell.input_act);
+		Base::empty_cache(*main_cell.forget_act);
+		Base::empty_cache(*main_cell.candidate_act);
 		Base::empty_cache(*main_cell.state_act);
 		Base::empty_cache(*main_cell.output_act);
 		cells = std::vector<Cell>(0);
 	}
 	inline std::vector<Layer<Scalar,Rank>*> get_layers() {
-		std::vector<Layer<Scalar,Rank>*> layers(9);
-		layers[0] = main_cell.forget_kernel.get();
-		layers[1] = main_cell.input_kernel.get();
-		layers[2] = main_cell.candidate_kernel.get();
-		layers[3] = main_cell.output_kernel.get();
-		layers[4] = main_cell.forget_act.get();
+		std::vector<Layer<Scalar,Rank>*> layers(13);
+		layers[0] = main_cell.h_forget_kernel.get();
+		layers[1] = main_cell.x_forget_kernel.get();
+		layers[2] = main_cell.h_input_kernel.get();
+		layers[3] = main_cell.x_input_kernel.get();
+		layers[4] = main_cell.h_candidate_kernel.get();
+		layers[5] = main_cell.x_candidate_kernel.get();
+		layers[6] = main_cell.h_output_kernel.get();
+		layers[7] = main_cell.x_output_kernel.get();
+		layers[8] = main_cell.forget_act.get();
 		layers[5] = main_cell.input_act.get();
 		layers[6] = main_cell.candidate_act.get();
 		layers[7] = main_cell.output_act.get();
@@ -1592,10 +1633,14 @@ protected:
 	}
 private:
 	struct Cell {
-		KernelPtr<Scalar,Rank> input_kernel;
-		KernelPtr<Scalar,Rank> forget_kernel;
-		KernelPtr<Scalar,Rank> candidate_kernel;
-		KernelPtr<Scalar,Rank> output_kernel;
+		KernelPtr<Scalar,Rank> h_forget_kernel;
+		KernelPtr<Scalar,Rank> x_forget_kernel;
+		KernelPtr<Scalar,Rank> h_input_kernel;
+		KernelPtr<Scalar,Rank> x_input_kernel;
+		KernelPtr<Scalar,Rank> h_candidate_kernel;
+		KernelPtr<Scalar,Rank> x_candidate_kernel;
+		KernelPtr<Scalar,Rank> h_output_kernel;
+		KernelPtr<Scalar,Rank> x_output_kernel;
 		ActivationPtr<Scalar,Rank> input_act;
 		ActivationPtr<Scalar,Rank> forget_act;
 		ActivationPtr<Scalar,Rank> candidate_act;
