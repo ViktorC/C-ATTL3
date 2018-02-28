@@ -82,7 +82,7 @@ protected:
 				weight_init(weight_init),
 				max_norm_constraint(max_norm_constraint),
 				max_norm(Utils<Scalar>::decidedly_greater(max_norm_constraint, .0)),
-				input_layer(input_layer),
+				input_layer(false),
 				weights(weight_rows, weight_cols),
 				weight_grads(weight_rows, weight_cols) {
 		assert(weight_init != nullptr);
@@ -644,7 +644,7 @@ public:
 			receptor_area(receptor_size * receptor_size),
 			height_rem(input_dims(0) - receptor_size),
 			width_rem(input_dims(1) - receptor_size),
-			input_layer(input_layer),
+			input_layer(false),
 			params(0, 0),
 			param_grads(0, 0) {
 		assert(input_dims(0) >= (int) receptor_size && input_dims(1) >= (int) receptor_size);
@@ -1014,7 +1014,7 @@ protected:
 		else {
 			int rows = out_grads.dimension(0);
 			typename Base::Data prev_out_grads;
-			if (!Layer<Scalar,3>::is_input_layer())
+			if (!Base::is_input_layer())
 				prev_out_grads = typename Base::Data(rows, Base::dims(0), Base::dims(1), Base::dims(2));
 			Dimensions<int,3> slice_dims({ Base::dims(0), Base::dims(1), 1 });
 			std::array<int,4> offsets({ 0, 0, 0, 0 });
@@ -1022,7 +1022,7 @@ protected:
 			for (int i = 0; i < Base::depth; ++i) {
 				offsets[3] = i;
 				typename Base::Data out_grads_slice_i = out_grads.slice(offsets, extents);
-				if (Layer<Scalar,3>::is_input_layer())
+				if (Base::is_input_layer())
 					Base::_pass_back(std::move(out_grads_slice_i), slice_dims, i);
 				else
 					prev_out_grads.slice(offsets, extents) = Base::_pass_back(std::move(out_grads_slice_i), slice_dims, i);

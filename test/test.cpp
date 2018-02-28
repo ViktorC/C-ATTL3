@@ -25,7 +25,7 @@
 using namespace cattle;
 typedef double Scalar;
 
-static int test_cnn() {
+static int test_residual() {
 	const int RANK = 3;
 	TensorPtr<Scalar,RANK,false> training_obs_ptr = TensorPtr<Scalar,RANK,false>(new Tensor<Scalar,RANK + 1>(80, 32, 32, 3));
 	TensorPtr<Scalar,RANK,false> training_obj_ptr = TensorPtr<Scalar,RANK,false>(new Tensor<Scalar,RANK + 1>(80, 1, 1, 1));
@@ -45,7 +45,8 @@ static int test_cnn() {
 			LayerPtr<Scalar,RANK>(new ConvLayer<Scalar>(training_prov.get_obs_dims(), 5, init, 1, 0)))));				// 0
 	parallel_lanes.push_back(NeuralNetPtr<Scalar,RANK,false>(new FeedforwardNeuralNetwork<Scalar,RANK>(
 			LayerPtr<Scalar,RANK>(new ConvLayer<Scalar>(training_prov.get_obs_dims(), 3, init, 5, 2)))));				// 1
-	comp_mods.push_back(NeuralNetPtr<Scalar,RANK,false>(new ParallelNeuralNetwork<Scalar>(std::move(parallel_lanes))));
+	comp_mods.push_back(NeuralNetPtr<Scalar,RANK,false>(
+			new ParallelNeuralNetwork<Scalar,RANK>(std::move(parallel_lanes))));
 	std::vector<LayerPtr<Scalar,RANK>> layers1(7);
 	layers1[0] = LayerPtr<Scalar,RANK>(new MaxPoolingLayer<Scalar>(comp_mods[0]->get_output_dims()));					// 2
 	layers1[1] = LayerPtr<Scalar,RANK>(new LeakyReLUActivationLayer<Scalar,RANK>(layers1[0]->get_output_dims()));		// 3
@@ -86,6 +87,38 @@ static int test_cnn() {
 	NadamOptimizer<Scalar,RANK,false> opt(loss, reg, 20);
 	std::cout << opt.verify_gradients(nn, test_prov) << std::endl;
 //	opt.optimize(nn, training_prov, test_prov, 500);
+	return 0;
+}
+
+static int test_parallel() {
+	const int RANK = 3;
+	TensorPtr<Scalar,RANK,false> training_obs_ptr = TensorPtr<Scalar,RANK,false>(new Tensor<Scalar,RANK + 1>(80, 8, 8, 3));
+	TensorPtr<Scalar,RANK,false> training_obj_ptr = TensorPtr<Scalar,RANK,false>(new Tensor<Scalar,RANK + 1>(80, 10, 1, 1));
+	training_obs_ptr->setRandom();
+	training_obj_ptr->setRandom();
+	InMemoryDataProvider<Scalar,RANK,false> training_prov(std::move(training_obs_ptr), std::move(training_obj_ptr));
+	TensorPtr<Scalar,RANK,false> test_obs_ptr = TensorPtr<Scalar,RANK,false>(new Tensor<Scalar,RANK + 1>(5, 8, 8, 3));
+	TensorPtr<Scalar,RANK,false> test_obj_ptr = TensorPtr<Scalar,RANK,false>(new Tensor<Scalar,RANK + 1>(5, 10, 1, 1));
+	test_obs_ptr->setRandom();
+	test_obj_ptr->setRandom();
+	InMemoryDataProvider<Scalar,RANK,false> test_prov(std::move(test_obs_ptr), std::move(test_obj_ptr));
+	WeightInitSharedPtr<Scalar> init(new HeWeightInitialization<Scalar>());
+	std::vector<NeuralNetPtr<Scalar,RANK,false>> lanes(2);
+	std::vector<LayerPtr<Scalar,RANK>> layers1(2);
+	layers1[0] = LayerPtr<Scalar,RANK>(new FCLayer<Scalar,RANK>(training_prov.get_obs_dims(), 5, init));
+	layers1[1] = LayerPtr<Scalar,RANK>(new TanhActivationLayer<Scalar,RANK>(layers1[0]->get_output_dims()));
+	lanes[0] = NeuralNetPtr<Scalar,RANK,false>(new FeedforwardNeuralNetwork<Scalar,RANK>(std::move(layers1)));
+	std::vector<LayerPtr<Scalar,RANK>> layers2(2);
+	layers2[0] = LayerPtr<Scalar,RANK>(new FCLayer<Scalar,RANK>(training_prov.get_obs_dims(), 5, init));
+	layers2[1] = LayerPtr<Scalar,RANK>(new TanhActivationLayer<Scalar,RANK>(layers2[0]->get_output_dims()));
+	lanes[1] = NeuralNetPtr<Scalar,RANK,false>(new FeedforwardNeuralNetwork<Scalar,RANK>(std::move(layers2)));
+	ParallelNeuralNetwork<Scalar,RANK> pnn(std::move(lanes), ParallelNeuralNetwork<Scalar,RANK>::CONCAT_LO_RANK);
+	pnn.init();
+	LossSharedPtr<Scalar,RANK,false> loss(new QuadraticLoss<Scalar,RANK,false>());
+	RegPenSharedPtr<Scalar> reg(new ElasticNetRegularizationPenalty<Scalar>());
+	NadamOptimizer<Scalar,RANK,false> opt(loss, reg, 20);
+	std::cout << opt.verify_gradients(pnn, test_prov) << std::endl;
+//	opt.optimize(pnn, training_prov, test_prov, 500);
 	return 0;
 }
 
@@ -150,5 +183,5 @@ static int test_seqnn() {
 }
 
 int main() {
-	return test_seqnn();
+	return test_residual();
 }
