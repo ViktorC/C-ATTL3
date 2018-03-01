@@ -122,6 +122,36 @@ static int test_parallel() {
 	return 0;
 }
 
+static int test_dense() {
+	const int RANK = 3;
+	TensorPtr<Scalar,RANK,false> training_obs_ptr = TensorPtr<Scalar,RANK,false>(new Tensor<Scalar,RANK + 1>(80, 8, 8, 2));
+	TensorPtr<Scalar,RANK,false> training_obj_ptr = TensorPtr<Scalar,RANK,false>(new Tensor<Scalar,RANK + 1>(80, 64, 8, 2));
+	training_obs_ptr->setRandom();
+	training_obj_ptr->setRandom();
+	InMemoryDataProvider<Scalar,RANK,false> training_prov(std::move(training_obs_ptr), std::move(training_obj_ptr));
+	TensorPtr<Scalar,RANK,false> test_obs_ptr = TensorPtr<Scalar,RANK,false>(new Tensor<Scalar,RANK + 1>(5, 8, 8, 2));
+	TensorPtr<Scalar,RANK,false> test_obj_ptr = TensorPtr<Scalar,RANK,false>(new Tensor<Scalar,RANK + 1>(5, 64, 8, 2));
+	test_obs_ptr->setRandom();
+	test_obj_ptr->setRandom();
+	InMemoryDataProvider<Scalar,RANK,false> test_prov(std::move(test_obs_ptr), std::move(test_obj_ptr));
+	WeightInitSharedPtr<Scalar> init(new HeWeightInitialization<Scalar>());
+	std::vector<CompositeNeuralNetwork<Scalar,RANK,false>> modules;
+	modules.push_back(CompositeNeuralNetwork<Scalar,RANK,false>(NeuralNetPtr<Scalar,RANK,false>(new FeedforwardNeuralNetwork<Scalar,RANK>(
+			LayerPtr<Scalar,RANK>(new ConvLayer<Scalar>(training_prov.get_obs_dims(), 2, init))))));
+	modules.push_back(CompositeNeuralNetwork<Scalar,RANK,false>(NeuralNetPtr<Scalar,RANK,false>(new FeedforwardNeuralNetwork<Scalar,RANK>(
+			LayerPtr<Scalar,RANK>(new ConvLayer<Scalar>(modules[0].get_input_dims().add_along_rank(modules[0].get_output_dims(), 0), 2, init))))));
+	modules.push_back(CompositeNeuralNetwork<Scalar,RANK,false>(NeuralNetPtr<Scalar,RANK,false>(new FeedforwardNeuralNetwork<Scalar,RANK>(
+			LayerPtr<Scalar,RANK>(new ConvLayer<Scalar>(modules[1].get_input_dims().add_along_rank(modules[1].get_output_dims(), 0), 2, init))))));
+	DenseNeuralNetwork<Scalar,RANK> dnn(std::move(modules), DenseNeuralNetwork<Scalar,RANK>::LOWEST_RANK);
+	dnn.init();
+	LossSharedPtr<Scalar,RANK,false> loss(new QuadraticLoss<Scalar,RANK,false>());
+	RegPenSharedPtr<Scalar> reg(new ElasticNetRegularizationPenalty<Scalar>());
+	NadamOptimizer<Scalar,RANK,false> opt(loss, reg, 20);
+	std::cout << opt.verify_gradients(dnn, test_prov) << std::endl;
+//	opt.optimize(dnn, training_prov, test_prov, 500);
+	return 0;
+}
+
 static int test_rnn() {
 	const int RANK = 3;
 	TensorPtr<Scalar,RANK,true> training_obs_ptr = TensorPtr<Scalar,RANK,true>(new Tensor<Scalar,RANK + 2>(80, 5, 16, 16, 3));
@@ -183,5 +213,5 @@ static int test_seqnn() {
 }
 
 int main() {
-	return test_residual();
+	return test_dense();
 }

@@ -703,24 +703,33 @@ class DenseNeuralNetwork : public NeuralNetwork<Scalar,Rank,false> {
 	typedef NeuralNetwork<Scalar,Rank,false> Base;
 	typedef CompositeNeuralNetwork<Scalar,Rank,false> Module;
 	typedef std::array<int,Base::DATA_RANKS> RankwiseArray;
-	static constexpr size_t HIGHEST_RANK_IND = Rank - 1;
-	static constexpr size_t HIGHEST_BATCH_RANK_IND = HIGHEST_RANK_IND + 1;
 public:
-	inline DenseNeuralNetwork(std::vector<Module> modules, bool foremost = true) :
-			modules(modules),
-			foremost(foremost) {
+	enum ConcatType { LOWEST_RANK, HIGHEST_RANK };
+	inline DenseNeuralNetwork(std::vector<Module> modules, ConcatType concat_type = HIGHEST_RANK,
+			bool foremost = true) :
+				modules(modules),
+				concat_type(concat_type),
+				concat_rank(concat_type == LOWEST_RANK ? 0 : Rank - 1),
+				concat_batch_rank(concat_rank + 1),
+				foremost(foremost) {
 		assert(this->modules.size() > 0 && "modules must contain at least 1 element");
+		assert(concat_type >= LOWEST_RANK && concat_type <= HIGHEST_RANK);
 		Module& first_module = this->modules[0];
 		input_dims = first_module.get_input_dims();
 		typename Base::Dims output_dims = first_module.get_output_dims();
-		output_dims(HIGHEST_RANK_IND) += input_dims(HIGHEST_RANK_IND);
-		for (int i = 0; i < HIGHEST_RANK_IND; ++i)
-			assert(input_dims(i) == output_dims(i));
+		output_dims(concat_rank) += input_dims(concat_rank);
+		if (concat_type == LOWEST_RANK) {
+			for (size_t i = Rank - 1; i > concat_rank; --i)
+				assert(input_dims(i) == output_dims(i));
+		} else {
+			for (size_t i = 0; i < concat_rank; ++i)
+				assert(input_dims(i) == output_dims(i));
+		}
 		for (unsigned i = 1; i < this->modules.size(); ++i) {
 			Module& module = this->modules[i];
 			const typename Base::Dims& module_input_dims = module.get_input_dims();
 			assert(module_input_dims == output_dims && "incompatible module dimensions");
-			output_dims(HIGHEST_RANK_IND) += module.get_output_dims()(HIGHEST_RANK_IND);
+			output_dims(concat_rank) += module.get_output_dims()(concat_rank);
 			module.set_foremost(false);
 		}
 		this->output_dims = output_dims;
@@ -757,51 +766,54 @@ protected:
 		return layers;
 	}
 	inline typename Base::Data propagate(typename Base::Data input, bool training) {
-		Utils<Scalar>::template check_dim_validity<Base::RANK_DIMS>(input);
-		Dimensions<int,Base::DATA_RANKS> dims = Utils<Scalar>::template get_dims<Base::RANK_DIMS>(input);
+		Utils<Scalar>::template check_dim_validity<Base::DATA_RANKS>(input);
+		Dimensions<int,Base::DATA_RANKS> dims = Utils<Scalar>::template get_dims<Base::DATA_RANKS>(input);
 		assert(input_dims == dims.template demote<>());
 		RankwiseArray offsets;
 		RankwiseArray extents = dims;
 		offsets.fill(0);
 		for (unsigned i = 0; i < modules.size(); ++i) {
 			Module& module = modules[i];
-			int layer_input_hi_rank = module.get_input_dims()(HIGHEST_RANK_IND);
-			int layer_output_hi_rank = module.get_output_dims()(HIGHEST_RANK_IND);
+			int layer_input_concat_rank_dim = module.get_input_dims()(concat_rank);
+			int layer_output_concat_rank_dim = module.get_output_dims()(concat_rank);
 			RankwiseArray out_i_sizes = extents;
-			out_i_sizes[HIGHEST_BATCH_RANK_IND] = layer_input_hi_rank + layer_output_hi_rank;
+			out_i_sizes[concat_batch_rank] = layer_input_concat_rank_dim + layer_output_concat_rank_dim;
 			typename Base::Data out_i(out_i_sizes);
-			offsets[HIGHEST_BATCH_RANK_IND] = 0;
-			extents[HIGHEST_BATCH_RANK_IND] = layer_input_hi_rank;
+			offsets[concat_batch_rank] = 0;
+			extents[concat_batch_rank] = layer_input_concat_rank_dim;
 			out_i.slice(offsets, extents) = input;
-			offsets[HIGHEST_BATCH_RANK_IND] = layer_input_hi_rank;
-			extents[HIGHEST_BATCH_RANK_IND] = layer_output_hi_rank;
+			offsets[concat_batch_rank] = layer_input_concat_rank_dim;
+			extents[concat_batch_rank] = layer_output_concat_rank_dim;
 			out_i.slice(offsets, extents) = module.propagate(std::move(input), training);
 			input = typename Base::Data(std::move(out_i));
 		}
 		return input;
 	}
 	inline typename Base::Data backpropagate(typename Base::Data out_grads) {
-		Utils<Scalar>::template check_dim_validity<Base::RANK_DIMS>(out_grads);
-		assert(output_dims == Utils<Scalar>::template get_dims<Base::RANK_DIMS>(out_grads).template demote<>());
+		Utils<Scalar>::template check_dim_validity<Base::DATA_RANKS>(out_grads);
+		assert(output_dims == Utils<Scalar>::template get_dims<Base::DATA_RANKS>(out_grads).template demote<>());
 		RankwiseArray offsets;
 		RankwiseArray extents = input_dims.template promote<>();
 		offsets.fill(0);
 		extents[0] = out_grads.dimension(0);
 		for (int i = modules.size() - 1; i >= 0; --i) {
 			Module& module = modules[i];
-			int layer_input_hi_rank = module.get_input_dims()(HIGHEST_RANK_IND);
-			int layer_output_hi_rank = module.get_output_dims()(HIGHEST_RANK_IND);
-			offsets[HIGHEST_BATCH_RANK_IND] = layer_input_hi_rank;
-			extents[HIGHEST_BATCH_RANK_IND] = layer_output_hi_rank;
+			int layer_input_concat_rank_dim = module.get_input_dims()(concat_rank);
+			int layer_output_concat_rank_dim = module.get_output_dims()(concat_rank);
+			offsets[concat_batch_rank] = layer_input_concat_rank_dim;
+			extents[concat_batch_rank] = layer_output_concat_rank_dim;
 			typename Base::Data out_grads_i = out_grads.slice(offsets, extents);
-			offsets[HIGHEST_BATCH_RANK_IND] = 0;
-			extents[HIGHEST_BATCH_RANK_IND] = layer_input_hi_rank;
+			offsets[concat_batch_rank] = 0;
+			extents[concat_batch_rank] = layer_input_concat_rank_dim;
 			out_grads = typename Base::Data(out_grads.slice(offsets, extents) +
 					module.backpropagate(std::move(out_grads_i)));
 		}
 		return out_grads;
 	}
 	std::vector<Module> modules;
+	const ConcatType concat_type;
+	const size_t concat_rank;
+	const size_t concat_batch_rank;
 	bool foremost;
 	typename Base::Dims input_dims;
 	typename Base::Dims output_dims;
@@ -922,12 +934,13 @@ class BidirectionalNeuralNetwork : public NeuralNetwork<Scalar,Rank,true> {
 	typedef std::array<int,Rank> RankwiseArray;
 public:
 	enum MergeType { CONCAT_LO_RANK, CONCAT_HI_RANK, SUM };
-	BidirectionalNeuralNetwork(UnidirNet network, MergeType merge_type = CONCAT_LO_RANK, boolean foremost = true) :
-			net(std::move(network)),
-			merge_type(merge_type),
-			concat_rank(merge_type == CONCAT_HI_RANK ? Rank - 1 : 0),
-			concat_batch_rank(concat_rank + 1),
-			foremost(foremost) {
+	inline BidirectionalNeuralNetwork(UnidirNet network, MergeType merge_type = CONCAT_LO_RANK,
+			bool foremost = true) :
+				net(std::move(network)),
+				merge_type(merge_type),
+				concat_rank(merge_type == CONCAT_HI_RANK ? Rank - 1 : 0),
+				concat_batch_rank(concat_rank + 1),
+				foremost(foremost) {
 		assert(this->net);
 		assert(merge_type >= CONCAT_LO_RANK && merge_type <= SUM);
 		net_rev = UnidirNet(this->net->clone());
@@ -1000,8 +1013,21 @@ protected:
 	inline typename Base::Data propagate(typename Base::Data input, bool training) {
 		Utils<Scalar>::template check_dim_validity<Base::DATA_RANKS>(input);
 		assert(input_dims == Utils<Scalar>::template get_dims<Base::DATA_RANKS>(input).template demote<2>());
+		pthread_attr_t attr;
+		pthread_t helper_thread;
+		pthread_attr_init(&attr);
+		pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_JOINABLE);
+		PropArgs args;
+		args.obj = this;
+		args.training = training;
+		args.in = &input;
+		assert(!pthread_create(&helper_thread, &attr, propagate, &args));
+		typename Base::Data forward_out = net->propagate(input, training);
+		assert(!pthread_join(helper_thread, nullptr));
+		pthread_attr_destroy(&attr);
+		assert(forward_out.dimension(1) == args.out.dimension(1));
+		input = Utils<Scalar>::template get_null_tensor<Base::DATA_RANKS>();
 		if (merge_type != SUM) {
-			typename Base::Data forward_out = net->propagate(input, training);
 			RankwiseArray dims = forward_out.dimensions();
 			RankwiseArray offsets;
 			RankwiseArray extents = dims;
@@ -1010,27 +1036,46 @@ protected:
 			typename Base::Data out(dims);
 			out.slice(offsets, extents) = forward_out;
 			offsets[concat_batch_rank] += extents[concat_batch_rank];
-			out.slice(offsets, extents) = net_rev->propagate(std::move(input), training);
+			out.slice(offsets, extents) = args.out;
 			return out;
-		} else
-			return net->propagate(input, training) + net_rev->propagate(input, training);
+		}
+		return forward_out + args.out;
 	}
 	inline typename Base::Data backpropagate(typename Base::Data out_grads) {
 		Utils<Scalar>::template check_dim_validity<Base::DATA_RANKS>(out_grads);
 		Dimensions<int,Base::DATA_RANKS> dims = Utils<Scalar>::template get_dims<Base::DATA_RANKS>(out_grads);
 		assert(output_dims == dims.template demote<2>());
+		pthread_attr_t attr;
+		pthread_t helper_thread;
+		pthread_attr_init(&attr);
+		pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_JOINABLE);
+		BackpropArgs args;
+		args.obj = this;
 		if (merge_type != SUM) {
 			RankwiseArray offsets;
 			RankwiseArray extents = dims;
 			offsets.fill(0);
 			extents[concat_batch_rank] /= 2;
-			typename Base::Data forward_slice = out_grads.slice(offsets, extents);
-			typename Base::Data grads = net->backpropagate(std::move(forward_slice));
 			offsets[concat_batch_rank] += extents[concat_batch_rank];
 			typename Base::Data backward_slice = out_grads.slice(offsets, extents);
-			return grads + net_rev->backpropagate(std::move(backward_slice));
-		} else
-			return net->backpropagate(out_grads) + net_rev->backpropagate(out_grads);
+			args.out_grads = *backward_slice;
+			assert(!pthread_create(&helper_thread, &attr, backpropagate, &args));
+			offsets[concat_batch_rank] -= extents[concat_batch_rank];
+			typename Base::Data forward_slice = out_grads.slice(offsets, extents);
+			typename Base::Data forward_prev_out_grads = net->backpropagate(std::move(forward_slice));
+			assert(!pthread_join(helper_thread, nullptr));
+			pthread_attr_destroy(&attr);
+			out_grads = Utils<Scalar>::template get_null_tensor<Base::DATA_RANKS>();
+			return forward_prev_out_grads + args.prev_out_grads;
+		} else {
+			args.out_grads = &out_grads;
+			assert(!pthread_create(&helper_thread, &attr, backpropagate, &args));
+			typename Base::Data forward_prev_out_grads = net->backpropagate(out_grads);
+			assert(!pthread_join(helper_thread, nullptr));
+			pthread_attr_destroy(&attr);
+			out_grads = Utils<Scalar>::template get_null_tensor<Base::DATA_RANKS>();
+			return forward_prev_out_grads + args.prev_out_grads;
+		}
 	}
 private:
 	UnidirNet net;
@@ -1041,6 +1086,27 @@ private:
 	bool foremost;
 	typename Base::Dims input_dims;
 	typename Base::Dims output_dims;
+	struct PropArgs {
+		Self* obj;
+		bool training;
+		typename Base::Data* in;
+		typename Base::Data out;
+	};
+	struct BackpropArgs {
+		Self* obj;
+		typename Base::Data* out_grads;
+		typename Base::Data prev_out_grads;
+	};
+	inline static void* propagate(void* args_ptr) {
+		PropArgs& args = *((PropArgs*) args_ptr);
+		args.out = args.obj->net_rev->propagate(*args.in, args.training);
+		return nullptr;
+	}
+	inline static void* backpropagate(void* args_ptr) {
+		BackpropArgs& args = *((BackpropArgs*) args_ptr);
+		args.prev_out_grads = args.obj->net_rev->backpropagate(*args.out_grads);
+		return nullptr;
+	}
 };
 
 template<typename Scalar, size_t Rank>
