@@ -165,14 +165,14 @@ static int test_rnn() {
 	test_obj_ptr->setRandom();
 	InMemoryDataProvider<Scalar,RANK,true> test_prov(std::move(test_obs_ptr), std::move(test_obj_ptr));
 	WeightInitSharedPtr<Scalar> init(new OrthogonalWeightInitialization<Scalar>());
-	KernelPtr<Scalar,RANK> u_kernel = KernelPtr<Scalar,RANK>(new ConvLayer<Scalar>(training_prov.get_obs_dims(), 5, init));
-	KernelPtr<Scalar,RANK> v_kernel = KernelPtr<Scalar,RANK>(new FCLayer<Scalar,RANK>(u_kernel->get_output_dims(), 2, init));
-	KernelPtr<Scalar,RANK> w_kernel = KernelPtr<Scalar,RANK>(new ConvLayer<Scalar>(u_kernel->get_output_dims(), 5, init));
+	KernelPtr<Scalar,RANK> input_kernel = KernelPtr<Scalar,RANK>(new ConvLayer<Scalar>(training_prov.get_obs_dims(), 5, init));
+	KernelPtr<Scalar,RANK> state_kernel = KernelPtr<Scalar,RANK>(new ConvLayer<Scalar>(input_kernel->get_output_dims(), 5, init));
+	KernelPtr<Scalar,RANK> output_kernel = KernelPtr<Scalar,RANK>(new FCLayer<Scalar,RANK>(input_kernel->get_output_dims(), 2, init));
 	ActivationPtr<Scalar,RANK> state_act = ActivationPtr<Scalar,RANK>(
-			new SigmoidActivationLayer<Scalar,RANK>(u_kernel->get_output_dims()));
+			new SigmoidActivationLayer<Scalar,RANK>(input_kernel->get_output_dims()));
 	ActivationPtr<Scalar,RANK> output_act = ActivationPtr<Scalar,RANK>(
-			new IdentityActivationLayer<Scalar,RANK>(v_kernel->get_output_dims()));
-	RecurrentNeuralNetwork<Scalar,RANK> rnn(std::move(u_kernel), std::move(v_kernel), std::move(w_kernel), std::move(state_act),
+			new IdentityActivationLayer<Scalar,RANK>(output_kernel->get_output_dims()));
+	RecurrentNeuralNetwork<Scalar,RANK> rnn(std::move(input_kernel), std::move(state_kernel), std::move(output_kernel), std::move(state_act),
 			std::move(output_act), [](int input_seq_length) { return std::make_pair(3, input_seq_length - 3); }, false, true);
 	rnn.init();
 	LossSharedPtr<Scalar,RANK,true> loss(new QuadraticLoss<Scalar,RANK,true>());
@@ -183,15 +183,47 @@ static int test_rnn() {
 	return 0;
 }
 
+static int test_bdrnn() {
+	const int RANK = 3;
+	TensorPtr<Scalar,RANK,true> training_obs_ptr = TensorPtr<Scalar,RANK,true>(new Tensor<Scalar,RANK + 2>(80, 7, 8, 8, 3));
+	TensorPtr<Scalar,RANK,true> training_obj_ptr = TensorPtr<Scalar,RANK,true>(new Tensor<Scalar,RANK + 2>(80, 3, 4, 1, 1));
+	training_obs_ptr->setRandom();
+	training_obj_ptr->setRandom();
+	InMemoryDataProvider<Scalar,RANK,true> training_prov(std::move(training_obs_ptr), std::move(training_obj_ptr));
+	TensorPtr<Scalar,RANK,true> test_obs_ptr = TensorPtr<Scalar,RANK,true>(new Tensor<Scalar,RANK + 2>(5, 7, 8, 8, 3));
+	TensorPtr<Scalar,RANK,true> test_obj_ptr = TensorPtr<Scalar,RANK,true>(new Tensor<Scalar,RANK + 2>(5, 3, 4, 1, 1));
+	test_obs_ptr->setRandom();
+	test_obj_ptr->setRandom();
+	InMemoryDataProvider<Scalar,RANK,true> test_prov(std::move(test_obs_ptr), std::move(test_obj_ptr));
+	WeightInitSharedPtr<Scalar> init(new OrthogonalWeightInitialization<Scalar>());
+	KernelPtr<Scalar,RANK> input_kernel = KernelPtr<Scalar,RANK>(new ConvLayer<Scalar>(training_prov.get_obs_dims(), 5, init));
+	KernelPtr<Scalar,RANK> state_kernel = KernelPtr<Scalar,RANK>(new ConvLayer<Scalar>(input_kernel->get_output_dims(), 5, init));
+	KernelPtr<Scalar,RANK> output_kernel = KernelPtr<Scalar,RANK>(new FCLayer<Scalar,RANK>(input_kernel->get_output_dims(), 2, init));
+	ActivationPtr<Scalar,RANK> state_act = ActivationPtr<Scalar,RANK>(
+			new SigmoidActivationLayer<Scalar,RANK>(input_kernel->get_output_dims()));
+	ActivationPtr<Scalar,RANK> output_act = ActivationPtr<Scalar,RANK>(
+			new IdentityActivationLayer<Scalar,RANK>(output_kernel->get_output_dims()));
+	BidirectionalNeuralNetwork<Scalar,RANK> bdrnn(UnidirNeuralNetPtr<Scalar,RANK>(new RecurrentNeuralNetwork<Scalar,RANK>(
+			std::move(input_kernel), std::move(state_kernel), std::move(output_kernel), std::move(state_act), std::move(output_act),
+			[](int input_seq_length) { return std::make_pair(3, 2); }, false, true)), BidirectionalNeuralNetwork<Scalar,RANK>::CONCAT_LO_RANK);
+	bdrnn.init();
+	LossSharedPtr<Scalar,RANK,true> loss(new QuadraticLoss<Scalar,RANK,true>());
+	RegPenSharedPtr<Scalar> reg(new ElasticNetRegularizationPenalty<Scalar>());
+	NadamOptimizer<Scalar,RANK,true> opt(loss, reg, 20);
+	std::cout << opt.verify_gradients(bdrnn, test_prov) << std::endl;
+//	opt.optimize(bdrnn, training_prov, test_prov, 500);
+	return 0;
+}
+
 static int test_seqnn() {
 	const int RANK = 3;
 	TensorPtr<Scalar,RANK,true> training_obs_ptr = TensorPtr<Scalar,RANK,true>(new Tensor<Scalar,RANK + 2>(80, 10, 8, 8, 3));
-	TensorPtr<Scalar,RANK,true> training_obj_ptr = TensorPtr<Scalar,RANK,true>(new Tensor<Scalar,RANK + 2>(80, 10, 2, 1, 1));
+	TensorPtr<Scalar,RANK,true> training_obj_ptr = TensorPtr<Scalar,RANK,true>(new Tensor<Scalar,RANK + 2>(80, 10, 4, 1, 1));
 	training_obs_ptr->setRandom();
 	training_obj_ptr->setRandom();
 	InMemoryDataProvider<Scalar,RANK,true> training_prov(std::move(training_obs_ptr), std::move(training_obj_ptr));
 	TensorPtr<Scalar,RANK,true> test_obs_ptr = TensorPtr<Scalar,RANK,true>(new Tensor<Scalar,RANK + 2>(20, 10, 8, 8, 3));
-	TensorPtr<Scalar,RANK,true> test_obj_ptr = TensorPtr<Scalar,RANK,true>(new Tensor<Scalar,RANK + 2>(20, 10, 2, 1, 1));
+	TensorPtr<Scalar,RANK,true> test_obj_ptr = TensorPtr<Scalar,RANK,true>(new Tensor<Scalar,RANK + 2>(20, 10, 4, 1, 1));
 	test_obs_ptr->setRandom();
 	test_obj_ptr->setRandom();
 	InMemoryDataProvider<Scalar,RANK,true> test_prov(std::move(test_obs_ptr), std::move(test_obj_ptr));
@@ -213,5 +245,5 @@ static int test_seqnn() {
 }
 
 int main() {
-	return test_dense();
+	return test_bdrnn();
 }

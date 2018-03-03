@@ -190,6 +190,8 @@ template<typename Scalar>
 const Tensor<Scalar,3> Utils<Scalar>::NULL_TENSOR3 = Tensor<Scalar,3>();
 template<typename Scalar>
 const Tensor<Scalar,4> Utils<Scalar>::NULL_TENSOR4 = Tensor<Scalar,4>();
+template<typename Scalar>
+const Tensor<Scalar,5> Utils<Scalar>::NULL_TENSOR5 = Tensor<Scalar,5>();
 
 }
 
