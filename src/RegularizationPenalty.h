@@ -9,7 +9,7 @@
 #define REGULARIZATIONPENALTY_H_
 
 #include <type_traits>
-#include <Utils.h>
+#include "Utils.h"
 
 namespace cattle {
 

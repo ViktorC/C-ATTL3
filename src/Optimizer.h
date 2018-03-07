@@ -11,18 +11,18 @@
 #include <algorithm>
 #include <cassert>
 #include <cstddef>
-#include <DataProvider.h>
-#include <Loss.h>
 #include <memory>
-#include <NeuralNetwork.h>
-#include <RegularizationPenalty.h>
 #include <random>
 #include <sstream>
 #include <string>
 #include <type_traits>
-#include <Utils.h>
 #include <vector>
-#include <WeightInitialization.h>
+#include "DataProvider.h"
+#include "Loss.h"
+#include "NeuralNetwork.h"
+#include "RegularizationPenalty.h"
+#include "Utils.h"
+#include "WeightInitialization.h"
 
 namespace cattle {
 
@@ -33,10 +33,10 @@ namespace cattle {
 // TODO GA
 // TODO PBIL
 
-template<typename Scalar, size_t Rank, bool Sequential>
+template<typename Scalar, std::size_t Rank, bool Sequential>
 using LossSharedPtr = std::shared_ptr<Loss<Scalar,Rank,Sequential>>;
 
-template<typename Scalar, size_t Rank, bool Sequential>
+template<typename Scalar, std::size_t Rank, bool Sequential>
 class Optimizer {
 	static_assert(std::is_floating_point<Scalar>::value, "non floating-point scalar type");
 	static_assert(Rank > 0 && Rank < 4, "illegal optimizer rank");
@@ -167,7 +167,7 @@ protected:
 template<typename Scalar>
 using RegPenSharedPtr = std::shared_ptr<RegularizationPenalty<Scalar>>;
 
-template<typename Scalar, size_t Rank, bool Sequential>
+template<typename Scalar, std::size_t Rank, bool Sequential>
 class SGDOptimizer : public Optimizer<Scalar,Rank,Sequential> {
 	typedef Optimizer<Scalar,Rank,Sequential> Base;
 public:
@@ -226,7 +226,7 @@ protected:
 	const unsigned batch_size;
 };
 
-template<typename Scalar, size_t Rank, bool Sequential>
+template<typename Scalar, std::size_t Rank, bool Sequential>
 class VanillaSGDOptimizer : public SGDOptimizer<Scalar,Rank,Sequential> {
 public:
 	inline VanillaSGDOptimizer(LossSharedPtr<Scalar,Rank,Sequential> loss, RegPenSharedPtr<Scalar> reg, unsigned batch_size = 1,
@@ -245,7 +245,7 @@ protected:
 	const Scalar learning_rate;
 };
 
-template<typename Scalar, size_t Rank, bool Sequential>
+template<typename Scalar, std::size_t Rank, bool Sequential>
 class MomentumAcceleratedSGDOptimizer : public SGDOptimizer<Scalar,Rank,Sequential> {
 public:
 	inline MomentumAcceleratedSGDOptimizer(LossSharedPtr<Scalar,Rank,Sequential> loss, RegPenSharedPtr<Scalar> reg,
@@ -289,7 +289,7 @@ protected:
 	std::vector<Matrix<Scalar>> param_grads_vec;
 };
 
-template<typename Scalar, size_t Rank, bool Sequential>
+template<typename Scalar, std::size_t Rank, bool Sequential>
 class NesterovMomentumAcceleratedSGDOptimizer : public MomentumAcceleratedSGDOptimizer<Scalar,Rank,Sequential> {
 	typedef MomentumAcceleratedSGDOptimizer<Scalar,Rank,Sequential> Base;
 public:
@@ -310,7 +310,7 @@ protected:
 	}
 };
 
-template<typename Scalar, size_t Rank, bool Sequential>
+template<typename Scalar, std::size_t Rank, bool Sequential>
 class AdagradOptimizer : public SGDOptimizer<Scalar,Rank,Sequential> {
 public:
 	inline AdagradOptimizer(LossSharedPtr<Scalar,Rank,Sequential> loss, RegPenSharedPtr<Scalar> reg, unsigned batch_size = 1,
@@ -355,7 +355,7 @@ protected:
 	std::vector<Matrix<Scalar>> param_grad_sqrs_vec;
 };
 
-template<typename Scalar, size_t Rank, bool Sequential>
+template<typename Scalar, std::size_t Rank, bool Sequential>
 class RMSPropOptimizer : public AdagradOptimizer<Scalar,Rank,Sequential> {
 public:
 	inline RMSPropOptimizer(LossSharedPtr<Scalar,Rank,Sequential> loss, RegPenSharedPtr<Scalar> reg,
@@ -378,7 +378,7 @@ protected:
 	const Scalar l2_decay;
 };
 
-template<typename Scalar, size_t Rank, bool Sequential>
+template<typename Scalar, std::size_t Rank, bool Sequential>
 class AdadeltaOptimizer : public SGDOptimizer<Scalar,Rank,Sequential> {
 public:
 	inline AdadeltaOptimizer(LossSharedPtr<Scalar,Rank,Sequential> loss, RegPenSharedPtr<Scalar> reg, unsigned batch_size = 1,
@@ -423,7 +423,7 @@ protected:
 	std::vector<ParamGradAndUpdateSqrs> pgus_vec;
 };
 
-template<typename Scalar, size_t Rank, bool Sequential>
+template<typename Scalar, std::size_t Rank, bool Sequential>
 class AdamOptimizer : public SGDOptimizer<Scalar,Rank,Sequential> {
 public:
 	inline AdamOptimizer(LossSharedPtr<Scalar,Rank,Sequential> loss, RegPenSharedPtr<Scalar> reg, unsigned batch_size = 1,
@@ -478,7 +478,7 @@ protected:
 	std::vector<ParamGradNorms> pgn_vec;
 };
 
-template<typename Scalar, size_t Rank, bool Sequential>
+template<typename Scalar, std::size_t Rank, bool Sequential>
 class AdaMaxOptimizer : public AdamOptimizer<Scalar,Rank,Sequential> {
 	typedef AdamOptimizer<Scalar,Rank,Sequential> Base;
 public:
@@ -501,7 +501,7 @@ protected:
 	}
 };
 
-template<typename Scalar, size_t Rank, bool Sequential>
+template<typename Scalar, std::size_t Rank, bool Sequential>
 class NadamOptimizer : public AdamOptimizer<Scalar,Rank,Sequential> {
 	typedef AdamOptimizer<Scalar,Rank,Sequential> Base;
 public:

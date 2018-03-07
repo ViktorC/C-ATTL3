@@ -15,18 +15,18 @@
 #include <cstdlib>
 #include <string>
 #include <type_traits>
-#include <Utils.h>
+#include "Utils.h"
 
 namespace cattle {
 
 // TODO CTC loss.
 
-template<typename Scalar, size_t Rank, bool Sequential>
+template<typename Scalar, std::size_t Rank, bool Sequential>
 class Loss {
 	static_assert(std::is_floating_point<Scalar>::value, "non floating-point scalar type");
 	static_assert(Rank > 0 && Rank < 4, "illegal loss rank");
 protected:
-	static constexpr size_t DATA_RANKS = Rank + Sequential + 1;
+	static constexpr std::size_t DATA_RANKS = Rank + Sequential + 1;
 	typedef Tensor<Scalar,DATA_RANKS> Data;
 	virtual ColVector<Scalar> _function(const Data& out, const Data& obj) const;
 	virtual Data _d_function(const Data& out, const Data& obj,
@@ -48,12 +48,12 @@ public:
 /**
  * Partial template specialization for sequential data.
  */
-template<typename Scalar, size_t Rank>
+template<typename Scalar, std::size_t Rank>
 class Loss<Scalar,Rank,true> {
 	static_assert(std::is_floating_point<Scalar>::value, "non floating-point scalar type");
 	static_assert(Rank > 0 && Rank < 4, "illegal loss rank");
 protected:
-	static constexpr size_t DATA_RANKS = Rank + 2;
+	static constexpr std::size_t DATA_RANKS = Rank + 2;
 	typedef Tensor<Scalar,DATA_RANKS> Data;
 	virtual ColVector<Scalar> _function(const Data& out, const Data& obj) const;
 	virtual Data _d_function(const Data& out, const Data& obj,
@@ -102,7 +102,7 @@ public:
 	}
 };
 
-template<typename Scalar, size_t Rank, bool Sequential>
+template<typename Scalar, std::size_t Rank, bool Sequential>
 class QuadraticLoss : public Loss<Scalar,Rank,Sequential> {
 	typedef Loss<Scalar,Rank,Sequential> Base;
 protected:
@@ -123,7 +123,7 @@ protected:
 /**
  * One-hot objective.
  */
-template<typename Scalar, size_t Rank, bool Sequential, bool Squared = false>
+template<typename Scalar, std::size_t Rank, bool Sequential, bool Squared = false>
 class HingeLoss : public Loss<Scalar,Rank,Sequential> {
 	typedef Loss<Scalar,Rank,Sequential> Base;
 protected:
@@ -197,7 +197,7 @@ protected:
 /**
  * Objective values between 0 and 1 (inclusive). Use with softmax activation.
  */
-template<typename Scalar, size_t Rank, bool Sequential>
+template<typename Scalar, std::size_t Rank, bool Sequential>
 class CrossEntropyLoss : public Loss<Scalar,Rank,Sequential> {
 	typedef Loss<Scalar,Rank,Sequential> Base;
 public:
@@ -223,7 +223,7 @@ private:
 /**
  * True label: 1; false label: -1.
  */
-template<typename Scalar, size_t Rank, bool Sequential, bool Squared = false>
+template<typename Scalar, std::size_t Rank, bool Sequential, bool Squared = false>
 class MultiLabelHingeLoss : public Loss<Scalar,Rank,Sequential> {
 	typedef Loss<Scalar,Rank,Sequential> Base;
 protected:
@@ -270,7 +270,7 @@ protected:
 /**
  * True label: 1; false label: 0. Use with sigmoid activation.
  */
-template<typename Scalar, size_t Rank, bool Sequential>
+template<typename Scalar, std::size_t Rank, bool Sequential>
 class MultiLabelLogLoss : public Loss<Scalar,Rank,Sequential> {
 	typedef Loss<Scalar,Rank,Sequential> Base;
 public:

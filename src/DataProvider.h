@@ -11,29 +11,29 @@
 #include <algorithm>
 #include <array>
 #include <cstddef>
-#include <Dimensions.h>
 #include <fstream>
 #include <memory>
 #include <string>
 #include <type_traits>
 #include <utility>
-#include <Utils.h>
+#include "Dimensions.h"
+#include "Utils.h"
 
 namespace cattle {
 
 // TODO OnDiskDataProvider.
 // TODO Specialized data providers for the MNIST, CIFAR, and ImageNet data sets.
 
-template<typename Scalar, size_t Rank, bool Sequential>
+template<typename Scalar, std::size_t Rank, bool Sequential>
 using TensorPtr = std::unique_ptr<Tensor<Scalar,Rank + Sequential + 1>>;
 
-template<typename Scalar, size_t Rank, bool Sequential>
+template<typename Scalar, std::size_t Rank, bool Sequential>
 using DataPair = std::pair<Tensor<Scalar,Rank + Sequential + 1>,Tensor<Scalar,Rank + Sequential + 1>>;
 
 /**
  * A class template for fetching data from memory or disk.
  */
-template<typename Scalar, size_t Rank, bool Sequential>
+template<typename Scalar, std::size_t Rank, bool Sequential>
 class DataProvider {
 	static_assert(std::is_floating_point<Scalar>::value, "non floating-point scalar type");
 	static_assert(Rank > 0 && Rank < 4, "illegal data provider rank");
@@ -47,9 +47,9 @@ public:
 	virtual void reset() = 0;
 };
 
-template<typename Scalar, size_t Rank, bool Sequential>
+template<typename Scalar, std::size_t Rank, bool Sequential>
 class InMemoryDataProvider : public DataProvider<Scalar,Rank,Sequential> {
-	static constexpr size_t DATA_RANKS = Rank + Sequential + 1;
+	static constexpr std::size_t DATA_RANKS = Rank + Sequential + 1;
 	typedef Tensor<Scalar,DATA_RANKS> Data;
 	typedef TensorPtr<Scalar,Rank,Sequential> DataPtr;
 public:
@@ -66,7 +66,7 @@ public:
 		Dimensions<int,DATA_RANKS> obj_dims = Utils<Scalar>::template get_dims<DATA_RANKS>(*this->obj);
 		this->obs_dims = obs_dims.template demote<Sequential + 1>();
 		this->obj_dims = obj_dims.template demote<Sequential + 1>();
-		rows = (size_t) this->obs->dimension(0);
+		rows = (std::size_t) this->obs->dimension(0);
 		offsets.fill(0);
 		data_extents = obs_dims;
 		obj_extents = obj_dims;
@@ -104,7 +104,7 @@ private:
 	DataPtr obj;
 	Dimensions<int,Rank> obs_dims;
 	Dimensions<int,Rank> obj_dims;
-	size_t rows;
+	std::size_t rows;
 	std::array<int,DATA_RANKS> offsets;
 	std::array<int,DATA_RANKS> data_extents;
 	std::array<int,DATA_RANKS> obj_extents;

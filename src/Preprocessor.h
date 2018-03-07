@@ -13,17 +13,17 @@
 #include <cassert>
 #include <cmath>
 #include <cstddef>
-#include <Eigen/Dense>
 #include <string>
 #include <type_traits>
-#include <Utils.h>
 #include <vector>
+#include "Eigen/Dense"
+#include "Utils.h"
 
 namespace cattle {
 
 // TODO Fix for sequential data.
 
-template<typename Scalar, size_t Rank, bool Sequential>
+template<typename Scalar, std::size_t Rank, bool Sequential>
 class Preprocessor {
 	static_assert(std::is_floating_point<Scalar>::value, "non floating-point scalar type");
 	static_assert(Rank > 0 && Rank < 4, "illegal pre-processor rank");
@@ -33,7 +33,7 @@ public:
 	virtual void transform(Tensor<Scalar,Rank + Sequential + 1>& data) const = 0;
 };
 
-template<typename Scalar, size_t Rank>
+template<typename Scalar, std::size_t Rank>
 class NormalizationPreprocessor : public Preprocessor<Scalar,Rank,false> {
 public:
 	inline NormalizationPreprocessor(bool standardize = false, Scalar epsilon = Utils<Scalar>::EPSILON2) :
@@ -125,7 +125,7 @@ protected:
 	Matrix<Scalar> sd;
 };
 
-template<typename Scalar, size_t Rank>
+template<typename Scalar, std::size_t Rank>
 class PCAPreprocessorBase : public NormalizationPreprocessor<Scalar,Rank> {
 protected:
 	typedef NormalizationPreprocessor<Scalar,Rank> Base;
@@ -188,7 +188,7 @@ protected:
 	std::vector<EigenDecomposition> ed_vec;
 };
 
-template<typename Scalar, size_t Rank>
+template<typename Scalar, std::size_t Rank>
 class PCAPreprocessor : public PCAPreprocessorBase<Scalar,Rank> {
 	typedef PCAPreprocessorBase<Scalar,Rank> Base;
 	typedef typename Base::Base Root;

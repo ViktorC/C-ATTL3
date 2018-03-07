@@ -9,10 +9,10 @@
 #define WEIGHTINITIALIZATION_H_
 
 #include <cmath>
-#include <Eigen/Dense>
 #include <random>
 #include <string>
 #include <type_traits>
+#include "Eigen/Dense"
 
 namespace cattle {
 

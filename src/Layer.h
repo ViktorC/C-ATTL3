@@ -13,22 +13,23 @@
 #include <cassert>
 #include <cmath>
 #include <cstddef>
-#include <Dimensions.h>
 #include <memory>
 #include <type_traits>
-#include <Utils.h>
 #include <utility>
-#include <WeightInitialization.h>
+#include "Dimensions.h"
+#include "Utils.h"
+#include "WeightInitialization.h"
 
 namespace cattle {
 
+// TODO 1D and 2D convolution and pooling.
 // TODO Optional GPU acceleration using cuBLAS and cuDNN.
 
 // Forward declarations to NeuralNetwork and Optimizer so they can be friended.
-template<typename Scalar, size_t Rank, bool Sequential> class NeuralNetwork;
-template<typename Scalar, size_t Rank, bool Sequential> class Optimizer;
+template<typename Scalar, std::size_t Rank, bool Sequential> class NeuralNetwork;
+template<typename Scalar, std::size_t Rank, bool Sequential> class Optimizer;
 
-template<typename Scalar, size_t Rank>
+template<typename Scalar, std::size_t Rank>
 class Layer {
 	static_assert(std::is_floating_point<Scalar>::value, "non floating-point scalar type");
 	static_assert(Rank > 0 && Rank < 4, "illegal rank");
@@ -64,7 +65,7 @@ protected:
 template<typename Scalar>
 using WeightInitSharedPtr = std::shared_ptr<WeightInitialization<Scalar>>;
 
-template<typename Scalar, size_t Rank>
+template<typename Scalar, std::size_t Rank>
 class KernelLayer : public Layer<Scalar,Rank> {
 public:
 	virtual ~KernelLayer() = default;
@@ -76,7 +77,7 @@ public:
 	}
 protected:
 	inline KernelLayer(const Dimensions<int,Rank>& input_dims, Dimensions<int,Rank> output_dims, WeightInitSharedPtr<Scalar> weight_init,
-			size_t weight_rows, size_t weight_cols, Scalar max_norm_constraint) :
+			std::size_t weight_rows, std::size_t weight_cols, Scalar max_norm_constraint) :
 				input_dims(input_dims),
 				output_dims(output_dims),
 				weight_init(weight_init),
@@ -122,12 +123,12 @@ protected:
 	Matrix<Scalar> weight_grads;
 };
 
-template<typename Scalar, size_t Rank>
+template<typename Scalar, std::size_t Rank>
 class FCLayer : public KernelLayer<Scalar,Rank> {
 	typedef KernelLayer<Scalar,Rank> Base;
 	typedef Tensor<Scalar,Rank + 1> Data;
 public:
-	inline FCLayer(const Dimensions<int,Rank>& input_dims, size_t output_size, WeightInitSharedPtr<Scalar> weight_init,
+	inline FCLayer(const Dimensions<int,Rank>& input_dims, std::size_t output_size, WeightInitSharedPtr<Scalar> weight_init,
 			Scalar max_norm_constraint = 0) :
 				Base::KernelLayer(input_dims, Dimensions<int,Rank>({ (int) output_size }), weight_init,
 						input_dims.get_volume() + 1, output_size, max_norm_constraint) { }
@@ -173,8 +174,8 @@ class ConvLayer : public KernelLayer<Scalar,3> {
 	typedef Tensor<Scalar,4> Data;
 	typedef std::array<int,4> RankwiseArray;
 public:
-	inline ConvLayer(const Dimensions<int,3>& input_dims, size_t filters, WeightInitSharedPtr<Scalar> weight_init,
-			size_t receptor_size = 3, size_t padding = 1, size_t stride = 1, size_t dilation = 0,
+	inline ConvLayer(const Dimensions<int,3>& input_dims, std::size_t filters, WeightInitSharedPtr<Scalar> weight_init,
+			std::size_t receptor_size = 3, std::size_t padding = 1, std::size_t stride = 1, std::size_t dilation = 0,
 			Scalar max_norm_constraint = 0) :
 				/* For every filter, there is a column in the weight matrix with the same number of
 				 * elements as the size of the receptive field (F * F * D) + 1 for the bias row. */
@@ -323,11 +324,11 @@ protected:
 		return (input_dim - receptor_size - (receptor_size - 1) * dilation + 2 * padding) / stride + 1;
 	}
 private:
-	const size_t filters;
-	const size_t receptor_size;
-	const size_t padding;
-	const size_t stride;
-	const size_t dilation;
+	const std::size_t filters;
+	const std::size_t receptor_size;
+	const std::size_t padding;
+	const std::size_t stride;
+	const std::size_t dilation;
 	const int padded_height;
 	const int padded_width;
 	const int dil_receptor_size;
@@ -335,7 +336,7 @@ private:
 	std::vector<Matrix<Scalar>> biased_in_vec;
 };
 
-template<typename Scalar, size_t Rank>
+template<typename Scalar, std::size_t Rank>
 class ActivationLayer : public Layer<Scalar,Rank> {
 	typedef Tensor<Scalar,Rank + 1> Data;
 public:
@@ -397,7 +398,7 @@ protected:
 	Matrix<Scalar> out;
 };
 
-template<typename Scalar, size_t Rank>
+template<typename Scalar, std::size_t Rank>
 class IdentityActivationLayer : public ActivationLayer<Scalar,Rank> {
 public:
 	inline IdentityActivationLayer(const Dimensions<int,Rank>& dims) :
@@ -415,7 +416,7 @@ protected:
 	}
 };
 
-template<typename Scalar, size_t Rank>
+template<typename Scalar, std::size_t Rank>
 class ScalingActivationLayer : public ActivationLayer<Scalar,Rank> {
 public:
 	inline ScalingActivationLayer(const Dimensions<int,Rank>& dims, Scalar scale) :
@@ -436,7 +437,7 @@ private:
 	const Scalar scale;
 };
 
-template<typename Scalar, size_t Rank>
+template<typename Scalar, std::size_t Rank>
 class BinaryStepActivationLayer : public ActivationLayer<Scalar,Rank> {
 public:
 	inline BinaryStepActivationLayer(const Dimensions<int,Rank>& dims) :
@@ -454,7 +455,7 @@ protected:
 	}
 };
 
-template<typename Scalar, size_t Rank>
+template<typename Scalar, std::size_t Rank>
 class SigmoidActivationLayer : public ActivationLayer<Scalar,Rank> {
 public:
 	inline SigmoidActivationLayer(const Dimensions<int,Rank>& dims) :
@@ -472,7 +473,7 @@ protected:
 	}
 };
 
-template<typename Scalar, size_t Rank>
+template<typename Scalar, std::size_t Rank>
 class TanhActivationLayer : public ActivationLayer<Scalar,Rank> {
 public:
 	inline TanhActivationLayer(const Dimensions<int,Rank>& dims) :
@@ -490,7 +491,7 @@ protected:
 	}
 };
 
-template<typename Scalar, size_t Rank>
+template<typename Scalar, std::size_t Rank>
 class SoftmaxActivationLayer : public ActivationLayer<Scalar,Rank> {
 public:
 	inline SoftmaxActivationLayer(const Dimensions<int,Rank>& dims, Scalar epsilon = Utils<Scalar>::EPSILON2) :
@@ -520,7 +521,7 @@ private:
 	const Scalar epsilon;
 };
 
-template<typename Scalar, size_t Rank>
+template<typename Scalar, std::size_t Rank>
 class ReLUActivationLayer : public ActivationLayer<Scalar,Rank> {
 public:
 	inline ReLUActivationLayer(const Dimensions<int,Rank>& dims) :
@@ -539,7 +540,7 @@ protected:
 	}
 };
 
-template<typename Scalar, size_t Rank>
+template<typename Scalar, std::size_t Rank>
 class LeakyReLUActivationLayer : public ActivationLayer<Scalar,Rank> {
 public:
 	inline LeakyReLUActivationLayer(const Dimensions<int,Rank>& dims, Scalar alpha = 1e-1) :
@@ -561,7 +562,7 @@ private:
 	const Scalar alpha;
 };
 
-template<typename Scalar, size_t Rank>
+template<typename Scalar, std::size_t Rank>
 class ELUActivationLayer : public ActivationLayer<Scalar,Rank> {
 public:
 	inline ELUActivationLayer(const Dimensions<int,Rank>& dims, Scalar alpha = 1e-1) :
@@ -587,7 +588,7 @@ private:
 	const Scalar alpha;
 };
 
-template<typename Scalar, size_t Rank>
+template<typename Scalar, std::size_t Rank>
 class PReLUActivationLayer : public ActivationLayer<Scalar,Rank> {
 	typedef ActivationLayer<Scalar,Rank> Base;
 public:
@@ -635,7 +636,7 @@ class PoolingLayer : public Layer<Scalar,3> {
 	typedef Tensor<Scalar,4> Data;
 	typedef std::array<int,4> RankwiseArray;
 public:
-	inline PoolingLayer(const Dimensions<int,3>& input_dims, size_t receptor_size, size_t stride) :
+	inline PoolingLayer(const Dimensions<int,3>& input_dims, std::size_t receptor_size, std::size_t stride) :
 			input_dims(input_dims),
 			output_dims({ calculate_output_dim(input_dims(0), receptor_size, stride),
 					calculate_output_dim(input_dims(1), receptor_size, stride), input_dims(2) }),
@@ -739,8 +740,8 @@ protected:
 	}
 	const Dimensions<int,3> input_dims;
 	const Dimensions<int,3> output_dims;
-	const size_t receptor_size;
-	const size_t stride;
+	const std::size_t receptor_size;
+	const std::size_t stride;
 	const int receptor_area;
 	const int height_rem;
 	const int width_rem;
@@ -755,7 +756,7 @@ protected:
 template<typename Scalar>
 class SumPoolingLayer : public PoolingLayer<Scalar> {
 public:
-	inline SumPoolingLayer(const Dimensions<int,3>& input_dims, size_t receptor_size = 2, size_t stride = 2) :
+	inline SumPoolingLayer(const Dimensions<int,3>& input_dims, std::size_t receptor_size = 2, std::size_t stride = 2) :
 			PoolingLayer<Scalar>::PoolingLayer(input_dims, receptor_size, stride) { }
 	inline Layer<Scalar,3>* clone() const {
 		return new SumPoolingLayer(*this);
@@ -774,7 +775,7 @@ protected:
 template<typename Scalar>
 class MeanPoolingLayer : public PoolingLayer<Scalar> {
 public:
-	inline MeanPoolingLayer(const Dimensions<int,3>& input_dims, size_t receptor_size = 2, size_t stride = 2) :
+	inline MeanPoolingLayer(const Dimensions<int,3>& input_dims, std::size_t receptor_size = 2, std::size_t stride = 2) :
 			PoolingLayer<Scalar>::PoolingLayer(input_dims, receptor_size, stride) { }
 	inline Layer<Scalar,3>* clone() const {
 		return new MeanPoolingLayer(*this);
@@ -830,7 +831,7 @@ private:
 	std::vector<unsigned> max_inds;
 };
 
-template<typename Scalar, size_t Rank>
+template<typename Scalar, std::size_t Rank>
 class BatchNormLayerBase : public Layer<Scalar,Rank> {
 public:
 	virtual ~BatchNormLayerBase() = default;
@@ -954,7 +955,7 @@ protected:
 };
 
 // Batch norm for all but multi-channel input tensors.
-template<typename Scalar, size_t Rank>
+template<typename Scalar, std::size_t Rank>
 class BatchNormLayer : public BatchNormLayerBase<Scalar,Rank> {
 	typedef BatchNormLayerBase<Scalar,Rank> Base;
 public:
@@ -1032,7 +1033,7 @@ protected:
 	}
 };
 
-template<typename Scalar, size_t Rank>
+template<typename Scalar, std::size_t Rank>
 class DropoutLayer : public Layer<Scalar,Rank> {
 	typedef Tensor<Scalar,Rank + 1> Data;
 public:

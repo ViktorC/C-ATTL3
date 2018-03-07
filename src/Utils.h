@@ -8,14 +8,18 @@
 #ifndef UTILS_H_
 #define UTILS_H_
 
+#define EIGEN_USE_THREADS
+
 #include <algorithm>
 #include <cstddef>
-#include <Dimensions.h>
-#include <Eigen/Dense>
 #include <limits>
+#include <memory>
 #include <type_traits>
 #include <utility>
-#include <unsupported/Eigen/CXX11/Tensor>
+#include "Eigen/Dense"
+#include "unsupported/Eigen/CXX11/Tensor"
+#include "unsupported/Eigen/CXX11/ThreadPool"
+#include "Dimensions.h"
 
 namespace cattle {
 
@@ -32,11 +36,15 @@ using Matrix = Eigen::Matrix<Scalar,Eigen::Dynamic,Eigen::Dynamic,Eigen::ColMajo
 template<typename Scalar>
 using MatrixMap = Eigen::Map<Matrix<Scalar>>;
 
-template<typename Scalar, size_t Rank>
+template<typename Scalar, std::size_t Rank>
 using Tensor = Eigen::Tensor<Scalar,Rank,Eigen::ColMajor,int>;
 
-template<typename Scalar, size_t Rank>
+template<typename Scalar, std::size_t Rank>
 using TensorMap = Eigen::TensorMap<Tensor<Scalar,Rank>>;
+
+typedef std::unique_ptr<Eigen::ThreadPool> EvalThreadPoolPtr;
+
+typedef Eigen::ThreadPoolDevice EvalThreadPoolDevice;
 
 template<typename Scalar>
 class Utils {
@@ -54,11 +62,14 @@ public:
 	static const Tensor<Scalar,3> NULL_TENSOR3;
 	static const Tensor<Scalar,4> NULL_TENSOR4;
 	static const Tensor<Scalar,5> NULL_TENSOR5;
-	inline static int num_of_eigen_threads() {
+	inline static int num_of_eval_threads() {
 		return Eigen::nbThreads();
 	}
-	inline static void set_num_of_eigen_threads(int num_of_threads) {
+	inline static void set_num_of_eval_threads(int num_of_threads) {
 		Eigen::setNbThreads(num_of_threads);
+	}
+	inline static EvalThreadPoolPtr get_eval_thread_pool() {
+		return EvalThreadPoolPtr(new Eigen::ThreadPool(num_of_eval_threads()));
 	}
 	inline static bool almost_equal(Scalar n1, Scalar n2, Scalar abs_epsilon = EPSILON1,
 			Scalar rel_epsilon = EPSILON1) {
@@ -84,7 +95,7 @@ public:
 			Scalar rel_epsilon = EPSILON1) {
 		return n1 < n2 || almost_equal(n1, n2, abs_epsilon, rel_epsilon);
 	}
-	template<size_t Rank>
+	template<std::size_t Rank>
 	inline static const Tensor<Scalar,Rank>& get_null_tensor() {
 		static_assert(Rank > 1 && Rank < 6, "illegal null tensor rank");
 		switch (Rank) {
@@ -98,30 +109,30 @@ public:
 			return NULL_TENSOR5;
 		}
 	}
-	template<size_t Rank>
+	template<std::size_t Rank>
 	inline static void check_dim_validity(const Tensor<Scalar,Rank>& tensor) {
 		std::array<int,Rank> dimensions = tensor.dimensions();
-		for (size_t i = 0; i < Rank; ++i)
+		for (std::size_t i = 0; i < Rank; ++i)
 			assert(dimensions[i] > 0 && "illegal tensor dimension");
 	}
-	template<size_t Rank>
+	template<std::size_t Rank>
 	inline static Dimensions<int,Rank> get_dims(const Tensor<Scalar,Rank>& tensor) {
 		static_assert(Rank > 1, "illegal tensor rank");
 		return Dimensions<int,Rank>(tensor.dimensions());
 	}
-	template<size_t Rank>
+	template<std::size_t Rank>
 	inline static Matrix<Scalar> map_tensor_to_mat(Tensor<Scalar,Rank> tensor, int rows, int cols) {
 		static_assert(Rank > 1, "tensor rank too low for conversion to matrix");
 		assert(rows > 0 && cols > 0 && rows * cols = tensor.size());
 		return MatrixMap<Scalar>(tensor.data(), rows, cols);
 	}
-	template<size_t Rank>
+	template<std::size_t Rank>
 	inline static Matrix<Scalar> map_tensor_to_mat(Tensor<Scalar,Rank> tensor) {
 		static_assert(Rank > 1, "tensor rank too low for conversion to matrix");
 		int rows = tensor.dimension(0);
 		return MatrixMap<Scalar>(tensor.data(), rows, tensor.size() / rows);
 	}
-	template<size_t Rank>
+	template<std::size_t Rank>
 	inline static Tensor<Scalar,Rank> map_mat_to_tensor(Matrix<Scalar> mat,
 			const Dimensions<int,Rank - 1>& dims) {
 		static_assert(Rank > 1, "rank too low for conversion to tensor");
@@ -130,7 +141,7 @@ public:
 		promoted(0) = mat.rows();
 		return TensorMap<Scalar,Rank>(mat.data(), promoted);
 	}
-	template<size_t Rank>
+	template<std::size_t Rank>
 	inline static Tensor<Scalar,Rank> map_mat_to_tensor(Matrix<Scalar> mat) {
 		static_assert(Rank > 1, "rank too low for conversion to tensor");
 		Dimensions<int,Rank> dims;
@@ -138,14 +149,14 @@ public:
 		dims(1) = mat.cols();
 		return TensorMap<Scalar,Rank>(mat.data(), dims);
 	}
-	template<size_t Rank, size_t NewRank>
+	template<std::size_t Rank, std::size_t NewRank>
 	inline static Tensor<Scalar,NewRank> map_tensor_to_tensor(Tensor<Scalar,Rank> tensor,
 			const Dimensions<int,NewRank>& dims) {
 		static_assert(Rank > 0 && NewRank > 0, "illegal tensor rank");
 		assert(tensor.size() == dims.get_volume());
 		return TensorMap<Scalar,NewRank>(tensor.data(), dims);
 	}
-	template<size_t Rank>
+	template<std::size_t Rank>
 	inline static Tensor<Scalar,Rank - 1> join_first_two_ranks(Tensor<Scalar,Rank> tensor) {
 		static_assert(Rank > 1, "illegal tensor rank");
 		Dimensions<int,Rank> dims = get_dims<Rank>(tensor);
@@ -154,12 +165,12 @@ public:
 		joined_dims(0) *= lowest_dim;
 		return TensorMap<Scalar,Rank - 1>(tensor.data(), joined_dims);
 	}
-	template<size_t Rank>
-	inline static Tensor<Scalar,Rank + 1> split_first_rank(Tensor<Scalar,Rank> tensor, size_t rank0_size,
-			size_t rank1_size) {
+	template<std::size_t Rank>
+	inline static Tensor<Scalar,Rank + 1> split_first_rank(Tensor<Scalar,Rank> tensor, std::size_t rank0_size,
+			std::size_t rank1_size) {
 		static_assert(Rank > 0, "illegal tensor rank");
 		Dimensions<int,Rank> dims = get_dims<Rank>(tensor);
-		assert(dims(0) == rank0_size * rank1_size);
+		assert(dims(0) == (int) (rank0_size * rank1_size));
 		Dimensions<int,Rank + 1> split_dims = dims.template promote<>();
 		split_dims(0) = rank0_size;
 		split_dims(1) = rank1_size;
@@ -172,7 +183,7 @@ public:
 		std::random_shuffle(perm.indices().data(), perm.indices().data() + perm.indices().size());
 		mat = perm * mat;
 	}
-	template<size_t Rank>
+	template<std::size_t Rank>
 	inline static void shuffle_tensor_rows(Tensor<Scalar,Rank>& tensor) {
 		static_assert(Rank > 1, "illegal tensor rank");
 		Dimensions<int,Rank - 1> dims = get_dims<Rank>(tensor).template demote<>();
