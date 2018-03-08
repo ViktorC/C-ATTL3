@@ -69,7 +69,6 @@ $(function() {
   <div class="summary">
 <a href="#nested-classes">Classes</a> &#124;
 <a href="#namespaces">Namespaces</a> &#124;
-<a href="#define-members">Macros</a> &#124;
 <a href="#typedef-members">Typedefs</a>  </div>
   <div class="headertitle">
 <div class="title">Utils.h File Reference</div>  </div>
@@ -83,7 +82,6 @@ $(function() {
 <code>#include &lt;utility&gt;</code><br />
 <code>#include &quot;Eigen/Dense&quot;</code><br />
 <code>#include &quot;unsupported/Eigen/CXX11/Tensor&quot;</code><br />
-<code>#include &quot;unsupported/Eigen/CXX11/ThreadPool&quot;</code><br />
 <code>#include &quot;<a class="el" href="_dimensions_8h_source.html">Dimensions.h</a>&quot;</code><br />
 </div>
 <p><a href="_utils_8h_source.html">Go to the source code of this file.</a></p>
@@ -97,11 +95,6 @@ Classes</h2></td></tr>
 Namespaces</h2></td></tr>
 <tr class="memitem:namespacecattle"><td class="memItemLeft" align="right" valign="top"> &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacecattle.html">cattle</a></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-</table><table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="define-members"></a>
-Macros</h2></td></tr>
-<tr class="memitem:a86a59fe12b00dac8ede2329ebba1d766"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="_utils_8h.html#a86a59fe12b00dac8ede2329ebba1d766">EIGEN_USE_THREADS</a></td></tr>
-<tr class="separator:a86a59fe12b00dac8ede2329ebba1d766"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="typedef-members"></a>
 Typedefs</h2></td></tr>
@@ -123,26 +116,7 @@ Typedefs</h2></td></tr>
 <tr class="memitem:a7dfcb4d57e2c5da3170ebd8d13fd0431"><td class="memTemplParams" colspan="2">template&lt;typename Scalar , std::size_t Rank&gt; </td></tr>
 <tr class="memitem:a7dfcb4d57e2c5da3170ebd8d13fd0431"><td class="memTemplItemLeft" align="right" valign="top">using&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespacecattle.html#a7dfcb4d57e2c5da3170ebd8d13fd0431">cattle::TensorMap</a> = Eigen::TensorMap&lt; Tensor&lt; Scalar, Rank &gt; &gt;</td></tr>
 <tr class="separator:a7dfcb4d57e2c5da3170ebd8d13fd0431"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a31c22fe6a9f1f42aa60920499c3b533a"><td class="memItemLeft" align="right" valign="top">typedef std::unique_ptr&lt; Eigen::ThreadPool &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacecattle.html#a31c22fe6a9f1f42aa60920499c3b533a">cattle::EvalThreadPoolPtr</a></td></tr>
-<tr class="separator:a31c22fe6a9f1f42aa60920499c3b533a"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a3b66619398fcc576b5acc91fbe9aa8b2"><td class="memItemLeft" align="right" valign="top">typedef Eigen::ThreadPoolDevice&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacecattle.html#a3b66619398fcc576b5acc91fbe9aa8b2">cattle::EvalThreadPoolDevice</a></td></tr>
-<tr class="separator:a3b66619398fcc576b5acc91fbe9aa8b2"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
-<h2 class="groupheader">Macro Definition Documentation</h2>
-<a id="a86a59fe12b00dac8ede2329ebba1d766"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a86a59fe12b00dac8ede2329ebba1d766">&#9670;&nbsp;</a></span>EIGEN_USE_THREADS</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define EIGEN_USE_THREADS</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>

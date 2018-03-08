@@ -1105,6 +1105,7 @@ private:
 	inline static void* backpropagate(void* args_ptr) {
 		BackpropArgs& args = *((BackpropArgs*) args_ptr);
 		args.prev_out_grads = args.obj->net_rev->backpropagate(*args.out_grads);
+		std::cout << "args.prev_out_grads: " << Utils<Scalar>::template get_dims<Rank + 2>(args.prev_out_grads) << std::endl;
 		return nullptr;
 	}
 };
@@ -1308,7 +1309,7 @@ protected:
 					}
 				}
 			} else
-				cells = std::vector<Cell>(1);
+				cells = std::vector<Cell>(0);
 		}
 		// If the network is stateful and we are in training mode, retain the state.
 		if (!training || !stateful || batch_size == -1) {
@@ -1348,8 +1349,6 @@ protected:
 		output_extents[1] = 1;
 		Dimensions<int,Rank + 1> input_time_step_dims = input_dims.template promote<>();
 		input_time_step_dims(0) = samples;
-		EvalThreadPoolPtr thread_pool = Utils<Scalar>::get_eval_thread_pool();
-		EvalThreadPoolDevice thread_pool_device(thread_pool.get(), Utils<Scalar>::num_of_eval_threads());
 		for (int i = 0; i < time_steps; ++i) {
 			// In inference mode, do not unroll the network.
 			Cell& cell = !training || i == 0 ? main_cell : cells[i - 1];
@@ -1375,13 +1374,13 @@ protected:
 						cell.input_kernel_cache = Root::pass_forward(*cell.input_kernel,
 								Utils<Scalar>::template map_tensor_to_tensor<Root::DATA_RANKS,Rank + 1>(std::move(in_i_seq),
 										input_time_step_dims), training);
-						state.device(thread_pool_device) = state * cell.input_kernel_cache;
+						state *= cell.input_kernel_cache;
 					} else
-						state.device(thread_pool_device) = state * Root::pass_forward(*cell.input_kernel,
+						state *= Root::pass_forward(*cell.input_kernel,
 								Utils<Scalar>::template map_tensor_to_tensor<Root::DATA_RANKS,Rank + 1>(std::move(in_i_seq),
 										input_time_step_dims), training);
 				} else
-					state.device(thread_pool_device) += Root::pass_forward(*cell.input_kernel,
+					state += Root::pass_forward(*cell.input_kernel,
 							Utils<Scalar>::template map_tensor_to_tensor<Root::DATA_RANKS,Rank + 1>(std::move(in_i_seq),
 								input_time_step_dims), training);
 				if (!training)
@@ -1443,8 +1442,6 @@ protected:
 		out_time_step_dims(0) = batch_size;
 		int output_end = output_seq_length + output_seq_delay;
 		int time_steps = std::max(input_seq_length, output_end);
-		EvalThreadPoolPtr thread_pool = Utils<Scalar>::get_eval_thread_pool();
-		EvalThreadPoolDevice thread_pool_device(thread_pool.get(), Utils<Scalar>::num_of_eval_threads());
 		for (int i = time_steps - 1; i >= 0; --i) {
 			Cell& cell = i == 0 ? main_cell : cells[i - 1];
 			// If there was an output at the time step...
@@ -1460,8 +1457,7 @@ protected:
 						Utils<Scalar>::template map_tensor_to_tensor<Root::DATA_RANKS,Rank + 1>(
 								std::move(out_grads_seq_i), out_time_step_dims));
 				Root::empty_cache(*cell.output_act);
-				state_grads.device(thread_pool_device) = Root::pass_back(*cell.output_kernel, std::move(out_grads_i)) +
-						state_grads;
+				state_grads += Root::pass_back(*cell.output_kernel, std::move(out_grads_i));
 				Root::empty_cache(*cell.output_kernel);
 			}
 			// Always back-propagate the state gradient.
@@ -1777,6 +1773,7 @@ protected:
 		this->foremost = foremost;
 	}
 	inline void empty_caches() {
+		const TimeStepData& null_tensor = Utils<Scalar>::template get_null_tensor<Rank + 1>();
 		Root::empty_cache(*main_cell.input_forget_kernel);
 		Root::empty_cache(*main_cell.output_forget_kernel);
 		Root::empty_cache(*main_cell.input_write_kernel);
@@ -1790,7 +1787,6 @@ protected:
 		Root::empty_cache(*main_cell.candidate_act);
 		Root::empty_cache(*main_cell.state_act);
 		Root::empty_cache(*main_cell.read_act);
-		const TimeStepData& null_tensor = Utils<Scalar>::template get_null_tensor<Rank + 1>();
 		main_cell.forget_filter_cache = null_tensor;
 		main_cell.prev_state_cache = null_tensor;
 		main_cell.write_filter_cache = null_tensor;
@@ -1809,19 +1805,19 @@ protected:
 	}
 	inline std::vector<Layer<Scalar,Rank>*> get_layers() {
 		std::vector<Layer<Scalar,Rank>*> layers(13);
-		layers[1] = main_cell.input_forget_kernel.get();
-		layers[0] = main_cell.output_forget_kernel.get();
-		layers[3] = main_cell.input_write_kernel.get();
-		layers[2] = main_cell.output_write_kernel.get();
-		layers[5] = main_cell.input_candidate_kernel.get();
-		layers[4] = main_cell.output_candidate_kernel.get();
-		layers[7] = main_cell.input_read_kernel.get();
-		layers[6] = main_cell.output_read_kernel.get();
+		layers[0] = main_cell.input_forget_kernel.get();
+		layers[1] = main_cell.output_forget_kernel.get();
+		layers[2] = main_cell.input_write_kernel.get();
+		layers[3] = main_cell.output_write_kernel.get();
+		layers[4] = main_cell.input_candidate_kernel.get();
+		layers[5] = main_cell.output_candidate_kernel.get();
+		layers[6] = main_cell.input_read_kernel.get();
+		layers[7] = main_cell.output_read_kernel.get();
 		layers[8] = main_cell.forget_act.get();
-		layers[5] = main_cell.write_act.get();
-		layers[6] = main_cell.candidate_act.get();
-		layers[7] = main_cell.read_act.get();
-		layers[8] = main_cell.state_act.get();
+		layers[9] = main_cell.write_act.get();
+		layers[10] = main_cell.candidate_act.get();
+		layers[11] = main_cell.read_act.get();
+		layers[12] = main_cell.state_act.get();
 		return layers;
 	}
 	inline typename Root::Data propagate(typename Root::Data input, bool training) {
@@ -1878,7 +1874,7 @@ protected:
 					}
 				}
 			} else
-				cells = std::vector<Cell>(1);
+				cells = std::vector<Cell>(0);
 		}
 		if (!training || !stateful || batch_size == -1) {
 			Dimensions<int,Rank + 1> dims = main_cell.forget_act->get_output_dims().template promote<>();
@@ -1917,8 +1913,6 @@ protected:
 		Dimensions<int,Rank + 1> input_time_step_dims = input_dims.template promote<>();
 		input_time_step_dims(0) = samples;
 		TimeStepData hidden_out;
-		EvalThreadPoolPtr thread_pool = Utils<Scalar>::get_eval_thread_pool();
-		EvalThreadPoolDevice thread_pool_device(thread_pool.get(), Utils<Scalar>::num_of_eval_threads());
 		TimeStepData null_tensor = Utils<Scalar>::template get_null_tensor<Rank + 1>();
 		for (int i = 0; i < time_steps; ++i) {
 			Cell& cell = !training || i == 0 ? main_cell : cells[i - 1];
@@ -1926,7 +1920,7 @@ protected:
 			// State update.
 			if (i < input_seq_length) {
 				if (input_seq_length > 1) {
-					TimeStepData input_slice = input.slice(input_offsets, input_extents);
+					typename Root::Data input_slice = input.slice(input_offsets, input_extents);
 					input_offsets[1] += 1;
 					input_res = Utils<Scalar>::template map_tensor_to_tensor<Root::DATA_RANKS,Rank + 1>(std::move(input_slice),
 							input_time_step_dims);
@@ -1942,7 +1936,7 @@ protected:
 					cell.forget_filter_cache = Root::pass_forward(*cell.forget_act, std::move(weighted_input_forget), training);
 					cell.prev_state_cache = std::move(state);
 					// Selective remembrance.
-					state.device(thread_pool_device) = cell.forget_filter_cache * cell.prev_state_cache;
+					state = cell.forget_filter_cache * cell.prev_state_cache;
 					if (!training)
 						Root::empty_cache(*cell.forget_act);
 					TimeStepData weighted_input_write = Root::pass_forward(*cell.input_write_kernel, input_res, training);
@@ -1957,7 +1951,7 @@ protected:
 					cell.candidate_cache = Root::pass_forward(*cell.candidate_act, std::move(weighted_input_candidates), training);
 					if (!training)
 						Root::empty_cache(*cell.candidate_act);
-					state.device(thread_pool_device) = state + cell.write_filter_cache * cell.candidate_cache;
+					state += cell.write_filter_cache * cell.candidate_cache;
 				} else {
 					// There is both an input and an output from the previous time step.
 					TimeStepData weighted_input_forget = Root::pass_forward(*cell.input_forget_kernel, input_res, training);
@@ -1970,16 +1964,15 @@ protected:
 					if (mul_int) {
 						cell.weighted_input_forget_cache = std::move(weighted_input_forget);
 						cell.weighted_output_forget_cache = std::move(weighted_output_forget);
-						weighted_forget.device(thread_pool_device) = cell.weighted_input_forget_cache *
-								cell.weighted_output_forget_cache;
+						weighted_forget = cell.weighted_input_forget_cache * cell.weighted_output_forget_cache;
 					} else {
-						weighted_forget.device(thread_pool_device) = weighted_input_forget + weighted_output_forget;
+						weighted_forget = weighted_input_forget + weighted_output_forget;
 						weighted_input_forget = null_tensor;
 						weighted_output_forget = null_tensor;
 					}
 					cell.forget_filter_cache = Root::pass_forward(*cell.forget_act, std::move(weighted_forget), training);
 					cell.prev_state_cache = std::move(state);
-					state.device(thread_pool_device) = cell.forget_filter_cache * cell.prev_state_cache;
+					state = cell.forget_filter_cache * cell.prev_state_cache;
 					if (!training)
 						Root::empty_cache(*cell.forget_act);
 					TimeStepData weighted_input_write = Root::pass_forward(*cell.input_write_kernel, input_res, training);
@@ -1992,10 +1985,10 @@ protected:
 					if (mul_int) {
 						cell.weighted_input_write_cache = std::move(weighted_input_write);
 						cell.weighted_output_write_cache = std::move(weighted_output_write);
-						weighted_write.device(thread_pool_device) = cell.weighted_input_write_cache *
+						weighted_write = cell.weighted_input_write_cache *
 								cell.weighted_output_write_cache;
 					} else {
-						weighted_write.device(thread_pool_device) = weighted_input_write + weighted_output_write;
+						weighted_write = weighted_input_write + weighted_output_write;
 						weighted_input_write = null_tensor;
 						weighted_output_write = null_tensor;
 					}
@@ -2012,17 +2005,17 @@ protected:
 					if (mul_int) {
 						cell.weighted_input_candidate_cache = std::move(weighted_input_candidates);
 						cell.weighted_output_candidate_cache = std::move(weighted_output_candidates);
-						weighted_candidates.device(thread_pool_device) = cell.weighted_input_candidate_cache *
+						weighted_candidates = cell.weighted_input_candidate_cache *
 								cell.weighted_output_candidate_cache;
 					} else {
-						weighted_candidates.device(thread_pool_device) = weighted_input_candidates + weighted_output_candidates;
+						weighted_candidates = weighted_input_candidates + weighted_output_candidates;
 						weighted_input_candidates = null_tensor;
 						weighted_output_candidates = null_tensor;
 					}
 					cell.candidate_cache = Root::pass_forward(*cell.candidate_act, std::move(weighted_candidates), training);
 					if (!training)
 						Root::empty_cache(*cell.candidate_act);
-					state.device(thread_pool_device) = state + cell.write_filter_cache * cell.candidate_cache;
+					state += cell.write_filter_cache * cell.candidate_cache;
 				}
 			} else {
 				// There is only the output from the previous time step and no new input (i must be greater than 0).
@@ -2031,7 +2024,7 @@ protected:
 					Root::empty_cache(*cell.output_forget_kernel);
 				cell.forget_filter_cache = Root::pass_forward(*cell.forget_act, std::move(weighted_output_forget), training);
 				cell.prev_state_cache = std::move(state);
-				state.device(thread_pool_device) = cell.forget_filter_cache * cell.prev_state_cache;
+				state = cell.forget_filter_cache * cell.prev_state_cache;
 				if (!training)
 					Root::empty_cache(*cell.forget_act);
 				TimeStepData weighted_output_write = Root::pass_forward(*cell.output_write_kernel, hidden_out, training);
@@ -2046,10 +2039,8 @@ protected:
 				cell.candidate_cache = Root::pass_forward(*cell.candidate_act, std::move(weighted_output_candidates), training);
 				if (!training)
 					Root::empty_cache(*cell.candidate_act);
-				state.device(thread_pool_device) = state + cell.write_filter_cache * cell.candidate_cache;
+				state += cell.write_filter_cache * cell.candidate_cache;
 			}
-			if (i == time_steps - 1 && i >= output_end)
-				break;
 			// Output computation.
 			TimeStepData weighted_read;
 			if (i < input_seq_length) {
@@ -2067,10 +2058,10 @@ protected:
 					if (mul_int) {
 						cell.weighted_input_read_cache = std::move(weighted_input_read);
 						cell.weighted_output_read_cache = std::move(weighted_output_read);
-						weighted_read.device(thread_pool_device) = cell.weighted_input_read_cache *
+						weighted_read = cell.weighted_input_read_cache *
 								cell.weighted_output_read_cache;
 					} else {
-						weighted_read.device(thread_pool_device) = weighted_input_read + weighted_output_read;
+						weighted_read = weighted_input_read + weighted_output_read;
 						weighted_input_read = null_tensor;
 						weighted_output_read = null_tensor;
 					}
@@ -2083,10 +2074,10 @@ protected:
 			cell.read_filter_cache = Root::pass_forward(*cell.read_act, std::move(weighted_read), training);
 			if (!training)
 				Root::empty_cache(*cell.read_act);
-			cell.activated_state_cache = Root::pass_forward(*cell.read_act, state, training);
+			cell.activated_state_cache = Root::pass_forward(*cell.state_act, state, training);
 			if (!training)
 				Root::empty_cache(*cell.state_act);
-			hidden_out.device(thread_pool_device) = cell.read_filter_cache * cell.activated_state_cache;
+			hidden_out = cell.read_filter_cache * cell.activated_state_cache;
 			// If there is a non-hidden output at this time step...
 			if (i >= output_seq_delay && i < output_end) {
 				if (output_seq_length > 1) {
@@ -2131,122 +2122,108 @@ protected:
 		Dimensions<int,Rank + 1> out_time_step_dims = output_dims.template promote<>();
 		out_time_step_dims(0) = batch_size;
 		int output_end = output_seq_length + output_seq_delay;
-		int time_steps = std::min(input_seq_length, output_end);
-		EvalThreadPoolPtr thread_pool = Utils<Scalar>::get_eval_thread_pool();
-		EvalThreadPoolDevice thread_pool_device(thread_pool.get(), Utils<Scalar>::num_of_eval_threads());
+		int time_steps = std::max(input_seq_length, output_end);
 		TimeStepData null_tensor = Utils<Scalar>::template get_null_tensor<Rank + 1>();
 		for (int i = time_steps - 1; i >= 0; --i) {
 			Cell& cell = i == 0 ? main_cell : cells[i - 1];
 			// If there was a non-hidden output at the time step, let the gradients flow into the hidden output gradients.
 			if (i >= output_seq_delay && i < output_end) {
 				if (output_seq_length == 1)
-					hidden_out_grads.device(thread_pool_device) = hidden_out_grads +
-							Utils<Scalar>::template map_tensor_to_tensor<Root::DATA_RANKS,Rank + 1>(std::move(out_grads),
+					hidden_out_grads += Utils<Scalar>::template map_tensor_to_tensor<Root::DATA_RANKS,Rank + 1>(std::move(out_grads),
 							out_time_step_dims);
 				else {
 					typename Root::Data out_grads_seq = out_grads.slice(output_offsets, output_extents);
-					hidden_out_grads.device(thread_pool_device) = hidden_out_grads +
-							Utils<Scalar>::template map_tensor_to_tensor<Root::DATA_RANKS,Rank + 1>(std::move(out_grads_seq),
-							out_time_step_dims);
 					output_offsets[1] -= 1;
+					hidden_out_grads += Utils<Scalar>::template map_tensor_to_tensor<Root::DATA_RANKS,Rank + 1>(std::move(out_grads_seq),
+							out_time_step_dims);
 				}
 			}
-			TimeStepData activated_state_grads;
-			activated_state_grads.device(thread_pool_device) = cell.read_filter_cache * hidden_out_grads;
-			state_grads.device(thread_pool_device) += Root::pass_back(*cell.state_act, std::move(activated_state_grads));
+			state_grads += Root::pass_back(*cell.state_act, cell.read_filter_cache * hidden_out_grads);
 			Root::empty_cache(*cell.state_act);
-			TimeStepData read_filter_grads;
-			read_filter_grads.device(thread_pool_device) = cell.activated_state_cache * hidden_out_grads;
-			TimeStepData weighted_read_grads = Root::pass_back(*cell.read_act, std::move(read_filter_grads));
+			TimeStepData weighted_read_grads = Root::pass_back(*cell.read_act, cell.activated_state_cache * hidden_out_grads);
 			Root::empty_cache(*cell.read_act);
-			TimeStepData activated_candidate_grads;
-			activated_candidate_grads.device(thread_pool_device) = cell.write_filter_cache * state_grads;
-			TimeStepData candidate_grads = Root::pass_back(*cell.candidate_act, std::move(activated_candidate_grads));
+			TimeStepData candidate_grads = Root::pass_back(*cell.candidate_act, cell.write_filter_cache * state_grads);
 			Root::empty_cache(*cell.candidate_act);
-			TimeStepData write_filter_grads;
-			write_filter_grads.device(thread_pool_device) = cell.candidate_cache * state_grads;
-			TimeStepData weighted_write_grads = Root::pass_back(*cell.write_act, std::move(write_filter_grads));
+			TimeStepData weighted_write_grads = Root::pass_back(*cell.write_act, cell.candidate_cache * state_grads);
 			Root::empty_cache(*cell.write_act);
-			TimeStepData forget_filter_grads;
-			forget_filter_grads.device(thread_pool_device) = cell.prev_state_cache * state_grads;
-			TimeStepData weighted_forget_grads = Root::pass_back(*cell.forget_act, std::move(forget_filter_grads));
+			TimeStepData weighted_forget_grads = Root::pass_back(*cell.forget_act, cell.prev_state_cache * state_grads);
 			Root::empty_cache(*cell.forget_act);
-			state_grads.device(thread_pool_device) = state_grads * cell.forget_filter_cache;
-			if (mul_int) {
-				TimeStepData weighted_output_read_grads;
-				weighted_output_read_grads.device(thread_pool_device) = cell.weighted_input_read_cache * weighted_read_grads;
-				hidden_out_grads.device(thread_pool_device) = hidden_out_grads + Root::pass_back(*cell.output_read_kernel,
-						std::move(weighted_output_read_grads));
-				TimeStepData weighted_output_candidate_grads;
-				weighted_output_candidate_grads.device(thread_pool_device) = cell.weighted_input_candidate_cache * candidate_grads;
-				hidden_out_grads.device(thread_pool_device) = hidden_out_grads + Root::pass_back(*cell.output_candidate_kernel,
-						std::move(weighted_output_candidate_grads));
-				TimeStepData weighted_output_write_grads;
-				weighted_output_write_grads.device(thread_pool_device) = cell.weighted_input_write_cache * weighted_write_grads;
-				hidden_out_grads.device(thread_pool_device) = hidden_out_grads + Root::pass_back(*cell.output_write_kernel,
-						std::move(weighted_output_write_grads));
-				TimeStepData weighted_output_forget_grads;
-				weighted_output_forget_grads.device(thread_pool_device) = cell.weighted_input_forget_cache * weighted_forget_grads;
-				hidden_out_grads.device(thread_pool_device) = hidden_out_grads + Root::pass_back(*cell.output_forget_kernel,
-						std::move(weighted_output_forget_grads));
-				if (i < input_seq_length) {
-					TimeStepData prev_out_grads_i;
-					TimeStepData weighted_input_read_grads;
-					weighted_input_read_grads.device(thread_pool_device) = cell.weighted_output_read_cache * weighted_read_grads;
-					weighted_input_read_grads = null_tensor;
-					prev_out_grads_i.device(thread_pool_device) = Root::pass_back(*cell.input_read_kernel, std::move(weighted_input_read_grads));
-					TimeStepData weighted_input_candidate_grads;
-					weighted_input_candidate_grads.device(thread_pool_device) = cell.weighted_output_candidate_cache * candidate_grads;
-					candidate_grads = null_tensor;
-					prev_out_grads_i.device(thread_pool_device) = prev_out_grads_i + Root::pass_back(*cell.input_candidate_kernel,
-							std::move(weighted_input_candidate_grads));
-					TimeStepData weighted_input_write_grads;
-					weighted_input_write_grads.device(thread_pool_device) = cell.weighted_output_write_cache * weighted_write_grads;
-					weighted_write_grads = null_tensor;
-					prev_out_grads_i.device(thread_pool_device) = prev_out_grads_i + Root::pass_back(*cell.input_write_kernel,
-							std::move(weighted_input_write_grads));
-					TimeStepData weighted_input_forget_grads;
-					weighted_input_forget_grads.device(thread_pool_device) = cell.weighted_output_forget_cache * weighted_forget_grads;
-					weighted_forget_grads = null_tensor;
-					prev_out_grads_i.device(thread_pool_device) = prev_out_grads_i + Root::pass_back(*cell.input_forget_kernel,
-							std::move(weighted_input_forget_grads));
-					if (!foremost) {
-						if (input_seq_length > 1) {
-							prev_out_grads.slice(input_offsets, input_extents) =
-									Utils<Scalar>::template map_tensor_to_tensor<Rank + 1,Root::DATA_RANKS>(
-											std::move(prev_out_grads_i), input_extents);
-							input_offsets[1] -= 1;
-						} else
-							prev_out_grads = Utils<Scalar>::template map_tensor_to_tensor<Rank + 1,Root::DATA_RANKS>(
-									std::move(prev_out_grads_i), input_extents);
+			state_grads *= cell.forget_filter_cache;
+			if (i < input_seq_length) {
+				TimeStepData prev_out_grads_i;
+				if (mul_int) {
+					if (i != 0) {
+						// Calculate the previous hidden output gradients.
+						hidden_out_grads = Root::pass_back(*cell.output_read_kernel, cell.weighted_input_read_cache * weighted_read_grads);
+						Root::empty_cache(*cell.output_read_kernel);
+						hidden_out_grads += Root::pass_back(*cell.output_candidate_kernel, cell.weighted_input_candidate_cache * candidate_grads);
+						Root::empty_cache(*cell.output_candidate_kernel);
+						hidden_out_grads += Root::pass_back(*cell.output_write_kernel, cell.weighted_input_write_cache * weighted_write_grads);
+						Root::empty_cache(*cell.output_write_kernel);
+						hidden_out_grads += Root::pass_back(*cell.output_forget_kernel, cell.weighted_input_forget_cache * weighted_forget_grads);
+						Root::empty_cache(*cell.output_forget_kernel);
+						// Calculate the input gradients.
+						prev_out_grads_i = Root::pass_back(*cell.input_read_kernel, cell.weighted_output_read_cache * weighted_read_grads);
+						Root::empty_cache(*cell.input_read_kernel);
+						weighted_read_grads = null_tensor;
+						prev_out_grads_i += Root::pass_back(*cell.input_candidate_kernel, cell.weighted_output_candidate_cache * candidate_grads);
+						Root::empty_cache(*cell.input_candidate_kernel);
+						candidate_grads = null_tensor;
+						prev_out_grads_i += Root::pass_back(*cell.input_write_kernel, cell.weighted_output_write_cache * weighted_write_grads);
+						Root::empty_cache(*cell.input_write_kernel);
+						weighted_write_grads = null_tensor;
+						prev_out_grads_i += Root::pass_back(*cell.input_forget_kernel, cell.weighted_output_forget_cache * weighted_forget_grads);
+						Root::empty_cache(*cell.input_forget_kernel);
+						weighted_forget_grads = null_tensor;
+					} else {
+						prev_out_grads_i = Root::pass_back(*cell.input_read_kernel, std::move(weighted_read_grads));
+						Root::empty_cache(*cell.input_read_kernel);
+						prev_out_grads_i += Root::pass_back(*cell.input_candidate_kernel, std::move(candidate_grads));
+						Root::empty_cache(*cell.input_candidate_kernel);
+						prev_out_grads_i += Root::pass_back(*cell.input_write_kernel, std::move(weighted_write_grads));
+						Root::empty_cache(*cell.input_write_kernel);
+						prev_out_grads_i += Root::pass_back(*cell.input_forget_kernel, std::move(weighted_forget_grads));
+						Root::empty_cache(*cell.input_forget_kernel);
 					}
-				}
-			} else {
-				hidden_out_grads.device(thread_pool_device) = hidden_out_grads +
-						Root::pass_back(*cell.output_read_kernel, weighted_read_grads);
-				hidden_out_grads.device(thread_pool_device) = hidden_out_grads +
-						Root::pass_back(*cell.output_candidate_kernel, candidate_grads);
-				hidden_out_grads.device(thread_pool_device) = hidden_out_grads +
-						Root::pass_back(*cell.output_write_kernel, weighted_write_grads);
-				hidden_out_grads.device(thread_pool_device) = hidden_out_grads +
-						Root::pass_back(*cell.output_forget_kernel, weighted_forget_grads);
-				if (i < input_seq_length) {
-					TimeStepData prev_out_grads;
-					prev_out_grads.device(thread_pool_device) = Root::pass_back(*cell.input_read_kernel, std::move(weighted_read_grads)) +
+				} else {
+					if (i != 0) {
+						hidden_out_grads = Root::pass_back(*cell.output_read_kernel, weighted_read_grads);
+						Root::empty_cache(*cell.output_read_kernel);
+						hidden_out_grads += Root::pass_back(*cell.output_candidate_kernel, candidate_grads);
+						Root::empty_cache(*cell.output_candidate_kernel);
+						hidden_out_grads += Root::pass_back(*cell.output_write_kernel, weighted_write_grads);
+						Root::empty_cache(*cell.output_write_kernel);
+						hidden_out_grads += Root::pass_back(*cell.output_forget_kernel, weighted_forget_grads);
+						Root::empty_cache(*cell.output_forget_kernel);
+					}
+					prev_out_grads_i = Root::pass_back(*cell.input_read_kernel, std::move(weighted_read_grads)) +
 							Root::pass_back(*cell.input_candidate_kernel, std::move(candidate_grads)) +
 							Root::pass_back(*cell.input_write_kernel, std::move(weighted_write_grads)) +
 							Root::pass_back(*cell.input_forget_kernel, std::move(weighted_forget_grads));
-					if (!foremost) {
-						if (input_seq_length > 1) {
-							prev_out_grads.slice(input_offsets, input_extents) =
-									Utils<Scalar>::template map_tensor_to_tensor<Rank + 1,Root::DATA_RANKS>(
-											std::move(prev_out_grads), input_extents);
-							input_offsets[1] -= 1;
-						} else
-							prev_out_grads = Utils<Scalar>::template map_tensor_to_tensor<Rank + 1,Root::DATA_RANKS>(
-									std::move(prev_out_grads), input_extents);
-					}
+					Root::empty_cache(*cell.input_read_kernel);
+					Root::empty_cache(*cell.input_candidate_kernel);
+					Root::empty_cache(*cell.input_write_kernel);
+					Root::empty_cache(*cell.input_forget_kernel);
 				}
+				if (!foremost) {
+					if (input_seq_length > 1) {
+						prev_out_grads.slice(input_offsets, input_extents) =
+								Utils<Scalar>::template map_tensor_to_tensor<Rank + 1,Root::DATA_RANKS>(
+										std::move(prev_out_grads_i), input_extents);
+						input_offsets[1] -= 1;
+					} else
+						prev_out_grads = Utils<Scalar>::template map_tensor_to_tensor<Rank + 1,Root::DATA_RANKS>(
+								std::move(prev_out_grads_i), input_extents);
+				}
+			} else {
+				hidden_out_grads = Root::pass_back(*cell.output_read_kernel, std::move(weighted_read_grads));
+				Root::empty_cache(*cell.output_read_kernel);
+				hidden_out_grads += Root::pass_back(*cell.output_candidate_kernel, std::move(candidate_grads));
+				Root::empty_cache(*cell.output_candidate_kernel);
+				hidden_out_grads += Root::pass_back(*cell.output_write_kernel, std::move(weighted_write_grads));
+				Root::empty_cache(*cell.output_write_kernel);
+				hidden_out_grads += Root::pass_back(*cell.output_forget_kernel, std::move(weighted_forget_grads));
+				Root::empty_cache(*cell.output_forget_kernel);
 			}
 		}
 		// Roll-up the network.

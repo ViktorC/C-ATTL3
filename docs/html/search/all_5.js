@@ -2,7 +2,6 @@ var searchData=
 [
   ['ed_5fvec',['ed_vec',['../classcattle_1_1_p_c_a_preprocessor_base.html#a07623716a95731b2f9ff08cfae054d5b',1,'cattle::PCAPreprocessorBase']]],
   ['eigen_5fbasis',['eigen_basis',['../structcattle_1_1_p_c_a_preprocessor_base_1_1_eigen_decomposition.html#a14ad0f38bdea86904d823b512cea3bff',1,'cattle::PCAPreprocessorBase::EigenDecomposition']]],
-  ['eigen_5fuse_5fthreads',['EIGEN_USE_THREADS',['../_utils_8h.html#a86a59fe12b00dac8ede2329ebba1d766',1,'Utils.h']]],
   ['eigen_5fvalues',['eigen_values',['../structcattle_1_1_p_c_a_preprocessor_base_1_1_eigen_decomposition.html#a3fc989a6206e5efadbd4eb946f9e102e',1,'cattle::PCAPreprocessorBase::EigenDecomposition']]],
   ['eigendecomposition',['EigenDecomposition',['../structcattle_1_1_p_c_a_preprocessor_base_1_1_eigen_decomposition.html',1,'cattle::PCAPreprocessorBase']]],
   ['elasticnetregularizationpenalty',['ElasticNetRegularizationPenalty',['../classcattle_1_1_elastic_net_regularization_penalty.html',1,'cattle::ElasticNetRegularizationPenalty&lt; Scalar &gt;'],['../classcattle_1_1_elastic_net_regularization_penalty.html#a06fc881e7dc12f7c2bf20eb377bd7c36',1,'cattle::ElasticNetRegularizationPenalty::ElasticNetRegularizationPenalty()']]],
@@ -14,7 +13,5 @@ var searchData=
   ['epsilon1',['EPSILON1',['../classcattle_1_1_utils.html#a7a27c5c317bb28810941597cd19c9d08',1,'cattle::Utils']]],
   ['epsilon2',['EPSILON2',['../classcattle_1_1_utils.html#a470503e37f928ed16eaf6b0b3d9dc7b3',1,'cattle::Utils']]],
   ['epsilon3',['EPSILON3',['../classcattle_1_1_utils.html#a9e2217bc789e17eabcb490e337d40a20',1,'cattle::Utils']]],
-  ['eval',['eval',['../classcattle_1_1_dim_expression.html#a80900ec3799e55374ee393327ead0279',1,'cattle::DimExpression']]],
-  ['evalthreadpooldevice',['EvalThreadPoolDevice',['../namespacecattle.html#a3b66619398fcc576b5acc91fbe9aa8b2',1,'cattle']]],
-  ['evalthreadpoolptr',['EvalThreadPoolPtr',['../namespacecattle.html#a31c22fe6a9f1f42aa60920499c3b533a',1,'cattle']]]
+  ['eval',['eval',['../classcattle_1_1_dim_expression.html#a80900ec3799e55374ee393327ead0279',1,'cattle::DimExpression']]]
 ];

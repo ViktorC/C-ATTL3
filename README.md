@@ -1,7 +1,7 @@
 # C-ATTL3
 A neural network library written in C++. C-ATTL3 uses [Eigen](http://eigen.tuxfamily.org), the popular linear algebra library when run on the CPU. It allows for the easy construction and training of feed-forward neural networks ranging from simple MLPs to state-of-the-art convolutional InceptionNets, ResNets, Inception-ResNets, and DenseNets. C-ATTL3 also supports different floating point scalar types such as `float`, `double`, and `long double`.
 
-The highest level building blocks of the different architectures are the neural network implementations provided by the library. Using these implementations, either as modules in a composite constellation or as standalone networks, almost any neural network architecture can be constructed. They are the following:
+The highest level building blocks of the different architectures are the neural network implementations provided by the library. Using these implementations, either as modules in a composite constellation or as standalone networks, almost any neural network architecture can be constructed. They are the following (NOT UP TO DATE!):
 * SequentialNeuralNetwork
 * ParallelNeuralNetwork
 * CompositeNeuralNetwork

@@ -8,8 +8,6 @@
 #ifndef UTILS_H_
 #define UTILS_H_
 
-#define EIGEN_USE_THREADS
-
 #include <algorithm>
 #include <cstddef>
 #include <limits>
@@ -18,7 +16,6 @@
 #include <utility>
 #include "Eigen/Dense"
 #include "unsupported/Eigen/CXX11/Tensor"
-#include "unsupported/Eigen/CXX11/ThreadPool"
 #include "Dimensions.h"
 
 namespace cattle {
@@ -42,10 +39,6 @@ using Tensor = Eigen::Tensor<Scalar,Rank,Eigen::ColMajor,int>;
 template<typename Scalar, std::size_t Rank>
 using TensorMap = Eigen::TensorMap<Tensor<Scalar,Rank>>;
 
-typedef std::unique_ptr<Eigen::ThreadPool> EvalThreadPoolPtr;
-
-typedef Eigen::ThreadPoolDevice EvalThreadPoolDevice;
-
 template<typename Scalar>
 class Utils {
 	static_assert(std::is_floating_point<Scalar>::value, "non floating-point scalar type");
@@ -67,9 +60,6 @@ public:
 	}
 	inline static void set_num_of_eval_threads(int num_of_threads) {
 		Eigen::setNbThreads(num_of_threads);
-	}
-	inline static EvalThreadPoolPtr get_eval_thread_pool() {
-		return EvalThreadPoolPtr(new Eigen::ThreadPool(num_of_eval_threads()));
 	}
 	inline static bool almost_equal(Scalar n1, Scalar n2, Scalar abs_epsilon = EPSILON1,
 			Scalar rel_epsilon = EPSILON1) {

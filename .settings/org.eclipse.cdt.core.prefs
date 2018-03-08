@@ -1,7 +1,7 @@
 eclipse.preferences.version=1
 environment/project/0.780211852/MINGW_HOME/delimiter=;
 environment/project/0.780211852/MINGW_HOME/operation=replace
-environment/project/0.780211852/MINGW_HOME/value=C\:\\Program Files\\mingw-w64\\x86_64-7.2.0-posix-seh-rt_v5-rev1\\mingw64
+environment/project/0.780211852/MINGW_HOME/value=C\:\\MinGW
 environment/project/0.780211852/MSYS_HOME/delimiter=;
 environment/project/0.780211852/MSYS_HOME/operation=replace
 environment/project/0.780211852/MSYS_HOME/value=C\:\\MinGW\\msys\\1.0
