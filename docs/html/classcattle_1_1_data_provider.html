@@ -161,6 +161,14 @@ template&lt;typename Scalar , std::size_t Rank, bool Sequential&gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
+<p>Reads and returns the specified number of observation-objective pairs. It also offsets the reader by the specified number.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">batch_size</td><td>The maximum number of observation-objective pairs to read and return. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>At most batch_size number of observation-objective pairs. If the number of unread pairs is less than batch_size, the number of returned pairs is that of the unread ones. </dd></dl>
 
 <p>Implemented in <a class="el" href="classcattle_1_1_in_memory_data_provider.html#a4464401f155224de05ff4ea002f505e2">cattle::InMemoryDataProvider&lt; Scalar, Rank, Sequential &gt;</a>.</p>
 
@@ -190,6 +198,8 @@ template&lt;typename Scalar , std::size_t Rank, bool Sequential&gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
+<p>A simple constant getter method for the dimensions of the objectives.</p>
+<dl class="section return"><dt>Returns</dt><dd>A constant reference to the dimensions of the objectives. </dd></dl>
 
 <p>Implemented in <a class="el" href="classcattle_1_1_in_memory_data_provider.html#a16ec75150352d6f75b08f92dd3534566">cattle::InMemoryDataProvider&lt; Scalar, Rank, Sequential &gt;</a>.</p>
 
@@ -219,6 +229,8 @@ template&lt;typename Scalar , std::size_t Rank, bool Sequential&gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
+<p>A simple constant getter method for the dimensions of the observations.</p>
+<dl class="section return"><dt>Returns</dt><dd>A constant reference to the dimensions of the observations. </dd></dl>
 
 <p>Implemented in <a class="el" href="classcattle_1_1_in_memory_data_provider.html#a6e407f85dfd2ec3979170ff9823b6486">cattle::InMemoryDataProvider&lt; Scalar, Rank, Sequential &gt;</a>.</p>
 
@@ -248,6 +260,8 @@ template&lt;typename Scalar , std::size_t Rank, bool Sequential&gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
+<p>A simple constant method that returns whether the data provider instance has more data to provide.</p>
+<dl class="section return"><dt>Returns</dt><dd>Whether there are more observation-objective pairs to read from the instance. </dd></dl>
 
 <p>Implemented in <a class="el" href="classcattle_1_1_in_memory_data_provider.html#a8345bde76f42ef6dbb5125f2e67650d4">cattle::InMemoryDataProvider&lt; Scalar, Rank, Sequential &gt;</a>.</p>
 
@@ -277,6 +291,8 @@ template&lt;typename Scalar , std::size_t Rank, bool Sequential&gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
+<p>A simple constant method that returns the number of observations and objectives handled by the data provider instance.</p>
+<dl class="section return"><dt>Returns</dt><dd>The number of observation-objective pairs provided by this instance. </dd></dl>
 
 <p>Implemented in <a class="el" href="classcattle_1_1_in_memory_data_provider.html#a490aed02a33cf88586133f3b5fa05421">cattle::InMemoryDataProvider&lt; Scalar, Rank, Sequential &gt;</a>.</p>
 
@@ -306,6 +322,7 @@ template&lt;typename Scalar , std::size_t Rank, bool Sequential&gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
+<p>It resets the reader head to the beginning of the data storage. </p>
 
 <p>Implemented in <a class="el" href="classcattle_1_1_in_memory_data_provider.html#a3baaf4923769255e6fe631983f2cb124">cattle::InMemoryDataProvider&lt; Scalar, Rank, Sequential &gt;</a>.</p>
 

@@ -119,7 +119,12 @@ Additional Inherited Members</h2></td></tr>
 <tr class="memitem:a73253d35ecefc2cfaa626e5a252ccccf inherit pro_attribs_classcattle_1_1_gaussian_weight_initialization"><td class="memItemLeft" align="right" valign="top">const Scalar&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_gaussian_weight_initialization.html#a73253d35ecefc2cfaa626e5a252ccccf">bias</a></td></tr>
 <tr class="separator:a73253d35ecefc2cfaa626e5a252ccccf inherit pro_attribs_classcattle_1_1_gaussian_weight_initialization"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
-<h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
+<a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
+<div class="textblock"><h3>template&lt;typename Scalar&gt;<br />
+class cattle::OrthogonalWeightInitialization&lt; Scalar &gt;</h3>
+
+<p>A class template representing the orthogonal weight initialization method. </p>
+</div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
 <a id="ab9be303db248270141684a0cf57b0cbf"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#ab9be303db248270141684a0cf57b0cbf">&#9670;&nbsp;</a></span>OrthogonalWeightInitialization()</h2>
 
@@ -155,6 +160,13 @@ template&lt;typename Scalar &gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">bias</td><td>The value to which the elements of the bias row are to be set. </td></tr>
+    <tr><td class="paramname">sd</td><td>The standard deviation of the normal distribution to sample from. </td></tr>
+  </table>
+  </dd>
+</dl>
 
 </div>
 </div>
@@ -184,6 +196,13 @@ template&lt;typename Scalar &gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
+<p>It initializes the values of the kernel. It is assumed that the last row of the kernel is the bias row and is thus treated differently.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">weights</td><td>A reference to the weight matrix. </td></tr>
+  </table>
+  </dd>
+</dl>
 
 <p>Reimplemented from <a class="el" href="classcattle_1_1_gaussian_weight_initialization.html#ac40c05d1bc293b57a99cbc68a8204279">cattle::GaussianWeightInitialization&lt; Scalar &gt;</a>.</p>
 
@@ -224,6 +243,15 @@ template&lt;typename Scalar &gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
+<p>It computes the standard deviation of the distribution to sample from.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">fan_ins</td><td>The input size of the kernel (the number of rows in the weight matrix excluding the bias row). </td></tr>
+    <tr><td class="paramname">fan_outs</td><td>The output size of the kernel (the number of columns in the weight matrix). </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>The standard deviation of the normal distribution from which the values of the initialized weight matrix are to be sampled. </dd></dl>
 
 <p>Implements <a class="el" href="classcattle_1_1_gaussian_weight_initialization.html#afe2fa9530689b146b8ca009860b9fd64">cattle::GaussianWeightInitialization&lt; Scalar &gt;</a>.</p>
 

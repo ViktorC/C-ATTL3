@@ -164,7 +164,12 @@ Additional Inherited Members</h2></td></tr>
 <tr class="memitem:afbef40c115ce4cacb2e2e8fc02c44cd3 inherit pro_attribs_classcattle_1_1_kernel_layer"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespacecattle.html#a1d78623a47279d516750a44dbad6090b">Matrix</a>&lt; Scalar &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_kernel_layer.html#afbef40c115ce4cacb2e2e8fc02c44cd3">weight_grads</a></td></tr>
 <tr class="separator:afbef40c115ce4cacb2e2e8fc02c44cd3 inherit pro_attribs_classcattle_1_1_kernel_layer"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
-<h2 class="groupheader">Member Typedef Documentation</h2>
+<a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
+<div class="textblock"><h3>template&lt;typename Scalar, std::size_t Rank&gt;<br />
+class cattle::FCLayer&lt; Scalar, Rank &gt;</h3>
+
+<p>A class template representing a fully connected layer. </p>
+</div><h2 class="groupheader">Member Typedef Documentation</h2>
 <a id="ada9858c79f9d6e00cc8074a95850b31d"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#ada9858c79f9d6e00cc8074a95850b31d">&#9670;&nbsp;</a></span>Base</h2>
 
@@ -261,6 +266,15 @@ template&lt;typename Scalar , std::size_t Rank&gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">input_dims</td><td>The dimensionality of the observations to be processed by the layer. </td></tr>
+    <tr><td class="paramname">output_size</td><td>The length of the vector output for each sample. </td></tr>
+    <tr><td class="paramname">weight_init</td><td>A shared pointer to a weight initialization used to initialize the values of the parametric kernel backing the layer. </td></tr>
+    <tr><td class="paramname">max_norm_constraint</td><td>An optional max-norm constraint. If it is 0 or less, no constraint is applied. </td></tr>
+  </table>
+  </dd>
+</dl>
 
 </div>
 </div>
@@ -289,6 +303,8 @@ template&lt;typename Scalar , std::size_t Rank&gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
+<p>A constant method implementing the clone pattern.</p>
+<dl class="section return"><dt>Returns</dt><dd>A pointer to a copy of the instance. The instance does not take ownership of the returned pointer (i.e. the caller is responsible for deleting it). </dd></dl>
 
 <p>Implements <a class="el" href="classcattle_1_1_layer.html#a46db46c62f3d46c6bbef5a482d7fcb00">cattle::Layer&lt; Scalar, Rank &gt;</a>.</p>
 
@@ -318,6 +334,7 @@ template&lt;typename Scalar , std::size_t Rank&gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
+<p>It empties the layer's caches such as those required for the derivation of the function represented by the layer. </p>
 
 <p>Implements <a class="el" href="classcattle_1_1_layer.html#ae3d00e9fb6079e4b4990b3a14625a93d">cattle::Layer&lt; Scalar, Rank &gt;</a>.</p>
 
@@ -348,6 +365,14 @@ template&lt;typename Scalar , std::size_t Rank&gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
+<p>It back-propagates the derivative of the error function w.r.t. the output of the layer updating the gradients of its learnable parameters along the way.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">out_grads</td><td>The derivative of the loss function w.r.t. the output of the layer </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>The derivative of the loss function w.r.t. the output of the previous layer or a null tensor if the layer is an input layer. </dd></dl>
 
 <p>Implements <a class="el" href="classcattle_1_1_layer.html#a10194a9e1de70a94e0e30a4701d14c0f">cattle::Layer&lt; Scalar, Rank &gt;</a>.</p>
 
@@ -388,6 +413,15 @@ template&lt;typename Scalar , std::size_t Rank&gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
+<p>It has the function represented by the layer applied to the input tensor.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">in</td><td>A tensor representing a batch of observations. The observations are of the rank specified by the layer's template parameter and the input tensors rank is one greater. </td></tr>
+    <tr><td class="paramname">training</td><td>Whether the input is to be processed in training or inference mode. If the forward pass is performed in inference mode, the backward pass is not guaranteed to work. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>The output of the function represented by the layer applied to the input tensor. </dd></dl>
 
 <p>Implements <a class="el" href="classcattle_1_1_layer.html#a6c1ea7b25d9f882364b7f2288f02d8da">cattle::Layer&lt; Scalar, Rank &gt;</a>.</p>
 

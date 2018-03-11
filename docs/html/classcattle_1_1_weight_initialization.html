@@ -98,7 +98,12 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a68bfcb0b9ece61633999eea551af1bec"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_weight_initialization.html#a68bfcb0b9ece61633999eea551af1bec">apply</a> (<a class="el" href="namespacecattle.html#a1d78623a47279d516750a44dbad6090b">Matrix</a>&lt; Scalar &gt; &amp;weights) const =0</td></tr>
 <tr class="separator:a68bfcb0b9ece61633999eea551af1bec"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
-<h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
+<a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
+<div class="textblock"><h3>template&lt;typename Scalar&gt;<br />
+class cattle::WeightInitialization&lt; Scalar &gt;</h3>
+
+<p>An abstract class template for different weight initialization methods for kernel layers. </p>
+</div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
 <a id="a297bdc222260167543fe802ada6d5b7e"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a297bdc222260167543fe802ada6d5b7e">&#9670;&nbsp;</a></span>~WeightInitialization()</h2>
 
@@ -152,6 +157,13 @@ template&lt;typename Scalar &gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
+<p>It initializes the values of the kernel. It is assumed that the last row of the kernel is the bias row and is thus treated differently.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">weights</td><td>A reference to the weight matrix. </td></tr>
+  </table>
+  </dd>
+</dl>
 
 <p>Implemented in <a class="el" href="classcattle_1_1_orthogonal_weight_initialization.html#ab14fdabb549f5f5ca36e2415b9823890">cattle::OrthogonalWeightInitialization&lt; Scalar &gt;</a>, <a class="el" href="classcattle_1_1_gaussian_weight_initialization.html#ac40c05d1bc293b57a99cbc68a8204279">cattle::GaussianWeightInitialization&lt; Scalar &gt;</a>, <a class="el" href="classcattle_1_1_one_weight_initialization.html#adb729e06ba75b0b4a5b7ab533bcf41d7">cattle::OneWeightInitialization&lt; Scalar &gt;</a>, and <a class="el" href="classcattle_1_1_zero_weight_initialization.html#ab40002b76c81026423a7a5303d529321">cattle::ZeroWeightInitialization&lt; Scalar &gt;</a>.</p>
 

@@ -1,17 +1,24 @@
 # C-ATTL3
-A neural network library written in C++. C-ATTL3 uses [Eigen](http://eigen.tuxfamily.org), the popular linear algebra library when run on the CPU. It allows for the easy construction and training of feed-forward neural networks ranging from simple MLPs to state-of-the-art convolutional InceptionNets, ResNets, Inception-ResNets, and DenseNets. C-ATTL3 also supports different floating point scalar types such as `float`, `double`, and `long double`.
+A neural network library written in C++. C-ATTL3 uses [Eigen](http://eigen.tuxfamily.org), the popular linear algebra library. It allows for the easy construction and training of both feed-forward and recurrent neural networks ranging from simple MLPs and RNNs to state-of-the-art InceptionNets, ResNets, DenseNets, convolutional LSTMs, and other complex architecures. C-ATTL3 supports rank 1, 2, and 3 data and different floating point scalar types such as `float`, `double`, and `long double`. The Doxygen documentation of the library can be found [here](https://viktorc.github.io/C-ATTL3/html/).
 
-The highest level building blocks of the different architectures are the neural network implementations provided by the library. Using these implementations, either as modules in a composite constellation or as standalone networks, almost any neural network architecture can be constructed. They are the following (NOT UP TO DATE!):
-* SequentialNeuralNetwork
-* ParallelNeuralNetwork
-* CompositeNeuralNetwork
-* ResidualNeuralNetwork
-* DenseNeuralNetwork
+The highest level building blocks of the different architectures are the neural network implementations provided by the library. Using these implementations, either as modules in a composite constellation or as standalone networks, almost any neural network architecture can be constructed. They are the following:
+* FeedforwardNeuralNetwork (NS)
+* ParallelNeuralNetwork (NS)
+* UnidirectionalNeuralNetwork (S)
+  * RecurrentNeuralNetwork (S)
+  * LSTMNeuralNetwork (S)
+* BidirectionalNeuralNetwork (S)
+* SequentialNeuralNetwork (S)
+* CompositeNeuralNetwork (NS/S)
+* ResidualNeuralNetwork (NS)
+* DenseNeuralNetwork (NS)
 
-Sequential neural networks are ordinary networks with a set of layers through which the input is propagated. Parallel neural nets, on the other hand, contain one or more 'lanes' of networks through which the input is simultaneously propagated and eventually concatenated along the depth dimension. Composite neural networks, similarly to parallel networks, are composed of one or more sub-nets; however, these nets are stacked sequentially. Residual networks and dense networks are implementations of the [ResNet](https://arxiv.org/abs/1512.03385) and [DenseNet](https://arxiv.org/abs/1608.06993) architectures that use composite neural networks as their sub-modules. Both the inputs and outputs of these neural networks are rank-four tensors which allow for the representation of batches of images or data of lower rank.
+These neural networks are either sequential (S) or non-sequential (NS). Non-sequential networks handle inputs of rank 2 to 4 where the first rank represents the samples thus allowing for (mini-) batch training. On the other hand, sequential networks handle inputs of rank 3 to 5 where the first rank, similarly to that of non-sequential networks' inputs, represents the samples and the second rank represents the time steps. Feedforward neural networks are ordinary networks with a set of layers through which the non-sequential input is propagated. Parallel neural nets, on the other hand, contain one or more 'lanes' of non-sequential networks through which the input is simultaneously propagated and eventually concatenated along either the highest or lowest rank. Both vanilla recurrent neural networks and LSTMs support arbitrary output schedules and multiplicative integration. A bidirectional network takes a unidirectional network which it clones and reverses yielding two recurrent networks processing the input data from its two opposite ends along the time step rank. The outputs of the two unidirectional subnets of a bidirectional net can be either concatenated or summed. Sequential networks function as wrappers around non-sequential networks allowing them to be used on sequential data by applying them to each time step. Composite neural networks, similarly to parallel networks, are composed of one or more sub-nets; however, these nets are stacked sequentially and can be either sequential or non-sequential. Residual networks and dense networks are implementations of the [ResNet](https://arxiv.org/abs/1512.03385) and [DenseNet](https://arxiv.org/abs/1608.06993) architectures that use non-sequential composite neural networks as their sub-modules.
 
 The lower level building blocks of neural networks are the layers. C-ATTL3 contains a wide selection of layers that can be used for the construction of highly effective sequential neural network modules. The available layer types are the following:
-* FCLayer
+* KernelLayer
+  * FCLayer
+  * ConvLayer (3)
 * ActivationLayer
   * IdentityActivationLayer
   * ScalingActivationLayer
@@ -23,11 +30,10 @@ The lower level building blocks of neural networks are the layers. C-ATTL3 conta
   * LeakyReLUActivationLayer
   * ELUActivationLayer
   * PReLUActivationLayer
-* ConvLayer
-* PoolingLayer
-  * SumPoolingLayer
-  * MaxPoolingLayer
-  * MeanPoolingLayer
+* PoolingLayer (3)
+  * SumPoolingLayer (3)
+  * MaxPoolingLayer (3)
+  * MeanPoolingLayer (3)
 * DropoutLayer
 * BatchNormLayer
 
@@ -74,49 +80,49 @@ Once a neural network has been trained, it can be used for inference effortlessl
 	using namespace cattle;
 	
 	// Generate random training data
-	Tensor4Ptr<Scalar> training_obs_ptr = Tensor4Ptr<Scalar>(new Tensor4<Scalar>(80, 32, 32, 3));
-	Tensor4Ptr<Scalar> training_obj_ptr = Tensor4Ptr<Scalar>(new Tensor4<Scalar>(80, 1, 1, 1));
+	TensorPtr<Scalar,4> training_obs_ptr = TensorPtr<Scalar,4>(new Tensor<Scalar,4>(80, 32, 32, 3));
+	TensorPtr<Scalar,4> training_obj_ptr = TensorPtr<Scalar,4>(new Tensor<Scalar,4>(80, 1, 1, 1));
 	training_obs_ptr->setRandom();
 	training_obj_ptr->setRandom();
-	InMemoryDataProvider<Scalar> training_prov(std::move(training_obs_ptr), std::move(training_obj_ptr));
+	InMemoryDataProvider<Scalar,3,false> training_prov(std::move(training_obs_ptr), std::move(training_obj_ptr));
 
 	// Generate random test data
-	Tensor4Ptr<Scalar> test_obs_ptr = Tensor4Ptr<Scalar>(new Tensor4<Scalar>(20, 32, 32, 3));
-	Tensor4Ptr<Scalar> test_obj_ptr = Tensor4Ptr<Scalar>(new Tensor4<Scalar>(20, 1, 1, 1));
+	TensorPtr<Scalar,4> test_obs_ptr = TensorPtr<Scalar,4>(new Tensor<Scalar,4>(20, 32, 32, 3));
+	TensorPtr<Scalar,4> test_obj_ptr = TensorPtr<Scalar,4>(new Tensor<Scalar,4>(20, 1, 1, 1));
 	test_obs_ptr->setRandom();
 	test_obj_ptr->setRandom();
-	InMemoryDataProvider<Scalar> test_prov(std::move(test_obs_ptr), std::move(test_obj_ptr));
+	InMemoryDataProvider<Scalar,3,false> test_prov(std::move(test_obs_ptr), std::move(test_obj_ptr));
 
 	// Construct a simple convolutional neural network.
 	WeightInitSharedPtr<Scalar> init(new HeWeightInitialization<Scalar>());
-	std::vector<LayerPtr<Scalar>> layers(9);
-	layers[0] = LayerPtr<Scalar>(new ConvLayer<Scalar>(training_prov.get_obs_dims(), 10, init, 5, 2));
-	layers[1] = LayerPtr<Scalar>(new ReLUActivationLayer<Scalar>(layers[0]->get_output_dims()));
-	layers[2] = LayerPtr<Scalar>(new MaxPoolingLayer<Scalar>(layers[1]->get_output_dims()));
-	layers[3] = LayerPtr<Scalar>(new ConvLayer<Scalar>(layers[2]->get_output_dims(), 20, init));
-	layers[4] = LayerPtr<Scalar>(new ReLUActivationLayer<Scalar>(layers[3]->get_output_dims()));
-	layers[5] = LayerPtr<Scalar>(new MaxPoolingLayer<Scalar>(layers[4]->get_output_dims()));
-	layers[6] = LayerPtr<Scalar>(new FCLayer<Scalar>(layers[5]->get_output_dims(), 500, init));
-	layers[7] = LayerPtr<Scalar>(new ReLUActivationLayer<Scalar>(layers[6]->get_output_dims()));
-	layers[8] = LayerPtr<Scalar>(new FCLayer<Scalar>(layers[7]->get_output_dims(), 1, init));
-	SequentialNeuralNetwork<Scalar> nn(std::move(layers));
+	std::vector<LayerPtr<Scalar,3>> layers(9);
+	layers[0] = LayerPtr<Scalar,3>(new ConvLayer<Scalar>(training_prov.get_obs_dims(), 10, init, 5, 2));
+	layers[1] = LayerPtr<Scalar,3>(new ReLUActivationLayer<Scalar,3>(layers[0]->get_output_dims()));
+	layers[2] = LayerPtr<Scalar,3>(new MaxPoolingLayer<Scalar>(layers[1]->get_output_dims()));
+	layers[3] = LayerPtr<Scalar,3>(new ConvLayer<Scalar>(layers[2]->get_output_dims(), 20, init));
+	layers[4] = LayerPtr<Scalar,3>(new ReLUActivationLayer<Scalar,3>(layers[3]->get_output_dims()));
+	layers[5] = LayerPtr<Scalar,3>(new MaxPoolingLayer<Scalar>(layers[4]->get_output_dims()));
+	layers[6] = LayerPtr<Scalar,3>(new FCLayer<Scalar,3>(layers[5]->get_output_dims(), 500, init));
+	layers[7] = LayerPtr<Scalar,3>(new ReLUActivationLayer<Scalar,3>(layers[6]->get_output_dims()));
+	layers[8] = LayerPtr<Scalar,3>(new FCLayer<Scalar,3>(layers[7]->get_output_dims(), 1, init));
+	FeedforwardNeuralNetwork<Scalar,3> nn(std::move(layers));
 
 	// Initialize the network.
 	nn.init();
 
 	// Construct the optimizer.
-	LossSharedPtr<Scalar> loss(new QuadraticLoss<Scalar>());
+	LossSharedPtr<Scalar,3,false> loss(new QuadraticLoss<Scalar,3,false>());
 	RegPenSharedPtr<Scalar> reg(new ElasticNetRegularizationPenalty<Scalar>());
-	NadamOptimizer<Scalar> opt(loss, reg, 20);
+	NadamOptimizer<Scalar,3,false> opt(loss, reg, 20);
 
 	// Train the network for 500 epochs.
 	opt.optimize(nn, training_prov, test_prov, 500);
 	
 	// Generate random input data.
-	Tensor4<Scalar> input(5, 32, 32, 3);
+	Tensor<Scalar,4> input(5, 32, 32, 3);
 	input.setRandom();
 	
 	// Inference
-	Tensor4<Scalar> prediction = nn.infer(input);
+	Tensor<Scalar,4> prediction = nn.infer(input);
 
-Planned features include additional data providers, network serialization and de-serialization, LSTM and GRU layers, evolutionary and second order optimization algorithms, and GPU support via the use of cuBLAS and cuDNN.
+Planned features include additional data providers, network serialization and de-serialization, GRU network, CTC loss, evolutionary and second order optimization algorithms, and GPU support via the use of cuBLAS and cuDNN.

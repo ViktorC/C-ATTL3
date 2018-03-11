@@ -177,7 +177,12 @@ Private Types</h2></td></tr>
 <tr class="memitem:a2ae920c7a86ab6b864ffc71f40c3dc91"><td class="memItemLeft" align="right" valign="top">typedef std::array&lt; int, 4 &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_pooling_layer.html#a2ae920c7a86ab6b864ffc71f40c3dc91">RankwiseArray</a></td></tr>
 <tr class="separator:a2ae920c7a86ab6b864ffc71f40c3dc91"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
-<h2 class="groupheader">Member Typedef Documentation</h2>
+<a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
+<div class="textblock"><h3>template&lt;typename Scalar&gt;<br />
+class cattle::PoolingLayer&lt; Scalar &gt;</h3>
+
+<p>An abstract class template representing a pooling layer for batches of rank 3 data. </p>
+</div><h2 class="groupheader">Member Typedef Documentation</h2>
 <a id="acad5c5f5936598525008b3a00d439791"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#acad5c5f5936598525008b3a00d439791">&#9670;&nbsp;</a></span>Data</h2>
 
@@ -313,6 +318,16 @@ template&lt;typename Scalar &gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
+<p>It calculates the depth of the tensor output by the layer for all of its ranks except the first one (which denotes the samples in the batch).</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">input_dim</td><td>The dimensionality of the input tensor. </td></tr>
+    <tr><td class="paramname">receptor_size</td><td>The spatial extent of the receptor. </td></tr>
+    <tr><td class="paramname">stride</td><td>The stride at which the receptor is applied to the input tensor. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>The depth of the output tensor. </dd></dl>
 
 </div>
 </div>
@@ -351,6 +366,15 @@ template&lt;typename Scalar &gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
+<p>Differentiates the reduction function and returns the derivative of the loss function w.r.t. the output of the previous layer.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">grad</td><td>The derivative of the loss function w.r.t. the output of this layer. </td></tr>
+    <tr><td class="paramname">patch_ind</td><td>The index of the patch. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>The derivative of the loss function w.r.t. the output of the previous layer. </dd></dl>
 
 <p>Implemented in <a class="el" href="classcattle_1_1_max_pooling_layer.html#ab877a00722264d97fe51b47353319ebe">cattle::MaxPoolingLayer&lt; Scalar &gt;</a>, <a class="el" href="classcattle_1_1_mean_pooling_layer.html#aaafeb9b58de5776946a0a7f5e7e8d7b7">cattle::MeanPoolingLayer&lt; Scalar &gt;</a>, and <a class="el" href="classcattle_1_1_sum_pooling_layer.html#ae4e066f00b2101a2275c90357589c436">cattle::SumPoolingLayer&lt; Scalar &gt;</a>.</p>
 
@@ -380,6 +404,7 @@ template&lt;typename Scalar &gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
+<p>It applies constraints such as max-norm to the parameters of the layer if applicable. </p>
 
 <p>Implements <a class="el" href="classcattle_1_1_layer.html#ac74dd19ed2f3a253cfbb1d1785f56197">cattle::Layer&lt; Scalar, 3 &gt;</a>.</p>
 
@@ -409,6 +434,8 @@ template&lt;typename Scalar &gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
+<p>A simple constant getter method for the input dimensionality of the layer.</p>
+<dl class="section return"><dt>Returns</dt><dd>A constant reference to the member variable denoting the dimensions of the tensors accepted by the layer as its input (except for the first rank which denotes the variable sample size). </dd></dl>
 
 <p>Implements <a class="el" href="classcattle_1_1_layer.html#a2a4b826fb2b9eb1337a8458aca134f64">cattle::Layer&lt; Scalar, 3 &gt;</a>.</p>
 
@@ -438,6 +465,8 @@ template&lt;typename Scalar &gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
+<p>A simple constant getter method for the output dimensionality of the layer.</p>
+<dl class="section return"><dt>Returns</dt><dd>A constant reference to the member variable denoting the dimensions of the tensors output by the layer along all ranks except the first one. </dd></dl>
 
 <p>Implements <a class="el" href="classcattle_1_1_layer.html#a0ede1fbe46eab83f70e16a75ba0991e9">cattle::Layer&lt; Scalar, 3 &gt;</a>.</p>
 
@@ -467,6 +496,8 @@ template&lt;typename Scalar &gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
+<p>It returns a reference to the gradients of the learnable parameters of the layer.</p>
+<dl class="section return"><dt>Returns</dt><dd>A non-constant reference to the gradients of the parameters of the layer. </dd></dl>
 
 <p>Implements <a class="el" href="classcattle_1_1_layer.html#aa66fc1380d7446d77a3980c4006e7532">cattle::Layer&lt; Scalar, 3 &gt;</a>.</p>
 
@@ -496,6 +527,8 @@ template&lt;typename Scalar &gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
+<p>It returns a reference to the learnable parameters of the layer.</p>
+<dl class="section return"><dt>Returns</dt><dd>A non-constant reference to the parameters of the layer that are to be learned. </dd></dl>
 
 <p>Implements <a class="el" href="classcattle_1_1_layer.html#abd799a16024c5aee49dbc0a5fe2f3183">cattle::Layer&lt; Scalar, 3 &gt;</a>.</p>
 
@@ -525,6 +558,7 @@ template&lt;typename Scalar &gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
+<p>It initializes the layer and its parameters. </p>
 
 <p>Implements <a class="el" href="classcattle_1_1_layer.html#aae8baf56035b9c2130eec90881e27bad">cattle::Layer&lt; Scalar, 3 &gt;</a>.</p>
 
@@ -554,6 +588,7 @@ template&lt;typename Scalar &gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
+<p>Initializes the cache required for back-propagation. </p>
 
 <p>Implemented in <a class="el" href="classcattle_1_1_max_pooling_layer.html#ac3fabf322b503dc8b9bb7bd503d4ccc0">cattle::MaxPoolingLayer&lt; Scalar &gt;</a>, <a class="el" href="classcattle_1_1_mean_pooling_layer.html#a4044bee4e2308e33ccd6aa5d29fafcab">cattle::MeanPoolingLayer&lt; Scalar &gt;</a>, and <a class="el" href="classcattle_1_1_sum_pooling_layer.html#a5ee03744fcb7c3f09612e126556ed46d">cattle::SumPoolingLayer&lt; Scalar &gt;</a>.</p>
 
@@ -583,6 +618,8 @@ template&lt;typename Scalar &gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
+<p>A constant method that returns whether this layer functions as an input layer. An input layer does not need to propagate the gradients all the way during the backward pass as it is assumed that no other layer needs them derive the gradients on its parameters. It is therefore possible for an input layer to simply return a null tensor as the output of its backward pass.</p>
+<dl class="section return"><dt>Returns</dt><dd>Whether this layer is the input layer of the neural network that contains it. </dd></dl>
 
 <p>Reimplemented from <a class="el" href="classcattle_1_1_layer.html#a65bfa4d93279548dad4e57d7f03cbd51">cattle::Layer&lt; Scalar, 3 &gt;</a>.</p>
 
@@ -689,6 +726,15 @@ template&lt;typename Scalar &gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
+<p>Reduces the input vector into a single coefficient.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">patch</td><td>A spatial patch of the input tensor (of size receptor*receptor) stretched into a row vector. </td></tr>
+    <tr><td class="paramname">patch_ind</td><td>The index of the patch. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>The single numeral representing the result of the reduction. </dd></dl>
 
 <p>Implemented in <a class="el" href="classcattle_1_1_max_pooling_layer.html#ae37204eee033f4b86277992cec0ff9db">cattle::MaxPoolingLayer&lt; Scalar &gt;</a>, <a class="el" href="classcattle_1_1_mean_pooling_layer.html#a36acc4e38977038c3e94c8509d32925b">cattle::MeanPoolingLayer&lt; Scalar &gt;</a>, and <a class="el" href="classcattle_1_1_sum_pooling_layer.html#ad56189d473bcdeb0f7169427f62948c4">cattle::SumPoolingLayer&lt; Scalar &gt;</a>.</p>
 
@@ -719,6 +765,13 @@ template&lt;typename Scalar &gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
+<p>Sets this instance's input layer status to the given value.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">input_layer</td><td>Whether this layer is to be an input layer or not. </td></tr>
+  </table>
+  </dd>
+</dl>
 
 <p>Reimplemented from <a class="el" href="classcattle_1_1_layer.html#a7aafba96b6e30bc67eaef0a9db3ad2e4">cattle::Layer&lt; Scalar, 3 &gt;</a>.</p>
 

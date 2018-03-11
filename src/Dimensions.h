@@ -29,6 +29,10 @@ namespace cattle {
 template<typename Derived, typename IndexType, std::size_t Rank>
 class DimExpression;
 
+/**
+ * A class representing dimensions along one or more ranks. It can describe the dimensionality of
+ * tensors of arbitrary ranks.
+ */
 template<typename IndexType, std::size_t Rank>
 class Dimensions : public DimExpression<Dimensions<IndexType,Rank>,IndexType,Rank> {
 	template<typename OtherIndexType, std::size_t OtherRank>
@@ -52,12 +56,23 @@ public:
 		for (std::size_t i = 0; i < Rank; ++i)
 			values[i] = dims(i);
 	}
+	/**
+	 * A constant method that returns a copy of the instance with an additional most-significant rank.
+	 *
+	 * @return A new Dimensions instance with an additional rank with a dimensionality of one
+	 * prepended to it.
+	 */
 	template<std::size_t Ranks = 1>
 	inline Dimensions<IndexType,Rank + Ranks> promote() const {
 		Dimensions<IndexType,Rank + Ranks> promoted;
 		std::copy(values.begin(), values.end(), promoted.values.begin() + Ranks);
 		return promoted;
 	}
+	/**
+	 * A constant method that returns a copy of the instance without the most-significant rank.
+	 *
+	 * @return A new Dimensions instance with the first rank removed.
+	 */
 	template<std::size_t Ranks = 1>
 	inline Dimensions<IndexType,Rank - Ranks> demote() const {
 		static_assert(Rank > Ranks, "rank must be greater than the number of ranks to demote by");
@@ -65,16 +80,34 @@ public:
 		std::copy(values.begin() + Ranks, values.end(), demoted.values.begin());
 		return demoted;
 	}
+	/**
+	 * A simple constant method that returns a copy of the numeral representing the
+	 * number of dimensions along a given rank.
+	 *
+	 * @param i The index of the rank whose dimensionality is to be returned.
+	 * @return The dimensionality of the i-th rank.
+	 */
 	inline IndexType operator()(std::size_t i) const {
 		if (i < 0 || i >= Rank)
 			throw std::invalid_argument("illegal index value: " + i);
 		return values[i];
 	}
+	/**
+	 * A that returns a non-constant reference to the numeral representing the
+	 * number of dimensions along a given rank.
+	 *
+	 * @param i The index of the rank whose dimensionality is to be returned.
+	 * @return The dimensionality of the i-th rank.
+	 */
 	inline IndexType& operator()(std::size_t i) {
 		if (i < 0 || i >= Rank)
 			throw std::invalid_argument("illegal index value: " + i);
 		return values[i];
 	}
+	/**
+	 * A constant conversion operator that returns an array with the contents
+	 * of the instance.
+	 */
 	inline operator std::array<IndexType,Rank>() const {
 		std::array<IndexType,Rank> array;
 		std::copy(values.begin(), values.end(), array.begin());
@@ -84,6 +117,9 @@ private:
 	std::vector<IndexType> values;
 };
 
+/**
+ * An expression representing an operation between a numeral and all ranks of a dimension expression.
+ */
 template<typename IndexType, std::size_t Rank, typename LhsExpr, typename OpType>
 class UnaryDimExpression :
 		public DimExpression<UnaryDimExpression<IndexType,Rank,LhsExpr,OpType>,IndexType,Rank> {
@@ -101,6 +137,33 @@ private:
 	IndexType rhs;
 };
 
+/**
+ * An expression representing an operation between a numeral and a single rank of a dimension expression.
+ */
+template<typename IndexType, std::size_t Rank, typename LhsExpr, typename OpType>
+class UnaryRankWiseDimExpression :
+		public DimExpression<UnaryRankWiseDimExpression<IndexType,Rank,LhsExpr,OpType>,IndexType,Rank> {
+public:
+	inline UnaryRankWiseDimExpression(const LhsExpr& lhs, const IndexType& rhs, std::size_t rank) :
+			lhs(lhs),
+			rhs(rhs),
+			rank(rank) {
+		assert(rank < Rank);
+	};
+	inline IndexType operator()(std::size_t i) const {
+		if (i < 0 || i >= Rank)
+			throw std::invalid_argument("illegal index value: " + i);
+		return i == rank ? OpType::apply(lhs(i), rhs) : lhs(i);
+	}
+private:
+	const LhsExpr& lhs;
+	IndexType rhs;
+	std::size_t rank;
+};
+
+/**
+ * An expression representing an operation between two dimension expressions of the same rank.
+ */
 template<typename IndexType, std::size_t Rank, typename LhsExpr, typename RhsExpr, typename OpType>
 class BinaryDimExpression :
 		public DimExpression<BinaryDimExpression<IndexType,Rank,LhsExpr,RhsExpr,OpType>,IndexType,Rank> {
@@ -118,6 +181,10 @@ protected:
 	const RhsExpr& rhs;
 };
 
+/**
+ * An expression representing an operation along a single rank of two dimension expressions of the
+ * same rank.
+ */
 template<typename IndexType, std::size_t Rank, typename LhsExpr, typename RhsExpr, typename OpType>
 class BinaryRankWiseDimExpression :
 		public DimExpression<BinaryRankWiseDimExpression<IndexType,Rank,LhsExpr,RhsExpr,OpType>,IndexType,Rank> {
@@ -153,6 +220,9 @@ template<typename Operand> class DivOp {
 public: inline static Operand apply(Operand lhs, Operand rhs) { return lhs / rhs; }
 };
 
+/**
+ * The base class of all dimension expressions.
+ */
 template<typename Derived, typename IndexType, std::size_t Rank>
 class DimExpression {
 	static_assert(Rank > 0, "illegal rank");
@@ -165,18 +235,40 @@ public:
 	inline operator const Derived&() const {
 		return static_cast<const Derived&>(*this);
 	}
+	/**
+	 * Evaluates the expression along the given rank.
+	 *
+	 * @param i The index of the single rank along which the expression is to be evaluated.
+	 * @return The result of the expression evaluated along the i-th rank.
+	 */
 	inline IndexType operator()(std::size_t i) const {
 		return static_cast<const Derived&>(*this)(i);
 	}
+	/**
+	 * A constant method the returns the volume of the expression.
+	 *
+	 * @return The product of the dimensions of each rank of the instance.
+	 */
 	inline IndexType get_volume() const {
 		int volume = 1;
 		for (std::size_t i = 0; i < Rank; ++i)
 			volume *= (*this)(i);
 		return volume;
 	}
+	/**
+	 * A method for forcing the evaluation of the expression.
+	 *
+	 * @return A Dimensions instance containing the results of the evaluated
+	 * expression.
+	 */
 	inline Dimensions<IndexType,Rank> eval() {
 		return Dimensions<IndexType,Rank>(*this);
 	}
+	/**
+	 * It evaluates the expression and returns a string containing the results.
+	 *
+	 * @return A string representation of the evaluated expression.
+	 */
 	inline std::string to_string() const {
 		std::stringstream strm;
 		strm << "[" + std::to_string((*this)(0));
@@ -184,6 +276,22 @@ public:
 			strm << "," << std::to_string((*this)(i));
 		strm << "]";
 		return strm.str();
+	}
+	inline UnaryRankWiseDimExpression<IndexType,Rank,Self,SumOp<IndexType>>
+	add_along_rank(const IndexType& n, std::size_t rank) const {
+		return UnaryRankWiseDimExpression<IndexType,Rank,Self,SumOp<IndexType>>(*this, n, rank);
+	}
+	inline UnaryRankWiseDimExpression<IndexType,Rank,Self,SumOp<IndexType>>
+	subtract_along_rank(const IndexType& n, std::size_t rank) const {
+		return UnaryRankWiseDimExpression<IndexType,Rank,Self,SubOp<IndexType>>(*this, n, rank);
+	}
+	inline UnaryRankWiseDimExpression<IndexType,Rank,Self,SumOp<IndexType>>
+	multiply_along_rank(const IndexType& n, std::size_t rank) const {
+		return UnaryRankWiseDimExpression<IndexType,Rank,Self,MulOp<IndexType>>(*this, n, rank);
+	}
+	inline UnaryRankWiseDimExpression<IndexType,Rank,Self,SumOp<IndexType>>
+	divide_along_rank(const IndexType& n, std::size_t rank) const {
+		return UnaryRankWiseDimExpression<IndexType,Rank,Self,DivOp<IndexType>>(*this, n, rank);
 	}
 	template<typename OtherDerived>
 	inline BinaryRankWiseDimExpression<IndexType,Rank,Self,Other<OtherDerived>,SumOp<IndexType>>

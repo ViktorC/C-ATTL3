@@ -118,7 +118,12 @@ Static Protected Attributes</h2></td></tr>
 <tr class="memitem:adb8c52376c99fb73c74a79ac3bed9e64"><td class="memItemLeft" align="right" valign="top">static constexpr std::size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_loss.html#adb8c52376c99fb73c74a79ac3bed9e64">DATA_RANKS</a> = Rank + Sequential + 1</td></tr>
 <tr class="separator:adb8c52376c99fb73c74a79ac3bed9e64"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
-<h2 class="groupheader">Member Typedef Documentation</h2>
+<a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
+<div class="textblock"><h3>template&lt;typename Scalar, std::size_t Rank, bool Sequential&gt;<br />
+class cattle::Loss&lt; Scalar, Rank, Sequential &gt;</h3>
+
+<p>An abstract class template for loss functions for non-sequential data. Implementations of this class should be stateless. </p>
+</div><h2 class="groupheader">Member Typedef Documentation</h2>
 <a id="a671fb8d7adceb4e140295360a94cb6f0"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a671fb8d7adceb4e140295360a94cb6f0">&#9670;&nbsp;</a></span>Data</h2>
 
@@ -289,6 +294,15 @@ template&lt;typename Scalar , std::size_t Rank, bool Sequential&gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
+<p>It calculates the derivative of the loss function w.r.t. the output.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">out</td><td>The output tensor. </td></tr>
+    <tr><td class="paramname">obj</td><td>The objective tensor (of the same dimensionality as the output). </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>The derivative of the loss function w.r.t. the output. </dd></dl>
 
 </div>
 </div>
@@ -327,6 +341,15 @@ template&lt;typename Scalar , std::size_t Rank, bool Sequential&gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
+<p>It calculates the error on each sample given the output and the objective tensors.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">out</td><td>The output tensor. </td></tr>
+    <tr><td class="paramname">obj</td><td>The objective tensor (of the same dimensionality as the output). </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>A column vector containing the loss for each sample. </dd></dl>
 
 </div>
 </div>

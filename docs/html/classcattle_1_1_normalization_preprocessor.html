@@ -121,7 +121,12 @@ Protected Attributes</h2></td></tr>
 <tr class="memitem:a17b2339be74d0a84a7ba13cdeb1df98d"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespacecattle.html#a3ac7e197e90e292a2db6b2d94f46befa">RowVector</a>&lt; Scalar &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_normalization_preprocessor.html#a17b2339be74d0a84a7ba13cdeb1df98d">sd</a></td></tr>
 <tr class="separator:a17b2339be74d0a84a7ba13cdeb1df98d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
-<h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
+<a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
+<div class="textblock"><h3>template&lt;typename Scalar, std::size_t Rank&gt;<br />
+class cattle::NormalizationPreprocessor&lt; Scalar, Rank &gt;</h3>
+
+<p>A class template for a normalization (mean-subtraction) preprocessor that optionally also standardizes the data (divides it by the standard deviation). </p>
+</div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
 <a id="a90c8928923e3bb85b175c89507a9a67c"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a90c8928923e3bb85b175c89507a9a67c">&#9670;&nbsp;</a></span>NormalizationPreprocessor()</h2>
 
@@ -157,6 +162,13 @@ template&lt;typename Scalar , std::size_t Rank&gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">standardize</td><td>Whether the preprocessor should standardize as well. </td></tr>
+    <tr><td class="paramname">epsilon</td><td>A small constant used to maintain numerical stability. </td></tr>
+  </table>
+  </dd>
+</dl>
 
 </div>
 </div>

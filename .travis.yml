@@ -1,0 +1,18 @@
+dist: trusty
+sudo: require
+language: cpp
+compiler: gcc
+addons:
+  apt:
+    sources:
+      - ubuntu-toolchain-r-test
+    packages:
+      - gcc-7.2
+      - g++-7.2
+script:
+  - ln -s /usr/bin/gcc-7.2 /usr/local/bin/gcc
+  - ln -s /usr/bin/g++-7.2 /usr/local/bin/g++
+  - export CC=/usr/bin/gcc-6
+  - export CXX=/usr/bin/g++-6
+  - gcc -v && g++ -v
+  - make -f makefile

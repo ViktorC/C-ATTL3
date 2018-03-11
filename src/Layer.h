@@ -29,6 +29,9 @@ namespace cattle {
 template<typename Scalar, std::size_t Rank, bool Sequential> class NeuralNetwork;
 template<typename Scalar, std::size_t Rank, bool Sequential> class Optimizer;
 
+/**
+ * An abstract class template representing layers in a neural network.
+ */
 template<typename Scalar, std::size_t Rank>
 class Layer {
 	static_assert(std::is_floating_point<Scalar>::value, "non floating-point scalar type");
@@ -37,34 +40,119 @@ class Layer {
 	friend class NeuralNetwork<Scalar,Rank,false>;
 	friend class Optimizer<Scalar,Rank,true>;
 	friend class Optimizer<Scalar,Rank,false>;
+	// Rank is increased by one to allow for batch training.
 	typedef Tensor<Scalar,Rank + 1> Data;
 public:
 	virtual ~Layer() = default;
-	// Clone pattern.
+	/**
+	 * A constant method implementing the clone pattern.
+	 *
+	 * @return A pointer to a copy of the instance. The instance does not take ownership of
+	 * the returned pointer (i.e. the caller is responsible for deleting it).
+	 */
 	virtual Layer<Scalar,Rank>* clone() const = 0;
+	/**
+	 * A simple constant getter method for the input dimensionality of the layer.
+	 *
+	 * @return A constant reference to the member variable denoting the dimensions of the
+	 * tensors accepted by the layer as its input (except for the first rank which denotes
+	 * the variable sample size).
+	 */
 	virtual const Dimensions<int,Rank>& get_input_dims() const = 0;
+	/**
+	 * A simple constant getter method for the output dimensionality of the layer.
+	 *
+	 * @return A constant reference to the member variable denoting the dimensions of the
+	 * tensors output by the layer along all ranks except the first one.
+	 */
 	virtual const Dimensions<int,Rank>& get_output_dims() const = 0;
+	/**
+	 * A method that returns whether the layer has parameters that can be learned.
+	 *
+	 * @return Whether the layer uses learnable parameters.
+	 */
 	inline bool is_parametric() {
 		return get_params().rows() > 0 && get_params().cols() > 0;
 	}
 protected:
 	/* Only expose methods that allow for the modification of the
 	 * layer's state to friends and sub-classes. */
+	/**
+	 * A constant method that returns whether this layer functions as an input layer. An input
+	 * layer does not need to propagate the gradients all the way during the backward pass as
+	 * it is assumed that no other layer needs them derive the gradients on its parameters. It
+	 * is therefore possible for an input layer to simply return a null tensor as the output of
+	 * its backward pass.
+	 *
+	 * @return Whether this layer is the input layer of the neural network that contains it.
+	 */
 	virtual bool is_input_layer() const;
+	/**
+	 * Sets this instance's input layer status to the given value.
+	 *
+	 * @param input_layer Whether this layer is to be an input layer or not.
+	 */
 	virtual void set_input_layer(bool input_layer);
+	/**
+	 * It initializes the layer and its parameters.
+	 */
 	virtual void init() = 0;
+	/**
+	 * It empties the layer's caches such as those required for the derivation of the function
+	 * represented by the layer.
+	 */
 	virtual void empty_cache() = 0;
+	/**
+	 * It returns a reference to the learnable parameters of the layer.
+	 *
+	 * @return A non-constant reference to the parameters of the layer that are to be learned.
+	 */
 	virtual Matrix<Scalar>& get_params() = 0;
+	/**
+	 * It returns a reference to the gradients of the learnable parameters of the layer.
+	 *
+	 * @return A non-constant reference to the gradients of the parameters of the layer.
+	 */
 	virtual Matrix<Scalar>& get_param_grads() = 0;
+	/**
+	 * It applies constraints such as max-norm to the parameters of the layer if applicable.
+	 */
 	virtual void enforce_constraints() = 0;
-	// Rank is increased by one to allow for batch training.
+	/**
+	 * It has the function represented by the layer applied to the input tensor.
+	 *
+	 * @param in A tensor representing a batch of observations. The observations are of
+	 * the rank specified by the layer's template parameter and the input tensors rank is
+	 * one greater.
+	 * @param training Whether the input is to be processed in training or inference mode.
+	 * If the forward pass is performed in inference mode, the backward pass is not
+	 * guaranteed to work.
+	 * @return The output of the function represented by the layer applied to the input
+	 * tensor.
+	 */
 	virtual Data pass_forward(Data in, bool training) = 0;
+	/**
+	 * It back-propagates the derivative of the error function w.r.t. the output of the
+	 * layer updating the gradients of its learnable parameters along the way.
+	 *
+	 * @param out_grads The derivative of the loss function w.r.t. the output of the
+	 * layer
+	 * @return The derivative of the loss function w.r.t. the output of the previous layer
+	 * or a null tensor if the layer is an input layer.
+	 */
 	virtual Data pass_back(Data out_grads) = 0;
 };
 
+/**
+ * An alias for a shared pointer to a WeightInitialization implementation instance.
+ */
 template<typename Scalar>
 using WeightInitSharedPtr = std::shared_ptr<WeightInitialization<Scalar>>;
 
+/**
+ * An abstract base class template for layers representing linear kernel-based operations
+ * such as matrix multiplication or convolution.
+ */
 template<typename Scalar, std::size_t Rank>
 class KernelLayer : public Layer<Scalar,Rank> {
 public:
@@ -123,11 +211,22 @@ protected:
 	Matrix<Scalar> weight_grads;
 };
 
+/**
+ * A class template representing a fully connected layer.
+ */
 template<typename Scalar, std::size_t Rank>
 class FCLayer : public KernelLayer<Scalar,Rank> {
 	typedef KernelLayer<Scalar,Rank> Base;
 	typedef Tensor<Scalar,Rank + 1> Data;
 public:
+	/**
+	 * @param input_dims The dimensionality of the observations to be processed by the layer.
+	 * @param output_size The length of the vector output for each sample.
+	 * @param weight_init A shared pointer to a weight initialization used to initialize the
+	 * values of the parametric kernel backing the layer.
+	 * @param max_norm_constraint An optional max-norm constraint. If it is 0 or less, no
+	 * constraint is applied.
+	 */
 	inline FCLayer(const Dimensions<int,Rank>& input_dims, std::size_t output_size, WeightInitSharedPtr<Scalar> weight_init,
 			Scalar max_norm_constraint = 0) :
 				Base::KernelLayer(input_dims, Dimensions<int,Rank>({ (int) output_size }), weight_init,
@@ -167,13 +266,31 @@ private:
 	Matrix<Scalar> biased_in;
 };
 
-// 3D convolutional layer.
+/**
+ * A class template representing a 3D convolutional layer.
+ */
 template<typename Scalar>
 class ConvLayer : public KernelLayer<Scalar,3> {
 	typedef KernelLayer<Scalar,3> Base;
 	typedef Tensor<Scalar,4> Data;
 	typedef std::array<int,4> RankwiseArray;
 public:
+	/**
+	 * @param input_dims The dimensionality of the observations to be processed by the layer.
+	 * The ranks of the input tensors denote the sample, height, width, and channel (N,H,W,C).
+	 * @param filters The number of filters to use.
+	 * @param weight_init A shared pointer to a weight initialization used to initialize the
+	 * values of the parametric kernel backing the layer.
+	 * @param receptor_size The length of the sides of the base of the receptor cuboid.
+	 * @param padding The length of padding to apply to the input tensor along its width and
+	 * weight.
+	 * @param stride The convolution stride i.e. the number of elements by which the receptor
+	 * is to be shifted at each step of the convolution.
+	 * @param dilation The size of the spatial (height- and width-wise) padding between voxels
+	 * of the receptor.
+	 * @param max_norm_constraint An optional max-norm constraint. If it is 0 or less, no
+	 * constraint is applied.
+	 */
 	inline ConvLayer(const Dimensions<int,3>& input_dims, std::size_t filters, WeightInitSharedPtr<Scalar> weight_init,
 			std::size_t receptor_size = 3, std::size_t padding = 1, std::size_t stride = 1, std::size_t dilation = 0,
 			Scalar max_norm_constraint = 0) :
@@ -320,6 +437,16 @@ protected:
 		RankwiseArray no_padding_extents({ rows, Base::input_dims(0), Base::input_dims(1), Base::input_dims(2) });
 		return prev_out_grads.slice(no_padding_offsets, no_padding_extents);
 	}
+	/**
+	 * It computes the dimension of the channel-rank of the output tensor of the layer.
+	 *
+	 * @param input_dim The dimensionality of the input tensor.
+	 * @param receptor_size The spatial extent of the receptor.
+	 * @param padding The spatial padding.
+	 * @param dilation The dilation of the receptor.
+	 * @param stride The convolution stride.
+	 * @return The depth of the output tensors produced by the layer.
+	 */
 	static int calculate_output_dim(int input_dim, int receptor_size, int padding, int dilation, int stride) {
 		return (input_dim - receptor_size - (receptor_size - 1) * dilation + 2 * padding) / stride + 1;
 	}
@@ -336,6 +463,9 @@ private:
 	std::vector<Matrix<Scalar>> biased_in_vec;
 };
 
+/**
+ * An abstract class template that represents a non-linear activation function layer.
+ */
 template<typename Scalar, std::size_t Rank>
 class ActivationLayer : public Layer<Scalar,Rank> {
 	typedef Tensor<Scalar,Rank + 1> Data;
@@ -353,7 +483,24 @@ public:
 		return dims;
 	}
 protected:
+	/**
+	 * Applies the non-linearity to the specified input matrix.
+	 *
+	 * @param in The input tensor mapped to a matrix.
+	 * @return The activated input matrix.
+	 */
 	virtual Matrix<Scalar> activate(const Matrix<Scalar>& in) = 0;
+	/**
+	 * Differentiates the activation function and returns the derivative of the loss
+	 * function w.r.t. the output of the previous layer in matrix form.
+	 *
+	 * @param in The input tensor mapped to a matrix.
+	 * @param out The output produced by layer when applied to the input matrix.
+	 * @param out_grads The derivative of the loss function w.r.t. to the output of
+	 * this layer.
+	 * @return The derivative of the loss function w.r.t. to the output of the
+	 * previous layer.
+	 */
 	virtual Matrix<Scalar> d_activate(const Matrix<Scalar>& in, const Matrix<Scalar>& out,
 			const Matrix<Scalar>& out_grads) = 0;
 	inline bool is_input_layer() const {
@@ -398,9 +545,16 @@ protected:
 	Matrix<Scalar> out;
 };
 
+/**
+ * A class template representing an identity activation layer that merely outputs
+ * its input.
+ */
 template<typename Scalar, std::size_t Rank>
 class IdentityActivationLayer : public ActivationLayer<Scalar,Rank> {
 public:
+	/**
+	 * @param dims The dimensionality of the input tensor.
+	 */
 	inline IdentityActivationLayer(const Dimensions<int,Rank>& dims) :
 			ActivationLayer<Scalar,Rank>::ActivationLayer(dims) { }
 	inline Layer<Scalar,Rank>* clone() const {
@@ -416,9 +570,16 @@ protected:
 	}
 };
 
+/**
+ * A class template that represents a linearly scaling activation layer.
+ */
 template<typename Scalar, std::size_t Rank>
 class ScalingActivationLayer : public ActivationLayer<Scalar,Rank> {
 public:
+	/**
+	 * @param dims The dimensionality of the input tensor.
+	 * @param scale The factor by which the input is to be scaled.
+	 */
 	inline ScalingActivationLayer(const Dimensions<int,Rank>& dims, Scalar scale) :
 			ActivationLayer<Scalar,Rank>::ActivationLayer(dims),
 			scale(scale) { }
@@ -437,9 +598,16 @@ private:
 	const Scalar scale;
 };
 
+/**
+ * A class template that represents a binary step activation function that outputs either
+ * 1 or 0 based on the signum of its input. This function is not theoretically differentiable.
+ */
 template<typename Scalar, std::size_t Rank>
 class BinaryStepActivationLayer : public ActivationLayer<Scalar,Rank> {
 public:
+	/**
+	 * @param dims The dimensionality of the input tensor.
+	 */
 	inline BinaryStepActivationLayer(const Dimensions<int,Rank>& dims) :
 			ActivationLayer<Scalar,Rank>::ActivationLayer(dims) { }
 	inline Layer<Scalar,Rank>* clone() const {
@@ -455,9 +623,15 @@ protected:
 	}
 };
 
+/**
+ * A class template representing a sigmoid activation function layer.
+ */
 template<typename Scalar, std::size_t Rank>
 class SigmoidActivationLayer : public ActivationLayer<Scalar,Rank> {
 public:
+	/**
+	 * @param dims The dimensionality of the input tensor.
+	 */
 	inline SigmoidActivationLayer(const Dimensions<int,Rank>& dims) :
 			ActivationLayer<Scalar,Rank>::ActivationLayer(dims) { }
 	inline Layer<Scalar,Rank>* clone() const {
@@ -473,9 +647,15 @@ protected:
 	}
 };
 
+/**
+ * A class template representing a hyperbolic tangent activation function layer.
+ */
 template<typename Scalar, std::size_t Rank>
 class TanhActivationLayer : public ActivationLayer<Scalar,Rank> {
 public:
+	/**
+	 * @param dims The dimensionality of the input tensor.
+	 */
 	inline TanhActivationLayer(const Dimensions<int,Rank>& dims) :
 			ActivationLayer<Scalar,Rank>::ActivationLayer(dims) { }
 	inline Layer<Scalar,Rank>* clone() const {
@@ -491,9 +671,18 @@ protected:
 	}
 };
 
+/**
+ * A class template for a softmax activation function layer. Unlike most other activation
+ * layers which represent element-wise functions, the softmax layer represents a multivariate
+ * function.
+ */
 template<typename Scalar, std::size_t Rank>
 class SoftmaxActivationLayer : public ActivationLayer<Scalar,Rank> {
 public:
+	/**
+	 * @param dims The dimensionality of the input tensor.
+	 * @param epsilon A small constant to maintain numerical stability.
+	 */
 	inline SoftmaxActivationLayer(const Dimensions<int,Rank>& dims, Scalar epsilon = Utils<Scalar>::EPSILON2) :
 			ActivationLayer<Scalar,Rank>::ActivationLayer(dims),
 			epsilon(epsilon) { }
@@ -521,9 +710,17 @@ private:
 	const Scalar epsilon;
 };
 
+/**
+ * A class template representing a rectified linear unit (ReLU) activation function. ReLU
+ * layers set all negative elements of the input to 0. This function is not theoretically
+ * differentiable.
+ */
 template<typename Scalar, std::size_t Rank>
 class ReLUActivationLayer : public ActivationLayer<Scalar,Rank> {
 public:
+	/**
+	 * @param dims The dimensionality of the input tensor.
+	 */
 	inline ReLUActivationLayer(const Dimensions<int,Rank>& dims) :
 			ActivationLayer<Scalar,Rank>::ActivationLayer(dims) { }
 	inline Layer<Scalar,Rank>* clone() const {
@@ -540,9 +737,19 @@ protected:
 	}
 };
 
+/**
+ * A class template representing a leaky rectified linear unit activation function. Unlike
+ * traditional ReLU layers leaky ReLU layers do not set negative elements of the input to
+ * 0 but scale them by a small constant alpha. This function is not theoretically
+ * differentiable.
+ */
 template<typename Scalar, std::size_t Rank>
 class LeakyReLUActivationLayer : public ActivationLayer<Scalar,Rank> {
 public:
+	/**
+	 * @param dims The dimensionality of the input tensor.
+	 * @param alpha The factor by which negative inputs are to be scaled.
+	 */
 	inline LeakyReLUActivationLayer(const Dimensions<int,Rank>& dims, Scalar alpha = 1e-1) :
 			ActivationLayer<Scalar,Rank>::ActivationLayer(dims),
 			alpha(alpha) { }
@@ -562,9 +769,18 @@ private:
 	const Scalar alpha;
 };
 
+/**
+ * A class template representing an exponential linear unit (ELU) activation function. ELUs
+ * apply an exponential (e based) function scaled by alpha to the negative elements of the input.
+ * ELU layers are not theoretically differentiable.
+ */
 template<typename Scalar, std::size_t Rank>
 class ELUActivationLayer : public ActivationLayer<Scalar,Rank> {
 public:
+	/**
+	 * @param dims The dimensionality of the input tensor.
+	 * @param alpha The factor by which negative inputs are to be scaled.
+	 */
 	inline ELUActivationLayer(const Dimensions<int,Rank>& dims, Scalar alpha = 1e-1) :
 			ActivationLayer<Scalar,Rank>::ActivationLayer(dims),
 			alpha(alpha) { }
@@ -588,10 +804,19 @@ private:
 	const Scalar alpha;
 };
 
+/**
+ * A class template representing a parametric rectified linear unit (PReLU) activation function.
+ * PReLU layers are Leaky ReLU activation functions with element-wise, learnable alphas. PReLU
+ * activation functions are not theoretically differentiable.
+ */
 template<typename Scalar, std::size_t Rank>
 class PReLUActivationLayer : public ActivationLayer<Scalar,Rank> {
 	typedef ActivationLayer<Scalar,Rank> Base;
 public:
+	/**
+	 * @param dims The dimensionality of the input tensor.
+	 * @param init_alpha The initial factor by which negative inputs are to be scaled.
+	 */
 	inline PReLUActivationLayer(const Dimensions<int,Rank>& dims, Scalar init_alpha = 1e-1) :
 			Base::ActivationLayer(dims),
 			init_alpha(init_alpha) {
@@ -631,6 +856,9 @@ private:
 	const Scalar init_alpha;
 };
 
+/**
+ * An abstract class template representing a pooling layer for batches of rank 3 data.
+ */
 template<typename Scalar>
 class PoolingLayer : public Layer<Scalar,3> {
 	typedef Tensor<Scalar,4> Data;
@@ -659,8 +887,27 @@ public:
 		return output_dims;
 	}
 protected:
+	/**
+	 * Initializes the cache required for back-propagation.
+	 */
 	virtual void init_cache() = 0;
+	/**
+	 * Reduces the input vector into a single coefficient.
+	 *
+	 * @param patch A spatial patch of the input tensor (of size receptor*receptor) stretched
+	 * into a row vector.
+	 * @param patch_ind The index of the patch.
+	 * @return The single numeral representing the result of the reduction.
+	 */
 	virtual Scalar reduce(const RowVector<Scalar>& patch, unsigned patch_ind) = 0;
+	/**
+	 * Differentiates the reduction function and returns the derivative of the loss function
+	 * w.r.t. the output of the previous layer.
+	 *
+	 * @param grad The derivative of the loss function w.r.t. the output of this layer.
+	 * @param patch_ind The index of the patch.
+	 * @return The derivative of the loss function w.r.t. the output of the previous layer.
+	 */
 	virtual RowVector<Scalar> d_reduce(Scalar grad, unsigned patch_ind) = 0;
 	inline bool is_input_layer() const {
 		return input_layer;
@@ -735,6 +982,15 @@ protected:
 		}
 		return prev_out_grads;
 	}
+	/**
+	 * It calculates the depth of the tensor output by the layer for all of its ranks except
+	 * the first one (which denotes the samples in the batch).
+	 *
+	 * @param input_dim The dimensionality of the input tensor.
+	 * @param receptor_size The spatial extent of the receptor.
+	 * @param stride The stride at which the receptor is applied to the input tensor.
+	 * @return The depth of the output tensor.
+	 */
 	static int calculate_output_dim(int input_dim, int receptor_size, int stride) {
 		return (input_dim - receptor_size) / stride + 1;
 	}
@@ -753,9 +1009,19 @@ protected:
 	int rows;
 };
 
+/**
+ * A class template representing a pooling layer that reduces patches of the input by taking their
+ * sums.
+ */
 template<typename Scalar>
 class SumPoolingLayer : public PoolingLayer<Scalar> {
 public:
+	/**
+	 * @param input_dims The dimensionality of the input tensor.
+	 * @param receptor_size The spatial extent of the pooling receptor.
+	 * @param stride The stride at which the input is to be pooled (i.e. the number of elements
+	 * by which the receptor is to be shifted after every step of the pooling process).
+	 */
 	inline SumPoolingLayer(const Dimensions<int,3>& input_dims, std::size_t receptor_size = 2, std::size_t stride = 2) :
 			PoolingLayer<Scalar>::PoolingLayer(input_dims, receptor_size, stride) { }
 	inline Layer<Scalar,3>* clone() const {
@@ -772,9 +1038,19 @@ protected:
 	inline void empty_cache() { }
 };
 
+/**
+ * A class template representing a pooling layer that reduces patches of the input by taking their
+ * means.
+ */
 template<typename Scalar>
 class MeanPoolingLayer : public PoolingLayer<Scalar> {
 public:
+	/**
+	 * @param input_dims The dimensionality of the input tensor.
+	 * @param receptor_size The spatial extent of the pooling receptor.
+	 * @param stride The stride at which the input is to be pooled (i.e. the number of elements
+	 * by which the receptor is to be shifted after every step of the pooling process).
+	 */
 	inline MeanPoolingLayer(const Dimensions<int,3>& input_dims, std::size_t receptor_size = 2, std::size_t stride = 2) :
 			PoolingLayer<Scalar>::PoolingLayer(input_dims, receptor_size, stride) { }
 	inline Layer<Scalar,3>* clone() const {
@@ -792,9 +1068,19 @@ protected:
 	inline void empty_cache() { }
 };
 
+/**
+ * A class template representing a pooling layer that reduces patches of the input by taking their
+ * maximums.
+ */
 template<typename Scalar>
 class MaxPoolingLayer : public PoolingLayer<Scalar> {
 public:
+	/**
+	 * @param input_dims The dimensionality of the input tensor.
+	 * @param receptor_size The spatial extent of the pooling receptor.
+	 * @param stride The stride at which the input is to be pooled (i.e. the number of elements
+	 * by which the receptor is to be shifted after every step of the pooling process).
+	 */
 	inline MaxPoolingLayer(const Dimensions<int,3>& input_dims, unsigned receptor_size = 2, unsigned stride = 2) :
 			PoolingLayer<Scalar>::PoolingLayer(input_dims, receptor_size, stride) { }
 	inline Layer<Scalar,3>* clone() const {
@@ -831,6 +1117,9 @@ private:
 	std::vector<unsigned> max_inds;
 };
 
+/**
+ * An abstract base class template for a batch normalization layer.
+ */
 template<typename Scalar, std::size_t Rank>
 class BatchNormLayerBase : public Layer<Scalar,Rank> {
 public:
@@ -954,11 +1243,18 @@ protected:
 	std::vector<Cache> cache_vec;
 };
 
-// Batch norm for all but multi-channel input tensors.
+/**
+ * A class template for a batch normalization layer for all but multi-channel input tensors.
+ */
 template<typename Scalar, std::size_t Rank>
 class BatchNormLayer : public BatchNormLayerBase<Scalar,Rank> {
 	typedef BatchNormLayerBase<Scalar,Rank> Base;
 public:
+	/**
+	 * @param dims The dimensionality of the input tensor.
+	 * @param norm_avg_decay The decay rate of the maintained means and variances.
+	 * @param epsilon A small constant used to maintain numerical stability.
+	 */
 	inline BatchNormLayer(const Dimensions<int,Rank>& dims, Scalar norm_avg_decay = .1, Scalar epsilon = Utils<Scalar>::EPSILON3) :
 			Base::template BatchNormLayerBase(dims, 1, norm_avg_decay, epsilon) { }
 	inline Layer<Scalar,Rank>* clone() const {
@@ -977,11 +1273,18 @@ protected:
 	}
 };
 
-// Partial template specialization for multi-channel input tensors.
+/**
+ * A partial template specialization for multi-channel input tensors.
+ */
 template<typename Scalar>
 class BatchNormLayer<Scalar,3> : public BatchNormLayerBase<Scalar,3> {
 	typedef BatchNormLayerBase<Scalar,3> Base;
 public:
+	/**
+	 * @param dims The dimensionality of the input tensor.
+	 * @param norm_avg_decay The decay rate of the maintained means and variances.
+	 * @param epsilon A small constant used to maintain numerical stability.
+	 */
 	inline BatchNormLayer(Dimensions<int,3> dims, Scalar norm_avg_decay = .1, Scalar epsilon = Utils<Scalar>::EPSILON3) :
 			Base::template BatchNormLayerBase(dims, dims(2), norm_avg_decay, epsilon) { }
 	inline Layer<Scalar,3>* clone() const {
@@ -1033,10 +1336,18 @@ protected:
 	}
 };
 
+/**
+ * A class template representing a drop-out layer.
+ */
 template<typename Scalar, std::size_t Rank>
 class DropoutLayer : public Layer<Scalar,Rank> {
 	typedef Tensor<Scalar,Rank + 1> Data;
 public:
+	/**
+	 * @param dims The dimensionality of the input tensor.
+	 * @param dropout_prob The probability of an element of the input tensor being set to 0.
+	 * @param epsilon A small constant used to maintain numerical stability.
+	 */
 	inline DropoutLayer(const Dimensions<int,Rank>& dims, Scalar dropout_prob, Scalar epsilon = Utils<Scalar>::EPSILON3) :
 			dims(dims),
 			dropout_prob(dropout_prob),

@@ -1,6 +1,7 @@
 var searchData=
 [
   ['unarydimexpression',['UnaryDimExpression',['../classcattle_1_1_unary_dim_expression.html',1,'cattle::UnaryDimExpression&lt; IndexType, Rank, LhsExpr, OpType &gt;'],['../classcattle_1_1_unary_dim_expression.html#a76c15c56731c5630792a769a028a14f4',1,'cattle::UnaryDimExpression::UnaryDimExpression()']]],
+  ['unaryrankwisedimexpression',['UnaryRankWiseDimExpression',['../classcattle_1_1_unary_rank_wise_dim_expression.html',1,'cattle::UnaryRankWiseDimExpression&lt; IndexType, Rank, LhsExpr, OpType &gt;'],['../classcattle_1_1_unary_rank_wise_dim_expression.html#ae43f85aae38cf913b2d28eb8004584b4',1,'cattle::UnaryRankWiseDimExpression::UnaryRankWiseDimExpression()']]],
   ['unidirectionalneuralnetwork',['UnidirectionalNeuralNetwork',['../classcattle_1_1_unidirectional_neural_network.html',1,'cattle']]],
   ['unidirnet',['UnidirNet',['../classcattle_1_1_bidirectional_neural_network.html#ac4dc7646fe47ff9d51e477ecf0908801',1,'cattle::BidirectionalNeuralNetwork']]],
   ['unidirneuralnetptr',['UnidirNeuralNetPtr',['../namespacecattle.html#a011c68542051b5509475ef3f94aaa048',1,'cattle']]],

@@ -147,7 +147,12 @@ Protected Attributes</h2></td></tr>
 <tr class="memitem:afbef40c115ce4cacb2e2e8fc02c44cd3"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespacecattle.html#a1d78623a47279d516750a44dbad6090b">Matrix</a>&lt; Scalar &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_kernel_layer.html#afbef40c115ce4cacb2e2e8fc02c44cd3">weight_grads</a></td></tr>
 <tr class="separator:afbef40c115ce4cacb2e2e8fc02c44cd3"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
-<h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
+<a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
+<div class="textblock"><h3>template&lt;typename Scalar, std::size_t Rank&gt;<br />
+class cattle::KernelLayer&lt; Scalar, Rank &gt;</h3>
+
+<p>An abstract base class template for layers representing linear kernel-based operations such as matrix multiplication or convolution. </p>
+</div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
 <a id="aefe7e22d78221c669e78f2a05a884536"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#aefe7e22d78221c669e78f2a05a884536">&#9670;&nbsp;</a></span>~KernelLayer()</h2>
 
@@ -262,6 +267,7 @@ template&lt;typename Scalar, std::size_t Rank&gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
+<p>It applies constraints such as max-norm to the parameters of the layer if applicable. </p>
 
 <p>Implements <a class="el" href="classcattle_1_1_layer.html#ac74dd19ed2f3a253cfbb1d1785f56197">cattle::Layer&lt; Scalar, Rank &gt;</a>.</p>
 
@@ -291,6 +297,8 @@ template&lt;typename Scalar, std::size_t Rank&gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
+<p>A simple constant getter method for the input dimensionality of the layer.</p>
+<dl class="section return"><dt>Returns</dt><dd>A constant reference to the member variable denoting the dimensions of the tensors accepted by the layer as its input (except for the first rank which denotes the variable sample size). </dd></dl>
 
 <p>Implements <a class="el" href="classcattle_1_1_layer.html#a2a4b826fb2b9eb1337a8458aca134f64">cattle::Layer&lt; Scalar, Rank &gt;</a>.</p>
 
@@ -320,6 +328,8 @@ template&lt;typename Scalar, std::size_t Rank&gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
+<p>A simple constant getter method for the output dimensionality of the layer.</p>
+<dl class="section return"><dt>Returns</dt><dd>A constant reference to the member variable denoting the dimensions of the tensors output by the layer along all ranks except the first one. </dd></dl>
 
 <p>Implements <a class="el" href="classcattle_1_1_layer.html#a0ede1fbe46eab83f70e16a75ba0991e9">cattle::Layer&lt; Scalar, Rank &gt;</a>.</p>
 
@@ -349,6 +359,8 @@ template&lt;typename Scalar, std::size_t Rank&gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
+<p>It returns a reference to the gradients of the learnable parameters of the layer.</p>
+<dl class="section return"><dt>Returns</dt><dd>A non-constant reference to the gradients of the parameters of the layer. </dd></dl>
 
 <p>Implements <a class="el" href="classcattle_1_1_layer.html#aa66fc1380d7446d77a3980c4006e7532">cattle::Layer&lt; Scalar, Rank &gt;</a>.</p>
 
@@ -378,6 +390,8 @@ template&lt;typename Scalar, std::size_t Rank&gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
+<p>It returns a reference to the learnable parameters of the layer.</p>
+<dl class="section return"><dt>Returns</dt><dd>A non-constant reference to the parameters of the layer that are to be learned. </dd></dl>
 
 <p>Implements <a class="el" href="classcattle_1_1_layer.html#abd799a16024c5aee49dbc0a5fe2f3183">cattle::Layer&lt; Scalar, Rank &gt;</a>.</p>
 
@@ -407,6 +421,7 @@ template&lt;typename Scalar, std::size_t Rank&gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
+<p>It initializes the layer and its parameters. </p>
 
 <p>Implements <a class="el" href="classcattle_1_1_layer.html#aae8baf56035b9c2130eec90881e27bad">cattle::Layer&lt; Scalar, Rank &gt;</a>.</p>
 
@@ -436,6 +451,8 @@ template&lt;typename Scalar, std::size_t Rank&gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
+<p>A constant method that returns whether this layer functions as an input layer. An input layer does not need to propagate the gradients all the way during the backward pass as it is assumed that no other layer needs them derive the gradients on its parameters. It is therefore possible for an input layer to simply return a null tensor as the output of its backward pass.</p>
+<dl class="section return"><dt>Returns</dt><dd>Whether this layer is the input layer of the neural network that contains it. </dd></dl>
 
 <p>Reimplemented from <a class="el" href="classcattle_1_1_layer.html#a65bfa4d93279548dad4e57d7f03cbd51">cattle::Layer&lt; Scalar, Rank &gt;</a>.</p>
 
@@ -466,6 +483,13 @@ template&lt;typename Scalar, std::size_t Rank&gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
+<p>Sets this instance's input layer status to the given value.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">input_layer</td><td>Whether this layer is to be an input layer or not. </td></tr>
+  </table>
+  </dd>
+</dl>
 
 <p>Reimplemented from <a class="el" href="classcattle_1_1_layer.html#a7aafba96b6e30bc67eaef0a9db3ad2e4">cattle::Layer&lt; Scalar, Rank &gt;</a>.</p>
 

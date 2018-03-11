@@ -24,9 +24,15 @@ namespace cattle {
 // TODO OnDiskDataProvider.
 // TODO Specialized data providers for the MNIST, CIFAR, and ImageNet data sets.
 
+/**
+ * An alias for a unique tensor pointer.
+ */
 template<typename Scalar, std::size_t Rank, bool Sequential>
 using TensorPtr = std::unique_ptr<Tensor<Scalar,Rank + Sequential + 1>>;
 
+/**
+ * An alias for a pair of two tensors of the same rank. It represents observation-objective pairs.
+ */
 template<typename Scalar, std::size_t Rank, bool Sequential>
 using DataPair = std::pair<Tensor<Scalar,Rank + Sequential + 1>,Tensor<Scalar,Rank + Sequential + 1>>;
 
@@ -39,20 +45,68 @@ class DataProvider {
 	static_assert(Rank > 0 && Rank < 4, "illegal data provider rank");
 public:
 	virtual ~DataProvider() = default;
+	/**
+	 * A simple constant getter method for the dimensions of the observations.
+	 *
+	 * @return A constant reference to the dimensions of the observations.
+	 */
 	virtual const Dimensions<int,Rank>& get_obs_dims() const = 0;
+	/**
+	 * A simple constant getter method for the dimensions of the objectives.
+	 *
+	 * @return A constant reference to the dimensions of the objectives.
+	 */
 	virtual const Dimensions<int,Rank>& get_obj_dims() const = 0;
+	/**
+	 * A simple constant method that returns the number of observations and objectives
+	 * handled by the data provider instance.
+	 *
+	 * @return The number of observation-objective pairs provided by this instance.
+	 */
 	virtual unsigned instances() const = 0;
+	/**
+	 * A simple constant method that returns whether the data provider instance has more
+	 * data to provide.
+	 *
+	 * @return Whether there are more observation-objective pairs to read from the
+	 * instance.
+	 */
 	virtual bool has_more() const = 0;
+	/**
+	 * Reads and returns the specified number of observation-objective pairs. It also
+	 * offsets the reader by the specified number.
+	 *
+	 * @param batch_size The maximum number of observation-objective pairs to read and
+	 * return.
+	 * @return At most batch_size number of observation-objective pairs. If the number
+	 * of unread pairs is less than batch_size, the number of returned pairs is that
+	 * of the unread ones.
+	 */
 	virtual DataPair<Scalar,Rank,Sequential> get_data(unsigned batch_size) = 0;
+	/**
+	 * It resets the reader head to the beginning of the data storage.
+	 */
 	virtual void reset() = 0;
 };
 
+/**
+ * A data provider that reads from the memory. It requires the entire observation and
+ * objective data sets to be loaded into memory, but it fetches pairs faster.
+ */
 template<typename Scalar, std::size_t Rank, bool Sequential>
 class InMemoryDataProvider : public DataProvider<Scalar,Rank,Sequential> {
 	static constexpr std::size_t DATA_RANKS = Rank + Sequential + 1;
 	typedef Tensor<Scalar,DATA_RANKS> Data;
 	typedef TensorPtr<Scalar,Rank,Sequential> DataPtr;
 public:
+	/**
+	 * It constructs a data provider backed by the specified tensors.
+	 *
+	 * @param obs A unique pointer to the tensor containing the observations.
+	 * @param obj A unique pointer to the tensor containing the objectives.
+	 * @param shuffle Whether the 'rows' (first ranks) of the tensors should be randomly
+	 * shuffled.
+	 */
 	inline InMemoryDataProvider(DataPtr obs, DataPtr obj, bool shuffle = true) :
 			obs(std::move(obs)),
 			obj(std::move(obj)),

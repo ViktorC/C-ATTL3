@@ -135,7 +135,7 @@ Additional Inherited Members</h2></td></tr>
 <div class="textblock"><h3>template&lt;typename Scalar, std::size_t Rank, bool Sequential&gt;<br />
 class cattle::CrossEntropyLoss&lt; Scalar, Rank, Sequential &gt;</h3>
 
-<p>Objective values between 0 and 1 (inclusive). Use with softmax activation. </p>
+<p>A template class representing the cross entropy loss function. This class assumes the objective values for each sample (and time step) to be in the range [0, 1]. </p>
 </div><h2 class="groupheader">Member Typedef Documentation</h2>
 <a id="a7a830d232d550e1c5589d29f971c367e"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a7a830d232d550e1c5589d29f971c367e">&#9670;&nbsp;</a></span>Base</h2>
@@ -187,6 +187,12 @@ template&lt;typename Scalar , std::size_t Rank, bool Sequential&gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">epsilon</td><td>A small constant used to maintain numerical stability. </td></tr>
+  </table>
+  </dd>
+</dl>
 
 </div>
 </div>

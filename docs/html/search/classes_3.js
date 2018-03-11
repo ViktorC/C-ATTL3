@@ -11,6 +11,7 @@ var searchData=
   ['dimexpression_3c_20dimensions_3c_20indextype_2c_20rank_20_3e_2c_20indextype_2c_20rank_20_3e',['DimExpression&lt; Dimensions&lt; IndexType, Rank &gt;, IndexType, Rank &gt;',['../classcattle_1_1_dim_expression.html',1,'cattle']]],
   ['dimexpression_3c_20dimensions_3c_20int_2c_20rank_20_3e_2c_20int_2c_20rank_20_3e',['DimExpression&lt; Dimensions&lt; int, Rank &gt;, int, Rank &gt;',['../classcattle_1_1_dim_expression.html',1,'cattle']]],
   ['dimexpression_3c_20unarydimexpression_3c_20indextype_2c_20rank_2c_20lhsexpr_2c_20optype_20_3e_2c_20indextype_2c_20rank_20_3e',['DimExpression&lt; UnaryDimExpression&lt; IndexType, Rank, LhsExpr, OpType &gt;, IndexType, Rank &gt;',['../classcattle_1_1_dim_expression.html',1,'cattle']]],
+  ['dimexpression_3c_20unaryrankwisedimexpression_3c_20indextype_2c_20rank_2c_20lhsexpr_2c_20optype_20_3e_2c_20indextype_2c_20rank_20_3e',['DimExpression&lt; UnaryRankWiseDimExpression&lt; IndexType, Rank, LhsExpr, OpType &gt;, IndexType, Rank &gt;',['../classcattle_1_1_dim_expression.html',1,'cattle']]],
   ['divop',['DivOp',['../classcattle_1_1_div_op.html',1,'cattle']]],
   ['dropoutlayer',['DropoutLayer',['../classcattle_1_1_dropout_layer.html',1,'cattle']]]
 ];

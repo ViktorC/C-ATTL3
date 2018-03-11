@@ -24,5 +24,6 @@ var searchData=
   ['mul_5fint',['mul_int',['../classcattle_1_1_recurrent_neural_network.html#a402cd4a5f756f22d15321387160ecffb',1,'cattle::RecurrentNeuralNetwork::mul_int()'],['../classcattle_1_1_l_s_t_m_neural_network.html#ac363eff5f15c3c05115307cb54d09b8d',1,'cattle::LSTMNeuralNetwork::mul_int()']]],
   ['mulop',['MulOp',['../classcattle_1_1_mul_op.html',1,'cattle']]],
   ['multilabelhingeloss',['MultiLabelHingeLoss',['../classcattle_1_1_multi_label_hinge_loss.html',1,'cattle']]],
-  ['multilabellogloss',['MultiLabelLogLoss',['../classcattle_1_1_multi_label_log_loss.html',1,'cattle::MultiLabelLogLoss&lt; Scalar, Rank, Sequential &gt;'],['../classcattle_1_1_multi_label_log_loss.html#a47c504330c9041efe42f5881c091a6bf',1,'cattle::MultiLabelLogLoss::MultiLabelLogLoss()']]]
+  ['multilabellogloss',['MultiLabelLogLoss',['../classcattle_1_1_multi_label_log_loss.html',1,'cattle::MultiLabelLogLoss&lt; Scalar, Rank, Sequential &gt;'],['../classcattle_1_1_multi_label_log_loss.html#a47c504330c9041efe42f5881c091a6bf',1,'cattle::MultiLabelLogLoss::MultiLabelLogLoss()']]],
+  ['multiply_5falong_5frank',['multiply_along_rank',['../classcattle_1_1_dim_expression.html#a99519d55a8279f97a841053c272c0bf9',1,'cattle::DimExpression']]]
 ];

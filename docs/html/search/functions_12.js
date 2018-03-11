@@ -12,6 +12,6 @@ var searchData=
   ['sigmoidactivationlayer',['SigmoidActivationLayer',['../classcattle_1_1_sigmoid_activation_layer.html#ad7215c0eeaa7b56b4902adc6867c9586',1,'cattle::SigmoidActivationLayer']]],
   ['softmaxactivationlayer',['SoftmaxActivationLayer',['../classcattle_1_1_softmax_activation_layer.html#a70f0f6a005dc56c550537d02483a5099',1,'cattle::SoftmaxActivationLayer']]],
   ['split_5ffirst_5frank',['split_first_rank',['../classcattle_1_1_utils.html#a9b5b324293b6f69717801dfd9d12425b',1,'cattle::Utils']]],
-  ['subtract_5falong_5frank',['subtract_along_rank',['../classcattle_1_1_dim_expression.html#a03ebe75e3fa561f3b2805ec5a733dce4',1,'cattle::DimExpression']]],
+  ['subtract_5falong_5frank',['subtract_along_rank',['../classcattle_1_1_dim_expression.html#ad3ec56e5c21987c7d55c905ddf939483',1,'cattle::DimExpression::subtract_along_rank(const IndexType &amp;n, std::size_t rank) const'],['../classcattle_1_1_dim_expression.html#a03ebe75e3fa561f3b2805ec5a733dce4',1,'cattle::DimExpression::subtract_along_rank(const Other&lt; OtherDerived &gt; &amp;dims, std::size_t rank) const']]],
   ['sumpoolinglayer',['SumPoolingLayer',['../classcattle_1_1_sum_pooling_layer.html#a595f0e649bdb2bcd4514138ca66d9760',1,'cattle::SumPoolingLayer']]]
 ];

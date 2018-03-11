@@ -153,7 +153,12 @@ Additional Inherited Members</h2></td></tr>
 <tr class="memitem:a17b2339be74d0a84a7ba13cdeb1df98d inherit pro_attribs_classcattle_1_1_normalization_preprocessor"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespacecattle.html#a3ac7e197e90e292a2db6b2d94f46befa">RowVector</a>&lt; Scalar &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_normalization_preprocessor.html#a17b2339be74d0a84a7ba13cdeb1df98d">sd</a></td></tr>
 <tr class="separator:a17b2339be74d0a84a7ba13cdeb1df98d inherit pro_attribs_classcattle_1_1_normalization_preprocessor"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
-<h2 class="groupheader">Member Typedef Documentation</h2>
+<a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
+<div class="textblock"><h3>template&lt;typename Scalar&gt;<br />
+class cattle::PCAPreprocessor&lt; Scalar, 3 &gt;</h3>
+
+<p>Partial template specialization of the PCA preprocessor for rank-3 tensors. </p>
+</div><h2 class="groupheader">Member Typedef Documentation</h2>
 <a id="a1520ea886aff42363cb02c01fef57324"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a1520ea886aff42363cb02c01fef57324">&#9670;&nbsp;</a></span>Base</h2>
 
@@ -250,6 +255,15 @@ template&lt;typename Scalar &gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">standardize</td><td>Whether the data should be standardized as well. </td></tr>
+    <tr><td class="paramname">whiten</td><td>Whether the data should be whitened as well. </td></tr>
+    <tr><td class="paramname">min_rel_var_to_retain</td><td>The minimum relative variance in the data to retain. It is expected to be within the range (0,1]. If it is 1, the dimensionality of the preprocessed data is guaranteed not to be reduced. If it is less than 1, the data cannot be a multi-channel tensor. </td></tr>
+    <tr><td class="paramname">epsilon</td><td>A small consant used to maintain numerical stability. </td></tr>
+  </table>
+  </dd>
+</dl>
 
 </div>
 </div>

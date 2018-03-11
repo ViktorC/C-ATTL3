@@ -92,12 +92,17 @@ Inheritance diagram for cattle::RegularizationPenalty&lt; Scalar &gt;:</div>
 Public Member Functions</h2></td></tr>
 <tr class="memitem:a5b4ebbc6bf08e8d345259335254d88a2"><td class="memItemLeft" align="right" valign="top">virtual&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_regularization_penalty.html#a5b4ebbc6bf08e8d345259335254d88a2">~RegularizationPenalty</a> ()=default</td></tr>
 <tr class="separator:a5b4ebbc6bf08e8d345259335254d88a2"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a89189ee0b4a49068bfc2adea9d9f7380"><td class="memItemLeft" align="right" valign="top">virtual Scalar&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_regularization_penalty.html#a89189ee0b4a49068bfc2adea9d9f7380">function</a> (const <a class="el" href="namespacecattle.html#a1d78623a47279d516750a44dbad6090b">Matrix</a>&lt; Scalar &gt; &amp;weights) const</td></tr>
-<tr class="separator:a89189ee0b4a49068bfc2adea9d9f7380"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a76b45d7858fb5025f61aa25fef36a598"><td class="memItemLeft" align="right" valign="top">virtual <a class="el" href="namespacecattle.html#a1d78623a47279d516750a44dbad6090b">Matrix</a>&lt; Scalar &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_regularization_penalty.html#a76b45d7858fb5025f61aa25fef36a598">d_function</a> (const <a class="el" href="namespacecattle.html#a1d78623a47279d516750a44dbad6090b">Matrix</a>&lt; Scalar &gt; &amp;weights) const</td></tr>
-<tr class="separator:a76b45d7858fb5025f61aa25fef36a598"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a90c9df2d7401f9c04820512f9f362831"><td class="memItemLeft" align="right" valign="top">virtual Scalar&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_regularization_penalty.html#a90c9df2d7401f9c04820512f9f362831">function</a> (const <a class="el" href="namespacecattle.html#a1d78623a47279d516750a44dbad6090b">Matrix</a>&lt; Scalar &gt; &amp;params) const</td></tr>
+<tr class="separator:a90c9df2d7401f9c04820512f9f362831"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:acea913fa5924465ad05d24f71ff05046"><td class="memItemLeft" align="right" valign="top">virtual <a class="el" href="namespacecattle.html#a1d78623a47279d516750a44dbad6090b">Matrix</a>&lt; Scalar &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_regularization_penalty.html#acea913fa5924465ad05d24f71ff05046">d_function</a> (const <a class="el" href="namespacecattle.html#a1d78623a47279d516750a44dbad6090b">Matrix</a>&lt; Scalar &gt; &amp;params) const</td></tr>
+<tr class="separator:acea913fa5924465ad05d24f71ff05046"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
-<h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
+<a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
+<div class="textblock"><h3>template&lt;typename Scalar&gt;<br />
+class cattle::RegularizationPenalty&lt; Scalar &gt;</h3>
+
+<p>An abstract template class for different regularization penalties for neural network layer parameters. Implementations of this class should be stateless. </p>
+</div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
 <a id="a5b4ebbc6bf08e8d345259335254d88a2"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a5b4ebbc6bf08e8d345259335254d88a2">&#9670;&nbsp;</a></span>~RegularizationPenalty()</h2>
 
@@ -126,8 +131,8 @@ template&lt;typename Scalar &gt; </div>
 </div>
 </div>
 <h2 class="groupheader">Member Function Documentation</h2>
-<a id="a76b45d7858fb5025f61aa25fef36a598"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a76b45d7858fb5025f61aa25fef36a598">&#9670;&nbsp;</a></span>d_function()</h2>
+<a id="acea913fa5924465ad05d24f71ff05046"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#acea913fa5924465ad05d24f71ff05046">&#9670;&nbsp;</a></span>d_function()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -141,7 +146,7 @@ template&lt;typename Scalar &gt; </div>
           <td class="memname">virtual <a class="el" href="namespacecattle.html#a1d78623a47279d516750a44dbad6090b">Matrix</a>&lt;Scalar&gt; <a class="el" href="classcattle_1_1_regularization_penalty.html">cattle::RegularizationPenalty</a>&lt; Scalar &gt;::d_function </td>
           <td>(</td>
           <td class="paramtype">const <a class="el" href="namespacecattle.html#a1d78623a47279d516750a44dbad6090b">Matrix</a>&lt; Scalar &gt; &amp;&#160;</td>
-          <td class="paramname"><em>weights</em></td><td>)</td>
+          <td class="paramname"><em>params</em></td><td>)</td>
           <td> const</td>
         </tr>
       </table>
@@ -151,13 +156,21 @@ template&lt;typename Scalar &gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
+<p>It differentiates the regularization function and returns its derivative w.r.t. the parameters.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">params</td><td>A constant reference to the parameter matrix. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>The gradient matrix. </dd></dl>
 
-<p>Reimplemented in <a class="el" href="classcattle_1_1_elastic_net_regularization_penalty.html#a63ffdfcaf6ee969227a60918c0a28e68">cattle::ElasticNetRegularizationPenalty&lt; Scalar &gt;</a>, <a class="el" href="classcattle_1_1_l2_regularization_penalty.html#a6174561037c5c8bfa3303b9209bd667e">cattle::L2RegularizationPenalty&lt; Scalar &gt;</a>, <a class="el" href="classcattle_1_1_l1_regularization_penalty.html#a571ebc70576c653931145d32c5e0d565">cattle::L1RegularizationPenalty&lt; Scalar &gt;</a>, and <a class="el" href="classcattle_1_1_no_regularization_penalty.html#a038e222b55124f58f6ce1a6f8aad1012">cattle::NoRegularizationPenalty&lt; Scalar &gt;</a>.</p>
+<p>Reimplemented in <a class="el" href="classcattle_1_1_elastic_net_regularization_penalty.html#a1e4a4a855c063910b5470d18024d5b2e">cattle::ElasticNetRegularizationPenalty&lt; Scalar &gt;</a>, <a class="el" href="classcattle_1_1_l2_regularization_penalty.html#af07b67a854deb832f3af4c52cafd3ed2">cattle::L2RegularizationPenalty&lt; Scalar &gt;</a>, <a class="el" href="classcattle_1_1_l1_regularization_penalty.html#a74eadec352818faf3a8c4ea582039401">cattle::L1RegularizationPenalty&lt; Scalar &gt;</a>, and <a class="el" href="classcattle_1_1_no_regularization_penalty.html#a20797bbfaa39c76a901f9f7543ce3b10">cattle::NoRegularizationPenalty&lt; Scalar &gt;</a>.</p>
 
 </div>
 </div>
-<a id="a89189ee0b4a49068bfc2adea9d9f7380"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a89189ee0b4a49068bfc2adea9d9f7380">&#9670;&nbsp;</a></span>function()</h2>
+<a id="a90c9df2d7401f9c04820512f9f362831"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a90c9df2d7401f9c04820512f9f362831">&#9670;&nbsp;</a></span>function()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -171,7 +184,7 @@ template&lt;typename Scalar &gt; </div>
           <td class="memname">virtual Scalar <a class="el" href="classcattle_1_1_regularization_penalty.html">cattle::RegularizationPenalty</a>&lt; Scalar &gt;::function </td>
           <td>(</td>
           <td class="paramtype">const <a class="el" href="namespacecattle.html#a1d78623a47279d516750a44dbad6090b">Matrix</a>&lt; Scalar &gt; &amp;&#160;</td>
-          <td class="paramname"><em>weights</em></td><td>)</td>
+          <td class="paramname"><em>params</em></td><td>)</td>
           <td> const</td>
         </tr>
       </table>
@@ -181,8 +194,16 @@ template&lt;typename Scalar &gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
+<p>It computes the regularization penalty for the given parameter values.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">params</td><td>A constant reference to the parameter matrix. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>The regularization penalty as a single scalar. </dd></dl>
 
-<p>Reimplemented in <a class="el" href="classcattle_1_1_elastic_net_regularization_penalty.html#a7ccda94f35a6050d60a8502d19119c98">cattle::ElasticNetRegularizationPenalty&lt; Scalar &gt;</a>, <a class="el" href="classcattle_1_1_l2_regularization_penalty.html#abc097f8d212cd2eec106aebd50f21481">cattle::L2RegularizationPenalty&lt; Scalar &gt;</a>, <a class="el" href="classcattle_1_1_l1_regularization_penalty.html#af2504d68b42db56385e1154d9523ae77">cattle::L1RegularizationPenalty&lt; Scalar &gt;</a>, and <a class="el" href="classcattle_1_1_no_regularization_penalty.html#a491aafeeb8c879779e69f8b89fbe3bdc">cattle::NoRegularizationPenalty&lt; Scalar &gt;</a>.</p>
+<p>Reimplemented in <a class="el" href="classcattle_1_1_elastic_net_regularization_penalty.html#affef525825ae7f3bc90476bbeb3bfa58">cattle::ElasticNetRegularizationPenalty&lt; Scalar &gt;</a>, <a class="el" href="classcattle_1_1_l2_regularization_penalty.html#a294d89027d612c72328c3f30e890bfcc">cattle::L2RegularizationPenalty&lt; Scalar &gt;</a>, <a class="el" href="classcattle_1_1_l1_regularization_penalty.html#a0e4673a25e8343c2b868d9a96fbe1313">cattle::L1RegularizationPenalty&lt; Scalar &gt;</a>, and <a class="el" href="classcattle_1_1_no_regularization_penalty.html#a7c462122280f822467eed5bd59dcf955">cattle::NoRegularizationPenalty&lt; Scalar &gt;</a>.</p>
 
 </div>
 </div>

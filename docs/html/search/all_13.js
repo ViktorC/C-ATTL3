@@ -24,7 +24,7 @@ var searchData=
   ['std_5fin',['std_in',['../structcattle_1_1_batch_norm_layer_base_1_1_cache.html#ade3fff30d846fd8935ecf8bc125a490b',1,'cattle::BatchNormLayerBase::Cache']]],
   ['stride',['stride',['../classcattle_1_1_conv_layer.html#a4eaf03dc0437ae2d50b2f2d9b23490f1',1,'cattle::ConvLayer::stride()'],['../classcattle_1_1_pooling_layer.html#a752ccf3dca5e4a20db1ed87acfd75bef',1,'cattle::PoolingLayer::stride()']]],
   ['subop',['SubOp',['../classcattle_1_1_sub_op.html',1,'cattle']]],
-  ['subtract_5falong_5frank',['subtract_along_rank',['../classcattle_1_1_dim_expression.html#a03ebe75e3fa561f3b2805ec5a733dce4',1,'cattle::DimExpression']]],
+  ['subtract_5falong_5frank',['subtract_along_rank',['../classcattle_1_1_dim_expression.html#ad3ec56e5c21987c7d55c905ddf939483',1,'cattle::DimExpression::subtract_along_rank(const IndexType &amp;n, std::size_t rank) const'],['../classcattle_1_1_dim_expression.html#a03ebe75e3fa561f3b2805ec5a733dce4',1,'cattle::DimExpression::subtract_along_rank(const Other&lt; OtherDerived &gt; &amp;dims, std::size_t rank) const']]],
   ['sum',['SUM',['../classcattle_1_1_parallel_neural_network.html#ab31baa148459bc8fe71917adacb93c8eafa68c14ca5f22c15d375f29f1f5fa88e',1,'cattle::ParallelNeuralNetwork::SUM()'],['../classcattle_1_1_bidirectional_neural_network.html#a57360547162372b4099e8b09f0695ee7a8569bab0b77dea1f1c744f3f2d392ed5',1,'cattle::BidirectionalNeuralNetwork::SUM()']]],
   ['sumop',['SumOp',['../classcattle_1_1_sum_op.html',1,'cattle']]],
   ['sumpoolinglayer',['SumPoolingLayer',['../classcattle_1_1_sum_pooling_layer.html',1,'cattle::SumPoolingLayer&lt; Scalar &gt;'],['../classcattle_1_1_sum_pooling_layer.html#a595f0e649bdb2bcd4514138ca66d9760',1,'cattle::SumPoolingLayer::SumPoolingLayer()']]],

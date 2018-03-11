@@ -21,6 +21,10 @@ namespace cattle {
 
 // TODO CTC loss.
 
+/**
+ * An abstract class template for loss functions for non-sequential data. Implementations
+ * of this class should be stateless.
+ */
 template<typename Scalar, std::size_t Rank, bool Sequential>
 class Loss {
 	static_assert(std::is_floating_point<Scalar>::value, "non floating-point scalar type");
@@ -33,11 +37,25 @@ protected:
 			const Dimensions<int,DATA_RANKS - 1>& grad_dims) const;
 public:
 	virtual ~Loss() = default;
+	/**
+	 * It calculates the error on each sample given the output and the objective tensors.
+	 *
+	 * @param out The output tensor.
+	 * @param obj The objective tensor (of the same dimensionality as the output).
+	 * @return A column vector containing the loss for each sample.
+	 */
 	inline ColVector<Scalar> function(const Data& out, const Data& obj) const {
 		assert(Utils<Scalar>::template get_dims<DATA_RANKS>(out) ==
 				Utils<Scalar>::template get_dims<DATA_RANKS>(obj));
 		return _function(out, obj);
 	}
+	/**
+	 * It calculates the derivative of the loss function w.r.t. the output.
+	 *
+	 * @param out The output tensor.
+	 * @param obj The objective tensor (of the same dimensionality as the output).
+	 * @return The derivative of the loss function w.r.t. the output.
+	 */
 	inline Data d_function(const Data& out, const Data& obj) const {
 		Dimensions<int,DATA_RANKS> dims = Utils<Scalar>::template get_dims<DATA_RANKS>(out);
 		assert(dims == Utils<Scalar>::template get_dims<DATA_RANKS>(obj));
@@ -46,7 +64,8 @@ public:
 };
 
 /**
- * Partial template specialization for sequential data.
+ * Partial template specialization for sequential data. Implementations
+ * of this class should be stateless.
  */
 template<typename Scalar, std::size_t Rank>
 class Loss<Scalar,Rank,true> {
@@ -60,6 +79,15 @@ protected:
 			const Dimensions<int,DATA_RANKS - 1>& grad_dims) const;
 public:
 	virtual ~Loss() = default;
+	/**
+	 * It calculates the error on each sample given the output and the objective tensors.
+	 * The loss on a sample is the sum of the losses on the time steps in each sample.
+	 *
+	 * @param out The output tensor.
+	 * @param obj The objective tensor (of the same dimensionality as the output).
+	 * @return A column vector containing the sum of losses for the time steps of each
+	 * sample.
+	 */
 	inline ColVector<Scalar> function(const Data& out, const Data& obj) const {
 		Dimensions<int,DATA_RANKS> dims = Utils<Scalar>::template get_dims<DATA_RANKS>(out);
 		assert(dims == Utils<Scalar>::template get_dims<DATA_RANKS>(obj));
@@ -79,6 +107,13 @@ public:
 		}
 		return loss;
 	}
+	/**
+	 * It calculates the derivative of the loss function w.r.t. the output.
+	 *
+	 * @param out The output tensor.
+	 * @param obj The objective tensor (of the same dimensionality as the output).
+	 * @return The derivative of the loss function w.r.t. the output.
+	 */
 	inline Data d_function(const Data& out, const Data& obj) const {
 		Dimensions<int,DATA_RANKS> dims = Utils<Scalar>::template get_dims<DATA_RANKS>(out);
 		assert(dims == Utils<Scalar>::template get_dims<DATA_RANKS>(obj));
@@ -102,6 +137,9 @@ public:
 	}
 };
 
+/**
+ * A template class representing the squared error loss function.
+ */
 template<typename Scalar, std::size_t Rank, bool Sequential>
 class QuadraticLoss : public Loss<Scalar,Rank,Sequential> {
 	typedef Loss<Scalar,Rank,Sequential> Base;
@@ -121,7 +159,8 @@ protected:
 };
 
 /**
- * One-hot objective.
+ * A template class representing the hinge loss function. This class assumes the objectives for
+ * each sample (and time step) to be a one-hot vector (tensor rank).
  */
 template<typename Scalar, std::size_t Rank, bool Sequential, bool Squared = false>
 class HingeLoss : public Loss<Scalar,Rank,Sequential> {
@@ -195,12 +234,16 @@ protected:
 };
 
 /**
- * Objective values between 0 and 1 (inclusive). Use with softmax activation.
+ * A template class representing the cross entropy loss function. This class assumes the objective
+ * values for each sample (and time step) to be in the range [0, 1].
  */
 template<typename Scalar, std::size_t Rank, bool Sequential>
 class CrossEntropyLoss : public Loss<Scalar,Rank,Sequential> {
 	typedef Loss<Scalar,Rank,Sequential> Base;
 public:
+	/**
+	 * @param epsilon A small constant used to maintain numerical stability.
+	 */
 	CrossEntropyLoss(Scalar epsilon = Utils<Scalar>::EPSILON2) : epsilon(epsilon) { };
 protected:
 	inline ColVector<Scalar> _function(const typename Base::Data& out,
@@ -221,7 +264,8 @@ private:
 };
 
 /**
- * True label: 1; false label: -1.
+ * A class template representing the hinge loss function for multi-label objectives. True labels
+ * are expected to have the value 1, while false labels are expected to correspond to the value -1.
  */
 template<typename Scalar, std::size_t Rank, bool Sequential, bool Squared = false>
 class MultiLabelHingeLoss : public Loss<Scalar,Rank,Sequential> {
@@ -268,12 +312,17 @@ protected:
 };
 
 /**
- * True label: 1; false label: 0. Use with sigmoid activation.
+ * A class template representing the logarithmic loss function for multi-label objectives. True
+ * labels are expected to have the value 1, while false labels are expected to correspond to the
+ * value 0.
  */
 template<typename Scalar, std::size_t Rank, bool Sequential>
 class MultiLabelLogLoss : public Loss<Scalar,Rank,Sequential> {
 	typedef Loss<Scalar,Rank,Sequential> Base;
 public:
+	/**
+	 * @param epsilon A small constant used to maintain numerical stability.
+	 */
 	MultiLabelLogLoss(Scalar epsilon = Utils<Scalar>::EPSILON2) :
 		epsilon(epsilon) { };
 protected:

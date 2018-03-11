@@ -135,7 +135,7 @@ Additional Inherited Members</h2></td></tr>
 <div class="textblock"><h3>template&lt;typename Scalar, std::size_t Rank, bool Sequential&gt;<br />
 class cattle::MultiLabelLogLoss&lt; Scalar, Rank, Sequential &gt;</h3>
 
-<p>True label: 1; false label: 0. Use with sigmoid activation. </p>
+<p>A class template representing the logarithmic loss function for multi-label objectives. True labels are expected to have the value 1, while false labels are expected to correspond to the value 0. </p>
 </div><h2 class="groupheader">Member Typedef Documentation</h2>
 <a id="a999543890bb827c2467b2b6bdb25a8c4"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a999543890bb827c2467b2b6bdb25a8c4">&#9670;&nbsp;</a></span>Base</h2>
@@ -187,6 +187,12 @@ template&lt;typename Scalar , std::size_t Rank, bool Sequential&gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">epsilon</td><td>A small constant used to maintain numerical stability. </td></tr>
+  </table>
+  </dd>
+</dl>
 
 </div>
 </div>

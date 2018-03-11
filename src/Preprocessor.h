@@ -23,19 +23,41 @@ namespace cattle {
 
 // TODO Fix for sequential data.
 
+/**
+ * An abstract class template for data preprocessors.
+ */
 template<typename Scalar, std::size_t Rank, bool Sequential>
 class Preprocessor {
 	static_assert(std::is_floating_point<Scalar>::value, "non floating-point scalar type");
 	static_assert(Rank > 0 && Rank < 4, "illegal pre-processor rank");
 public:
 	virtual ~Preprocessor() = default;
+	/**
+	 * It fits the preprocessor to the specified data.
+	 *
+	 * @param data A constant reference to a data tensor.
+	 */
 	virtual void fit(const Tensor<Scalar,Rank + Sequential + 1>& data) = 0;
+	/**
+	 * It transforms the specified tensor according to the preprocessors current state
+	 * created by #fit(const Tensor<Scalar,Rank + Sequential + 1>&).
+	 *
+	 * @param data A non-constatn reference to a data tensor.
+	 */
 	virtual void transform(Tensor<Scalar,Rank + Sequential + 1>& data) const = 0;
 };
 
+/**
+ * A class template for a normalization (mean-subtraction) preprocessor that optionally also
+ * standardizes the data (divides it by the standard deviation).
+ */
 template<typename Scalar, std::size_t Rank>
 class NormalizationPreprocessor : public Preprocessor<Scalar,Rank,false> {
 public:
+	/**
+	 * @param standardize Whether the preprocessor should standardize as well.
+	 * @param epsilon A small constant used to maintain numerical stability.
+	 */
 	inline NormalizationPreprocessor(bool standardize = false, Scalar epsilon = Utils<Scalar>::EPSILON2) :
 			standardize(standardize),
 			epsilon(epsilon) {
@@ -70,10 +92,16 @@ protected:
 	RowVector<Scalar> sd;
 };
 
-// Partial template specialization for batches of 3D tensors (with multiple channels).
+/**
+ * Partial template specialization for batches of rank-3 tensors (with multiple channels).
+ */
 template<typename Scalar>
 class NormalizationPreprocessor<Scalar,3> {
 public:
+	/**
+	 * @param standardize Whether the preprocessor should standardize as well.
+	 * @param epsilon A small constant used to maintain numerical stability.
+	 */
 	inline NormalizationPreprocessor(bool standardize = false, Scalar epsilon = Utils<Scalar>::EPSILON2) :
 			standardize(standardize),
 			epsilon(epsilon) {
@@ -125,6 +153,10 @@ protected:
 	Matrix<Scalar> sd;
 };
 
+/**
+ * An abstract base class template for a principal component analysis (PCA) preprocessor that can also
+ * standardize and whiten the data.
+ */
 template<typename Scalar, std::size_t Rank>
 class PCAPreprocessorBase : public NormalizationPreprocessor<Scalar,Rank> {
 protected:
@@ -188,11 +220,23 @@ protected:
 	std::vector<EigenDecomposition> ed_vec;
 };
 
+/**
+ * A class template for a PCA preprocessor that can also standardize and whiten.
+ */
 template<typename Scalar, std::size_t Rank>
 class PCAPreprocessor : public PCAPreprocessorBase<Scalar,Rank> {
 	typedef PCAPreprocessorBase<Scalar,Rank> Base;
 	typedef typename Base::Base Root;
 public:
+	/**
+	 * @param standardize Whether the data should be standardized as well.
+	 * @param whiten Whether the data should be whitened as well.
+	 * @param min_rel_var_to_retain The minimum relative variance in the data
+	 * to retain. It is expected to be within the range (0,1]. If it is 1,
+	 * the dimensionality of the preprocessed data is guaranteed not to be
+	 * reduced.
+	 * @param epsilon A small consant used to maintain numerical stability.
+	 */
 	inline PCAPreprocessor(bool standardize = false, bool whiten = false, Scalar min_rel_var_to_retain = 1,
 			Scalar epsilon = Utils<Scalar>::EPSILON2) :
 				Base::PCAPreprocessorBase(standardize, whiten, min_rel_var_to_retain, epsilon) { }
@@ -207,12 +251,24 @@ public:
 	}
 };
 
-// 3D partial template specialization of the PCA preprocessor.
+/**
+ * Partial template specialization of the PCA preprocessor for rank-3 tensors.
+ */
 template<typename Scalar>
 class PCAPreprocessor<Scalar,3> : public PCAPreprocessorBase<Scalar,3> {
 	typedef PCAPreprocessorBase<Scalar,3> Base;
 	typedef typename Base::Base Root;
 public:
+	/**
+	 * @param standardize Whether the data should be standardized as well.
+	 * @param whiten Whether the data should be whitened as well.
+	 * @param min_rel_var_to_retain The minimum relative variance in the data
+	 * to retain. It is expected to be within the range (0,1]. If it is 1,
+	 * the dimensionality of the preprocessed data is guaranteed not to be
+	 * reduced. If it is less than 1, the data cannot be a multi-channel
+	 * tensor.
+	 * @param epsilon A small consant used to maintain numerical stability.
+	 */
 	inline PCAPreprocessor(bool standardize = false, bool whiten = false, Scalar min_rel_var_to_retain = 1,
 			Scalar epsilon = Utils<Scalar>::EPSILON2) :
 				Base::PCAPreprocessorBase(standardize, whiten, min_rel_var_to_retain, epsilon) { }

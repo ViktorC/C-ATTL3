@@ -109,7 +109,7 @@ Static Protected Attributes</h2></td></tr>
 <div class="textblock"><h3>template&lt;typename Scalar, std::size_t Rank&gt;<br />
 class cattle::Loss&lt; Scalar, Rank, true &gt;</h3>
 
-<p>Partial template specialization for sequential data. </p>
+<p>Partial template specialization for sequential data. Implementations of this class should be stateless. </p>
 </div><h2 class="groupheader">Member Typedef Documentation</h2>
 <a id="adc6236d7160ab48df776bf428b6535de"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#adc6236d7160ab48df776bf428b6535de">&#9670;&nbsp;</a></span>Data</h2>
@@ -281,6 +281,15 @@ template&lt;typename Scalar , std::size_t Rank&gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
+<p>It calculates the derivative of the loss function w.r.t. the output.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">out</td><td>The output tensor. </td></tr>
+    <tr><td class="paramname">obj</td><td>The objective tensor (of the same dimensionality as the output). </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>The derivative of the loss function w.r.t. the output. </dd></dl>
 
 </div>
 </div>
@@ -319,6 +328,15 @@ template&lt;typename Scalar , std::size_t Rank&gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
+<p>It calculates the error on each sample given the output and the objective tensors. The loss on a sample is the sum of the losses on the time steps in each sample.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">out</td><td>The output tensor. </td></tr>
+    <tr><td class="paramname">obj</td><td>The objective tensor (of the same dimensionality as the output). </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>A column vector containing the sum of losses for the time steps of each sample. </dd></dl>
 
 </div>
 </div>

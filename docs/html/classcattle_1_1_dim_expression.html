@@ -92,6 +92,14 @@ Public Member Functions</h2></td></tr>
 <tr class="separator:a80900ec3799e55374ee393327ead0279"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ae51ed9575f019bc86402615cf08e97d8"><td class="memItemLeft" align="right" valign="top">std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_dim_expression.html#ae51ed9575f019bc86402615cf08e97d8">to_string</a> () const</td></tr>
 <tr class="separator:ae51ed9575f019bc86402615cf08e97d8"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad14faa346e24c377c8a3306f587e8e50"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classcattle_1_1_unary_rank_wise_dim_expression.html">UnaryRankWiseDimExpression</a>&lt; IndexType, Rank, <a class="el" href="classcattle_1_1_dim_expression.html#a51aa030935c467cf158c24924b3ea0a8">Self</a>, <a class="el" href="classcattle_1_1_sum_op.html">SumOp</a>&lt; IndexType &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_dim_expression.html#ad14faa346e24c377c8a3306f587e8e50">add_along_rank</a> (const IndexType &amp;n, std::size_t rank) const</td></tr>
+<tr class="separator:ad14faa346e24c377c8a3306f587e8e50"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad3ec56e5c21987c7d55c905ddf939483"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classcattle_1_1_unary_rank_wise_dim_expression.html">UnaryRankWiseDimExpression</a>&lt; IndexType, Rank, <a class="el" href="classcattle_1_1_dim_expression.html#a51aa030935c467cf158c24924b3ea0a8">Self</a>, <a class="el" href="classcattle_1_1_sum_op.html">SumOp</a>&lt; IndexType &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_dim_expression.html#ad3ec56e5c21987c7d55c905ddf939483">subtract_along_rank</a> (const IndexType &amp;n, std::size_t rank) const</td></tr>
+<tr class="separator:ad3ec56e5c21987c7d55c905ddf939483"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a99519d55a8279f97a841053c272c0bf9"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classcattle_1_1_unary_rank_wise_dim_expression.html">UnaryRankWiseDimExpression</a>&lt; IndexType, Rank, <a class="el" href="classcattle_1_1_dim_expression.html#a51aa030935c467cf158c24924b3ea0a8">Self</a>, <a class="el" href="classcattle_1_1_sum_op.html">SumOp</a>&lt; IndexType &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_dim_expression.html#a99519d55a8279f97a841053c272c0bf9">multiply_along_rank</a> (const IndexType &amp;n, std::size_t rank) const</td></tr>
+<tr class="separator:a99519d55a8279f97a841053c272c0bf9"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab1a5b379fdaa8a11c300df8232b7892d"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classcattle_1_1_unary_rank_wise_dim_expression.html">UnaryRankWiseDimExpression</a>&lt; IndexType, Rank, <a class="el" href="classcattle_1_1_dim_expression.html#a51aa030935c467cf158c24924b3ea0a8">Self</a>, <a class="el" href="classcattle_1_1_sum_op.html">SumOp</a>&lt; IndexType &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_dim_expression.html#ab1a5b379fdaa8a11c300df8232b7892d">divide_along_rank</a> (const IndexType &amp;n, std::size_t rank) const</td></tr>
+<tr class="separator:ab1a5b379fdaa8a11c300df8232b7892d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a0af82eb2cea08605a78375851710e58a"><td class="memTemplParams" colspan="2">template&lt;typename OtherDerived &gt; </td></tr>
 <tr class="memitem:a0af82eb2cea08605a78375851710e58a"><td class="memTemplItemLeft" align="right" valign="top"><a class="el" href="classcattle_1_1_binary_rank_wise_dim_expression.html">BinaryRankWiseDimExpression</a>&lt; IndexType, Rank, <a class="el" href="classcattle_1_1_dim_expression.html#a51aa030935c467cf158c24924b3ea0a8">Self</a>, <a class="el" href="classcattle_1_1_dim_expression.html#aceb32c6dd9f288d3867c2db242b9d988">Other</a>&lt; OtherDerived &gt;, <a class="el" href="classcattle_1_1_sum_op.html">SumOp</a>&lt; IndexType &gt; &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classcattle_1_1_dim_expression.html#a0af82eb2cea08605a78375851710e58a">add_along_rank</a> (const <a class="el" href="classcattle_1_1_dim_expression.html#aceb32c6dd9f288d3867c2db242b9d988">Other</a>&lt; OtherDerived &gt; &amp;dims, std::size_t rank) const</td></tr>
 <tr class="separator:a0af82eb2cea08605a78375851710e58a"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -138,7 +146,8 @@ Friends</h2></td></tr>
 <div class="textblock"><h3>template&lt;typename Derived, typename IndexType, std::size_t Rank&gt;<br />
 class cattle::DimExpression&lt; Derived, IndexType, Rank &gt;</h3>
 
-<p>NOTE: Expression templates are rather unwarranted for this class as its objects are unlikely to be used in complex expressions. They have only been implemented for the sake of practical learning. </p>
+<p>NOTE: Expression templates are rather unwarranted for this class as its objects are unlikely to be used in complex expressions. They have only been implemented for the sake of practical learning.</p>
+<p>The base class of all dimension expressions. </p>
 </div><h2 class="groupheader">Member Typedef Documentation</h2>
 <a id="aceb32c6dd9f288d3867c2db242b9d988"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#aceb32c6dd9f288d3867c2db242b9d988">&#9670;&nbsp;</a></span>Other</h2>
@@ -191,8 +200,46 @@ template&lt;typename Derived, typename IndexType, std::size_t Rank&gt; </div>
 </div>
 </div>
 <h2 class="groupheader">Member Function Documentation</h2>
+<a id="ad14faa346e24c377c8a3306f587e8e50"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad14faa346e24c377c8a3306f587e8e50">&#9670;&nbsp;</a></span>add_along_rank() <span class="overload">[1/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename Derived, typename IndexType, std::size_t Rank&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classcattle_1_1_unary_rank_wise_dim_expression.html">UnaryRankWiseDimExpression</a>&lt;IndexType,Rank,<a class="el" href="classcattle_1_1_dim_expression.html#a51aa030935c467cf158c24924b3ea0a8">Self</a>,<a class="el" href="classcattle_1_1_sum_op.html">SumOp</a>&lt;IndexType&gt; &gt; <a class="el" href="classcattle_1_1_dim_expression.html">cattle::DimExpression</a>&lt; Derived, IndexType, Rank &gt;::add_along_rank </td>
+          <td>(</td>
+          <td class="paramtype">const IndexType &amp;&#160;</td>
+          <td class="paramname"><em>n</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">std::size_t&#160;</td>
+          <td class="paramname"><em>rank</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
 <a id="a0af82eb2cea08605a78375851710e58a"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a0af82eb2cea08605a78375851710e58a">&#9670;&nbsp;</a></span>add_along_rank()</h2>
+<h2 class="memtitle"><span class="permalink"><a href="#a0af82eb2cea08605a78375851710e58a">&#9670;&nbsp;</a></span>add_along_rank() <span class="overload">[2/2]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -209,6 +256,44 @@ template&lt;typename OtherDerived &gt; </div>
           <td>(</td>
           <td class="paramtype">const <a class="el" href="classcattle_1_1_dim_expression.html#aceb32c6dd9f288d3867c2db242b9d988">Other</a>&lt; OtherDerived &gt; &amp;&#160;</td>
           <td class="paramname"><em>dims</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">std::size_t&#160;</td>
+          <td class="paramname"><em>rank</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="ab1a5b379fdaa8a11c300df8232b7892d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab1a5b379fdaa8a11c300df8232b7892d">&#9670;&nbsp;</a></span>divide_along_rank()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename Derived, typename IndexType, std::size_t Rank&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classcattle_1_1_unary_rank_wise_dim_expression.html">UnaryRankWiseDimExpression</a>&lt;IndexType,Rank,<a class="el" href="classcattle_1_1_dim_expression.html#a51aa030935c467cf158c24924b3ea0a8">Self</a>,<a class="el" href="classcattle_1_1_sum_op.html">SumOp</a>&lt;IndexType&gt; &gt; <a class="el" href="classcattle_1_1_dim_expression.html">cattle::DimExpression</a>&lt; Derived, IndexType, Rank &gt;::divide_along_rank </td>
+          <td>(</td>
+          <td class="paramtype">const IndexType &amp;&#160;</td>
+          <td class="paramname"><em>n</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -255,6 +340,8 @@ template&lt;typename Derived, typename IndexType, std::size_t Rank&gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
+<p>A method for forcing the evaluation of the expression.</p>
+<dl class="section return"><dt>Returns</dt><dd>A <a class="el" href="classcattle_1_1_dimensions.html">Dimensions</a> instance containing the results of the evaluated expression. </dd></dl>
 
 </div>
 </div>
@@ -274,6 +361,46 @@ template&lt;typename Derived, typename IndexType, std::size_t Rank&gt; </div>
           <td>(</td>
           <td class="paramname"></td><td>)</td>
           <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p>A constant method the returns the volume of the expression.</p>
+<dl class="section return"><dt>Returns</dt><dd>The product of the dimensions of each rank of the instance. </dd></dl>
+
+</div>
+</div>
+<a id="a99519d55a8279f97a841053c272c0bf9"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a99519d55a8279f97a841053c272c0bf9">&#9670;&nbsp;</a></span>multiply_along_rank()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename Derived, typename IndexType, std::size_t Rank&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classcattle_1_1_unary_rank_wise_dim_expression.html">UnaryRankWiseDimExpression</a>&lt;IndexType,Rank,<a class="el" href="classcattle_1_1_dim_expression.html#a51aa030935c467cf158c24924b3ea0a8">Self</a>,<a class="el" href="classcattle_1_1_sum_op.html">SumOp</a>&lt;IndexType&gt; &gt; <a class="el" href="classcattle_1_1_dim_expression.html">cattle::DimExpression</a>&lt; Derived, IndexType, Rank &gt;::multiply_along_rank </td>
+          <td>(</td>
+          <td class="paramtype">const IndexType &amp;&#160;</td>
+          <td class="paramname"><em>n</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">std::size_t&#160;</td>
+          <td class="paramname"><em>rank</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td> const</td>
         </tr>
       </table>
   </td>
@@ -364,6 +491,14 @@ template&lt;typename Derived, typename IndexType, std::size_t Rank&gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
+<p>Evaluates the expression along the given rank.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">i</td><td>The index of the single rank along which the expression is to be evaluated. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>The result of the expression evaluated along the i-th rank. </dd></dl>
 
 </div>
 </div>
@@ -599,8 +734,46 @@ template&lt;typename OtherDerived &gt; </div>
 
 </div>
 </div>
+<a id="ad3ec56e5c21987c7d55c905ddf939483"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad3ec56e5c21987c7d55c905ddf939483">&#9670;&nbsp;</a></span>subtract_along_rank() <span class="overload">[1/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename Derived, typename IndexType, std::size_t Rank&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classcattle_1_1_unary_rank_wise_dim_expression.html">UnaryRankWiseDimExpression</a>&lt;IndexType,Rank,<a class="el" href="classcattle_1_1_dim_expression.html#a51aa030935c467cf158c24924b3ea0a8">Self</a>,<a class="el" href="classcattle_1_1_sum_op.html">SumOp</a>&lt;IndexType&gt; &gt; <a class="el" href="classcattle_1_1_dim_expression.html">cattle::DimExpression</a>&lt; Derived, IndexType, Rank &gt;::subtract_along_rank </td>
+          <td>(</td>
+          <td class="paramtype">const IndexType &amp;&#160;</td>
+          <td class="paramname"><em>n</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">std::size_t&#160;</td>
+          <td class="paramname"><em>rank</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
 <a id="a03ebe75e3fa561f3b2805ec5a733dce4"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a03ebe75e3fa561f3b2805ec5a733dce4">&#9670;&nbsp;</a></span>subtract_along_rank()</h2>
+<h2 class="memtitle"><span class="permalink"><a href="#a03ebe75e3fa561f3b2805ec5a733dce4">&#9670;&nbsp;</a></span>subtract_along_rank() <span class="overload">[2/2]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -663,6 +836,8 @@ template&lt;typename Derived, typename IndexType, std::size_t Rank&gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
+<p>It evaluates the expression and returns a string containing the results.</p>
+<dl class="section return"><dt>Returns</dt><dd>A string representation of the evaluated expression. </dd></dl>
 
 </div>
 </div>

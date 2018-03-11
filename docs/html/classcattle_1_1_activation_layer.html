@@ -161,7 +161,12 @@ Private Types</h2></td></tr>
 <tr class="memitem:a4f87c070eac1677dfa0ed68178a2bda0"><td class="memItemLeft" align="right" valign="top">typedef <a class="el" href="namespacecattle.html#a264993c35ba14dd4f77aaff5152b8557">Tensor</a>&lt; Scalar, Rank+1 &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_activation_layer.html#a4f87c070eac1677dfa0ed68178a2bda0">Data</a></td></tr>
 <tr class="separator:a4f87c070eac1677dfa0ed68178a2bda0"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
-<h2 class="groupheader">Member Typedef Documentation</h2>
+<a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
+<div class="textblock"><h3>template&lt;typename Scalar, std::size_t Rank&gt;<br />
+class cattle::ActivationLayer&lt; Scalar, Rank &gt;</h3>
+
+<p>An abstract class template that represents a non-linear activation function layer. </p>
+</div><h2 class="groupheader">Member Typedef Documentation</h2>
 <a id="a4f87c070eac1677dfa0ed68178a2bda0"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a4f87c070eac1677dfa0ed68178a2bda0">&#9670;&nbsp;</a></span>Data</h2>
 
@@ -268,6 +273,14 @@ template&lt;typename Scalar , std::size_t Rank&gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
+<p>Applies the non-linearity to the specified input matrix.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">in</td><td>The input tensor mapped to a matrix. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>The activated input matrix. </dd></dl>
 
 <p>Implemented in <a class="el" href="classcattle_1_1_p_re_l_u_activation_layer.html#a656ea135746d21d117dea3953472a10f">cattle::PReLUActivationLayer&lt; Scalar, Rank &gt;</a>, <a class="el" href="classcattle_1_1_e_l_u_activation_layer.html#a73b86143b7ffe36c07f844ece1513c2a">cattle::ELUActivationLayer&lt; Scalar, Rank &gt;</a>, <a class="el" href="classcattle_1_1_leaky_re_l_u_activation_layer.html#a47aea7a34c68c22916c84270b032392b">cattle::LeakyReLUActivationLayer&lt; Scalar, Rank &gt;</a>, <a class="el" href="classcattle_1_1_re_l_u_activation_layer.html#ad4439cdc1022bbabc0499a984ab7c5b1">cattle::ReLUActivationLayer&lt; Scalar, Rank &gt;</a>, <a class="el" href="classcattle_1_1_softmax_activation_layer.html#a9b206914cac590890c610df06814401c">cattle::SoftmaxActivationLayer&lt; Scalar, Rank &gt;</a>, <a class="el" href="classcattle_1_1_tanh_activation_layer.html#a38f4b8de6cac7b5b3b104737f247fb3f">cattle::TanhActivationLayer&lt; Scalar, Rank &gt;</a>, <a class="el" href="classcattle_1_1_sigmoid_activation_layer.html#a1ea5f887aad664202823558429229f99">cattle::SigmoidActivationLayer&lt; Scalar, Rank &gt;</a>, <a class="el" href="classcattle_1_1_binary_step_activation_layer.html#ab32010a6bdb2cfb63b5cd7a396db9d83">cattle::BinaryStepActivationLayer&lt; Scalar, Rank &gt;</a>, <a class="el" href="classcattle_1_1_scaling_activation_layer.html#a7f3c853a07fc69a50d4a2f19f295d0cf">cattle::ScalingActivationLayer&lt; Scalar, Rank &gt;</a>, and <a class="el" href="classcattle_1_1_identity_activation_layer.html#a555783014110cad5cc82e29cebf25739">cattle::IdentityActivationLayer&lt; Scalar, Rank &gt;</a>.</p>
 
@@ -314,6 +327,16 @@ template&lt;typename Scalar , std::size_t Rank&gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
+<p>Differentiates the activation function and returns the derivative of the loss function w.r.t. the output of the previous layer in matrix form.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">in</td><td>The input tensor mapped to a matrix. </td></tr>
+    <tr><td class="paramname">out</td><td>The output produced by layer when applied to the input matrix. </td></tr>
+    <tr><td class="paramname">out_grads</td><td>The derivative of the loss function w.r.t. to the output of this layer. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>The derivative of the loss function w.r.t. to the output of the previous layer. </dd></dl>
 
 <p>Implemented in <a class="el" href="classcattle_1_1_p_re_l_u_activation_layer.html#a79936a9de6be294ac793e4ce151244b7">cattle::PReLUActivationLayer&lt; Scalar, Rank &gt;</a>, <a class="el" href="classcattle_1_1_e_l_u_activation_layer.html#a731b97b76a953f2b479230725cec4cba">cattle::ELUActivationLayer&lt; Scalar, Rank &gt;</a>, <a class="el" href="classcattle_1_1_leaky_re_l_u_activation_layer.html#aa7d61fcb59ae2926c03458633f907570">cattle::LeakyReLUActivationLayer&lt; Scalar, Rank &gt;</a>, <a class="el" href="classcattle_1_1_re_l_u_activation_layer.html#af0fab71c3f2b5f95a6965af72b2556c5">cattle::ReLUActivationLayer&lt; Scalar, Rank &gt;</a>, <a class="el" href="classcattle_1_1_softmax_activation_layer.html#ae374b9b972b3546c45285dd0a950a385">cattle::SoftmaxActivationLayer&lt; Scalar, Rank &gt;</a>, <a class="el" href="classcattle_1_1_tanh_activation_layer.html#ac0ad135f564d05992df9b5a16ce82488">cattle::TanhActivationLayer&lt; Scalar, Rank &gt;</a>, <a class="el" href="classcattle_1_1_sigmoid_activation_layer.html#aeaf86dd9e12e5f7eb3f8157feb82cd29">cattle::SigmoidActivationLayer&lt; Scalar, Rank &gt;</a>, <a class="el" href="classcattle_1_1_binary_step_activation_layer.html#ade3b81d5146d5576071ea15c8c69eb4f">cattle::BinaryStepActivationLayer&lt; Scalar, Rank &gt;</a>, <a class="el" href="classcattle_1_1_scaling_activation_layer.html#a36a522516fd11100b4dd902cdf67d254">cattle::ScalingActivationLayer&lt; Scalar, Rank &gt;</a>, and <a class="el" href="classcattle_1_1_identity_activation_layer.html#ac53767a90f07ea7aee1a168a868ab57b">cattle::IdentityActivationLayer&lt; Scalar, Rank &gt;</a>.</p>
 
@@ -343,6 +366,7 @@ template&lt;typename Scalar , std::size_t Rank&gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
+<p>It empties the layer's caches such as those required for the derivation of the function represented by the layer. </p>
 
 <p>Implements <a class="el" href="classcattle_1_1_layer.html#ae3d00e9fb6079e4b4990b3a14625a93d">cattle::Layer&lt; Scalar, Rank &gt;</a>.</p>
 
@@ -372,6 +396,7 @@ template&lt;typename Scalar , std::size_t Rank&gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
+<p>It applies constraints such as max-norm to the parameters of the layer if applicable. </p>
 
 <p>Implements <a class="el" href="classcattle_1_1_layer.html#ac74dd19ed2f3a253cfbb1d1785f56197">cattle::Layer&lt; Scalar, Rank &gt;</a>.</p>
 
@@ -401,6 +426,8 @@ template&lt;typename Scalar , std::size_t Rank&gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
+<p>A simple constant getter method for the input dimensionality of the layer.</p>
+<dl class="section return"><dt>Returns</dt><dd>A constant reference to the member variable denoting the dimensions of the tensors accepted by the layer as its input (except for the first rank which denotes the variable sample size). </dd></dl>
 
 <p>Implements <a class="el" href="classcattle_1_1_layer.html#a2a4b826fb2b9eb1337a8458aca134f64">cattle::Layer&lt; Scalar, Rank &gt;</a>.</p>
 
@@ -430,6 +457,8 @@ template&lt;typename Scalar , std::size_t Rank&gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
+<p>A simple constant getter method for the output dimensionality of the layer.</p>
+<dl class="section return"><dt>Returns</dt><dd>A constant reference to the member variable denoting the dimensions of the tensors output by the layer along all ranks except the first one. </dd></dl>
 
 <p>Implements <a class="el" href="classcattle_1_1_layer.html#a0ede1fbe46eab83f70e16a75ba0991e9">cattle::Layer&lt; Scalar, Rank &gt;</a>.</p>
 
@@ -459,6 +488,8 @@ template&lt;typename Scalar , std::size_t Rank&gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
+<p>It returns a reference to the gradients of the learnable parameters of the layer.</p>
+<dl class="section return"><dt>Returns</dt><dd>A non-constant reference to the gradients of the parameters of the layer. </dd></dl>
 
 <p>Implements <a class="el" href="classcattle_1_1_layer.html#aa66fc1380d7446d77a3980c4006e7532">cattle::Layer&lt; Scalar, Rank &gt;</a>.</p>
 
@@ -488,6 +519,8 @@ template&lt;typename Scalar , std::size_t Rank&gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
+<p>It returns a reference to the learnable parameters of the layer.</p>
+<dl class="section return"><dt>Returns</dt><dd>A non-constant reference to the parameters of the layer that are to be learned. </dd></dl>
 
 <p>Implements <a class="el" href="classcattle_1_1_layer.html#abd799a16024c5aee49dbc0a5fe2f3183">cattle::Layer&lt; Scalar, Rank &gt;</a>.</p>
 
@@ -517,6 +550,7 @@ template&lt;typename Scalar , std::size_t Rank&gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
+<p>It initializes the layer and its parameters. </p>
 
 <p>Implements <a class="el" href="classcattle_1_1_layer.html#aae8baf56035b9c2130eec90881e27bad">cattle::Layer&lt; Scalar, Rank &gt;</a>.</p>
 
@@ -548,6 +582,8 @@ template&lt;typename Scalar , std::size_t Rank&gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
+<p>A constant method that returns whether this layer functions as an input layer. An input layer does not need to propagate the gradients all the way during the backward pass as it is assumed that no other layer needs them derive the gradients on its parameters. It is therefore possible for an input layer to simply return a null tensor as the output of its backward pass.</p>
+<dl class="section return"><dt>Returns</dt><dd>Whether this layer is the input layer of the neural network that contains it. </dd></dl>
 
 <p>Reimplemented from <a class="el" href="classcattle_1_1_layer.html#a65bfa4d93279548dad4e57d7f03cbd51">cattle::Layer&lt; Scalar, Rank &gt;</a>.</p>
 
@@ -578,6 +614,14 @@ template&lt;typename Scalar , std::size_t Rank&gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
+<p>It back-propagates the derivative of the error function w.r.t. the output of the layer updating the gradients of its learnable parameters along the way.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">out_grads</td><td>The derivative of the loss function w.r.t. the output of the layer </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>The derivative of the loss function w.r.t. the output of the previous layer or a null tensor if the layer is an input layer. </dd></dl>
 
 <p>Implements <a class="el" href="classcattle_1_1_layer.html#a10194a9e1de70a94e0e30a4701d14c0f">cattle::Layer&lt; Scalar, Rank &gt;</a>.</p>
 
@@ -618,6 +662,15 @@ template&lt;typename Scalar , std::size_t Rank&gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
+<p>It has the function represented by the layer applied to the input tensor.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">in</td><td>A tensor representing a batch of observations. The observations are of the rank specified by the layer's template parameter and the input tensors rank is one greater. </td></tr>
+    <tr><td class="paramname">training</td><td>Whether the input is to be processed in training or inference mode. If the forward pass is performed in inference mode, the backward pass is not guaranteed to work. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>The output of the function represented by the layer applied to the input tensor. </dd></dl>
 
 <p>Implements <a class="el" href="classcattle_1_1_layer.html#a6c1ea7b25d9f882364b7f2288f02d8da">cattle::Layer&lt; Scalar, Rank &gt;</a>.</p>
 
@@ -648,6 +701,13 @@ template&lt;typename Scalar , std::size_t Rank&gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
+<p>Sets this instance's input layer status to the given value.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">input_layer</td><td>Whether this layer is to be an input layer or not. </td></tr>
+  </table>
+  </dd>
+</dl>
 
 <p>Reimplemented from <a class="el" href="classcattle_1_1_layer.html#a7aafba96b6e30bc67eaef0a9db3ad2e4">cattle::Layer&lt; Scalar, Rank &gt;</a>.</p>
 
