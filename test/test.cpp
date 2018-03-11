@@ -52,9 +52,7 @@ static int test_parallel() {
 	LossSharedPtr<Scalar,RANK,false> loss(new QuadraticLoss<Scalar,RANK,false>());
 	RegPenSharedPtr<Scalar> reg(new ElasticNetRegularizationPenalty<Scalar>());
 	NadamOptimizer<Scalar,RANK,false> opt(loss, reg, 20);
-	std::cout << opt.verify_gradients(pnn, test_prov) << std::endl;
-//	opt.optimize(pnn, training_prov, test_prov, 500);
-	return 0;
+	return opt.verify_gradients(pnn, test_prov);
 }
 
 static int test_residual() {
@@ -117,9 +115,7 @@ static int test_residual() {
 	LossSharedPtr<Scalar,RANK,false> loss(new QuadraticLoss<Scalar,RANK,false>());
 	RegPenSharedPtr<Scalar> reg(new ElasticNetRegularizationPenalty<Scalar>());
 	NadamOptimizer<Scalar,RANK,false> opt(loss, reg, 20);
-	std::cout << opt.verify_gradients(nn, test_prov, 1e-5, 1e-4, 1e-1) << std::endl;
-//	opt.optimize(nn, training_prov, test_prov, 500);
-	return 0;
+	return opt.verify_gradients(nn, test_prov, 1e-5, 1e-4, 1e-1);
 }
 
 static int test_dense() {
@@ -147,9 +143,7 @@ static int test_dense() {
 	LossSharedPtr<Scalar,RANK,false> loss(new QuadraticLoss<Scalar,RANK,false>());
 	RegPenSharedPtr<Scalar> reg(new ElasticNetRegularizationPenalty<Scalar>());
 	NadamOptimizer<Scalar,RANK,false> opt(loss, reg, 20);
-	std::cout << opt.verify_gradients(dnn, test_prov) << std::endl;
-//	opt.optimize(dnn, training_prov, test_prov, 500);
-	return 0;
+	return opt.verify_gradients(dnn, test_prov);
 }
 
 static int test_seqnn() {
@@ -170,15 +164,13 @@ static int test_seqnn() {
 	layers[1] = LayerPtr<Scalar,RANK>(new TanhActivationLayer<Scalar,RANK>(layers[0]->get_output_dims()));
 	layers[2] = LayerPtr<Scalar,RANK>(new ConvLayer<Scalar>(layers[1]->get_output_dims(), 5, init));
 	layers[3] = LayerPtr<Scalar,RANK>(new TanhActivationLayer<Scalar,RANK>(layers[2]->get_output_dims()));
-	layers[4] = LayerPtr<Scalar,RANK>(new FCLayer<Scalar,RANK>(layers[3]->get_output_dims(), 2, init));
+	layers[4] = LayerPtr<Scalar,RANK>(new FCLayer<Scalar,RANK>(layers[3]->get_output_dims(), 4, init));
 	SequentialNeuralNetwork<Scalar,RANK> seqnn(NeuralNetPtr<Scalar,RANK,false>(
 			new FeedforwardNeuralNetwork<Scalar,RANK>(std::move(layers))));
 	LossSharedPtr<Scalar,RANK,true> loss(new QuadraticLoss<Scalar,RANK,true>());
 	RegPenSharedPtr<Scalar> reg(new ElasticNetRegularizationPenalty<Scalar>());
 	NadamOptimizer<Scalar,RANK,true> opt(loss, reg, 20);
-	std::cout << opt.verify_gradients(seqnn, test_prov) << std::endl;
-//	opt.optimize(seqnn, training_prov, test_prov, 500);
-	return 0;
+	return opt.verify_gradients(seqnn, test_prov);
 }
 
 static int test_rnn() {
@@ -207,9 +199,7 @@ static int test_rnn() {
 	LossSharedPtr<Scalar,RANK,true> loss(new QuadraticLoss<Scalar,RANK,true>());
 	RegPenSharedPtr<Scalar> reg(new ElasticNetRegularizationPenalty<Scalar>());
 	NadamOptimizer<Scalar,RANK,true> opt(loss, reg, 20);
-	std::cout << opt.verify_gradients(rnn, test_prov) << std::endl;
-//	opt.optimize(rnn, training_prov, test_prov, 500);
-	return 0;
+	return opt.verify_gradients(rnn, test_prov);
 }
 
 static int test_lstm() {
@@ -248,9 +238,7 @@ static int test_lstm() {
 	LossSharedPtr<Scalar,RANK,true> loss(new QuadraticLoss<Scalar,RANK,true>());
 	RegPenSharedPtr<Scalar> reg(new ElasticNetRegularizationPenalty<Scalar>());
 	NadamOptimizer<Scalar,RANK,true> opt(loss, reg, 20);
-	std::cout << opt.verify_gradients(lstm, test_prov) << std::endl;
-//	opt.optimize(lstm, training_prov, test_prov, 500);
-	return 0;
+	return opt.verify_gradients(lstm, test_prov);
 }
 
 static int test_bdrnn() {
@@ -280,12 +268,10 @@ static int test_bdrnn() {
 	LossSharedPtr<Scalar,RANK,true> loss(new QuadraticLoss<Scalar,RANK,true>());
 	RegPenSharedPtr<Scalar> reg(new ElasticNetRegularizationPenalty<Scalar>());
 	NadamOptimizer<Scalar,RANK,true> opt(loss, reg, 20);
-	std::cout << opt.verify_gradients(bdrnn, test_prov) << std::endl;
-//	opt.optimize(bdrnn, training_prov, test_prov, 500);
-	return 0;
+	return opt.verify_gradients(bdrnn, test_prov);
 }
 
 int main() {
-	assert(test_parallel() | test_residual() | test_dense() | test_seqnn() | test_rnn() | test_lstm() | test_bdrnn());
+	assert(test_parallel() & test_residual() & test_dense() & test_seqnn() & test_rnn() & test_lstm() & test_bdrnn());
 	return 0;
 }

@@ -1,6 +1,6 @@
 MAKE := make -f makefile
 CC := g++
-ARCH := -m32
+ARCH := -m64
 CFLAGS := -std=c++11 -march=native -fopenmp -fmessage-length=0
 DEF_OPT_FLAGS := -O3
 DEBUG_OPT_FLAGS := -g -O0

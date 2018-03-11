@@ -1384,7 +1384,6 @@ private:
 	inline static void* backpropagate(void* args_ptr) {
 		BackpropArgs& args = *((BackpropArgs*) args_ptr);
 		args.prev_out_grads = args.obj->net_rev->backpropagate(*args.out_grads);
-		std::cout << "args.prev_out_grads: " << Utils<Scalar>::template get_dims<Rank + 2>(args.prev_out_grads) << std::endl;
 		return nullptr;
 	}
 };
