@@ -158,7 +158,12 @@ Private Member Functions</h2></td></tr>
 <tr class="memitem:aa11c45cbbacf83cc707d2385e9010fa3"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_utils.html#aa11c45cbbacf83cc707d2385e9010fa3">Utils</a> ()</td></tr>
 <tr class="separator:aa11c45cbbacf83cc707d2385e9010fa3"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
-<h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
+<a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
+<div class="textblock"><h3>template&lt;typename Scalar&gt;<br />
+class cattle::Utils&lt; Scalar &gt;</h3>
+
+<p>A utility class template containing static methods and variables to help with numerical issues, the manipulation of matrices and tensors, and the conversion between tensors and matrices. </p>
+</div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
 <a id="aa11c45cbbacf83cc707d2385e9010fa3"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#aa11c45cbbacf83cc707d2385e9010fa3">&#9670;&nbsp;</a></span>Utils()</h2>
 
@@ -234,6 +239,17 @@ template&lt;typename Scalar&gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
+<p>Returns whether the two numerals are close enough to be considered equal.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">n1</td><td>The first numeral. </td></tr>
+    <tr><td class="paramname">n2</td><td>The second numeral. </td></tr>
+    <tr><td class="paramname">abs_epsilon</td><td>The maximum absolute difference that would still allow them to be considered equal. </td></tr>
+    <tr><td class="paramname">rel_epsilon</td><td>The maximum relative (to the greater numeral of the two) difference that would still allow them to be considered equal. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>Whether the two numerals can be considered equal. </dd></dl>
 
 </div>
 </div>
@@ -264,6 +280,13 @@ template&lt;std::size_t Rank&gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
+<p>It asserts that each rank of the tensor has a size greater than 0.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">tensor</td><td>A constant reference to the tensor to check. </td></tr>
+  </table>
+  </dd>
+</dl>
 
 </div>
 </div>
@@ -314,6 +337,17 @@ template&lt;typename Scalar&gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
+<p>Returns whether a numeral is greater than another one by a margin great enough for them not to be considered almost equal.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">n1</td><td>The first numeral. </td></tr>
+    <tr><td class="paramname">n2</td><td>The second numeral. </td></tr>
+    <tr><td class="paramname">abs_epsilon</td><td>The maximum absolute difference that would still allow them to be considered equal. </td></tr>
+    <tr><td class="paramname">rel_epsilon</td><td>The maximum relative (to the greater numeral of the two) difference that would still allow them to be considered equal. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>Whether the the first numeral is sufficiently greater than the second. </dd></dl>
 
 </div>
 </div>
@@ -364,6 +398,17 @@ template&lt;typename Scalar&gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
+<p>Returns whether a numeral is lesser than another one by a margin great enough for them not to be considered almost equal.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">n1</td><td>The first numeral. </td></tr>
+    <tr><td class="paramname">n2</td><td>The second numeral. </td></tr>
+    <tr><td class="paramname">abs_epsilon</td><td>The maximum absolute difference that would still allow them to be considered equal. </td></tr>
+    <tr><td class="paramname">rel_epsilon</td><td>The maximum relative (to the greater numeral of the two) difference that would still allow them to be considered equal. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>Whether the the first numeral is sufficiently lesser than the second. </dd></dl>
 
 </div>
 </div>
@@ -394,6 +439,14 @@ template&lt;std::size_t Rank&gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
+<p>Returns a <a class="el" href="classcattle_1_1_dimensions.html">Dimensions</a> instance representing the dimensionality of the specified tensor.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">tensor</td><td>A constant reference to the tensor whose dimensionality is to be assessed. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>A <a class="el" href="classcattle_1_1_dimensions.html">Dimensions</a> instance containing the size of the tensor along its ranks. </dd></dl>
 
 </div>
 </div>
@@ -423,6 +476,8 @@ template&lt;std::size_t Rank&gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
+<p>Returns a null tensor without having to create a new instance as long as Rank is in the range [2,5].</p>
+<dl class="section return"><dt>Returns</dt><dd>A constant reference to a tensor of the desired rank with a size of 0 along each rank. </dd></dl>
 
 </div>
 </div>
@@ -473,6 +528,17 @@ template&lt;typename Scalar&gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
+<p>Returns whether a numeral is not lesser than another one by a margin great enough for them not to be considered almost equal.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">n1</td><td>The first numeral. </td></tr>
+    <tr><td class="paramname">n2</td><td>The second numeral. </td></tr>
+    <tr><td class="paramname">abs_epsilon</td><td>The maximum absolute difference that would still allow them to be considered equal. </td></tr>
+    <tr><td class="paramname">rel_epsilon</td><td>The maximum relative (to the greater numeral of the two) difference that would still allow them to be considered equal. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>Whether the the first numeral is sufficiently great enough not to be considered decidedly smaller than the second. </dd></dl>
 
 </div>
 </div>
@@ -503,6 +569,14 @@ template&lt;std::size_t Rank&gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
+<p>It removes the first rank of the tensor and extends the new first rank by a factor equal to the dimensionality of the removed rank.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">tensor</td><td>The tensor whose first two ranks are to be joined. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>The tensor with the first two ranks joined. </dd></dl>
 
 </div>
 </div>
@@ -553,6 +627,17 @@ template&lt;typename Scalar&gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
+<p>Returns whether a numeral is not greater than another one by a margin great enough for them not to be considered almost equal.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">n1</td><td>The first numeral. </td></tr>
+    <tr><td class="paramname">n2</td><td>The second numeral. </td></tr>
+    <tr><td class="paramname">abs_epsilon</td><td>The maximum absolute difference that would still allow them to be considered equal. </td></tr>
+    <tr><td class="paramname">rel_epsilon</td><td>The maximum relative (to the greater numeral of the two) difference that would still allow them to be considered equal. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>Whether the the first numeral is sufficiently small enough not to be considered decidedly greater than the second. </dd></dl>
 
 </div>
 </div>
@@ -593,6 +678,15 @@ template&lt;std::size_t Rank&gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
+<p>It maps the data backing a matrix to a tensor of arbitrary rank.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">mat</td><td>The matrix to map to a tensor. </td></tr>
+    <tr><td class="paramname">dims</td><td>The dimensionality of the tensor to which the matrix is to be mapped. The rank of the dimensions is one less than that of the returned tensor as the size of the tensor along its first rank takes on the number of rows the matrix has. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>A tensor backed by the data of the matrix. </dd></dl>
 
 </div>
 </div>
@@ -623,6 +717,14 @@ template&lt;std::size_t Rank&gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
+<p>It maps the data backing a matrix to a tensor of arbitrary rank with the same dimensionality along its first rank as the number of rows the matrix has and the same dimensionality along its second rank as the number of columns the matrix has.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">mat</td><td>The matrix whose data is to be mapped to a tensor. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>A tensor backed by the data of the matrix. </dd></dl>
 
 </div>
 </div>
@@ -669,6 +771,16 @@ template&lt;std::size_t Rank&gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
+<p>It maps the data backing a tensor to a matrix. The product of the specified number of rows and columns should equal the product of the dimensions of the tensor along its ranks.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">tensor</td><td>The tensor whose data is to be mapped to a matrix. </td></tr>
+    <tr><td class="paramname">rows</td><td>The number of rows the returned matrix is to have. </td></tr>
+    <tr><td class="paramname">cols</td><td>The number of columns the returned matrix is to have. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>A matrix backed by the data of the tensor. </dd></dl>
 
 </div>
 </div>
@@ -699,6 +811,14 @@ template&lt;std::size_t Rank&gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
+<p>It maps the data backing a tensor to a matrix. The number of rows of the returned matrix equals the size of the tensor along its first rank and the number of columns of the matrix equals the product of the sizes of the tensor along its other ranks.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">tensor</td><td>The tensor whose data is to be mapped to a matrix. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>A matrix backed by the data of the tensor. </dd></dl>
 
 </div>
 </div>
@@ -739,6 +859,15 @@ template&lt;std::size_t Rank, std::size_t NewRank&gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
+<p>It maps a tensor to another tensor of arbitrary rank.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">tensor</td><td>The tensor whose backing data is to be mapped onto another tensor. </td></tr>
+    <tr><td class="paramname">dims</td><td>The dimensionality of the new tensor. The volume should equal the total size of the tensor to be mapped. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>A tensor backed by the data of the original tensor. </dd></dl>
 
 </div>
 </div>
@@ -766,6 +895,7 @@ template&lt;typename Scalar&gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
+<dl class="section return"><dt>Returns</dt><dd>The number of threads used by Eigen to accelerate operations supporting multithreading. </dd></dl>
 
 </div>
 </div>
@@ -794,6 +924,12 @@ template&lt;typename Scalar&gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">num_of_threads</td><td>The number of threads Eigen should use to accelerate operations supporting multithreading. </td></tr>
+  </table>
+  </dd>
+</dl>
 
 </div>
 </div>
@@ -822,6 +958,13 @@ template&lt;typename Scalar&gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
+<p>It randomly shuffles the rows of the specified matrix.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">mat</td><td>A reference to the matrix whose rows are to be shuffled. </td></tr>
+  </table>
+  </dd>
+</dl>
 
 </div>
 </div>
@@ -852,6 +995,13 @@ template&lt;std::size_t Rank&gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
+<p>It randomly shuffles the first rank of the tensor.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">tensor</td><td>A reference to the tensor whose first rank is to be shuffled. </td></tr>
+  </table>
+  </dd>
+</dl>
 
 </div>
 </div>
@@ -898,6 +1048,16 @@ template&lt;std::size_t Rank&gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
+<p>It splits the first rank of the tensor into two ranks. The product of the two rank sizes specified must match the size of the tensor's first rank.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">tensor</td><td>The tensor whose first rank is to be split. </td></tr>
+    <tr><td class="paramname">rank0_size</td><td>The size of the new first rank. </td></tr>
+    <tr><td class="paramname">rank1_size</td><td>The size of the new second rank. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>The tensor with the first rank split into two ranks. </dd></dl>
 
 </div>
 </div>

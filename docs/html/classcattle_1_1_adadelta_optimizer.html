@@ -167,7 +167,12 @@ Additional Inherited Members</h2></td></tr>
 <tr class="memitem:a45dd4848eeebfbf4321d517d543dd040 inherit pro_static_methods_classcattle_1_1_optimizer"><td class="memItemLeft" align="right" valign="top">static const void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_optimizer.html#a45dd4848eeebfbf4321d517d543dd040">enforce_constraints</a> (<a class="el" href="classcattle_1_1_layer.html">Layer</a>&lt; Scalar, Rank &gt; &amp;layer)</td></tr>
 <tr class="separator:a45dd4848eeebfbf4321d517d543dd040 inherit pro_static_methods_classcattle_1_1_optimizer"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
-<h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
+<a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
+<div class="textblock"><h3>template&lt;typename Scalar, std::size_t Rank, bool Sequential&gt;<br />
+class cattle::AdadeltaOptimizer&lt; Scalar, Rank, Sequential &gt;</h3>
+
+<p>A class template for the Adadelta optimization algorithm. </p>
+</div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
 <a id="a8c80bcaa07303829a9c6523672d5fa54"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a8c80bcaa07303829a9c6523672d5fa54">&#9670;&nbsp;</a></span>AdadeltaOptimizer()</h2>
 
@@ -221,6 +226,16 @@ template&lt;typename Scalar , std::size_t Rank, bool Sequential&gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">loss</td><td>A shared pointer to the loss function to use. </td></tr>
+    <tr><td class="paramname">reg</td><td>A shared pointer to the regularization penalty to use. </td></tr>
+    <tr><td class="paramname">batch_size</td><td>The batch size to use for training and testing. It is expected to be greater than 0. </td></tr>
+    <tr><td class="paramname">decay</td><td>The decay rate of the accelerated accumulated parameter gradients. It is expected to be in the range [0,1]. The greater it is, the faster the accumulated gradients decay. </td></tr>
+    <tr><td class="paramname">epsilon</td><td>A small constant used to maintain numerical stability. </td></tr>
+  </table>
+  </dd>
+</dl>
 
 </div>
 </div>
@@ -250,6 +265,13 @@ template&lt;typename Scalar , std::size_t Rank, bool Sequential&gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
+<p>It fits the optimizer to the neural network. It allows optimizers with individual learning rates for each parameter to set up their necessary internal data structures.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">net</td><td>A reference to the neural network that is to be optimized. </td></tr>
+  </table>
+  </dd>
+</dl>
 
 <p>Implements <a class="el" href="classcattle_1_1_optimizer.html#a5ea3b9b9173bf065c6d3f3978b57b823">cattle::Optimizer&lt; Scalar, Rank, Sequential &gt;</a>.</p>
 
@@ -296,6 +318,15 @@ template&lt;typename Scalar , std::size_t Rank, bool Sequential&gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
+<p>It updates the parameters of the specified layer based on their gradients after back-propagation.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">layer</td><td>A reference to the layer whose parameters are to be updated. </td></tr>
+    <tr><td class="paramname">i</td><td>The index of the layer. </td></tr>
+    <tr><td class="paramname">epoch</td><td>The index of the epoch. </td></tr>
+  </table>
+  </dd>
+</dl>
 
 <p>Implements <a class="el" href="classcattle_1_1_s_g_d_optimizer.html#a79317598e4426c479f42f8272d7c4689">cattle::SGDOptimizer&lt; Scalar, Rank, Sequential &gt;</a>.</p>
 

@@ -144,7 +144,8 @@ protected:
 };
 
 /**
- * An alias for a shared pointer to a WeightInitialization implementation instance.
+ * An alias for a shared pointer to a WeightInitialization implementation instance of
+ * an arbitrary scalar type.
  */
 template<typename Scalar>
 using WeightInitSharedPtr = std::shared_ptr<WeightInitialization<Scalar>>;
@@ -1244,7 +1245,7 @@ protected:
 };
 
 /**
- * A class template for a batch normalization layer for all but multi-channel input tensors.
+ * A class template for a batch normalization layer.
  */
 template<typename Scalar, std::size_t Rank>
 class BatchNormLayer : public BatchNormLayerBase<Scalar,Rank> {

@@ -126,10 +126,10 @@ Public Member Functions</h2></td></tr>
 <tr class="separator:a1c17b2e69961587d9629ed8a68123368"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a9e6bae99ee6170cb7d7c255ec8cbb44e"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classcattle_1_1_parallel_neural_network.html#a3134866b904a35a6832e245dc9c2145c">Base</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_parallel_neural_network.html#a9e6bae99ee6170cb7d7c255ec8cbb44e">clone</a> () const</td></tr>
 <tr class="separator:a9e6bae99ee6170cb7d7c255ec8cbb44e"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a9f0e446e86946d6dd4f65dbe6ab0c9d2"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classcattle_1_1_neural_network.html#ac53724869b4f3d635f89312c7a992139">Base::Dims</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_parallel_neural_network.html#a9f0e446e86946d6dd4f65dbe6ab0c9d2">get_input_dims</a> () const</td></tr>
-<tr class="separator:a9f0e446e86946d6dd4f65dbe6ab0c9d2"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a706fa55820e6743a7dfa7f908b7407af"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classcattle_1_1_neural_network.html#ac53724869b4f3d635f89312c7a992139">Base::Dims</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_parallel_neural_network.html#a706fa55820e6743a7dfa7f908b7407af">get_output_dims</a> () const</td></tr>
-<tr class="separator:a706fa55820e6743a7dfa7f908b7407af"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a50e670d08db97a4c1bba877123fece64"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="classcattle_1_1_neural_network.html#ac53724869b4f3d635f89312c7a992139">Base::Dims</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_parallel_neural_network.html#a50e670d08db97a4c1bba877123fece64">get_input_dims</a> () const</td></tr>
+<tr class="separator:a50e670d08db97a4c1bba877123fece64"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a07ce0e3a05e3b1022b3e8f1cfcdd41cf"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="classcattle_1_1_neural_network.html#ac53724869b4f3d635f89312c7a992139">Base::Dims</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_parallel_neural_network.html#a07ce0e3a05e3b1022b3e8f1cfcdd41cf">get_output_dims</a> () const</td></tr>
+<tr class="separator:a07ce0e3a05e3b1022b3e8f1cfcdd41cf"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="inherit_header pub_methods_classcattle_1_1_neural_network"><td colspan="2" onclick="javascript:toggleInherit('pub_methods_classcattle_1_1_neural_network')"><img src="closed.png" alt="-"/>&#160;Public Member Functions inherited from <a class="el" href="classcattle_1_1_neural_network.html">cattle::NeuralNetwork&lt; Scalar, Rank, false &gt;</a></td></tr>
 <tr class="memitem:a334880e27677f0360c86dec07a745cbb inherit pub_methods_classcattle_1_1_neural_network"><td class="memItemLeft" align="right" valign="top">virtual&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_neural_network.html#a334880e27677f0360c86dec07a745cbb">~NeuralNetwork</a> ()=default</td></tr>
 <tr class="separator:a334880e27677f0360c86dec07a745cbb inherit pub_methods_classcattle_1_1_neural_network"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -220,7 +220,12 @@ Additional Inherited Members</h2></td></tr>
 <tr class="memitem:a0b8194350bbd1abc1c9118b3d34fede4 inherit pro_static_attribs_classcattle_1_1_neural_network"><td class="memItemLeft" align="right" valign="top">static constexpr std::size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_neural_network.html#a0b8194350bbd1abc1c9118b3d34fede4">DATA_RANKS</a></td></tr>
 <tr class="separator:a0b8194350bbd1abc1c9118b3d34fede4 inherit pro_static_attribs_classcattle_1_1_neural_network"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
-<h2 class="groupheader">Member Typedef Documentation</h2>
+<a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
+<div class="textblock"><h3>template&lt;typename Scalar, std::size_t Rank&gt;<br />
+class cattle::ParallelNeuralNetwork&lt; Scalar, Rank &gt;</h3>
+
+<p>A class template for a parallel neural network that consists of one or more lanes of non-sequential neural networks with the same input dimensions. Inputs and gradients are propagated through the lanes simultaneously using multithreading. The outputs of the lanes are merged by concatenation (either along the lowest or hightest rank) or summation. </p>
+</div><h2 class="groupheader">Member Typedef Documentation</h2>
 <a id="a3134866b904a35a6832e245dc9c2145c"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a3134866b904a35a6832e245dc9c2145c">&#9670;&nbsp;</a></span>Base</h2>
 
@@ -331,6 +336,7 @@ template&lt;typename Scalar , std::size_t Rank&gt; </div>
         </tr>
       </table>
 </div><div class="memdoc">
+<p>An enumeration type for the different ways the outputs of the lanes of the parallel network may be merged. </p>
 <table class="fieldtable">
 <tr><th colspan="2">Enumerator</th></tr><tr><td class="fieldname"><a id="ab31baa148459bc8fe71917adacb93c8ea4505c17abf8ec36c3167f0b8af5005e2"></a>CONCAT_LO_RANK&#160;</td><td class="fielddoc"></td></tr>
 <tr><td class="fieldname"><a id="ab31baa148459bc8fe71917adacb93c8ea03a361e36cea233ff2f57d4598cc338b"></a>CONCAT_HI_RANK&#160;</td><td class="fielddoc"></td></tr>
@@ -381,6 +387,14 @@ template&lt;typename Scalar , std::size_t Rank&gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">lanes</td><td>A vector of unique pointers to non-sequential neural networks. </td></tr>
+    <tr><td class="paramname">merge_type</td><td>The fashion in which the outputs of the lanes are to be merged. </td></tr>
+    <tr><td class="paramname">foremost</td><td>Whether the network is to function as a foremost network. </td></tr>
+  </table>
+  </dd>
+</dl>
 
 </div>
 </div>
@@ -419,6 +433,13 @@ template&lt;typename Scalar , std::size_t Rank&gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">lane</td><td>A unique pointer to a non-sequential neural network. </td></tr>
+    <tr><td class="paramname">foremost</td><td>Whether the network is to function as a foremost network. </td></tr>
+  </table>
+  </dd>
+</dl>
 
 </div>
 </div>
@@ -531,6 +552,14 @@ template&lt;typename Scalar , std::size_t Rank&gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
+<p>It back-propagates the derivative of the loss function w.r.t. the output of the network through its layers updating the gradients on their parameters.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">out_grads</td><td>The derivative of the loss function w.r.t. the output of the network. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>The derivative of the loss function w.r.t. the input of the network or a null tensor if the network is a foremost network. </dd></dl>
 
 <p>Implements <a class="el" href="classcattle_1_1_neural_network.html#ae4fd8a1e33b0d9cbb975a6ee5c41fa6c">cattle::NeuralNetwork&lt; Scalar, Rank, false &gt;</a>.</p>
 
@@ -561,6 +590,13 @@ template&lt;typename Scalar , std::size_t Rank&gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
+<p>The back-propagation function executed in a different thread for each lane of a parallel network.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">args_ptr</td><td>The back-propagation argument struct containing all necessary information. </td></tr>
+  </table>
+  </dd>
+</dl>
 
 </div>
 </div>
@@ -588,6 +624,8 @@ template&lt;typename Scalar , std::size_t Rank&gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
+<p>A constant method implementing the clone pattern.</p>
+<dl class="section return"><dt>Returns</dt><dd>A pointer to a copy of the instance. The instance does not take ownership of the returned pointer (i.e. the caller is responsible for deleting it). </dd></dl>
 
 <p>Implements <a class="el" href="classcattle_1_1_neural_network.html#a2abd58d4e18caa4ae95563da19c8338b">cattle::NeuralNetwork&lt; Scalar, Rank, false &gt;</a>.</p>
 
@@ -618,6 +656,14 @@ template&lt;typename Scalar , std::size_t Rank&gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
+<p>Creates a size-1 vector out of the specified unique pointer.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">net</td><td>A unique pointer to the single non-sequential neural network lane. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>A vector of size 1 containing the unique pointer. </dd></dl>
 
 </div>
 </div>
@@ -645,13 +691,14 @@ template&lt;typename Scalar , std::size_t Rank&gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
+<p>Empties the caches of every layer of the network. </p>
 
 <p>Implements <a class="el" href="classcattle_1_1_neural_network.html#a9ca6f92bd8f0f284d05ed4fef5af55ca">cattle::NeuralNetwork&lt; Scalar, Rank, false &gt;</a>.</p>
 
 </div>
 </div>
-<a id="a9f0e446e86946d6dd4f65dbe6ab0c9d2"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a9f0e446e86946d6dd4f65dbe6ab0c9d2">&#9670;&nbsp;</a></span>get_input_dims()</h2>
+<a id="a50e670d08db97a4c1bba877123fece64"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a50e670d08db97a4c1bba877123fece64">&#9670;&nbsp;</a></span>get_input_dims()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -662,7 +709,7 @@ template&lt;typename Scalar , std::size_t Rank&gt; </div>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="classcattle_1_1_neural_network.html#ac53724869b4f3d635f89312c7a992139">Base::Dims</a> <a class="el" href="classcattle_1_1_parallel_neural_network.html">cattle::ParallelNeuralNetwork</a>&lt; Scalar, Rank &gt;::get_input_dims </td>
+          <td class="memname">const <a class="el" href="classcattle_1_1_neural_network.html#ac53724869b4f3d635f89312c7a992139">Base::Dims</a>&amp; <a class="el" href="classcattle_1_1_parallel_neural_network.html">cattle::ParallelNeuralNetwork</a>&lt; Scalar, Rank &gt;::get_input_dims </td>
           <td>(</td>
           <td class="paramname"></td><td>)</td>
           <td> const</td>
@@ -674,8 +721,9 @@ template&lt;typename Scalar , std::size_t Rank&gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
+<dl class="section return"><dt>Returns</dt><dd>A constant reference to the member variable denoting the dimensions of the tensors accepted by the network as its input along (except for the first rank which denotes the variable sample size and in case of sequential networks the second rank which denotes the variable time steps). </dd></dl>
 
-<p>Implements <a class="el" href="classcattle_1_1_neural_network.html#a7025f8746ff856fc449d47168be69703">cattle::NeuralNetwork&lt; Scalar, Rank, false &gt;</a>.</p>
+<p>Implements <a class="el" href="classcattle_1_1_neural_network.html#acbea7d3cad12acbd2728e092acba4a25">cattle::NeuralNetwork&lt; Scalar, Rank, false &gt;</a>.</p>
 
 </div>
 </div>
@@ -703,13 +751,14 @@ template&lt;typename Scalar , std::size_t Rank&gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
+<dl class="section return"><dt>Returns</dt><dd>A vector of pointers to the layers of the network. The ownership of the layers remains with the network. </dd></dl>
 
 <p>Implements <a class="el" href="classcattle_1_1_neural_network.html#a297039d2fff23643c9b73da7b4bb686c">cattle::NeuralNetwork&lt; Scalar, Rank, false &gt;</a>.</p>
 
 </div>
 </div>
-<a id="a706fa55820e6743a7dfa7f908b7407af"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a706fa55820e6743a7dfa7f908b7407af">&#9670;&nbsp;</a></span>get_output_dims()</h2>
+<a id="a07ce0e3a05e3b1022b3e8f1cfcdd41cf"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a07ce0e3a05e3b1022b3e8f1cfcdd41cf">&#9670;&nbsp;</a></span>get_output_dims()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -720,7 +769,7 @@ template&lt;typename Scalar , std::size_t Rank&gt; </div>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="classcattle_1_1_neural_network.html#ac53724869b4f3d635f89312c7a992139">Base::Dims</a> <a class="el" href="classcattle_1_1_parallel_neural_network.html">cattle::ParallelNeuralNetwork</a>&lt; Scalar, Rank &gt;::get_output_dims </td>
+          <td class="memname">const <a class="el" href="classcattle_1_1_neural_network.html#ac53724869b4f3d635f89312c7a992139">Base::Dims</a>&amp; <a class="el" href="classcattle_1_1_parallel_neural_network.html">cattle::ParallelNeuralNetwork</a>&lt; Scalar, Rank &gt;::get_output_dims </td>
           <td>(</td>
           <td class="paramname"></td><td>)</td>
           <td> const</td>
@@ -732,8 +781,9 @@ template&lt;typename Scalar , std::size_t Rank&gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
+<dl class="section return"><dt>Returns</dt><dd>A constant reference to the member variable denoting the dimensions of the tensors output by the network (except for the first rank which denotes the variable sample size and in case of sequential networks the second rank which denotes the variable time steps). </dd></dl>
 
-<p>Implements <a class="el" href="classcattle_1_1_neural_network.html#a3a73e500e93a113a3142c558231e99d0">cattle::NeuralNetwork&lt; Scalar, Rank, false &gt;</a>.</p>
+<p>Implements <a class="el" href="classcattle_1_1_neural_network.html#abae4c549cee2b29c2b6e072ce0314303">cattle::NeuralNetwork&lt; Scalar, Rank, false &gt;</a>.</p>
 
 </div>
 </div>
@@ -761,6 +811,7 @@ template&lt;typename Scalar , std::size_t Rank&gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
+<dl class="section return"><dt>Returns</dt><dd>Whether the instance is a foremost network. If the instance is not a stand-alone network and it is not the first module of a complex network, it is not a foremost network. Foremost networks do not need to back-propagate the gradients all the way given that no other network is expected to depend on them. </dd></dl>
 
 <p>Implements <a class="el" href="classcattle_1_1_neural_network.html#a5dadb8900281afff9167f02b2d75c86a">cattle::NeuralNetwork&lt; Scalar, Rank, false &gt;</a>.</p>
 
@@ -829,6 +880,15 @@ template&lt;typename Scalar , std::size_t Rank&gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
+<p>It propagates the input tensor through the network and outputs its prediction.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">input</td><td>The input tensor to propagate through. </td></tr>
+    <tr><td class="paramname">training</td><td>Whether the input is to be propagated in training mode or not. Propagating the input in training mode may be more time and memory consuming, but is a prerequisite of back-propagation. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>The output tensor of the network in response to the input. </dd></dl>
 
 <p>Implements <a class="el" href="classcattle_1_1_neural_network.html#a6ade9cd95110766ff25e7b157c9fddcf">cattle::NeuralNetwork&lt; Scalar, Rank, false &gt;</a>.</p>
 
@@ -859,6 +919,13 @@ template&lt;typename Scalar , std::size_t Rank&gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
+<p>The propagation function executed in a different thread for each lane of a parallel network.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">args_ptr</td><td>The propagation argument struct containing all necessary information. </td></tr>
+  </table>
+  </dd>
+</dl>
 
 </div>
 </div>
@@ -887,6 +954,13 @@ template&lt;typename Scalar , std::size_t Rank&gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
+<p>Sets the foremost status of the network.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">foremost</td><td>Whether the network is to function as a foremost network. </td></tr>
+  </table>
+  </dd>
+</dl>
 
 <p>Implements <a class="el" href="classcattle_1_1_neural_network.html#ae417618e6c761cf7630f24dff2d3568a">cattle::NeuralNetwork&lt; Scalar, Rank, false &gt;</a>.</p>
 

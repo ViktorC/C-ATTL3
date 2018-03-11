@@ -175,7 +175,12 @@ Additional Inherited Members</h2></td></tr>
 <tr class="memitem:a3716158bae6f92c7dd917d2ad804fafa inherit pro_attribs_classcattle_1_1_optimizer"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="namespacecattle.html#a5fa4a5f7df1ad35afbadd9975ec24a12">LossSharedPtr</a>&lt; Scalar, Rank, Sequential &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_optimizer.html#a3716158bae6f92c7dd917d2ad804fafa">loss</a></td></tr>
 <tr class="separator:a3716158bae6f92c7dd917d2ad804fafa inherit pro_attribs_classcattle_1_1_optimizer"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
-<h2 class="groupheader">Member Typedef Documentation</h2>
+<a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
+<div class="textblock"><h3>template&lt;typename Scalar, std::size_t Rank, bool Sequential&gt;<br />
+class cattle::NesterovMomentumAcceleratedSGDOptimizer&lt; Scalar, Rank, Sequential &gt;</h3>
+
+<p>A class template for Nesterov momentum accelerated SGD optimizers. </p>
+</div><h2 class="groupheader">Member Typedef Documentation</h2>
 <a id="a8b30fb5b03b8c3f962d970d9ed5246c8"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a8b30fb5b03b8c3f962d970d9ed5246c8">&#9670;&nbsp;</a></span>Base</h2>
 
@@ -260,6 +265,17 @@ template&lt;typename Scalar , std::size_t Rank, bool Sequential&gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">loss</td><td>A shared pointer to the loss function to use. </td></tr>
+    <tr><td class="paramname">reg</td><td>A shared pointer to the regularization penalty to use. </td></tr>
+    <tr><td class="paramname">batch_size</td><td>The batch size to use for training and testing. It is expected to be greater than 0. </td></tr>
+    <tr><td class="paramname">init_learning_rate</td><td>The initial learning rate (a.k.a. step size) to use. It is expected to be greater than 0. </td></tr>
+    <tr><td class="paramname">annealing_rate</td><td>The rate at which the learning rate is to be annealed. It is expected to be greater than or equal to 0. The greater it is, the faster the learning rate decreases. </td></tr>
+    <tr><td class="paramname">momentum</td><td>The momentum rate to use. The greater the momentum, the lesser the effect of newer gradients. It is expected to be greater than 0 and less than 1. </td></tr>
+  </table>
+  </dd>
+</dl>
 
 </div>
 </div>
@@ -305,6 +321,15 @@ template&lt;typename Scalar , std::size_t Rank, bool Sequential&gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
+<p>It updates the parameters of the specified layer based on their gradients after back-propagation.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">layer</td><td>A reference to the layer whose parameters are to be updated. </td></tr>
+    <tr><td class="paramname">i</td><td>The index of the layer. </td></tr>
+    <tr><td class="paramname">epoch</td><td>The index of the epoch. </td></tr>
+  </table>
+  </dd>
+</dl>
 
 <p>Reimplemented from <a class="el" href="classcattle_1_1_momentum_accelerated_s_g_d_optimizer.html#a95941f89564f5f20de746fe52be6eb40">cattle::MomentumAcceleratedSGDOptimizer&lt; Scalar, Rank, Sequential &gt;</a>.</p>
 

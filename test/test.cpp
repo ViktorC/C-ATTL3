@@ -117,7 +117,7 @@ static int test_residual() {
 	LossSharedPtr<Scalar,RANK,false> loss(new QuadraticLoss<Scalar,RANK,false>());
 	RegPenSharedPtr<Scalar> reg(new ElasticNetRegularizationPenalty<Scalar>());
 	NadamOptimizer<Scalar,RANK,false> opt(loss, reg, 20);
-	std::cout << opt.verify_gradients(nn, test_prov) << std::endl;
+	std::cout << opt.verify_gradients(nn, test_prov, 1e-5, 1e-4, 1e-1) << std::endl;
 //	opt.optimize(nn, training_prov, test_prov, 500);
 	return 0;
 }
@@ -286,5 +286,6 @@ static int test_bdrnn() {
 }
 
 int main() {
-	return test_lstm();
+	assert(test_parallel() | test_residual() | test_dense() | test_seqnn() | test_rnn() | test_lstm() | test_bdrnn());
+	return 0;
 }

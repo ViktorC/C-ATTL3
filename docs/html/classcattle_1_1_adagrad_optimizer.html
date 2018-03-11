@@ -114,10 +114,8 @@ Public Member Functions</h2></td></tr>
 Protected Member Functions</h2></td></tr>
 <tr class="memitem:ae400b62713d31b250e142514fd0626c4"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_adagrad_optimizer.html#ae400b62713d31b250e142514fd0626c4">fit</a> (<a class="el" href="classcattle_1_1_neural_network.html">NeuralNetwork</a>&lt; Scalar, Rank, Sequential &gt; &amp;net)</td></tr>
 <tr class="separator:ae400b62713d31b250e142514fd0626c4"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a1cd5184ad787389d4c7e400c12e7a4b2"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_adagrad_optimizer.html#a1cd5184ad787389d4c7e400c12e7a4b2">update_acc_weight_grad_sqrs</a> (<a class="el" href="namespacecattle.html#a1d78623a47279d516750a44dbad6090b">Matrix</a>&lt; Scalar &gt; &amp;acc_weight_grad_sqrs, const <a class="el" href="namespacecattle.html#a1d78623a47279d516750a44dbad6090b">Matrix</a>&lt; Scalar &gt; &amp;param_grads)</td></tr>
-<tr class="separator:a1cd5184ad787389d4c7e400c12e7a4b2"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ac87dde412a9adbde434b314116f82c1c"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_adagrad_optimizer.html#ac87dde412a9adbde434b314116f82c1c">update_acc_batch_norm_grad_sqrs</a> (<a class="el" href="namespacecattle.html#a3ac7e197e90e292a2db6b2d94f46befa">RowVector</a>&lt; Scalar &gt; &amp;acc_batch_norm_grad_sqrs, const <a class="el" href="namespacecattle.html#a3ac7e197e90e292a2db6b2d94f46befa">RowVector</a>&lt; Scalar &gt; &amp;batch_norm_grads)</td></tr>
-<tr class="separator:ac87dde412a9adbde434b314116f82c1c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:afaab4b4d4641b73841e19f709e51f5a0"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_adagrad_optimizer.html#afaab4b4d4641b73841e19f709e51f5a0">update_acc_param_grad_sqrs</a> (<a class="el" href="namespacecattle.html#a1d78623a47279d516750a44dbad6090b">Matrix</a>&lt; Scalar &gt; &amp;acc_param_grad_sqrs, const <a class="el" href="namespacecattle.html#a1d78623a47279d516750a44dbad6090b">Matrix</a>&lt; Scalar &gt; &amp;param_grads)</td></tr>
+<tr class="separator:afaab4b4d4641b73841e19f709e51f5a0"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a4932d1b497bf3a9185bd35ae05eecb87"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_adagrad_optimizer.html#a4932d1b497bf3a9185bd35ae05eecb87">update_params</a> (<a class="el" href="classcattle_1_1_layer.html">Layer</a>&lt; Scalar, Rank &gt; &amp;layer, unsigned i, unsigned epoch)</td></tr>
 <tr class="separator:a4932d1b497bf3a9185bd35ae05eecb87"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="inherit_header pro_methods_classcattle_1_1_s_g_d_optimizer"><td colspan="2" onclick="javascript:toggleInherit('pro_methods_classcattle_1_1_s_g_d_optimizer')"><img src="closed.png" alt="-"/>&#160;Protected Member Functions inherited from <a class="el" href="classcattle_1_1_s_g_d_optimizer.html">cattle::SGDOptimizer&lt; Scalar, Rank, Sequential &gt;</a></td></tr>
@@ -168,7 +166,12 @@ Additional Inherited Members</h2></td></tr>
 <tr class="memitem:a45dd4848eeebfbf4321d517d543dd040 inherit pro_static_methods_classcattle_1_1_optimizer"><td class="memItemLeft" align="right" valign="top">static const void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_optimizer.html#a45dd4848eeebfbf4321d517d543dd040">enforce_constraints</a> (<a class="el" href="classcattle_1_1_layer.html">Layer</a>&lt; Scalar, Rank &gt; &amp;layer)</td></tr>
 <tr class="separator:a45dd4848eeebfbf4321d517d543dd040 inherit pro_static_methods_classcattle_1_1_optimizer"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
-<h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
+<a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
+<div class="textblock"><h3>template&lt;typename Scalar, std::size_t Rank, bool Sequential&gt;<br />
+class cattle::AdagradOptimizer&lt; Scalar, Rank, Sequential &gt;</h3>
+
+<p>A class template for the Adagrad optimization algorithm. </p>
+</div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
 <a id="ae97c2620045c5de6ff37ae41759119ae"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#ae97c2620045c5de6ff37ae41759119ae">&#9670;&nbsp;</a></span>AdagradOptimizer()</h2>
 
@@ -222,6 +225,16 @@ template&lt;typename Scalar , std::size_t Rank, bool Sequential&gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">loss</td><td>A shared pointer to the loss function to use. </td></tr>
+    <tr><td class="paramname">reg</td><td>A shared pointer to the regularization penalty to use. </td></tr>
+    <tr><td class="paramname">batch_size</td><td>The batch size to use for training and testing. It is expected to be greater than 0. </td></tr>
+    <tr><td class="paramname">learning_rate</td><td>The learning rate (a.k.a. step size) to use. It is expected to be greater than 0. </td></tr>
+    <tr><td class="paramname">epsilon</td><td>A small constant used to maintain numerical stability. </td></tr>
+  </table>
+  </dd>
+</dl>
 
 </div>
 </div>
@@ -278,13 +291,20 @@ template&lt;typename Scalar , std::size_t Rank, bool Sequential&gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
+<p>It fits the optimizer to the neural network. It allows optimizers with individual learning rates for each parameter to set up their necessary internal data structures.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">net</td><td>A reference to the neural network that is to be optimized. </td></tr>
+  </table>
+  </dd>
+</dl>
 
 <p>Implements <a class="el" href="classcattle_1_1_optimizer.html#a5ea3b9b9173bf065c6d3f3978b57b823">cattle::Optimizer&lt; Scalar, Rank, Sequential &gt;</a>.</p>
 
 </div>
 </div>
-<a id="ac87dde412a9adbde434b314116f82c1c"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ac87dde412a9adbde434b314116f82c1c">&#9670;&nbsp;</a></span>update_acc_batch_norm_grad_sqrs()</h2>
+<a id="afaab4b4d4641b73841e19f709e51f5a0"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#afaab4b4d4641b73841e19f709e51f5a0">&#9670;&nbsp;</a></span>update_acc_param_grad_sqrs()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -295,50 +315,10 @@ template&lt;typename Scalar , std::size_t Rank, bool Sequential&gt; </div>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">virtual void <a class="el" href="classcattle_1_1_adagrad_optimizer.html">cattle::AdagradOptimizer</a>&lt; Scalar, Rank, Sequential &gt;::update_acc_batch_norm_grad_sqrs </td>
-          <td>(</td>
-          <td class="paramtype"><a class="el" href="namespacecattle.html#a3ac7e197e90e292a2db6b2d94f46befa">RowVector</a>&lt; Scalar &gt; &amp;&#160;</td>
-          <td class="paramname"><em>acc_batch_norm_grad_sqrs</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">const <a class="el" href="namespacecattle.html#a3ac7e197e90e292a2db6b2d94f46befa">RowVector</a>&lt; Scalar &gt; &amp;&#160;</td>
-          <td class="paramname"><em>batch_norm_grads</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">protected</span><span class="mlabel">virtual</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Reimplemented in <a class="el" href="classcattle_1_1_r_m_s_prop_optimizer.html#a91875e8497ac3b01f88985b87c38d58e">cattle::RMSPropOptimizer&lt; Scalar, Rank, Sequential &gt;</a>.</p>
-
-</div>
-</div>
-<a id="a1cd5184ad787389d4c7e400c12e7a4b2"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a1cd5184ad787389d4c7e400c12e7a4b2">&#9670;&nbsp;</a></span>update_acc_weight_grad_sqrs()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<div class="memtemplate">
-template&lt;typename Scalar , std::size_t Rank, bool Sequential&gt; </div>
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">virtual void <a class="el" href="classcattle_1_1_adagrad_optimizer.html">cattle::AdagradOptimizer</a>&lt; Scalar, Rank, Sequential &gt;::update_acc_weight_grad_sqrs </td>
+          <td class="memname">virtual void <a class="el" href="classcattle_1_1_adagrad_optimizer.html">cattle::AdagradOptimizer</a>&lt; Scalar, Rank, Sequential &gt;::update_acc_param_grad_sqrs </td>
           <td>(</td>
           <td class="paramtype"><a class="el" href="namespacecattle.html#a1d78623a47279d516750a44dbad6090b">Matrix</a>&lt; Scalar &gt; &amp;&#160;</td>
-          <td class="paramname"><em>acc_weight_grad_sqrs</em>, </td>
+          <td class="paramname"><em>acc_param_grad_sqrs</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -358,8 +338,16 @@ template&lt;typename Scalar , std::size_t Rank, bool Sequential&gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
+<p>It updates the accumulated squared parameter gradients.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">acc_param_grad_sqrs</td><td>The accumulated squared parameter gradients. </td></tr>
+    <tr><td class="paramname">param_grads</td><td>The new parameter gradients. </td></tr>
+  </table>
+  </dd>
+</dl>
 
-<p>Reimplemented in <a class="el" href="classcattle_1_1_r_m_s_prop_optimizer.html#aaa99d2e02a6ff0fd15810fcebdd47cdb">cattle::RMSPropOptimizer&lt; Scalar, Rank, Sequential &gt;</a>.</p>
+<p>Reimplemented in <a class="el" href="classcattle_1_1_r_m_s_prop_optimizer.html#a91bd6fc15570231db85c4577a01fab32">cattle::RMSPropOptimizer&lt; Scalar, Rank, Sequential &gt;</a>.</p>
 
 </div>
 </div>
@@ -404,6 +392,15 @@ template&lt;typename Scalar , std::size_t Rank, bool Sequential&gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
+<p>It updates the parameters of the specified layer based on their gradients after back-propagation.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">layer</td><td>A reference to the layer whose parameters are to be updated. </td></tr>
+    <tr><td class="paramname">i</td><td>The index of the layer. </td></tr>
+    <tr><td class="paramname">epoch</td><td>The index of the epoch. </td></tr>
+  </table>
+  </dd>
+</dl>
 
 <p>Implements <a class="el" href="classcattle_1_1_s_g_d_optimizer.html#a79317598e4426c479f42f8272d7c4689">cattle::SGDOptimizer&lt; Scalar, Rank, Sequential &gt;</a>.</p>
 

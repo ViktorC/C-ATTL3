@@ -175,7 +175,12 @@ Additional Inherited Members</h2></td></tr>
 <tr class="memitem:a3716158bae6f92c7dd917d2ad804fafa inherit pro_attribs_classcattle_1_1_optimizer"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="namespacecattle.html#a5fa4a5f7df1ad35afbadd9975ec24a12">LossSharedPtr</a>&lt; Scalar, Rank, Sequential &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_optimizer.html#a3716158bae6f92c7dd917d2ad804fafa">loss</a></td></tr>
 <tr class="separator:a3716158bae6f92c7dd917d2ad804fafa inherit pro_attribs_classcattle_1_1_optimizer"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
-<h2 class="groupheader">Member Typedef Documentation</h2>
+<a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
+<div class="textblock"><h3>template&lt;typename Scalar, std::size_t Rank, bool Sequential&gt;<br />
+class cattle::NadamOptimizer&lt; Scalar, Rank, Sequential &gt;</h3>
+
+<p>A class template for the Nesterov accelerated Adam (Nadam) optimization algorithm. </p>
+</div><h2 class="groupheader">Member Typedef Documentation</h2>
 <a id="a727bafdd8cabcd29ebe62257d86b45a4"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a727bafdd8cabcd29ebe62257d86b45a4">&#9670;&nbsp;</a></span>Base</h2>
 
@@ -266,6 +271,18 @@ template&lt;typename Scalar , std::size_t Rank, bool Sequential&gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">loss</td><td>A shared pointer to the loss function to use. </td></tr>
+    <tr><td class="paramname">reg</td><td>A shared pointer to the regularization penalty to use. </td></tr>
+    <tr><td class="paramname">batch_size</td><td>The batch size to use for training and testing. It is expected to be greater than 0. </td></tr>
+    <tr><td class="paramname">learning_rate</td><td>The learning rate (a.k.a. step size) to use. It is expected to be greater than 0. </td></tr>
+    <tr><td class="paramname">l1_decay</td><td>The decay rate of the accumulated parameter gradients. It is expected to be in the range [0,1]. The greater it is, the faster the accumulated gradients decay. </td></tr>
+    <tr><td class="paramname">l2_decay</td><td>The decay rate of the accumulated squared parameter gradients. It is expected to be in the range [0,1]. The greater it is, the faster the accumulated squared gradients decay. </td></tr>
+    <tr><td class="paramname">epsilon</td><td>A small constant used to maintain numerical stability. </td></tr>
+  </table>
+  </dd>
+</dl>
 
 </div>
 </div>
@@ -311,6 +328,15 @@ template&lt;typename Scalar , std::size_t Rank, bool Sequential&gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
+<p>It updates the parameters of the specified layer based on their gradients after back-propagation.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">layer</td><td>A reference to the layer whose parameters are to be updated. </td></tr>
+    <tr><td class="paramname">i</td><td>The index of the layer. </td></tr>
+    <tr><td class="paramname">epoch</td><td>The index of the epoch. </td></tr>
+  </table>
+  </dd>
+</dl>
 
 <p>Reimplemented from <a class="el" href="classcattle_1_1_adam_optimizer.html#a379db8d742ea5d6014c3e94b8c8cade2">cattle::AdamOptimizer&lt; Scalar, Rank, Sequential &gt;</a>.</p>
 

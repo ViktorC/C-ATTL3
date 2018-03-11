@@ -149,7 +149,12 @@ Protected Attributes</h2></td></tr>
 <tr class="memitem:a3716158bae6f92c7dd917d2ad804fafa"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="namespacecattle.html#a5fa4a5f7df1ad35afbadd9975ec24a12">LossSharedPtr</a>&lt; Scalar, Rank, Sequential &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_optimizer.html#a3716158bae6f92c7dd917d2ad804fafa">loss</a></td></tr>
 <tr class="separator:a3716158bae6f92c7dd917d2ad804fafa"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
-<h2 class="groupheader">Member Typedef Documentation</h2>
+<a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
+<div class="textblock"><h3>template&lt;typename Scalar, std::size_t Rank, bool Sequential&gt;<br />
+class cattle::Optimizer&lt; Scalar, Rank, Sequential &gt;</h3>
+
+<p>An abstract class template for neural network optimizer algorithm implementations. </p>
+</div><h2 class="groupheader">Member Typedef Documentation</h2>
 <a id="a0d75182c650ec8e7cf615aad5fef649e"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a0d75182c650ec8e7cf615aad5fef649e">&#9670;&nbsp;</a></span>Data</h2>
 
@@ -314,6 +319,16 @@ template&lt;typename Scalar , std::size_t Rank, bool Sequential&gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
+<p>A method to expose protected methods of the <a class="el" href="classcattle_1_1_neural_network.html">NeuralNetwork</a> class to subclasses of <a class="el" href="classcattle_1_1_optimizer.html">Optimizer</a> that are not friend classes of <a class="el" href="classcattle_1_1_neural_network.html">NeuralNetwork</a>.</p>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="classcattle_1_1_neural_network.html#ae4fd8a1e33b0d9cbb975a6ee5c41fa6c">NeuralNetwork::backpropagate</a>(<a class="el" href="namespacecattle.html#a264993c35ba14dd4f77aaff5152b8557">Tensor</a>&lt;Scalar,Rank + Sequential + 1&gt;)</dd></dl>
+<p>It back-propagates the gradients through the specified network.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">net</td><td>A reference to the network throught which the gradients are to be back-propagated. </td></tr>
+    <tr><td class="paramname">out_grads</td><td>The gradient tensor. </td></tr>
+  </table>
+  </dd>
+</dl>
 
 </div>
 </div>
@@ -342,6 +357,15 @@ template&lt;typename Scalar , std::size_t Rank, bool Sequential&gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
+<p>A method to expose protected methods of the <a class="el" href="classcattle_1_1_layer.html">Layer</a> class to subclasses of <a class="el" href="classcattle_1_1_optimizer.html">Optimizer</a> that are not friend classes of <a class="el" href="classcattle_1_1_layer.html">Layer</a>.</p>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="classcattle_1_1_layer.html#ac74dd19ed2f3a253cfbb1d1785f56197">Layer::enforce_constraints()</a></dd></dl>
+<p>It enforces constraints on the parameters of the specified layer if applicable.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">layer</td><td>The layer whose parameters are to be constrained. </td></tr>
+  </table>
+  </dd>
+</dl>
 
 </div>
 </div>
@@ -370,6 +394,13 @@ template&lt;typename Scalar , std::size_t Rank, bool Sequential&gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
+<p>It fits the optimizer to the neural network. It allows optimizers with individual learning rates for each parameter to set up their necessary internal data structures.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">net</td><td>A reference to the neural network that is to be optimized. </td></tr>
+  </table>
+  </dd>
+</dl>
 
 <p>Implemented in <a class="el" href="classcattle_1_1_adam_optimizer.html#a3d0ea04bf2796b9364eb9fcb42026c9f">cattle::AdamOptimizer&lt; Scalar, Rank, Sequential &gt;</a>, <a class="el" href="classcattle_1_1_adadelta_optimizer.html#a318a515804dfb0adaf5d339213d50e19">cattle::AdadeltaOptimizer&lt; Scalar, Rank, Sequential &gt;</a>, <a class="el" href="classcattle_1_1_adagrad_optimizer.html#ae400b62713d31b250e142514fd0626c4">cattle::AdagradOptimizer&lt; Scalar, Rank, Sequential &gt;</a>, <a class="el" href="classcattle_1_1_momentum_accelerated_s_g_d_optimizer.html#ad2dfe28f2d034e6ae633a0c3d0a68660">cattle::MomentumAcceleratedSGDOptimizer&lt; Scalar, Rank, Sequential &gt;</a>, and <a class="el" href="classcattle_1_1_vanilla_s_g_d_optimizer.html#a2aaacb301fb9e9c02d4f99cc433e9f75">cattle::VanillaSGDOptimizer&lt; Scalar, Rank, Sequential &gt;</a>.</p>
 
@@ -400,6 +431,16 @@ template&lt;typename Scalar , std::size_t Rank, bool Sequential&gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
+<p>A method to expose protected methods of the <a class="el" href="classcattle_1_1_neural_network.html">NeuralNetwork</a> class to subclasses of <a class="el" href="classcattle_1_1_optimizer.html">Optimizer</a> that are not friend classes of <a class="el" href="classcattle_1_1_neural_network.html">NeuralNetwork</a>.</p>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="classcattle_1_1_neural_network.html#a297039d2fff23643c9b73da7b4bb686c">NeuralNetwork::get_layers()</a></dd></dl>
+<p>It returns a vector of pointers to the layers of the specified network.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">net</td><td>A reference to the network whose layers are to be fetched. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>A vector of pointers to the layers of the network. </dd></dl>
 
 </div>
 </div>
@@ -428,6 +469,16 @@ template&lt;typename Scalar , std::size_t Rank, bool Sequential&gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
+<p>A method to expose protected methods of the <a class="el" href="classcattle_1_1_layer.html">Layer</a> class to subclasses of <a class="el" href="classcattle_1_1_optimizer.html">Optimizer</a> that are not friend classes of <a class="el" href="classcattle_1_1_layer.html">Layer</a>.</p>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="classcattle_1_1_layer.html#aa66fc1380d7446d77a3980c4006e7532">Layer::get_param_grads()</a></dd></dl>
+<p>It returns a non-constant reference to the gradients of the specified layer's parameters.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">layer</td><td>The layer whose parameters' gradients are to be fetched. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>A non-constant reference to the gradients of the layer's parameters. </dd></dl>
 
 </div>
 </div>
@@ -456,6 +507,16 @@ template&lt;typename Scalar , std::size_t Rank, bool Sequential&gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
+<p>A method to expose protected methods of the <a class="el" href="classcattle_1_1_layer.html">Layer</a> class to subclasses of <a class="el" href="classcattle_1_1_optimizer.html">Optimizer</a> that are not friend classes of <a class="el" href="classcattle_1_1_layer.html">Layer</a>.</p>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="classcattle_1_1_layer.html#abd799a16024c5aee49dbc0a5fe2f3183">Layer::get_params()</a></dd></dl>
+<p>It returns a non-constant reference to the parameter matrix of the specified layer.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">layer</td><td>The layer whose parameters are to be fetched. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>A non-constant reference to the parameter matrix of the layer. </dd></dl>
 
 </div>
 </div>
@@ -484,6 +545,16 @@ template&lt;typename Scalar , std::size_t Rank, bool Sequential&gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
+<p>A method to expose protected methods of the <a class="el" href="classcattle_1_1_layer.html">Layer</a> class to subclasses of <a class="el" href="classcattle_1_1_optimizer.html">Optimizer</a> that are not friend classes of <a class="el" href="classcattle_1_1_layer.html">Layer</a>.</p>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="classcattle_1_1_layer.html#a92963ac4a339d9174a3aef3dbf3c271f">Layer::is_parametric()</a></dd></dl>
+<p>It returns whether the layer has learnable parameters.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">layer</td><td>The layer whose parametric status is to be determined. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>Whether the layer has learnable parameters. </dd></dl>
 
 </div>
 </div>
@@ -540,6 +611,18 @@ template&lt;typename Scalar , std::size_t Rank, bool Sequential&gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
+<p>It optimizes the specified neural network using the given data providers according to the optimizers loss function.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">net</td><td>A reference to the network whose parameters are to be optimized. </td></tr>
+    <tr><td class="paramname">training_prov</td><td>A reference to the provider of the training data. </td></tr>
+    <tr><td class="paramname">test_prov</td><td>A reference to the provider of the test data. </td></tr>
+    <tr><td class="paramname">epochs</td><td>The number of epochs for which the optimization should proceed. </td></tr>
+    <tr><td class="paramname">early_stop</td><td>An unsigned integer denoting the number of consecutive loss increases after which the optimization process is to be terminated prematurely. If it is 0, the process is never terminated prematurely. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>The test loss of the last epoch. </dd></dl>
 
 </div>
 </div>
@@ -578,6 +661,17 @@ template&lt;typename Scalar , std::size_t Rank, bool Sequential&gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
+<p>A method to expose protected methods of the <a class="el" href="classcattle_1_1_neural_network.html">NeuralNetwork</a> class to subclasses of <a class="el" href="classcattle_1_1_optimizer.html">Optimizer</a> that are not friend classes of <a class="el" href="classcattle_1_1_neural_network.html">NeuralNetwork</a>.</p>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="classcattle_1_1_neural_network.html#a6ade9cd95110766ff25e7b157c9fddcf">NeuralNetwork::propagate</a>(<a class="el" href="namespacecattle.html#a264993c35ba14dd4f77aaff5152b8557">Tensor</a>&lt;Scalar,Rank + Sequential + 1&gt;,bool)</dd></dl>
+<p>It propagates the input tensor through the specified network in training mode.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">net</td><td>A reference to the network through which the input is to be propagated. </td></tr>
+    <tr><td class="paramname">in</td><td>The input tensor. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>The output of the network in response to the input. </dd></dl>
 
 </div>
 </div>
@@ -622,6 +716,16 @@ template&lt;typename Scalar , std::size_t Rank, bool Sequential&gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
+<p>It tests the specified neural network for a single epoch on the test data provided by the specified data provider.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">net</td><td>A reference to the neural network to test. </td></tr>
+    <tr><td class="paramname">test_prov</td><td>A reference to the test data provider. </td></tr>
+    <tr><td class="paramname">epoch</td><td>The index of the epoch starting from 0. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>The test loss of the epoch. </dd></dl>
 
 <p>Implemented in <a class="el" href="classcattle_1_1_s_g_d_optimizer.html#a7e93a5babf0f974ef6f0db0901f7a6fe">cattle::SGDOptimizer&lt; Scalar, Rank, Sequential &gt;</a>.</p>
 
@@ -668,6 +772,16 @@ template&lt;typename Scalar , std::size_t Rank, bool Sequential&gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
+<p>It trains the specified neural network for a single epoch on data provided by the specified data provider.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">net</td><td>A reference to the neural network to optimize. </td></tr>
+    <tr><td class="paramname">training_prov</td><td>A reference to the training data provider. </td></tr>
+    <tr><td class="paramname">epoch</td><td>The index of the current epoch. starting from 1. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>The training loss of the epoch. </dd></dl>
 
 <p>Implemented in <a class="el" href="classcattle_1_1_s_g_d_optimizer.html#a16383bf6d1e11f38ee28cae6dccabcf7">cattle::SGDOptimizer&lt; Scalar, Rank, Sequential &gt;</a>.</p>
 
@@ -726,6 +840,18 @@ template&lt;typename Scalar , std::size_t Rank, bool Sequential&gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
+<p>It performs a gradient check to verify the correctness of the neural network and layer implementations. Theoretically not differentiable layers such rectified linear units may fail.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">net</td><td>A reference to the network on which the gradient check is to be performed. </td></tr>
+    <tr><td class="paramname">provider</td><td>A reference to the data provider to use for the gradient check. </td></tr>
+    <tr><td class="paramname">step_size</td><td>The step size for numerical differentiation. </td></tr>
+    <tr><td class="paramname">abs_epsilon</td><td>The maximum acceptable absolute difference between the numerical and analytic gradients. </td></tr>
+    <tr><td class="paramname">rel_epsilon</td><td>The maximum acceptable relative (to the greater out of the two) difference between the numerical and analytic gradients. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>Whether the gradient check has been passed or failed. </dd></dl>
 
 </div>
 </div>

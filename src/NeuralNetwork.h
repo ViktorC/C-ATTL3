@@ -26,7 +26,7 @@
 #include "Dimensions.h"
 #include "Layer.h"
 
-// TODO LSTM and GRU networks.
+// TODO GRU network.
 // TODO Possibility to add and remove modules (e.g. layers for sequential networks, inception modules for InceptionNets).
 // TODO Serialization.
 
@@ -38,12 +38,8 @@ template<typename Scalar, std::size_t Rank> class ParallelNeuralNetwork;
 template<typename Scalar, std::size_t Rank> class SequentialNeuralNetwork;
 
 /**
- * A neural network class that consists of a vector of neuron layers. It allows
- * for the calculation of the output of the network given an input vector and
- * it provides a member function for back-propagating the derivative of a loss
- * function with respect to the activated output of the network's last layer.
- * This back-propagation sets the gradients of the parameters associated with each
- * layer.
+ * An abstract neural network class template. It allows for inference and training via
+ * back-propagation.
  */
 template<typename Scalar, std::size_t Rank, bool Sequential>
 class NeuralNetwork {
@@ -59,18 +55,52 @@ protected:
 	typedef Dimensions<int,Rank> Dims;
 public:
 	virtual ~NeuralNetwork() = default;
+	/**
+	 * A constant method implementing the clone pattern.
+	 *
+	 * @return A pointer to a copy of the instance. The instance does not take ownership of
+	 * the returned pointer (i.e. the caller is responsible for deleting it).
+	 */
 	virtual NeuralNetwork<Scalar,Rank,Sequential>* clone() const = 0;
+	/**
+	 * @return Whether the instance is a foremost network. If the instance is not a stand-alone
+	 * network and it is not the first module of a complex network, it is not a foremost
+	 * network. Foremost networks do not need to back-propagate the gradients all the way
+	 * given that no other network is expected to depend on them.
+	 */
 	virtual bool is_foremost() const = 0;
-	virtual Dims get_input_dims() const = 0;
-	virtual Dims get_output_dims() const = 0;
+	/**
+	 * @return A constant reference to the member variable denoting the dimensions of the
+	 * tensors accepted by the network as its input along (except for the first rank which
+	 * denotes the variable sample size and in case of sequential networks the second rank
+	 * which denotes the variable time steps).
+	 */
+	virtual const Dims& get_input_dims() const = 0;
+	/**
+	 * @return A constant reference to the member variable denoting the dimensions of the
+	 * tensors output by the network (except for the first rank which denotes the variable
+	 * sample size and in case of sequential networks the second rank which denotes the
+	 * variable time steps).
+	 */
+	virtual const Dims& get_output_dims() const = 0;
 	inline virtual void init() {
 		std::vector<Layer<Scalar,Rank>*> layers = get_layers();
 		for (unsigned i = 0; i < layers.size(); ++i)
 			layers[i]->init();
 	}
+	/**
+	 * It propagates the input through the neural network and outputs its prediction
+	 * according to its current parameters.
+	 *
+	 * @param input The input to be mapped.
+	 * @return The inference/prediction of the neural network.
+	 */
 	inline virtual Data infer(Data input) {
 		return propagate(std::move(input), false);
 	}
+	/**
+	 * @return A string representation of the neural network.
+	 */
 	inline virtual std::string to_string() {
 		std::stringstream strm;
 		strm << "Neural Net " << this << std::endl;
@@ -100,35 +130,137 @@ public:
 		return os << nn.to_string() << std::endl;
 	}
 protected:
+	/**
+	 * Sets the foremost status of the network.
+	 *
+	 * @param foremost Whether the network is to function as a foremost network.
+	 */
 	virtual void set_foremost(bool foremost) = 0;
+	/**
+	 * Empties the caches of every layer of the network.
+	 */
 	virtual void empty_caches() = 0;
+	/**
+	 * @return A vector of pointers to the layers of the network. The ownership of the
+	 * layers remains with the network.
+	 */
 	virtual std::vector<Layer<Scalar,Rank>*> get_layers() = 0;
+	/**
+	 * It propagates the input tensor through the network and outputs its prediction.
+	 *
+	 * @param input The input tensor to propagate through.
+	 * @param training Whether the input is to be propagated in training mode or not.
+	 * Propagating the input in training mode may be more time and memory consuming, but
+	 * is a prerequisite of back-propagation.
+	 * @return The output tensor of the network in response to the input.
+	 */
 	virtual Data propagate(Data input, bool training) = 0;
+	/**
+	 * It back-propagates the derivative of the loss function w.r.t. the output of the
+	 * network through its layers updating the gradients on their parameters.
+	 *
+	 * @param out_grads The derivative of the loss function w.r.t. the output of the
+	 * network.
+	 * @return The derivative of the loss function w.r.t. the input of the network or
+	 * a null tensor if the network is a foremost network.
+	 */
 	virtual Data backpropagate(Data out_grads) = 0;
+	/**
+	 * A method to expose protected methods of the Layer class to subclasses of
+	 * NeuralNetwork that are not friend classes of Layer.
+	 *
+	 * \see Layer#set_input_layer(bool)
+	 *
+	 * It sets the specified layer's input-layer-status.
+	 *
+	 * @param layer The layer to modify.
+	 * @param on Whether the layer is to function as an input layer.
+	 */
 	inline static void set_input_layer(Layer<Scalar,Rank>& layer, bool on) {
 		layer.set_input_layer(on);
 	}
+	/**
+	 * A method to expose protected methods of the Layer class to subclasses of
+	 * NeuralNetwork that are not friend classes of Layer.
+	 *
+	 * \see Layer#empty_cache()
+	 *
+	 * It empties the cache of the layer.
+	 *
+	 * @param layer The layer whose cache is to be emptied.
+	 */
 	inline static void empty_cache(Layer<Scalar,Rank>& layer) {
 		layer.empty_cache();
 	}
+	/**
+	 * A method to expose protected methods of the Layer class to subclasses of
+	 * NeuralNetwork that are not friend classes of Layer.
+	 *
+	 * \see Layer#pass_forward(Tensor<Scalar,Rank + 1>,bool)
+	 *
+	 * It propagates the input through the specified layer.
+	 *
+	 * @param layer The layer to which the input is to be fed.
+	 * @param prev_out The input tensor.
+	 * @param training Whether the input is to propagated through the layer in
+	 * training mode.
+	 * @return The output of the layer in response to the input.
+	 */
 	inline static Tensor<Scalar,Rank + 1> pass_forward(Layer<Scalar,Rank>& layer, Tensor<Scalar,Rank + 1> prev_out,
 			bool training) {
 		return layer.pass_forward(std::move(prev_out), training);
 	}
+	/**
+	 * A method to expose protected methods of the Layer class to subclasses of
+	 * NeuralNetwork that are not friend classes of Layer.
+	 *
+	 * \see Layer#pass_back(Tensor<Scalar,Rank + 1>)
+	 *
+	 * It back-propagates the derivative of the loss function w.r.t. the output of
+	 * the layer through the layer updating the gradients on its parameters along
+	 * the way.
+	 *
+	 * @param layer The layer through which the gradients are to be back-propagated.
+	 * @param out_grads The derivative of the loss function w.r.t. the output of
+	 * the layer
+	 * @return The derivative of the loss function w.r.t. the input of the layer or
+	 * a null tensor if the layer is an input layer.
+	 */
 	inline static Tensor<Scalar,Rank + 1> pass_back(Layer<Scalar,Rank>& layer, Tensor<Scalar,Rank + 1> out_grads) {
 		return layer.pass_back(std::move(out_grads));
 	}
+	/**
+	 * A method to expose protected methods of the Layer class to subclasses of
+	 * NeuralNetwork that are not friend classes of Layer.
+	 *
+	 * \see Layer#get_param_grads()
+	 *
+	 * It returns a non-constant reference to the gradients of the specified
+	 * layer's parameters.
+	 *
+	 * @param layer The layer whose parameters' gradients are to be fetched.
+	 * @return A non-constant reference to the gradients of the layer's
+	 * parameters.
+	 */
 	inline static Matrix<Scalar>& get_param_grads(Layer<Scalar,Rank>& layer) {
 		return layer.get_param_grads();
 	}
 };
 
+/**
+ * An alias for a unique pointer to a neural network of arbitrary scalar type, rank,
+ * and sequentiality.
+ */
 template<typename Scalar, std::size_t Rank, bool Sequential>
 using NeuralNetPtr = std::unique_ptr<NeuralNetwork<Scalar,Rank,Sequential>>;
 
 template<typename Scalar, std::size_t Rank> class ResidualNeuralNetwork;
 template<typename Scalar, std::size_t Rank> class DenseNeuralNetwork;
 
+/**
+ * A class template for a composite neural network that consists of a set of
+ * serially stacked neural network sub-modules.
+ */
 template<typename Scalar, std::size_t Rank, bool Sequential>
 class CompositeNeuralNetwork : public NeuralNetwork<Scalar,Rank,Sequential> {
 	friend class ResidualNeuralNetwork<Scalar,Rank>;
@@ -137,6 +269,10 @@ class CompositeNeuralNetwork : public NeuralNetwork<Scalar,Rank,Sequential> {
 	typedef CompositeNeuralNetwork<Scalar,Rank,Sequential> Self;
 	typedef NeuralNetPtr<Scalar,Rank,Sequential> Block;
 public:
+	/**
+	 * @param blocks A vector of unique pointers to neural networks.
+	 * @param foremost Whether the network is to function as a foremost network.
+	 */
 	inline CompositeNeuralNetwork(std::vector<Block> blocks, bool foremost = true) :
 			blocks(std::move(blocks)),
 			foremost(foremost) {
@@ -155,7 +291,11 @@ public:
 		}
 		first_block.set_foremost(foremost);
 	}
-	inline CompositeNeuralNetwork(Block&& block, bool foremost = true) :
+	/**
+	 * @param block A unique pointer to a neural network.
+	 * @param foremost Whether the network is to function as a foremost network.
+	 */
+	inline CompositeNeuralNetwork(Block block, bool foremost = true) :
 			CompositeNeuralNetwork(create_vector(std::move(block)), foremost) { }
 	inline CompositeNeuralNetwork(const Self& network) :
 			blocks(network.blocks.size()) {
@@ -179,10 +319,10 @@ public:
 	inline bool is_foremost() const {
 		return foremost;
 	}
-	inline typename Base::Dims get_input_dims() const {
+	inline const typename Base::Dims& get_input_dims() const {
 		return input_dims;
 	}
-	inline typename Base::Dims get_output_dims() const {
+	inline const typename Base::Dims& get_output_dims() const {
 		return output_dims;
 	}
 	inline friend void swap(Self& network1, Self& network2) {
@@ -224,7 +364,13 @@ protected:
 			out_grads = blocks[i]->backpropagate(std::move(out_grads));
 		return out_grads;
 	}
-	inline static std::vector<Block> create_vector(Block&& net) {
+	/**
+	 * Creates a size-1 vector out of the specified unique pointer.
+	 *
+	 * @param net A unique pointer to the single neural network sub-module.
+	 * @return A vector of size 1 containing the unique pointer.
+	 */
+	inline static std::vector<Block> create_vector(Block net) {
 		std::vector<Block> vec(1);
 		vec[0] = std::move(net);
 		return vec;
@@ -236,6 +382,13 @@ private:
 	typename Base::Dims output_dims;
 };
 
+/**
+ * A class template for a parallel neural network that consists of one or more
+ * lanes of non-sequential neural networks with the same input dimensions. Inputs
+ * and gradients are propagated through the lanes simultaneously using multithreading.
+ * The outputs of the lanes are merged by concatenation (either along the lowest
+ * or hightest rank) or summation.
+ */
 template<typename Scalar, std::size_t Rank>
 class ParallelNeuralNetwork : public NeuralNetwork<Scalar,Rank,false> {
 	typedef NeuralNetwork<Scalar,Rank,false> Base;
@@ -243,7 +396,16 @@ class ParallelNeuralNetwork : public NeuralNetwork<Scalar,Rank,false> {
 	typedef NeuralNetPtr<Scalar,Rank,false> Lane;
 	typedef std::array<int,Base::DATA_RANKS> RankwiseArray;
 public:
+	/**
+	 * An enumeration type for the different ways the outputs of the lanes of the
+	 * parallel network may be merged.
+	 */
 	enum MergeType { CONCAT_LO_RANK, CONCAT_HI_RANK, SUM };
+	/**
+	 * @param lanes A vector of unique pointers to non-sequential neural networks.
+	 * @param merge_type The fashion in which the outputs of the lanes are to be merged.
+	 * @param foremost Whether the network is to function as a foremost network.
+	 */
 	inline ParallelNeuralNetwork(std::vector<Lane> lanes, MergeType merge_type = CONCAT_HI_RANK,
 			bool foremost = true) :
 				lanes(std::move(lanes)),
@@ -278,8 +440,12 @@ public:
 		this->input_dims = first_lane.get_input_dims();
 		this->output_dims = output_dims;
 	}
+	/**
+	 * @param lane A unique pointer to a non-sequential neural network.
+	 * @param foremost Whether the network is to function as a foremost network.
+	 */
 	inline ParallelNeuralNetwork(Base&& lane, bool foremost = true) :
-			ParallelNeuralNetwork(create_vector(std::move(lane)), foremost) { }
+			ParallelNeuralNetwork(create_vector(std::move(lane)), SUM, foremost) { }
 	inline ParallelNeuralNetwork(const Self& network) :
 			lanes(network.lanes.size()),
 			merge_type(network.merge_type),
@@ -305,10 +471,10 @@ public:
 	inline Base* clone() const {
 		return new ParallelNeuralNetwork(*this);
 	}
-	inline typename Base::Dims get_input_dims() const {
+	inline const typename Base::Dims& get_input_dims() const {
 		return input_dims;
 	}
-	inline typename Base::Dims get_output_dims() const {
+	inline const typename Base::Dims& get_output_dims() const {
 		return output_dims;
 	}
 	inline friend void swap(Self& network1, Self& network2) {
@@ -438,6 +604,12 @@ protected:
 			pthread_attr_destroy(&attr);
 		return prev_out_grads;
 	}
+	/**
+	 * Creates a size-1 vector out of the specified unique pointer.
+	 *
+	 * @param net A unique pointer to the single non-sequential neural network lane.
+	 * @return A vector of size 1 containing the unique pointer.
+	 */
 	inline static std::vector<Lane> create_vector(Lane&& net) {
 		std::vector<Lane> vec(1);
 		vec[0] = std::move(net);
@@ -451,6 +623,9 @@ private:
 	bool foremost;
 	typename Base::Dims input_dims;
 	typename Base::Dims output_dims;
+	/**
+	 * A struct containing the data required for propagation.
+	 */
 	struct PropArgs {
 		Self* obj;
 		int lane_id;
@@ -458,6 +633,9 @@ private:
 		typename Base::Data* in;
 		typename Base::Data out;
 	};
+	/**
+	 * A struct containing the data require for back-propagation.
+	 */
 	struct BackpropArgs {
 		Self* obj;
 		int lane_id;
@@ -465,11 +643,25 @@ private:
 		typename Base::Data* out_grads;
 		typename Base::Data prev_out_grads;
 	};
+	/**
+	 * The propagation function executed in a different thread for each lane of a
+	 * parallel network.
+	 *
+	 * @param args_ptr The propagation argument struct containing all necessary
+	 * information.
+	 */
 	inline static void* propagate(void* args_ptr) {
 		PropArgs& args = *((PropArgs*) args_ptr);
 		args.out = args.obj->lanes[args.lane_id]->propagate(*args.in, args.training);
 		return nullptr;
 	}
+	/**
+	 * The back-propagation function executed in a different thread for each lane of a
+	 * parallel network.
+	 *
+	 * @param args_ptr The back-propagation argument struct containing all necessary
+	 * information.
+	 */
 	inline static void* backpropagate(void* args_ptr) {
 		BackpropArgs& args = *((BackpropArgs*) args_ptr);
 		Base& lane = *args.obj->lanes[args.lane_id];
@@ -487,17 +679,21 @@ private:
 	}
 };
 
+/**
+ * An alias for a unique pointer to a layer of arbitrary rank and scalar type.
+ */
 template<typename Scalar, std::size_t Rank>
 using LayerPtr = std::unique_ptr<Layer<Scalar,Rank>>;
 
+/**
+ * A class template representing a simple feed-forward neural network.
+ */
 template<typename Scalar, std::size_t Rank>
 class FeedforwardNeuralNetwork : public NeuralNetwork<Scalar,Rank,false> {
 	typedef NeuralNetwork<Scalar,Rank,false> Base;
 	typedef FeedforwardNeuralNetwork<Scalar,Rank> Self;
 public:
 	/**
-	 * Constructs the network using the provided layer pointers. It takes ownership of the layer pointers.
-	 *
 	 * @param layers A vector of unique smart pointers to the layers that constitute the neural network.
 	 * @param foremost Whether the network directly receives its input. If it is set to false, back-propagation
 	 * returns an empty tensor.
@@ -518,6 +714,10 @@ public:
 		}
 		Base::set_input_layer(first_layer, foremost);
 	}
+	/**
+	 * @param layer A unique pointer to the single layer of the network.
+	 * @param foremost Whether the network is to function as a foremost network.
+	 */
 	inline FeedforwardNeuralNetwork(LayerPtr<Scalar,Rank> layer, bool foremost = true) :
 			FeedforwardNeuralNetwork(create_vector(std::move(layer)), foremost) { }
 	// Copy constructor.
@@ -547,10 +747,10 @@ public:
 	inline bool is_foremost() const {
 		return foremost;
 	}
-	inline typename Base::Dims get_input_dims() const {
+	inline const typename Base::Dims& get_input_dims() const {
 		return input_dims;
 	}
-	inline typename Base::Dims get_output_dims() const {
+	inline const typename Base::Dims& get_output_dims() const {
 		return output_dims;
 	}
 	// For the copy-and-swap idiom.
@@ -610,14 +810,20 @@ private:
 };
 
 /**
- * This class can be used to build InceptionNets, ResNets, Inception-ResNets, or non-residual composite
- * neural networks.
+ * A class template for ResNets. These networks take vectors of CompositeNeuralNetwork and bool pairs
+ * as their sub-modules. The second, boolean value of the pair denotes whether the sub-module is a
+ * residual module or not.
  */
 template<typename Scalar, std::size_t Rank>
 class ResidualNeuralNetwork : public NeuralNetwork<Scalar,Rank,false> {
 	typedef NeuralNetwork<Scalar,Rank,false> Base;
 	typedef CompositeNeuralNetwork<Scalar,Rank,false> Module;
 public:
+	/**
+	 * @param modules A vector of CompositeNeuralNetwork and bool pairs with the boolean denoting
+	 * whether the respective network module is residual.
+	 * @param foremost Whether the network is to function as a foremost network.
+	 */
 	inline ResidualNeuralNetwork(std::vector<std::pair<Module,bool>> modules, bool foremost = true) :
 			modules(modules),
 			foremost(foremost) {
@@ -644,10 +850,10 @@ public:
 	inline bool is_foremost() const {
 		return foremost;
 	}
-	inline typename Base::Dims get_input_dims() const {
+	inline const typename Base::Dims& get_input_dims() const {
 		return input_dims;
 	}
-	inline typename Base::Dims get_output_dims() const {
+	inline const typename Base::Dims& get_output_dims() const {
 		return output_dims;
 	}
 protected:
@@ -699,13 +905,29 @@ private:
 	typename Base::Dims output_dims;
 };
 
+/**
+ * A class template for DenseNet architectures. These networks consist of sub-modules that are all
+ * 'connected' to each other as in the input of each module is concatenated to its output and then
+ * propagated to the next module as its input. The input is concatenated to the output either along
+ * its lowest or highest rank.
+ */
 template<typename Scalar, std::size_t Rank>
 class DenseNeuralNetwork : public NeuralNetwork<Scalar,Rank,false> {
 	typedef NeuralNetwork<Scalar,Rank,false> Base;
 	typedef CompositeNeuralNetwork<Scalar,Rank,false> Module;
 	typedef std::array<int,Base::DATA_RANKS> RankwiseArray;
 public:
+	/**
+	 * An enumeration type for the different ways the input of a sub-network may be concatenated
+	 * to its output.
+	 */
 	enum ConcatType { LOWEST_RANK, HIGHEST_RANK };
+	/**
+	 * @param modules A vector of CompositeNeuralNetwork instances.
+	 * @param concat_type The method of concatenation used to merge the inputs and outputs of the
+	 * sub-modules.
+	 * @param foremost Whether the network is to function as a foremost network.
+	 */
 	inline DenseNeuralNetwork(std::vector<Module> modules, ConcatType concat_type = HIGHEST_RANK,
 			bool foremost = true) :
 				modules(modules),
@@ -742,10 +964,10 @@ public:
 	inline bool is_foremost() const {
 		return foremost;
 	}
-	inline typename Base::Dims get_input_dims() const {
+	inline const typename Base::Dims& get_input_dims() const {
 		return input_dims;
 	}
-	inline typename Base::Dims get_output_dims() const {
+	inline const typename Base::Dims& get_output_dims() const {
 		return output_dims;
 	}
 protected:
@@ -821,8 +1043,9 @@ protected:
 };
 
 /**
- * Enables the use of non-sequential networks on sequential data by joining the 'samples' and 'time steps' ranks of
- * the tensors and splitting them again once the internal, non-sequential network is done processing them.
+ * A class template for a wrapper neural network that enables the use of non-sequential networks on
+ * sequential data by joining the 'samples' and 'time steps' ranks of the tensors and splitting them
+ * again once the internal, non-sequential network is done processing them.
  */
 template<typename Scalar, std::size_t Rank>
 class SequentialNeuralNetwork : public NeuralNetwork<Scalar,Rank,true> {
@@ -831,6 +1054,10 @@ class SequentialNeuralNetwork : public NeuralNetwork<Scalar,Rank,true> {
 	typedef NeuralNetPtr<Scalar,Rank,false> Net;
 	typedef std::array<int,Base::DATA_RANKS> RankwiseArray;
 public:
+	/**
+	 * @param network A unique pointer to a non-sequential neural network to wrap.
+	 * @param foremost Whether the network is to function as a foremost network.
+	 */
 	inline SequentialNeuralNetwork(Net network, bool foremost = true) :
 			net(std::move(network)),
 			foremost(foremost),
@@ -861,10 +1088,10 @@ public:
 	inline bool is_foremost() const {
 		return foremost;
 	}
-	inline typename Base::Dims get_input_dims() const {
+	inline const typename Base::Dims& get_input_dims() const {
 		return input_dims;
 	}
-	inline typename Base::Dims get_output_dims() const {
+	inline const typename Base::Dims& get_output_dims() const {
 		return output_dims;
 	}
 	inline friend void swap(Self& network1, Self& network2) {
@@ -914,19 +1141,40 @@ private:
 
 template<typename Scalar, std::size_t Rank> class BidirectionalNeuralNetwork;
 
+/**
+ * An abstract class template for unidirectional recurrent neural networks.
+ */
 template<typename Scalar, std::size_t Rank>
 class UnidirectionalNeuralNetwork : public NeuralNetwork<Scalar,Rank,true> {
 	friend class BidirectionalNeuralNetwork<Scalar,Rank>;
 public:
 	virtual ~UnidirectionalNeuralNetwork() = default;
 protected:
+	/**
+	 * @return Whether the direction along the time-step rank in which the network processes
+	 * its inputs is reversed.
+	 */
 	virtual bool is_reversed() const;
+	/**
+	 * Flips the direction along the time-step rank in which the network processes its inputs
+	 * is reversed.
+	 */
 	virtual void reverse();
 };
 
+/**
+ * An alias for unidirectional recurrent neural network of arbitrary scalar type and rank.
+ */
 template<typename Scalar, std::size_t Rank>
 using UnidirNeuralNetPtr = std::unique_ptr<UnidirectionalNeuralNetwork<Scalar,Rank>>;
 
+/**
+ * A class template for a bidirectional neural network that takes a unidirectional recurrent
+ * network, clones it, reverses the clone's processing direction, and uses the two networks
+ * as its parallel sub-modules. The outputs of the two sub-networks can be merged by summation
+ * or concatenation either along the lowest (the 3rd after the sample and time-step ranks) or
+ * highest rank.
+ */
 template<typename Scalar, std::size_t Rank>
 class BidirectionalNeuralNetwork : public NeuralNetwork<Scalar,Rank,true> {
 	typedef NeuralNetwork<Scalar,Rank,true> Base;
@@ -934,7 +1182,18 @@ class BidirectionalNeuralNetwork : public NeuralNetwork<Scalar,Rank,true> {
 	typedef UnidirNeuralNetPtr<Scalar,Rank> UnidirNet;
 	typedef std::array<int,Base::DATA_RANKS> RankwiseArray;
 public:
+	/**
+	 * An enumeration type for the different ways the outputs of the lanes of the
+	 * parallel network may be merged.
+	 */
 	enum MergeType { CONCAT_LO_RANK, CONCAT_HI_RANK, SUM };
+	/**
+	 * @param network A unique pointer to a unidirectional recurrent neural network that,
+	 * along with its reversed clone, will constitute the bidirectional network.
+	 * @param merge_type The fashion in which the outputs of the two sub-networks are to be
+	 * merged.
+	 * @param foremost Whether the network is to function as a foremost network.
+	 */
 	inline BidirectionalNeuralNetwork(UnidirNet network, MergeType merge_type = CONCAT_LO_RANK,
 			bool foremost = true) :
 				net(std::move(network)),
@@ -974,10 +1233,10 @@ public:
 	inline bool is_foremost() const {
 		return foremost;
 	}
-	inline typename Base::Dims get_input_dims() const {
+	inline const typename Base::Dims& get_input_dims() const {
 		return input_dims;
 	}
-	inline typename Base::Dims get_output_dims() const {
+	inline const typename Base::Dims& get_output_dims() const {
 		return output_dims;
 	}
 	inline friend void swap(Self& network1, Self& network2) {
@@ -1086,22 +1345,42 @@ private:
 	bool foremost;
 	typename Base::Dims input_dims;
 	typename Base::Dims output_dims;
+	/**
+	 * A struct containing the data required for propagation.
+	 */
 	struct PropArgs {
 		Self* obj;
 		bool training;
 		typename Base::Data* in;
 		typename Base::Data out;
 	};
+	/**
+	 * A struct containing the data require for back-propagation.
+	 */
 	struct BackpropArgs {
 		Self* obj;
 		typename Base::Data* out_grads;
 		typename Base::Data prev_out_grads;
 	};
+	/**
+	 * The propagation function executed in a different thread for each lane of a
+	 * parallel network.
+	 *
+	 * @param args_ptr The propagation argument struct containing all necessary
+	 * information.
+	 */
 	inline static void* propagate(void* args_ptr) {
 		PropArgs& args = *((PropArgs*) args_ptr);
 		args.out = args.obj->net_rev->propagate(*args.in, args.training);
 		return nullptr;
 	}
+	/**
+	 * The back-propagation function executed in a different thread for each lane of a
+	 * parallel network.
+	 *
+	 * @param args_ptr The back-propagation argument struct containing all necessary
+	 * information.
+	 */
 	inline static void* backpropagate(void* args_ptr) {
 		BackpropArgs& args = *((BackpropArgs*) args_ptr);
 		args.prev_out_grads = args.obj->net_rev->backpropagate(*args.out_grads);
@@ -1110,12 +1389,21 @@ private:
 	}
 };
 
+/**
+ * An alias for a unique pointer to a kernel layer of arbitrary rank and scalar type.
+ */
 template<typename Scalar, std::size_t Rank>
 using KernelPtr = std::unique_ptr<KernelLayer<Scalar,Rank>>;
 
+/**
+ * An alias for a unique pointer to an activation layer of arbitrary rank and scalar type.
+ */
 template<typename Scalar, std::size_t Rank>
 using ActivationPtr = std::unique_ptr<ActivationLayer<Scalar,Rank>>;
 
+/**
+ * A class template for a simple recurrent neural network (RNN).
+ */
 template<typename Scalar, std::size_t Rank>
 class RecurrentNeuralNetwork : public UnidirectionalNeuralNetwork<Scalar,Rank> {
 	typedef NeuralNetwork<Scalar,Rank,true> Root;
@@ -1125,6 +1413,25 @@ class RecurrentNeuralNetwork : public UnidirectionalNeuralNetwork<Scalar,Rank> {
 	typedef std::function<std::pair<std::size_t,std::size_t>(std::size_t)> OutputSeqSizeFunc;
 	typedef Tensor<Scalar,Rank + 1> TimeStepData;
 public:
+	/**
+	 * @param input_kernel The linear layer applied to the input of the network at each time step
+	 * with an input.
+	 * @param state_kernel The linear layer applied to the previous hidden state of the network at
+	 * each time step.
+	 * @param output_kernel The linear layer applied to the hidden state of the network at each time
+	 * step with an output.
+	 * @param state_act The activation function applied to the hidden state at each time step.
+	 * @param output_act The activation function applied to the linearly transformed hidden state
+	 * of the network at each time step with an output.
+	 * @param output_seq_size_func A function parameterized by the input sequence length that
+	 * determines the output sequence delay and length
+	 * @param stateful Whether the network is to be stateful. A stateful network retains its hidden
+	 * state across sequences as long as the batch size is constant.
+	 * @param mul_int Whether multiplicative integration should be used to combine the linearly
+	 * transformed input and the linearly transformed previous hidden state.
+	 * @param reversed Whether the network is to reverse its inputs along the time-step rank.
+	 * @param foremost Whether the network is to function as a foremost network.
+	 */
 	inline RecurrentNeuralNetwork(KernelPtr<Scalar,Rank> input_kernel, KernelPtr<Scalar,Rank> state_kernel,
 			KernelPtr<Scalar,Rank> output_kernel, ActivationPtr<Scalar,Rank> state_act, ActivationPtr<Scalar,Rank> output_act,
 			OutputSeqSizeFunc output_seq_size_func, bool stateful = false, bool mul_int = false, bool reversed = false,
@@ -1215,10 +1522,10 @@ public:
 	inline bool is_foremost() const {
 		return foremost;
 	}
-	inline typename Root::Dims get_input_dims() const {
+	inline const typename Root::Dims& get_input_dims() const {
 		return input_dims;
 	}
-	inline typename Root::Dims get_output_dims() const {
+	inline const typename Root::Dims& get_output_dims() const {
 		return output_dims;
 	}
 	// For the copy-and-swap idiom.
@@ -1524,6 +1831,9 @@ protected:
 		return prev_out_grads;
 	}
 private:
+	/**
+	 * A struct representing a cell in the unrolled RNN.
+	 */
 	struct Cell {
 		KernelPtr<Scalar,Rank> input_kernel;
 		KernelPtr<Scalar,Rank> state_kernel;
@@ -1552,6 +1862,9 @@ private:
 	int output_seq_delay;
 };
 
+/**
+ * A class template representing a long-short term memory (LSTM) recurrent neural network.
+ */
 template<typename Scalar, std::size_t Rank>
 class LSTMNeuralNetwork : public UnidirectionalNeuralNetwork<Scalar,Rank> {
 	typedef NeuralNetwork<Scalar,Rank,true> Root;
@@ -1561,6 +1874,38 @@ class LSTMNeuralNetwork : public UnidirectionalNeuralNetwork<Scalar,Rank> {
 	typedef std::function<std::pair<std::size_t,std::size_t>(std::size_t)> OutputSeqSizeFunc;
 	typedef Tensor<Scalar,Rank + 1> TimeStepData;
 public:
+	/**
+	 * @param input_forget_kernel The forget kernel to apply to the input of the network.
+	 * @param output_forget_kernel The forget kernel to apply to the hidden output of the network
+	 * at the previous time step.
+	 * @param input_write_kernel The write kernel to apply to the input of the network.
+	 * @param output_write_kernel The write kernel to apply to the hidden output of the network
+	 * at the previous time step.
+	 * @param input_candidate_kernel The candidate kernel to apply to the input of the network.
+	 * @param output_candidate_kernel The candidate kernel to apply to the hidden output of the
+	 * network at the previous time step.
+	 * @param input_read_kernel The read kernel to apply to the input of the network.
+	 * @param output_read_kernel The read kernel to apply to the hidden output of the network
+	 * at the previous time step.
+	 * @param forget_act The activation layer of the forget gate. Usually a sigmoid activation
+	 * function.
+	 * @param write_act The activation layer of the filter of the write gate. Usually a sigmoid
+	 * activation function.
+	 * @param candidate_act The activation layer of the candidates of the write gate. Usually
+	 * a hyperbolic tangent activation function.
+	 * @param state_act The activation layer of the state at the read gate. Usually a hyperbolic
+	 * tangent activation function.
+	 * @param read_act The activation layer of the read filter. Usually a sigmoid activation
+	 * function.
+	 * @param output_seq_size_func A function parameterized by the input sequence length that
+	 * determines the output sequence delay and length
+	 * @param stateful Whether the network is to be stateful. A stateful network retains its hidden
+	 * state across sequences as long as the batch size is constant.
+	 * @param mul_int Whether multiplicative integration should be used to combine the linearly
+	 * transformed inputs and the linearly transformed hidden outputs.
+	 * @param reversed Whether the network is to reverse its inputs along the time-step rank.
+	 * @param foremost Whether the network is to function as a foremost network.
+	 */
 	inline LSTMNeuralNetwork(KernelPtr<Scalar,Rank> input_forget_kernel, KernelPtr<Scalar,Rank> output_forget_kernel,
 			KernelPtr<Scalar,Rank> input_write_kernel, KernelPtr<Scalar,Rank> output_write_kernel,
 			KernelPtr<Scalar,Rank> input_candidate_kernel, KernelPtr<Scalar,Rank> output_candidate_kernel,
@@ -1741,10 +2086,10 @@ public:
 	inline bool is_foremost() const {
 		return foremost;
 	}
-	inline typename Root::Dims get_input_dims() const {
+	inline const typename Root::Dims& get_input_dims() const {
 		return input_dims;
 	}
-	inline typename Root::Dims get_output_dims() const {
+	inline const typename Root::Dims& get_output_dims() const {
 		return output_dims;
 	}
 	inline friend void swap(Self& network1, Self& network2) {
@@ -2262,6 +2607,9 @@ protected:
 		return prev_out_grads;
 	}
 private:
+	/**
+	 * A struct representing a cell in the unrolled LSTM.
+	 */
 	struct Cell {
 		KernelPtr<Scalar,Rank> input_forget_kernel;
 		KernelPtr<Scalar,Rank> output_forget_kernel;
