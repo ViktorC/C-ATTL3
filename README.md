@@ -2,7 +2,7 @@
 A header-only neural network template library written in C++. C-ATTL3 uses [Eigen](http://eigen.tuxfamily.org), the popular linear algebra library. It allows for the easy construction and training of both feed-forward and recurrent neural networks ranging from simple MLPs and RNNs to state-of-the-art InceptionNets, ResNets, DenseNets, convolutional LSTMs, and other complex architectures. C-ATTL3 supports rank 1, 2, and 3 data and different floating point scalar types such as `float`, `double`, and `long double`. The Doxygen documentation of the library can be found [here](https://viktorc.github.io/C-ATTL3/html/).
 
 ## Components
-The following section describes the main components of the C-ATTL3 deep learning library.
+The following sub-sections describe the main components of the C-ATTL3 deep learning library. Knowledge of these components and their relations is required for the effective usage of the library.
 
 ### Layer
 The lowest level building blocks of neural networks in C-ATTL3 are the layers. The library provides a wide selection of them that can be used for the construction of neural network modules. The available layer types are the following:
@@ -90,8 +90,10 @@ The standard regularization penalties are:
   * [L2RegularizationPenalty](https://viktorc.github.io/C-ATTL3/html/classcattle_1_1_l2_regularization_penalty.html)
   * [ElasticNetRegularizationPenalty](https://viktorc.github.io/C-ATTL3/html/classcattle_1_1_elastic_net_regularization_penalty.html)
 
+Given these parameters, optimizers can be constructed and used for gradient checks (in case of using self-implemented sub-classes of the core interfaces) and network training. Both methods are parameterized by a neural network implementation and one or two data providers.
+
 ### DataProvider
-Given these parameters, optimizers can be constructed and used for gradient checks (in case of using self-implemented sub-classes of the core interfaces) and network training. Both methods are parameterized by a neural network implementation and one or two data providers. Data providers are responsible for supplying the data used for gradient verification, training, and testing. Currently only an in-memory data provider implementation is provided by the library, but the addition of a general on-disk data provider and specialized providers for popular data sets such as MNIST, CIFAR, and ImageNet is planned.
+Data providers are responsible for supplying the data used for gradient verification, training, and testing. Currently only an in-memory data provider implementation is provided by the library, but the addition of a general on-disk data provider and specialized providers for popular data sets such as MNIST, CIFAR, and ImageNet is planned.
 * [DataProvider](https://viktorc.github.io/C-ATTL3/html/classcattle_1_1_data_provider.html) [A]
   * [InMemoryDataProvider](https://viktorc.github.io/C-ATTL3/html/classcattle_1_1_in_memory_data_provider.html)
 
