@@ -1,7 +1,11 @@
 # C-ATTL3 [![Build Status](https://travis-ci.org/ViktorC/C-ATTL3.svg?branch=master)](https://travis-ci.org/ViktorC/C-ATTL3)
-A neural network library written in C++. C-ATTL3 uses [Eigen](http://eigen.tuxfamily.org), the popular linear algebra library. It allows for the easy construction and training of both feed-forward and recurrent neural networks ranging from simple MLPs and RNNs to state-of-the-art InceptionNets, ResNets, DenseNets, convolutional LSTMs, and other complex architectures. C-ATTL3 supports rank 1, 2, and 3 data and different floating point scalar types such as `float`, `double`, and `long double`. The Doxygen documentation of the library can be found [here](https://viktorc.github.io/C-ATTL3/html/).
+A header-only neural network template library written in C++. C-ATTL3 uses [Eigen](http://eigen.tuxfamily.org), the popular linear algebra library. It allows for the easy construction and training of both feed-forward and recurrent neural networks ranging from simple MLPs and RNNs to state-of-the-art InceptionNets, ResNets, DenseNets, convolutional LSTMs, and other complex architectures. C-ATTL3 supports rank 1, 2, and 3 data and different floating point scalar types such as `float`, `double`, and `long double`. The Doxygen documentation of the library can be found [here](https://viktorc.github.io/C-ATTL3/html/).
 
-The lowest level building blocks of neural networks in C-ATTLE3 are the layers. The library provides a wide selection of them that can be used for the construction of neural network modules. The available layer types are the following:
+## Components
+The following section describes the main components of the C-ATTL3 deep learning library.
+
+### Layer
+The lowest level building blocks of neural networks in C-ATTL3 are the layers. The library provides a wide selection of them that can be used for the construction of neural network modules. The available layer types are the following:
 * [Layer](https://viktorc.github.io/C-ATTL3/html/classcattle_1_1_layer.html) [A]
   * [KernelLayer](https://viktorc.github.io/C-ATTL3/html/classcattle_1_1_kernel_layer.html) [A]
     * [FCLayer](https://viktorc.github.io/C-ATTL3/html/classcattle_1_1_f_c_layer.html)
@@ -24,7 +28,10 @@ The lowest level building blocks of neural networks in C-ATTLE3 are the layers. 
   * [BatchNormLayer](https://viktorc.github.io/C-ATTL3/html/classcattle_1_1_batch_norm_layer.html)
   * [DropoutLayer](https://viktorc.github.io/C-ATTL3/html/classcattle_1_1_dropout_layer.html)
 
-Most layers can handle data of rank 1 to 3 with the exception of convolutional and pooling layers which only accept rank 3 data. The actual input and output of the layers is of a rank one greater than the nominal rank of the layers to allow for batch learning. Besides the input dimensions, the one parameter required by all, each layer uses multiple hyper-parameters (e.g. max-norm constraint, dilation, receptor field size, etc.). These parameters can be fine-tuned to optimize the behaviour of the networks. The kernel layers (fully-connected and convolutional) also require weight initialization. The out-of-the-box weight initialization algorithms include:
+Most layers can handle data of rank 1 to 3 with the exception of convolutional and pooling layers which only accept rank 3 data. The actual input and output of the layers is of a rank one greater than the nominal rank of the layers to allow for batch learning. Besides the input dimensions, the one parameter required by all, each layer uses multiple hyper-parameters (e.g. max-norm constraint, dilation, receptor field size, etc.). These parameters can be fine-tuned to optimize the behaviour of the networks.
+
+#### WeightInitialization
+The kernel layers (fully-connected and convolutional) also require weight initialization. The out-of-the-box weight initialization algorithms include:
 * [WeightInitialization](https://viktorc.github.io/C-ATTL3/html/classcattle_1_1_weight_initialization.html) [A]
   * [ZeroWeightInitialization](https://viktorc.github.io/C-ATTL3/html/classcattle_1_1_zero_weight_initialization.html)
   * [OneWeightInitialization](https://viktorc.github.io/C-ATTL3/html/classcattle_1_1_one_weight_initialization.html)
@@ -36,6 +43,7 @@ Most layers can handle data of rank 1 to 3 with the exception of convolutional a
 
 The dimensionalities of the accepted input tensors of the different layers are specified using instances of the [Dimensions](https://viktorc.github.io/C-ATTL3/html/classcattle_1_1_dimensions.html) class which uses expression templates and compile time polymorphism to enable the fast and easy computation of the input dimensionalities of intermediary layers in complex neural networks.
 
+### NeuralNetwork
 The highest level building blocks of the different architectures are the neural network implementations provided by the library. Using these implementations, either as modules in a composite constellation or as standalone networks, almost any neural network architecture can be constructed. They are the following:
 * [NeuralNetwork](https://viktorc.github.io/C-ATTL3/html/classcattle_1_1_neural_network.html) [A] (NS/S)
   * [FeedforwardNeuralNetwork](https://viktorc.github.io/C-ATTL3/html/classcattle_1_1_feedforward_neural_network.html) (NS)
@@ -51,6 +59,7 @@ The highest level building blocks of the different architectures are the neural 
 
 These neural networks are either sequential (S) or non-sequential (NS). Non-sequential networks handle inputs of rank 2 to 4 (one greater than their nominal ranks) where the first rank represents the samples thus allowing for (mini-) batch training. On the other hand, sequential networks handle inputs of rank 3 to 5 (two greater than their nominal ranks) where the first rank, similarly to that of non-sequential networks' inputs, represents the samples and the second rank represents the time steps. Feedforward neural networks are ordinary networks with a set of layers through which the non-sequential input is propagated. Parallel neural nets, on the other hand, contain one or more 'lanes' of non-sequential networks through which the input is simultaneously propagated and eventually concatenated along either the highest or lowest rank. Both vanilla recurrent neural networks and LSTMs support arbitrary output schedules and multiplicative integration. A bidirectional network takes a unidirectional network which it clones and reverses yielding two recurrent networks processing the input data from its two opposite ends along the time step rank. The outputs of the two unidirectional subnets of a bidirectional net can be either concatenated or summed. Sequential networks function as wrappers around non-sequential networks allowing them to be used on sequential data by applying them to each time step. Composite neural networks, similarly to parallel networks, are composed of one or more sub-nets; however, these nets are stacked sequentially and can be either sequential or non-sequential. Residual networks and dense networks are implementations of the [ResNet](https://arxiv.org/abs/1512.03385) and [DenseNet](https://arxiv.org/abs/1608.06993) architectures that use non-sequential composite neural networks as their sub-modules.
 
+### Optimizer
 The library also provides optimizers that can be used to train the networks via backpropagation. The currently available (first-order gradient descent) optimizers include the following:
 * [Optimizer](https://viktorc.github.io/C-ATTL3/html/classcattle_1_1_optimizer.html) [A]
   * [SGDOptimizer](https://viktorc.github.io/C-ATTL3/html/classcattle_1_1_s_g_d_optimizer.html) [A]
@@ -64,6 +73,7 @@ The library also provides optimizers that can be used to train the networks via 
       * [AdaMaxOptimizer](https://viktorc.github.io/C-ATTL3/html/classcattle_1_1_ada_max_optimizer.html)
       * [NadamOptimizer](https://viktorc.github.io/C-ATTL3/html/classcattle_1_1_nadam_optimizer.html)
 
+#### Loss
 Similarly to the layers, these optimizers rely on hyper-parameters as well. Besides the hyper-parameters, optimizers also require more-or-less differentiable loss functions and regularization penalty functions. The library provides the following out of the box loss functions:
 * [Loss](https://viktorc.github.io/C-ATTL3/html/classcattle_1_1_loss.html) [A]
   * [QuadraticLoss](https://viktorc.github.io/C-ATTL3/html/classcattle_1_1_quadratic_loss.html)
@@ -72,6 +82,7 @@ Similarly to the layers, these optimizers rely on hyper-parameters as well. Besi
   * [MultiLabelHingeLoss](https://viktorc.github.io/C-ATTL3/html/classcattle_1_1_multi_label_hinge_loss.html)
   * [MultiLabelLogLoss](https://viktorc.github.io/C-ATTL3/html/classcattle_1_1_multi_label_log_loss.html)
 
+#### RegularizationPenalty
 The standard regularization penalties are:
 * [RegularizationPenalty](https://viktorc.github.io/C-ATTL3/html/classcattle_1_1_regularization_penalty.html) [A]
   * [NoRegularizationPenalty](https://viktorc.github.io/C-ATTL3/html/classcattle_1_1_no_regularization_penalty.html)
@@ -79,13 +90,18 @@ The standard regularization penalties are:
   * [L2RegularizationPenalty](https://viktorc.github.io/C-ATTL3/html/classcattle_1_1_l2_regularization_penalty.html)
   * [ElasticNetRegularizationPenalty](https://viktorc.github.io/C-ATTL3/html/classcattle_1_1_elastic_net_regularization_penalty.html)
 
+### DataProvider
 Given these parameters, optimizers can be constructed and used for gradient checks (in case of using self-implemented sub-classes of the core interfaces) and network training. Both methods are parameterized by a neural network implementation and one or two data providers. Data providers are responsible for supplying the data used for gradient verification, training, and testing. Currently only an in-memory data provider implementation is provided by the library, but the addition of a general on-disk data provider and specialized providers for popular data sets such as MNIST, CIFAR, and ImageNet is planned.
+* [DataProvider](https://viktorc.github.io/C-ATTL3/html/classcattle_1_1_data_provider.html) [A]
+  * [InMemoryDataProvider](https://viktorc.github.io/C-ATTL3/html/classcattle_1_1_in_memory_data_provider.html)
 
+### Preprocessor
 C-ATTL3 also contains two preporcessors that can be used to transform the input data. They are:
 * [Preprocessor](https://viktorc.github.io/C-ATTL3/html/classcattle_1_1_preprocessor.html) [A]
   * [NormalizationPreprocessor](https://viktorc.github.io/C-ATTL3/html/classcattle_1_1_normalization_preprocessor.html)
   * [PCAPreprocessor](https://viktorc.github.io/C-ATTL3/html/classcattle_1_1_p_c_a_preprocessor.html)
 
+## Usage
 Once a neural network has been trained, it can be used for inference effortlessly. The following code snippet demonstrates the usage of the library via a simple example.
 
 	using namespace cattle;
@@ -138,4 +154,5 @@ Once a neural network has been trained, it can be used for inference effortlessl
 
 More examples of neural network specifications can be found [here](https://github.com/ViktorC/C-ATTL3/blob/master/test/test.cpp).
 
+## TODO
 Planned features include additional data providers, network serialization and de-serialization, GRU network, CTC loss, evolutionary and second order optimization algorithms, and GPU acceleration via the use of cuBLAS and cuDNN.
