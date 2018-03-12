@@ -16,8 +16,5 @@ script:
   - export CXX=/usr/bin/g++-7
   - gcc -v && g++ -v
   - make -f makefile
-  - sudo cd build
-  - sudo ls -l
-  - sudo ./cattle_test
 notifications:
   email: false

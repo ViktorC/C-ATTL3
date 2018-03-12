@@ -159,4 +159,4 @@ The final code snippet demonstrates the usage of the trained neural network for 
 More examples of neural network constructs can be found [here](https://github.com/ViktorC/C-ATTL3/blob/master/test/test.cpp).
 
 ## TODO
-Planned features include additional data providers, network serialization and de-serialization, GRU neural net, CTC loss, evolutionary and second order optimization algorithms, GPU acceleration via the use of cuBLAS and cuDNN, proper testing, and more extensive documentation including practical examples.
+Planned features include additional data providers, network serialization and de-serialization, GRU neural net, CTC loss, evolutionary and second order optimization algorithms, GPU acceleration via the use of cuBLAS and cuDNN, proper automated testing using CMake, and more extensive documentation including practical examples.
