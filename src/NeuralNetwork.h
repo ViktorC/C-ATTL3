@@ -617,9 +617,9 @@ protected:
 	}
 private:
 	std::vector<Lane> lanes;
-	const MergeType merge_type;
-	const std::size_t concat_rank;
-	const std::size_t concat_batch_rank;
+	MergeType merge_type;
+	std::size_t concat_rank;
+	std::size_t concat_batch_rank;
 	bool foremost;
 	typename Base::Dims input_dims;
 	typename Base::Dims output_dims;
@@ -1339,9 +1339,9 @@ protected:
 private:
 	UnidirNet net;
 	UnidirNet net_rev;
-	const MergeType merge_type;
-	const std::size_t concat_rank;
-	const std::size_t concat_batch_rank;
+	MergeType merge_type;
+	std::size_t concat_rank;
+	std::size_t concat_batch_rank;
 	bool foremost;
 	typename Base::Dims input_dims;
 	typename Base::Dims output_dims;

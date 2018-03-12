@@ -1,5 +1,5 @@
 # C-ATTL3 [![Build Status](https://travis-ci.org/ViktorC/C-ATTL3.svg?branch=master)](https://travis-ci.org/ViktorC/C-ATTL3)
-A header-only neural network template library written in C++. C-ATTL3 uses [Eigen](http://eigen.tuxfamily.org), the popular linear algebra library. It allows for the easy construction and training of both feed-forward and recurrent neural networks ranging from simple MLPs and RNNs to state-of-the-art InceptionNets, ResNets, DenseNets, convolutional LSTMs, and other complex architectures. C-ATTL3 supports rank 1, 2, and 3 data and different floating point scalar types such as `float`, `double`, and `long double`. The Doxygen documentation of the library can be found [here](https://viktorc.github.io/C-ATTL3/html/).
+A header-only neural network template library written in C++. C-ATTL3 relies heavily on [Eigen](http://eigen.tuxfamily.org), the popular linear algebra library. It allows for the easy construction and training of both feed-forward and recurrent neural networks ranging from simple MLPs and RNNs to state-of-the-art InceptionNets, ResNets, DenseNets, convolutional LSTMs, and other complex architectures. C-ATTL3 supports data samples of rank 1 to 3 and different floating point scalar types such as `float`, `double`, and `long double`. The Doxygen documentation of the library can be found [here](https://viktorc.github.io/C-ATTL3/html/).
 
 ## Components
 The following sub-sections describe the main components of the C-ATTL3 deep learning library. Knowledge of these components and their relations is required for the effective usage of the library.
@@ -28,7 +28,7 @@ The lowest level building blocks of neural networks in C-ATTL3 are the layers. T
   * [BatchNormLayer](https://viktorc.github.io/C-ATTL3/html/classcattle_1_1_batch_norm_layer.html)
   * [DropoutLayer](https://viktorc.github.io/C-ATTL3/html/classcattle_1_1_dropout_layer.html)
 
-Most layers can handle data of rank 1 to 3 with the exception of convolutional and pooling layers which only accept rank 3 data. The actual input and output of the layers is of a rank one greater than the nominal rank of the layers to allow for batch learning. Besides the input dimensions, the one parameter required by all, each layer uses multiple hyper-parameters (e.g. max-norm constraint, dilation, receptor field size, etc.). These parameters can be fine-tuned to optimize the behaviour of the networks.
+Most layers can handle data of rank 1 to 3 with the exception of convolutional and pooling layers which only accept rank 3 data. The actual rank of the input and output of the layers is one greater than the nominal rank of the layers to allow for batch learning. In the case of a layer with a nominal rank of 3, the input tensor is expected to be a rank-4 tensor with its ranks representing the sample number, height, width, and depth/channel (N,H,W,C) respectively. The nominal dimensionalities of the accepted input tensors of the different layers are specified using instances of the [Dimensions](https://viktorc.github.io/C-ATTL3/html/classcattle_1_1_dimensions.html) class which relies on expression templates and compile time polymorphism to enable the fast and easy computation of the input dimensions of intermediary layers in complex neural networks. Besides the input dimensions, the one parameter required by all, most layers rely on multiple other hyper-parameters as well (e.g. max-norm constraint, dilation, receptor field size, etc.). These parameters may need to be fine-tuned manually or via random search (or in some other way) to optimize the behaviour of the networks.
 
 #### WeightInitialization
 The kernel layers (fully-connected and convolutional) also require weight initialization. The out-of-the-box weight initialization algorithms include:
@@ -40,8 +40,6 @@ The kernel layers (fully-connected and convolutional) also require weight initia
     * [GlorotWeightInitialization](https://viktorc.github.io/C-ATTL3/html/classcattle_1_1_glorot_weight_initialization.html)
     * [HeWeightInitialization](https://viktorc.github.io/C-ATTL3/html/classcattle_1_1_he_weight_initialization.html)
     * [OrthogonalWeightInitialization](https://viktorc.github.io/C-ATTL3/html/classcattle_1_1_orthogonal_weight_initialization.html)
-
-The dimensionalities of the accepted input tensors of the different layers are specified using instances of the [Dimensions](https://viktorc.github.io/C-ATTL3/html/classcattle_1_1_dimensions.html) class which uses expression templates and compile time polymorphism to enable the fast and easy computation of the input dimensionalities of intermediary layers in complex neural networks.
 
 ### NeuralNetwork
 The highest level building blocks of the different architectures are the neural network implementations provided by the library. Using these implementations, either as modules in a composite constellation or as standalone networks, almost any neural network architecture can be constructed. They are the following:
@@ -74,7 +72,7 @@ The library also provides optimizers that can be used to train the networks via 
       * [NadamOptimizer](https://viktorc.github.io/C-ATTL3/html/classcattle_1_1_nadam_optimizer.html)
 
 #### Loss
-Similarly to the layers, these optimizers rely on hyper-parameters as well. Besides the hyper-parameters, optimizers also require more-or-less differentiable loss functions and regularization penalty functions. The library provides the following out of the box loss functions:
+Similarly to the layers, these optimizers rely on hyper-parameters as well. Besides the hyper-parameters, optimizers also require 'practically' differentiable loss functions and regularization penalty functions. The library provides the following out of the box loss functions:
 * [Loss](https://viktorc.github.io/C-ATTL3/html/classcattle_1_1_loss.html) [A]
   * [QuadraticLoss](https://viktorc.github.io/C-ATTL3/html/classcattle_1_1_quadratic_loss.html)
   * [HingeLoss](https://viktorc.github.io/C-ATTL3/html/classcattle_1_1_hinge_loss.html)
@@ -104,25 +102,28 @@ C-ATTL3 also contains two preporcessors that can be used to transform the input 
   * [PCAPreprocessor](https://viktorc.github.io/C-ATTL3/html/classcattle_1_1_p_c_a_preprocessor.html)
 
 ## Usage
-Once a neural network has been trained, it can be used for inference effortlessly. The following code snippet demonstrates the usage of the library via a simple example.
+The following code snippets demonstrate the usage of the library via a simple example.
 
 	using namespace cattle;
 	
-	// Generate random training data
+Generate some random training data.
+
 	TensorPtr<Scalar,4> training_obs_ptr = TensorPtr<Scalar,4>(new Tensor<Scalar,4>(80, 32, 32, 3));
 	TensorPtr<Scalar,4> training_obj_ptr = TensorPtr<Scalar,4>(new Tensor<Scalar,4>(80, 1, 1, 1));
 	training_obs_ptr->setRandom();
 	training_obj_ptr->setRandom();
 	InMemoryDataProvider<Scalar,3,false> training_prov(std::move(training_obs_ptr), std::move(training_obj_ptr));
 
-	// Generate random test data
+Generate some random test data.
+
 	TensorPtr<Scalar,4> test_obs_ptr = TensorPtr<Scalar,4>(new Tensor<Scalar,4>(20, 32, 32, 3));
 	TensorPtr<Scalar,4> test_obj_ptr = TensorPtr<Scalar,4>(new Tensor<Scalar,4>(20, 1, 1, 1));
 	test_obs_ptr->setRandom();
 	test_obj_ptr->setRandom();
 	InMemoryDataProvider<Scalar,3,false> test_prov(std::move(test_obs_ptr), std::move(test_obj_ptr));
 
-	// Construct a simple convolutional neural network.
+Construct a simple convolutional neural network.
+
 	WeightInitSharedPtr<Scalar> init(new HeWeightInitialization<Scalar>());
 	std::vector<LayerPtr<Scalar,3>> layers(9);
 	layers[0] = LayerPtr<Scalar,3>(new ConvLayer<Scalar>(training_prov.get_obs_dims(), 10, init, 5, 2));
@@ -136,25 +137,30 @@ Once a neural network has been trained, it can be used for inference effortlessl
 	layers[8] = LayerPtr<Scalar,3>(new FCLayer<Scalar,3>(layers[7]->get_output_dims(), 1, init));
 	FeedforwardNeuralNetwork<Scalar,3> nn(std::move(layers));
 
-	// Initialize the network.
+Initialize the network.
+
 	nn.init();
 
-	// Construct the optimizer.
+Construct the optimizer.
+
 	LossSharedPtr<Scalar,3,false> loss(new QuadraticLoss<Scalar,3,false>());
 	RegPenSharedPtr<Scalar> reg(new ElasticNetRegularizationPenalty<Scalar>());
 	NadamOptimizer<Scalar,3,false> opt(loss, reg, 20);
 
-	// Train the network for 500 epochs.
+Train the network for 500 epochs.
+
 	opt.optimize(nn, training_prov, test_prov, 500);
 	
-	// Generate random input data.
+Generate some random input data.
+
 	Tensor<Scalar,4> input(5, 32, 32, 3);
 	input.setRandom();
 	
-	// Inference
+Inference.
+
 	Tensor<Scalar,4> prediction = nn.infer(input);
 
 More examples of neural network specifications can be found [here](https://github.com/ViktorC/C-ATTL3/blob/master/test/test.cpp).
 
 ## TODO
-Planned features include additional data providers, network serialization and de-serialization, GRU network, CTC loss, evolutionary and second order optimization algorithms, and GPU acceleration via the use of cuBLAS and cuDNN.
+Planned features include additional data providers, network serialization and de-serialization, GRU neural net, CTC loss, evolutionary and second order optimization algorithms, GPU acceleration via the use of cuBLAS and cuDNN, proper testing, and more extensive documentation including practical examples.
