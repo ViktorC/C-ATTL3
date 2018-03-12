@@ -71,7 +71,9 @@ template<typename _MatrixType, unsigned int UpLo> class SelfAdjointView
 
     EIGEN_DEVICE_FUNC
     explicit inline SelfAdjointView(MatrixType& matrix) : m_matrix(matrix)
-    {}
+    {
+      EIGEN_STATIC_ASSERT(UpLo==Lower || UpLo==Upper,SELFADJOINTVIEW_ACCEPTS_UPPER_AND_LOWER_MODE_ONLY);
+    }
 
     EIGEN_DEVICE_FUNC
     inline Index rows() const { return m_matrix.rows(); }
@@ -322,7 +324,7 @@ public:
 /** This is the const version of MatrixBase::selfadjointView() */
 template<typename Derived>
 template<unsigned int UpLo>
-typename MatrixBase<Derived>::template ConstSelfAdjointViewReturnType<UpLo>::Type
+EIGEN_DEVICE_FUNC typename MatrixBase<Derived>::template ConstSelfAdjointViewReturnType<UpLo>::Type
 MatrixBase<Derived>::selfadjointView() const
 {
   return typename ConstSelfAdjointViewReturnType<UpLo>::Type(derived());
@@ -339,7 +341,7 @@ MatrixBase<Derived>::selfadjointView() const
   */
 template<typename Derived>
 template<unsigned int UpLo>
-typename MatrixBase<Derived>::template SelfAdjointViewReturnType<UpLo>::Type
+EIGEN_DEVICE_FUNC typename MatrixBase<Derived>::template SelfAdjointViewReturnType<UpLo>::Type
 MatrixBase<Derived>::selfadjointView()
 {
   return typename SelfAdjointViewReturnType<UpLo>::Type(derived());

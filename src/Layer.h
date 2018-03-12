@@ -402,7 +402,7 @@ protected:
 			out_grads_row_offsets[0] = i;
 			Matrix<Scalar> prev_out_grads_mat_i;
 			{
-				Data slice_i = out_grads.slice(out_grads_row_offsets, out_grads_row_extents);
+				Data slice_i = out_grads.slice(out_grads_row_offsets, out_grads_row_extents).eval();
 				MatrixMap<Scalar> out_grads_mat_map_i = MatrixMap<Scalar>(slice_i.data(), Base::output_dims(0) *
 						Base::output_dims(1), filters);
 				// Accumulate the gradients of the outputs w.r.t. the weights for each observation a.k.a 'tensor-row'.

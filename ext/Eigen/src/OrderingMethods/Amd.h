@@ -26,7 +26,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 */
 
-#include "../../../../ext/Eigen/src/Core/util/NonMPL2.h"
+#include "../Core/util/NonMPL2.h"
 
 #ifndef EIGEN_SPARSE_AMD_H
 #define EIGEN_SPARSE_AMD_H

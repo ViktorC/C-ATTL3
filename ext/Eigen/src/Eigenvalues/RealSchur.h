@@ -11,7 +11,7 @@
 #ifndef EIGEN_REAL_SCHUR_H
 #define EIGEN_REAL_SCHUR_H
 
-#include "../../../../ext/Eigen/src/Eigenvalues/HessenbergDecomposition.h"
+#include "./HessenbergDecomposition.h"
 
 namespace Eigen { 
 

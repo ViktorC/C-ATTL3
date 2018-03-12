@@ -55,7 +55,7 @@ The highest level building blocks of the different architectures are the neural 
   * [ResidualNeuralNetwork](https://viktorc.github.io/C-ATTL3/html/classcattle_1_1_residual_neural_network.html) (NS)
   * [DenseNeuralNetwork](https://viktorc.github.io/C-ATTL3/html/classcattle_1_1_dense_neural_network.html) (NS)
 
-These neural networks are either sequential (S) or non-sequential (NS). Non-sequential networks handle inputs of rank 2 to 4 (one greater than their nominal ranks) where the first rank represents the samples thus allowing for (mini-) batch training. On the other hand, sequential networks handle inputs of rank 3 to 5 (two greater than their nominal ranks) where the first rank, similarly to that of non-sequential networks' inputs, represents the samples and the second rank represents the time steps. Feedforward neural networks are ordinary networks with a set of layers through which the non-sequential input is propagated. Parallel neural nets, on the other hand, contain one or more 'lanes' of non-sequential networks through which the input is simultaneously propagated and eventually concatenated along either the highest or lowest rank. Both vanilla recurrent neural networks and LSTMs support arbitrary output schedules and multiplicative integration. A bidirectional network takes a unidirectional network which it clones and reverses yielding two recurrent networks processing the input data from its two opposite ends along the time step rank. The outputs of the two unidirectional subnets of a bidirectional net can be either concatenated or summed. Sequential networks function as wrappers around non-sequential networks allowing them to be used on sequential data by applying them to each time step. Composite neural networks, similarly to parallel networks, are composed of one or more sub-nets; however, these nets are stacked sequentially and can be either sequential or non-sequential. Residual networks and dense networks are implementations of the [ResNet](https://arxiv.org/abs/1512.03385) and [DenseNet](https://arxiv.org/abs/1608.06993) architectures that use non-sequential composite neural networks as their sub-modules.
+These neural networks are either sequential (S) or non-sequential (NS). Non-sequential networks handle inputs of rank 2 to 4 (one greater than their nominal ranks) where the first rank represents the samples thus allowing for (mini-) batch training. On the other hand, sequential networks handle inputs of rank 3 to 5 (two greater than their nominal ranks) where the first rank, similarly to that of non-sequential networks' inputs, represents the samples and the second rank represents the time steps. Feedforward neural networks are ordinary networks with a set of layers through which the non-sequential input is propagated. Parallel neural nets, on the other hand, contain one or more 'lanes' of non-sequential networks through which the input is simultaneously propagated and eventually concatenated along either the highest or lowest rank. Both vanilla recurrent neural networks and LSTMs support arbitrary output schedules and multiplicative integration; however, due to the fact that they are unrolled for propagation/backpropagation through time (no symbolic loop), their memory requirements can be fairly high depending on the number of time steps. A bidirectional network takes a unidirectional network which it clones and reverses yielding two recurrent networks processing the input data from its two opposite ends along the time step rank. The outputs of the two unidirectional subnets of a bidirectional net can be either concatenated or summed. Sequential networks function as wrappers around non-sequential networks allowing them to be used on sequential data by applying them to each time step. Composite neural networks, similarly to parallel networks, are composed of one or more sub-nets; however, these nets are stacked sequentially and can be either sequential or non-sequential. Residual networks and dense networks are implementations of the [ResNet](https://arxiv.org/abs/1512.03385) and [DenseNet](https://arxiv.org/abs/1608.06993) architectures that use non-sequential composite neural networks as their sub-modules.
 
 ### Optimizer
 The library also provides optimizers that can be used to train the networks via backpropagation. The currently available (first-order gradient descent) optimizers include the following:
@@ -104,48 +104,47 @@ C-ATTL3 also contains two preporcessors that can be used to transform the input 
 ## Usage
 The following code snippets demonstrate the usage of the library via a simple example.
 
-	using namespace cattle;
-	
-Generate some random training data.
+To demonstrate the usage of the library's in-memory data provider, some random training data is generated. The training data is comprised of two tensors of rank 4 and type `float`; one for the observations and one for the objectives. The function to be approximated by the neural network is the mapping function between the observations and the objectives. The first rank of these tensors always denotes the samples and its value must be the same in the two tensors. In the example below, the training data consists of 80 observation-objective pairs. In case of sequential data, the second rank of the tensors denotes the time steps which can differ between the observations and the objectives (if the output sequence length of the network does not match the input sequence length); however, in this example, the tensors represent non-sequential data (see the third template argument of the data providers or the optimizer; or the fact that the network to be trained is an inherently non-sequential feed-forward neural network), thus the last 3 ranks describe the individual observation and objective instances. The nominal rank of the data here is thus 3; representing height, width, and depth. The observations are images with a resolution of 32x32 and 3 color channels, while the objectives are single scalars. The data is generated by filling the two tensors with random values between 0 and 1. Finally, the training data provider is created out of the two tensors by moving the two unique pointers referencing them to the `InMemoryDataProvider` constructor.
 
-	TensorPtr<Scalar,4> training_obs_ptr = TensorPtr<Scalar,4>(new Tensor<Scalar,4>(80, 32, 32, 3));
-	TensorPtr<Scalar,4> training_obj_ptr = TensorPtr<Scalar,4>(new Tensor<Scalar,4>(80, 1, 1, 1));
+	using namespace cattle;
+	TensorPtr<float,4> training_obs_ptr = TensorPtr<float,4>(new Tensor<float,4>(80, 32, 32, 3));
+	TensorPtr<float,4> training_obj_ptr = TensorPtr<float,4>(new Tensor<float,4>(80, 1, 1, 1));
 	training_obs_ptr->setRandom();
 	training_obj_ptr->setRandom();
-	InMemoryDataProvider<Scalar,3,false> training_prov(std::move(training_obs_ptr), std::move(training_obj_ptr));
+	InMemoryDataProvider<float,3,false> training_prov(std::move(training_obs_ptr), std::move(training_obj_ptr));
 
-Generate some random test data.
+The test data provider is created in the same way. This test data is used to assess the accuracy of the neural network on data it has not encountered during the training process. This provides a measure of the network's generalization ability; the difference between the network's accuracy on the training data and that on the test data is a metric of overfitting. The test data is usually a smaller portion of all the available data than the training data. In our example, it is 20 samples as opposed to the 80 comprising the training data. Note that all other ranks of the test observation and objective tensors must match those of the training observation and objective tensors.
 
-	TensorPtr<Scalar,4> test_obs_ptr = TensorPtr<Scalar,4>(new Tensor<Scalar,4>(20, 32, 32, 3));
-	TensorPtr<Scalar,4> test_obj_ptr = TensorPtr<Scalar,4>(new Tensor<Scalar,4>(20, 1, 1, 1));
+	TensorPtr<float,4> test_obs_ptr = TensorPtr<float,4>(new Tensor<float,4>(20, 32, 32, 3));
+	TensorPtr<float,4> test_obj_ptr = TensorPtr<float,4>(new Tensor<float,4>(20, 1, 1, 1));
 	test_obs_ptr->setRandom();
 	test_obj_ptr->setRandom();
-	InMemoryDataProvider<Scalar,3,false> test_prov(std::move(test_obs_ptr), std::move(test_obj_ptr));
+	InMemoryDataProvider<float,3,false> test_prov(std::move(test_obs_ptr), std::move(test_obj_ptr));
 
-Construct a simple convolutional neural network.
+The next step is the construction of the neural network. The below snippet demonstrates that of a simple convolutional neural network. The neural network implementation used is `FeedforwardNeuralNetwork` which takes a vector of unique layer pointers. Each layer in the vector must have the same input dimensions as the output dimensions of the preceding layer. The example network consists of convolutional, max pooling, rectified linear unit, and fully connected layers. Convolutional and fully connected layers require weight initialization; due to its well-known compatibility with ReLU activations, He weight initialization is a good choice in our situation. As the `WeightInitialization` class specifies a stateless interface, multiple layers can use the same implementation instance (this is the reason they take shared pointers). Notice how the dimensions of the outputs of the layers do not need to be calculated manually; they can be simply retrieved using the `get_output_dims` method of the previous layers.
 
-	WeightInitSharedPtr<Scalar> init(new HeWeightInitialization<Scalar>());
-	std::vector<LayerPtr<Scalar,3>> layers(9);
-	layers[0] = LayerPtr<Scalar,3>(new ConvLayer<Scalar>(training_prov.get_obs_dims(), 10, init, 5, 2));
-	layers[1] = LayerPtr<Scalar,3>(new ReLUActivationLayer<Scalar,3>(layers[0]->get_output_dims()));
-	layers[2] = LayerPtr<Scalar,3>(new MaxPoolingLayer<Scalar>(layers[1]->get_output_dims()));
-	layers[3] = LayerPtr<Scalar,3>(new ConvLayer<Scalar>(layers[2]->get_output_dims(), 20, init));
-	layers[4] = LayerPtr<Scalar,3>(new ReLUActivationLayer<Scalar,3>(layers[3]->get_output_dims()));
-	layers[5] = LayerPtr<Scalar,3>(new MaxPoolingLayer<Scalar>(layers[4]->get_output_dims()));
-	layers[6] = LayerPtr<Scalar,3>(new FCLayer<Scalar,3>(layers[5]->get_output_dims(), 500, init));
-	layers[7] = LayerPtr<Scalar,3>(new ReLUActivationLayer<Scalar,3>(layers[6]->get_output_dims()));
-	layers[8] = LayerPtr<Scalar,3>(new FCLayer<Scalar,3>(layers[7]->get_output_dims(), 1, init));
-	FeedforwardNeuralNetwork<Scalar,3> nn(std::move(layers));
+	WeightInitSharedPtr<float> init(new HeWeightInitialization<float>());
+	std::vector<LayerPtr<float,3>> layers(9);
+	layers[0] = LayerPtr<float,3>(new ConvLayer<float>(training_prov.get_obs_dims(), 10, init, 5, 2));
+	layers[1] = LayerPtr<float,3>(new ReLUActivationLayer<float,3>(layers[0]->get_output_dims()));
+	layers[2] = LayerPtr<float,3>(new MaxPoolingLayer<float>(layers[1]->get_output_dims()));
+	layers[3] = LayerPtr<float,3>(new ConvLayer<float>(layers[2]->get_output_dims(), 20, init));
+	layers[4] = LayerPtr<float,3>(new ReLUActivationLayer<float,3>(layers[3]->get_output_dims()));
+	layers[5] = LayerPtr<float,3>(new MaxPoolingLayer<float>(layers[4]->get_output_dims()));
+	layers[6] = LayerPtr<float,3>(new FCLayer<float,3>(layers[5]->get_output_dims(), 500, init));
+	layers[7] = LayerPtr<float,3>(new ReLUActivationLayer<float,3>(layers[6]->get_output_dims()));
+	layers[8] = LayerPtr<float,3>(new FCLayer<float,3>(layers[7]->get_output_dims(), 1, init));
+	FeedforwardNeuralNetwork<float,3> nn(std::move(layers));
 
-Initialize the network.
+Once the network is constructed, it is appropriate to initialize it. An unitialized network is in an undefined state. The initialization of the network entails the initialization of all its layers' parameters. Care must be taken not to unintentionally override learned parameters by re-initializing the network.
 
 	nn.init();
 
-Construct the optimizer.
+Having set up the data providers and the network, it is time to specify the loss function, the regularization penalty, and the optimizer. For the sake of simplicity (concerning the data generation), the quadratic loss function is used in our example.
 
-	LossSharedPtr<Scalar,3,false> loss(new QuadraticLoss<Scalar,3,false>());
-	RegPenSharedPtr<Scalar> reg(new ElasticNetRegularizationPenalty<Scalar>());
-	NadamOptimizer<Scalar,3,false> opt(loss, reg, 20);
+	LossSharedPtr<float,3,false> loss(new QuadraticLoss<float,3,false>());
+	RegPenSharedPtr<float> reg(new ElasticNetRegularizationPenalty<float>());
+	NadamOptimizer<float,3,false> opt(loss, reg, 20);
 
 Train the network for 500 epochs.
 
@@ -153,14 +152,14 @@ Train the network for 500 epochs.
 	
 Generate some random input data.
 
-	Tensor<Scalar,4> input(5, 32, 32, 3);
+	Tensor<float,4> input(5, 32, 32, 3);
 	input.setRandom();
 	
 Inference.
 
-	Tensor<Scalar,4> prediction = nn.infer(input);
+	Tensor<float,4> prediction = nn.infer(input);
 
-More examples of neural network specifications can be found [here](https://github.com/ViktorC/C-ATTL3/blob/master/test/test.cpp).
+More examples of neural network constructs can be found [here](https://github.com/ViktorC/C-ATTL3/blob/master/test/test.cpp).
 
 ## TODO
 Planned features include additional data providers, network serialization and de-serialization, GRU neural net, CTC loss, evolutionary and second order optimization algorithms, GPU acceleration via the use of cuBLAS and cuDNN, proper testing, and more extensive documentation including practical examples.

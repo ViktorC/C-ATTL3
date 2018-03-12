@@ -11,7 +11,7 @@
 #ifndef EIGEN_STDDEQUE_H
 #define EIGEN_STDDEQUE_H
 
-#include "../../../../ext/Eigen/src/StlSupport/details.h"
+#include "details.h"
 
 /**
  * This section contains a convenience MACRO which allows an easy specialization of

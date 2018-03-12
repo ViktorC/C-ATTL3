@@ -83,8 +83,8 @@ large enough to hold all the data.
 
     // You can also map fixed-size tensors.  Here we get a 1d view of
     // the 2d fixed-size tensor.
-    Tensor<float, Sizes<4, 5>> t_4x3;
-    TensorMap<Tensor<float, 1>> t_12(t_4x3, 12);
+    TensorFixedSize<float, Sizes<4, 5>> t_4x3;
+    TensorMap<Tensor<float, 1>> t_12(t_4x3.data(), 12);
 
 
 #### Class TensorRef
@@ -272,7 +272,7 @@ Operation to a TensorFixedSize instead of a Tensor, which is a bit more
 efficient.
 
     // We know that the result is a 4x4x2 tensor!
-    TensorFixedSize<float, 4, 4, 2> result = t5;
+    TensorFixedSize<float, Sizes<4, 4, 2>> result = t5;
 
 Simiarly, assigning an expression to a TensorMap causes its evaluation.  Like
 tensors of type TensorFixedSize, TensorMaps cannot be resized so they have to
@@ -296,7 +296,7 @@ the expression in a temporary Tensor of the right size.  The code above in
 effect does:
 
     // .eval() knows the size!
-    TensorFixedSize<float, 4, 4, 2> tmp = t1 + t2;
+    TensorFixedSize<float, Sizes<4, 4, 2>> tmp = t1 + t2;
     Tensor<float, 3> result = (tmp * 0.2f).exp();
 
 Note that the return value of ```eval()``` is itself an Operation, so the
@@ -567,11 +567,11 @@ to the rank of the tensor. The content of the tensor is not initialized.
 
 ### TensorFixedSize
 
-Creates a tensor of the specified size. The number of arguments in the Size<>
+Creates a tensor of the specified size. The number of arguments in the Sizes<>
 template parameter determines the rank of the tensor. The content of the tensor
 is not initialized.
 
-    Eigen::TensorFixedSize<float, Size<3, 4>> a;
+    Eigen::TensorFixedSize<float, Sizes<3, 4>> a;
     cout << "Rank: " << a.rank() << endl;
     => Rank: 2
     cout << "NumRows: " << a.dimension(0) << " NumCols: " << a.dimension(1) << endl;
@@ -584,11 +584,11 @@ until the TensorMap is discarded, and the size of the data must be large enough
 to accomodate of the coefficients of the tensor.
 
     float data[] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11};
-    Eigen::TensorMap<float, 2> a(data, 3, 4);
+    Eigen::TensorMap<Tensor<float, 2>> a(data, 3, 4);
     cout << "NumRows: " << a.dimension(0) << " NumCols: " << a.dimension(1) << endl;
     => NumRows: 3 NumCols: 4
     cout << "a(1, 2): " << a(1, 2) << endl;
-    => a(1, 2): 9
+    => a(1, 2): 7
 
 
 ## Contents Initialization
@@ -1016,13 +1016,20 @@ multidimensional case.
     a.setValues({{1, 2}, {4, 5}, {5, 6}});
 
     // Compute the traditional matrix product
-    array<IndexPair<int>, 1> product_dims = { IndexPair(1, 0) };
+    Eigen::array<Eigen::IndexPair<int>, 1> product_dims = { Eigen::IndexPair(1, 0) };
     Eigen::Tensor<int, 2> AB = a.contract(b, product_dims);
 
     // Compute the product of the transpose of the matrices
-    array<IndexPair<int>, 1> transpose_product_dims = { IndexPair(0, 1) };
+    Eigen::array<Eigen::IndexPair<int>, 1> transpose_product_dims = { Eigen::IndexPair(0, 1) };
     Eigen::Tensor<int, 2> AtBt = a.contract(b, transposed_product_dims);
-
+    
+    // Contraction to scalar value using a ouble contraction 
+    // First coordinate of both tensors are contracted as well as both second coordinates
+    Eigen::array<Eigen::IndexPair<int>, 2> double_contraction_product_dims = { Eigen::IndexPair<int>(0, 0), Eigen::IndexPair<int>(1, 1) };
+    Eigen::Tensor<int, 0> AdoubleontractedA = a.contract(a, double_contraction_product_dims);
+    
+    // Extracting the scalar value of the tensor contraction for further usage
+    int value = AdoublecontractedA(0);
 
 ## Reduction Operations
 
@@ -1166,6 +1173,58 @@ short-circuiting, so may be significantly inefficient.
 
 Reduce a tensor using a user-defined reduction operator.  See ```SumReducer```
 in TensorFunctors.h for information on how to implement a reduction operator.
+
+
+## Trace
+
+A *Trace* operation returns a tensor with fewer dimensions than the original
+tensor. It returns a tensor whose elements are the sum of the elements of the
+original tensor along the main diagonal for a list of specified dimensions, the
+"trace dimensions". Similar to the ```Reduction Dimensions```, the trace dimensions
+are passed as an input parameter to the operation, are of type ```<TensorType>::Dimensions```
+, and have the same requirements when passed as an input parameter. In addition,
+the trace dimensions must have the same size.
+
+Example: Trace along 2 dimensions.
+
+    // Create a tensor of 3 dimensions
+    Eigen::Tensor<int, 3> a(2, 2, 3);
+    a.setValues({{{1, 2, 3}, {4, 5, 6}}, {{7, 8, 9}, {10, 11, 12}}});
+    // Specify the dimensions along which the trace will be computed.
+    // In this example, the trace can only be computed along the dimensions
+    // with indices 0 and 1
+    Eigen::array<int, 2> dims({0, 1});
+    // The output tensor contains all but the trace dimensions.
+    Tensor<int, 1> a_trace = a.trace(dims);
+    cout << "a_trace:" << endl;
+    cout << a_trace << endl;
+    =>
+    a_trace:
+    11
+    13
+    15
+
+
+### <Operation> trace(const Dimensions& new_dims)
+### <Operation> trace()
+
+As a special case, if no parameter is passed to the operation, trace is computed
+along *all* dimensions of the input tensor.
+
+Example: Trace along all dimensions.
+
+    // Create a tensor of 3 dimensions, with all dimensions having the same size.
+    Eigen::Tensor<int, 3> a(3, 3, 3);
+    a.setValues({{{1, 2, 3}, {4, 5, 6}, {7, 8, 9}},
+                {{10, 11, 12}, {13, 14, 15}, {16, 17, 18}},
+                {{19, 20, 21}, {22, 23, 24}, {25, 26, 27}}});
+    // Result is a zero dimension tensor
+    Tensor<int, 0> a_trace = a.trace();
+    cout<<"a_trace:"<<endl;
+    cout<<a_trace<<endl;
+    =>
+    a_trace:
+    42
 
 
 ## Scan Operations
@@ -1314,7 +1373,7 @@ The previous example can be rewritten as follow:
     Eigen::Tensor<float, 2, Eigen::ColMajor> a(2, 3);
     a.setValues({{0.0f, 100.0f, 200.0f}, {300.0f, 400.0f, 500.0f}});
     Eigen::array<Eigen::DenseIndex, 2> two_dim({2, 3});
-    Eigen::Tensor<float, 1, Eigen::ColMajor> b;
+    Eigen::Tensor<float, 1, Eigen::ColMajor> b(6);
     b.reshape(two_dim) = a;
     cout << "b" << endl << b << endl;
     =>
@@ -1737,11 +1796,9 @@ TODO
 
 ## Representation of scalar values
 
-Scalar values are often represented by tensors of size 1 and rank 1. It would be
-more logical and user friendly to use tensors of rank 0 instead. For example
-Tensor<T, N>::maximum() currently returns a Tensor<T, 1>. Similarly, the inner
-product of 2 1d tensors (through contractions) returns a 1d tensor. In the
-future these operations might be updated to return 0d tensors instead.
+Scalar values are often represented by tensors of size 1 and rank 0.For example
+Tensor<T, N>::maximum() currently returns a Tensor<T, 0>. Similarly, the inner
+product of 2 1d tensors (through contractions) returns a 0d tensor.
 
 ## Limitations
 

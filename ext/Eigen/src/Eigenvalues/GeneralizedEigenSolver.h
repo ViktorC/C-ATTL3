@@ -12,7 +12,7 @@
 #ifndef EIGEN_GENERALIZEDEIGENSOLVER_H
 #define EIGEN_GENERALIZEDEIGENSOLVER_H
 
-#include "../../../../ext/Eigen/src/Eigenvalues/RealQZ.h"
+#include "./RealQZ.h"
 
 namespace Eigen { 
 

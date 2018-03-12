@@ -10,7 +10,7 @@
 #ifndef EIGEN_STDLIST_H
 #define EIGEN_STDLIST_H
 
-#include "../../../../ext/Eigen/src/StlSupport/details.h"
+#include "details.h"
 
 /**
  * This section contains a convenience MACRO which allows an easy specialization of

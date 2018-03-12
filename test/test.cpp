@@ -272,6 +272,6 @@ static int test_bdrnn() {
 }
 
 int main() {
-	assert(test_parallel() & test_residual() & test_dense() & test_seqnn() & test_rnn() & test_lstm() & test_bdrnn());
+	assert(test_dense() & test_seqnn() & test_rnn() & test_lstm() & test_bdrnn());
 	return 0;
 }

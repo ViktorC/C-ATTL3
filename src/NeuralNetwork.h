@@ -1809,7 +1809,7 @@ protected:
 			Root::empty_cache(*cell.state_kernel);
 		}
 		// Roll the network up and accumulate the gradients.
-		// TODO Single evaluation.
+		// FIXME Single evaluation.
 		Matrix<Scalar>& u_param_grads = Root::get_param_grads(*main_cell.input_kernel);
 		Matrix<Scalar>& w_param_grads = Root::get_param_grads(*main_cell.state_kernel);
 		Matrix<Scalar>& v_param_grads = Root::get_param_grads(*main_cell.output_kernel);
@@ -1840,7 +1840,7 @@ private:
 		ActivationPtr<Scalar,Rank> state_act;
 		ActivationPtr<Scalar,Rank> output_act;
 		// State and input caches for multiplicative integration.
-		// TODO Do not cache the input doubly (it is also cached in the layer).
+		// FIXME Do not cache the input doubly (it is also cached in the layer).
 		TimeStepData state_kernel_cache;
 		TimeStepData input_kernel_cache;
 	};

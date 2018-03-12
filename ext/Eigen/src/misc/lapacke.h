@@ -43,10 +43,6 @@
 #include "lapacke_config.h"
 #endif
 
-#ifdef __cplusplus
-extern "C" {
-#endif /* __cplusplus */
-
 #include <stdlib.h>
 
 #ifndef lapack_int
@@ -108,6 +104,11 @@ lapack_complex_double lapack_make_complex_double( double re, double im );
 
 #endif
 
+
+#ifdef __cplusplus
+extern "C" {
+#endif /* __cplusplus */
+
 #ifndef LAPACKE_malloc
 #define LAPACKE_malloc( size ) malloc( size )
 #endif
@@ -142,7 +143,7 @@ typedef lapack_logical (*LAPACK_Z_SELECT1) ( const lapack_complex_double* );
 typedef lapack_logical (*LAPACK_Z_SELECT2)
     ( const lapack_complex_double*, const lapack_complex_double* );
 
-#include "../../../../ext/Eigen/src/misc/lapacke_mangling.h"
+#include "lapacke_mangling.h"
 
 #define LAPACK_lsame LAPACK_GLOBAL(lsame,LSAME)
 lapack_logical LAPACK_lsame( char* ca,  char* cb,

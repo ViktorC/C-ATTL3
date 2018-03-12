@@ -69,6 +69,7 @@ template<typename Derived> class ArrayBase
     using Base::coeff;
     using Base::coeffRef;
     using Base::lazyAssign;
+    using Base::operator-;
     using Base::operator=;
     using Base::operator+=;
     using Base::operator-=;
@@ -88,12 +89,11 @@ template<typename Derived> class ArrayBase
 
 #define EIGEN_CURRENT_STORAGE_BASE_CLASS Eigen::ArrayBase
 #define EIGEN_DOC_UNARY_ADDONS(X,Y)
-#   include "../../../../ext/Eigen/src/plugins/CommonCwiseUnaryOps.h"
-#   include "../../../../ext/Eigen/src/plugins/MatrixCwiseUnaryOps.h"
-#   include "../../../../ext/Eigen/src/plugins/ArrayCwiseUnaryOps.h"
-#   include "../../../../ext/Eigen/src/plugins/CommonCwiseBinaryOps.h"
-#   include "../../../../ext/Eigen/src/plugins/MatrixCwiseBinaryOps.h"
-#   include "../../../../ext/Eigen/src/plugins/ArrayCwiseBinaryOps.h"
+#   include "../plugins/MatrixCwiseUnaryOps.h"
+#   include "../plugins/ArrayCwiseUnaryOps.h"
+#   include "../plugins/CommonCwiseBinaryOps.h"
+#   include "../plugins/MatrixCwiseBinaryOps.h"
+#   include "../plugins/ArrayCwiseBinaryOps.h"
 #   ifdef EIGEN_ARRAYBASE_PLUGIN
 #     include EIGEN_ARRAYBASE_PLUGIN
 #   endif

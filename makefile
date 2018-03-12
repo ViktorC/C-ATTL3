@@ -3,7 +3,7 @@ CC := g++
 ARCH := -m64
 CFLAGS := -std=c++11 -march=native -fopenmp -fmessage-length=0
 DEF_OPT_FLAGS := -O3
-DEBUG_OPT_FLAGS := -g -Wa,-mbig-obj -O0
+DEBUG_OPT_FLAGS := -g3 -Wa,-mbig-obj -O1
 SOURCE_DIR := test
 SOURCES := test.cpp
 INCLUDES := -Isrc/ -Itest/ -Iext/
