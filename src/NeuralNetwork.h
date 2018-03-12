@@ -2280,6 +2280,7 @@ protected:
 					cell.forget_filter_cache = Root::pass_forward(*cell.forget_act, std::move(weighted_input_forget), training);
 					cell.prev_state_cache = std::move(state);
 					// Selective remembrance.
+					// FIXME Use a thread pool to evaluate the tensor operations.
 					state = cell.forget_filter_cache * cell.prev_state_cache;
 					if (!training)
 						Root::empty_cache(*cell.forget_act);
