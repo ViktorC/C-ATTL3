@@ -9,7 +9,12 @@ SOURCES := test.cpp
 INCLUDES := -Isrc/ -Itest/ -Iext/
 LIBS := -lpthread -lgomp
 BUILD_DIR := build
-TARGET := $(BUILD_DIR)/CattleTest.exe
+ifeq ($(OS),Windows_NT)
+	TARGET_NAME := cattle_test.exe
+else
+	TARGET_NAME := cattle_test
+endif
+TARGET := $(BUILD_DIR)/$(TARGET_NAME)
 OBJECTS := $(BUILD_DIR)/$(SOURCES:%.cpp=%.o)
 $(OBJECTS): $(BUILD_DIR)/%.o: $(SOURCE_DIR)/%.cpp
 	$(CC) $(ARCH) $(CFLAGS) $(OPT_FLAGS) $(INCLUDES) -c -o $@ $<
