@@ -22,9 +22,9 @@
 #include <typeinfo>
 #include <utility>
 #include <vector>
-#include "Eigen/Core"
 #include "Dimensions.h"
 #include "Layer.h"
+#include "Utils.h"
 
 // TODO GRU network.
 // TODO Possibility to add and remove modules (e.g. layers for sequential networks, inception modules for InceptionNets).
@@ -563,7 +563,7 @@ protected:
 		assert(output_dims == Utils<Scalar>::template get_dims<Base::DATA_RANKS>(out_grads).template demote<>());
 		typename Base::Data prev_out_grads;
 		if (foremost)
-			prev_out_grads = Utils<Scalar>::template get_null_tensor<Base::DATA_RANKS>();
+			prev_out_grads = typename Base::Data();
 		else {
 			RankwiseArray dims = input_dims.template promote<>();
 			dims[0] = out_grads.dimension(0);
@@ -1286,7 +1286,7 @@ protected:
 		assert(!pthread_join(helper_thread, nullptr));
 		pthread_attr_destroy(&attr);
 		assert(forward_out.dimension(1) == args.out.dimension(1));
-		input = Utils<Scalar>::template get_null_tensor<Base::DATA_RANKS>();
+		input = typename Base::Data();
 		if (merge_type != SUM) {
 			RankwiseArray dims = forward_out.dimensions();
 			RankwiseArray offsets;
@@ -1333,7 +1333,7 @@ protected:
 			assert(!pthread_join(helper_thread, nullptr));
 		}
 		pthread_attr_destroy(&attr);
-		out_grads = Utils<Scalar>::template get_null_tensor<Base::DATA_RANKS>();
+		out_grads = typename Base::Data();
 		return forward_prev_out_grads + args.prev_out_grads;
 	}
 private:
@@ -1551,12 +1551,12 @@ protected:
 		this->foremost = foremost;
 	}
 	inline void empty_caches() {
+		TimeStepData null_tensor;
 		Root::empty_cache(*main_cell.input_kernel);
 		Root::empty_cache(*main_cell.state_kernel);
 		Root::empty_cache(*main_cell.output_kernel);
 		Root::empty_cache(*main_cell.state_act);
 		Root::empty_cache(*main_cell.output_act);
-		const TimeStepData& null_tensor = Utils<Scalar>::template get_null_tensor<Rank + 1>();
 		main_cell.state_kernel_cache = null_tensor;
 		main_cell.input_kernel_cache = null_tensor;
 		cells = std::vector<Cell>(0);
@@ -1726,6 +1726,7 @@ protected:
 		Dimensions<int,Root::DATA_RANKS> data_dims = Utils<Scalar>::template get_dims<Root::DATA_RANKS>(out_grads);
 		assert(output_dims == data_dims.template demote<2>() && batch_size == data_dims(0) &&
 				output_seq_length == data_dims(1));
+		TimeStepData null_tensor;
 		RankwiseIntArray output_offsets;
 		RankwiseIntArray output_extents = data_dims;
 		RankwiseIntArray input_offsets;
@@ -1775,14 +1776,14 @@ protected:
 				if (foremost) {
 					if (mul_int) { // Multiplicative integration.
 						Root::pass_back(*cell.input_kernel, cell.state_kernel_cache * state_grads);
-						cell.state_kernel_cache = Utils<Scalar>::template get_null_tensor<Rank + 1>();
+						cell.state_kernel_cache = null_tensor;
 					} else // Additive integration.
 						Root::pass_back(*cell.input_kernel, state_grads);
 				} else if (input_seq_length == 1) {
 					if (mul_int) {
 						prev_out_grads = Utils<Scalar>::template map_tensor_to_tensor<Rank + 1,Root::DATA_RANKS>(
 								Root::pass_back(*cell.input_kernel, cell.state_kernel_cache * state_grads), input_extents);
-						cell.state_kernel_cache = Utils<Scalar>::template get_null_tensor<Rank + 1>();
+						cell.state_kernel_cache = null_tensor;
 					} else
 						prev_out_grads = Utils<Scalar>::template map_tensor_to_tensor<Rank + 1,Root::DATA_RANKS>(
 								Root::pass_back(*cell.input_kernel, state_grads), input_extents);
@@ -1791,7 +1792,7 @@ protected:
 						prev_out_grads.slice(input_offsets, input_extents) =
 								Utils<Scalar>::template map_tensor_to_tensor<Rank + 1,Root::DATA_RANKS>(
 										Root::pass_back(*cell.input_kernel, cell.state_kernel_cache * state_grads), input_extents);
-						cell.state_kernel_cache = Utils<Scalar>::template get_null_tensor<Rank + 1>();
+						cell.state_kernel_cache = null_tensor;
 					} else
 						prev_out_grads.slice(input_offsets, input_extents) =
 								Utils<Scalar>::template map_tensor_to_tensor<Rank + 1,Root::DATA_RANKS>(
@@ -1803,7 +1804,7 @@ protected:
 			// Compute the gradients w.r.t. the state kernel.
 			if (mul_int) {
 				state_grads = Root::pass_back(*cell.state_kernel, cell.input_kernel_cache * state_grads);
-				cell.input_kernel_cache = Utils<Scalar>::template get_null_tensor<Rank + 1>();
+				cell.input_kernel_cache = null_tensor;
 			} else
 				state_grads = Root::pass_back(*cell.state_kernel, std::move(state_grads));
 			Root::empty_cache(*cell.state_kernel);
@@ -2117,7 +2118,7 @@ protected:
 		this->foremost = foremost;
 	}
 	inline void empty_caches() {
-		const TimeStepData& null_tensor = Utils<Scalar>::template get_null_tensor<Rank + 1>();
+		TimeStepData null_tensor;
 		Root::empty_cache(*main_cell.input_forget_kernel);
 		Root::empty_cache(*main_cell.output_forget_kernel);
 		Root::empty_cache(*main_cell.input_write_kernel);
@@ -2174,6 +2175,7 @@ protected:
 		int output_seq_length = (int) output_seq_info.first;
 		int output_seq_delay = (int) output_seq_info.second;
 		assert(output_seq_length > 0);
+		TimeStepData null_tensor;
 		if (reversed) {
 			RankwiseBoolArray reverse;
 			reverse.fill(false);
@@ -2257,7 +2259,6 @@ protected:
 		Dimensions<int,Rank + 1> input_time_step_dims = input_dims.template promote<>();
 		input_time_step_dims(0) = samples;
 		TimeStepData hidden_out;
-		TimeStepData null_tensor = Utils<Scalar>::template get_null_tensor<Rank + 1>();
 		for (int i = 0; i < time_steps; ++i) {
 			Cell& cell = !training || i == 0 ? main_cell : cells[i - 1];
 			TimeStepData input_res;
@@ -2444,6 +2445,7 @@ protected:
 		Dimensions<int,Root::DATA_RANKS> data_dims = Utils<Scalar>::template get_dims<Root::DATA_RANKS>(out_grads);
 		assert(output_dims == data_dims.template demote<2>() && batch_size == data_dims(0) &&
 				output_seq_length == data_dims(1));
+		TimeStepData null_tensor;
 		RankwiseIntArray output_offsets;
 		RankwiseIntArray output_extents = data_dims;
 		RankwiseIntArray input_offsets;
@@ -2468,7 +2470,6 @@ protected:
 		out_time_step_dims(0) = batch_size;
 		int output_end = output_seq_length + output_seq_delay;
 		int time_steps = std::max(input_seq_length, output_end);
-		TimeStepData null_tensor = Utils<Scalar>::template get_null_tensor<Rank + 1>();
 		for (int i = time_steps - 1; i >= 0; --i) {
 			Cell& cell = i == 0 ? main_cell : cells[i - 1];
 			// If there was a non-hidden output at the time step, let the gradients flow into the hidden output gradients.

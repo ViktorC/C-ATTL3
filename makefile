@@ -6,7 +6,7 @@ DEF_OPT_FLAGS := -O3
 DEBUG_OPT_FLAGS := -g3 -Wa,-mbig-obj -O1
 SOURCE_DIR := test
 SOURCES := test.cpp
-INCLUDES := -Isrc/ -Itest/ -Iext/
+INCLUDES := -Isrc/ -Itest/ -Iext/Eigen/
 LIBS := -lpthread -lgomp
 BUILD_DIR := build
 ifeq ($(OS),Windows_NT)

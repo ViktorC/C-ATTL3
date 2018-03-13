@@ -16,7 +16,6 @@
 #include <string>
 #include <type_traits>
 #include <vector>
-#include "Eigen/Dense"
 #include "Utils.h"
 
 namespace cattle {

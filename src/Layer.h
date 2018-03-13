@@ -256,7 +256,7 @@ protected:
 		// Compute the gradients of the outputs with respect to the weights.
 		Base::weight_grads = biased_in.transpose() * out_grads_mat;
 		if (Base::is_input_layer())
-			return Utils<Scalar>::template get_null_tensor<Rank + 1>();
+			return Data();
 		/* Remove the bias row from the weight matrix, transpose it, and compute gradients w.r.t. the
 		 * previous layer's output. */
 		return Utils<Scalar>::template map_mat_to_tensor<Rank + 1>((out_grads_mat *
@@ -332,7 +332,7 @@ protected:
 		paddings[3] = std::make_pair(0, 0);
 		Data padded_in = in.pad(paddings);
 		// Free the memory occupied by the now-expendable input tensor.
-		in = Utils<Scalar>::template get_null_tensor<4>();
+		in = Data();
 		int rows = padded_in.dimension(0);
 		int patches = Base::output_dims(0) * Base::output_dims(1);
 		int receptor_vol = receptor_size * receptor_size * Base::input_dims(2);
@@ -533,7 +533,7 @@ protected:
 		assert(Utils<Scalar>::template get_dims<Rank + 1>(out_grads).template demote<>() == dims);
 		assert(out_grads.dimension(0) > 0 && out.rows() == out_grads.dimension(0));
 		if (input_layer)
-			return Utils<Scalar>::template get_null_tensor<Rank + 1>();
+			return Data();
 		return Utils<Scalar>::template map_mat_to_tensor<Rank + 1>(d_activate(in, out,
 				Utils<Scalar>::template map_tensor_to_mat<Rank + 1>(std::move(out_grads))), dims);
 	}
@@ -956,7 +956,7 @@ protected:
 		assert(Utils<Scalar>::template get_dims<4>(out_grads).template demote<>() == output_dims);
 		assert(out_grads.dimension(0) > 0 && rows == out_grads.dimension(0));
 		if (input_layer)
-			return Utils<Scalar>::template get_null_tensor<4>();
+			return Data();
 		int depth = input_dims(2);
 		Dimensions<int,3> patch_dims({ (int) receptor_size, (int) receptor_size, 1 });
 		RankwiseArray patch_offsets({ 0, 0, 0, 0});
@@ -1216,7 +1216,7 @@ protected:
 			param_grads.row(2 * i) = out_grads_ch_map_i.cwiseProduct(cache.std_in).colwise().sum();
 			param_grads.row(2 * i + 1) = out_grads_ch_map_i.colwise().sum();
 			if (input_layer)
-				return Utils<Scalar>::template get_null_tensor<Rank + 1>();
+				return Data();
 			std_in_grads_i = out_grads_ch_map_i * params.row(2 * i).asDiagonal();
 		}
 		return Utils<Scalar>::template map_mat_to_tensor<Rank + 1>(((((rows * std_in_grads_i).rowwise() -
@@ -1407,7 +1407,7 @@ protected:
 		assert(Utils<Scalar>::template get_dims<Rank + 1>(out_grads).template demote<>() == dims);
 		assert(out_grads.dimension(0) > 0 && dropout_mask.rows() == out_grads.dimension(0));
 		if (input_layer)
-			return Utils<Scalar>::template get_null_tensor<Rank + 1>();
+			return Data();
 		// The derivative of the dropout 'function'.
 		return Utils<Scalar>::template map_mat_to_tensor<Rank + 1>(Utils<Scalar>::template map_tensor_to_mat<Rank + 1>(std::move(out_grads))
 				.cwiseProduct(dropout_mask).eval(), dims);

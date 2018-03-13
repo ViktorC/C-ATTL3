@@ -78,11 +78,6 @@ public:
 	static constexpr Scalar EPSILON1 = std::numeric_limits<Scalar>::epsilon();
 	static constexpr Scalar EPSILON2 = 1e-8;
 	static constexpr Scalar EPSILON3 = 1e-4;
-	static const Matrix<Scalar> NULL_MATRIX;
-	static const Tensor<Scalar,2> NULL_TENSOR2;
-	static const Tensor<Scalar,3> NULL_TENSOR3;
-	static const Tensor<Scalar,4> NULL_TENSOR4;
-	static const Tensor<Scalar,5> NULL_TENSOR5;
 	/**
 	 * @return The number of threads used by Eigen to accelerate operations
 	 * supporting multithreading.
@@ -181,27 +176,6 @@ public:
 	inline static bool lesser_or_almost_equal(Scalar n1, Scalar n2, Scalar abs_epsilon = EPSILON1,
 			Scalar rel_epsilon = EPSILON1) {
 		return n1 < n2 || almost_equal(n1, n2, abs_epsilon, rel_epsilon);
-	}
-	/**
-	 * Returns a null tensor without having to create a new instance as long as Rank is in the
-	 * range [2,5].
-	 *
-	 * @return A constant reference to a tensor of the desired rank with a size of 0 along each
-	 * rank.
-	 */
-	template<std::size_t Rank>
-	inline static const Tensor<Scalar,Rank>& get_null_tensor() {
-		static_assert(Rank > 1 && Rank < 6, "illegal null tensor rank");
-		switch (Rank) {
-		case 2:
-			return NULL_TENSOR2;
-		case 3:
-			return NULL_TENSOR3;
-		case 4:
-			return NULL_TENSOR4;
-		case 5:
-			return NULL_TENSOR5;
-		}
 	}
 	/**
 	 * It asserts that each rank of the tensor has a size greater than 0.
@@ -366,17 +340,6 @@ public:
 		tensor = map_mat_to_tensor<Rank>(std::move(mat), dims);
 	}
 };
-
-template<typename Scalar>
-const Matrix<Scalar> Utils<Scalar>::NULL_MATRIX = Matrix<Scalar>();
-template<typename Scalar>
-const Tensor<Scalar,2> Utils<Scalar>::NULL_TENSOR2 = Tensor<Scalar,2>();
-template<typename Scalar>
-const Tensor<Scalar,3> Utils<Scalar>::NULL_TENSOR3 = Tensor<Scalar,3>();
-template<typename Scalar>
-const Tensor<Scalar,4> Utils<Scalar>::NULL_TENSOR4 = Tensor<Scalar,4>();
-template<typename Scalar>
-const Tensor<Scalar,5> Utils<Scalar>::NULL_TENSOR5 = Tensor<Scalar,5>();
 
 }
 
