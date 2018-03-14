@@ -114,8 +114,8 @@ Public Member Functions</h2></td></tr>
 Protected Member Functions</h2></td></tr>
 <tr class="memitem:ae400b62713d31b250e142514fd0626c4"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_adagrad_optimizer.html#ae400b62713d31b250e142514fd0626c4">fit</a> (<a class="el" href="classcattle_1_1_neural_network.html">NeuralNetwork</a>&lt; Scalar, Rank, Sequential &gt; &amp;net)</td></tr>
 <tr class="separator:ae400b62713d31b250e142514fd0626c4"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:afaab4b4d4641b73841e19f709e51f5a0"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_adagrad_optimizer.html#afaab4b4d4641b73841e19f709e51f5a0">update_acc_param_grad_sqrs</a> (<a class="el" href="namespacecattle.html#a1d78623a47279d516750a44dbad6090b">Matrix</a>&lt; Scalar &gt; &amp;acc_param_grad_sqrs, const <a class="el" href="namespacecattle.html#a1d78623a47279d516750a44dbad6090b">Matrix</a>&lt; Scalar &gt; &amp;param_grads)</td></tr>
-<tr class="separator:afaab4b4d4641b73841e19f709e51f5a0"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a61a32e88374a14b25fe6db0eeeb569ea"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_adagrad_optimizer.html#a61a32e88374a14b25fe6db0eeeb569ea">update_acc_params_grad_sqrs</a> (<a class="el" href="namespacecattle.html#a1d78623a47279d516750a44dbad6090b">Matrix</a>&lt; Scalar &gt; &amp;acc_params_grad_sqrs, const <a class="el" href="namespacecattle.html#a1d78623a47279d516750a44dbad6090b">Matrix</a>&lt; Scalar &gt; &amp;params_grad)</td></tr>
+<tr class="separator:a61a32e88374a14b25fe6db0eeeb569ea"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a4932d1b497bf3a9185bd35ae05eecb87"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_adagrad_optimizer.html#a4932d1b497bf3a9185bd35ae05eecb87">update_params</a> (<a class="el" href="classcattle_1_1_layer.html">Layer</a>&lt; Scalar, Rank &gt; &amp;layer, unsigned i, unsigned epoch)</td></tr>
 <tr class="separator:a4932d1b497bf3a9185bd35ae05eecb87"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="inherit_header pro_methods_classcattle_1_1_s_g_d_optimizer"><td colspan="2" onclick="javascript:toggleInherit('pro_methods_classcattle_1_1_s_g_d_optimizer')"><img src="closed.png" alt="-"/>&#160;Protected Member Functions inherited from <a class="el" href="classcattle_1_1_s_g_d_optimizer.html">cattle::SGDOptimizer&lt; Scalar, Rank, Sequential &gt;</a></td></tr>
@@ -130,8 +130,8 @@ Protected Attributes</h2></td></tr>
 <tr class="separator:acda16233b86471e79f471a39be690af8"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a9e76842aeb13eec263b5dea0eaea2516"><td class="memItemLeft" align="right" valign="top">const Scalar&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_adagrad_optimizer.html#a9e76842aeb13eec263b5dea0eaea2516">epsilon</a></td></tr>
 <tr class="separator:a9e76842aeb13eec263b5dea0eaea2516"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a504897a555cb0d802e48e1a8642e58bf"><td class="memItemLeft" align="right" valign="top">std::vector&lt; <a class="el" href="namespacecattle.html#a1d78623a47279d516750a44dbad6090b">Matrix</a>&lt; Scalar &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_adagrad_optimizer.html#a504897a555cb0d802e48e1a8642e58bf">param_grad_sqrs_vec</a></td></tr>
-<tr class="separator:a504897a555cb0d802e48e1a8642e58bf"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a32f5513607fdc1ec6576a77d2f445d69"><td class="memItemLeft" align="right" valign="top">std::vector&lt; <a class="el" href="namespacecattle.html#a1d78623a47279d516750a44dbad6090b">Matrix</a>&lt; Scalar &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_adagrad_optimizer.html#a32f5513607fdc1ec6576a77d2f445d69">params_grad_sqrs_vec</a></td></tr>
+<tr class="separator:a32f5513607fdc1ec6576a77d2f445d69"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="inherit_header pro_attribs_classcattle_1_1_s_g_d_optimizer"><td colspan="2" onclick="javascript:toggleInherit('pro_attribs_classcattle_1_1_s_g_d_optimizer')"><img src="closed.png" alt="-"/>&#160;Protected Attributes inherited from <a class="el" href="classcattle_1_1_s_g_d_optimizer.html">cattle::SGDOptimizer&lt; Scalar, Rank, Sequential &gt;</a></td></tr>
 <tr class="memitem:a85f1e7ea5cb110e39376d254f65d14e9 inherit pro_attribs_classcattle_1_1_s_g_d_optimizer"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="namespacecattle.html#af01c35d5a6127252427cffc91b52a616">RegPenSharedPtr</a>&lt; Scalar &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_s_g_d_optimizer.html#a85f1e7ea5cb110e39376d254f65d14e9">reg</a></td></tr>
 <tr class="separator:a85f1e7ea5cb110e39376d254f65d14e9 inherit pro_attribs_classcattle_1_1_s_g_d_optimizer"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -161,8 +161,8 @@ Additional Inherited Members</h2></td></tr>
 <tr class="separator:abc23bf23413dfa4a8c6a8d9b222af7eb inherit pro_static_methods_classcattle_1_1_optimizer"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a03a788c5ce15f611d5c6007d43550ef5 inherit pro_static_methods_classcattle_1_1_optimizer"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="namespacecattle.html#a1d78623a47279d516750a44dbad6090b">Matrix</a>&lt; Scalar &gt; &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_optimizer.html#a03a788c5ce15f611d5c6007d43550ef5">get_params</a> (<a class="el" href="classcattle_1_1_layer.html">Layer</a>&lt; Scalar, Rank &gt; &amp;layer)</td></tr>
 <tr class="separator:a03a788c5ce15f611d5c6007d43550ef5 inherit pro_static_methods_classcattle_1_1_optimizer"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a30497ef0f5a5ef64ff591a51e4b065e4 inherit pro_static_methods_classcattle_1_1_optimizer"><td class="memItemLeft" align="right" valign="top">static const <a class="el" href="namespacecattle.html#a1d78623a47279d516750a44dbad6090b">Matrix</a>&lt; Scalar &gt; &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_optimizer.html#a30497ef0f5a5ef64ff591a51e4b065e4">get_param_grads</a> (<a class="el" href="classcattle_1_1_layer.html">Layer</a>&lt; Scalar, Rank &gt; &amp;layer)</td></tr>
-<tr class="separator:a30497ef0f5a5ef64ff591a51e4b065e4 inherit pro_static_methods_classcattle_1_1_optimizer"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4697c3e95df8ae818471c5734b6f5ef6 inherit pro_static_methods_classcattle_1_1_optimizer"><td class="memItemLeft" align="right" valign="top">static const <a class="el" href="namespacecattle.html#a1d78623a47279d516750a44dbad6090b">Matrix</a>&lt; Scalar &gt; &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_optimizer.html#a4697c3e95df8ae818471c5734b6f5ef6">get_params_grad</a> (<a class="el" href="classcattle_1_1_layer.html">Layer</a>&lt; Scalar, Rank &gt; &amp;layer)</td></tr>
+<tr class="separator:a4697c3e95df8ae818471c5734b6f5ef6 inherit pro_static_methods_classcattle_1_1_optimizer"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a45dd4848eeebfbf4321d517d543dd040 inherit pro_static_methods_classcattle_1_1_optimizer"><td class="memItemLeft" align="right" valign="top">static const void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_optimizer.html#a45dd4848eeebfbf4321d517d543dd040">enforce_constraints</a> (<a class="el" href="classcattle_1_1_layer.html">Layer</a>&lt; Scalar, Rank &gt; &amp;layer)</td></tr>
 <tr class="separator:a45dd4848eeebfbf4321d517d543dd040 inherit pro_static_methods_classcattle_1_1_optimizer"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
@@ -303,8 +303,8 @@ template&lt;typename Scalar , std::size_t Rank, bool Sequential&gt; </div>
 
 </div>
 </div>
-<a id="afaab4b4d4641b73841e19f709e51f5a0"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#afaab4b4d4641b73841e19f709e51f5a0">&#9670;&nbsp;</a></span>update_acc_param_grad_sqrs()</h2>
+<a id="a61a32e88374a14b25fe6db0eeeb569ea"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a61a32e88374a14b25fe6db0eeeb569ea">&#9670;&nbsp;</a></span>update_acc_params_grad_sqrs()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -315,16 +315,16 @@ template&lt;typename Scalar , std::size_t Rank, bool Sequential&gt; </div>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">virtual void <a class="el" href="classcattle_1_1_adagrad_optimizer.html">cattle::AdagradOptimizer</a>&lt; Scalar, Rank, Sequential &gt;::update_acc_param_grad_sqrs </td>
+          <td class="memname">virtual void <a class="el" href="classcattle_1_1_adagrad_optimizer.html">cattle::AdagradOptimizer</a>&lt; Scalar, Rank, Sequential &gt;::update_acc_params_grad_sqrs </td>
           <td>(</td>
           <td class="paramtype"><a class="el" href="namespacecattle.html#a1d78623a47279d516750a44dbad6090b">Matrix</a>&lt; Scalar &gt; &amp;&#160;</td>
-          <td class="paramname"><em>acc_param_grad_sqrs</em>, </td>
+          <td class="paramname"><em>acc_params_grad_sqrs</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">const <a class="el" href="namespacecattle.html#a1d78623a47279d516750a44dbad6090b">Matrix</a>&lt; Scalar &gt; &amp;&#160;</td>
-          <td class="paramname"><em>param_grads</em>&#160;</td>
+          <td class="paramname"><em>params_grad</em>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -341,13 +341,13 @@ template&lt;typename Scalar , std::size_t Rank, bool Sequential&gt; </div>
 <p>It updates the accumulated squared parameter gradients.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">acc_param_grad_sqrs</td><td>The accumulated squared parameter gradients. </td></tr>
-    <tr><td class="paramname">param_grads</td><td>The new parameter gradients. </td></tr>
+    <tr><td class="paramname">acc_params_grad_sqrs</td><td>The accumulated squared parameter gradients. </td></tr>
+    <tr><td class="paramname">params_grad</td><td>The new parameter gradients. </td></tr>
   </table>
   </dd>
 </dl>
 
-<p>Reimplemented in <a class="el" href="classcattle_1_1_r_m_s_prop_optimizer.html#a91bd6fc15570231db85c4577a01fab32">cattle::RMSPropOptimizer&lt; Scalar, Rank, Sequential &gt;</a>.</p>
+<p>Reimplemented in <a class="el" href="classcattle_1_1_r_m_s_prop_optimizer.html#aea009496af2793c0435dab489fa7eee0">cattle::RMSPropOptimizer&lt; Scalar, Rank, Sequential &gt;</a>.</p>
 
 </div>
 </div>
@@ -455,8 +455,8 @@ template&lt;typename Scalar , std::size_t Rank, bool Sequential&gt; </div>
 
 </div>
 </div>
-<a id="a504897a555cb0d802e48e1a8642e58bf"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a504897a555cb0d802e48e1a8642e58bf">&#9670;&nbsp;</a></span>param_grad_sqrs_vec</h2>
+<a id="a32f5513607fdc1ec6576a77d2f445d69"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a32f5513607fdc1ec6576a77d2f445d69">&#9670;&nbsp;</a></span>params_grad_sqrs_vec</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -467,7 +467,7 @@ template&lt;typename Scalar , std::size_t Rank, bool Sequential&gt; </div>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">std::vector&lt;<a class="el" href="namespacecattle.html#a1d78623a47279d516750a44dbad6090b">Matrix</a>&lt;Scalar&gt; &gt; <a class="el" href="classcattle_1_1_adagrad_optimizer.html">cattle::AdagradOptimizer</a>&lt; Scalar, Rank, Sequential &gt;::param_grad_sqrs_vec</td>
+          <td class="memname">std::vector&lt;<a class="el" href="namespacecattle.html#a1d78623a47279d516750a44dbad6090b">Matrix</a>&lt;Scalar&gt; &gt; <a class="el" href="classcattle_1_1_adagrad_optimizer.html">cattle::AdagradOptimizer</a>&lt; Scalar, Rank, Sequential &gt;::params_grad_sqrs_vec</td>
         </tr>
       </table>
   </td>

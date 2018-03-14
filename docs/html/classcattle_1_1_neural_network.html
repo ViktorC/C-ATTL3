@@ -139,8 +139,8 @@ Static Protected Member Functions</h2></td></tr>
 <tr class="separator:a7daf5b9eb47ba2c78c05928a39799cc0"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a6ad331a525fefb2384ec045c7c7b46de"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="namespacecattle.html#a264993c35ba14dd4f77aaff5152b8557">Tensor</a>&lt; Scalar, Rank+1 &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_neural_network.html#a6ad331a525fefb2384ec045c7c7b46de">pass_back</a> (<a class="el" href="classcattle_1_1_layer.html">Layer</a>&lt; Scalar, Rank &gt; &amp;layer, <a class="el" href="namespacecattle.html#a264993c35ba14dd4f77aaff5152b8557">Tensor</a>&lt; Scalar, Rank+1 &gt; out_grads)</td></tr>
 <tr class="separator:a6ad331a525fefb2384ec045c7c7b46de"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a04a0f672876cffad55d7f2663888044e"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="namespacecattle.html#a1d78623a47279d516750a44dbad6090b">Matrix</a>&lt; Scalar &gt; &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_neural_network.html#a04a0f672876cffad55d7f2663888044e">get_param_grads</a> (<a class="el" href="classcattle_1_1_layer.html">Layer</a>&lt; Scalar, Rank &gt; &amp;layer)</td></tr>
-<tr class="separator:a04a0f672876cffad55d7f2663888044e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a64b361839ba75dd77dd4f5cc02323d7d"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="namespacecattle.html#a1d78623a47279d516750a44dbad6090b">Matrix</a>&lt; Scalar &gt; &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_neural_network.html#a64b361839ba75dd77dd4f5cc02323d7d">get_params_grad</a> (<a class="el" href="classcattle_1_1_layer.html">Layer</a>&lt; Scalar, Rank &gt; &amp;layer)</td></tr>
+<tr class="separator:a64b361839ba75dd77dd4f5cc02323d7d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pro-static-attribs"></a>
 Static Protected Attributes</h2></td></tr>
@@ -469,8 +469,8 @@ template&lt;typename Scalar, std::size_t Rank, bool Sequential&gt; </div>
 
 </div>
 </div>
-<a id="a04a0f672876cffad55d7f2663888044e"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a04a0f672876cffad55d7f2663888044e">&#9670;&nbsp;</a></span>get_param_grads()</h2>
+<a id="a64b361839ba75dd77dd4f5cc02323d7d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a64b361839ba75dd77dd4f5cc02323d7d">&#9670;&nbsp;</a></span>get_params_grad()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -481,7 +481,7 @@ template&lt;typename Scalar, std::size_t Rank, bool Sequential&gt; </div>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">static <a class="el" href="namespacecattle.html#a1d78623a47279d516750a44dbad6090b">Matrix</a>&lt;Scalar&gt;&amp; <a class="el" href="classcattle_1_1_neural_network.html">cattle::NeuralNetwork</a>&lt; Scalar, Rank, Sequential &gt;::get_param_grads </td>
+          <td class="memname">static <a class="el" href="namespacecattle.html#a1d78623a47279d516750a44dbad6090b">Matrix</a>&lt;Scalar&gt;&amp; <a class="el" href="classcattle_1_1_neural_network.html">cattle::NeuralNetwork</a>&lt; Scalar, Rank, Sequential &gt;::get_params_grad </td>
           <td>(</td>
           <td class="paramtype"><a class="el" href="classcattle_1_1_layer.html">Layer</a>&lt; Scalar, Rank &gt; &amp;&#160;</td>
           <td class="paramname"><em>layer</em></td><td>)</td>
@@ -495,15 +495,15 @@ template&lt;typename Scalar, std::size_t Rank, bool Sequential&gt; </div>
 </table>
 </div><div class="memdoc">
 <p>A method to expose protected methods of the <a class="el" href="classcattle_1_1_layer.html">Layer</a> class to subclasses of <a class="el" href="classcattle_1_1_neural_network.html">NeuralNetwork</a> that are not friend classes of <a class="el" href="classcattle_1_1_layer.html">Layer</a>.</p>
-<dl class="section see"><dt>See also</dt><dd><a class="el" href="classcattle_1_1_layer.html#aa66fc1380d7446d77a3980c4006e7532">Layer::get_param_grads()</a></dd></dl>
-<p>It returns a non-constant reference to the gradients of the specified layer's parameters.</p>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="classcattle_1_1_layer.html#a6e2e726f9677758ea61c6916a5c88b92">Layer::get_params_grad()</a></dd></dl>
+<p>It returns a non-constant reference to the gradient of the specified layer's parameters.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">layer</td><td>The layer whose parameters' gradients are to be fetched. </td></tr>
+    <tr><td class="paramname">layer</td><td>The layer whose parameters' gradient is to be fetched. </td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>A non-constant reference to the gradients of the layer's parameters. </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>A non-constant reference to the gradient of the layer's parameters. </dd></dl>
 
 </div>
 </div>

@@ -139,8 +139,8 @@ Static Protected Member Functions</h2></td></tr>
 <tr class="separator:abc23bf23413dfa4a8c6a8d9b222af7eb"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a03a788c5ce15f611d5c6007d43550ef5"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="namespacecattle.html#a1d78623a47279d516750a44dbad6090b">Matrix</a>&lt; Scalar &gt; &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_optimizer.html#a03a788c5ce15f611d5c6007d43550ef5">get_params</a> (<a class="el" href="classcattle_1_1_layer.html">Layer</a>&lt; Scalar, Rank &gt; &amp;layer)</td></tr>
 <tr class="separator:a03a788c5ce15f611d5c6007d43550ef5"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a30497ef0f5a5ef64ff591a51e4b065e4"><td class="memItemLeft" align="right" valign="top">static const <a class="el" href="namespacecattle.html#a1d78623a47279d516750a44dbad6090b">Matrix</a>&lt; Scalar &gt; &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_optimizer.html#a30497ef0f5a5ef64ff591a51e4b065e4">get_param_grads</a> (<a class="el" href="classcattle_1_1_layer.html">Layer</a>&lt; Scalar, Rank &gt; &amp;layer)</td></tr>
-<tr class="separator:a30497ef0f5a5ef64ff591a51e4b065e4"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4697c3e95df8ae818471c5734b6f5ef6"><td class="memItemLeft" align="right" valign="top">static const <a class="el" href="namespacecattle.html#a1d78623a47279d516750a44dbad6090b">Matrix</a>&lt; Scalar &gt; &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_optimizer.html#a4697c3e95df8ae818471c5734b6f5ef6">get_params_grad</a> (<a class="el" href="classcattle_1_1_layer.html">Layer</a>&lt; Scalar, Rank &gt; &amp;layer)</td></tr>
+<tr class="separator:a4697c3e95df8ae818471c5734b6f5ef6"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a45dd4848eeebfbf4321d517d543dd040"><td class="memItemLeft" align="right" valign="top">static const void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_optimizer.html#a45dd4848eeebfbf4321d517d543dd040">enforce_constraints</a> (<a class="el" href="classcattle_1_1_layer.html">Layer</a>&lt; Scalar, Rank &gt; &amp;layer)</td></tr>
 <tr class="separator:a45dd4848eeebfbf4321d517d543dd040"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
@@ -444,44 +444,6 @@ template&lt;typename Scalar , std::size_t Rank, bool Sequential&gt; </div>
 
 </div>
 </div>
-<a id="a30497ef0f5a5ef64ff591a51e4b065e4"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a30497ef0f5a5ef64ff591a51e4b065e4">&#9670;&nbsp;</a></span>get_param_grads()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<div class="memtemplate">
-template&lt;typename Scalar , std::size_t Rank, bool Sequential&gt; </div>
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">static const <a class="el" href="namespacecattle.html#a1d78623a47279d516750a44dbad6090b">Matrix</a>&lt;Scalar&gt;&amp; <a class="el" href="classcattle_1_1_optimizer.html">cattle::Optimizer</a>&lt; Scalar, Rank, Sequential &gt;::get_param_grads </td>
-          <td>(</td>
-          <td class="paramtype"><a class="el" href="classcattle_1_1_layer.html">Layer</a>&lt; Scalar, Rank &gt; &amp;&#160;</td>
-          <td class="paramname"><em>layer</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span><span class="mlabel">protected</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-<p>A method to expose protected methods of the <a class="el" href="classcattle_1_1_layer.html">Layer</a> class to subclasses of <a class="el" href="classcattle_1_1_optimizer.html">Optimizer</a> that are not friend classes of <a class="el" href="classcattle_1_1_layer.html">Layer</a>.</p>
-<dl class="section see"><dt>See also</dt><dd><a class="el" href="classcattle_1_1_layer.html#aa66fc1380d7446d77a3980c4006e7532">Layer::get_param_grads()</a></dd></dl>
-<p>It returns a non-constant reference to the gradients of the specified layer's parameters.</p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">layer</td><td>The layer whose parameters' gradients are to be fetched. </td></tr>
-  </table>
-  </dd>
-</dl>
-<dl class="section return"><dt>Returns</dt><dd>A non-constant reference to the gradients of the layer's parameters. </dd></dl>
-
-</div>
-</div>
 <a id="a03a788c5ce15f611d5c6007d43550ef5"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a03a788c5ce15f611d5c6007d43550ef5">&#9670;&nbsp;</a></span>get_params()</h2>
 
@@ -517,6 +479,44 @@ template&lt;typename Scalar , std::size_t Rank, bool Sequential&gt; </div>
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>A non-constant reference to the parameter matrix of the layer. </dd></dl>
+
+</div>
+</div>
+<a id="a4697c3e95df8ae818471c5734b6f5ef6"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a4697c3e95df8ae818471c5734b6f5ef6">&#9670;&nbsp;</a></span>get_params_grad()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename Scalar , std::size_t Rank, bool Sequential&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static const <a class="el" href="namespacecattle.html#a1d78623a47279d516750a44dbad6090b">Matrix</a>&lt;Scalar&gt;&amp; <a class="el" href="classcattle_1_1_optimizer.html">cattle::Optimizer</a>&lt; Scalar, Rank, Sequential &gt;::get_params_grad </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="classcattle_1_1_layer.html">Layer</a>&lt; Scalar, Rank &gt; &amp;&#160;</td>
+          <td class="paramname"><em>layer</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span><span class="mlabel">protected</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p>A method to expose protected methods of the <a class="el" href="classcattle_1_1_layer.html">Layer</a> class to subclasses of <a class="el" href="classcattle_1_1_optimizer.html">Optimizer</a> that are not friend classes of <a class="el" href="classcattle_1_1_layer.html">Layer</a>.</p>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="classcattle_1_1_layer.html#a6e2e726f9677758ea61c6916a5c88b92">Layer::get_params_grad()</a></dd></dl>
+<p>It returns a non-constant reference to the gradient of the specified layer's parameters.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">layer</td><td>The layer whose parameters' gradient is to be fetched. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>A non-constant reference to the gradient of the layer's parameters. </dd></dl>
 
 </div>
 </div>

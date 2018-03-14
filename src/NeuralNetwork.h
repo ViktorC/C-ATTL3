@@ -233,17 +233,17 @@ protected:
 	 * A method to expose protected methods of the Layer class to subclasses of
 	 * NeuralNetwork that are not friend classes of Layer.
 	 *
-	 * \see Layer#get_param_grads()
+	 * \see Layer#get_params_grad()
 	 *
-	 * It returns a non-constant reference to the gradients of the specified
+	 * It returns a non-constant reference to the gradient of the specified
 	 * layer's parameters.
 	 *
-	 * @param layer The layer whose parameters' gradients are to be fetched.
-	 * @return A non-constant reference to the gradients of the layer's
+	 * @param layer The layer whose parameters' gradient is to be fetched.
+	 * @return A non-constant reference to the gradient of the layer's
 	 * parameters.
 	 */
-	inline static Matrix<Scalar>& get_param_grads(Layer<Scalar,Rank>& layer) {
-		return layer.get_param_grads();
+	inline static Matrix<Scalar>& get_params_grad(Layer<Scalar,Rank>& layer) {
+		return layer.get_params_grad();
 	}
 };
 
@@ -1801,7 +1801,7 @@ protected:
 				}
 				Root::empty_cache(*cell.input_kernel);
 			}
-			// Compute the gradients w.r.t. the state kernel.
+			// Compute the the state kernel's gradient.
 			if (mul_int) {
 				state_grads = Root::pass_back(*cell.state_kernel, cell.input_kernel_cache * state_grads);
 				cell.input_kernel_cache = null_tensor;
@@ -1811,20 +1811,20 @@ protected:
 		}
 		// Roll the network up and accumulate the gradients.
 		// FIXME Single evaluation.
-		Matrix<Scalar>& u_param_grads = Root::get_param_grads(*main_cell.input_kernel);
-		Matrix<Scalar>& w_param_grads = Root::get_param_grads(*main_cell.state_kernel);
-		Matrix<Scalar>& v_param_grads = Root::get_param_grads(*main_cell.output_kernel);
-		Matrix<Scalar>& state_act_param_grads = Root::get_param_grads(*main_cell.state_act);
-		Matrix<Scalar>& output_act_param_grads = Root::get_param_grads(*main_cell.output_act);
+		Matrix<Scalar>& u_params_grad = Root::get_params_grad(*main_cell.input_kernel);
+		Matrix<Scalar>& w_params_grad = Root::get_params_grad(*main_cell.state_kernel);
+		Matrix<Scalar>& v_params_grad = Root::get_params_grad(*main_cell.output_kernel);
+		Matrix<Scalar>& state_act_params_grad = Root::get_params_grad(*main_cell.state_act);
+		Matrix<Scalar>& output_act_params_grad = Root::get_params_grad(*main_cell.output_act);
 		for (int i = 1; i < time_steps; ++i) {
 			Cell& cell = cells[i - 1];
-			w_param_grads += Root::get_param_grads(*cell.state_kernel);
-			state_act_param_grads += Root::get_param_grads(*cell.state_act);
+			w_params_grad += Root::get_params_grad(*cell.state_kernel);
+			state_act_params_grad += Root::get_params_grad(*cell.state_act);
 			if (i < input_seq_length)
-				u_param_grads += Root::get_param_grads(*cell.input_kernel);
+				u_params_grad += Root::get_params_grad(*cell.input_kernel);
 			if (i >= output_seq_delay && i < output_end) {
-				v_param_grads += Root::get_param_grads(*cell.output_kernel);
-				output_act_param_grads += Root::get_param_grads(*cell.output_act);
+				v_params_grad += Root::get_params_grad(*cell.output_kernel);
+				output_act_params_grad += Root::get_params_grad(*cell.output_act);
 			}
 		}
 		cells = std::vector<Cell>(0);
@@ -2573,35 +2573,35 @@ protected:
 			}
 		}
 		// Roll-up the network.
-		Matrix<Scalar>& input_forget_kernel_param_grads = Root::get_param_grads(*main_cell.input_forget_kernel);
-		Matrix<Scalar>& output_forget_kernel_param_grads = Root::get_param_grads(*main_cell.output_forget_kernel);
-		Matrix<Scalar>& input_write_kernel_param_grads = Root::get_param_grads(*main_cell.input_write_kernel);
-		Matrix<Scalar>& output_write_kernel_param_grads = Root::get_param_grads(*main_cell.output_write_kernel);
-		Matrix<Scalar>& input_candidate_kernel_param_grads = Root::get_param_grads(*main_cell.input_candidate_kernel);
-		Matrix<Scalar>& output_candidate_kernel_param_grads = Root::get_param_grads(*main_cell.output_candidate_kernel);
-		Matrix<Scalar>& input_read_kernel_param_grads = Root::get_param_grads(*main_cell.input_read_kernel);
-		Matrix<Scalar>& output_read_kernel_param_grads = Root::get_param_grads(*main_cell.output_read_kernel);
-		Matrix<Scalar>& forget_act_param_grads = Root::get_param_grads(*main_cell.forget_act);
-		Matrix<Scalar>& write_act_param_grads = Root::get_param_grads(*main_cell.write_act);
-		Matrix<Scalar>& candidate_act_param_grads = Root::get_param_grads(*main_cell.candidate_act);
-		Matrix<Scalar>& state_act_param_grads = Root::get_param_grads(*main_cell.state_act);
-		Matrix<Scalar>& read_act_param_grads = Root::get_param_grads(*main_cell.read_act);
+		Matrix<Scalar>& input_forget_kernel_params_grad = Root::get_params_grad(*main_cell.input_forget_kernel);
+		Matrix<Scalar>& output_forget_kernel_params_grad = Root::get_params_grad(*main_cell.output_forget_kernel);
+		Matrix<Scalar>& input_write_kernel_params_grad = Root::get_params_grad(*main_cell.input_write_kernel);
+		Matrix<Scalar>& output_write_kernel_params_grad = Root::get_params_grad(*main_cell.output_write_kernel);
+		Matrix<Scalar>& input_candidate_kernel_params_grad = Root::get_params_grad(*main_cell.input_candidate_kernel);
+		Matrix<Scalar>& output_candidate_kernel_params_grad = Root::get_params_grad(*main_cell.output_candidate_kernel);
+		Matrix<Scalar>& input_read_kernel_params_grad = Root::get_params_grad(*main_cell.input_read_kernel);
+		Matrix<Scalar>& output_read_kernel_params_grad = Root::get_params_grad(*main_cell.output_read_kernel);
+		Matrix<Scalar>& forget_act_params_grad = Root::get_params_grad(*main_cell.forget_act);
+		Matrix<Scalar>& write_act_params_grad = Root::get_params_grad(*main_cell.write_act);
+		Matrix<Scalar>& candidate_act_params_grad = Root::get_params_grad(*main_cell.candidate_act);
+		Matrix<Scalar>& state_act_params_grad = Root::get_params_grad(*main_cell.state_act);
+		Matrix<Scalar>& read_act_params_grad = Root::get_params_grad(*main_cell.read_act);
 		for (int i = 1; i < time_steps; ++i) {
 			Cell& cell = cells[i - 1];
-			forget_act_param_grads += Root::get_param_grads(*cell.forget_act);
-			write_act_param_grads += Root::get_param_grads(*cell.write_act);
-			candidate_act_param_grads += Root::get_param_grads(*cell.candidate_act);
-			state_act_param_grads += Root::get_param_grads(*cell.state_act);
-			read_act_param_grads += Root::get_param_grads(*cell.read_act);
-			output_forget_kernel_param_grads += Root::get_param_grads(*cell.output_forget_kernel);
-			output_write_kernel_param_grads += Root::get_param_grads(*cell.output_write_kernel);
-			output_candidate_kernel_param_grads += Root::get_param_grads(*cell.output_candidate_kernel);
-			output_read_kernel_param_grads += Root::get_param_grads(*cell.output_read_kernel);
+			forget_act_params_grad += Root::get_params_grad(*cell.forget_act);
+			write_act_params_grad += Root::get_params_grad(*cell.write_act);
+			candidate_act_params_grad += Root::get_params_grad(*cell.candidate_act);
+			state_act_params_grad += Root::get_params_grad(*cell.state_act);
+			read_act_params_grad += Root::get_params_grad(*cell.read_act);
+			output_forget_kernel_params_grad += Root::get_params_grad(*cell.output_forget_kernel);
+			output_write_kernel_params_grad += Root::get_params_grad(*cell.output_write_kernel);
+			output_candidate_kernel_params_grad += Root::get_params_grad(*cell.output_candidate_kernel);
+			output_read_kernel_params_grad += Root::get_params_grad(*cell.output_read_kernel);
 			if (i < input_seq_length) {
-				input_forget_kernel_param_grads += Root::get_param_grads(*cell.input_forget_kernel);
-				input_write_kernel_param_grads += Root::get_param_grads(*cell.input_write_kernel);
-				input_candidate_kernel_param_grads += Root::get_param_grads(*cell.input_candidate_kernel);
-				input_read_kernel_param_grads += Root::get_param_grads(*cell.input_read_kernel);
+				input_forget_kernel_params_grad += Root::get_params_grad(*cell.input_forget_kernel);
+				input_write_kernel_params_grad += Root::get_params_grad(*cell.input_write_kernel);
+				input_candidate_kernel_params_grad += Root::get_params_grad(*cell.input_candidate_kernel);
+				input_read_kernel_params_grad += Root::get_params_grad(*cell.input_read_kernel);
 			}
 		}
 		cells = std::vector<Cell>(0);

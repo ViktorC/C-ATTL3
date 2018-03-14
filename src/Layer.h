@@ -80,7 +80,7 @@ protected:
 	/**
 	 * A constant method that returns whether this layer functions as an input layer. An input
 	 * layer does not need to propagate the gradients all the way during the backward pass as
-	 * it is assumed that no other layer needs them derive the gradients on its parameters. It
+	 * it is assumed that no other layer needs them derive the gradient on its parameters. It
 	 * is therefore possible for an input layer to simply return a null tensor as the output of
 	 * its backward pass.
 	 *
@@ -109,11 +109,11 @@ protected:
 	 */
 	virtual Matrix<Scalar>& get_params() = 0;
 	/**
-	 * It returns a reference to the gradients of the learnable parameters of the layer.
+	 * It returns a reference to the gradient of the learnable parameters of the layer.
 	 *
-	 * @return A non-constant reference to the gradients of the parameters of the layer.
+	 * @return A non-constant reference to the gradient of the parameters of the layer.
 	 */
-	virtual Matrix<Scalar>& get_param_grads() = 0;
+	virtual Matrix<Scalar>& get_params_grad() = 0;
 	/**
 	 * It applies constraints such as max-norm to the parameters of the layer if applicable.
 	 */
@@ -133,7 +133,7 @@ protected:
 	virtual Data pass_forward(Data in, bool training) = 0;
 	/**
 	 * It back-propagates the derivative of the error function w.r.t. the output of the
-	 * layer updating the gradients of its learnable parameters along the way.
+	 * layer updating the gradient of its learnable parameters along the way.
 	 *
 	 * @param out_grads The derivative of the loss function w.r.t. the output of the
 	 * layer
@@ -174,7 +174,7 @@ protected:
 				max_norm(Utils<Scalar>::decidedly_greater(max_norm_constraint, .0)),
 				input_layer(false),
 				weights(weight_rows, weight_cols),
-				weight_grads(weight_rows, weight_cols) {
+				weights_grad(weight_rows, weight_cols) {
 		assert(weight_init != nullptr);
 	}
 	inline bool is_input_layer() const {
@@ -185,13 +185,13 @@ protected:
 	}
 	inline void init() {
 		weight_init->apply(weights);
-		weight_grads.setZero(weight_grads.rows(), weight_grads.cols());
+		weights_grad.setZero(weights_grad.rows(), weights_grad.cols());
 	}
 	inline Matrix<Scalar>& get_params() {
 		return weights;
 	}
-	inline Matrix<Scalar>& get_param_grads() {
-		return weight_grads;
+	inline Matrix<Scalar>& get_params_grad() {
+		return weights_grad;
 	}
 	inline void enforce_constraints() {
 		if (max_norm) {
@@ -209,7 +209,7 @@ protected:
 	/* Eigen matrices are backed by arrays allocated on the heap, so these
 	 * members do not burden the stack. */
 	Matrix<Scalar> weights;
-	Matrix<Scalar> weight_grads;
+	Matrix<Scalar> weights_grad;
 };
 
 /**
@@ -253,11 +253,11 @@ protected:
 		assert(Utils<Scalar>::template get_dims<Rank + 1>(out_grads).template demote<>() == Base::output_dims);
 		assert(out_grads.dimension(0) > 0 && biased_in.rows() == out_grads.dimension(0));
 		Matrix<Scalar> out_grads_mat = Utils<Scalar>::template map_tensor_to_mat<Rank + 1>(std::move(out_grads));
-		// Compute the gradients of the outputs with respect to the weights.
-		Base::weight_grads = biased_in.transpose() * out_grads_mat;
+		// Compute the gradient of the outputs with respect to the weights.
+		Base::weights_grad = biased_in.transpose() * out_grads_mat;
 		if (Base::is_input_layer())
 			return Data();
-		/* Remove the bias row from the weight matrix, transpose it, and compute gradients w.r.t. the
+		/* Remove the bias row from the weight matrix, transpose it, and compute the derivative w.r.t. the
 		 * previous layer's output. */
 		return Utils<Scalar>::template map_mat_to_tensor<Rank + 1>((out_grads_mat *
 				Base::weights.topRows(Base::input_dims.get_volume()).transpose()).eval(), Base::input_dims);
@@ -397,7 +397,7 @@ protected:
 		RankwiseArray strides({ 1, (int) dilation + 1, (int) dilation + 1, 1 });
 		Data prev_out_grads(rows, padded_height, padded_width, depth);
 		prev_out_grads.setZero();
-		Base::weight_grads.setZero(Base::weight_grads.rows(), Base::weight_grads.cols());
+		Base::weights_grad.setZero(Base::weights_grad.rows(), Base::weights_grad.cols());
 		for (int i = 0; i < rows; ++i) {
 			out_grads_row_offsets[0] = i;
 			Matrix<Scalar> prev_out_grads_mat_i;
@@ -405,16 +405,16 @@ protected:
 				Data slice_i = out_grads.slice(out_grads_row_offsets, out_grads_row_extents).eval();
 				MatrixMap<Scalar> out_grads_mat_map_i = MatrixMap<Scalar>(slice_i.data(), Base::output_dims(0) *
 						Base::output_dims(1), filters);
-				// Accumulate the gradients of the outputs w.r.t. the weights for each observation a.k.a 'tensor-row'.
-				Base::weight_grads += biased_in_vec[i].transpose() * out_grads_mat_map_i;
+				// Accumulate the gradients across the observations.
+				Base::weights_grad += biased_in_vec[i].transpose() * out_grads_mat_map_i;
 				if (Base::is_input_layer())
 					continue;
-				/* Remove the bias row from the weight matrix, transpose it, and compute the gradients w.r.t. the
+				/* Remove the bias row from the weight matrix, transpose it, and compute the gradient of the
 				 * previous layer's output. */
 				prev_out_grads_mat_i = out_grads_mat_map_i * Base::weights.topRows(Base::weights.rows() - 1).transpose();
 			}
-			/* Given the gradients w.r.t. the stretched out receptor patches, perform a 'backwards' convolution
-			 * to get the gradients w.r.t. the individual input nodes. */
+			/* Given the gradient of the stretched out receptor patches, perform a 'backwards' convolution
+			 * to get the derivative w.r.t. the individual input nodes. */
 			int patch_ind = 0;
 			patch_offsets[0] = i;
 			for (int j = 0; j <= height_rem; j += stride) {
@@ -475,7 +475,7 @@ public:
 			dims(dims),
 			input_layer(false),
 			params(0, 0),
-			param_grads(0, 0) { }
+			params_grad(0, 0) { }
 	virtual ~ActivationLayer() = default;
 	inline const Dimensions<int,Rank>& get_input_dims() const {
 		return dims;
@@ -518,8 +518,8 @@ protected:
 	inline Matrix<Scalar>& get_params() {
 		return params;
 	}
-	inline Matrix<Scalar>& get_param_grads() {
-		return param_grads;
+	inline Matrix<Scalar>& get_params_grad() {
+		return params_grad;
 	}
 	inline void enforce_constraints() { }
 	inline Data pass_forward(Data in, bool training) {
@@ -540,7 +540,7 @@ protected:
 	const Dimensions<int,Rank> dims;
 	bool input_layer;
 	Matrix<Scalar> params;
-	Matrix<Scalar> param_grads;
+	Matrix<Scalar> params_grad;
 	// Staged computation caches
 	Matrix<Scalar> in;
 	Matrix<Scalar> out;
@@ -822,7 +822,7 @@ public:
 			Base::ActivationLayer(dims),
 			init_alpha(init_alpha) {
 		Base::params.resize(1, dims.get_volume());
-		Base::param_grads.resize(1, dims.get_volume());
+		Base::params_grad.resize(1, dims.get_volume());
 	}
 	inline Layer<Scalar,Rank>* clone() const {
 		return new PReLUActivationLayer(*this);
@@ -830,14 +830,14 @@ public:
 protected:
 	inline void init() {
 		Base::params.setConstant(init_alpha);
-		Base::param_grads.setZero(1, Base::dims.get_volume());
+		Base::params_grad.setZero(1, Base::dims.get_volume());
 	}
 	inline Matrix<Scalar> activate(const Matrix<Scalar>& in) {
 		return in.cwiseMax(in * Base::params.row(0).asDiagonal());
 	}
 	inline Matrix<Scalar> d_activate(const Matrix<Scalar>& in, const Matrix<Scalar>& out,
 			const Matrix<Scalar>& out_grads) {
-		Base::param_grads.row(0).setZero();
+		Base::params_grad.row(0).setZero();
 		Matrix<Scalar> d_in = Matrix<Scalar>(in.rows(), in.cols());
 		for (int i = 0; i < in.cols(); ++i) {
 			for (int j = 0; j < in.rows(); ++j) {
@@ -847,7 +847,7 @@ protected:
 				else {
 					Scalar out_ji = out_grads(j,i);
 					d_in(j,i) = Base::params(0,i) * out_ji;
-					Base::param_grads(0,i) += in_ji * out_ji;
+					Base::params_grad(0,i) += in_ji * out_ji;
 				}
 			}
 		}
@@ -876,7 +876,7 @@ public:
 			width_rem(input_dims(1) - receptor_size),
 			input_layer(false),
 			params(0, 0),
-			param_grads(0, 0) {
+			params_grad(0, 0) {
 		assert(input_dims(0) >= (int) receptor_size && input_dims(1) >= (int) receptor_size);
 		assert(receptor_size > 0);
 		assert(stride > 0);
@@ -920,8 +920,8 @@ protected:
 	inline Matrix<Scalar>& get_params() {
 		return params;
 	}
-	inline Matrix<Scalar>& get_param_grads() {
-		return param_grads;
+	inline Matrix<Scalar>& get_params_grad() {
+		return params_grad;
 	}
 	inline void enforce_constraints() { };
 	inline Data pass_forward(Data in, bool training) {
@@ -1005,7 +1005,7 @@ protected:
 	bool input_layer;
 	// No actual parameters.
 	Matrix<Scalar> params;
-	Matrix<Scalar> param_grads;
+	Matrix<Scalar> params_grad;
 	// Keep track of the input rows.
 	int rows;
 };
@@ -1143,7 +1143,7 @@ protected:
 			avg_inv_sds(depth, dims.get_volume() / depth),
 			avgs_init(false),
 			params(2 * depth, dims.get_volume() / depth),
-			param_grads(2 * depth, dims.get_volume() / depth),
+			params_grad(2 * depth, dims.get_volume() / depth),
 			cache_vec(depth) {
 		assert(norm_avg_decay >= 0 && norm_avg_decay <= 1 &&
 				"norm avg decay must not be less than 0 or greater than 1");
@@ -1162,7 +1162,7 @@ protected:
 			// Beta
 			params.row(i + 1).setZero();
 		}
-		param_grads.setZero(params.rows(), params.cols());
+		params_grad.setZero(params.rows(), params.cols());
 		avg_means.setZero(avg_means.rows(), avg_means.cols());
 		avg_inv_sds.setZero(avg_means.rows(), avg_inv_sds.cols());
 		avgs_init = false;
@@ -1177,8 +1177,8 @@ protected:
 	inline Matrix<Scalar>& get_params() {
 		return params;
 	}
-	inline Matrix<Scalar>& get_param_grads() {
-		return param_grads;
+	inline Matrix<Scalar>& get_params_grad() {
+		return params_grad;
 	}
 	inline void enforce_constraints() { }
 	inline Data _pass_forward(Data in, const Dimensions<int,Rank>& output_dims, bool training, int i) {
@@ -1210,11 +1210,11 @@ protected:
 		Cache& cache = cache_vec[i];
 		Matrix<Scalar> std_in_grads_i;
 		/* Back-propagate the gradient through the batch normalization 'function' and also calculate the
-		 * gradients on the betas and gammas. */
+		 * gradients of the betas and gammas. */
 		{ // Manage memory by scope restriction.
 			Matrix<Scalar> out_grads_ch_map_i = Utils<Scalar>::template map_tensor_to_mat<Rank + 1>(std::move(out_grads));
-			param_grads.row(2 * i) = out_grads_ch_map_i.cwiseProduct(cache.std_in).colwise().sum();
-			param_grads.row(2 * i + 1) = out_grads_ch_map_i.colwise().sum();
+			params_grad.row(2 * i) = out_grads_ch_map_i.cwiseProduct(cache.std_in).colwise().sum();
+			params_grad.row(2 * i + 1) = out_grads_ch_map_i.colwise().sum();
 			if (input_layer)
 				return Data();
 			std_in_grads_i = out_grads_ch_map_i * params.row(2 * i).asDiagonal();
@@ -1235,7 +1235,7 @@ protected:
 	bool avgs_init;
 	// Betas and gammas
 	Matrix<Scalar> params;
-	Matrix<Scalar> param_grads;
+	Matrix<Scalar> params_grad;
 	// Staged computation cache_vec
 	struct Cache {
 		RowVector<Scalar> inv_in_sd;
@@ -1356,7 +1356,7 @@ public:
 			dropout(Utils<Scalar>::decidedly_greater(dropout_prob, .0)),
 			input_layer(false),
 			params(0, 0),
-			param_grads(0, 0) {
+			params_grad(0, 0) {
 		assert(dropout_prob <= 1 && "dropout prob must not be greater than 1");
 		assert(epsilon > 0 && "epsilon must be greater than 0");
 	}
@@ -1383,8 +1383,8 @@ protected:
 	inline Matrix<Scalar>& get_params() {
 		return params;
 	}
-	inline Matrix<Scalar>& get_param_grads() {
-		return param_grads;
+	inline Matrix<Scalar>& get_params_grad() {
+		return params_grad;
 	}
 	inline void enforce_constraints() { }
 	inline Data pass_forward(Data in, bool training) {
@@ -1419,7 +1419,7 @@ private:
 	const bool dropout;
 	bool input_layer;
 	Matrix<Scalar> params;
-	Matrix<Scalar> param_grads;
+	Matrix<Scalar> params_grad;
 	// Staged computation cache_vec
 	Matrix<Scalar> dropout_mask;
 };

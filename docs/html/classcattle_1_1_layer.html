@@ -132,8 +132,8 @@ Protected Member Functions</h2></td></tr>
 <tr class="separator:ae3d00e9fb6079e4b4990b3a14625a93d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:abd799a16024c5aee49dbc0a5fe2f3183"><td class="memItemLeft" align="right" valign="top">virtual <a class="el" href="namespacecattle.html#a1d78623a47279d516750a44dbad6090b">Matrix</a>&lt; Scalar &gt; &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_layer.html#abd799a16024c5aee49dbc0a5fe2f3183">get_params</a> ()=0</td></tr>
 <tr class="separator:abd799a16024c5aee49dbc0a5fe2f3183"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aa66fc1380d7446d77a3980c4006e7532"><td class="memItemLeft" align="right" valign="top">virtual <a class="el" href="namespacecattle.html#a1d78623a47279d516750a44dbad6090b">Matrix</a>&lt; Scalar &gt; &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_layer.html#aa66fc1380d7446d77a3980c4006e7532">get_param_grads</a> ()=0</td></tr>
-<tr class="separator:aa66fc1380d7446d77a3980c4006e7532"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a6e2e726f9677758ea61c6916a5c88b92"><td class="memItemLeft" align="right" valign="top">virtual <a class="el" href="namespacecattle.html#a1d78623a47279d516750a44dbad6090b">Matrix</a>&lt; Scalar &gt; &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_layer.html#a6e2e726f9677758ea61c6916a5c88b92">get_params_grad</a> ()=0</td></tr>
+<tr class="separator:a6e2e726f9677758ea61c6916a5c88b92"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ac74dd19ed2f3a253cfbb1d1785f56197"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_layer.html#ac74dd19ed2f3a253cfbb1d1785f56197">enforce_constraints</a> ()=0</td></tr>
 <tr class="separator:ac74dd19ed2f3a253cfbb1d1785f56197"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a6c1ea7b25d9f882364b7f2288f02d8da"><td class="memItemLeft" align="right" valign="top">virtual <a class="el" href="classcattle_1_1_layer.html#ae63e6a1e862cea9b83b5c93fe1d9a6a3">Data</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_layer.html#a6c1ea7b25d9f882364b7f2288f02d8da">pass_forward</a> (<a class="el" href="classcattle_1_1_layer.html#ae63e6a1e862cea9b83b5c93fe1d9a6a3">Data</a> in, bool training)=0</td></tr>
@@ -369,37 +369,6 @@ template&lt;typename Scalar, std::size_t Rank&gt; </div>
 
 </div>
 </div>
-<a id="aa66fc1380d7446d77a3980c4006e7532"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aa66fc1380d7446d77a3980c4006e7532">&#9670;&nbsp;</a></span>get_param_grads()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<div class="memtemplate">
-template&lt;typename Scalar, std::size_t Rank&gt; </div>
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">virtual <a class="el" href="namespacecattle.html#a1d78623a47279d516750a44dbad6090b">Matrix</a>&lt;Scalar&gt;&amp; <a class="el" href="classcattle_1_1_layer.html">cattle::Layer</a>&lt; Scalar, Rank &gt;::get_param_grads </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">protected</span><span class="mlabel">pure virtual</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-<p>It returns a reference to the gradients of the learnable parameters of the layer.</p>
-<dl class="section return"><dt>Returns</dt><dd>A non-constant reference to the gradients of the parameters of the layer. </dd></dl>
-
-<p>Implemented in <a class="el" href="classcattle_1_1_dropout_layer.html#ae118c8e2aa9cd03ccd2c743f55cb1d52">cattle::DropoutLayer&lt; Scalar, Rank &gt;</a>, <a class="el" href="classcattle_1_1_batch_norm_layer_base.html#aa040964c65ed9c23031668144bf56bc7">cattle::BatchNormLayerBase&lt; Scalar, Rank &gt;</a>, <a class="el" href="classcattle_1_1_batch_norm_layer_base.html#aa040964c65ed9c23031668144bf56bc7">cattle::BatchNormLayerBase&lt; Scalar, 3 &gt;</a>, <a class="el" href="classcattle_1_1_pooling_layer.html#ad13be929db489b7b6c8e1fd94ab41068">cattle::PoolingLayer&lt; Scalar &gt;</a>, <a class="el" href="classcattle_1_1_activation_layer.html#ac5bdcc2cf308a6195d7f7957bd46a045">cattle::ActivationLayer&lt; Scalar, Rank &gt;</a>, <a class="el" href="classcattle_1_1_kernel_layer.html#aae85cddab5126c0343d2c34fc3b99b0a">cattle::KernelLayer&lt; Scalar, Rank &gt;</a>, and <a class="el" href="classcattle_1_1_kernel_layer.html#aae85cddab5126c0343d2c34fc3b99b0a">cattle::KernelLayer&lt; Scalar, 3 &gt;</a>.</p>
-
-</div>
-</div>
 <a id="abd799a16024c5aee49dbc0a5fe2f3183"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#abd799a16024c5aee49dbc0a5fe2f3183">&#9670;&nbsp;</a></span>get_params()</h2>
 
@@ -428,6 +397,37 @@ template&lt;typename Scalar, std::size_t Rank&gt; </div>
 <dl class="section return"><dt>Returns</dt><dd>A non-constant reference to the parameters of the layer that are to be learned. </dd></dl>
 
 <p>Implemented in <a class="el" href="classcattle_1_1_dropout_layer.html#afdf7ed4bac91e56664c0f5ed6a9dafda">cattle::DropoutLayer&lt; Scalar, Rank &gt;</a>, <a class="el" href="classcattle_1_1_batch_norm_layer_base.html#ae51e553e1dc5be6b061b7b2a38686f6f">cattle::BatchNormLayerBase&lt; Scalar, Rank &gt;</a>, <a class="el" href="classcattle_1_1_batch_norm_layer_base.html#ae51e553e1dc5be6b061b7b2a38686f6f">cattle::BatchNormLayerBase&lt; Scalar, 3 &gt;</a>, <a class="el" href="classcattle_1_1_pooling_layer.html#a792bfd45e387484ec19bd080a48f9ef3">cattle::PoolingLayer&lt; Scalar &gt;</a>, <a class="el" href="classcattle_1_1_activation_layer.html#ab97e38ad519af40007f659120f3f7fe1">cattle::ActivationLayer&lt; Scalar, Rank &gt;</a>, <a class="el" href="classcattle_1_1_kernel_layer.html#a9b9896f4bd8461df9021f9ae0c03c5b8">cattle::KernelLayer&lt; Scalar, Rank &gt;</a>, and <a class="el" href="classcattle_1_1_kernel_layer.html#a9b9896f4bd8461df9021f9ae0c03c5b8">cattle::KernelLayer&lt; Scalar, 3 &gt;</a>.</p>
+
+</div>
+</div>
+<a id="a6e2e726f9677758ea61c6916a5c88b92"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a6e2e726f9677758ea61c6916a5c88b92">&#9670;&nbsp;</a></span>get_params_grad()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename Scalar, std::size_t Rank&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual <a class="el" href="namespacecattle.html#a1d78623a47279d516750a44dbad6090b">Matrix</a>&lt;Scalar&gt;&amp; <a class="el" href="classcattle_1_1_layer.html">cattle::Layer</a>&lt; Scalar, Rank &gt;::get_params_grad </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">protected</span><span class="mlabel">pure virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p>It returns a reference to the gradient of the learnable parameters of the layer.</p>
+<dl class="section return"><dt>Returns</dt><dd>A non-constant reference to the gradient of the parameters of the layer. </dd></dl>
+
+<p>Implemented in <a class="el" href="classcattle_1_1_dropout_layer.html#ac72ed377cf408274f15e280de3266044">cattle::DropoutLayer&lt; Scalar, Rank &gt;</a>, <a class="el" href="classcattle_1_1_batch_norm_layer_base.html#abeaa4b34bd86ec270705421ff20282fd">cattle::BatchNormLayerBase&lt; Scalar, Rank &gt;</a>, <a class="el" href="classcattle_1_1_batch_norm_layer_base.html#abeaa4b34bd86ec270705421ff20282fd">cattle::BatchNormLayerBase&lt; Scalar, 3 &gt;</a>, <a class="el" href="classcattle_1_1_pooling_layer.html#acf98b76579034d93e252ec8ab69d4a4a">cattle::PoolingLayer&lt; Scalar &gt;</a>, <a class="el" href="classcattle_1_1_activation_layer.html#af9822a94073cb72e2db4de62c2126d54">cattle::ActivationLayer&lt; Scalar, Rank &gt;</a>, <a class="el" href="classcattle_1_1_kernel_layer.html#aa2956ff7c87760f05d4e0d906ed16b10">cattle::KernelLayer&lt; Scalar, Rank &gt;</a>, and <a class="el" href="classcattle_1_1_kernel_layer.html#aa2956ff7c87760f05d4e0d906ed16b10">cattle::KernelLayer&lt; Scalar, 3 &gt;</a>.</p>
 
 </div>
 </div>
@@ -485,7 +485,7 @@ template&lt;typename Scalar, std::size_t Rank&gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
-<p>A constant method that returns whether this layer functions as an input layer. An input layer does not need to propagate the gradients all the way during the backward pass as it is assumed that no other layer needs them derive the gradients on its parameters. It is therefore possible for an input layer to simply return a null tensor as the output of its backward pass.</p>
+<p>A constant method that returns whether this layer functions as an input layer. An input layer does not need to propagate the gradients all the way during the backward pass as it is assumed that no other layer needs them derive the gradient on its parameters. It is therefore possible for an input layer to simply return a null tensor as the output of its backward pass.</p>
 <dl class="section return"><dt>Returns</dt><dd>Whether this layer is the input layer of the neural network that contains it. </dd></dl>
 
 <p>Reimplemented in <a class="el" href="classcattle_1_1_dropout_layer.html#a601eec2c307fd047dd390e2e4347cc58">cattle::DropoutLayer&lt; Scalar, Rank &gt;</a>, <a class="el" href="classcattle_1_1_batch_norm_layer_base.html#aa03b7850674b51b3e48b1436ef4f2b9b">cattle::BatchNormLayerBase&lt; Scalar, Rank &gt;</a>, <a class="el" href="classcattle_1_1_batch_norm_layer_base.html#aa03b7850674b51b3e48b1436ef4f2b9b">cattle::BatchNormLayerBase&lt; Scalar, 3 &gt;</a>, <a class="el" href="classcattle_1_1_pooling_layer.html#a5ee003390561ac32d9d4277eaa4fece7">cattle::PoolingLayer&lt; Scalar &gt;</a>, <a class="el" href="classcattle_1_1_activation_layer.html#a3733446d064f63f86f8a48bd30c0dbcb">cattle::ActivationLayer&lt; Scalar, Rank &gt;</a>, <a class="el" href="classcattle_1_1_kernel_layer.html#a93f48e39e3e9af884acc8ddd518c45e4">cattle::KernelLayer&lt; Scalar, Rank &gt;</a>, and <a class="el" href="classcattle_1_1_kernel_layer.html#a93f48e39e3e9af884acc8ddd518c45e4">cattle::KernelLayer&lt; Scalar, 3 &gt;</a>.</p>
@@ -546,7 +546,7 @@ template&lt;typename Scalar, std::size_t Rank&gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
-<p>It back-propagates the derivative of the error function w.r.t. the output of the layer updating the gradients of its learnable parameters along the way.</p>
+<p>It back-propagates the derivative of the error function w.r.t. the output of the layer updating the gradient of its learnable parameters along the way.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">out_grads</td><td>The derivative of the loss function w.r.t. the output of the layer </td></tr>

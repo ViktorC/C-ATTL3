@@ -90,11 +90,11 @@ public:
 				std::cout << "Layer " << std::setw(3) << std::to_string(i + 1) <<
 						std::string(28, '-') << std::endl;
 				Matrix<Scalar>& params = layer.get_params();
-				const Matrix<Scalar>& param_grads = layer.get_param_grads();
+				const Matrix<Scalar>& params_grad = layer.get_params_grad();
 				for (int j = 0; j < params.rows(); ++j) {
 					for (int k = 0; k < params.cols(); ++k) {
 						std::cout << "\tParam[" << i << "," << j << "," << k << "]:" << std::endl;
-						Scalar ana_grad = param_grads(j,k);
+						Scalar ana_grad = params_grad(j,k);
 						std::cout << "\t\tAnalytic gradient = " << ana_grad << std::endl;
 						Scalar param = params(j,k);
 						params(j,k) = param + step_size;
@@ -274,17 +274,17 @@ protected:
 	 * A method to expose protected methods of the Layer class to subclasses of
 	 * Optimizer that are not friend classes of Layer.
 	 *
-	 * \see Layer#get_param_grads()
+	 * \see Layer#get_params_grad()
 	 *
-	 * It returns a non-constant reference to the gradients of the specified
+	 * It returns a non-constant reference to the gradient of the specified
 	 * layer's parameters.
 	 *
-	 * @param layer The layer whose parameters' gradients are to be fetched.
-	 * @return A non-constant reference to the gradients of the layer's
+	 * @param layer The layer whose parameters' gradient is to be fetched.
+	 * @return A non-constant reference to the gradient of the layer's
 	 * parameters.
 	 */
-	inline static const Matrix<Scalar>& get_param_grads(Layer<Scalar,Rank>& layer) {
-		return layer.get_param_grads();
+	inline static const Matrix<Scalar>& get_params_grad(Layer<Scalar,Rank>& layer) {
+		return layer.get_params_grad();
 	}
 	/**
 	 * A method to expose protected methods of the Layer class to subclasses of
@@ -402,7 +402,7 @@ protected:
 	inline void fit(NeuralNetwork<Scalar,Rank,Sequential>& net) { }
 	inline void update_params(Layer<Scalar,Rank>& layer, unsigned i, unsigned epoch) {
 		Matrix<Scalar>& params = Optimizer<Scalar,Rank,Sequential>::get_params(layer);
-		params -= (learning_rate * (Optimizer<Scalar,Rank,Sequential>::get_param_grads(layer) +
+		params -= (learning_rate * (Optimizer<Scalar,Rank,Sequential>::get_params_grad(layer) +
 				SGDOptimizer<Scalar,Rank,Sequential>::reg->d_function(params)));
 	}
 	const Scalar learning_rate;
@@ -442,22 +442,22 @@ public:
 protected:
 	inline void fit(NeuralNetwork<Scalar,Rank,Sequential>& net) {
 		std::vector<Layer<Scalar,Rank>*> layers = Optimizer<Scalar,Rank,Sequential>::get_layers(net);
-		param_grads_vec = std::vector<Matrix<Scalar>>(layers.size());
-		for (unsigned i = 0; i < param_grads_vec.size(); ++i) {
+		params_grad_vec = std::vector<Matrix<Scalar>>(layers.size());
+		for (unsigned i = 0; i < params_grad_vec.size(); ++i) {
 			Layer<Scalar,Rank>& layer = *(layers[i]);
-			Matrix<Scalar>& param_grads = param_grads_vec[i];
-			param_grads = Matrix<Scalar>(Optimizer<Scalar,Rank,Sequential>::get_param_grads(layer).rows(),
-					Optimizer<Scalar,Rank,Sequential>::get_param_grads(layer).cols());
-			param_grads.setZero(param_grads.rows(), param_grads.cols());
+			Matrix<Scalar>& params_grad = params_grad_vec[i];
+			params_grad = Matrix<Scalar>(Optimizer<Scalar,Rank,Sequential>::get_params_grad(layer).rows(),
+					Optimizer<Scalar,Rank,Sequential>::get_params_grad(layer).cols());
+			params_grad.setZero(params_grad.rows(), params_grad.cols());
 		}
 	}
 	inline void update_params(Layer<Scalar,Rank>& layer, unsigned i, unsigned epoch) {
 		Scalar learning_rate = calculate_learning_rate(epoch);
-		Matrix<Scalar>& param_grads = param_grads_vec[i];
+		Matrix<Scalar>& params_grad = params_grad_vec[i];
 		Matrix<Scalar>& params = Optimizer<Scalar,Rank,Sequential>::get_params(layer);
-		param_grads = momentum * param_grads - learning_rate * (Optimizer<Scalar,Rank,Sequential>::get_param_grads(layer) +
+		params_grad = momentum * params_grad - learning_rate * (Optimizer<Scalar,Rank,Sequential>::get_params_grad(layer) +
 				SGDOptimizer<Scalar,Rank,Sequential>::reg->d_function(params));
-		params += param_grads;
+		params += params_grad;
 	}
 	/**
 	 * It calculates the annealed learning rate as a function of the epoch index.
@@ -471,7 +471,7 @@ protected:
 	const Scalar init_learning_rate;
 	const Scalar annealing_rate;
 	const Scalar momentum;
-	std::vector<Matrix<Scalar>> param_grads_vec;
+	std::vector<Matrix<Scalar>> params_grad_vec;
 };
 
 /**
@@ -502,12 +502,12 @@ public:
 protected:
 	inline void update_params(Layer<Scalar,Rank>& layer, unsigned i, unsigned epoch) {
 		Scalar learning_rate = Base::calculate_learning_rate(epoch);
-		Matrix<Scalar>& param_grads = Base::param_grads_vec[i];
+		Matrix<Scalar>& params_grad = Base::params_grad_vec[i];
 		Matrix<Scalar>& params = Optimizer<Scalar,Rank,Sequential>::get_params(layer);
-		Matrix<Scalar> param_grads_bak = param_grads;
-		param_grads = Base::momentum * param_grads - learning_rate * (Optimizer<Scalar,Rank,Sequential>::get_param_grads(layer) +
+		Matrix<Scalar> params_grad_bak = params_grad;
+		params_grad = Base::momentum * params_grad - learning_rate * (Optimizer<Scalar,Rank,Sequential>::get_params_grad(layer) +
 				SGDOptimizer<Scalar,Rank,Sequential>::reg->d_function(params));
-		params += -Base::momentum * param_grads_bak + (1 + Base::momentum) * param_grads;
+		params += -Base::momentum * params_grad_bak + (1 + Base::momentum) * params_grad;
 	}
 };
 
@@ -538,37 +538,37 @@ public:
 protected:
 	inline void fit(NeuralNetwork<Scalar,Rank,Sequential>& net) {
 		std::vector<Layer<Scalar,Rank>*> layers = Optimizer<Scalar,Rank,Sequential>::get_layers(net);
-		param_grad_sqrs_vec = std::vector<Matrix<Scalar>>(layers.size());
-		for (unsigned i = 0; i < param_grad_sqrs_vec.size(); ++i) {
+		params_grad_sqrs_vec = std::vector<Matrix<Scalar>>(layers.size());
+		for (unsigned i = 0; i < params_grad_sqrs_vec.size(); ++i) {
 			Layer<Scalar,Rank>& layer = *(layers[i]);
-			Matrix<Scalar>& param_grad_sqrs = param_grad_sqrs_vec[i];
-			param_grad_sqrs = Matrix<Scalar>(Optimizer<Scalar,Rank,Sequential>::get_param_grads(layer).rows(),
-					Optimizer<Scalar,Rank,Sequential>::get_param_grads(layer).cols());
-			param_grad_sqrs.setZero(param_grad_sqrs.rows(), param_grad_sqrs.cols());
+			Matrix<Scalar>& params_grad_sqrs = params_grad_sqrs_vec[i];
+			params_grad_sqrs = Matrix<Scalar>(Optimizer<Scalar,Rank,Sequential>::get_params_grad(layer).rows(),
+					Optimizer<Scalar,Rank,Sequential>::get_params_grad(layer).cols());
+			params_grad_sqrs.setZero(params_grad_sqrs.rows(), params_grad_sqrs.cols());
 		}
 	}
 	/**
 	 * It updates the accumulated squared parameter gradients.
 	 *
-	 * @param acc_param_grad_sqrs The accumulated squared parameter gradients.
-	 * @param param_grads The new parameter gradients.
+	 * @param acc_params_grad_sqrs The accumulated squared parameter gradients.
+	 * @param params_grad The new parameter gradients.
 	 */
-	inline virtual void update_acc_param_grad_sqrs(Matrix<Scalar>& acc_param_grad_sqrs,
-			const Matrix<Scalar>& param_grads) {
+	inline virtual void update_acc_params_grad_sqrs(Matrix<Scalar>& acc_params_grad_sqrs,
+			const Matrix<Scalar>& params_grad) {
 		// Accumulate the squares of the gradients.
-		acc_param_grad_sqrs += param_grads.cwiseProduct(param_grads);
+		acc_params_grad_sqrs += params_grad.cwiseProduct(params_grad);
 	}
 	inline void update_params(Layer<Scalar,Rank>& layer, unsigned i, unsigned epoch) {
-		Matrix<Scalar>& param_grad_sqrs = param_grad_sqrs_vec[i];
+		Matrix<Scalar>& params_grad_sqrs = params_grad_sqrs_vec[i];
 		Matrix<Scalar>& params = Optimizer<Scalar,Rank,Sequential>::get_params(layer);
-		Matrix<Scalar> param_grads = Optimizer<Scalar,Rank,Sequential>::get_param_grads(layer) +
+		Matrix<Scalar> params_grad = Optimizer<Scalar,Rank,Sequential>::get_params_grad(layer) +
 				SGDOptimizer<Scalar,Rank,Sequential>::reg->d_function(params);
-		update_acc_param_grad_sqrs(param_grad_sqrs, param_grads);
-		params -= (learning_rate * param_grads.array() / (param_grad_sqrs.array().sqrt() + epsilon)).matrix();
+		update_acc_params_grad_sqrs(params_grad_sqrs, params_grad);
+		params -= (learning_rate * params_grad.array() / (params_grad_sqrs.array().sqrt() + epsilon)).matrix();
 	}
 	const Scalar learning_rate;
 	const Scalar epsilon;
-	std::vector<Matrix<Scalar>> param_grad_sqrs_vec;
+	std::vector<Matrix<Scalar>> params_grad_sqrs_vec;
 };
 
 /**
@@ -597,9 +597,9 @@ public:
 		assert(l2_decay >= 0 && l2_decay <= 1);
 	}
 protected:
-	inline void update_acc_param_grad_sqrs(Matrix<Scalar>& acc_param_grad_sqrs,
-			const Matrix<Scalar>& param_grads) {
-		acc_param_grad_sqrs = (1 - l2_decay) * acc_param_grad_sqrs + l2_decay * param_grads.cwiseProduct(param_grads);
+	inline void update_acc_params_grad_sqrs(Matrix<Scalar>& acc_params_grad_sqrs,
+			const Matrix<Scalar>& params_grad) {
+		acc_params_grad_sqrs = (1 - l2_decay) * acc_params_grad_sqrs + l2_decay * params_grad.cwiseProduct(params_grad);
 	}
 	const Scalar l2_decay;
 };
@@ -635,23 +635,23 @@ protected:
 		for (unsigned i = 0; i < pgus_vec.size(); ++i) {
 			Layer<Scalar,Rank>& layer = *(layers[i]);
 			ParamGradAndUpdateSqrs& pgus = pgus_vec[i];
-			pgus.param_grad = Matrix<Scalar>(Optimizer<Scalar,Rank,Sequential>::get_param_grads(layer).rows(),
-					Optimizer<Scalar,Rank,Sequential>::get_param_grads(layer).cols());
-			pgus.param_grad.setZero(pgus.param_grad.rows(), pgus.param_grad.cols());
-			pgus.param_update = Matrix<Scalar>(pgus.param_grad.rows(), pgus.param_grad.cols());
-			pgus.param_update.setZero(pgus.param_update.rows(), pgus.param_update.cols());
+			pgus.params_grad = Matrix<Scalar>(Optimizer<Scalar,Rank,Sequential>::get_params_grad(layer).rows(),
+					Optimizer<Scalar,Rank,Sequential>::get_params_grad(layer).cols());
+			pgus.params_grad.setZero(pgus.params_grad.rows(), pgus.params_grad.cols());
+			pgus.params_update = Matrix<Scalar>(pgus.params_grad.rows(), pgus.params_grad.cols());
+			pgus.params_update.setZero(pgus.params_update.rows(), pgus.params_update.cols());
 		}
 	}
 	inline void update_params(Layer<Scalar,Rank>& layer, unsigned i, unsigned epoch) {
 		ParamGradAndUpdateSqrs& pgus = pgus_vec[i];
 		Matrix<Scalar>& params = Optimizer<Scalar,Rank,Sequential>::get_params(layer);
-		Matrix<Scalar> param_grads = Optimizer<Scalar,Rank,Sequential>::get_param_grads(layer) +
+		Matrix<Scalar> params_grad = Optimizer<Scalar,Rank,Sequential>::get_params_grad(layer) +
 				SGDOptimizer<Scalar,Rank,Sequential>::reg->d_function(params);
-		pgus.param_grad = (1 - decay) * pgus.param_grad + decay * param_grads.cwiseProduct(param_grads);
-		Matrix<Scalar> weight_updates = -param_grads.array() * (pgus.param_update.array() + epsilon).sqrt() /
-				(pgus.param_grad.array() + epsilon).sqrt();
+		pgus.params_grad = (1 - decay) * pgus.params_grad + decay * params_grad.cwiseProduct(params_grad);
+		Matrix<Scalar> weight_updates = -params_grad.array() * (pgus.params_update.array() + epsilon).sqrt() /
+				(pgus.params_grad.array() + epsilon).sqrt();
 		params += weight_updates;
-		pgus.param_update = (1 - decay) * pgus.param_update + decay * weight_updates.cwiseProduct(weight_updates);
+		pgus.params_update = (1 - decay) * pgus.params_update + decay * weight_updates.cwiseProduct(weight_updates);
 	}
 	const Scalar decay;
 	const Scalar epsilon;
@@ -659,8 +659,8 @@ protected:
 	 * A struct containing the accumulated squared gradients and squared gradients updates of a layer.
 	 */
 	struct ParamGradAndUpdateSqrs {
-		Matrix<Scalar> param_grad;
-		Matrix<Scalar> param_update;
+		Matrix<Scalar> params_grad;
+		Matrix<Scalar> params_update;
 	};
 	std::vector<ParamGradAndUpdateSqrs> pgus_vec;
 };
@@ -707,11 +707,11 @@ protected:
 		for (unsigned i = 0; i < pgn_vec.size(); ++i) {
 			Layer<Scalar,Rank>& layer = *(layers[i]);
 			ParamGradNorms& vel = pgn_vec[i];
-			vel.param_grad_l1 = Matrix<Scalar>(Optimizer<Scalar,Rank,Sequential>::get_param_grads(layer).rows(),
-					Optimizer<Scalar,Rank,Sequential>::get_param_grads(layer).cols());
-			vel.param_grad_l1.setZero(vel.param_grad_l1.rows(), vel.param_grad_l1.cols());
-			vel.param_grad_l2 = Matrix<Scalar>(vel.param_grad_l1.rows(), vel.param_grad_l1.cols());
-			vel.param_grad_l2.setZero(vel.param_grad_l2.rows(), vel.param_grad_l2.cols());
+			vel.params_grad_l1 = Matrix<Scalar>(Optimizer<Scalar,Rank,Sequential>::get_params_grad(layer).rows(),
+					Optimizer<Scalar,Rank,Sequential>::get_params_grad(layer).cols());
+			vel.params_grad_l1.setZero(vel.params_grad_l1.rows(), vel.params_grad_l1.cols());
+			vel.params_grad_l2 = Matrix<Scalar>(vel.params_grad_l1.rows(), vel.params_grad_l1.cols());
+			vel.params_grad_l2.setZero(vel.params_grad_l2.rows(), vel.params_grad_l2.cols());
 		}
 	}
 	inline void update_params(Layer<Scalar,Rank>& layer, unsigned i, unsigned epoch) {
@@ -719,13 +719,13 @@ protected:
 		Scalar l1_corr = 1.0 / (1.0 - pow(1.0 - l1_decay, epoch + 1) + epsilon);
 		Scalar l2_corr = 1.0 / (1.0 - pow(1.0 - l2_decay, epoch + 1) + epsilon);
 		Matrix<Scalar>& params = Optimizer<Scalar,Rank,Sequential>::get_params(layer);
-		Matrix<Scalar> param_grads = Optimizer<Scalar,Rank,Sequential>::get_param_grads(layer) +
+		Matrix<Scalar> params_grad = Optimizer<Scalar,Rank,Sequential>::get_params_grad(layer) +
 				SGDOptimizer<Scalar,Rank,Sequential>::reg->d_function(params);
-		grad_norms.param_grad_l1 = (1 - l1_decay) * grad_norms.param_grad_l1 + l1_decay * param_grads;
-		grad_norms.param_grad_l2 = (1 - l2_decay) * grad_norms.param_grad_l2 +
-				l2_decay * param_grads.cwiseProduct(param_grads);
-		params -= (learning_rate * (grad_norms.param_grad_l1 * l1_corr).array() /
-				((grad_norms.param_grad_l2 * l2_corr).array().sqrt() + epsilon)).matrix();
+		grad_norms.params_grad_l1 = (1 - l1_decay) * grad_norms.params_grad_l1 + l1_decay * params_grad;
+		grad_norms.params_grad_l2 = (1 - l2_decay) * grad_norms.params_grad_l2 +
+				l2_decay * params_grad.cwiseProduct(params_grad);
+		params -= (learning_rate * (grad_norms.params_grad_l1 * l1_corr).array() /
+				((grad_norms.params_grad_l2 * l2_corr).array().sqrt() + epsilon)).matrix();
 	}
 	const Scalar learning_rate;
 	const Scalar l1_decay;
@@ -736,8 +736,8 @@ protected:
 	 * of a layer.
 	 */
 	struct ParamGradNorms {
-		Matrix<Scalar> param_grad_l1;
-		Matrix<Scalar> param_grad_l2;
+		Matrix<Scalar> params_grad_l1;
+		Matrix<Scalar> params_grad_l2;
 	};
 	std::vector<ParamGradNorms> pgn_vec;
 };
@@ -774,12 +774,12 @@ protected:
 		typename Base::ParamGradNorms& grad_norms = Base::pgn_vec[i];
 		Scalar l1_corr = 1.0 / (1.0 - pow(1.0 - Base::l1_decay, epoch + 1) + Base::epsilon);
 		Matrix<Scalar>& params = Optimizer<Scalar,Rank,Sequential>::get_params(layer);
-		Matrix<Scalar> param_grads = Optimizer<Scalar,Rank,Sequential>::get_param_grads(layer) +
+		Matrix<Scalar> params_grad = Optimizer<Scalar,Rank,Sequential>::get_params_grad(layer) +
 				SGDOptimizer<Scalar,Rank,Sequential>::reg->d_function(params);
-		grad_norms.param_grad_l1 = (1 - Base::l1_decay) * grad_norms.param_grad_l1 + Base::l1_decay * param_grads;
-		grad_norms.param_grad_l2 = ((1 - Base::l2_decay) * grad_norms.param_grad_l2).cwiseMax(param_grads.cwiseAbs());
-		params -= (Base::learning_rate * (grad_norms.param_grad_l1 * l1_corr).array() /
-				(grad_norms.param_grad_l2.array() + Base::epsilon)).matrix();
+		grad_norms.params_grad_l1 = (1 - Base::l1_decay) * grad_norms.params_grad_l1 + Base::l1_decay * params_grad;
+		grad_norms.params_grad_l2 = ((1 - Base::l2_decay) * grad_norms.params_grad_l2).cwiseMax(params_grad.cwiseAbs());
+		params -= (Base::learning_rate * (grad_norms.params_grad_l1 * l1_corr).array() /
+				(grad_norms.params_grad_l2.array() + Base::epsilon)).matrix();
 	}
 };
 
@@ -816,14 +816,14 @@ protected:
 		Scalar l1_next_corr = 1.0 / (1.0 - pow(1.0 - Base::l1_decay, epoch + 2) + Base::epsilon);
 		Scalar l2_corr = 1.0 / (1.0 - pow(1.0 - Base::l2_decay, epoch + 1) + Base::epsilon);
 		Matrix<Scalar>& params = Optimizer<Scalar,Rank,Sequential>::get_params(layer);
-		Matrix<Scalar> param_grads = Optimizer<Scalar,Rank,Sequential>::get_param_grads(layer) +
+		Matrix<Scalar> params_grad = Optimizer<Scalar,Rank,Sequential>::get_params_grad(layer) +
 				SGDOptimizer<Scalar,Rank,Sequential>::reg->d_function(params);
-		grad_norms.param_grad_l1 = (1 - Base::l1_decay) * grad_norms.param_grad_l1 + Base::l1_decay * param_grads;
-		grad_norms.param_grad_l2 = (1 - Base::l2_decay) * grad_norms.param_grad_l2 + Base::l2_decay *
-				param_grads.cwiseProduct(param_grads);
-		params -= (Base::learning_rate * (Base::l1_decay * l1_corr * param_grads +
-				(1.0 - Base::l1_decay) * l1_next_corr * grad_norms.param_grad_l1).array() /
-				((grad_norms.param_grad_l2 * l2_corr).array().sqrt() + Base::epsilon)).matrix();
+		grad_norms.params_grad_l1 = (1 - Base::l1_decay) * grad_norms.params_grad_l1 + Base::l1_decay * params_grad;
+		grad_norms.params_grad_l2 = (1 - Base::l2_decay) * grad_norms.params_grad_l2 + Base::l2_decay *
+				params_grad.cwiseProduct(params_grad);
+		params -= (Base::learning_rate * (Base::l1_decay * l1_corr * params_grad +
+				(1.0 - Base::l1_decay) * l1_next_corr * grad_norms.params_grad_l1).array() /
+				((grad_norms.params_grad_l2 * l2_corr).array().sqrt() + Base::epsilon)).matrix();
 	}
 };
 
