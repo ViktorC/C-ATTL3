@@ -1,11 +1,11 @@
 # C-ATTL3 [![Build Status](https://travis-ci.org/ViktorC/C-ATTL3.svg?branch=master)](https://travis-ci.org/ViktorC/C-ATTL3)
-A header-only neural network template library written in C++. __C-ATTL3__ relies heavily on [Eigen](http://eigen.tuxfamily.org), the popular linear algebra library. It allows for the easy construction and training of both feed-forward and recurrent neural networks ranging from simple MLPs and RNNs to state-of-the-art InceptionNets, ResNets, DenseNets, convolutional LSTMs, and other complex architectures. __C-ATTL3__ supports data samples of different ranks and different floating point scalar types such as `float`, `double`, and `long double`. The Doxygen documentation of the library can be found [here](https://viktorc.github.io/C-ATTL3/html/).
+A header-only neural network template library written in C++. C-ATTL3 relies heavily on [Eigen](http://eigen.tuxfamily.org), the popular linear algebra library. It allows for the easy construction and training of both feed-forward and recurrent neural networks ranging from simple MLPs and RNNs to state-of-the-art InceptionNets, ResNets, DenseNets, convolutional LSTMs, and other complex architectures. C-ATTL3 supports data samples of different ranks and different floating point scalar types such as `float`, `double`, and `long double`. The Doxygen documentation of the library can be found [here](https://viktorc.github.io/C-ATTL3/html/).
 
 ## Components
-The following sub-sections describe the main components of the __C-ATTL3__ deep learning library. Knowledge of these components and their relations is required for the effective usage of the library.
+The following sub-sections describe the main components of the C-ATTL3 deep learning library. Knowledge of these components and their relations is required for the effective usage of the library.
 
 ### Layer
-The lowest level building blocks of neural networks in __C-ATTL3__ are the layers. The library provides a wide selection of them that can be used for the construction of neural network modules. The available layer types are the following:
+The lowest level building blocks of neural networks in C-ATTL3 are the layers. The library provides a wide selection of them that can be used for the construction of neural network modules. The available layer types are the following:
 * [Layer](https://viktorc.github.io/C-ATTL3/html/classcattle_1_1_layer.html) [A]
   * [KernelLayer](https://viktorc.github.io/C-ATTL3/html/classcattle_1_1_kernel_layer.html) [A]
     * [FCLayer](https://viktorc.github.io/C-ATTL3/html/classcattle_1_1_f_c_layer.html)
