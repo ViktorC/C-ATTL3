@@ -78,6 +78,13 @@ protected:
 	/* Only expose methods that allow for the modification of the
 	 * layer's state to friends and sub-classes. */
 	/**
+	 * It returns a clone of the layer instance using a reference to the original's parameters.
+	 *
+	 * @return A clone of the original layer instance sharing the same parameters with the
+	 * original.
+	 */
+	virtual Layer<Scalar,Rank>* clone_with_shared_params() const = 0;
+	/**
 	 * A constant method that returns whether this layer functions as an input layer. An input
 	 * layer does not need to propagate the gradients all the way during the backward pass as
 	 * it is assumed that no other layer needs them derive the gradient on its parameters. It
@@ -174,9 +181,20 @@ protected:
 				max_norm(Utils<Scalar>::decidedly_greater(max_norm_constraint, .0)),
 				input_layer(false),
 				weights(weight_rows, weight_cols),
-				weights_grad(weight_rows, weight_cols) {
+				weights_grad(weight_rows, weight_cols),
+				weights_ref(weights) {
 		assert(weight_init != nullptr);
 	}
+	inline KernelLayer(const KernelLayer<Scalar,Rank>& layer, bool share_weights) :
+		input_dims(layer.input_dims),
+		output_dims(layer.output_dims),
+		weight_init(layer.weight_init),
+		max_norm_constraint(layer.max_norm_constraint),
+		max_norm(layer.max_norm),
+		input_layer(layer.input_layer),
+		weights(share_weights ? Matrix<Scalar>(0, 0) : layer.weights),
+		weights_grad(layer.weights_grad),
+		weights_ref(share_weights ? layer.weights : weights) { }
 	inline bool is_input_layer() const {
 		return input_layer;
 	}
@@ -184,11 +202,11 @@ protected:
 		this->input_layer = input_layer;
 	}
 	inline void init() {
-		weight_init->apply(weights);
+		weight_init->apply(weights_ref);
 		weights_grad.setZero(weights_grad.rows(), weights_grad.cols());
 	}
 	inline Matrix<Scalar>& get_params() {
-		return weights;
+		return weights_ref;
 	}
 	inline Matrix<Scalar>& get_params_grad() {
 		return weights_grad;
@@ -208,8 +226,10 @@ protected:
 	bool input_layer;
 	/* Eigen matrices are backed by arrays allocated on the heap, so these
 	 * members do not burden the stack. */
-	Matrix<Scalar> weights;
 	Matrix<Scalar> weights_grad;
+	Matrix<Scalar>& weights_ref;
+private:
+	Matrix<Scalar> weights;
 };
 
 /**
@@ -236,6 +256,12 @@ public:
 		return new FCLayer(*this);
 	}
 protected:
+	inline FCLayer(const FCLayer<Scalar,Rank>& layer, bool share_weights) :
+			Base::KernelLayer(layer, share_weights),
+			biased_in(layer.biased_in) { }
+	inline Layer<Scalar,Rank>* clone_with_shared_params() const {
+		return new FCLayer(*this, true);
+	}
 	inline void empty_cache() {
 		biased_in = Matrix<Scalar>(0, 0);
 	}
@@ -247,7 +273,7 @@ protected:
 		biased_in = Matrix<Scalar>(in.dimension(0), input_size + 1);
 		biased_in.leftCols(input_size) = Utils<Scalar>::template map_tensor_to_mat<Rank + 1>(std::move(in));
 		biased_in.col(input_size).setOnes();
-		return Utils<Scalar>::template map_mat_to_tensor<Rank + 1>((biased_in * Base::weights).eval(), Base::output_dims);
+		return Utils<Scalar>::template map_mat_to_tensor<Rank + 1>((biased_in * Base::weights_ref).eval(), Base::output_dims);
 	}
 	inline Data pass_back(Data out_grads) {
 		assert(Utils<Scalar>::template get_dims<Rank + 1>(out_grads).template demote<>() == Base::output_dims);
@@ -260,7 +286,7 @@ protected:
 		/* Remove the bias row from the weight matrix, transpose it, and compute the derivative w.r.t. the
 		 * previous layer's output. */
 		return Utils<Scalar>::template map_mat_to_tensor<Rank + 1>((out_grads_mat *
-				Base::weights.topRows(Base::input_dims.get_volume()).transpose()).eval(), Base::input_dims);
+				Base::weights_ref.topRows(Base::input_dims.get_volume()).transpose()).eval(), Base::input_dims);
 	}
 private:
 	// Staged computation caches
@@ -318,6 +344,20 @@ public:
 		return new ConvLayer(*this);
 	}
 protected:
+	inline ConvLayer(const ConvLayer<Scalar>& layer, bool share_weights) :
+			Base::KernelLayer(layer, share_weights),
+			filters(layer.filters),
+			receptor_size(layer.receptor_size),
+			padding(layer.padding),
+			stride(layer.stride),
+			dilation(layer.dilation),
+			padded_height(layer.padded_height),
+			padded_width(layer.padded_width),
+			dil_receptor_size(layer.dil_receptor_size),
+			biased_in_vec(layer.biased_in_vec) { }
+	inline Layer<Scalar,Rank>* clone_with_shared_params() const {
+		return new ConvLayer(*this, true);
+	}
 	inline void empty_cache() {
 		biased_in_vec = std::vector<Matrix<Scalar>>(0);
 	}
@@ -376,7 +416,7 @@ protected:
 			}
 			/* Flatten the matrix product into a row vector, reshape it into a 'single-row' sub-tensor, and
 			 * assign it to the output tensor's corresponding 'row'. */
-			Matrix<Scalar> out_i = biased_in_vec[i] * Base::weights;
+			Matrix<Scalar> out_i = biased_in_vec[i] * Base::weights_ref;
 			out.slice(row_offsets, row_extents) = Utils<Scalar>::template map_mat_to_tensor<4>(MatrixMap<Scalar>(out_i.data(),
 					1, out_i.rows() * out_i.cols()).matrix(), Base::output_dims);
 		}
@@ -411,7 +451,7 @@ protected:
 					continue;
 				/* Remove the bias row from the weight matrix, transpose it, and compute the gradient of the
 				 * previous layer's output. */
-				prev_out_grads_mat_i = out_grads_mat_map_i * Base::weights.topRows(Base::weights.rows() - 1).transpose();
+				prev_out_grads_mat_i = out_grads_mat_map_i * Base::weights_ref.topRows(Base::weights_ref.rows() - 1).transpose();
 			}
 			/* Given the gradient of the stretched out receptor patches, perform a 'backwards' convolution
 			 * to get the derivative w.r.t. the individual input nodes. */
@@ -471,11 +511,6 @@ template<typename Scalar, std::size_t Rank>
 class ActivationLayer : public Layer<Scalar,Rank> {
 	typedef Tensor<Scalar,Rank + 1> Data;
 public:
-	inline ActivationLayer(const Dimensions<int,Rank>& dims) :
-			dims(dims),
-			input_layer(false),
-			params(0, 0),
-			params_grad(0, 0) { }
 	virtual ~ActivationLayer() = default;
 	inline const Dimensions<int,Rank>& get_input_dims() const {
 		return dims;
@@ -484,6 +519,20 @@ public:
 		return dims;
 	}
 protected:
+	inline ActivationLayer(const Dimensions<int,Rank>& dims) :
+			dims(dims),
+			input_layer(false),
+			params(share_weights ? Matrix<Scalar>(0, 0) : layer.weights),
+			params_grad(0, 0),
+			params_ref(params) { }
+	inline ActivationLayer(const ActivationLayer<Scalar,Rank>& layer, bool share_weights) :
+			dims(layer.dims),
+			input_layer(layer.input_layer),
+			params(share_weights ? Matrix<Scalar>(0, 0) : layer.params),
+			params_grad(layer.params_grad),
+			params_ref(share_weights ? layer.params : params),
+			in(layer.in),
+			out(layer.out) { }
 	/**
 	 * Applies the non-linearity to the specified input matrix.
 	 *
@@ -516,7 +565,7 @@ protected:
 		out = Matrix<Scalar>(0, 0);
 	}
 	inline Matrix<Scalar>& get_params() {
-		return params;
+		return params_ref;
 	}
 	inline Matrix<Scalar>& get_params_grad() {
 		return params_grad;
@@ -539,11 +588,13 @@ protected:
 	}
 	const Dimensions<int,Rank> dims;
 	bool input_layer;
-	Matrix<Scalar> params;
 	Matrix<Scalar> params_grad;
+	Matrix<Scalar>& params_ref;
 	// Staged computation caches
 	Matrix<Scalar> in;
 	Matrix<Scalar> out;
+private:
+	Matrix<Scalar> params;
 };
 
 /**
@@ -562,6 +613,9 @@ public:
 		return new IdentityActivationLayer(*this);
 	}
 protected:
+	inline Layer<Scalar,Rank>* clone_with_shared_params() const {
+		return clone();
+	}
 	inline Matrix<Scalar> activate(const Matrix<Scalar>& in) {
 		return in;
 	}
@@ -588,6 +642,9 @@ public:
 		return new ScalingActivationLayer(*this);
 	}
 protected:
+	inline Layer<Scalar,Rank>* clone_with_shared_params() const {
+		return clone();
+	}
 	inline Matrix<Scalar> activate(const Matrix<Scalar>& in) {
 		return in * scale;
 	}
@@ -615,6 +672,9 @@ public:
 		return new BinaryStepActivationLayer(*this);
 	}
 protected:
+	inline Layer<Scalar,Rank>* clone_with_shared_params() const {
+		return clone();
+	}
 	inline Matrix<Scalar> activate(const Matrix<Scalar>& in) {
 		return in.unaryExpr([](Scalar i) { return (Scalar) (i >= .0 ? 1.0 : .0); });
 	}
@@ -639,6 +699,9 @@ public:
 		return new SigmoidActivationLayer(*this);
 	}
 protected:
+	inline Layer<Scalar,Rank>* clone_with_shared_params() const {
+		return clone();
+	}
 	inline Matrix<Scalar> activate(const Matrix<Scalar>& in) {
 		return ((-in).array().exp() + 1).inverse();
 	}
@@ -663,6 +726,9 @@ public:
 		return new TanhActivationLayer(*this);
 	}
 protected:
+	inline Layer<Scalar,Rank>* clone_with_shared_params() const {
+		return clone();
+	}
 	inline Matrix<Scalar> activate(const Matrix<Scalar>& in) {
 		return in.array().tanh();
 	}
@@ -691,6 +757,9 @@ public:
 		return new SoftmaxActivationLayer(*this);
 	}
 protected:
+	inline Layer<Scalar,Rank>* clone_with_shared_params() const {
+		return clone();
+	}
 	inline Matrix<Scalar> activate(const Matrix<Scalar>& in) {
 		/* First subtract the value of the greatest coefficient from each element row-wise
 		 * to avoid an overflow due to raising e to great powers. */
@@ -728,6 +797,9 @@ public:
 		return new ReLUActivationLayer(*this);
 	}
 protected:
+	inline Layer<Scalar,Rank>* clone_with_shared_params() const {
+		return clone();
+	}
 	inline Matrix<Scalar> activate(const Matrix<Scalar>& in) {
 		return in.cwiseMax(.0);
 	}
@@ -758,6 +830,9 @@ public:
 		return new LeakyReLUActivationLayer(*this);
 	}
 protected:
+	inline Layer<Scalar,Rank>* clone_with_shared_params() const {
+		return clone();
+	}
 	inline Matrix<Scalar> activate(const Matrix<Scalar>& in) {
 		return in.cwiseMax(in * alpha);
 	}
@@ -789,6 +864,9 @@ public:
 		return new ELUActivationLayer(*this);
 	}
 protected:
+	inline Layer<Scalar,Rank>* clone_with_shared_params() const {
+		return clone();
+	}
 	inline Matrix<Scalar> activate(const Matrix<Scalar>& in) {
 		return in.unaryExpr([this](Scalar i) { return (Scalar) (i > .0 ? i : (alpha * (exp(i) - 1))); });
 	}

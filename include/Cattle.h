@@ -8,10 +8,10 @@
 #ifndef INCLUDE_CATTLE_H_
 #define INCLUDE_CATTLE_H_
 
+#include <Loss.h>
 #include "../src/DataProvider.h"
 #include "../src/Dimensions.h"
 #include "../src/Layer.h"
-#include "../src/Loss.h"
 #include "../src/NeuralNetwork.h"
 #include "../src/Optimizer.h"
 #include "../src/Preprocessor.h"

@@ -1601,6 +1601,7 @@ protected:
 					Cell& cell = cells[j - 1];
 					cell.state_kernel = KernelPtr<Scalar,Rank>(
 							(KernelLayer<Scalar,Rank>*) main_cell.state_kernel->clone());
+
 					cell.state_act = ActivationPtr<Scalar,Rank>(
 							(ActivationLayer<Scalar,Rank>*) main_cell.state_act->clone());
 					// Only copy the kernels and activations that will actually be used.
