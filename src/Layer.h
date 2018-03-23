@@ -40,8 +40,6 @@ class Layer {
 	friend class NeuralNetwork<Scalar,Rank,false>;
 	friend class Optimizer<Scalar,Rank,true>;
 	friend class Optimizer<Scalar,Rank,false>;
-	// Rank is increased by one to allow for batch training.
-	typedef Tensor<Scalar,Rank + 1> Data;
 public:
 	virtual ~Layer() = default;
 	/**
@@ -75,6 +73,8 @@ public:
 		return get_params().rows() > 0 && get_params().cols() > 0;
 	}
 protected:
+	// Rank is increased by one to allow for batch training.
+	typedef Tensor<Scalar,Rank + 1> Data;
 	/* Only expose methods that allow for the modification of the
 	 * layer's state to friends and sub-classes. */
 	/**
@@ -185,16 +185,16 @@ protected:
 				weights_ref(weights) {
 		assert(weight_init != nullptr);
 	}
-	inline KernelLayer(const KernelLayer<Scalar,Rank>& layer, bool share_weights) :
-		input_dims(layer.input_dims),
-		output_dims(layer.output_dims),
-		weight_init(layer.weight_init),
-		max_norm_constraint(layer.max_norm_constraint),
-		max_norm(layer.max_norm),
-		input_layer(layer.input_layer),
-		weights(share_weights ? Matrix<Scalar>(0, 0) : layer.weights),
-		weights_grad(layer.weights_grad),
-		weights_ref(share_weights ? layer.weights : weights) { }
+	inline KernelLayer(const KernelLayer<Scalar,Rank>& layer, bool share_weights = false) :
+			input_dims(layer.input_dims),
+			output_dims(layer.output_dims),
+			weight_init(layer.weight_init),
+			max_norm_constraint(layer.max_norm_constraint),
+			max_norm(layer.max_norm),
+			input_layer(layer.input_layer),
+			weights(share_weights ? Matrix<Scalar>(0, 0) : layer.weights),
+			weights_grad(layer.weights_grad),
+			weights_ref(share_weights ? layer.weights : weights) { }
 	inline bool is_input_layer() const {
 		return input_layer;
 	}
@@ -229,7 +229,7 @@ protected:
 	Matrix<Scalar> weights_grad;
 	Matrix<Scalar>& weights_ref;
 private:
-	Matrix<Scalar> weights;
+	mutable Matrix<Scalar> weights;
 };
 
 /**
@@ -256,7 +256,7 @@ public:
 		return new FCLayer(*this);
 	}
 protected:
-	inline FCLayer(const FCLayer<Scalar,Rank>& layer, bool share_weights) :
+	inline FCLayer(const FCLayer<Scalar,Rank>& layer, bool share_weights = false) :
 			Base::KernelLayer(layer, share_weights),
 			biased_in(layer.biased_in) { }
 	inline Layer<Scalar,Rank>* clone_with_shared_params() const {
@@ -344,7 +344,7 @@ public:
 		return new ConvLayer(*this);
 	}
 protected:
-	inline ConvLayer(const ConvLayer<Scalar>& layer, bool share_weights) :
+	inline ConvLayer(const ConvLayer<Scalar>& layer, bool share_weights = false) :
 			Base::KernelLayer(layer, share_weights),
 			filters(layer.filters),
 			receptor_size(layer.receptor_size),
@@ -355,7 +355,7 @@ protected:
 			padded_width(layer.padded_width),
 			dil_receptor_size(layer.dil_receptor_size),
 			biased_in_vec(layer.biased_in_vec) { }
-	inline Layer<Scalar,Rank>* clone_with_shared_params() const {
+	inline Layer<Scalar,3>* clone_with_shared_params() const {
 		return new ConvLayer(*this, true);
 	}
 	inline void empty_cache() {
@@ -519,13 +519,14 @@ public:
 		return dims;
 	}
 protected:
-	inline ActivationLayer(const Dimensions<int,Rank>& dims) :
-			dims(dims),
-			input_layer(false),
-			params(share_weights ? Matrix<Scalar>(0, 0) : layer.weights),
-			params_grad(0, 0),
-			params_ref(params) { }
-	inline ActivationLayer(const ActivationLayer<Scalar,Rank>& layer, bool share_weights) :
+	inline ActivationLayer(const Dimensions<int,Rank>& dims, std::size_t param_rows = 0,
+			std::size_t params_cols = 0) :
+				dims(dims),
+				input_layer(false),
+				params(param_rows, params_cols),
+				params_grad(param_rows, params_cols),
+				params_ref(params) { }
+	inline ActivationLayer(const ActivationLayer<Scalar,Rank>& layer, bool share_weights = false) :
 			dims(layer.dims),
 			input_layer(layer.input_layer),
 			params(share_weights ? Matrix<Scalar>(0, 0) : layer.params),
@@ -594,7 +595,7 @@ protected:
 	Matrix<Scalar> in;
 	Matrix<Scalar> out;
 private:
-	Matrix<Scalar> params;
+	mutable Matrix<Scalar> params;
 };
 
 /**
@@ -897,21 +898,24 @@ public:
 	 * @param init_alpha The initial factor by which negative inputs are to be scaled.
 	 */
 	inline PReLUActivationLayer(const Dimensions<int,Rank>& dims, Scalar init_alpha = 1e-1) :
-			Base::ActivationLayer(dims),
-			init_alpha(init_alpha) {
-		Base::params.resize(1, dims.get_volume());
-		Base::params_grad.resize(1, dims.get_volume());
-	}
+			Base::ActivationLayer(dims, 1, dims.get_volume()),
+			init_alpha(init_alpha) { }
 	inline Layer<Scalar,Rank>* clone() const {
 		return new PReLUActivationLayer(*this);
 	}
 protected:
+	inline PReLUActivationLayer(const PReLUActivationLayer<Scalar,Rank>& layer, bool share_weights = false) :
+			Base::ActivationLayer(layer, share_weights),
+			init_alpha(layer.init_alpha) { }
+	inline Layer<Scalar,Rank>* clone_with_shared_params() const {
+		return new PReLUActivationLayer(*this, true);
+	}
 	inline void init() {
-		Base::params.setConstant(init_alpha);
+		Base::params_ref.setConstant(init_alpha);
 		Base::params_grad.setZero(1, Base::dims.get_volume());
 	}
 	inline Matrix<Scalar> activate(const Matrix<Scalar>& in) {
-		return in.cwiseMax(in * Base::params.row(0).asDiagonal());
+		return in.cwiseMax(in * Base::params_ref.row(0).asDiagonal());
 	}
 	inline Matrix<Scalar> d_activate(const Matrix<Scalar>& in, const Matrix<Scalar>& out,
 			const Matrix<Scalar>& out_grads) {
@@ -943,6 +947,13 @@ class PoolingLayer : public Layer<Scalar,3> {
 	typedef Tensor<Scalar,4> Data;
 	typedef std::array<int,4> RankwiseArray;
 public:
+	inline const Dimensions<int,3>& get_input_dims() const {
+		return input_dims;
+	}
+	inline const Dimensions<int,3>& get_output_dims() const {
+		return output_dims;
+	}
+protected:
 	inline PoolingLayer(const Dimensions<int,3>& input_dims, std::size_t receptor_size, std::size_t stride) :
 			input_dims(input_dims),
 			output_dims({ calculate_output_dim(input_dims(0), receptor_size, stride),
@@ -959,13 +970,6 @@ public:
 		assert(receptor_size > 0);
 		assert(stride > 0);
 	}
-	inline const Dimensions<int,3>& get_input_dims() const {
-		return input_dims;
-	}
-	inline const Dimensions<int,3>& get_output_dims() const {
-		return output_dims;
-	}
-protected:
 	/**
 	 * Initializes the cache required for back-propagation.
 	 */
@@ -1107,6 +1111,9 @@ public:
 		return new SumPoolingLayer(*this);
 	}
 protected:
+	inline Layer<Scalar,3>* clone_with_shared_params() const {
+		return clone();
+	}
 	inline void init_cache() { };
 	inline Scalar reduce(const RowVector<Scalar>& patch, unsigned patch_ind) {
 		return patch.sum();
@@ -1136,6 +1143,9 @@ public:
 		return new MeanPoolingLayer(*this);
 	}
 protected:
+	inline Layer<Scalar,3>* clone_with_shared_params() const {
+		return clone();
+	}
 	inline void init_cache() { }
 	inline Scalar reduce(const RowVector<Scalar>& patch, unsigned patch_ind) {
 		return patch.mean();
@@ -1166,6 +1176,9 @@ public:
 		return new MaxPoolingLayer(*this);
 	}
 protected:
+	inline Layer<Scalar,3>* clone_with_shared_params() const {
+		return clone();
+	}
 	inline void init_cache() {
 		max_inds = std::vector<unsigned>(PoolingLayer<Scalar>::rows *
 				PoolingLayer<Scalar>::output_dims.get_volume());
@@ -1201,6 +1214,7 @@ private:
  */
 template<typename Scalar, std::size_t Rank>
 class BatchNormLayerBase : public Layer<Scalar,Rank> {
+	typedef Layer<Scalar,Rank> Base;
 public:
 	virtual ~BatchNormLayerBase() = default;
 	inline const Dimensions<int,Rank>& get_input_dims() const {
@@ -1210,7 +1224,6 @@ public:
 		return dims;
 	}
 protected:
-	typedef Tensor<Scalar,Rank + 1> Data;
 	inline BatchNormLayerBase(const Dimensions<int,Rank>& dims, int depth, Scalar norm_avg_decay, Scalar epsilon) :
 			dims(dims),
 			depth(depth),
@@ -1222,11 +1235,25 @@ protected:
 			avgs_init(false),
 			params(2 * depth, dims.get_volume() / depth),
 			params_grad(2 * depth, dims.get_volume() / depth),
+			params_ref(params),
 			cache_vec(depth) {
 		assert(norm_avg_decay >= 0 && norm_avg_decay <= 1 &&
 				"norm avg decay must not be less than 0 or greater than 1");
 		assert(epsilon > 0 && "epsilon must be greater than 0");
 	}
+	inline BatchNormLayerBase(const BatchNormLayerBase<Scalar,Rank>& layer, bool share_weights = false) :
+			dims(layer.dims),
+			depth(layer.depth),
+			norm_avg_decay(layer.norm_avg_decay),
+			epsilon(layer.epsilon),
+			input_layer(layer.input_layer),
+			avg_means(layer.avg_means),
+			avg_inv_sds(layer.avg_inv_sds),
+			avgs_init(layer.avgs_init),
+			params(share_weights ? Matrix<Scalar>(0, 0) : layer.params),
+			params_grad(layer.params_grad),
+			params_ref(share_weights ? layer.params : params),
+			cache_vec(layer.cache_vec) { }
 	inline bool is_input_layer() const {
 		return input_layer;
 	}
@@ -1234,13 +1261,13 @@ protected:
 		this->input_layer = input_layer;
 	}
 	inline void init() {
-		for (int i = 0; i < params.rows(); i += 2) {
+		for (int i = 0; i < params_ref.rows(); i += 2) {
 			// Gamma
-			params.row(i).setOnes();
+			params_ref.row(i).setOnes();
 			// Beta
-			params.row(i + 1).setZero();
+			params_ref.row(i + 1).setZero();
 		}
-		params_grad.setZero(params.rows(), params.cols());
+		params_grad.setZero(params_ref.rows(), params_ref.cols());
 		avg_means.setZero(avg_means.rows(), avg_means.cols());
 		avg_inv_sds.setZero(avg_means.rows(), avg_inv_sds.cols());
 		avgs_init = false;
@@ -1253,13 +1280,14 @@ protected:
 		}
 	}
 	inline Matrix<Scalar>& get_params() {
-		return params;
+		return params_ref;
 	}
 	inline Matrix<Scalar>& get_params_grad() {
 		return params_grad;
 	}
 	inline void enforce_constraints() { }
-	inline Data _pass_forward(Data in, const Dimensions<int,Rank>& output_dims, bool training, int i) {
+	inline typename Base::Data _pass_forward(typename Base::Data in, const Dimensions<int,Rank>& output_dims,
+			bool training, int i) {
 		Matrix<Scalar> in_ch_i = Utils<Scalar>::template map_tensor_to_mat<Rank + 1>(std::move(in));
 		if (training) {
 			Cache& cache = cache_vec[i];
@@ -1280,10 +1308,11 @@ protected:
 			}
 		} else // For testing, use the moving averages.
 			in_ch_i = (in_ch_i.rowwise() - avg_means.row(i)) * avg_inv_sds.row(i).asDiagonal();
-		return Utils<Scalar>::template map_mat_to_tensor<Rank + 1>(((in_ch_i * params.row(2 * i).asDiagonal())
-				.rowwise() + params.row(2 * i + 1)).eval(), output_dims);
+		return Utils<Scalar>::template map_mat_to_tensor<Rank + 1>(((in_ch_i * params_ref.row(2 * i).asDiagonal())
+				.rowwise() + params_ref.row(2 * i + 1)).eval(), output_dims);
 	}
-	inline Data _pass_back(Data out_grads, const Dimensions<int,Rank>& output_dims, int i) {
+	inline typename Base::Data _pass_back(typename Base::Data out_grads, const Dimensions<int,Rank>& output_dims,
+			int i) {
 		int rows = out_grads.dimension(0);
 		Cache& cache = cache_vec[i];
 		Matrix<Scalar> std_in_grads_i;
@@ -1294,8 +1323,8 @@ protected:
 			params_grad.row(2 * i) = out_grads_ch_map_i.cwiseProduct(cache.std_in).colwise().sum();
 			params_grad.row(2 * i + 1) = out_grads_ch_map_i.colwise().sum();
 			if (input_layer)
-				return Data();
-			std_in_grads_i = out_grads_ch_map_i * params.row(2 * i).asDiagonal();
+				return typename Base::Data();
+			std_in_grads_i = out_grads_ch_map_i * params_ref.row(2 * i).asDiagonal();
 		}
 		return Utils<Scalar>::template map_mat_to_tensor<Rank + 1>(((((rows * std_in_grads_i).rowwise() -
 				std_in_grads_i.colwise().sum()) - cache.std_in *
@@ -1312,14 +1341,16 @@ protected:
 	Matrix<Scalar> avg_inv_sds;
 	bool avgs_init;
 	// Betas and gammas
-	Matrix<Scalar> params;
 	Matrix<Scalar> params_grad;
+	Matrix<Scalar>& params_ref;
 	// Staged computation cache_vec
 	struct Cache {
 		RowVector<Scalar> inv_in_sd;
 		Matrix<Scalar> std_in;
 	};
 	std::vector<Cache> cache_vec;
+private:
+	mutable Matrix<Scalar> params;
 };
 
 /**
@@ -1327,6 +1358,7 @@ protected:
  */
 template<typename Scalar, std::size_t Rank>
 class BatchNormLayer : public BatchNormLayerBase<Scalar,Rank> {
+	typedef Layer<Scalar,Rank> Root;
 	typedef BatchNormLayerBase<Scalar,Rank> Base;
 public:
 	/**
@@ -1335,17 +1367,22 @@ public:
 	 * @param epsilon A small constant used to maintain numerical stability.
 	 */
 	inline BatchNormLayer(const Dimensions<int,Rank>& dims, Scalar norm_avg_decay = .1, Scalar epsilon = Utils<Scalar>::EPSILON3) :
-			Base::template BatchNormLayerBase(dims, 1, norm_avg_decay, epsilon) { }
+			Base::BatchNormLayerBase(dims, 1, norm_avg_decay, epsilon) { }
 	inline Layer<Scalar,Rank>* clone() const {
 		return new BatchNormLayer(*this);
 	}
 protected:
-	inline typename Base::Data pass_forward(typename Base::Data in, bool training) {
+	inline BatchNormLayer(const BatchNormLayer<Scalar,Rank>& layer, bool share_weights = false) :
+			Base::BatchNormLayerBase(layer, share_weights) { }
+	inline Layer<Scalar,Rank>* clone_with_shared_params() const {
+		return new BatchNormLayer(*this, true);
+	}
+	inline typename Root::Data pass_forward(typename Root::Data in, bool training) {
 		assert(Utils<Scalar>::template get_dims<Rank + 1>(in).template demote<>() == Base::dims);
 		assert(in.dimension(0) > 0);
 		return Base::_pass_forward(std::move(in), Base::dims, training, 0);
 	}
-	inline typename Base::Data pass_back(typename Base::Data out_grads) {
+	inline typename Root::Data pass_back(typename Root::Data out_grads) {
 		assert(Utils<Scalar>::template get_dims<Rank + 1>(out_grads).template demote<>() == Base::dims);
 		assert(out_grads.dimension(0) > 0 && Base::cache_vec[0].std_in.rows() == out_grads.dimension(0));
 		return Base::_pass_back(std::move(out_grads), Base::dims, 0);
@@ -1357,6 +1394,7 @@ protected:
  */
 template<typename Scalar>
 class BatchNormLayer<Scalar,3> : public BatchNormLayerBase<Scalar,3> {
+	typedef Layer<Scalar,3> Root;
 	typedef BatchNormLayerBase<Scalar,3> Base;
 public:
 	/**
@@ -1370,14 +1408,19 @@ public:
 		return new BatchNormLayer(*this);
 	}
 protected:
-	inline typename Base::Data pass_forward(typename Base::Data in, bool training) {
+	inline BatchNormLayer(const BatchNormLayer<Scalar,3>& layer, bool share_weights = false) :
+			Base::BatchNormLayerBase(layer, share_weights) { }
+	inline Layer<Scalar,3>* clone_with_shared_params() const {
+		return new BatchNormLayer(*this, true);
+	}
+	inline typename Base::Data pass_forward(typename Root::Data in, bool training) {
 		assert(Utils<Scalar>::template get_dims<4>(in).template demote<>() == Base::dims);
 		assert(in.dimension(0) > 0);
 		if (Base::depth == 1)
 			return Base::_pass_forward(std::move(in), Base::dims, training, 0);
 		else { // Multi-channel image data; depth-wise normalization.
 			int rows = in.dimension(0);
-			typename Base::Data out(rows, Base::dims(0), Base::dims(1), Base::dims(2));
+			typename Root::Data out(rows, Base::dims(0), Base::dims(1), Base::dims(2));
 			Dimensions<int,3> slice_dims({ Base::dims(0), Base::dims(1), 1 });
 			std::array<int,4> offsets({ 0, 0, 0, 0 });
 			std::array<int,4> extents({ rows, slice_dims(0), slice_dims(1), slice_dims(2) });
@@ -1389,7 +1432,7 @@ protected:
 			return out;
 		}
 	}
-	inline typename Base::Data pass_back(typename Base::Data out_grads) {
+	inline typename Root::Data pass_back(typename Root::Data out_grads) {
 		assert(Utils<Scalar>::template get_dims<4>(out_grads).template demote<>() == Base::dims);
 		assert(out_grads.dimension(0) > 0 && Base::cache_vec[0].std_in.rows() == out_grads.dimension(0));
 		if (Base::depth == 1)
@@ -1404,7 +1447,7 @@ protected:
 			std::array<int,4> extents({ rows, slice_dims(0), slice_dims(1), slice_dims(2) });
 			for (int i = 0; i < Base::depth; ++i) {
 				offsets[3] = i;
-				typename Base::Data out_grads_slice_i = out_grads.slice(offsets, extents);
+				typename Root::Data out_grads_slice_i = out_grads.slice(offsets, extents);
 				if (Base::is_input_layer())
 					Base::_pass_back(std::move(out_grads_slice_i), slice_dims, i);
 				else
@@ -1448,6 +1491,9 @@ public:
 		return dims;
 	}
 protected:
+	inline Layer<Scalar,Rank>* clone_with_shared_params() const {
+		return clone();
+	}
 	inline bool is_input_layer() const {
 		return input_layer;
 	}

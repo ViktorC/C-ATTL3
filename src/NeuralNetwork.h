@@ -126,7 +126,7 @@ public:
 		}
 		return strm.str();
 	}
-	friend std::ostream& operator<<(std::ostream& os, const NeuralNetwork<Scalar,Rank,Sequential>& nn) {
+	friend std::ostream& operator<<(std::ostream& os, NeuralNetwork<Scalar,Rank,Sequential>& nn) {
 		return os << nn.to_string() << std::endl;
 	}
 protected:
@@ -165,6 +165,22 @@ protected:
 	 * a null tensor if the network is a foremost network.
 	 */
 	virtual Data backpropagate(Data out_grads) = 0;
+	/**
+	 * A method to expose protected methods of the Layer class to subclasses of
+	 * NeuralNetwork that are not friend classes of Layer.
+	 *
+	 * \see Layer#clone_with_shared_params()
+	 *
+	 * It produces a clone of the specified layer that shares the original layer's
+	 * parameters.
+	 *
+	 * @param layer The layer to clone.
+	 * @return A pointer to the clone that uses a reference to the original layer's
+	 * parameters.
+	 */
+	inline static Layer<Scalar,Rank>* clone_with_shared_params(Layer<Scalar,Rank>& layer) {
+		return layer.clone_with_shared_params();
+	}
 	/**
 	 * A method to expose protected methods of the Layer class to subclasses of
 	 * NeuralNetwork that are not friend classes of Layer.
@@ -1589,34 +1605,32 @@ protected:
 		}
 		int output_end = output_seq_length + output_seq_delay;
 		int time_steps = std::max(input_seq_length, output_end);
-		// If in training mode, unroll the updated network.
-		if (training) {
+		// If in training mode, unroll the network (unless it has already been unrolled for the same alignment).
+		if (training && (input_seq_length != this->input_seq_length ||
+				output_seq_length != this->output_seq_length || output_seq_delay != this->output_seq_delay)) {
 			cells = std::vector<Cell>(time_steps - 1);
 			if (time_steps > 1) {
 				// Empty the caches of the main cell to reduce the amount of data to copy.
 				empty_caches();
-				cells = std::vector<Cell>(time_steps - 1);
 				// Unroll the network by creating n -1 copies of the main cell;
 				for (int j = 1; j < time_steps; ++j) {
 					Cell& cell = cells[j - 1];
-					cell.state_kernel = KernelPtr<Scalar,Rank>(
-							(KernelLayer<Scalar,Rank>*) main_cell.state_kernel->clone());
-
-					cell.state_act = ActivationPtr<Scalar,Rank>(
-							(ActivationLayer<Scalar,Rank>*) main_cell.state_act->clone());
+					cell.state_kernel = KernelPtr<Scalar,Rank>((KernelLayer<Scalar,Rank>*)
+							Root::clone_with_shared_params(*main_cell.state_kernel));
+					cell.state_act = ActivationPtr<Scalar,Rank>((ActivationLayer<Scalar,Rank>*)
+							Root::clone_with_shared_params(*main_cell.state_act));
 					// Only copy the kernels and activations that will actually be used.
 					if (j < input_seq_length)
-						cell.input_kernel = KernelPtr<Scalar,Rank>(
-								(KernelLayer<Scalar,Rank>*) main_cell.input_kernel->clone());
+						cell.input_kernel = KernelPtr<Scalar,Rank>((KernelLayer<Scalar,Rank>*)
+								Root::clone_with_shared_params(*main_cell.input_kernel));
 					if (j >= output_seq_delay && j < output_end) {
-						cell.output_kernel = KernelPtr<Scalar,Rank>(
-								(KernelLayer<Scalar,Rank>*) main_cell.output_kernel->clone());
-						cell.output_act = ActivationPtr<Scalar,Rank>(
-								(ActivationLayer<Scalar,Rank>*) main_cell.output_act->clone());
+						cell.output_kernel = KernelPtr<Scalar,Rank>((KernelLayer<Scalar,Rank>*)
+								Root::clone_with_shared_params(*main_cell.output_kernel));
+						cell.output_act = ActivationPtr<Scalar,Rank>((ActivationLayer<Scalar,Rank>*)
+								Root::clone_with_shared_params(*main_cell.output_act));
 					}
 				}
-			} else
-				cells = std::vector<Cell>(0);
+			}
 		}
 		// If the network is stateful and we are in training mode, retain the state.
 		if (!training || !stateful || batch_size == -1) {
@@ -1828,7 +1842,6 @@ protected:
 				output_act_params_grad += Root::get_params_grad(*cell.output_act);
 			}
 		}
-		cells = std::vector<Cell>(0);
 		return prev_out_grads;
 	}
 private:
@@ -2185,43 +2198,44 @@ protected:
 		}
 		int output_end = output_seq_length + output_seq_delay;
 		int time_steps = std::max(input_seq_length, output_end);
-		if (training) {
+		// Only unroll the network in training mode and if the sequence alignment has changed.
+		if (training && (input_seq_length != this->input_seq_length ||
+				output_seq_length != this->output_seq_length || output_seq_delay != this->output_seq_delay)) {
+			cells = std::vector<Cell>(time_steps - 1);
 			if (time_steps > 1) {
 				empty_caches();
-				cells = std::vector<Cell>(time_steps - 1);
 				for (int j = 1; j < time_steps; ++j) {
 					Cell& cell = cells[j - 1];
 					cell.output_forget_kernel = KernelPtr<Scalar,Rank>((KernelLayer<Scalar,Rank>*)
-							main_cell.output_forget_kernel->clone());
+							Root::clone_with_shared_params(*main_cell.output_forget_kernel));
 					cell.output_write_kernel = KernelPtr<Scalar,Rank>((KernelLayer<Scalar,Rank>*)
-							main_cell.output_write_kernel->clone());
+							Root::clone_with_shared_params(*main_cell.output_write_kernel));
 					cell.output_candidate_kernel = KernelPtr<Scalar,Rank>((KernelLayer<Scalar,Rank>*)
-							main_cell.output_candidate_kernel->clone());
+							Root::clone_with_shared_params(*main_cell.output_candidate_kernel));
 					cell.output_read_kernel = KernelPtr<Scalar,Rank>((KernelLayer<Scalar,Rank>*)
-							main_cell.output_read_kernel->clone());
+							Root::clone_with_shared_params(*main_cell.output_read_kernel));
 					cell.write_act = ActivationPtr<Scalar,Rank>((ActivationLayer<Scalar,Rank>*)
-							main_cell.write_act->clone());
+							Root::clone_with_shared_params(*main_cell.write_act));
 					cell.forget_act = ActivationPtr<Scalar,Rank>((ActivationLayer<Scalar,Rank>*)
-							main_cell.forget_act->clone());
+							Root::clone_with_shared_params(*main_cell.forget_act));
 					cell.candidate_act = ActivationPtr<Scalar,Rank>((ActivationLayer<Scalar,Rank>*)
-							main_cell.candidate_act->clone());
+							Root::clone_with_shared_params(*main_cell.candidate_act));
 					cell.state_act = ActivationPtr<Scalar,Rank>((ActivationLayer<Scalar,Rank>*)
-							main_cell.state_act->clone());
+							Root::clone_with_shared_params(*main_cell.state_act));
 					cell.read_act = ActivationPtr<Scalar,Rank>((ActivationLayer<Scalar,Rank>*)
-							main_cell.read_act->clone());
+							Root::clone_with_shared_params(*main_cell.read_act));
 					if (j < input_seq_length) {
 						cell.input_forget_kernel = KernelPtr<Scalar,Rank>((KernelLayer<Scalar,Rank>*)
-								main_cell.input_forget_kernel->clone());
+								Root::clone_with_shared_params(*main_cell.input_forget_kernel));
 						cell.input_write_kernel = KernelPtr<Scalar,Rank>((KernelLayer<Scalar,Rank>*)
-								main_cell.input_write_kernel->clone());
+								Root::clone_with_shared_params(*main_cell.input_write_kernel));
 						cell.input_candidate_kernel = KernelPtr<Scalar,Rank>((KernelLayer<Scalar,Rank>*)
-								main_cell.input_candidate_kernel->clone());
+								Root::clone_with_shared_params(*main_cell.input_candidate_kernel));
 						cell.input_read_kernel = KernelPtr<Scalar,Rank>((KernelLayer<Scalar,Rank>*)
-								main_cell.input_read_kernel->clone());
+								Root::clone_with_shared_params(*main_cell.input_read_kernel));
 					}
 				}
-			} else
-				cells = std::vector<Cell>(0);
+			}
 		}
 		if (!training || !stateful || batch_size == -1) {
 			Dimensions<int,Rank + 1> dims = main_cell.forget_act->get_output_dims().template promote<>();
@@ -2605,7 +2619,6 @@ protected:
 				input_read_kernel_params_grad += Root::get_params_grad(*cell.input_read_kernel);
 			}
 		}
-		cells = std::vector<Cell>(0);
 		return prev_out_grads;
 	}
 private:
