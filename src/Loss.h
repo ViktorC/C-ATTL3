@@ -392,22 +392,6 @@ private:
 	Scalar epsilon;
 };
 
-//template<typename Scalar, std::size_t Rank>
-//class CTCLoss : public Loss<Scalar,Rank,true> {
-//	typedef Loss<Scalar,Rank,true> Base;
-//public:
-//	inline ColVector<Scalar> function(const typename Base::Data& out, const typename Base::Data& obj) const {
-//		assert(Utils<Scalar>::template get_dims<Base::DATA_RANKS>(out) ==
-//				Utils<Scalar>::template get_dims<Base::DATA_RANKS>(obj));
-//
-//	}
-//	inline typename Base::Data d_function(const typename Base::Data& out, const typename Base::Data& obj) const {
-//		Dimensions<int,Base::DATA_RANKS> dims = Utils<Scalar>::template get_dims<Base::DATA_RANKS>(out);
-//		assert(dims == Utils<Scalar>::template get_dims<Base::DATA_RANKS>(obj));
-//
-//	}
-//};
-
 } /* namespace cattle */
 
 #endif /* LOSS_H_ */

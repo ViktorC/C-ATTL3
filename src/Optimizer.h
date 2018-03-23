@@ -167,6 +167,8 @@ public:
 			std::cout << std::endl << std::endl;
 			prev_test_loss = test_loss;
 		}
+		// Empty the network caches.
+		net.empty_caches();
 		return prev_test_loss;
 	}
 protected:

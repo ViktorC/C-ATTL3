@@ -174,11 +174,11 @@ protected:
 	 * It produces a clone of the specified layer that shares the original layer's
 	 * parameters.
 	 *
-	 * @param layer The layer to clone.
+	 * @param layer A reference to the layer to clone.
 	 * @return A pointer to the clone that uses a reference to the original layer's
 	 * parameters.
 	 */
-	inline static Layer<Scalar,Rank>* clone_with_shared_params(Layer<Scalar,Rank>& layer) {
+	inline static Layer<Scalar,Rank>* clone_with_shared_params(const Layer<Scalar,Rank>& layer) {
 		return layer.clone_with_shared_params();
 	}
 	/**
@@ -1575,6 +1575,12 @@ protected:
 		Root::empty_cache(*main_cell.output_act);
 		main_cell.state_kernel_cache = null_tensor;
 		main_cell.input_kernel_cache = null_tensor;
+		// Clear the state as well.
+		batch_size = -1;
+		state = null_tensor;
+		input_seq_length = -1;
+		output_seq_length = -1;
+		output_seq_delay = -1;
 		cells = std::vector<Cell>(0);
 	}
 	inline std::vector<Layer<Scalar,Rank>*> get_layers() {
@@ -1608,10 +1614,11 @@ protected:
 		// If in training mode, unroll the network (unless it has already been unrolled for the same alignment).
 		if (training && (input_seq_length != this->input_seq_length ||
 				output_seq_length != this->output_seq_length || output_seq_delay != this->output_seq_delay)) {
-			cells = std::vector<Cell>(time_steps - 1);
 			if (time_steps > 1) {
 				// Empty the caches of the main cell to reduce the amount of data to copy.
 				empty_caches();
+				// Emptying the caches also clears the cell vector, thus it has to be recreated afterwards.
+				cells = std::vector<Cell>(time_steps - 1);
 				// Unroll the network by creating n -1 copies of the main cell;
 				for (int j = 1; j < time_steps; ++j) {
 					Cell& cell = cells[j - 1];
@@ -1630,10 +1637,11 @@ protected:
 								Root::clone_with_shared_params(*main_cell.output_act));
 					}
 				}
-			}
+			} else
+				cells = std::vector<Cell>(0);
 		}
-		// If the network is stateful and we are in training mode, retain the state.
-		if (!training || !stateful || batch_size == -1) {
+		// If the network is stateful, retain the state.
+		if (!stateful || batch_size == -1) {
 			Dimensions<int,Rank + 1> dims = main_cell.input_kernel->get_output_dims().template promote<>();
 			dims(0) = samples;
 			state = Tensor<Scalar,Rank + 1>(dims);
@@ -1855,7 +1863,6 @@ private:
 		ActivationPtr<Scalar,Rank> state_act;
 		ActivationPtr<Scalar,Rank> output_act;
 		// State and input caches for multiplicative integration.
-		// FIXME Do not cache the input doubly (it is also cached in the layer).
 		TimeStepData state_kernel_cache;
 		TimeStepData input_kernel_cache;
 	};
@@ -2160,6 +2167,12 @@ protected:
 		main_cell.weighted_output_candidate_cache = null_tensor;
 		main_cell.weighted_input_read_cache = null_tensor;
 		main_cell.weighted_output_read_cache = null_tensor;
+		// Clear the state as well.
+		batch_size = -1;
+		state = null_tensor;
+		input_seq_length = -1;
+		output_seq_length = -1;
+		output_seq_delay = -1;
 		cells = std::vector<Cell>(0);
 	}
 	inline std::vector<Layer<Scalar,Rank>*> get_layers() {
@@ -2201,9 +2214,9 @@ protected:
 		// Only unroll the network in training mode and if the sequence alignment has changed.
 		if (training && (input_seq_length != this->input_seq_length ||
 				output_seq_length != this->output_seq_length || output_seq_delay != this->output_seq_delay)) {
-			cells = std::vector<Cell>(time_steps - 1);
 			if (time_steps > 1) {
 				empty_caches();
+				cells = std::vector<Cell>(time_steps - 1);
 				for (int j = 1; j < time_steps; ++j) {
 					Cell& cell = cells[j - 1];
 					cell.output_forget_kernel = KernelPtr<Scalar,Rank>((KernelLayer<Scalar,Rank>*)
@@ -2235,9 +2248,10 @@ protected:
 								Root::clone_with_shared_params(*main_cell.input_read_kernel));
 					}
 				}
-			}
+			} else
+				cells = std::vector<Cell>(0);
 		}
-		if (!training || !stateful || batch_size == -1) {
+		if (!stateful || batch_size == -1) {
 			Dimensions<int,Rank + 1> dims = main_cell.forget_act->get_output_dims().template promote<>();
 			dims(0) = samples;
 			state = Tensor<Scalar,Rank + 1>(dims);
@@ -2323,9 +2337,15 @@ protected:
 						Root::empty_cache(*cell.output_forget_kernel);
 					TimeStepData weighted_forget;
 					if (mul_int) {
-						cell.weighted_input_forget_cache = std::move(weighted_input_forget);
-						cell.weighted_output_forget_cache = std::move(weighted_output_forget);
-						weighted_forget = cell.weighted_input_forget_cache * cell.weighted_output_forget_cache;
+						if (training) {
+							cell.weighted_input_forget_cache = std::move(weighted_input_forget);
+							cell.weighted_output_forget_cache = std::move(weighted_output_forget);
+							weighted_forget = cell.weighted_input_forget_cache * cell.weighted_output_forget_cache;
+						} else {
+							weighted_forget = weighted_input_forget * weighted_output_forget;
+							weighted_input_forget = null_tensor;
+							weighted_output_forget = null_tensor;
+						}
 					} else {
 						weighted_forget = weighted_input_forget + weighted_output_forget;
 						weighted_input_forget = null_tensor;
@@ -2344,10 +2364,16 @@ protected:
 						Root::empty_cache(*cell.output_write_kernel);
 					TimeStepData weighted_write;
 					if (mul_int) {
-						cell.weighted_input_write_cache = std::move(weighted_input_write);
-						cell.weighted_output_write_cache = std::move(weighted_output_write);
-						weighted_write = cell.weighted_input_write_cache *
-								cell.weighted_output_write_cache;
+						if (training) {
+							cell.weighted_input_write_cache = std::move(weighted_input_write);
+							cell.weighted_output_write_cache = std::move(weighted_output_write);
+							weighted_write = cell.weighted_input_write_cache *
+									cell.weighted_output_write_cache;
+						} else {
+							weighted_write = weighted_input_write * weighted_output_write;
+							weighted_input_write = null_tensor;
+							weighted_output_write = null_tensor;
+						}
 					} else {
 						weighted_write = weighted_input_write + weighted_output_write;
 						weighted_input_write = null_tensor;
@@ -2364,10 +2390,16 @@ protected:
 						Root::empty_cache(*cell.output_candidate_kernel);
 					TimeStepData weighted_candidates;
 					if (mul_int) {
-						cell.weighted_input_candidate_cache = std::move(weighted_input_candidates);
-						cell.weighted_output_candidate_cache = std::move(weighted_output_candidates);
-						weighted_candidates = cell.weighted_input_candidate_cache *
-								cell.weighted_output_candidate_cache;
+						if (training) {
+							cell.weighted_input_candidate_cache = std::move(weighted_input_candidates);
+							cell.weighted_output_candidate_cache = std::move(weighted_output_candidates);
+							weighted_candidates = cell.weighted_input_candidate_cache *
+									cell.weighted_output_candidate_cache;
+						} else {
+							weighted_candidates = weighted_input_candidates * weighted_output_candidates;
+							weighted_input_candidates = null_tensor;
+							weighted_output_candidates = null_tensor;
+						}
 					} else {
 						weighted_candidates = weighted_input_candidates + weighted_output_candidates;
 						weighted_input_candidates = null_tensor;
@@ -2417,10 +2449,16 @@ protected:
 					if (!training)
 						Root::empty_cache(*cell.output_read_kernel);
 					if (mul_int) {
-						cell.weighted_input_read_cache = std::move(weighted_input_read);
-						cell.weighted_output_read_cache = std::move(weighted_output_read);
-						weighted_read = cell.weighted_input_read_cache *
-								cell.weighted_output_read_cache;
+						if (training) {
+							cell.weighted_input_read_cache = std::move(weighted_input_read);
+							cell.weighted_output_read_cache = std::move(weighted_output_read);
+							weighted_read = cell.weighted_input_read_cache *
+									cell.weighted_output_read_cache;
+						} else {
+							weighted_read = weighted_input_read * weighted_output_read;
+							weighted_input_read = null_tensor;
+							weighted_output_read = null_tensor;
+						}
 					} else {
 						weighted_read = weighted_input_read + weighted_output_read;
 						weighted_input_read = null_tensor;

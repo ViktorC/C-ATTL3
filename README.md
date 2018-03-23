@@ -43,7 +43,7 @@ The kernel layers (fully-connected and convolutional) also require weight initia
 
 ### NeuralNetwork
 The highest level building blocks of the different architectures are the neural network implementations provided by the library. Using these implementations, either as modules in a composite constellation or as standalone networks, almost any neural network architecture can be constructed. They are the following:
-* [NeuralNetwork](https://viktorc.github.io/C-ATTL3/html/classcattle_1_1_neural_network.html) [A] (NS/S)
+* [NeuralNetwork](https://viktorc.github.io/C-ATTL3/html/classcattle_1_1_neural_network.html) [A]
   * [FeedforwardNeuralNetwork](https://viktorc.github.io/C-ATTL3/html/classcattle_1_1_feedforward_neural_network.html) (NS)
   * [ParallelNeuralNetwork](https://viktorc.github.io/C-ATTL3/html/classcattle_1_1_parallel_neural_network.html) (NS)
   * [UnidirectionalNeuralNetwork](https://viktorc.github.io/C-ATTL3/html/classcattle_1_1_unidirectional_neural_network.html) [A] (S)
@@ -51,7 +51,7 @@ The highest level building blocks of the different architectures are the neural 
     * [LSTMNeuralNetwork](https://viktorc.github.io/C-ATTL3/html/classcattle_1_1_l_s_t_m_neural_network.html) (S)
   * [BidirectionalNeuralNetwork](https://viktorc.github.io/C-ATTL3/html/classcattle_1_1_bidirectional_neural_network.html) (S)
   * [SequentialNeuralNetwork](https://viktorc.github.io/C-ATTL3/html/classcattle_1_1_sequential_neural_network.html) (S)
-  * [CompositeNeuralNetwork](https://viktorc.github.io/C-ATTL3/html/classcattle_1_1_composite_neural_network.html) (NS/S)
+  * [CompositeNeuralNetwork](https://viktorc.github.io/C-ATTL3/html/classcattle_1_1_composite_neural_network.html)
   * [ResidualNeuralNetwork](https://viktorc.github.io/C-ATTL3/html/classcattle_1_1_residual_neural_network.html) (NS)
   * [DenseNeuralNetwork](https://viktorc.github.io/C-ATTL3/html/classcattle_1_1_dense_neural_network.html) (NS)
 
@@ -100,8 +100,8 @@ Data providers are responsible for supplying the data used for gradient verifica
 ### Preprocessor
 C-ATTL3 also contains two preporcessors that can be used to transform the input data. They are:
 * [Preprocessor](https://viktorc.github.io/C-ATTL3/html/classcattle_1_1_preprocessor.html) [A]
-  * [NormalizationPreprocessor](https://viktorc.github.io/C-ATTL3/html/classcattle_1_1_normalization_preprocessor.html)
-  * [PCAPreprocessor](https://viktorc.github.io/C-ATTL3/html/classcattle_1_1_p_c_a_preprocessor.html)
+  * [NormalizationPreprocessor](https://viktorc.github.io/C-ATTL3/html/classcattle_1_1_normalization_preprocessor.html) (NS)
+  * [PCAPreprocessor](https://viktorc.github.io/C-ATTL3/html/classcattle_1_1_p_c_a_preprocessor.html) (NS)
 
 ## Usage
 The following code snippets demonstrate the usage of the library via a simple example.
