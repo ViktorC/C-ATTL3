@@ -1,9 +1,9 @@
 var searchData=
 [
-  ['tanhactivationlayer',['TanhActivationLayer',['../classcattle_1_1_tanh_activation_layer.html',1,'cattle::TanhActivationLayer&lt; Scalar, Rank &gt;'],['../classcattle_1_1_tanh_activation_layer.html#aab6019c38de51f8ca21f42dd60691359',1,'cattle::TanhActivationLayer::TanhActivationLayer()']]],
-  ['tensor',['Tensor',['../namespacecattle.html#a264993c35ba14dd4f77aaff5152b8557',1,'cattle']]],
+  ['tanhactivationlayer',['TanhActivationLayer',['../classcattle_1_1_tanh_activation_layer.html',1,'cattle::TanhActivationLayer&lt; Scalar, Rank &gt;'],['../classcattle_1_1_tanh_activation_layer.html#a67d44e760962f78b74c182b1b1cf528d',1,'cattle::TanhActivationLayer::TanhActivationLayer()']]],
+  ['tensor',['Tensor',['../namespacecattle.html#a8b9323ad928764340e46f0802bf27fbb',1,'cattle']]],
   ['tensormap',['TensorMap',['../namespacecattle.html#a7dfcb4d57e2c5da3170ebd8d13fd0431',1,'cattle']]],
-  ['tensorptr',['TensorPtr',['../namespacecattle.html#ab061aa53a1ef071417f4b4f970cd9578',1,'cattle']]],
+  ['tensorptr',['TensorPtr',['../namespacecattle.html#ae90497baf0bcd6d9b075aa3287bcd475',1,'cattle']]],
   ['test',['test',['../classcattle_1_1_optimizer.html#abeccb14ff8083627a72efa7cff5c6c56',1,'cattle::Optimizer::test()'],['../classcattle_1_1_s_g_d_optimizer.html#a7e93a5babf0f974ef6f0db0901f7a6fe',1,'cattle::SGDOptimizer::test()']]],
   ['timestepdata',['TimeStepData',['../classcattle_1_1_recurrent_neural_network.html#aac3fa894e227a3df0836496f2640bfc5',1,'cattle::RecurrentNeuralNetwork::TimeStepData()'],['../classcattle_1_1_l_s_t_m_neural_network.html#a4f83676114595585965bce162a75bf04',1,'cattle::LSTMNeuralNetwork::TimeStepData()']]],
   ['to_5fstring',['to_string',['../classcattle_1_1_dim_expression.html#ae51ed9575f019bc86402615cf08e97d8',1,'cattle::DimExpression::to_string()'],['../classcattle_1_1_neural_network.html#ad216c4f30172a8924e959d103e38a82c',1,'cattle::NeuralNetwork::to_string()']]],

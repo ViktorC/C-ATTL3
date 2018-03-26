@@ -241,7 +241,8 @@ public:
 	virtual ~JointFileDataProvider() = default;
 	inline bool has_more() {
 		for (; current_stream < data_streams.size(); ++current_stream) {
-			if (data_streams[current_stream])
+			std::ifstream& data_stream = data_streams[current_stream];
+			if (data_stream && data_stream.peek() != EOF)
 				return true;
 		}
 		return false;
@@ -264,7 +265,8 @@ public:
 		return data_pair;
 	}
 	inline void reset() {
-		for (std::size_t i = 0; i <= current_stream; ++i)
+		std::size_t max_ind = std::min(current_stream, (std::size_t) (data_streams.size() - 1));
+		for (std::size_t i = 0; i <= max_ind; ++i)
 			data_streams[i].seekg(0, std::ios::beg);
 		current_stream = 0;
 	}
@@ -283,7 +285,7 @@ protected:
 	/**
 	 * It reads at most the specified number of observation-objective pairs from the provided
 	 * file stream. The file stream can be expected not to have any of its fail flags set
-	 * initially.
+	 * initially and to have at least 1 more character left to read.
 	 *
 	 * @param data_stream A reference to the file stream of the data set.
 	 * @param batch_size The number of data points to return.
@@ -326,8 +328,9 @@ public:
 	virtual ~SplitFileDataProvider() = default;
 	inline bool has_more() {
 		for (; current_stream_pair < data_stream_pairs.size(); ++current_stream_pair) {
-			std::pair<std::string,std::string>& path_pair = data_stream_pairs[current_stream_pair];
-			if (path_pair.first() && path_pair.second())
+			std::pair<std::ifstream,std::ifstream>& stream_pair = data_stream_pairs[current_stream_pair];
+			if (stream_pair.first() && stream_pair.first.peek() != EOF &&
+					stream_pair.second && stream_pair.second.peek() != EOF)
 				return true;
 		}
 		return false;
@@ -350,7 +353,8 @@ public:
 		return data_pair;
 	}
 	inline void reset() {
-		for (std::size_t i = 0; i <= current_stream_pair; ++i) {
+		std::size_t max_ind = std::min(current_stream_pair, (std::size_t) (data_stream_pairs.size() - 1));
+		for (std::size_t i = 0; i <= max_ind; ++i) {
 			std::pair<std::ifstream,std::ifstream>& stream_pair = data_stream_pairs[i];
 			stream_pair.first.seekg(0, std::ios::beg);
 			stream_pair.second.seekg(0, std::ios::beg);
@@ -378,7 +382,8 @@ protected:
 	/**
 	 * It reads at most the specified number of observations from the observation-file and at
 	 * most the specified number of objectives from the objective-file. The file streams can
-	 * be expected not to have any of their fail flags set initially.
+	 * be expected not to have any of their fail flags set initially and to have at least 1
+	 * more character left to read in each.
 	 *
 	 * @param obs_input_stream A reference to the file stream to a file containing
 	 * observations.
@@ -460,10 +465,8 @@ protected:
 			return std::make_pair(obs, obj);
 		std::array<std::size_t,4> offsets({ 0, 0, 0, 0 });
 		std::array<std::size_t,4> obs_extents({ i, 32u, 32u, 3u });
-		std::array<std::size_t,4> obj_extents({ i, 1u, 1u, 1u });
-		Tensor<Scalar,4> obs_slice = obs.slice(offsets, obs_extents);
-		Tensor<Scalar,4> obj_slice = obj.slice(offsets, obj_extents);
-		return std::make_pair(obs_slice, obj_slice);
+		std::array<std::size_t,4> obj_extents({ i, 10u, 1u, 1u });
+		return std::make_pair(obs.slice(offsets, obs_extents), obj.slice(offsets, obj_extents));
 	}
 	inline std::size_t _skip(std::ifstream& data_stream, std::size_t instances) {
 		std::streampos curr_pos = data_stream.tellg();

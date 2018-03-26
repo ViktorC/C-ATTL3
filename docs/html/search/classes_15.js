@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['weightinitialization',['WeightInitialization',['../classcattle_1_1_weight_initialization.html',1,'cattle']]]
+  ['vanillasgdoptimizer',['VanillaSGDOptimizer',['../classcattle_1_1_vanilla_s_g_d_optimizer.html',1,'cattle']]]
 ];

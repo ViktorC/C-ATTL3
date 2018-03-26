@@ -116,9 +116,9 @@ Public Member Functions</h2></td></tr>
 <tr class="separator:a5d9115e16b00b9a53b774c939e518587"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a9f74f8b89552faecedd0716bb8b15138"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_l_s_t_m_neural_network.html#a9f74f8b89552faecedd0716bb8b15138">is_foremost</a> () const</td></tr>
 <tr class="separator:a9f74f8b89552faecedd0716bb8b15138"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a9adf5855f929f9896e2874e9e7c49582"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="classcattle_1_1_neural_network.html#ac53724869b4f3d635f89312c7a992139">Root::Dims</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_l_s_t_m_neural_network.html#a9adf5855f929f9896e2874e9e7c49582">get_input_dims</a> () const</td></tr>
+<tr class="memitem:a9adf5855f929f9896e2874e9e7c49582"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="classcattle_1_1_neural_network.html#ab3608ae118bbbacbc9161f489afcd562">Root::Dims</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_l_s_t_m_neural_network.html#a9adf5855f929f9896e2874e9e7c49582">get_input_dims</a> () const</td></tr>
 <tr class="separator:a9adf5855f929f9896e2874e9e7c49582"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a2d1f3a8365e2325340ab69f167b1fd1d"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="classcattle_1_1_neural_network.html#ac53724869b4f3d635f89312c7a992139">Root::Dims</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_l_s_t_m_neural_network.html#a2d1f3a8365e2325340ab69f167b1fd1d">get_output_dims</a> () const</td></tr>
+<tr class="memitem:a2d1f3a8365e2325340ab69f167b1fd1d"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="classcattle_1_1_neural_network.html#ab3608ae118bbbacbc9161f489afcd562">Root::Dims</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_l_s_t_m_neural_network.html#a2d1f3a8365e2325340ab69f167b1fd1d">get_output_dims</a> () const</td></tr>
 <tr class="separator:a2d1f3a8365e2325340ab69f167b1fd1d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="inherit_header pub_methods_classcattle_1_1_unidirectional_neural_network"><td colspan="2" onclick="javascript:toggleInherit('pub_methods_classcattle_1_1_unidirectional_neural_network')"><img src="closed.png" alt="-"/>&#160;Public Member Functions inherited from <a class="el" href="classcattle_1_1_unidirectional_neural_network.html">cattle::UnidirectionalNeuralNetwork&lt; Scalar, Rank &gt;</a></td></tr>
 <tr class="memitem:a4743aef3626e8e0df53b6c7fae32bbbf inherit pub_methods_classcattle_1_1_unidirectional_neural_network"><td class="memItemLeft" align="right" valign="top">virtual&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_unidirectional_neural_network.html#a4743aef3626e8e0df53b6c7fae32bbbf">~UnidirectionalNeuralNetwork</a> ()=default</td></tr>
@@ -152,13 +152,13 @@ Private Types</h2></td></tr>
 <tr class="separator:af411cd24166a1c73abe85ce111aaa969"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:af7b4654127d59185538db06eb3aeff87"><td class="memItemLeft" align="right" valign="top">typedef <a class="el" href="classcattle_1_1_l_s_t_m_neural_network.html">LSTMNeuralNetwork</a>&lt; Scalar, Rank &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_l_s_t_m_neural_network.html#af7b4654127d59185538db06eb3aeff87">Self</a></td></tr>
 <tr class="separator:af7b4654127d59185538db06eb3aeff87"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:af814ea47bcad982a0df960513632df2d"><td class="memItemLeft" align="right" valign="top">typedef std::array&lt; int, <a class="el" href="classcattle_1_1_neural_network.html#a0b8194350bbd1abc1c9118b3d34fede4">Root::DATA_RANKS</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_l_s_t_m_neural_network.html#af814ea47bcad982a0df960513632df2d">RankwiseIntArray</a></td></tr>
-<tr class="separator:af814ea47bcad982a0df960513632df2d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0b9a75aa171847eb21288fe6e1b5a768"><td class="memItemLeft" align="right" valign="top">typedef std::array&lt; std::size_t, <a class="el" href="classcattle_1_1_neural_network.html#a0b8194350bbd1abc1c9118b3d34fede4">Root::DATA_RANKS</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_l_s_t_m_neural_network.html#a0b9a75aa171847eb21288fe6e1b5a768">RankwiseIntArray</a></td></tr>
+<tr class="separator:a0b9a75aa171847eb21288fe6e1b5a768"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ada533bbf3f88d6825e890c789301ae9c"><td class="memItemLeft" align="right" valign="top">typedef std::array&lt; bool, <a class="el" href="classcattle_1_1_neural_network.html#a0b8194350bbd1abc1c9118b3d34fede4">Root::DATA_RANKS</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_l_s_t_m_neural_network.html#ada533bbf3f88d6825e890c789301ae9c">RankwiseBoolArray</a></td></tr>
 <tr class="separator:ada533bbf3f88d6825e890c789301ae9c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ab03ef5d59b3ba30b6db8c354e088d88e"><td class="memItemLeft" align="right" valign="top">typedef std::function&lt; std::pair&lt; std::size_t, std::size_t &gt;std::size_t)&gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_l_s_t_m_neural_network.html#ab03ef5d59b3ba30b6db8c354e088d88e">OutputSeqSizeFunc</a></td></tr>
 <tr class="separator:ab03ef5d59b3ba30b6db8c354e088d88e"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a4f83676114595585965bce162a75bf04"><td class="memItemLeft" align="right" valign="top">typedef <a class="el" href="namespacecattle.html#a264993c35ba14dd4f77aaff5152b8557">Tensor</a>&lt; Scalar, Rank+1 &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_l_s_t_m_neural_network.html#a4f83676114595585965bce162a75bf04">TimeStepData</a></td></tr>
+<tr class="memitem:a4f83676114595585965bce162a75bf04"><td class="memItemLeft" align="right" valign="top">typedef <a class="el" href="namespacecattle.html#a8b9323ad928764340e46f0802bf27fbb">Tensor</a>&lt; Scalar, Rank+1 &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_l_s_t_m_neural_network.html#a4f83676114595585965bce162a75bf04">TimeStepData</a></td></tr>
 <tr class="separator:a4f83676114595585965bce162a75bf04"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pri-attribs"></a>
@@ -175,9 +175,9 @@ Private Attributes</h2></td></tr>
 <tr class="separator:aacef4873854aee159b0eaf776f247911"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a3423d6f0d8717303013f3208d816581e"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_l_s_t_m_neural_network.html#a3423d6f0d8717303013f3208d816581e">foremost</a></td></tr>
 <tr class="separator:a3423d6f0d8717303013f3208d816581e"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a5324e5c8bb29feed06357aada8e75520"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classcattle_1_1_neural_network.html#ac53724869b4f3d635f89312c7a992139">Root::Dims</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_l_s_t_m_neural_network.html#a5324e5c8bb29feed06357aada8e75520">input_dims</a></td></tr>
+<tr class="memitem:a5324e5c8bb29feed06357aada8e75520"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classcattle_1_1_neural_network.html#ab3608ae118bbbacbc9161f489afcd562">Root::Dims</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_l_s_t_m_neural_network.html#a5324e5c8bb29feed06357aada8e75520">input_dims</a></td></tr>
 <tr class="separator:a5324e5c8bb29feed06357aada8e75520"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a4930edbf9042b8ac612df620b2a2971d"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classcattle_1_1_neural_network.html#ac53724869b4f3d635f89312c7a992139">Root::Dims</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_l_s_t_m_neural_network.html#a4930edbf9042b8ac612df620b2a2971d">output_dims</a></td></tr>
+<tr class="memitem:a4930edbf9042b8ac612df620b2a2971d"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classcattle_1_1_neural_network.html#ab3608ae118bbbacbc9161f489afcd562">Root::Dims</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_l_s_t_m_neural_network.html#a4930edbf9042b8ac612df620b2a2971d">output_dims</a></td></tr>
 <tr class="separator:a4930edbf9042b8ac612df620b2a2971d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a4dda4aa227369c8d38b0d782c369bdf0"><td class="memItemLeft" align="right" valign="top">std::vector&lt; <a class="el" href="structcattle_1_1_l_s_t_m_neural_network_1_1_cell.html">Cell</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_l_s_t_m_neural_network.html#a4dda4aa227369c8d38b0d782c369bdf0">cells</a></td></tr>
 <tr class="separator:a4dda4aa227369c8d38b0d782c369bdf0"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -200,18 +200,20 @@ Friends</h2></td></tr>
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="inherited"></a>
 Additional Inherited Members</h2></td></tr>
 <tr class="inherit_header pro_types_classcattle_1_1_neural_network"><td colspan="2" onclick="javascript:toggleInherit('pro_types_classcattle_1_1_neural_network')"><img src="closed.png" alt="-"/>&#160;Protected Types inherited from <a class="el" href="classcattle_1_1_neural_network.html">cattle::NeuralNetwork&lt; Scalar, Rank, true &gt;</a></td></tr>
-<tr class="memitem:a817609dfe2b6a9f825da6f2fb2124aca inherit pro_types_classcattle_1_1_neural_network"><td class="memItemLeft" align="right" valign="top">typedef <a class="el" href="namespacecattle.html#a264993c35ba14dd4f77aaff5152b8557">Tensor</a>&lt; Scalar, <a class="el" href="classcattle_1_1_neural_network.html#a0b8194350bbd1abc1c9118b3d34fede4">DATA_RANKS</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_neural_network.html#a817609dfe2b6a9f825da6f2fb2124aca">Data</a></td></tr>
+<tr class="memitem:a817609dfe2b6a9f825da6f2fb2124aca inherit pro_types_classcattle_1_1_neural_network"><td class="memItemLeft" align="right" valign="top">typedef <a class="el" href="namespacecattle.html#a8b9323ad928764340e46f0802bf27fbb">Tensor</a>&lt; Scalar, <a class="el" href="classcattle_1_1_neural_network.html#a0b8194350bbd1abc1c9118b3d34fede4">DATA_RANKS</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_neural_network.html#a817609dfe2b6a9f825da6f2fb2124aca">Data</a></td></tr>
 <tr class="separator:a817609dfe2b6a9f825da6f2fb2124aca inherit pro_types_classcattle_1_1_neural_network"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ac53724869b4f3d635f89312c7a992139 inherit pro_types_classcattle_1_1_neural_network"><td class="memItemLeft" align="right" valign="top">typedef <a class="el" href="classcattle_1_1_dimensions.html">Dimensions</a>&lt; int, Rank &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_neural_network.html#ac53724869b4f3d635f89312c7a992139">Dims</a></td></tr>
-<tr class="separator:ac53724869b4f3d635f89312c7a992139 inherit pro_types_classcattle_1_1_neural_network"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab3608ae118bbbacbc9161f489afcd562 inherit pro_types_classcattle_1_1_neural_network"><td class="memItemLeft" align="right" valign="top">typedef <a class="el" href="classcattle_1_1_dimensions.html">Dimensions</a>&lt; std::size_t, Rank &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_neural_network.html#ab3608ae118bbbacbc9161f489afcd562">Dims</a></td></tr>
+<tr class="separator:ab3608ae118bbbacbc9161f489afcd562 inherit pro_types_classcattle_1_1_neural_network"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="inherit_header pro_static_methods_classcattle_1_1_neural_network"><td colspan="2" onclick="javascript:toggleInherit('pro_static_methods_classcattle_1_1_neural_network')"><img src="closed.png" alt="-"/>&#160;Static Protected Member Functions inherited from <a class="el" href="classcattle_1_1_neural_network.html">cattle::NeuralNetwork&lt; Scalar, Rank, true &gt;</a></td></tr>
+<tr class="memitem:aeb549ff03b351397f4c7bded24d55e7c inherit pro_static_methods_classcattle_1_1_neural_network"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="classcattle_1_1_layer.html">Layer</a>&lt; Scalar, Rank &gt; *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_neural_network.html#aeb549ff03b351397f4c7bded24d55e7c">clone_with_shared_params</a> (const <a class="el" href="classcattle_1_1_layer.html">Layer</a>&lt; Scalar, Rank &gt; &amp;layer)</td></tr>
+<tr class="separator:aeb549ff03b351397f4c7bded24d55e7c inherit pro_static_methods_classcattle_1_1_neural_network"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a6cdd26677f188f7c499f520a01082b60 inherit pro_static_methods_classcattle_1_1_neural_network"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_neural_network.html#a6cdd26677f188f7c499f520a01082b60">set_input_layer</a> (<a class="el" href="classcattle_1_1_layer.html">Layer</a>&lt; Scalar, Rank &gt; &amp;layer, bool on)</td></tr>
 <tr class="separator:a6cdd26677f188f7c499f520a01082b60 inherit pro_static_methods_classcattle_1_1_neural_network"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a417cb77f47eab00bb62f2f5347aff86f inherit pro_static_methods_classcattle_1_1_neural_network"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_neural_network.html#a417cb77f47eab00bb62f2f5347aff86f">empty_cache</a> (<a class="el" href="classcattle_1_1_layer.html">Layer</a>&lt; Scalar, Rank &gt; &amp;layer)</td></tr>
 <tr class="separator:a417cb77f47eab00bb62f2f5347aff86f inherit pro_static_methods_classcattle_1_1_neural_network"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a7daf5b9eb47ba2c78c05928a39799cc0 inherit pro_static_methods_classcattle_1_1_neural_network"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="namespacecattle.html#a264993c35ba14dd4f77aaff5152b8557">Tensor</a>&lt; Scalar, Rank+1 &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_neural_network.html#a7daf5b9eb47ba2c78c05928a39799cc0">pass_forward</a> (<a class="el" href="classcattle_1_1_layer.html">Layer</a>&lt; Scalar, Rank &gt; &amp;layer, <a class="el" href="namespacecattle.html#a264993c35ba14dd4f77aaff5152b8557">Tensor</a>&lt; Scalar, Rank+1 &gt; prev_out, bool training)</td></tr>
+<tr class="memitem:a7daf5b9eb47ba2c78c05928a39799cc0 inherit pro_static_methods_classcattle_1_1_neural_network"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="namespacecattle.html#a8b9323ad928764340e46f0802bf27fbb">Tensor</a>&lt; Scalar, Rank+1 &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_neural_network.html#a7daf5b9eb47ba2c78c05928a39799cc0">pass_forward</a> (<a class="el" href="classcattle_1_1_layer.html">Layer</a>&lt; Scalar, Rank &gt; &amp;layer, <a class="el" href="namespacecattle.html#a8b9323ad928764340e46f0802bf27fbb">Tensor</a>&lt; Scalar, Rank+1 &gt; prev_out, bool training)</td></tr>
 <tr class="separator:a7daf5b9eb47ba2c78c05928a39799cc0 inherit pro_static_methods_classcattle_1_1_neural_network"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a6ad331a525fefb2384ec045c7c7b46de inherit pro_static_methods_classcattle_1_1_neural_network"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="namespacecattle.html#a264993c35ba14dd4f77aaff5152b8557">Tensor</a>&lt; Scalar, Rank+1 &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_neural_network.html#a6ad331a525fefb2384ec045c7c7b46de">pass_back</a> (<a class="el" href="classcattle_1_1_layer.html">Layer</a>&lt; Scalar, Rank &gt; &amp;layer, <a class="el" href="namespacecattle.html#a264993c35ba14dd4f77aaff5152b8557">Tensor</a>&lt; Scalar, Rank+1 &gt; out_grads)</td></tr>
+<tr class="memitem:a6ad331a525fefb2384ec045c7c7b46de inherit pro_static_methods_classcattle_1_1_neural_network"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="namespacecattle.html#a8b9323ad928764340e46f0802bf27fbb">Tensor</a>&lt; Scalar, Rank+1 &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_neural_network.html#a6ad331a525fefb2384ec045c7c7b46de">pass_back</a> (<a class="el" href="classcattle_1_1_layer.html">Layer</a>&lt; Scalar, Rank &gt; &amp;layer, <a class="el" href="namespacecattle.html#a8b9323ad928764340e46f0802bf27fbb">Tensor</a>&lt; Scalar, Rank+1 &gt; out_grads)</td></tr>
 <tr class="separator:a6ad331a525fefb2384ec045c7c7b46de inherit pro_static_methods_classcattle_1_1_neural_network"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a64b361839ba75dd77dd4f5cc02323d7d inherit pro_static_methods_classcattle_1_1_neural_network"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="namespacecattle.html#a1d78623a47279d516750a44dbad6090b">Matrix</a>&lt; Scalar &gt; &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_neural_network.html#a64b361839ba75dd77dd4f5cc02323d7d">get_params_grad</a> (<a class="el" href="classcattle_1_1_layer.html">Layer</a>&lt; Scalar, Rank &gt; &amp;layer)</td></tr>
 <tr class="separator:a64b361839ba75dd77dd4f5cc02323d7d inherit pro_static_methods_classcattle_1_1_neural_network"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -273,8 +275,8 @@ template&lt;typename Scalar , std::size_t Rank&gt; </div>
 
 </div>
 </div>
-<a id="af814ea47bcad982a0df960513632df2d"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#af814ea47bcad982a0df960513632df2d">&#9670;&nbsp;</a></span>RankwiseIntArray</h2>
+<a id="a0b9a75aa171847eb21288fe6e1b5a768"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a0b9a75aa171847eb21288fe6e1b5a768">&#9670;&nbsp;</a></span>RankwiseIntArray</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -285,7 +287,7 @@ template&lt;typename Scalar , std::size_t Rank&gt; </div>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">typedef std::array&lt;int,<a class="el" href="classcattle_1_1_neural_network.html#a0b8194350bbd1abc1c9118b3d34fede4">Root::DATA_RANKS</a>&gt; <a class="el" href="classcattle_1_1_l_s_t_m_neural_network.html">cattle::LSTMNeuralNetwork</a>&lt; Scalar, Rank &gt;::<a class="el" href="classcattle_1_1_l_s_t_m_neural_network.html#af814ea47bcad982a0df960513632df2d">RankwiseIntArray</a></td>
+          <td class="memname">typedef std::array&lt;std::size_t,<a class="el" href="classcattle_1_1_neural_network.html#a0b8194350bbd1abc1c9118b3d34fede4">Root::DATA_RANKS</a>&gt; <a class="el" href="classcattle_1_1_l_s_t_m_neural_network.html">cattle::LSTMNeuralNetwork</a>&lt; Scalar, Rank &gt;::<a class="el" href="classcattle_1_1_l_s_t_m_neural_network.html#a0b9a75aa171847eb21288fe6e1b5a768">RankwiseIntArray</a></td>
         </tr>
       </table>
   </td>
@@ -357,7 +359,7 @@ template&lt;typename Scalar , std::size_t Rank&gt; </div>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">typedef <a class="el" href="namespacecattle.html#a264993c35ba14dd4f77aaff5152b8557">Tensor</a>&lt;Scalar,Rank + 1&gt; <a class="el" href="classcattle_1_1_l_s_t_m_neural_network.html">cattle::LSTMNeuralNetwork</a>&lt; Scalar, Rank &gt;::<a class="el" href="classcattle_1_1_l_s_t_m_neural_network.html#a4f83676114595585965bce162a75bf04">TimeStepData</a></td>
+          <td class="memname">typedef <a class="el" href="namespacecattle.html#a8b9323ad928764340e46f0802bf27fbb">Tensor</a>&lt;Scalar,Rank + 1&gt; <a class="el" href="classcattle_1_1_l_s_t_m_neural_network.html">cattle::LSTMNeuralNetwork</a>&lt; Scalar, Rank &gt;::<a class="el" href="classcattle_1_1_l_s_t_m_neural_network.html#a4f83676114595585965bce162a75bf04">TimeStepData</a></td>
         </tr>
       </table>
   </td>
@@ -722,7 +724,7 @@ template&lt;typename Scalar , std::size_t Rank&gt; </div>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">const <a class="el" href="classcattle_1_1_neural_network.html#ac53724869b4f3d635f89312c7a992139">Root::Dims</a>&amp; <a class="el" href="classcattle_1_1_l_s_t_m_neural_network.html">cattle::LSTMNeuralNetwork</a>&lt; Scalar, Rank &gt;::get_input_dims </td>
+          <td class="memname">const <a class="el" href="classcattle_1_1_neural_network.html#ab3608ae118bbbacbc9161f489afcd562">Root::Dims</a>&amp; <a class="el" href="classcattle_1_1_l_s_t_m_neural_network.html">cattle::LSTMNeuralNetwork</a>&lt; Scalar, Rank &gt;::get_input_dims </td>
           <td>(</td>
           <td class="paramname"></td><td>)</td>
           <td> const</td>
@@ -782,7 +784,7 @@ template&lt;typename Scalar , std::size_t Rank&gt; </div>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">const <a class="el" href="classcattle_1_1_neural_network.html#ac53724869b4f3d635f89312c7a992139">Root::Dims</a>&amp; <a class="el" href="classcattle_1_1_l_s_t_m_neural_network.html">cattle::LSTMNeuralNetwork</a>&lt; Scalar, Rank &gt;::get_output_dims </td>
+          <td class="memname">const <a class="el" href="classcattle_1_1_neural_network.html#ab3608ae118bbbacbc9161f489afcd562">Root::Dims</a>&amp; <a class="el" href="classcattle_1_1_l_s_t_m_neural_network.html">cattle::LSTMNeuralNetwork</a>&lt; Scalar, Rank &gt;::get_output_dims </td>
           <td>(</td>
           <td class="paramname"></td><td>)</td>
           <td> const</td>
@@ -1128,7 +1130,7 @@ template&lt;typename Scalar , std::size_t Rank&gt; </div>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="classcattle_1_1_neural_network.html#ac53724869b4f3d635f89312c7a992139">Root::Dims</a> <a class="el" href="classcattle_1_1_l_s_t_m_neural_network.html">cattle::LSTMNeuralNetwork</a>&lt; Scalar, Rank &gt;::input_dims</td>
+          <td class="memname"><a class="el" href="classcattle_1_1_neural_network.html#ab3608ae118bbbacbc9161f489afcd562">Root::Dims</a> <a class="el" href="classcattle_1_1_l_s_t_m_neural_network.html">cattle::LSTMNeuralNetwork</a>&lt; Scalar, Rank &gt;::input_dims</td>
         </tr>
       </table>
   </td>
@@ -1224,7 +1226,7 @@ template&lt;typename Scalar , std::size_t Rank&gt; </div>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="classcattle_1_1_neural_network.html#ac53724869b4f3d635f89312c7a992139">Root::Dims</a> <a class="el" href="classcattle_1_1_l_s_t_m_neural_network.html">cattle::LSTMNeuralNetwork</a>&lt; Scalar, Rank &gt;::output_dims</td>
+          <td class="memname"><a class="el" href="classcattle_1_1_neural_network.html#ab3608ae118bbbacbc9161f489afcd562">Root::Dims</a> <a class="el" href="classcattle_1_1_l_s_t_m_neural_network.html">cattle::LSTMNeuralNetwork</a>&lt; Scalar, Rank &gt;::output_dims</td>
         </tr>
       </table>
   </td>

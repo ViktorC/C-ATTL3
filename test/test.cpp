@@ -233,8 +233,8 @@ typedef double Scalar;
 //}
 
 int main() {
-	CIFAR10DataProvider<float> training_prov({ "C:\\Users\\A6714\\Downloads\\cifar-10-batches-bin\\data_batch_1.bin" });
-	CIFAR10DataProvider<float> test_prov({ "C:\\Users\\A6714\\Downloads\\cifar-10-batches-bin\\data_batch_2.bin" });
+	CIFAR10DataProvider<float> training_prov({ "C:\\Users\\Viktor\\Downloads\\cifar-10-batches-bin\\data_batch_1.bin" });
+	CIFAR10DataProvider<float> test_prov({ "C:\\Users\\Viktor\\Downloads\\cifar-10-batches-bin\\test_batch.bin" });
 	WeightInitSharedPtr<float> init(new HeWeightInitialization<float>());
 	std::vector<LayerPtr<float,3>> layers(11);
 	layers[0] = LayerPtr<float,3>(new ConvLayer<float>(training_prov.get_obs_dims(), 10, init, 5, 2));
