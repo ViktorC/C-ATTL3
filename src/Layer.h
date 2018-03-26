@@ -765,7 +765,7 @@ protected:
 	inline Matrix<Scalar> activate(const Matrix<Scalar>& in) {
 		/* First subtract the value of the greatest coefficient from each element row-wise
 		 * to avoid an overflow due to raising e to great powers. */
-		Matrix<Scalar> out = (in.array().colwise() - in.array().rowwise().maxCoeff()).exp();
+		Matrix<Scalar> out = in.array().exp();
 		return out.array().colwise() / (out.array().rowwise().sum() + epsilon);
 	}
 	inline Matrix<Scalar> d_activate(const Matrix<Scalar>& in, const Matrix<Scalar>& out,
@@ -773,7 +773,9 @@ protected:
 		Matrix<Scalar> d_in(in.rows(), in.cols());
 		for (int i = 0; i < d_in.rows(); ++i) {
 			RowVector<Scalar> row_i = out.row(i);
-			auto jacobian = (row_i.asDiagonal() - (row_i.transpose() * row_i));
+			// FIXME Do not evaluate the expressions into a temporary variable.
+			Matrix<Scalar> jacobian = row_i.asDiagonal();
+			jacobian -= row_i.transpose() * row_i;
 			d_in.row(i) = out_grads.row(i) * jacobian;
 		}
 		return d_in;

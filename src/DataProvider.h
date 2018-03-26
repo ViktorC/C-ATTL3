@@ -15,6 +15,7 @@
 #include <initializer_list>
 #include <iostream>
 #include <memory>
+#include <stdexcept>
 #include <string>
 #include <type_traits>
 #include <utility>
@@ -38,6 +39,8 @@ using TensorPtr = std::unique_ptr<Tensor<Scalar,Rank>>;
 template<typename Scalar, std::size_t Rank, bool Sequential>
 using DataPair = std::pair<Tensor<Scalar,Rank + Sequential + 1>,Tensor<Scalar,Rank + Sequential + 1>>;
 
+template<typename Scalar, std::size_t Rank, bool Sequential> class PartitionDataProvider;
+
 /**
  * A class template for fetching data from memory or disk.
  */
@@ -45,6 +48,7 @@ template<typename Scalar, std::size_t Rank, bool Sequential>
 class DataProvider {
 	static_assert(std::is_floating_point<Scalar>::value, "non floating-point scalar type");
 	static_assert(Rank > 0 && Rank < 4, "illegal data provider rank");
+	friend class PartitionDataProvider<Scalar,Rank,Sequential>;
 public:
 	virtual ~DataProvider() = default;
 	/**
@@ -60,16 +64,17 @@ public:
 	 */
 	virtual const Dimensions<std::size_t,Rank>& get_obj_dims() const = 0;
 	/**
-	 * A simple constant method that returns whether the data provider instance has more
-	 * data to provide.
+	 * A method that returns whether the data provider instance has more data to provide.
+	 * It should always be called before calling get_data(std::size_t).
 	 *
 	 * @return Whether there are more observation-objective pairs to read from the
 	 * instance.
 	 */
-	virtual bool has_more() const = 0;
+	virtual bool has_more() = 0;
 	/**
 	 * Reads and returns the specified number of observation-objective pairs. It also
-	 * offsets the reader by the specified number.
+	 * offsets the reader by the specified number. If has_more() returns false, the
+	 * invocation of this method results in the throwing of a std::out_of_range exception.
 	 *
 	 * @param batch_size The maximum number of observation-objective pairs to read and
 	 * return.
@@ -84,7 +89,8 @@ public:
 	virtual void reset() = 0;
 protected:
 	/**
-	 * It skips the specified number of data points.
+	 * It skips the specified number of data points. If has_more() returns false,
+	 * the invocation of the method has no effect.
 	 *
 	 * @param instances The number of instances to skip.
 	 */
@@ -101,7 +107,7 @@ protected:
  * by mapping two contiguous blocks of its data to two PartitionedDataProvider instances.
  */
 template<typename Scalar, std::size_t Rank, bool Sequential>
-class PartitionDataProvider : DataProvider<Scalar,Rank,Sequential> {
+class PartitionDataProvider : public DataProvider<Scalar,Rank,Sequential> {
 	typedef DataProvider<Scalar,Rank,Sequential> Base;
 public:
 	inline PartitionDataProvider(Base& orig_provider, std::size_t offset, std::size_t length) :
@@ -117,7 +123,7 @@ public:
 	inline const Dimensions<std::size_t,Rank>& get_obj_dims() const {
 		return orig_provider.get_obj_dims();
 	}
-	inline bool has_more() const {
+	inline bool has_more() {
 		return instances_read < length && orig_provider.has_more();
 	}
 	inline DataPair<Scalar,Rank,Sequential> get_data(std::size_t batch_size) {
@@ -190,10 +196,12 @@ public:
 	inline const Dimensions<std::size_t,Rank>& get_obj_dims() const {
 		return obj_dims;
 	}
-	inline bool has_more() const {
+	inline bool has_more() {
 		return offsets[0] < (int) instances;
 	}
 	inline DataPair<Scalar,Rank,Sequential> get_data(std::size_t batch_size) {
+		if (!has_more)
+			throw std::out_of_range("no more data left to fetch");
 		std::size_t max_batch_size = std::min(batch_size, instances - offsets[0]);
 		data_extents[0] = max_batch_size;
 		obj_extents[0] = max_batch_size;
@@ -231,42 +239,36 @@ class JointFileDataProvider : public DataProvider<Scalar,Rank,Sequential> {
 	typedef DataProvider<Scalar,Rank,Sequential> Base;
 public:
 	virtual ~JointFileDataProvider() = default;
-	inline bool has_more() const {
-		return current_stream < data_streams.size() - 1 || (current_stream < data_streams.size() &&
-				!data_streams[current_stream].eof());
+	inline bool has_more() {
+		for (; current_stream < data_streams.size(); ++current_stream) {
+			if (data_streams[current_stream])
+				return true;
+		}
+		return false;
 	}
 	inline DataPair<Scalar,Rank,Sequential> get_data(std::size_t batch_size) {
 		if (!has_more())
-			return std::make_pair(typename Base::Data(), typename Base::Data());
+			throw std::out_of_range("no more data left to fetch");
 		DataPair<Scalar,Rank,Sequential> data_pair = _get_data(data_streams[current_stream],
 				batch_size);
 		assert(data_pair.first.dimension(0) == data_pair.second.dimension(0));
-		while (data_pair.first.dimension(0) != batch_size && ++current_stream < data_streams.size()) {
-			DataPair<Scalar,Rank,Sequential> additional_data_pair = _get_data(data_streams[current_stream],
+		/* If the data contains fewer batches than expected, the end of the file has been reached and the
+		 * rest of the data should be read from the next file. */
+		while (data_pair.first.dimension(0) < batch_size && has_more()) {
+			DataPair<Scalar,Rank,Sequential> add_data_pair = _get_data(data_streams[current_stream],
 					batch_size - data_pair.first.dimension(0));
-			assert(additional_data_pair.first.dimension(0) == additional_data_pair.second.dimension(0));
-			data_pair.first = data_pair.first.concatenate(additional_data_pair.first, 0);
-			data_pair.second = data_pair.second.concatenate(additional_data_pair.second, 0);
+			assert(add_data_pair.first.dimension(0) == add_data_pair.second.dimension(0));
+			data_pair.first = data_pair.first.concatenate(add_data_pair.first, 0);
+			data_pair.second = data_pair.second.concatenate(add_data_pair.second, 0);
 		}
 		return data_pair;
 	}
 	inline void reset() {
-		for (std::size_t i = 0; i <= current_stream && i <= data_streams.size(); ++i)
+		for (std::size_t i = 0; i <= current_stream; ++i)
 			data_streams[i].seekg(0, std::ios::beg);
 		current_stream = 0;
 	}
 protected:
-	inline JointFileDataProvider(std::initializer_list<std::string> dataset_paths, bool binary) :
-				data_streams(dataset_paths.size()),
-				current_stream(0) {
-		assert(dataset_paths.size() > 0);
-		std::size_t i = 0;
-		for (std::initializer_list<std::string>::iterator it = dataset_paths.begin();
-				it != dataset_paths.end(); ++it) {
-			data_streams[i] = std::ifstream(*it, binary ? std::ios::binary : std::ios::in);
-			assert(data_streams[i++].is_open());
-		}
-	}
 	inline JointFileDataProvider(std::vector<std::string> dataset_paths, bool binary) :
 			data_streams(dataset_paths.size()),
 			current_stream(0) {
@@ -276,9 +278,12 @@ protected:
 			assert(data_streams[i].is_open());
 		}
 	}
+	inline JointFileDataProvider(std::string dataset_path, bool binary) :
+			JointFileDataProvider({ dataset_path }, binary) { }
 	/**
 	 * It reads at most the specified number of observation-objective pairs from the provided
-	 * file stream.
+	 * file stream. The file stream can be expected not to have any of its fail flags set
+	 * initially.
 	 *
 	 * @param data_stream A reference to the file stream of the data set.
 	 * @param batch_size The number of data points to return.
@@ -287,7 +292,8 @@ protected:
 	virtual DataPair<Scalar,Rank,Sequential> _get_data(std::ifstream& data_stream,
 			std::size_t batch_size) = 0;
 	/**
-	 * Skips at most the specified number of instances in the data stream.
+	 * Skips at most the specified number of instances in the data stream. The file stream can
+	 * be expected not to have any of its fail flags set initially.
 	 *
 	 * @param data_stream A reference to the file stream of the data set.
 	 * @param instances The number of instances to skip.
@@ -299,7 +305,7 @@ protected:
 		if (!has_more())
 			return;
 		std::size_t skipped = _skip(data_streams[current_stream], instances);
-		while (skipped != instances && ++current_stream < data_streams.size())
+		while (skipped < instances && has_more())
 			skipped += _skip(data_streams[current_stream], instances - skipped);
 	}
 private:
@@ -318,22 +324,22 @@ class SplitFileDataProvider : public DataProvider<Scalar,Rank,Sequential> {
 	typedef DataProvider<Scalar,Rank,Sequential> Base;
 public:
 	virtual ~SplitFileDataProvider() = default;
-	inline bool has_more() const {
-		return current_stream_pair < data_stream_pairs.size() - 1 ||
-				(current_stream_pair < data_stream_pairs.size() &&
-				!data_stream_pairs[current_stream_pair].first.eof() &&
-				!data_stream_pairs[current_stream_pair].second.eof());
+	inline bool has_more() {
+		for (; current_stream_pair < data_stream_pairs.size(); ++current_stream_pair) {
+			std::pair<std::string,std::string>& path_pair = data_stream_pairs[current_stream_pair];
+			if (path_pair.first() && path_pair.second())
+				return true;
+		}
+		return false;
 	}
 	inline DataPair<Scalar,Rank,Sequential> get_data(std::size_t batch_size) {
 		if (!has_more())
-			return std::make_pair(typename Base::Data(), typename Base::Data());
-		std::pair<std::ifstream,std::ifstream>& first_stream_pair =
-				data_stream_pairs[current_stream_pair];
+			throw std::out_of_range("no more data left to fetch");
+		std::pair<std::ifstream,std::ifstream>& first_stream_pair = data_stream_pairs[current_stream_pair];
 		DataPair<Scalar,Rank,Sequential> data_pair = _get_data(first_stream_pair.first,
 				first_stream_pair.second, batch_size);
 		assert(data_pair.first.dimension(0) == data_pair.second.dimension(0));
-		while (data_pair.first.dimension(0) != batch_size &&
-				++current_stream_pair < data_stream_pairs.size()) {
+		while (data_pair.first.dimension(0) < batch_size && has_more()) {
 			std::pair<std::ifstream,std::ifstream>& stream_pair = data_stream_pairs[current_stream_pair];
 			DataPair<Scalar,Rank,Sequential> additional_data_pair = _get_data(stream_pair.first,
 					stream_pair.second, batch_size - data_pair.first.dimension(0));
@@ -344,7 +350,7 @@ public:
 		return data_pair;
 	}
 	inline void reset() {
-		for (std::size_t i = 0; i <= current_stream_pair && i <= data_stream_pairs.size(); ++i) {
+		for (std::size_t i = 0; i <= current_stream_pair; ++i) {
 			std::pair<std::ifstream,std::ifstream>& stream_pair = data_stream_pairs[i];
 			stream_pair.first.seekg(0, std::ios::beg);
 			stream_pair.second.seekg(0, std::ios::beg);
@@ -352,29 +358,13 @@ public:
 		current_stream_pair = 0;
 	}
 protected:
-	inline SplitFileDataProvider(std::initializer_list<std::pair<std::string,std::string>> obs_obj_pairs,
+	inline SplitFileDataProvider(std::vector<std::pair<std::string,std::string>> dataset_path_pairs,
 			bool obs_binary, bool obj_binary) :
-				data_stream_pairs(obs_obj_pairs.size()),
+				data_stream_pairs(dataset_path_pairs.size()),
 				current_stream_pair(0) {
-		assert(obs_obj_pairs.size() > 0);
-		std::size_t i = 0;
-		for (std::initializer_list<std::pair<std::string,std::string>>::iterator it = obs_obj_pairs.begin();
-				it != obs_obj_pairs.end(); ++it) {
-			std::pair<std::string,std::string>& path_pair = *it;
-			std::ifstream obs_stream(path_pair.first, obs_binary ? std::ios::binary : std::ios::in);
-			assert(obs_stream.is_open());
-			std::ifstream obj_stream(path_pair.second, obj_binary ? std::ios::binary : std::ios::in);
-			assert(obj_stream.is_open());
-			data_stream_pairs[i++] = std::make_pair(obs_stream, obj_stream);
-		}
-	}
-	inline SplitFileDataProvider(std::vector<std::pair<std::string,std::string>> obs_obj_pairs, bool obs_binary,
-			bool obj_binary) :
-				data_stream_pairs(obs_obj_pairs.size()),
-				current_stream_pair(0) {
-		assert(!obs_obj_pairs.empty());
-		for (std::size_t i = 0; i < obs_obj_pairs.size(); ++i) {
-			std::pair<std::string,std::string>& path_pair = obs_obj_pairs[i];
+		assert(!dataset_path_pairs.empty());
+		for (std::size_t i = 0; i < dataset_path_pairs.size(); ++i) {
+			std::pair<std::string,std::string>& path_pair = dataset_path_pairs[i];
 			std::ifstream obs_stream(path_pair.first, obs_binary ? std::ios::binary : std::ios::in);
 			assert(obs_stream.is_open());
 			std::ifstream obj_stream(path_pair.second, obj_binary ? std::ios::binary : std::ios::in);
@@ -382,9 +372,13 @@ protected:
 			data_stream_pairs[i] = std::make_pair(obs_stream, obj_stream);
 		}
 	}
+	inline SplitFileDataProvider(std::pair<std::string,std::string> dataset_path_pair, bool obs_binary,
+			bool obj_binary) :
+				SplitFileDataProvider({ dataset_path_pair }, obs_binary, obj_binary) { }
 	/**
-	 * It reads at most the specified number of observations from the observation-file and
-	 * at most the specified number of objectives from the objective-file.
+	 * It reads at most the specified number of observations from the observation-file and at
+	 * most the specified number of objectives from the objective-file. The file streams can
+	 * be expected not to have any of their fail flags set initially.
 	 *
 	 * @param obs_input_stream A reference to the file stream to a file containing
 	 * observations.
@@ -396,7 +390,8 @@ protected:
 	virtual DataPair<Scalar,Rank,Sequential> _get_data(std::ifstream& obs_input_stream,
 			std::ifstream& obj_input_stream, std::size_t batch_size) = 0;
 	/**
-	 * Skips at most the specified number of instances in the data streams.
+	 * Skips at most the specified number of instances in the data streams. The file streams can
+	 * be expected not to have any of their fail flags set initially.
 	 *
 	 * @param obs_input_stream A reference to the file stream to a file containing
 	 * observations.
@@ -413,7 +408,7 @@ protected:
 			return;
 		std::pair<std::ifstream,std::ifstream>& first_stream_pair = data_stream_pairs[current_stream_pair];
 		std::size_t skipped = _skip(first_stream_pair.first, first_stream_pair.second, instances);
-		while (skipped != instances && ++current_stream_pair < data_stream_pairs.size()) {
+		while (skipped < instances && has_more()) {
 			std::pair<std::ifstream,std::ifstream>& stream_pair = data_stream_pairs[current_stream_pair];
 			skipped += _skip(stream_pair.first, stream_pair.second, instances - skipped);
 		}
@@ -432,10 +427,10 @@ class CIFAR10DataProvider : public JointFileDataProvider<Scalar,3,false> {
 	typedef JointFileDataProvider<Scalar,3,false> Base;
 	static constexpr std::size_t INSTANCE_LENGTH = 3073;
 public:
-	inline CIFAR10DataProvider(std::initializer_list<std::string> files) :
-			Base::JointFileDataProvider(files, true),
+	inline CIFAR10DataProvider(std::vector<std::string> file_paths) :
+			Base::JointFileDataProvider(file_paths, true),
 			obs({ 32u, 32u, 3u }),
-			obj({ 1u, 1u, 1u }) { }
+			obj({ 10u, 1u, 1u }) { }
 	inline const Dimensions<std::size_t,3>& get_obs_dims() const {
 		return obs;
 	}
@@ -446,16 +441,17 @@ protected:
 	inline DataPair<Scalar,3,false> _get_data(std::ifstream& data_stream,
 				std::size_t batch_size) {
 		Tensor<Scalar,4> obs(batch_size, 32u, 32u, 3u);
-		Tensor<Scalar,4> obj(batch_size, 1u, 1u, 1u);
+		Tensor<Scalar,4> obj(batch_size, 10u, 1u, 1u);
+		obj.setZero();
 		std::size_t i;
-		for (i = 0; !data_stream.eof(); ++i) {
-			data_stream.read(buffer, INSTANCE_LENGTH);
-			obj(i,0,0,0) = (Scalar) buffer[0];
+		for (i = 0; i < batch_size && data_stream.read(buffer, INSTANCE_LENGTH); ++i) {
+			unsigned char* u_buffer = reinterpret_cast<unsigned char*>(buffer);
+			obj(i,u_buffer[0],0u,0u) = (Scalar) 1;
 			std::size_t buffer_ind = 1;
 			for (std::size_t channel = 0; channel < 3; ++channel) {
 				for (std::size_t row = 0; row < 32; ++row) {
-					for (std::size_t height = 0; height < 32; ++height)
-						obs(i,height,row,channel) = (Scalar) buffer[buffer_ind++];
+					for (std::size_t column = 0; column < 32; ++column)
+						obs(i,column,row,channel) = (Scalar) u_buffer[buffer_ind++];
 				}
 			}
 			assert(buffer_ind == INSTANCE_LENGTH);
@@ -466,11 +462,16 @@ protected:
 		std::array<std::size_t,4> obs_extents({ i, 32u, 32u, 3u });
 		std::array<std::size_t,4> obj_extents({ i, 1u, 1u, 1u });
 		Tensor<Scalar,4> obs_slice = obs.slice(offsets, obs_extents);
-		Tensor<Scalar,4> obj_slice = obj.slice(offsets, obs_extents);
+		Tensor<Scalar,4> obj_slice = obj.slice(offsets, obj_extents);
 		return std::make_pair(obs_slice, obj_slice);
 	}
 	inline std::size_t _skip(std::ifstream& data_stream, std::size_t instances) {
-		data_stream.seekg(data_stream.tellg() + instances * INSTANCE_LENGTH);
+		std::streampos curr_pos = data_stream.tellg();
+		data_stream.seekg(0, std::ios::end);
+		std::size_t skip_extent = data_stream.tellg() - curr_pos;
+		data_stream.seekg(curr_pos);
+		data_stream.ignore(instances * INSTANCE_LENGTH);
+		return std::min(instances, skip_extent / INSTANCE_LENGTH);
 	}
 private:
 	const Dimensions<std::size_t,3> obs;

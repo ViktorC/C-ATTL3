@@ -47,7 +47,6 @@ public:
 	}
 	inline Dimensions(const std::array<IndexType,Rank>& array) :
 			Dimensions() {
-		assert(array.size() <= Rank);
 		std::copy(array.begin(), array.end(), values.begin());
 	}
 	template<typename OtherDerived>
