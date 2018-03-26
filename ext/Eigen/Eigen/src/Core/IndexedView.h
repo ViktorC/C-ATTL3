@@ -89,7 +89,7 @@ class IndexedViewImpl;
   * Typical supported types thus include:
   *  - std::vector<int>
   *  - std::valarray<int>
-  *  - std::array<int>
+  *  - std::array<std::size_t>
   *  - Plain C arrays: int[N]
   *  - Eigen::ArrayXi
   *  - decltype(ArrayXi::LinSpaced(...))

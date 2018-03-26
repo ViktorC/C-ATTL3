@@ -11,6 +11,7 @@
 #include <algorithm>
 #include <cassert>
 #include <cstddef>
+#include <limits>
 #include <memory>
 #include <random>
 #include <sstream>
@@ -76,12 +77,12 @@ public:
 		assert(net.get_output_dims() == provider.get_obj_dims());
 		assert(step_size > 0);
 		assert(abs_epsilon >= 0 && rel_epsilon > 0);
-		DataPair<Scalar,Rank,Sequential> data_pair = provider.get_data(provider.instances());
+		DataPair<Scalar,Rank,Sequential> data_pair = provider.get_data(std::numeric_limits<std::size_t>::max());
+		std::size_t instances = data_pair.first.dimension(0);
 		provider.reset();
 		/* As the loss to minimize is the mean of the losses for all the training observations, the gradient to
 		 * back-propagate is to be divided by the number of observations in the batch. */
-		net.backpropagate(loss->d_function(net.propagate(data_pair.first, true), data_pair.second) /
-				(Scalar) provider.instances());
+		net.backpropagate(loss->d_function(net.propagate(data_pair.first, true), data_pair.second) / (Scalar) instances);
 		bool failure = false;
 		std::vector<Layer<Scalar,Rank>*> layers = net.get_layers();
 		for (unsigned i = 0; i < layers.size(); ++i) {
@@ -101,11 +102,9 @@ public:
 						/* Compute the numerical gradients in training mode to ensure that the means
 						 * and standard deviations used for batch normalization are the same as those
 						 * used during the analytic gradient computation. */
-						Scalar loss_inc = loss->function(net.propagate(data_pair.first, true),
-								data_pair.second).mean();
+						Scalar loss_inc = loss->function(net.propagate(data_pair.first, true), data_pair.second).mean();
 						params(j,k) = param - step_size;
-						Scalar loss_dec = loss->function(net.propagate(data_pair.first, true),
-								data_pair.second).mean();
+						Scalar loss_dec = loss->function(net.propagate(data_pair.first, true), data_pair.second).mean();
 						params(j,k) = param;
 						Scalar num_grad = (loss_inc - loss_dec) / (2 * step_size);
 						std::cout << "\t\tNumerical gradient = " << num_grad;
@@ -327,19 +326,22 @@ public:
 	virtual ~SGDOptimizer() = default;
 protected:
 	inline Scalar train(typename Base::Net& net, typename Base::Provider& training_prov, unsigned epoch) {
-		// TODO Handle overflow.
 		Scalar training_loss = 0;
-		Scalar instances = (Scalar) training_prov.instances();
+		Scalar instances = 0;
 		std::vector<Layer<Scalar,Rank>*> layers = Base::get_layers(net);
 		// Perform an entire training epoch.
 		while (training_prov.has_more()) {
 			DataPair<Scalar,Rank,Sequential> data_pair = training_prov.get_data(batch_size);
+			instances += data_pair.first.dimension(0);
 			typename Base::Data out = Base::propagate(net, std::move(data_pair.first));
 			training_loss += Base::loss->function(out, data_pair.second).sum();
-			/* Again, the loss on a batch is the mean of the losses on the observations in the batch and not their
-			 * sum (see the last line of the function), thus the gradients of the loss function w.r.t the output of
-			 * the network have to be divided by the number of instances in the batch. */
-			Base::backpropagate(net, Base::loss->d_function(out, data_pair.second) / instances);
+			/* Divide the gradient by the batch size to decouple the learning rate and the batch
+			 * size hyper-parameters. Use the nominal batch size as the denominator even if the
+			 * actual batch size is different (in case the number of samples in the data set is
+			 * not divisible by the batch size and the last batch of the epoch contains fewer
+			 * instances than the others) to make sure that the magnitude of the gradient is
+			 * proportional to the batch size (just like its 'accuracy' is). */
+			Base::backpropagate(net, Base::loss->d_function(out, data_pair.second) / (Scalar) batch_size);
 			for (unsigned k = 0; k < layers.size(); ++k) {
 				Layer<Scalar,Rank>& layer = *(layers[k]);
 				if (Base::is_parametric(layer)) {
@@ -351,15 +353,16 @@ protected:
 		return training_loss / instances;
 	}
 	inline Scalar test(typename Base::Net& net, typename Base::Provider& test_prov, unsigned epoch) {
-		// TODO Handle overflow.
 		Scalar obj_loss = 0;
+		Scalar instances = 0;
 		std::vector<Layer<Scalar,Rank>*> layers = Base::get_layers(net);
 		// Perform an entire test epoch.
 		while (test_prov.has_more()) {
 			DataPair<Scalar,Rank,Sequential> data_pair = test_prov.get_data(batch_size);
+			instances += data_pair.first.dimension(0);
 			obj_loss += Base::loss->function(net.infer(std::move(data_pair.first)), data_pair.second).sum();
 		}
-		Scalar mean_obj_loss = obj_loss / test_prov.instances();
+		Scalar mean_obj_loss = obj_loss / instances;
 		Scalar reg_loss = 0;
 		for (unsigned j = 0; j < layers.size(); ++j)
 			reg_loss += reg->function(Base::get_params(*(layers[j])));

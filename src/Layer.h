@@ -56,14 +56,14 @@ public:
 	 * tensors accepted by the layer as its input (except for the first rank which denotes
 	 * the variable sample size).
 	 */
-	virtual const Dimensions<int,Rank>& get_input_dims() const = 0;
+	virtual const Dimensions<std::size_t,Rank>& get_input_dims() const = 0;
 	/**
 	 * A simple constant getter method for the output dimensionality of the layer.
 	 *
 	 * @return A constant reference to the member variable denoting the dimensions of the
 	 * tensors output by the layer along all ranks except the first one.
 	 */
-	virtual const Dimensions<int,Rank>& get_output_dims() const = 0;
+	virtual const Dimensions<std::size_t,Rank>& get_output_dims() const = 0;
 	/**
 	 * A method that returns whether the layer has parameters that can be learned.
 	 *
@@ -165,14 +165,14 @@ template<typename Scalar, std::size_t Rank>
 class KernelLayer : public Layer<Scalar,Rank> {
 public:
 	virtual ~KernelLayer() = default;
-	const Dimensions<int,Rank>& get_input_dims() const {
+	const Dimensions<std::size_t,Rank>& get_input_dims() const {
 		return input_dims;
 	}
-	const Dimensions<int,Rank>& get_output_dims() const {
+	const Dimensions<std::size_t,Rank>& get_output_dims() const {
 		return output_dims;
 	}
 protected:
-	inline KernelLayer(const Dimensions<int,Rank>& input_dims, Dimensions<int,Rank> output_dims, WeightInitSharedPtr<Scalar> weight_init,
+	inline KernelLayer(const Dimensions<std::size_t,Rank>& input_dims, Dimensions<std::size_t,Rank> output_dims, WeightInitSharedPtr<Scalar> weight_init,
 			std::size_t weight_rows, std::size_t weight_cols, Scalar max_norm_constraint) :
 				input_dims(input_dims),
 				output_dims(output_dims),
@@ -218,8 +218,8 @@ protected:
 				weights *= (max_norm_constraint / l2_norm);
 		}
 	}
-	const Dimensions<int,Rank> input_dims;
-	const Dimensions<int,Rank> output_dims;
+	const Dimensions<std::size_t,Rank> input_dims;
+	const Dimensions<std::size_t,Rank> output_dims;
 	const WeightInitSharedPtr<Scalar> weight_init;
 	const Scalar max_norm_constraint;
 	const bool max_norm;
@@ -248,9 +248,9 @@ public:
 	 * @param max_norm_constraint An optional max-norm constraint. If it is 0 or less, no
 	 * constraint is applied.
 	 */
-	inline FCLayer(const Dimensions<int,Rank>& input_dims, std::size_t output_size, WeightInitSharedPtr<Scalar> weight_init,
+	inline FCLayer(const Dimensions<std::size_t,Rank>& input_dims, std::size_t output_size, WeightInitSharedPtr<Scalar> weight_init,
 			Scalar max_norm_constraint = 0) :
-				Base::KernelLayer(input_dims, Dimensions<int,Rank>({ (int) output_size }), weight_init,
+				Base::KernelLayer(input_dims, Dimensions<std::size_t,Rank>({ output_size }), weight_init,
 						input_dims.get_volume() + 1, output_size, max_norm_constraint) { }
 	inline Layer<Scalar,Rank>* clone() const {
 		return new FCLayer(*this);
@@ -300,7 +300,7 @@ template<typename Scalar>
 class ConvLayer : public KernelLayer<Scalar,3> {
 	typedef KernelLayer<Scalar,3> Base;
 	typedef Tensor<Scalar,4> Data;
-	typedef std::array<int,4> RankwiseArray;
+	typedef std::array<std::size_t,4> RankwiseArray;
 public:
 	/**
 	 * @param input_dims The dimensionality of the observations to be processed by the layer.
@@ -318,13 +318,13 @@ public:
 	 * @param max_norm_constraint An optional max-norm constraint. If it is 0 or less, no
 	 * constraint is applied.
 	 */
-	inline ConvLayer(const Dimensions<int,3>& input_dims, std::size_t filters, WeightInitSharedPtr<Scalar> weight_init,
+	inline ConvLayer(const Dimensions<std::size_t,3>& input_dims, std::size_t filters, WeightInitSharedPtr<Scalar> weight_init,
 			std::size_t receptor_size = 3, std::size_t padding = 1, std::size_t stride = 1, std::size_t dilation = 0,
 			Scalar max_norm_constraint = 0) :
 				/* For every filter, there is a column in the weight matrix with the same number of
 				 * elements as the size of the receptive field (F * F * D) + 1 for the bias row. */
-				Base::KernelLayer(input_dims, Dimensions<int,3>({ calculate_output_dim(input_dims(0), receptor_size, padding, dilation, stride),
-						calculate_output_dim(input_dims(1), receptor_size, padding, dilation, stride), (int) filters }), weight_init,
+				Base::KernelLayer(input_dims, Dimensions<std::size_t,3>({ calculate_output_dim(input_dims(0), receptor_size, padding, dilation, stride),
+						calculate_output_dim(input_dims(1), receptor_size, padding, dilation, stride), filters }), weight_init,
 						receptor_size * receptor_size * input_dims(2) + 1, filters, max_norm_constraint),
 				filters(filters),
 				receptor_size(receptor_size),
@@ -365,7 +365,7 @@ protected:
 		assert(Utils<Scalar>::template get_dims<4>(in).template demote<>() == Base::input_dims);
 		assert(in.dimension(0) > 0);
 		// Spatial padding.
-		std::array<std::pair<int,int>,4> paddings;
+		std::array<std::pair<std::size_t,std::size_t>,4> paddings;
 		paddings[0] = std::make_pair(0, 0);
 		paddings[1] = std::make_pair(padding, padding);
 		paddings[2] = std::make_pair(padding, padding);
@@ -373,30 +373,30 @@ protected:
 		Data padded_in = in.pad(paddings);
 		// Free the memory occupied by the now-expendable input tensor.
 		in = Data();
-		int rows = padded_in.dimension(0);
-		int patches = Base::output_dims(0) * Base::output_dims(1);
-		int receptor_vol = receptor_size * receptor_size * Base::input_dims(2);
-		int height_rem = padded_height - dil_receptor_size;
-		int width_rem = padded_width - dil_receptor_size;
+		std::size_t rows = padded_in.dimension(0);
+		std::size_t patches = Base::output_dims(0) * Base::output_dims(1);
+		std::size_t receptor_vol = receptor_size * receptor_size * Base::input_dims(2);
+		std::size_t height_rem = padded_height - dil_receptor_size;
+		std::size_t width_rem = padded_width - dil_receptor_size;
 		// Prepare the base offsets and extents for slicing and dilation.
 		RankwiseArray row_offsets({ 0, 0, 0, 0 });
 		RankwiseArray row_extents({ 1, Base::output_dims(0), Base::output_dims(1), Base::output_dims(2) });
 		RankwiseArray patch_extents({ 1, dil_receptor_size, dil_receptor_size, padded_in.dimension(3) });
 		RankwiseArray patch_offsets({ 0, 0, 0, 0 });
-		RankwiseArray dil_strides({ 1, (int) dilation + 1, (int) dilation + 1, 1 });
+		RankwiseArray dil_strides({ 1, dilation + 1, dilation + 1, 1 });
 		Data out(padded_in.dimension(0), Base::output_dims(0), Base::output_dims(1), Base::output_dims(2));
 		biased_in_vec = std::vector<Matrix<Scalar>>(padded_in.dimension(0));
 		/* 'Tensor-row' by 'tensor-row', stretch the receptor locations into row vectors, form a matrix out of
 		 * them, and multiply it by the weight matrix. */
-		for (int i = 0; i < rows; ++i) {
+		for (std::size_t i = 0; i < rows; ++i) {
 			row_offsets[0] = i;
 			patch_offsets[0] = i;
-			int patch_ind = 0;
+			std::size_t patch_ind = 0;
 			{
 				Matrix<Scalar> in_mat_i(patches, receptor_vol);
-				for (int j = 0; j <= height_rem; j += stride) {
+				for (std::size_t j = 0; j <= height_rem; j += stride) {
 					patch_offsets[1] = j;
-					for (int k = 0; k <= width_rem; k += stride) {
+					for (std::size_t k = 0; k <= width_rem; k += stride) {
 						patch_offsets[2] = k;
 						Data patch;
 						// If the patch is dilated, skip the 'internal padding' when stretching it into a row.
@@ -425,20 +425,20 @@ protected:
 	inline Data pass_back(Data out_grads) {
 		assert(Utils<Scalar>::template get_dims<4>(out_grads).template demote<>() == Base::output_dims);
 		assert(out_grads.dimension(0) > 0 && biased_in_vec.size() == (unsigned) out_grads.dimension(0));
-		int rows = out_grads.dimension(0);
-		int depth = Base::input_dims(2);
-		int height_rem = padded_height - dil_receptor_size;
-		int width_rem = padded_width - dil_receptor_size;
-		Dimensions<int,3> comp_patch_dims({ (int) receptor_size, (int) receptor_size, Base::input_dims(2) });
+		std::size_t rows = out_grads.dimension(0);
+		std::size_t depth = Base::input_dims(2);
+		std::size_t height_rem = padded_height - dil_receptor_size;
+		std::size_t width_rem = padded_width - dil_receptor_size;
+		Dimensions<std::size_t,3> comp_patch_dims({ receptor_size, receptor_size, Base::input_dims(2) });
 		RankwiseArray out_grads_row_offsets({ 0, 0, 0, 0 });
 		RankwiseArray out_grads_row_extents({ 1, Base::output_dims(0), Base::output_dims(1), Base::output_dims(2) });
 		RankwiseArray patch_extents({ 1, dil_receptor_size, dil_receptor_size, depth });
 		RankwiseArray patch_offsets({ 0, 0, 0, 0 });
-		RankwiseArray strides({ 1, (int) dilation + 1, (int) dilation + 1, 1 });
+		RankwiseArray strides({ 1, dilation + 1, dilation + 1, 1 });
 		Data prev_out_grads(rows, padded_height, padded_width, depth);
 		prev_out_grads.setZero();
 		Base::weights_grad.setZero(Base::weights_grad.rows(), Base::weights_grad.cols());
-		for (int i = 0; i < rows; ++i) {
+		for (std::size_t i = 0; i < rows; ++i) {
 			out_grads_row_offsets[0] = i;
 			Matrix<Scalar> prev_out_grads_mat_i;
 			{
@@ -455,11 +455,11 @@ protected:
 			}
 			/* Given the gradient of the stretched out receptor patches, perform a 'backwards' convolution
 			 * to get the derivative w.r.t. the individual input nodes. */
-			int patch_ind = 0;
+			std::size_t patch_ind = 0;
 			patch_offsets[0] = i;
-			for (int j = 0; j <= height_rem; j += stride) {
+			for (std::size_t j = 0; j <= height_rem; j += stride) {
 				patch_offsets[1] = j;
-				for (int k = 0; k <= width_rem; k += stride) {
+				for (std::size_t k = 0; k <= width_rem; k += stride) {
 					patch_offsets[2] = k;
 					// Accumulate the gradients where the receptor-patch-tensors overlap.
 					if (dilation > 0) {
@@ -474,7 +474,7 @@ protected:
 			assert(patch_ind == prev_out_grads_mat_i.rows());
 		}
 		// Cut off the padding.
-		RankwiseArray no_padding_offsets({ 0, (int) padding, (int) padding, 0 });
+		RankwiseArray no_padding_offsets({ 0, padding, padding, 0 });
 		RankwiseArray no_padding_extents({ rows, Base::input_dims(0), Base::input_dims(1), Base::input_dims(2) });
 		return prev_out_grads.slice(no_padding_offsets, no_padding_extents);
 	}
@@ -488,7 +488,8 @@ protected:
 	 * @param stride The convolution stride.
 	 * @return The depth of the output tensors produced by the layer.
 	 */
-	static int calculate_output_dim(int input_dim, int receptor_size, int padding, int dilation, int stride) {
+	static std::size_t calculate_output_dim(std::size_t input_dim, std::size_t receptor_size, std::size_t padding,
+			std::size_t dilation, std::size_t stride) {
 		return (input_dim - receptor_size - (receptor_size - 1) * dilation + 2 * padding) / stride + 1;
 	}
 private:
@@ -497,9 +498,9 @@ private:
 	const std::size_t padding;
 	const std::size_t stride;
 	const std::size_t dilation;
-	const int padded_height;
-	const int padded_width;
-	const int dil_receptor_size;
+	const std::size_t padded_height;
+	const std::size_t padded_width;
+	const std::size_t dil_receptor_size;
 	// Staged computation caches
 	std::vector<Matrix<Scalar>> biased_in_vec;
 };
@@ -512,14 +513,14 @@ class ActivationLayer : public Layer<Scalar,Rank> {
 	typedef Tensor<Scalar,Rank + 1> Data;
 public:
 	virtual ~ActivationLayer() = default;
-	inline const Dimensions<int,Rank>& get_input_dims() const {
+	inline const Dimensions<std::size_t,Rank>& get_input_dims() const {
 		return dims;
 	}
-	inline const Dimensions<int,Rank>& get_output_dims() const {
+	inline const Dimensions<std::size_t,Rank>& get_output_dims() const {
 		return dims;
 	}
 protected:
-	inline ActivationLayer(const Dimensions<int,Rank>& dims, std::size_t param_rows = 0,
+	inline ActivationLayer(const Dimensions<std::size_t,Rank>& dims, std::size_t param_rows = 0,
 			std::size_t params_cols = 0) :
 				dims(dims),
 				input_layer(false),
@@ -587,7 +588,7 @@ protected:
 		return Utils<Scalar>::template map_mat_to_tensor<Rank + 1>(d_activate(in, out,
 				Utils<Scalar>::template map_tensor_to_mat<Rank + 1>(std::move(out_grads))), dims);
 	}
-	const Dimensions<int,Rank> dims;
+	const Dimensions<std::size_t,Rank> dims;
 	bool input_layer;
 	Matrix<Scalar> params_grad;
 	Matrix<Scalar>& params_ref;
@@ -608,7 +609,7 @@ public:
 	/**
 	 * @param dims The dimensionality of the input tensor.
 	 */
-	inline IdentityActivationLayer(const Dimensions<int,Rank>& dims) :
+	inline IdentityActivationLayer(const Dimensions<std::size_t,Rank>& dims) :
 			ActivationLayer<Scalar,Rank>::ActivationLayer(dims) { }
 	inline Layer<Scalar,Rank>* clone() const {
 		return new IdentityActivationLayer(*this);
@@ -636,7 +637,7 @@ public:
 	 * @param dims The dimensionality of the input tensor.
 	 * @param scale The factor by which the input is to be scaled.
 	 */
-	inline ScalingActivationLayer(const Dimensions<int,Rank>& dims, Scalar scale) :
+	inline ScalingActivationLayer(const Dimensions<std::size_t,Rank>& dims, Scalar scale) :
 			ActivationLayer<Scalar,Rank>::ActivationLayer(dims),
 			scale(scale) { }
 	inline Layer<Scalar,Rank>* clone() const {
@@ -667,7 +668,7 @@ public:
 	/**
 	 * @param dims The dimensionality of the input tensor.
 	 */
-	inline BinaryStepActivationLayer(const Dimensions<int,Rank>& dims) :
+	inline BinaryStepActivationLayer(const Dimensions<std::size_t,Rank>& dims) :
 			ActivationLayer<Scalar,Rank>::ActivationLayer(dims) { }
 	inline Layer<Scalar,Rank>* clone() const {
 		return new BinaryStepActivationLayer(*this);
@@ -694,7 +695,7 @@ public:
 	/**
 	 * @param dims The dimensionality of the input tensor.
 	 */
-	inline SigmoidActivationLayer(const Dimensions<int,Rank>& dims) :
+	inline SigmoidActivationLayer(const Dimensions<std::size_t,Rank>& dims) :
 			ActivationLayer<Scalar,Rank>::ActivationLayer(dims) { }
 	inline Layer<Scalar,Rank>* clone() const {
 		return new SigmoidActivationLayer(*this);
@@ -721,7 +722,7 @@ public:
 	/**
 	 * @param dims The dimensionality of the input tensor.
 	 */
-	inline TanhActivationLayer(const Dimensions<int,Rank>& dims) :
+	inline TanhActivationLayer(const Dimensions<std::size_t,Rank>& dims) :
 			ActivationLayer<Scalar,Rank>::ActivationLayer(dims) { }
 	inline Layer<Scalar,Rank>* clone() const {
 		return new TanhActivationLayer(*this);
@@ -751,7 +752,7 @@ public:
 	 * @param dims The dimensionality of the input tensor.
 	 * @param epsilon A small constant to maintain numerical stability.
 	 */
-	inline SoftmaxActivationLayer(const Dimensions<int,Rank>& dims, Scalar epsilon = Utils<Scalar>::EPSILON2) :
+	inline SoftmaxActivationLayer(const Dimensions<std::size_t,Rank>& dims, Scalar epsilon = Utils<Scalar>::EPSILON2) :
 			ActivationLayer<Scalar,Rank>::ActivationLayer(dims),
 			epsilon(epsilon) { }
 	inline Layer<Scalar,Rank>* clone() const {
@@ -792,7 +793,7 @@ public:
 	/**
 	 * @param dims The dimensionality of the input tensor.
 	 */
-	inline ReLUActivationLayer(const Dimensions<int,Rank>& dims) :
+	inline ReLUActivationLayer(const Dimensions<std::size_t,Rank>& dims) :
 			ActivationLayer<Scalar,Rank>::ActivationLayer(dims) { }
 	inline Layer<Scalar,Rank>* clone() const {
 		return new ReLUActivationLayer(*this);
@@ -824,7 +825,7 @@ public:
 	 * @param dims The dimensionality of the input tensor.
 	 * @param alpha The factor by which negative inputs are to be scaled.
 	 */
-	inline LeakyReLUActivationLayer(const Dimensions<int,Rank>& dims, Scalar alpha = 1e-1) :
+	inline LeakyReLUActivationLayer(const Dimensions<std::size_t,Rank>& dims, Scalar alpha = 1e-1) :
 			ActivationLayer<Scalar,Rank>::ActivationLayer(dims),
 			alpha(alpha) { }
 	inline Layer<Scalar,Rank>* clone() const {
@@ -858,7 +859,7 @@ public:
 	 * @param dims The dimensionality of the input tensor.
 	 * @param alpha The factor by which negative inputs are to be scaled.
 	 */
-	inline ELUActivationLayer(const Dimensions<int,Rank>& dims, Scalar alpha = 1e-1) :
+	inline ELUActivationLayer(const Dimensions<std::size_t,Rank>& dims, Scalar alpha = 1e-1) :
 			ActivationLayer<Scalar,Rank>::ActivationLayer(dims),
 			alpha(alpha) { }
 	inline Layer<Scalar,Rank>* clone() const {
@@ -897,7 +898,7 @@ public:
 	 * @param dims The dimensionality of the input tensor.
 	 * @param init_alpha The initial factor by which negative inputs are to be scaled.
 	 */
-	inline PReLUActivationLayer(const Dimensions<int,Rank>& dims, Scalar init_alpha = 1e-1) :
+	inline PReLUActivationLayer(const Dimensions<std::size_t,Rank>& dims, Scalar init_alpha = 1e-1) :
 			Base::ActivationLayer(dims, 1, dims.get_volume()),
 			init_alpha(init_alpha) { }
 	inline Layer<Scalar,Rank>* clone() const {
@@ -945,16 +946,16 @@ private:
 template<typename Scalar>
 class PoolingLayer : public Layer<Scalar,3> {
 	typedef Tensor<Scalar,4> Data;
-	typedef std::array<int,4> RankwiseArray;
+	typedef std::array<std::size_t,4> RankwiseArray;
 public:
-	inline const Dimensions<int,3>& get_input_dims() const {
+	inline const Dimensions<std::size_t,3>& get_input_dims() const {
 		return input_dims;
 	}
-	inline const Dimensions<int,3>& get_output_dims() const {
+	inline const Dimensions<std::size_t,3>& get_output_dims() const {
 		return output_dims;
 	}
 protected:
-	inline PoolingLayer(const Dimensions<int,3>& input_dims, std::size_t receptor_size, std::size_t stride) :
+	inline PoolingLayer(const Dimensions<std::size_t,3>& input_dims, std::size_t receptor_size, std::size_t stride) :
 			input_dims(input_dims),
 			output_dims({ calculate_output_dim(input_dims(0), receptor_size, stride),
 					calculate_output_dim(input_dims(1), receptor_size, stride), input_dims(2) }),
@@ -966,7 +967,7 @@ protected:
 			input_layer(false),
 			params(0, 0),
 			params_grad(0, 0) {
-		assert(input_dims(0) >= (int) receptor_size && input_dims(1) >= (int) receptor_size);
+		assert(input_dims(0) >= receptor_size && input_dims(1) >= receptor_size);
 		assert(receptor_size > 0);
 		assert(stride > 0);
 	}
@@ -1010,21 +1011,21 @@ protected:
 		assert(Utils<Scalar>::template get_dims<4>(in).template demote<>() == input_dims);
 		assert(in.dimension(0) > 0);
 		rows = in.dimension(0);
-		int depth = input_dims(2);
+		std::size_t depth = input_dims(2);
 		RankwiseArray patch_offsets({ 0, 0, 0, 0 });
-		RankwiseArray patch_extents({ 1, (int) receptor_size, (int) receptor_size, 1 });
+		RankwiseArray patch_extents({ 1, receptor_size, receptor_size, 1 });
 		Data out(rows, output_dims(0), output_dims(1), output_dims(2));
 		init_cache();
-		int patch_ind = 0;
-		for (int i = 0; i < rows; ++i) {
+		std::size_t patch_ind = 0;
+		for (std::size_t i = 0; i < rows; ++i) {
 			patch_offsets[0] = i;
-			int out_j = 0;
-			for (int j = 0; j <= height_rem; j += stride, ++out_j) {
+			std::size_t out_j = 0;
+			for (std::size_t j = 0; j <= height_rem; j += stride, ++out_j) {
 				patch_offsets[1] = j;
-				int out_k = 0;
-				for (int k = 0; k <= width_rem; k += stride, ++out_k) {
+				std::size_t out_k = 0;
+				for (std::size_t k = 0; k <= width_rem; k += stride, ++out_k) {
 					patch_offsets[2] = k;
-					for (int l = 0; l < depth; ++l) {
+					for (std::size_t l = 0; l < depth; ++l) {
 						patch_offsets[3] = l;
 						Data patch = in.slice(patch_offsets, patch_extents);
 						out(i,out_j,out_k,l) = reduce(Utils<Scalar>::template map_tensor_to_mat<4>(std::move(patch)), patch_ind++);
@@ -1039,22 +1040,22 @@ protected:
 		assert(out_grads.dimension(0) > 0 && rows == out_grads.dimension(0));
 		if (input_layer)
 			return Data();
-		int depth = input_dims(2);
-		Dimensions<int,3> patch_dims({ (int) receptor_size, (int) receptor_size, 1 });
+		std::size_t depth = input_dims(2);
+		Dimensions<std::size_t,3> patch_dims({ receptor_size, receptor_size, 1 });
 		RankwiseArray patch_offsets({ 0, 0, 0, 0});
 		RankwiseArray patch_extents({ 1, patch_dims(0), patch_dims(1), patch_dims(2) });
 		Data prev_out_grads(rows, input_dims(0), input_dims(1), depth);
 		prev_out_grads.setZero();
-		int patch_ind = 0;
-		for (int i = 0; i < rows; ++i) {
+		std::size_t patch_ind = 0;
+		for (std::size_t i = 0; i < rows; ++i) {
 			patch_offsets[0] = i;
-			int out_grads_j = 0;
-			for (int j = 0; j <= height_rem; j += stride, ++out_grads_j) {
+			std::size_t out_grads_j = 0;
+			for (std::size_t j = 0; j <= height_rem; j += stride, ++out_grads_j) {
 				patch_offsets[1] = j;
-				int out_grads_k = 0;
-				for (int k = 0; k <= width_rem; k += stride, ++out_grads_k) {
+				std::size_t out_grads_k = 0;
+				for (std::size_t k = 0; k <= width_rem; k += stride, ++out_grads_k) {
 					patch_offsets[2] = k;
-					for (int l = 0; l < depth; ++l) {
+					for (std::size_t l = 0; l < depth; ++l) {
 						patch_offsets[3] = l;
 						prev_out_grads.slice(patch_offsets, patch_extents) +=
 								Utils<Scalar>::template map_mat_to_tensor<4>(d_reduce(out_grads(i,out_grads_j,out_grads_k,l),
@@ -1074,16 +1075,16 @@ protected:
 	 * @param stride The stride at which the receptor is applied to the input tensor.
 	 * @return The depth of the output tensor.
 	 */
-	static int calculate_output_dim(int input_dim, int receptor_size, int stride) {
+	static std::size_t calculate_output_dim(std::size_t input_dim, std::size_t receptor_size, std::size_t stride) {
 		return (input_dim - receptor_size) / stride + 1;
 	}
-	const Dimensions<int,3> input_dims;
-	const Dimensions<int,3> output_dims;
+	const Dimensions<std::size_t,3> input_dims;
+	const Dimensions<std::size_t,3> output_dims;
 	const std::size_t receptor_size;
 	const std::size_t stride;
-	const int receptor_area;
-	const int height_rem;
-	const int width_rem;
+	const std::size_t receptor_area;
+	const std::size_t height_rem;
+	const std::size_t width_rem;
 	bool input_layer;
 	// No actual parameters.
 	Matrix<Scalar> params;
@@ -1105,7 +1106,7 @@ public:
 	 * @param stride The stride at which the input is to be pooled (i.e. the number of elements
 	 * by which the receptor is to be shifted after every step of the pooling process).
 	 */
-	inline SumPoolingLayer(const Dimensions<int,3>& input_dims, std::size_t receptor_size = 2, std::size_t stride = 2) :
+	inline SumPoolingLayer(const Dimensions<std::size_t,3>& input_dims, std::size_t receptor_size = 2, std::size_t stride = 2) :
 			PoolingLayer<Scalar>::PoolingLayer(input_dims, receptor_size, stride) { }
 	inline Layer<Scalar,3>* clone() const {
 		return new SumPoolingLayer(*this);
@@ -1137,7 +1138,7 @@ public:
 	 * @param stride The stride at which the input is to be pooled (i.e. the number of elements
 	 * by which the receptor is to be shifted after every step of the pooling process).
 	 */
-	inline MeanPoolingLayer(const Dimensions<int,3>& input_dims, std::size_t receptor_size = 2, std::size_t stride = 2) :
+	inline MeanPoolingLayer(const Dimensions<std::size_t,3>& input_dims, std::size_t receptor_size = 2, std::size_t stride = 2) :
 			PoolingLayer<Scalar>::PoolingLayer(input_dims, receptor_size, stride) { }
 	inline Layer<Scalar,3>* clone() const {
 		return new MeanPoolingLayer(*this);
@@ -1170,7 +1171,7 @@ public:
 	 * @param stride The stride at which the input is to be pooled (i.e. the number of elements
 	 * by which the receptor is to be shifted after every step of the pooling process).
 	 */
-	inline MaxPoolingLayer(const Dimensions<int,3>& input_dims, unsigned receptor_size = 2, unsigned stride = 2) :
+	inline MaxPoolingLayer(const Dimensions<std::size_t,3>& input_dims, unsigned receptor_size = 2, unsigned stride = 2) :
 			PoolingLayer<Scalar>::PoolingLayer(input_dims, receptor_size, stride) { }
 	inline Layer<Scalar,3>* clone() const {
 		return new MaxPoolingLayer(*this);
@@ -1217,14 +1218,14 @@ class BatchNormLayerBase : public Layer<Scalar,Rank> {
 	typedef Layer<Scalar,Rank> Base;
 public:
 	virtual ~BatchNormLayerBase() = default;
-	inline const Dimensions<int,Rank>& get_input_dims() const {
+	inline const Dimensions<std::size_t,Rank>& get_input_dims() const {
 		return dims;
 	}
-	inline const Dimensions<int,Rank>& get_output_dims() const {
+	inline const Dimensions<std::size_t,Rank>& get_output_dims() const {
 		return dims;
 	}
 protected:
-	inline BatchNormLayerBase(const Dimensions<int,Rank>& dims, int depth, Scalar norm_avg_decay, Scalar epsilon) :
+	inline BatchNormLayerBase(const Dimensions<std::size_t,Rank>& dims, std::size_t depth, Scalar norm_avg_decay, Scalar epsilon) :
 			dims(dims),
 			depth(depth),
 			norm_avg_decay(norm_avg_decay),
@@ -1286,7 +1287,7 @@ protected:
 		return params_grad;
 	}
 	inline void enforce_constraints() { }
-	inline typename Base::Data _pass_forward(typename Base::Data in, const Dimensions<int,Rank>& output_dims,
+	inline typename Base::Data _pass_forward(typename Base::Data in, const Dimensions<std::size_t,Rank>& output_dims,
 			bool training, int i) {
 		Matrix<Scalar> in_ch_i = Utils<Scalar>::template map_tensor_to_mat<Rank + 1>(std::move(in));
 		if (training) {
@@ -1311,9 +1312,9 @@ protected:
 		return Utils<Scalar>::template map_mat_to_tensor<Rank + 1>(((in_ch_i * params_ref.row(2 * i).asDiagonal())
 				.rowwise() + params_ref.row(2 * i + 1)).eval(), output_dims);
 	}
-	inline typename Base::Data _pass_back(typename Base::Data out_grads, const Dimensions<int,Rank>& output_dims,
+	inline typename Base::Data _pass_back(typename Base::Data out_grads, const Dimensions<std::size_t,Rank>& output_dims,
 			int i) {
-		int rows = out_grads.dimension(0);
+		std::size_t rows = out_grads.dimension(0);
 		Cache& cache = cache_vec[i];
 		Matrix<Scalar> std_in_grads_i;
 		/* Back-propagate the gradient through the batch normalization 'function' and also calculate the
@@ -1331,8 +1332,8 @@ protected:
 				(cache.std_in.cwiseProduct(std_in_grads_i).colwise().sum().asDiagonal())) *
 				((1.0 / rows) * cache.inv_in_sd).asDiagonal()).eval(), output_dims);
 	}
-	const Dimensions<int,Rank> dims;
-	const int depth;
+	const Dimensions<std::size_t,Rank> dims;
+	const std::size_t depth;
 	const Scalar norm_avg_decay;
 	const Scalar epsilon;
 	bool input_layer;
@@ -1366,7 +1367,7 @@ public:
 	 * @param norm_avg_decay The decay rate of the maintained means and variances.
 	 * @param epsilon A small constant used to maintain numerical stability.
 	 */
-	inline BatchNormLayer(const Dimensions<int,Rank>& dims, Scalar norm_avg_decay = .1, Scalar epsilon = Utils<Scalar>::EPSILON3) :
+	inline BatchNormLayer(const Dimensions<std::size_t,Rank>& dims, Scalar norm_avg_decay = .1, Scalar epsilon = Utils<Scalar>::EPSILON3) :
 			Base::BatchNormLayerBase(dims, 1, norm_avg_decay, epsilon) { }
 	inline Layer<Scalar,Rank>* clone() const {
 		return new BatchNormLayer(*this);
@@ -1402,7 +1403,7 @@ public:
 	 * @param norm_avg_decay The decay rate of the maintained means and variances.
 	 * @param epsilon A small constant used to maintain numerical stability.
 	 */
-	inline BatchNormLayer(Dimensions<int,3> dims, Scalar norm_avg_decay = .1, Scalar epsilon = Utils<Scalar>::EPSILON3) :
+	inline BatchNormLayer(Dimensions<std::size_t,3> dims, Scalar norm_avg_decay = .1, Scalar epsilon = Utils<Scalar>::EPSILON3) :
 			Base::template BatchNormLayerBase(dims, dims(2), norm_avg_decay, epsilon) { }
 	inline Layer<Scalar,3>* clone() const {
 		return new BatchNormLayer(*this);
@@ -1419,11 +1420,11 @@ protected:
 		if (Base::depth == 1)
 			return Base::_pass_forward(std::move(in), Base::dims, training, 0);
 		else { // Multi-channel image data; depth-wise normalization.
-			int rows = in.dimension(0);
+			std::size_t rows = in.dimension(0);
 			typename Root::Data out(rows, Base::dims(0), Base::dims(1), Base::dims(2));
-			Dimensions<int,3> slice_dims({ Base::dims(0), Base::dims(1), 1 });
-			std::array<int,4> offsets({ 0, 0, 0, 0 });
-			std::array<int,4> extents({ rows, slice_dims(0), slice_dims(1), slice_dims(2) });
+			Dimensions<std::size_t,3> slice_dims({ Base::dims(0), Base::dims(1), 1 });
+			std::array<std::size_t,4> offsets({ 0, 0, 0, 0 });
+			std::array<std::size_t,4> extents({ rows, slice_dims(0), slice_dims(1), slice_dims(2) });
 			for (int i = 0; i < Base::depth; ++i) {
 				offsets[3] = i;
 				typename Base::Data in_slice_i = in.slice(offsets, extents);
@@ -1438,13 +1439,13 @@ protected:
 		if (Base::depth == 1)
 			return Base::_pass_back(std::move(out_grads), Base::dims, 0);
 		else {
-			int rows = out_grads.dimension(0);
+			std::size_t rows = out_grads.dimension(0);
 			typename Base::Data prev_out_grads;
 			if (!Base::is_input_layer())
 				prev_out_grads = typename Base::Data(rows, Base::dims(0), Base::dims(1), Base::dims(2));
-			Dimensions<int,3> slice_dims({ Base::dims(0), Base::dims(1), 1 });
-			std::array<int,4> offsets({ 0, 0, 0, 0 });
-			std::array<int,4> extents({ rows, slice_dims(0), slice_dims(1), slice_dims(2) });
+			Dimensions<std::size_t,3> slice_dims({ Base::dims(0), Base::dims(1), 1 });
+			std::array<std::size_t,4> offsets({ 0, 0, 0, 0 });
+			std::array<std::size_t,4> extents({ rows, slice_dims(0), slice_dims(1), slice_dims(2) });
 			for (int i = 0; i < Base::depth; ++i) {
 				offsets[3] = i;
 				typename Root::Data out_grads_slice_i = out_grads.slice(offsets, extents);
@@ -1470,7 +1471,7 @@ public:
 	 * @param dropout_prob The probability of an element of the input tensor being set to 0.
 	 * @param epsilon A small constant used to maintain numerical stability.
 	 */
-	inline DropoutLayer(const Dimensions<int,Rank>& dims, Scalar dropout_prob, Scalar epsilon = Utils<Scalar>::EPSILON3) :
+	inline DropoutLayer(const Dimensions<std::size_t,Rank>& dims, Scalar dropout_prob, Scalar epsilon = Utils<Scalar>::EPSILON3) :
 			dims(dims),
 			dropout_prob(dropout_prob),
 			epsilon(epsilon),
@@ -1484,10 +1485,10 @@ public:
 	inline Layer<Scalar,Rank>* clone() const {
 		return new DropoutLayer(*this);
 	}
-	inline const Dimensions<int,Rank>& get_input_dims() const {
+	inline const Dimensions<std::size_t,Rank>& get_input_dims() const {
 		return dims;
 	}
-	inline const Dimensions<int,Rank>& get_output_dims() const {
+	inline const Dimensions<std::size_t,Rank>& get_output_dims() const {
 		return dims;
 	}
 protected:
@@ -1537,7 +1538,7 @@ protected:
 				.cwiseProduct(dropout_mask).eval(), dims);
 	}
 private:
-	const Dimensions<int,Rank> dims;
+	const Dimensions<std::size_t,Rank> dims;
 	const Scalar dropout_prob;
 	const Scalar epsilon;
 	const bool dropout;

@@ -1,7 +1,7 @@
 MAKE := make -f makefile
 CC := g++
 ARCH := -m64
-CFLAGS := -std=c++11 -fopenmp -fmessage-length=0
+CFLAGS := -std=c++11 -fopenmp -fmessage-length=0 -Wno-ignored-attributes
 DEF_OPT_FLAGS := -O3
 DEBUG_OPT_FLAGS := -g3 -Wa,-mbig-obj -O1
 SOURCE_DIR := test

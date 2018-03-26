@@ -76,7 +76,7 @@ protected:
 	 * @return The gradient tensor of the output batch.
 	 */
 	virtual typename Base::Data _d_function(const typename Base::Data& out, const typename Base::Data& obj,
-			const Dimensions<int,Base::DATA_RANKS - 1>& grad_dims) const = 0;
+			const Dimensions<std::size_t,Base::DATA_RANKS - 1>& grad_dims) const = 0;
 public:
 	virtual ~UniversalLoss() = default;
 	inline ColVector<Scalar> function(const typename Base::Data& out, const typename Base::Data& obj) const {
@@ -85,7 +85,7 @@ public:
 		return _function(out, obj);
 	}
 	inline typename Base::Data d_function(const typename Base::Data& out, const typename Base::Data& obj) const {
-		Dimensions<int,Base::DATA_RANKS> dims = Utils<Scalar>::template get_dims<Base::DATA_RANKS>(out);
+		Dimensions<std::size_t,Base::DATA_RANKS> dims = Utils<Scalar>::template get_dims<Base::DATA_RANKS>(out);
 		assert(dims == Utils<Scalar>::template get_dims<Base::DATA_RANKS>(obj));
 		return _d_function(out, obj, dims.template demote<>());
 	}
@@ -117,17 +117,17 @@ protected:
 	 * @return The gradient tensor of the provided time step of the output batch.
 	 */
 	virtual typename Base::Data _d_function(const typename Base::Data& out, const typename Base::Data& obj,
-			const Dimensions<int,Base::DATA_RANKS - 1>& grad_dims) const = 0;
+			const Dimensions<std::size_t,Base::DATA_RANKS - 1>& grad_dims) const = 0;
 public:
 	virtual ~UniversalLoss() = default;
 	inline ColVector<Scalar> function(const typename Base::Data& out, const typename Base::Data& obj) const {
-		Dimensions<int,Base::DATA_RANKS> dims = Utils<Scalar>::template get_dims<Base::DATA_RANKS>(out);
+		Dimensions<std::size_t,Base::DATA_RANKS> dims = Utils<Scalar>::template get_dims<Base::DATA_RANKS>(out);
 		assert(dims == Utils<Scalar>::template get_dims<Base::DATA_RANKS>(obj));
 		int time_steps = dims(1);
 		if (time_steps == 1)
 			return _function(out, obj);
-		std::array<int,Base::DATA_RANKS> offsets;
-		std::array<int,Base::DATA_RANKS> extents = dims;
+		std::array<std::size_t,Base::DATA_RANKS> offsets;
+		std::array<std::size_t,Base::DATA_RANKS> extents = dims;
 		offsets.fill(0);
 		extents[1] = 1;
 		ColVector<Scalar> loss = ColVector<Scalar>::Zero(dims(0), 1);
@@ -140,7 +140,7 @@ public:
 		return loss;
 	}
 	inline typename Base::Data d_function(const typename Base::Data& out, const typename Base::Data& obj) const {
-		Dimensions<int,Base::DATA_RANKS> dims = Utils<Scalar>::template get_dims<Base::DATA_RANKS>(out);
+		Dimensions<std::size_t,Base::DATA_RANKS> dims = Utils<Scalar>::template get_dims<Base::DATA_RANKS>(out);
 		assert(dims == Utils<Scalar>::template get_dims<Base::DATA_RANKS>(obj));
 		int time_steps = dims(1);
 		if (time_steps == 1)
@@ -148,10 +148,10 @@ public:
 		typename Base::Data grads(dims);
 		grads.setZero();
 		dims(1) = 1;
-		std::array<int,Base::DATA_RANKS> offsets;
-		std::array<int,Base::DATA_RANKS> extents = dims;
+		std::array<std::size_t,Base::DATA_RANKS> offsets;
+		std::array<std::size_t,Base::DATA_RANKS> extents = dims;
 		offsets.fill(0);
-		Dimensions<int,Base::DATA_RANKS - 1> grad_dims = dims.template demote<>();
+		Dimensions<std::size_t,Base::DATA_RANKS - 1> grad_dims = dims.template demote<>();
 		for (int i = 0; i < time_steps; ++i) {
 			offsets[1] = i;
 			typename Base::Data out_i = out.slice(offsets, extents);
@@ -176,7 +176,7 @@ protected:
 				.array().square().rowwise().sum();
 	}
 	inline typename Root::Data _d_function(const typename Root::Data& out,
-			const typename Root::Data& obj, const Dimensions<int,Root::DATA_RANKS - 1>& grad_dims) const {
+			const typename Root::Data& obj, const Dimensions<std::size_t,Root::DATA_RANKS - 1>& grad_dims) const {
 		return Utils<Scalar>::template map_mat_to_tensor<Root::DATA_RANKS>((2 *
 				(Utils<Scalar>::template map_tensor_to_mat<Root::DATA_RANKS>(out) -
 				Utils<Scalar>::template map_tensor_to_mat<Root::DATA_RANKS>(obj))).eval(), grad_dims);
@@ -221,7 +221,7 @@ protected:
 		return loss;
 	}
 	inline typename Root::Data _d_function(const typename Root::Data& out,
-			const typename Root::Data& obj, const Dimensions<int,Root::DATA_RANKS - 1>& grad_dims) const {
+			const typename Root::Data& obj, const Dimensions<std::size_t,Root::DATA_RANKS - 1>& grad_dims) const {
 		Matrix<Scalar> out_mat = Utils<Scalar>::template map_tensor_to_mat<Root::DATA_RANKS>(out);
 		Matrix<Scalar> obj_mat = Utils<Scalar>::template map_tensor_to_mat<Root::DATA_RANKS>(obj);
 		Matrix<Scalar> out_grads(out_mat.rows(), out_mat.cols());
@@ -278,7 +278,7 @@ protected:
 				.matrix().rowwise().sum() * -1;
 	}
 	inline typename Root::Data _d_function(const typename Root::Data& out,
-			const typename Root::Data& obj, const Dimensions<int,Root::DATA_RANKS - 1>& grad_dims) const {
+			const typename Root::Data& obj, const Dimensions<std::size_t,Root::DATA_RANKS - 1>& grad_dims) const {
 		return Utils<Scalar>::template map_mat_to_tensor<Root::DATA_RANKS>(
 				(-Utils<Scalar>::template map_tensor_to_mat<Root::DATA_RANKS>(obj).array() /
 				(Utils<Scalar>::template map_tensor_to_mat<Root::DATA_RANKS>(out).array() + epsilon)).eval(),
@@ -315,7 +315,7 @@ protected:
 		return loss;
 	}
 	inline typename Root::Data _d_function(const typename Root::Data& out,
-			const typename Root::Data& obj, const Dimensions<int,Root::DATA_RANKS - 1>& grad_dims) const {
+			const typename Root::Data& obj, const Dimensions<std::size_t,Root::DATA_RANKS - 1>& grad_dims) const {
 		Matrix<Scalar> out_mat = Utils<Scalar>::template map_tensor_to_mat<Root::DATA_RANKS>(out);
 		Matrix<Scalar> obj_mat = Utils<Scalar>::template map_tensor_to_mat<Root::DATA_RANKS>(obj);
 		Matrix<Scalar> out_grads(out_mat.rows(), out_mat.cols());
@@ -370,7 +370,7 @@ protected:
 		return loss;
 	}
 	inline typename Root::Data _d_function(const typename Root::Data& out,
-			const typename Root::Data& obj, const Dimensions<int,Root::DATA_RANKS - 1>& grad_dims) const {
+			const typename Root::Data& obj, const Dimensions<std::size_t,Root::DATA_RANKS - 1>& grad_dims) const {
 		Matrix<Scalar> out_mat = Utils<Scalar>::template map_tensor_to_mat<Root::DATA_RANKS>(out);
 		Matrix<Scalar> obj_mat = Utils<Scalar>::template map_tensor_to_mat<Root::DATA_RANKS>(obj);
 		int rows = out_mat.rows();

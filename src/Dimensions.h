@@ -277,28 +277,65 @@ public:
 		strm << "]";
 		return strm.str();
 	}
+	/**
+	 * @param n The value to add.
+	 * @param rank The rank to which the value is to be added.
+	 * @return An expression representing the addition of the specified value to the
+	 * specified rank of the dimension expression.
+	 */
 	inline UnaryRankWiseDimExpression<IndexType,Rank,Self,SumOp<IndexType>>
 	add_along_rank(const IndexType& n, std::size_t rank) const {
 		return UnaryRankWiseDimExpression<IndexType,Rank,Self,SumOp<IndexType>>(*this, n, rank);
 	}
-	inline UnaryRankWiseDimExpression<IndexType,Rank,Self,SumOp<IndexType>>
+	/**
+	 * @param n The value to subtract.
+	 * @param rank The rank from which the value is to be subtracted.
+	 * @return An expression representing the subtraction of the specified value from the
+	 * specified rank of the dimension expression.
+	 */
+	inline UnaryRankWiseDimExpression<IndexType,Rank,Self,SubOp<IndexType>>
 	subtract_along_rank(const IndexType& n, std::size_t rank) const {
 		return UnaryRankWiseDimExpression<IndexType,Rank,Self,SubOp<IndexType>>(*this, n, rank);
 	}
-	inline UnaryRankWiseDimExpression<IndexType,Rank,Self,SumOp<IndexType>>
+	/**
+	 * @param n The value to multiply by.
+	 * @param rank The rank which is to be multiplied by the value.
+	 * @return An expression representing the multiplication of the specified rank of the
+	 * dimension expression by the specified value.
+	 */
+	inline UnaryRankWiseDimExpression<IndexType,Rank,Self,MulOp<IndexType>>
 	multiply_along_rank(const IndexType& n, std::size_t rank) const {
 		return UnaryRankWiseDimExpression<IndexType,Rank,Self,MulOp<IndexType>>(*this, n, rank);
 	}
-	inline UnaryRankWiseDimExpression<IndexType,Rank,Self,SumOp<IndexType>>
+	/**
+	 * @param n The value to divide by.
+	 * @param rank The rank which is to be divide by the value.
+	 * @return An expression representing the division of the specified rank of the
+	 * dimension expression by the specified value.
+	 */
+	inline UnaryRankWiseDimExpression<IndexType,Rank,Self,DivOp<IndexType>>
 	divide_along_rank(const IndexType& n, std::size_t rank) const {
 		return UnaryRankWiseDimExpression<IndexType,Rank,Self,DivOp<IndexType>>(*this, n, rank);
 	}
+	/**
+	 * @param dims The dimension expression to add.
+	 * @param rank The rank along which the expressions are to be added.
+	 * @return An expression representing the addition of the specified expression
+	 * dimension to the instance on which the method is invoked along the specified rank.
+	 */
 	template<typename OtherDerived>
 	inline BinaryRankWiseDimExpression<IndexType,Rank,Self,Other<OtherDerived>,SumOp<IndexType>>
 	add_along_rank(const Other<OtherDerived>& dims, std::size_t rank) const {
 		return BinaryRankWiseDimExpression<IndexType,Rank,Self,
 				Other<OtherDerived>,SumOp<IndexType>>(*this, dims, rank);
 	}
+	/**
+	 * @param dims The dimension expression to subtract.
+	 * @param rank The rank along which the dimension expression is to be subtracted from
+	 * the instance on which the method is invoked.
+	 * @return An expression representing the subtraction of the specified expression
+	 * dimension from the instance on which the method is invoked along the specified rank.
+	 */
 	template<typename OtherDerived>
 	inline BinaryRankWiseDimExpression<IndexType,Rank,Self,Other<OtherDerived>,SubOp<IndexType>>
 	subtract_along_rank(const Other<OtherDerived>& dims, std::size_t rank) const {

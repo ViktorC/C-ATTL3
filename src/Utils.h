@@ -53,7 +53,7 @@ using MatrixMap = Eigen::Map<Matrix<Scalar>>;
  * An alias for a tensor of arbitrary rank and scalar type with dynamic dimensionality.
  */
 template<typename Scalar, std::size_t Rank>
-using Tensor = Eigen::Tensor<Scalar,Rank,Eigen::ColMajor,int>;
+using Tensor = Eigen::Tensor<Scalar,Rank,Eigen::ColMajor,std::size_t>;
 
 /**
  * An for a class that can be used to map raw pointer data to a tensor of arbitrary
@@ -184,7 +184,7 @@ public:
 	 */
 	template<std::size_t Rank>
 	inline static void check_dim_validity(const Tensor<Scalar,Rank>& tensor) {
-		std::array<int,Rank> dimensions = tensor.dimensions();
+		std::array<std::size_t,Rank> dimensions = tensor.dimensions();
 		for (std::size_t i = 0; i < Rank; ++i)
 			assert(dimensions[i] > 0 && "illegal tensor dimension");
 	}
@@ -196,9 +196,9 @@ public:
 	 * @return A Dimensions instance containing the size of the tensor along its ranks.
 	 */
 	template<std::size_t Rank>
-	inline static Dimensions<int,Rank> get_dims(const Tensor<Scalar,Rank>& tensor) {
+	inline static Dimensions<std::size_t,Rank> get_dims(const Tensor<Scalar,Rank>& tensor) {
 		static_assert(Rank > 1, "illegal tensor rank");
-		return Dimensions<int,Rank>(tensor.dimensions());
+		return Dimensions<std::size_t,Rank>(tensor.dimensions());
 	}
 	/**
 	 * It maps the data backing a tensor to a matrix. The product of the specified number of
@@ -240,10 +240,10 @@ public:
 	 */
 	template<std::size_t Rank>
 	inline static Tensor<Scalar,Rank> map_mat_to_tensor(Matrix<Scalar> mat,
-			const Dimensions<int,Rank - 1>& dims) {
+			const Dimensions<std::size_t,Rank - 1>& dims) {
 		static_assert(Rank > 1, "rank too low for conversion to tensor");
 		assert(dims.get_volume() == mat.cols());
-		Dimensions<int,Rank> promoted = dims.template promote<>();
+		Dimensions<std::size_t,Rank> promoted = dims.template promote<>();
 		promoted(0) = mat.rows();
 		return TensorMap<Scalar,Rank>(mat.data(), promoted);
 	}
@@ -258,7 +258,7 @@ public:
 	template<std::size_t Rank>
 	inline static Tensor<Scalar,Rank> map_mat_to_tensor(Matrix<Scalar> mat) {
 		static_assert(Rank > 1, "rank too low for conversion to tensor");
-		Dimensions<int,Rank> dims;
+		Dimensions<std::size_t,Rank> dims;
 		dims(0) = mat.rows();
 		dims(1) = mat.cols();
 		return TensorMap<Scalar,Rank>(mat.data(), dims);
@@ -273,7 +273,7 @@ public:
 	 */
 	template<std::size_t Rank, std::size_t NewRank>
 	inline static Tensor<Scalar,NewRank> map_tensor_to_tensor(Tensor<Scalar,Rank> tensor,
-			const Dimensions<int,NewRank>& dims) {
+			const Dimensions<std::size_t,NewRank>& dims) {
 		static_assert(Rank > 0 && NewRank > 0, "illegal tensor rank");
 		assert(tensor.size() == dims.get_volume());
 		return TensorMap<Scalar,NewRank>(tensor.data(), dims);
@@ -288,9 +288,9 @@ public:
 	template<std::size_t Rank>
 	inline static Tensor<Scalar,Rank - 1> join_first_two_ranks(Tensor<Scalar,Rank> tensor) {
 		static_assert(Rank > 1, "illegal tensor rank");
-		Dimensions<int,Rank> dims = get_dims<Rank>(tensor);
+		Dimensions<std::size_t,Rank> dims = get_dims<Rank>(tensor);
 		int lowest_dim = dims(0);
-		Dimensions<int,Rank - 1> joined_dims = dims.template demote<>();
+		Dimensions<std::size_t,Rank - 1> joined_dims = dims.template demote<>();
 		joined_dims(0) *= lowest_dim;
 		return TensorMap<Scalar,Rank - 1>(tensor.data(), joined_dims);
 	}
@@ -307,9 +307,9 @@ public:
 	inline static Tensor<Scalar,Rank + 1> split_first_rank(Tensor<Scalar,Rank> tensor, std::size_t rank0_size,
 			std::size_t rank1_size) {
 		static_assert(Rank > 0, "illegal tensor rank");
-		Dimensions<int,Rank> dims = get_dims<Rank>(tensor);
+		Dimensions<std::size_t,Rank> dims = get_dims<Rank>(tensor);
 		assert(dims(0) == (int) (rank0_size * rank1_size));
-		Dimensions<int,Rank + 1> split_dims = dims.template promote<>();
+		Dimensions<std::size_t,Rank + 1> split_dims = dims.template promote<>();
 		split_dims(0) = rank0_size;
 		split_dims(1) = rank1_size;
 		return TensorMap<Scalar,Rank + 1>(tensor.data(), split_dims);
@@ -334,7 +334,7 @@ public:
 	template<std::size_t Rank>
 	inline static void shuffle_tensor_rows(Tensor<Scalar,Rank>& tensor) {
 		static_assert(Rank > 1, "illegal tensor rank");
-		Dimensions<int,Rank - 1> dims = get_dims<Rank>(tensor).template demote<>();
+		Dimensions<std::size_t,Rank - 1> dims = get_dims<Rank>(tensor).template demote<>();
 		Matrix<Scalar> mat = map_tensor_to_mat<Rank>(std::move(tensor));
 		shuffle_mat_rows(mat);
 		tensor = map_mat_to_tensor<Rank>(std::move(mat), dims);

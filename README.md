@@ -76,11 +76,12 @@ The library also provides optimizers that can be used to train the networks via 
 #### Loss
 Similarly to the layers, these optimizers rely on several hyper-parameters as well. Besides the hyper-parameters, optimizers also require 'practically' differentiable loss functions and regularization penalty functions. The library provides the following out of the box loss functions:
 * [Loss](https://viktorc.github.io/C-ATTL3/html/classcattle_1_1_loss.html) [A]
-  * [QuadraticLoss](https://viktorc.github.io/C-ATTL3/html/classcattle_1_1_quadratic_loss.html)
-  * [HingeLoss](https://viktorc.github.io/C-ATTL3/html/classcattle_1_1_hinge_loss.html)
-  * [CrossEntropyLoss](https://viktorc.github.io/C-ATTL3/html/classcattle_1_1_cross_entropy_loss.html)
-  * [MultiLabelHingeLoss](https://viktorc.github.io/C-ATTL3/html/classcattle_1_1_multi_label_hinge_loss.html)
-  * [MultiLabelLogLoss](https://viktorc.github.io/C-ATTL3/html/classcattle_1_1_multi_label_log_loss.html)
+  * [UniversalLoss](https://viktorc.github.io/C-ATTL3/html/classcattle_1_1_universal_loss.html) [A]
+    * [QuadraticLoss](https://viktorc.github.io/C-ATTL3/html/classcattle_1_1_quadratic_loss.html)
+    * [HingeLoss](https://viktorc.github.io/C-ATTL3/html/classcattle_1_1_hinge_loss.html)
+    * [CrossEntropyLoss](https://viktorc.github.io/C-ATTL3/html/classcattle_1_1_cross_entropy_loss.html)
+    * [MultiLabelHingeLoss](https://viktorc.github.io/C-ATTL3/html/classcattle_1_1_multi_label_hinge_loss.html)
+    * [MultiLabelLogLoss](https://viktorc.github.io/C-ATTL3/html/classcattle_1_1_multi_label_log_loss.html)
 
 #### RegularizationPenalty
 The standard regularization penalties are:
@@ -93,9 +94,15 @@ The standard regularization penalties are:
 Given a loss function and a regularization penalty, optimizers can be constructed and used for gradient checks (e.g. to test self-implemented sub-classes of the core interfaces) and network training. Both of these methods are parameterized by a neural network and data providers.
 
 ### DataProvider
-Data providers are responsible for supplying the data used for gradient verification, training, and testing. Currently only an in-memory data provider implementation is provided by the library, but the addition of a general on-disk data provider and specialized providers for popular data sets such as MNIST, CIFAR, and ImageNet is planned.
+Data providers are responsible for supplying the data used for gradient verification, training, and testing. The currently available data providers include:
 * [DataProvider](https://viktorc.github.io/C-ATTL3/html/classcattle_1_1_data_provider.html) [A]
-  * [InMemoryDataProvider](https://viktorc.github.io/C-ATTL3/html/classcattle_1_1_in_memory_data_provider.html)
+  * [PartitionDataProvider](https://viktorc.github.io/C-ATTL3/html/classcattle_1_1_partition_data_provider.html)
+  * [MemoryDataProvider](https://viktorc.github.io/C-ATTL3/html/classcattle_1_1_memory_data_provider.html)
+  * [JointFileDataProvider](https://viktorc.github.io/C-ATTL3/html/classcattle_1_1_joint_file_data_provider.html) [A]
+    * [CIFAR10DataProvider](https://viktorc.github.io/C-ATTL3/html/classcattle_1_1_cifar10_data_provider.html) [A] (3,NS)
+  * [SplitFileDataProvider](https://viktorc.github.io/C-ATTL3/html/classcattle_1_1_split_file_data_provider.html) [A]
+
+The partition data provider maps to a continuous segment of the data backing another data provider. This allows for the partitioning of a single provider into training and test data providers. The memory data provider is backed by two in-memory tensors containing the observations and the objectives. The joint file data provider supports the processing of data sets stored in an arbitrary number of files that each contain both the observations and their respective objectives. On the other hand, the split file data provider is backed by an arbitrary number of file pairs for when the observations and the objectives are stored in separate files. The library also ships a specialized data provider for the CIFAR-10 data set.
 
 ### Preprocessor
 C-ATTL3 also contains two preporcessors that can be used to transform the input data. They are:
@@ -107,19 +114,19 @@ C-ATTL3 also contains two preporcessors that can be used to transform the input 
 The following code snippets demonstrate the usage of the library via a simple example.
 ```cpp
 using namespace cattle;
-TensorPtr<float,4> training_obs_ptr = TensorPtr<float,4>(new Tensor<float,4>(80, 32, 32, 3));
-TensorPtr<float,4> training_obj_ptr = TensorPtr<float,4>(new Tensor<float,4>(80, 1, 1, 1));
+TensorPtr<float,4> training_obs_ptr(new Tensor<float,4>(80u, 32u, 32u, 3u));
+TensorPtr<float,4> training_obj_ptr(new Tensor<float,4>(80u, 1u, 1u, 1u));
 training_obs_ptr->setRandom();
 training_obj_ptr->setRandom();
-InMemoryDataProvider<float,3,false> training_prov(std::move(training_obs_ptr), std::move(training_obj_ptr));
+MemoryDataProvider<float,3,false> training_prov(std::move(training_obs_ptr), std::move(training_obj_ptr));
 ```
 To demonstrate the usage of the library's in-memory data provider, some random training data is generated. The training data is comprised of two tensors of rank 4 and type `float`; one for the observations and one for the objectives. The function to be approximated by the neural network is the mapping function between the observations and the objectives. The first rank of these tensors always denotes the samples and its value must be the same in the two tensors. In the example above, the training data consists of 80 observation-objective pairs. In case of sequential data, the second rank of the tensors denotes the time steps which can differ between the observations and the objectives (if the output sequence length of the network does not match the input sequence length); however, in this example, the tensors represent non-sequential data (see the third template argument of the data providers or the optimizer; or the fact that the network to be trained is an inherently non-sequential feed-forward neural network), thus the last 3 ranks describe the individual observation and objective instances. The nominal rank of the data here is thus 3; representing height, width, and depth. The observations are images with a resolution of 32x32 and 3 color channels, while the objectives are single scalars. The data is generated by filling the two tensors with random values between 0 and 1. Finally, the training data provider is created out of the two tensors by moving the two unique pointers referencing them to the `InMemoryDataProvider` constructor.
 ```cpp
-TensorPtr<float,4> test_obs_ptr = TensorPtr<float,4>(new Tensor<float,4>(20, 32, 32, 3));
-TensorPtr<float,4> test_obj_ptr = TensorPtr<float,4>(new Tensor<float,4>(20, 1, 1, 1));
+TensorPtr<float,4> test_obs_ptr(new Tensor<float,4>(20u, 32u, 32u, 3u));
+TensorPtr<float,4> test_obj_ptr(new Tensor<float,4>(20u, 1u, 1u, 1u));
 test_obs_ptr->setRandom();
 test_obj_ptr->setRandom();
-InMemoryDataProvider<float,3,false> test_prov(std::move(test_obs_ptr), std::move(test_obj_ptr));
+MemoryDataProvider<float,3,false> test_prov(std::move(test_obs_ptr), std::move(test_obj_ptr));
 ```
 The test data provider is created the same way. This test data is used to assess the accuracy of the neural network on data it has not encountered during the training process. This provides a measure of the network's generalization ability; the difference between the network's accuracy on the training data and that on the test data is a metric of overfitting. The test data is usually a smaller portion of all the available data than the training data. In our example, it is 20 samples as opposed to the 80 comprising the training data. Note that all the other ranks of the test observation and objective tensors must match those of the training observation and objective tensors.
 ```cpp
@@ -152,7 +159,7 @@ opt.optimize(nn, training_prov, test_prov, 500);
 ```	
 With everything set up and ready, the optimization can commence. The four non-optional paramaters of the `optimize` method are the neural network whose paramaters are to be optimized, the training data provider, the test data provider, and the number of epochs for which the optimization should go on. For our optimizer, these 500 epochs mean 2000 parameter updates alltogether. The `optimize` method is moderately verbose; for every epoch, it prints the training and test losses to the standard out stream. It also prints a warning message in case the test loss is greater than at the previous epoch.
 ```cpp
-Tensor<float,4> input(5, 32, 32, 3);
+Tensor<float,4> input(5u, 32u, 32u, 3u);
 input.setRandom();
 Tensor<float,4> prediction = nn.infer(input);
 ```	

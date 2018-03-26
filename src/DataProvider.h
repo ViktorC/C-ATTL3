@@ -12,11 +12,13 @@
 #include <array>
 #include <cstddef>
 #include <fstream>
+#include <initializer_list>
 #include <iostream>
 #include <memory>
 #include <string>
 #include <type_traits>
 #include <utility>
+#include <vector>
 #include "Dimensions.h"
 #include "Utils.h"
 
@@ -27,8 +29,8 @@ namespace cattle {
 /**
  * An alias for a unique tensor pointer.
  */
-template<typename Scalar, std::size_t Rank, bool Sequential>
-using TensorPtr = std::unique_ptr<Tensor<Scalar,Rank + Sequential + 1>>;
+template<typename Scalar, std::size_t Rank>
+using TensorPtr = std::unique_ptr<Tensor<Scalar,Rank>>;
 
 /**
  * An alias for a pair of two tensors of the same rank. It represents observation-objective pairs.
@@ -50,20 +52,13 @@ public:
 	 *
 	 * @return A constant reference to the dimensions of the observations.
 	 */
-	virtual const Dimensions<int,Rank>& get_obs_dims() const = 0;
+	virtual const Dimensions<std::size_t,Rank>& get_obs_dims() const = 0;
 	/**
 	 * A simple constant getter method for the dimensions of the objectives.
 	 *
 	 * @return A constant reference to the dimensions of the objectives.
 	 */
-	virtual const Dimensions<int,Rank>& get_obj_dims() const = 0;
-	/**
-	 * A simple constant method that returns the number of observations and objectives
-	 * handled by the data provider instance.
-	 *
-	 * @return The number of observation-objective pairs provided by this instance.
-	 */
-	virtual std::size_t instances() const = 0;
+	virtual const Dimensions<std::size_t,Rank>& get_obj_dims() const = 0;
 	/**
 	 * A simple constant method that returns whether the data provider instance has more
 	 * data to provide.
@@ -88,9 +83,16 @@ public:
 	 */
 	virtual void reset() = 0;
 protected:
+	/**
+	 * It skips the specified number of data points.
+	 *
+	 * @param instances The number of instances to skip.
+	 */
+	virtual void skip(std::size_t instances) = 0;
+protected:
 	static constexpr std::size_t DATA_RANKS = Rank + Sequential + 1;
 	typedef Tensor<Scalar,DATA_RANKS> Data;
-	typedef TensorPtr<Scalar,Rank,Sequential> DataPtr;
+	typedef TensorPtr<Scalar,DATA_RANKS> DataPtr;
 };
 
 /**
@@ -99,24 +101,21 @@ protected:
  * by mapping two contiguous blocks of its data to two PartitionedDataProvider instances.
  */
 template<typename Scalar, std::size_t Rank, bool Sequential>
-class PartitionedDataProvider : DataProvider<Scalar,Rank,Sequential> {
+class PartitionDataProvider : DataProvider<Scalar,Rank,Sequential> {
 	typedef DataProvider<Scalar,Rank,Sequential> Base;
 public:
-	PartitionedDataProvider(Base& orig_provider, std::size_t offset, std::size_t length) :
+	inline PartitionDataProvider(Base& orig_provider, std::size_t offset, std::size_t length) :
 			orig_provider(orig_provider),
 			offset(offset),
 			length(length) {
 		assert(length > 0);
 		reset();
 	}
-	inline const Dimensions<int,Rank>& get_obs_dims() const {
+	inline const Dimensions<std::size_t,Rank>& get_obs_dims() const {
 		return orig_provider.get_obs_dims();
 	}
-	inline const Dimensions<int,Rank>& get_obj_dims() const {
+	inline const Dimensions<std::size_t,Rank>& get_obj_dims() const {
 		return orig_provider.get_obj_dims();
-	}
-	inline std::size_t instances() const {
-		return std::min(length, orig_provider.instances());
 	}
 	inline bool has_more() const {
 		return instances_read < length && orig_provider.has_more();
@@ -126,10 +125,14 @@ public:
 		instances_read += instances_to_read;
 		return orig_provider.get_data(instances_to_read);
 	}
-	void reset() {
+	inline void reset() {
 		orig_provider.reset();
-		orig_provider.get_data(offset);
+		orig_provider.skip(offset);
 		instances_read = 0;
+	}
+protected:
+	inline void skip(std::size_t instances) {
+		orig_provider.skip(instances);
 	}
 private:
 	Base& orig_provider;
@@ -166,13 +169,13 @@ public:
 		Utils<Scalar>::template check_dim_validity<Base::DATA_RANKS>(*this->obj);
 		assert(this->obs->dimension(0) == this->obj->dimension(0) &&
 				"mismatched data and obj tensor row numbers");
-		Dimensions<int,Base::DATA_RANKS> obs_dims =
+		Dimensions<std::size_t,Base::DATA_RANKS> obs_dims =
 				Utils<Scalar>::template get_dims<Base::DATA_RANKS>(*this->obs);
-		Dimensions<int,Base::DATA_RANKS> obj_dims =
+		Dimensions<std::size_t,Base::DATA_RANKS> obj_dims =
 				Utils<Scalar>::template get_dims<Base::DATA_RANKS>(*this->obj);
 		this->obs_dims = obs_dims.template demote<Sequential + 1>();
 		this->obj_dims = obj_dims.template demote<Sequential + 1>();
-		rows = (std::size_t) this->obs->dimension(0);
+		instances = (std::size_t) this->obs->dimension(0);
 		offsets.fill(0);
 		data_extents = obs_dims;
 		obj_extents = obj_dims;
@@ -181,119 +184,298 @@ public:
 			Utils<Scalar>::template shuffle_tensor_rows<Base::DATA_RANKS>(*this->obj);
 		}
 	}
-	inline const Dimensions<int,Rank>& get_obs_dims() const {
+	inline const Dimensions<std::size_t,Rank>& get_obs_dims() const {
 		return obs_dims;
 	}
-	inline const Dimensions<int,Rank>& get_obj_dims() const {
+	inline const Dimensions<std::size_t,Rank>& get_obj_dims() const {
 		return obj_dims;
 	}
-	inline std::size_t instances() const {
-		return rows;
-	}
 	inline bool has_more() const {
-		return offsets[0] < (int) rows;
+		return offsets[0] < (int) instances;
 	}
 	inline DataPair<Scalar,Rank,Sequential> get_data(std::size_t batch_size) {
-		int max_batch_size = std::min((int) batch_size, (int) (rows - offsets[0]));
+		std::size_t max_batch_size = std::min(batch_size, instances - offsets[0]);
 		data_extents[0] = max_batch_size;
 		obj_extents[0] = max_batch_size;
 		typename Base::Data data_batch = obs->slice(offsets, data_extents);
 		typename Base::Data obj_batch = obj->slice(offsets, obj_extents);
-		offsets[0] = std::min((int) rows, (int) offsets[0] + max_batch_size);
+		offsets[0] = std::min(instances, offsets[0] + max_batch_size);
 		return std::make_pair(data_batch, obj_batch);
 	}
-	void reset() {
+	inline void reset() {
 		offsets[0] = 0;
+	}
+protected:
+	inline void skip(std::size_t instances) {
+		offsets[0] = std::min((int) this->instances, (int) (offsets[0] + instances));
 	}
 private:
 	typename Base::DataPtr obs;
 	typename Base::DataPtr obj;
-	Dimensions<int,Rank> obs_dims;
-	Dimensions<int,Rank> obj_dims;
-	std::size_t rows;
-	std::array<int,Base::DATA_RANKS> offsets;
-	std::array<int,Base::DATA_RANKS> data_extents;
-	std::array<int,Base::DATA_RANKS> obj_extents;
+	Dimensions<std::size_t,Rank> obs_dims;
+	Dimensions<std::size_t,Rank> obj_dims;
+	std::size_t instances;
+	std::array<std::size_t,Base::DATA_RANKS> offsets;
+	std::array<std::size_t,Base::DATA_RANKS> data_extents;
+	std::array<std::size_t,Base::DATA_RANKS> obj_extents;
 };
 
 /**
- * An abstract class template for a data provider backed by data on disk in the form of a single
- * file containing both the observations and the objectives. Implementations are responsible for
- * specifying the he number of data points, the dimensions of both the observations and the
- * objectives, and for reading batches of observation-objective pairs from the file.
+ * An abstract class template for a data provider backed by data on disk in the form of an arbitrary
+ * number of files containing both the observations and the objectives. Implementations are responsible
+ * for specifying the dimensions of both the observations and the objectives, for reading batches of
+ * observation-objective pairs from the file, and for skipping arbitrary number of data instances.
  */
 template<typename Scalar, std::size_t Rank, bool Sequential>
 class JointFileDataProvider : public DataProvider<Scalar,Rank,Sequential> {
+	typedef DataProvider<Scalar,Rank,Sequential> Base;
 public:
+	virtual ~JointFileDataProvider() = default;
 	inline bool has_more() const {
-		return input_stream.eof();
+		return current_stream < data_streams.size() - 1 || (current_stream < data_streams.size() &&
+				!data_streams[current_stream].eof());
 	}
 	inline DataPair<Scalar,Rank,Sequential> get_data(std::size_t batch_size) {
-		return _get_data(input_stream, batch_size);
+		if (!has_more())
+			return std::make_pair(typename Base::Data(), typename Base::Data());
+		DataPair<Scalar,Rank,Sequential> data_pair = _get_data(data_streams[current_stream],
+				batch_size);
+		assert(data_pair.first.dimension(0) == data_pair.second.dimension(0));
+		while (data_pair.first.dimension(0) != batch_size && ++current_stream < data_streams.size()) {
+			DataPair<Scalar,Rank,Sequential> additional_data_pair = _get_data(data_streams[current_stream],
+					batch_size - data_pair.first.dimension(0));
+			assert(additional_data_pair.first.dimension(0) == additional_data_pair.second.dimension(0));
+			data_pair.first = data_pair.first.concatenate(additional_data_pair.first, 0);
+			data_pair.second = data_pair.second.concatenate(additional_data_pair.second, 0);
+		}
+		return data_pair;
 	}
-	void reset() {
-		input_stream.seekg(0, std::ios::beg);
+	inline void reset() {
+		for (std::size_t i = 0; i <= current_stream && i <= data_streams.size(); ++i)
+			data_streams[i].seekg(0, std::ios::beg);
+		current_stream = 0;
 	}
 protected:
-	JointFileDataProvider(std::string dataset_path) :
-			input_stream(dataset_path) {
-		assert(input_stream.is_open());
+	inline JointFileDataProvider(std::initializer_list<std::string> dataset_paths, bool binary) :
+				data_streams(dataset_paths.size()),
+				current_stream(0) {
+		assert(dataset_paths.size() > 0);
+		std::size_t i = 0;
+		for (std::initializer_list<std::string>::iterator it = dataset_paths.begin();
+				it != dataset_paths.end(); ++it) {
+			data_streams[i] = std::ifstream(*it, binary ? std::ios::binary : std::ios::in);
+			assert(data_streams[i++].is_open());
+		}
+	}
+	inline JointFileDataProvider(std::vector<std::string> dataset_paths, bool binary) :
+			data_streams(dataset_paths.size()),
+			current_stream(0) {
+		assert(!dataset_paths.empty());
+		for (std::size_t i = 0; i < dataset_paths.size(); ++i) {
+			data_streams[i] = std::ifstream(dataset_paths[i], binary ? std::ios::binary : std::ios::in);
+			assert(data_streams[i].is_open());
+		}
 	}
 	/**
 	 * It reads at most the specified number of observation-objective pairs from the provided
 	 * file stream.
 	 *
-	 * @param input_stream A reference to the file stream of the data set.
+	 * @param data_stream A reference to the file stream of the data set.
 	 * @param batch_size The number of data points to return.
 	 * @return A pair of tensors containing the data batch.
 	 */
-	virtual DataPair<Scalar,Rank,Sequential> _get_data(std::ifstream& input_stream,
+	virtual DataPair<Scalar,Rank,Sequential> _get_data(std::ifstream& data_stream,
 			std::size_t batch_size) = 0;
+	/**
+	 * Skips at most the specified number of instances in the data stream.
+	 *
+	 * @param data_stream A reference to the file stream of the data set.
+	 * @param instances The number of instances to skip.
+	 * @return The number of instances actually skipped. It may be less than the specified
+	 * amount if there are fewer remaining instances in the data stream.
+	 */
+	virtual std::size_t _skip(std::ifstream& data_stream, std::size_t instances) = 0;
+	inline void skip(std::size_t instances) {
+		if (!has_more())
+			return;
+		std::size_t skipped = _skip(data_streams[current_stream], instances);
+		while (skipped != instances && ++current_stream < data_streams.size())
+			skipped += _skip(data_streams[current_stream], instances - skipped);
+	}
 private:
-	std::ifstream input_stream;
+	std::vector<std::ifstream> data_streams;
+	std::size_t current_stream;
 };
 
 /**
- * An abstract class template for a data provider backed by two files containing the
- * observations and the objectives respectively. Implementations are responsible for
- * specifying the he number of data points, the dimensions of both the observations and the
- * objectives, and for reading batches of observation-objective pairs from the file.
+ * An abstract class template for a data provider backed by an arbitrary number of file pairs
+ * containing the separated observations and the objectives. Implementations are responsible for
+ * specifying the dimensions of both the observations and the objectives, for reading batches of
+ * observation-objective pairs from the file, and for skipping arbitrary number of data instances.
  */
 template<typename Scalar, std::size_t Rank, bool Sequential>
-class SeparatedFileDataProvider : public DataProvider<Scalar,Rank,Sequential> {
+class SplitFileDataProvider : public DataProvider<Scalar,Rank,Sequential> {
+	typedef DataProvider<Scalar,Rank,Sequential> Base;
 public:
+	virtual ~SplitFileDataProvider() = default;
 	inline bool has_more() const {
-		return obs_input_stream.eof() && obj_input_stream.eof();
+		return current_stream_pair < data_stream_pairs.size() - 1 ||
+				(current_stream_pair < data_stream_pairs.size() &&
+				!data_stream_pairs[current_stream_pair].first.eof() &&
+				!data_stream_pairs[current_stream_pair].second.eof());
 	}
 	inline DataPair<Scalar,Rank,Sequential> get_data(std::size_t batch_size) {
-		return _get_data(obs_input_stream, obj_input_stream, batch_size);
+		if (!has_more())
+			return std::make_pair(typename Base::Data(), typename Base::Data());
+		std::pair<std::ifstream,std::ifstream>& first_stream_pair =
+				data_stream_pairs[current_stream_pair];
+		DataPair<Scalar,Rank,Sequential> data_pair = _get_data(first_stream_pair.first,
+				first_stream_pair.second, batch_size);
+		assert(data_pair.first.dimension(0) == data_pair.second.dimension(0));
+		while (data_pair.first.dimension(0) != batch_size &&
+				++current_stream_pair < data_stream_pairs.size()) {
+			std::pair<std::ifstream,std::ifstream>& stream_pair = data_stream_pairs[current_stream_pair];
+			DataPair<Scalar,Rank,Sequential> additional_data_pair = _get_data(stream_pair.first,
+					stream_pair.second, batch_size - data_pair.first.dimension(0));
+			assert(additional_data_pair.first.dimension(0) == additional_data_pair.second.dimension(0));
+			data_pair.first = data_pair.first.concatenate(additional_data_pair.first, 0);
+			data_pair.second = data_pair.second.concatenate(additional_data_pair.second, 0);
+		}
+		return data_pair;
 	}
-	void reset() {
-		obs_input_stream.seekg(0, std::ios::beg);
-		obj_input_stream.seekg(0, std::ios::beg);
+	inline void reset() {
+		for (std::size_t i = 0; i <= current_stream_pair && i <= data_stream_pairs.size(); ++i) {
+			std::pair<std::ifstream,std::ifstream>& stream_pair = data_stream_pairs[i];
+			stream_pair.first.seekg(0, std::ios::beg);
+			stream_pair.second.seekg(0, std::ios::beg);
+		}
+		current_stream_pair = 0;
 	}
 protected:
-	SeparatedFileDataProvider(std::string obs_path, std::string obj_path) :
-			obs_input_stream(obs_path),
-			obj_input_stream(obj_path) {
-		assert(obs_input_stream.is_open() && obj_input_stream.is_open());
+	inline SplitFileDataProvider(std::initializer_list<std::pair<std::string,std::string>> obs_obj_pairs,
+			bool obs_binary, bool obj_binary) :
+				data_stream_pairs(obs_obj_pairs.size()),
+				current_stream_pair(0) {
+		assert(obs_obj_pairs.size() > 0);
+		std::size_t i = 0;
+		for (std::initializer_list<std::pair<std::string,std::string>>::iterator it = obs_obj_pairs.begin();
+				it != obs_obj_pairs.end(); ++it) {
+			std::pair<std::string,std::string>& path_pair = *it;
+			std::ifstream obs_stream(path_pair.first, obs_binary ? std::ios::binary : std::ios::in);
+			assert(obs_stream.is_open());
+			std::ifstream obj_stream(path_pair.second, obj_binary ? std::ios::binary : std::ios::in);
+			assert(obj_stream.is_open());
+			data_stream_pairs[i++] = std::make_pair(obs_stream, obj_stream);
+		}
+	}
+	inline SplitFileDataProvider(std::vector<std::pair<std::string,std::string>> obs_obj_pairs, bool obs_binary,
+			bool obj_binary) :
+				data_stream_pairs(obs_obj_pairs.size()),
+				current_stream_pair(0) {
+		assert(!obs_obj_pairs.empty());
+		for (std::size_t i = 0; i < obs_obj_pairs.size(); ++i) {
+			std::pair<std::string,std::string>& path_pair = obs_obj_pairs[i];
+			std::ifstream obs_stream(path_pair.first, obs_binary ? std::ios::binary : std::ios::in);
+			assert(obs_stream.is_open());
+			std::ifstream obj_stream(path_pair.second, obj_binary ? std::ios::binary : std::ios::in);
+			assert(obj_stream.is_open());
+			data_stream_pairs[i] = std::make_pair(obs_stream, obj_stream);
+		}
 	}
 	/**
 	 * It reads at most the specified number of observations from the observation-file and
 	 * at most the specified number of objectives from the objective-file.
 	 *
-	 * @param obs_input_stream A reference to the file stream to the file containing the
+	 * @param obs_input_stream A reference to the file stream to a file containing
 	 * observations.
-	 * @param obj_input_stream A reference to the file stream to the file containing the
+	 * @param obj_input_stream A reference to the file stream to a file containing
 	 * objectives.
 	 * @param batch_size The number of data points to read.
 	 * @return The paired observations and objectives.
 	 */
 	virtual DataPair<Scalar,Rank,Sequential> _get_data(std::ifstream& obs_input_stream,
 			std::ifstream& obj_input_stream, std::size_t batch_size) = 0;
+	/**
+	 * Skips at most the specified number of instances in the data streams.
+	 *
+	 * @param obs_input_stream A reference to the file stream to a file containing
+	 * observations.
+	 * @param obj_input_stream A reference to the file stream to a file containing
+	 * objectives.
+	 * @param instances The number of data points to skip.
+	 * @return The number of actual data points skipped. It may be less than the specified
+	 * amount if there are fewer remaining instances in the data streams.
+	 */
+	virtual std::size_t _skip(std::ifstream& obs_input_stream, std::ifstream& obj_input_stream,
+			std::size_t instances) = 0;
+	inline void skip(std::size_t instances) {
+		if (!has_more())
+			return;
+		std::pair<std::ifstream,std::ifstream>& first_stream_pair = data_stream_pairs[current_stream_pair];
+		std::size_t skipped = _skip(first_stream_pair.first, first_stream_pair.second, instances);
+		while (skipped != instances && ++current_stream_pair < data_stream_pairs.size()) {
+			std::pair<std::ifstream,std::ifstream>& stream_pair = data_stream_pairs[current_stream_pair];
+			skipped += _skip(stream_pair.first, stream_pair.second, instances - skipped);
+		}
+	}
 private:
-	std::ifstream obs_input_stream;
-	std::ifstream obj_input_stream;
+	std::vector<std::pair<std::ifstream,std::ifstream>> data_stream_pairs;
+	std::size_t current_stream_pair;
+};
+
+/**
+ * A data provider template for the CIFAR-10 data set.
+ */
+template<typename Scalar>
+class CIFAR10DataProvider : public JointFileDataProvider<Scalar,3,false> {
+	typedef DataProvider<Scalar,3,false> Root;
+	typedef JointFileDataProvider<Scalar,3,false> Base;
+	static constexpr std::size_t INSTANCE_LENGTH = 3073;
+public:
+	inline CIFAR10DataProvider(std::initializer_list<std::string> files) :
+			Base::JointFileDataProvider(files, true),
+			obs({ 32u, 32u, 3u }),
+			obj({ 1u, 1u, 1u }) { }
+	inline const Dimensions<std::size_t,3>& get_obs_dims() const {
+		return obs;
+	}
+	inline const Dimensions<std::size_t,3>& get_obj_dims() const {
+		return obj;
+	}
+protected:
+	inline DataPair<Scalar,3,false> _get_data(std::ifstream& data_stream,
+				std::size_t batch_size) {
+		Tensor<Scalar,4> obs(batch_size, 32u, 32u, 3u);
+		Tensor<Scalar,4> obj(batch_size, 1u, 1u, 1u);
+		std::size_t i;
+		for (i = 0; !data_stream.eof(); ++i) {
+			data_stream.read(buffer, INSTANCE_LENGTH);
+			obj(i,0,0,0) = (Scalar) buffer[0];
+			std::size_t buffer_ind = 1;
+			for (std::size_t channel = 0; channel < 3; ++channel) {
+				for (std::size_t row = 0; row < 32; ++row) {
+					for (std::size_t height = 0; height < 32; ++height)
+						obs(i,height,row,channel) = (Scalar) buffer[buffer_ind++];
+				}
+			}
+			assert(buffer_ind == INSTANCE_LENGTH);
+		}
+		if (i == batch_size)
+			return std::make_pair(obs, obj);
+		std::array<std::size_t,4> offsets({ 0, 0, 0, 0 });
+		std::array<std::size_t,4> obs_extents({ i, 32u, 32u, 3u });
+		std::array<std::size_t,4> obj_extents({ i, 1u, 1u, 1u });
+		Tensor<Scalar,4> obs_slice = obs.slice(offsets, obs_extents);
+		Tensor<Scalar,4> obj_slice = obj.slice(offsets, obs_extents);
+		return std::make_pair(obs_slice, obj_slice);
+	}
+	inline std::size_t _skip(std::ifstream& data_stream, std::size_t instances) {
+		data_stream.seekg(data_stream.tellg() + instances * INSTANCE_LENGTH);
+	}
+private:
+	const Dimensions<std::size_t,3> obs;
+	const Dimensions<std::size_t,3> obj;
+	char buffer[INSTANCE_LENGTH];
 };
 
 } /* namespace cattle */

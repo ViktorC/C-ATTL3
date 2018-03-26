@@ -75,7 +75,7 @@ struct checkIdx {
   }
 
   template<std::size_t N>
-  static inline int run(std::array<int, N> e, int flags, int dummy, std::set<uint64_t>& found, std::map<uint64_t, int> const& expected)
+  static inline int run(std::array<std::size_t, N> e, int flags, int dummy, std::set<uint64_t>& found, std::map<uint64_t, int> const& expected)
   {
     return doCheck_(e, flags, dummy, found, expected);
   }
@@ -83,7 +83,7 @@ struct checkIdx {
 
 static void test_symgroups_static()
 {
-  std::array<int, 7> identity{{0,1,2,3,4,5,6}};
+  std::array<std::size_t, 7> identity{{0,1,2,3,4,5,6}};
 
   // Simple static symmetry group
   StaticSGroup<
@@ -137,8 +137,8 @@ static void test_symgroups_dynamic()
 
 static void test_symgroups_selection()
 {
-  std::array<int, 7> identity7{{0,1,2,3,4,5,6}};
-  std::array<int, 10> identity10{{0,1,2,3,4,5,6,7,8,9}};
+  std::array<std::size_t, 7> identity7{{0,1,2,3,4,5,6}};
+  std::array<std::size_t, 10> identity10{{0,1,2,3,4,5,6,7,8,9}};
 
   {
     // Do the same test as in test_symgroups_static but

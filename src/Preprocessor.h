@@ -75,7 +75,7 @@ public:
 	inline virtual void transform(Tensor<Scalar,Rank + 1>& data) const {
 		int rows = data.dimension(0);
 		assert(rows > 0);
-		Dimensions<int,Rank> demoted_dims = Utils<Scalar>::template get_dims<Rank + 1>(data).demote();
+		Dimensions<std::size_t,Rank> demoted_dims = Utils<Scalar>::template get_dims<Rank + 1>(data).demote();
 		assert(demoted_dims == dims && "mismatched fit and transform input tensor dimensions");
 		Matrix<Scalar> data_mat = Utils<Scalar>::template map_tensor_to_mat<Rank + 1>(std::move(data));
 		data_mat = data_mat.rowwise() - means;
@@ -86,7 +86,7 @@ public:
 protected:
 	const bool standardize;
 	const Scalar epsilon;
-	Dimensions<int,Rank> dims;
+	Dimensions<std::size_t,Rank> dims;
 	RowVector<Scalar> means;
 	RowVector<Scalar> sd;
 };
@@ -114,8 +114,8 @@ public:
 		int depth = dims(2);
 		means = Matrix<Scalar>(depth, dims.get_volume() / depth);
 		sd = Matrix<Scalar>(means.rows(), means.cols());
-		std::array<int,4> offsets({ 0, 0, 0, 0 });
-		std::array<int,4> extents({ rows, dims(0), dims(1), 1 });
+		std::array<std::size_t,4> offsets({ 0, 0, 0, 0 });
+		std::array<std::size_t,4> extents({ rows, dims(0), dims(1), 1 });
 		for (int i = 0; i < depth; ++i) {
 			offsets[3] = i;
 			Tensor<Scalar,4> data_slice_i = data.slice(offsets, extents);
@@ -127,13 +127,13 @@ public:
 	}
 	inline virtual void transform(Tensor<Scalar,4>& data) const {
 		int rows = data.dimension(0);
-		Dimensions<int,3> demoted_dims = Utils<Scalar>::template get_dims<4>(data).demote();
+		Dimensions<std::size_t,3> demoted_dims = Utils<Scalar>::template get_dims<4>(data).demote();
 		assert(demoted_dims == dims && "mismatched fit and transform input tensor dimensions");
 		assert(rows > 0);
 		int depth = data.dimension(3);
-		Dimensions<int,3> slice_dims({ dims(0), dims(1), 1 });
-		std::array<int,4> offsets = { 0, 0, 0, 0 };
-		std::array<int,4> extents = { rows, slice_dims(0), slice_dims(1), slice_dims(2) };
+		Dimensions<std::size_t,3> slice_dims({ dims(0), dims(1), 1 });
+		std::array<std::size_t,4> offsets = { 0, 0, 0, 0 };
+		std::array<std::size_t,4> extents = { rows, slice_dims(0), slice_dims(1), slice_dims(2) };
 		for (int i = 0; i < depth; ++i) {
 			offsets[3] = i;
 			Tensor<Scalar,4> data_slice_i = data.slice(offsets, extents);
@@ -147,7 +147,7 @@ public:
 protected:
 	const bool standardize;
 	const Scalar epsilon;
-	Dimensions<int,3> dims;
+	Dimensions<std::size_t,3> dims;
 	Matrix<Scalar> means;
 	Matrix<Scalar> sd;
 };
@@ -198,7 +198,7 @@ protected:
 			ed_vec[i].eigen_values = eigen_values.bottomRows(dims_to_retain).transpose();
 	}
 	inline Tensor<Scalar,Rank + 1> _transform(Tensor<Scalar,Rank + 1> data, int i) const {
-		Dimensions<int,Rank> output_dims;
+		Dimensions<std::size_t,Rank> output_dims;
 		if (!reduce_dims)
 			output_dims = Utils<Scalar>::template get_dims<Rank + 1>(data).demote();
 		Matrix<Scalar> data_mat = Utils<Scalar>::template map_tensor_to_mat<Rank + 1>(std::move(data));
@@ -276,8 +276,8 @@ public:
 		Root::fit(data);
 		int channels = Root::dims(2);
 		Base::ed_vec = std::vector<typename Base::EigenDecomposition>(channels);
-		std::array<int,4> offsets({ 0, 0, 0, 0 });
-		std::array<int,4> extents({ data.dimension(0), Root::dims(0), Root::dims(1), 1 });
+		std::array<std::size_t,4> offsets({ 0, 0, 0, 0 });
+		std::array<std::size_t,4> extents({ data.dimension(0), Root::dims(0), Root::dims(1), 1 });
 		for (int i = 0; i < channels; ++i) {
 			offsets[3] = i;
 			Tensor<Scalar,4> data_slice_i = data.slice(offsets, extents);
@@ -287,12 +287,12 @@ public:
 	inline void transform(Tensor<Scalar,4>& data) const {
 		Root::transform(data);
 		if (Base::reduce_dims) {
-			Dimensions<int,3> output_dims({ data.dimension(1) * data.dimension(2), 1, 1 });
+			Dimensions<std::size_t,3> output_dims({ data.dimension(1) * data.dimension(2), 1, 1 });
 			data = Base::_transform(std::move(data), 0);
 		} else {
 			int rows = data.dimension(0);
-			std::array<int,4> offsets({ 0, 0, 0, 0 });
-			std::array<int,4> extents({ rows, Root::dims(0), Root::dims(1), 1 });
+			std::array<std::size_t,4> offsets({ 0, 0, 0, 0 });
+			std::array<std::size_t,4> extents({ rows, Root::dims(0), Root::dims(1), 1 });
 			for (int i = 0; i < Root::dims(2); ++i) {
 				offsets[3] = i;
 				Tensor<Scalar,4> data_slice_i = data.slice(offsets, extents);
