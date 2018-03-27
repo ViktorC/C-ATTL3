@@ -99,10 +99,11 @@ Data providers are responsible for supplying the data used for gradient verifica
   * [PartitionDataProvider](https://viktorc.github.io/C-ATTL3/html/classcattle_1_1_partition_data_provider.html)
   * [MemoryDataProvider](https://viktorc.github.io/C-ATTL3/html/classcattle_1_1_memory_data_provider.html)
   * [JointFileDataProvider](https://viktorc.github.io/C-ATTL3/html/classcattle_1_1_joint_file_data_provider.html) [A]
-    * [CIFAR10DataProvider](https://viktorc.github.io/C-ATTL3/html/classcattle_1_1_cifar10_data_provider.html) [A] (3,NS)
+    * [CIFARDataProvider](https://viktorc.github.io/C-ATTL3/html/classcattle_1_1_c_i_f_a_r_data_provider.html) [A] (3,NS)
   * [SplitFileDataProvider](https://viktorc.github.io/C-ATTL3/html/classcattle_1_1_split_file_data_provider.html) [A]
+    * [MNISTDataProvider](https://viktorc.github.io/C-ATTL3/html/classcattle_1_1_m_n_i_s_t_data_provider.html) [A] (3,NS)
 
-The partition data provider maps to a continuous segment of the data backing another data provider. This allows for the partitioning of a single provider into training and test data providers. The memory data provider is backed by two in-memory tensors containing the observations and the objectives. The joint file data provider supports the processing of data sets stored in an arbitrary number of files that each contain both the observations and their respective objectives. On the other hand, the split file data provider is backed by an arbitrary number of file pairs for when the observations and the objectives are stored in separate files. The library also ships a specialized data provider for the CIFAR-10 data set.
+The partition data provider maps to a continuous segment of the data backing another data provider. This allows for the partitioning of a single provider into training and test data providers. The memory data provider is backed by two in-memory tensors containing the observations and the objectives. The joint file data provider supports the processing of data sets stored in an arbitrary number of files that each contain both the observations and their respective objectives. On the other hand, the split file data provider is backed by an arbitrary number of file pairs for when the observations and the objectives are stored in separate files. C-ATTL3 includes a specialized data provider for the popular MNIST data set for the easy comparison of the performance of different network architectures to published results. The library also ships a specialized data provider for the CIFAR data set which supports both CIFAR-10 and CIFAR-100.
 
 ### Preprocessor
 C-ATTL3 also contains two preporcessors that can be used to transform the input data. They are:

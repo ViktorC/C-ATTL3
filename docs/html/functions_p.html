@@ -74,11 +74,9 @@ $(function() {
 <li>padding
 : <a class="el" href="classcattle_1_1_conv_layer.html#a35c5813a1043ca111403b65976cc0bb6">cattle::ConvLayer&lt; Scalar &gt;</a>
 </li>
-<li>ParallelNeuralNetwork()
-: <a class="el" href="classcattle_1_1_parallel_neural_network.html#aeccb985461cfb77133f41363c66fb4f0">cattle::ParallelNeuralNetwork&lt; Scalar, Rank &gt;</a>
-</li>
-<li>ParallelNeuralNetwork&lt; Scalar, Rank &gt;
-: <a class="el" href="classcattle_1_1_neural_network.html#abf866a6ba7fdf927bd90e0cd4c4587bc">cattle::NeuralNetwork&lt; Scalar, Rank, Sequential &gt;</a>
+<li>ParallelNeuralNetwork
+: <a class="el" href="classcattle_1_1_neural_network.html#a78e35da5014bc0ae5977aabe614705e2">cattle::NeuralNetwork&lt; Scalar, Rank, Sequential &gt;</a>
+, <a class="el" href="classcattle_1_1_parallel_neural_network.html#af89f10de5c5a498f3d7555d3ad0985c1">cattle::ParallelNeuralNetwork&lt; Scalar, Rank, MergeType &gt;</a>
 </li>
 <li>params
 : <a class="el" href="classcattle_1_1_activation_layer.html#a5898471212c6c3911ee2534838067db9">cattle::ActivationLayer&lt; Scalar, Rank &gt;</a>
@@ -160,25 +158,25 @@ $(function() {
 : <a class="el" href="classcattle_1_1_p_re_l_u_activation_layer.html#a1a0949224107210b2f30cc25d7f24d54">cattle::PReLUActivationLayer&lt; Scalar, Rank &gt;</a>
 </li>
 <li>prev_out_grads
-: <a class="el" href="structcattle_1_1_bidirectional_neural_network_1_1_backprop_args.html#a651f8e2c46f44cedef233a4940474699">cattle::BidirectionalNeuralNetwork&lt; Scalar, Rank &gt;::BackpropArgs</a>
-, <a class="el" href="structcattle_1_1_parallel_neural_network_1_1_backprop_args.html#a5545d03f37747abb0ee34beac08764bd">cattle::ParallelNeuralNetwork&lt; Scalar, Rank &gt;::BackpropArgs</a>
+: <a class="el" href="structcattle_1_1_bidirectional_neural_network_1_1_backprop_args.html#a0e59b0fbdde6f1db36156a4ca4ebf12f">cattle::BidirectionalNeuralNetwork&lt; Scalar, Rank, MergeType &gt;::BackpropArgs</a>
+, <a class="el" href="structcattle_1_1_parallel_neural_network_1_1_backprop_args.html#a5a462e39f579a0f1ad6cfc6b2e0e19e4">cattle::ParallelNeuralNetwork&lt; Scalar, Rank, MergeType &gt;::BackpropArgs</a>
 </li>
 <li>prev_state_cache
-: <a class="el" href="structcattle_1_1_l_s_t_m_neural_network_1_1_cell.html#a3622056bccc92d974183c8aa1f4afd90">cattle::LSTMNeuralNetwork&lt; Scalar, Rank &gt;::Cell</a>
+: <a class="el" href="structcattle_1_1_l_s_t_m_neural_network_1_1_cell.html#a145f4bcd01c0c5cc1081e33522749606">cattle::LSTMNeuralNetwork&lt; Scalar, Rank, MulInt, Stateful &gt;::Cell</a>
 </li>
 <li>promote()
 : <a class="el" href="classcattle_1_1_dimensions.html#adb690e938cda0c2507af6af1ff92f74e">cattle::Dimensions&lt; IndexType, Rank &gt;</a>
 </li>
 <li>propagate()
-: <a class="el" href="classcattle_1_1_bidirectional_neural_network.html#ad2e28228e602c8fce835e3d394b5b8de">cattle::BidirectionalNeuralNetwork&lt; Scalar, Rank &gt;</a>
+: <a class="el" href="classcattle_1_1_bidirectional_neural_network.html#a39ad32596d09d588305f9f3fcca9414a">cattle::BidirectionalNeuralNetwork&lt; Scalar, Rank, MergeType &gt;</a>
 , <a class="el" href="classcattle_1_1_composite_neural_network.html#a684ad635a4255a6a4123e982ad72cac3">cattle::CompositeNeuralNetwork&lt; Scalar, Rank, Sequential &gt;</a>
-, <a class="el" href="classcattle_1_1_dense_neural_network.html#ae37728e8151cedb92c92c14e5e2304cc">cattle::DenseNeuralNetwork&lt; Scalar, Rank &gt;</a>
+, <a class="el" href="classcattle_1_1_dense_neural_network.html#a252b20495010a47ed646089564643a35">cattle::DenseNeuralNetwork&lt; Scalar, Rank, ConcatType &gt;</a>
 , <a class="el" href="classcattle_1_1_feedforward_neural_network.html#a5ba42a837437bbc9ed7d70e532107fe0">cattle::FeedforwardNeuralNetwork&lt; Scalar, Rank &gt;</a>
-, <a class="el" href="classcattle_1_1_l_s_t_m_neural_network.html#a3b4a57b4d4feee6bd8b60f5bff1380c9">cattle::LSTMNeuralNetwork&lt; Scalar, Rank &gt;</a>
+, <a class="el" href="classcattle_1_1_l_s_t_m_neural_network.html#a06041a938c2b82c3cbbee3545e7f904f">cattle::LSTMNeuralNetwork&lt; Scalar, Rank, MulInt, Stateful &gt;</a>
 , <a class="el" href="classcattle_1_1_neural_network.html#a6ade9cd95110766ff25e7b157c9fddcf">cattle::NeuralNetwork&lt; Scalar, Rank, Sequential &gt;</a>
 , <a class="el" href="classcattle_1_1_optimizer.html#a03eff65d0152bf88d98988808090f34c">cattle::Optimizer&lt; Scalar, Rank, Sequential &gt;</a>
-, <a class="el" href="classcattle_1_1_parallel_neural_network.html#a0b5a06caad17ca9331f33ab902ad1ae2">cattle::ParallelNeuralNetwork&lt; Scalar, Rank &gt;</a>
-, <a class="el" href="classcattle_1_1_recurrent_neural_network.html#ad9263e8f76fb79cd117edddcf22b7d9d">cattle::RecurrentNeuralNetwork&lt; Scalar, Rank &gt;</a>
+, <a class="el" href="classcattle_1_1_parallel_neural_network.html#a466d10733088d7ab1de221b3487205f4">cattle::ParallelNeuralNetwork&lt; Scalar, Rank, MergeType &gt;</a>
+, <a class="el" href="classcattle_1_1_recurrent_neural_network.html#ad280f608bd81c202f82ab497e203e11e">cattle::RecurrentNeuralNetwork&lt; Scalar, Rank, MulInt, Stateful &gt;</a>
 , <a class="el" href="classcattle_1_1_residual_neural_network.html#a2b3df37e544c34170dcdd8f30bd6ece7">cattle::ResidualNeuralNetwork&lt; Scalar, Rank &gt;</a>
 , <a class="el" href="classcattle_1_1_sequential_neural_network.html#a7938e9ded5e59b86b748a07d25b2a6b7">cattle::SequentialNeuralNetwork&lt; Scalar, Rank &gt;</a>
 </li>

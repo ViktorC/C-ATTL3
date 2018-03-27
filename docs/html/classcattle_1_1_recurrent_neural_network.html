@@ -5,7 +5,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
 <meta name="generator" content="Doxygen 1.8.14"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>C-ATTL3: cattle::RecurrentNeuralNetwork&lt; Scalar, Rank &gt; Class Template Reference</title>
+<title>C-ATTL3: cattle::RecurrentNeuralNetwork&lt; Scalar, Rank, MulInt, Stateful &gt; Class Template Reference</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -75,19 +75,19 @@ $(function() {
 <a href="#friends">Friends</a> &#124;
 <a href="classcattle_1_1_recurrent_neural_network-members.html">List of all members</a>  </div>
   <div class="headertitle">
-<div class="title">cattle::RecurrentNeuralNetwork&lt; Scalar, Rank &gt; Class Template Reference</div>  </div>
+<div class="title">cattle::RecurrentNeuralNetwork&lt; Scalar, Rank, MulInt, Stateful &gt; Class Template Reference</div>  </div>
 </div><!--header-->
 <div class="contents">
 
 <p><code>#include &lt;<a class="el" href="_neural_network_8h_source.html">NeuralNetwork.h</a>&gt;</code></p>
 <div class="dynheader">
-Inheritance diagram for cattle::RecurrentNeuralNetwork&lt; Scalar, Rank &gt;:</div>
+Inheritance diagram for cattle::RecurrentNeuralNetwork&lt; Scalar, Rank, MulInt, Stateful &gt;:</div>
 <div class="dyncontent">
  <div class="center">
-  <img src="classcattle_1_1_recurrent_neural_network.png" usemap="#cattle::RecurrentNeuralNetwork_3C_20Scalar_2C_20Rank_20_3E_map" alt=""/>
-  <map id="cattle::RecurrentNeuralNetwork_3C_20Scalar_2C_20Rank_20_3E_map" name="cattle::RecurrentNeuralNetwork_3C_20Scalar_2C_20Rank_20_3E_map">
-<area href="classcattle_1_1_unidirectional_neural_network.html" alt="cattle::UnidirectionalNeuralNetwork&lt; Scalar, Rank &gt;" shape="rect" coords="0,56,307,80"/>
-<area href="classcattle_1_1_neural_network.html" alt="cattle::NeuralNetwork&lt; Scalar, Rank, true &gt;" shape="rect" coords="0,0,307,24"/>
+  <img src="classcattle_1_1_recurrent_neural_network.png" usemap="#cattle::RecurrentNeuralNetwork_3C_20Scalar_2C_20Rank_2C_20MulInt_2C_20Stateful_20_3E_map" alt=""/>
+  <map id="cattle::RecurrentNeuralNetwork_3C_20Scalar_2C_20Rank_2C_20MulInt_2C_20Stateful_20_3E_map" name="cattle::RecurrentNeuralNetwork_3C_20Scalar_2C_20Rank_2C_20MulInt_2C_20Stateful_20_3E_map">
+<area href="classcattle_1_1_unidirectional_neural_network.html" alt="cattle::UnidirectionalNeuralNetwork&lt; Scalar, Rank &gt;" shape="rect" coords="0,56,380,80"/>
+<area href="classcattle_1_1_neural_network.html" alt="cattle::NeuralNetwork&lt; Scalar, Rank, true &gt;" shape="rect" coords="0,0,380,24"/>
 </map>
  </div></div>
 <table class="memberdecls">
@@ -98,28 +98,28 @@ Classes</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:a6003fcca479a0b6f7ee6f3209a3fe09e"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_recurrent_neural_network.html#a6003fcca479a0b6f7ee6f3209a3fe09e">RecurrentNeuralNetwork</a> (<a class="el" href="namespacecattle.html#a540d630253530c3530f6af1c31b82c44">KernelPtr</a>&lt; Scalar, Rank &gt; input_kernel, <a class="el" href="namespacecattle.html#a540d630253530c3530f6af1c31b82c44">KernelPtr</a>&lt; Scalar, Rank &gt; state_kernel, <a class="el" href="namespacecattle.html#a540d630253530c3530f6af1c31b82c44">KernelPtr</a>&lt; Scalar, Rank &gt; output_kernel, <a class="el" href="namespacecattle.html#a33c43d0983f054e904daa2806ce17231">ActivationPtr</a>&lt; Scalar, Rank &gt; state_act, <a class="el" href="namespacecattle.html#a33c43d0983f054e904daa2806ce17231">ActivationPtr</a>&lt; Scalar, Rank &gt; output_act, <a class="el" href="classcattle_1_1_recurrent_neural_network.html#ae652c0d21be9ecba58710f8d581a5d38">OutputSeqSizeFunc</a> <a class="el" href="classcattle_1_1_recurrent_neural_network.html#a718a560afcc0d47a3d0aee3f3f1d0f34">output_seq_size_func</a>, bool <a class="el" href="classcattle_1_1_recurrent_neural_network.html#adb1c2701a00f2533a9111809a8e83e62">stateful</a>=false, bool <a class="el" href="classcattle_1_1_recurrent_neural_network.html#a402cd4a5f756f22d15321387160ecffb">mul_int</a>=false, bool <a class="el" href="classcattle_1_1_recurrent_neural_network.html#a90ba4b8a45e036a604c4e3fba218fd84">reversed</a>=false, bool <a class="el" href="classcattle_1_1_recurrent_neural_network.html#aecb9ee3a8b0f3ce2512fc7401cb3d7c3">foremost</a>=true)</td></tr>
-<tr class="separator:a6003fcca479a0b6f7ee6f3209a3fe09e"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a61d02c11439c2e679b89c1cf81f12f71"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_recurrent_neural_network.html#a61d02c11439c2e679b89c1cf81f12f71">RecurrentNeuralNetwork</a> (const <a class="el" href="classcattle_1_1_recurrent_neural_network.html#a506a66d30d4bb202e16ce69b851c5a3c">Self</a> &amp;network)</td></tr>
-<tr class="separator:a61d02c11439c2e679b89c1cf81f12f71"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a972c132c500e331b07fe8cef68de67f1"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_recurrent_neural_network.html#a972c132c500e331b07fe8cef68de67f1">RecurrentNeuralNetwork</a> (<a class="el" href="classcattle_1_1_recurrent_neural_network.html#a506a66d30d4bb202e16ce69b851c5a3c">Self</a> &amp;&amp;network)</td></tr>
-<tr class="separator:a972c132c500e331b07fe8cef68de67f1"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a9b81d56d692fcb9780dab6b652b797ad"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_recurrent_neural_network.html#a9b81d56d692fcb9780dab6b652b797ad">~RecurrentNeuralNetwork</a> ()=default</td></tr>
-<tr class="separator:a9b81d56d692fcb9780dab6b652b797ad"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a5af8fafb68754cbdc6316bad625e82e6"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classcattle_1_1_recurrent_neural_network.html#a506a66d30d4bb202e16ce69b851c5a3c">Self</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_recurrent_neural_network.html#a5af8fafb68754cbdc6316bad625e82e6">operator=</a> (<a class="el" href="classcattle_1_1_recurrent_neural_network.html#a506a66d30d4bb202e16ce69b851c5a3c">Self</a> network)</td></tr>
-<tr class="separator:a5af8fafb68754cbdc6316bad625e82e6"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ad57c74a9fa42ad3a114b6f8d314d6fac"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classcattle_1_1_recurrent_neural_network.html#af905e833cc41b2db045192abf2fa84ef">Root</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_recurrent_neural_network.html#ad57c74a9fa42ad3a114b6f8d314d6fac">clone</a> () const</td></tr>
-<tr class="separator:ad57c74a9fa42ad3a114b6f8d314d6fac"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a89012091d0206ee2515e488677eab240"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_recurrent_neural_network.html#a89012091d0206ee2515e488677eab240">is_reversed</a> () const</td></tr>
-<tr class="separator:a89012091d0206ee2515e488677eab240"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ae5fb378d85d9f990a640df087ca6d971"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_recurrent_neural_network.html#ae5fb378d85d9f990a640df087ca6d971">reverse</a> ()</td></tr>
-<tr class="separator:ae5fb378d85d9f990a640df087ca6d971"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a0cc59d127eb866ebfd10b24dae192ee1"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_recurrent_neural_network.html#a0cc59d127eb866ebfd10b24dae192ee1">is_foremost</a> () const</td></tr>
-<tr class="separator:a0cc59d127eb866ebfd10b24dae192ee1"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ac1b7c1725083e347c24d8d50480681b2"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="classcattle_1_1_neural_network.html#ab3608ae118bbbacbc9161f489afcd562">Root::Dims</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_recurrent_neural_network.html#ac1b7c1725083e347c24d8d50480681b2">get_input_dims</a> () const</td></tr>
-<tr class="separator:ac1b7c1725083e347c24d8d50480681b2"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ab3f1161d480723bb99c9a0a74a0d34f6"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="classcattle_1_1_neural_network.html#ab3608ae118bbbacbc9161f489afcd562">Root::Dims</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_recurrent_neural_network.html#ab3f1161d480723bb99c9a0a74a0d34f6">get_output_dims</a> () const</td></tr>
-<tr class="separator:ab3f1161d480723bb99c9a0a74a0d34f6"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad788443003ca3d8300198398627e812e"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_recurrent_neural_network.html#ad788443003ca3d8300198398627e812e">RecurrentNeuralNetwork</a> (<a class="el" href="namespacecattle.html#a540d630253530c3530f6af1c31b82c44">KernelPtr</a>&lt; Scalar, Rank &gt; input_kernel, <a class="el" href="namespacecattle.html#a540d630253530c3530f6af1c31b82c44">KernelPtr</a>&lt; Scalar, Rank &gt; state_kernel, <a class="el" href="namespacecattle.html#a540d630253530c3530f6af1c31b82c44">KernelPtr</a>&lt; Scalar, Rank &gt; output_kernel, <a class="el" href="namespacecattle.html#a33c43d0983f054e904daa2806ce17231">ActivationPtr</a>&lt; Scalar, Rank &gt; state_act, <a class="el" href="namespacecattle.html#a33c43d0983f054e904daa2806ce17231">ActivationPtr</a>&lt; Scalar, Rank &gt; output_act, <a class="el" href="classcattle_1_1_recurrent_neural_network.html#a8e6160930a2609eb0f4906e8ad878ac9">OutputSeqSizeFunc</a> <a class="el" href="classcattle_1_1_recurrent_neural_network.html#a4f21b0f580f4550786a6b8c6daba7874">output_seq_size_func</a>, bool <a class="el" href="classcattle_1_1_recurrent_neural_network.html#a81ef0726ad9e89f33145cc59a81e1898">reversed</a>=false, bool <a class="el" href="classcattle_1_1_recurrent_neural_network.html#a3373cd0fe4d1808b1c65a98f9c15be4e">foremost</a>=true)</td></tr>
+<tr class="separator:ad788443003ca3d8300198398627e812e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0c83d0a6d53f10accb7d9600de0b4cf4"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_recurrent_neural_network.html#a0c83d0a6d53f10accb7d9600de0b4cf4">RecurrentNeuralNetwork</a> (const <a class="el" href="classcattle_1_1_recurrent_neural_network.html#a53ea28c420bef143f4b615be678df495">Self</a> &amp;network)</td></tr>
+<tr class="separator:a0c83d0a6d53f10accb7d9600de0b4cf4"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ace6a5ef741e365dca5dd65bf74a725fa"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_recurrent_neural_network.html#ace6a5ef741e365dca5dd65bf74a725fa">RecurrentNeuralNetwork</a> (<a class="el" href="classcattle_1_1_recurrent_neural_network.html#a53ea28c420bef143f4b615be678df495">Self</a> &amp;&amp;network)</td></tr>
+<tr class="separator:ace6a5ef741e365dca5dd65bf74a725fa"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aceb9eb9a590cfa390664cd874886c67f"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_recurrent_neural_network.html#aceb9eb9a590cfa390664cd874886c67f">~RecurrentNeuralNetwork</a> ()=default</td></tr>
+<tr class="separator:aceb9eb9a590cfa390664cd874886c67f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae884d327ff5815a1d05e448767f1010f"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classcattle_1_1_recurrent_neural_network.html#a53ea28c420bef143f4b615be678df495">Self</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_recurrent_neural_network.html#ae884d327ff5815a1d05e448767f1010f">operator=</a> (<a class="el" href="classcattle_1_1_recurrent_neural_network.html#a53ea28c420bef143f4b615be678df495">Self</a> network)</td></tr>
+<tr class="separator:ae884d327ff5815a1d05e448767f1010f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a24cdf0e19a4704b59d22d23ec371e6c3"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classcattle_1_1_recurrent_neural_network.html#a8a25ffa831603c9392b09c90af368180">Root</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_recurrent_neural_network.html#a24cdf0e19a4704b59d22d23ec371e6c3">clone</a> () const</td></tr>
+<tr class="separator:a24cdf0e19a4704b59d22d23ec371e6c3"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1d2d1d83cd4b9acdc364fb8684d7443a"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_recurrent_neural_network.html#a1d2d1d83cd4b9acdc364fb8684d7443a">is_reversed</a> () const</td></tr>
+<tr class="separator:a1d2d1d83cd4b9acdc364fb8684d7443a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a315780fd2e06405a11065e903c0561eb"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_recurrent_neural_network.html#a315780fd2e06405a11065e903c0561eb">reverse</a> ()</td></tr>
+<tr class="separator:a315780fd2e06405a11065e903c0561eb"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab3790738cc9ac1b654a2e357465d0ce1"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_recurrent_neural_network.html#ab3790738cc9ac1b654a2e357465d0ce1">is_foremost</a> () const</td></tr>
+<tr class="separator:ab3790738cc9ac1b654a2e357465d0ce1"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa570e1c7a8baa09fbee96aa9457050dd"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="classcattle_1_1_neural_network.html#ab3608ae118bbbacbc9161f489afcd562">Root::Dims</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_recurrent_neural_network.html#aa570e1c7a8baa09fbee96aa9457050dd">get_input_dims</a> () const</td></tr>
+<tr class="separator:aa570e1c7a8baa09fbee96aa9457050dd"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a65378382938c173044d138d1fe35f84e"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="classcattle_1_1_neural_network.html#ab3608ae118bbbacbc9161f489afcd562">Root::Dims</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_recurrent_neural_network.html#a65378382938c173044d138d1fe35f84e">get_output_dims</a> () const</td></tr>
+<tr class="separator:a65378382938c173044d138d1fe35f84e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="inherit_header pub_methods_classcattle_1_1_unidirectional_neural_network"><td colspan="2" onclick="javascript:toggleInherit('pub_methods_classcattle_1_1_unidirectional_neural_network')"><img src="closed.png" alt="-"/>&#160;Public Member Functions inherited from <a class="el" href="classcattle_1_1_unidirectional_neural_network.html">cattle::UnidirectionalNeuralNetwork&lt; Scalar, Rank &gt;</a></td></tr>
 <tr class="memitem:a4743aef3626e8e0df53b6c7fae32bbbf inherit pub_methods_classcattle_1_1_unidirectional_neural_network"><td class="memItemLeft" align="right" valign="top">virtual&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_unidirectional_neural_network.html#a4743aef3626e8e0df53b6c7fae32bbbf">~UnidirectionalNeuralNetwork</a> ()=default</td></tr>
 <tr class="separator:a4743aef3626e8e0df53b6c7fae32bbbf inherit pub_methods_classcattle_1_1_unidirectional_neural_network"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -135,66 +135,62 @@ Public Member Functions</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pro-methods"></a>
 Protected Member Functions</h2></td></tr>
-<tr class="memitem:a104288442cc436a54b6ff3ae75fd237c"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_recurrent_neural_network.html#a104288442cc436a54b6ff3ae75fd237c">set_foremost</a> (bool <a class="el" href="classcattle_1_1_recurrent_neural_network.html#aecb9ee3a8b0f3ce2512fc7401cb3d7c3">foremost</a>)</td></tr>
-<tr class="separator:a104288442cc436a54b6ff3ae75fd237c"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a788a2b4afe9d8d02c57aea29df8f0ebc"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_recurrent_neural_network.html#a788a2b4afe9d8d02c57aea29df8f0ebc">empty_caches</a> ()</td></tr>
-<tr class="separator:a788a2b4afe9d8d02c57aea29df8f0ebc"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a3eb2b2f59e5d675e4af08104228c635b"><td class="memItemLeft" align="right" valign="top">std::vector&lt; <a class="el" href="classcattle_1_1_layer.html">Layer</a>&lt; Scalar, Rank &gt; * &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_recurrent_neural_network.html#a3eb2b2f59e5d675e4af08104228c635b">get_layers</a> ()</td></tr>
-<tr class="separator:a3eb2b2f59e5d675e4af08104228c635b"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ad9263e8f76fb79cd117edddcf22b7d9d"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classcattle_1_1_neural_network.html#a817609dfe2b6a9f825da6f2fb2124aca">Root::Data</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_recurrent_neural_network.html#ad9263e8f76fb79cd117edddcf22b7d9d">propagate</a> (typename <a class="el" href="classcattle_1_1_neural_network.html#a817609dfe2b6a9f825da6f2fb2124aca">Root::Data</a> input, bool training)</td></tr>
-<tr class="separator:ad9263e8f76fb79cd117edddcf22b7d9d"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a5778649f7723ad6bc45712b79014d910"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classcattle_1_1_neural_network.html#a817609dfe2b6a9f825da6f2fb2124aca">Root::Data</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_recurrent_neural_network.html#a5778649f7723ad6bc45712b79014d910">backpropagate</a> (typename <a class="el" href="classcattle_1_1_neural_network.html#a817609dfe2b6a9f825da6f2fb2124aca">Root::Data</a> out_grads)</td></tr>
-<tr class="separator:a5778649f7723ad6bc45712b79014d910"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:afa0abaa4d3214a0d57fa615f532093a2"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_recurrent_neural_network.html#afa0abaa4d3214a0d57fa615f532093a2">set_foremost</a> (bool <a class="el" href="classcattle_1_1_recurrent_neural_network.html#a3373cd0fe4d1808b1c65a98f9c15be4e">foremost</a>)</td></tr>
+<tr class="separator:afa0abaa4d3214a0d57fa615f532093a2"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a8a742415e4090e8512ee34d33c22be25"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_recurrent_neural_network.html#a8a742415e4090e8512ee34d33c22be25">empty_caches</a> ()</td></tr>
+<tr class="separator:a8a742415e4090e8512ee34d33c22be25"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4938ecae0c0430d75f7f57e732a10c8b"><td class="memItemLeft" align="right" valign="top">std::vector&lt; <a class="el" href="classcattle_1_1_layer.html">Layer</a>&lt; Scalar, Rank &gt; * &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_recurrent_neural_network.html#a4938ecae0c0430d75f7f57e732a10c8b">get_layers</a> ()</td></tr>
+<tr class="separator:a4938ecae0c0430d75f7f57e732a10c8b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad280f608bd81c202f82ab497e203e11e"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classcattle_1_1_neural_network.html#a817609dfe2b6a9f825da6f2fb2124aca">Root::Data</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_recurrent_neural_network.html#ad280f608bd81c202f82ab497e203e11e">propagate</a> (typename <a class="el" href="classcattle_1_1_neural_network.html#a817609dfe2b6a9f825da6f2fb2124aca">Root::Data</a> input, bool training)</td></tr>
+<tr class="separator:ad280f608bd81c202f82ab497e203e11e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab1f3f5c4f17a92260c9aced80b7cf125"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classcattle_1_1_neural_network.html#a817609dfe2b6a9f825da6f2fb2124aca">Root::Data</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_recurrent_neural_network.html#ab1f3f5c4f17a92260c9aced80b7cf125">backpropagate</a> (typename <a class="el" href="classcattle_1_1_neural_network.html#a817609dfe2b6a9f825da6f2fb2124aca">Root::Data</a> out_grads)</td></tr>
+<tr class="separator:ab1f3f5c4f17a92260c9aced80b7cf125"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pri-types"></a>
 Private Types</h2></td></tr>
-<tr class="memitem:af905e833cc41b2db045192abf2fa84ef"><td class="memItemLeft" align="right" valign="top">typedef <a class="el" href="classcattle_1_1_neural_network.html">NeuralNetwork</a>&lt; Scalar, Rank, true &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_recurrent_neural_network.html#af905e833cc41b2db045192abf2fa84ef">Root</a></td></tr>
-<tr class="separator:af905e833cc41b2db045192abf2fa84ef"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a506a66d30d4bb202e16ce69b851c5a3c"><td class="memItemLeft" align="right" valign="top">typedef <a class="el" href="classcattle_1_1_recurrent_neural_network.html">RecurrentNeuralNetwork</a>&lt; Scalar, Rank &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_recurrent_neural_network.html#a506a66d30d4bb202e16ce69b851c5a3c">Self</a></td></tr>
-<tr class="separator:a506a66d30d4bb202e16ce69b851c5a3c"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a0b418f38bc49109e297c375223eee5d4"><td class="memItemLeft" align="right" valign="top">typedef std::array&lt; std::size_t, <a class="el" href="classcattle_1_1_neural_network.html#a0b8194350bbd1abc1c9118b3d34fede4">Root::DATA_RANKS</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_recurrent_neural_network.html#a0b418f38bc49109e297c375223eee5d4">RankwiseIntArray</a></td></tr>
-<tr class="separator:a0b418f38bc49109e297c375223eee5d4"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a989205119d36f4a6d5160430a8cb6999"><td class="memItemLeft" align="right" valign="top">typedef std::array&lt; bool, <a class="el" href="classcattle_1_1_neural_network.html#a0b8194350bbd1abc1c9118b3d34fede4">Root::DATA_RANKS</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_recurrent_neural_network.html#a989205119d36f4a6d5160430a8cb6999">RankwiseBoolArray</a></td></tr>
-<tr class="separator:a989205119d36f4a6d5160430a8cb6999"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ae652c0d21be9ecba58710f8d581a5d38"><td class="memItemLeft" align="right" valign="top">typedef std::function&lt; std::pair&lt; std::size_t, std::size_t &gt;std::size_t)&gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_recurrent_neural_network.html#ae652c0d21be9ecba58710f8d581a5d38">OutputSeqSizeFunc</a></td></tr>
-<tr class="separator:ae652c0d21be9ecba58710f8d581a5d38"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aac3fa894e227a3df0836496f2640bfc5"><td class="memItemLeft" align="right" valign="top">typedef <a class="el" href="namespacecattle.html#a8b9323ad928764340e46f0802bf27fbb">Tensor</a>&lt; Scalar, Rank+1 &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_recurrent_neural_network.html#aac3fa894e227a3df0836496f2640bfc5">TimeStepData</a></td></tr>
-<tr class="separator:aac3fa894e227a3df0836496f2640bfc5"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a8a25ffa831603c9392b09c90af368180"><td class="memItemLeft" align="right" valign="top">typedef <a class="el" href="classcattle_1_1_neural_network.html">NeuralNetwork</a>&lt; Scalar, Rank, true &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_recurrent_neural_network.html#a8a25ffa831603c9392b09c90af368180">Root</a></td></tr>
+<tr class="separator:a8a25ffa831603c9392b09c90af368180"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a53ea28c420bef143f4b615be678df495"><td class="memItemLeft" align="right" valign="top">typedef <a class="el" href="classcattle_1_1_recurrent_neural_network.html">RecurrentNeuralNetwork</a>&lt; Scalar, Rank &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_recurrent_neural_network.html#a53ea28c420bef143f4b615be678df495">Self</a></td></tr>
+<tr class="separator:a53ea28c420bef143f4b615be678df495"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2de90a3cc09508804a7ae29b8ead23be"><td class="memItemLeft" align="right" valign="top">typedef std::array&lt; std::size_t, <a class="el" href="classcattle_1_1_neural_network.html#a0b8194350bbd1abc1c9118b3d34fede4">Root::DATA_RANKS</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_recurrent_neural_network.html#a2de90a3cc09508804a7ae29b8ead23be">RankwiseIntArray</a></td></tr>
+<tr class="separator:a2de90a3cc09508804a7ae29b8ead23be"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:add2c484eb253ae143c3f223d2cc4ea80"><td class="memItemLeft" align="right" valign="top">typedef std::array&lt; bool, <a class="el" href="classcattle_1_1_neural_network.html#a0b8194350bbd1abc1c9118b3d34fede4">Root::DATA_RANKS</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_recurrent_neural_network.html#add2c484eb253ae143c3f223d2cc4ea80">RankwiseBoolArray</a></td></tr>
+<tr class="separator:add2c484eb253ae143c3f223d2cc4ea80"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a8e6160930a2609eb0f4906e8ad878ac9"><td class="memItemLeft" align="right" valign="top">typedef std::function&lt; std::pair&lt; std::size_t, std::size_t &gt;std::size_t)&gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_recurrent_neural_network.html#a8e6160930a2609eb0f4906e8ad878ac9">OutputSeqSizeFunc</a></td></tr>
+<tr class="separator:a8e6160930a2609eb0f4906e8ad878ac9"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac019582577b2e88293a140eb49bdf567"><td class="memItemLeft" align="right" valign="top">typedef <a class="el" href="namespacecattle.html#a8b9323ad928764340e46f0802bf27fbb">Tensor</a>&lt; Scalar, Rank+1 &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_recurrent_neural_network.html#ac019582577b2e88293a140eb49bdf567">TimeStepData</a></td></tr>
+<tr class="separator:ac019582577b2e88293a140eb49bdf567"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pri-attribs"></a>
 Private Attributes</h2></td></tr>
-<tr class="memitem:abdb97737aaaf35b3a220db3e96b32d0b"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structcattle_1_1_recurrent_neural_network_1_1_cell.html">Cell</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_recurrent_neural_network.html#abdb97737aaaf35b3a220db3e96b32d0b">main_cell</a></td></tr>
-<tr class="separator:abdb97737aaaf35b3a220db3e96b32d0b"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a718a560afcc0d47a3d0aee3f3f1d0f34"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classcattle_1_1_recurrent_neural_network.html#ae652c0d21be9ecba58710f8d581a5d38">OutputSeqSizeFunc</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_recurrent_neural_network.html#a718a560afcc0d47a3d0aee3f3f1d0f34">output_seq_size_func</a></td></tr>
-<tr class="separator:a718a560afcc0d47a3d0aee3f3f1d0f34"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:adb1c2701a00f2533a9111809a8e83e62"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_recurrent_neural_network.html#adb1c2701a00f2533a9111809a8e83e62">stateful</a></td></tr>
-<tr class="separator:adb1c2701a00f2533a9111809a8e83e62"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a402cd4a5f756f22d15321387160ecffb"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_recurrent_neural_network.html#a402cd4a5f756f22d15321387160ecffb">mul_int</a></td></tr>
-<tr class="separator:a402cd4a5f756f22d15321387160ecffb"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a90ba4b8a45e036a604c4e3fba218fd84"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_recurrent_neural_network.html#a90ba4b8a45e036a604c4e3fba218fd84">reversed</a></td></tr>
-<tr class="separator:a90ba4b8a45e036a604c4e3fba218fd84"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aecb9ee3a8b0f3ce2512fc7401cb3d7c3"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_recurrent_neural_network.html#aecb9ee3a8b0f3ce2512fc7401cb3d7c3">foremost</a></td></tr>
-<tr class="separator:aecb9ee3a8b0f3ce2512fc7401cb3d7c3"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a9ae16df90cf30573612de97e13734443"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classcattle_1_1_neural_network.html#ab3608ae118bbbacbc9161f489afcd562">Root::Dims</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_recurrent_neural_network.html#a9ae16df90cf30573612de97e13734443">input_dims</a></td></tr>
-<tr class="separator:a9ae16df90cf30573612de97e13734443"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a659b99b5ca3caeaa1ffdd0743003830f"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classcattle_1_1_neural_network.html#ab3608ae118bbbacbc9161f489afcd562">Root::Dims</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_recurrent_neural_network.html#a659b99b5ca3caeaa1ffdd0743003830f">output_dims</a></td></tr>
-<tr class="separator:a659b99b5ca3caeaa1ffdd0743003830f"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ac07d422d964845f0b94dfbf611f35790"><td class="memItemLeft" align="right" valign="top">std::vector&lt; <a class="el" href="structcattle_1_1_recurrent_neural_network_1_1_cell.html">Cell</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_recurrent_neural_network.html#ac07d422d964845f0b94dfbf611f35790">cells</a></td></tr>
-<tr class="separator:ac07d422d964845f0b94dfbf611f35790"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ac39b967c905da39d3662078e98ac084e"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classcattle_1_1_recurrent_neural_network.html#aac3fa894e227a3df0836496f2640bfc5">TimeStepData</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_recurrent_neural_network.html#ac39b967c905da39d3662078e98ac084e">state</a></td></tr>
-<tr class="separator:ac39b967c905da39d3662078e98ac084e"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a0f6495d9dd408c27fc7615a9dd3cd5ba"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_recurrent_neural_network.html#a0f6495d9dd408c27fc7615a9dd3cd5ba">batch_size</a></td></tr>
-<tr class="separator:a0f6495d9dd408c27fc7615a9dd3cd5ba"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a0616a15c39755162f97b43625db8be10"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_recurrent_neural_network.html#a0616a15c39755162f97b43625db8be10">input_seq_length</a></td></tr>
-<tr class="separator:a0616a15c39755162f97b43625db8be10"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ae2a0addfd5f44276735debc5db8faab1"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_recurrent_neural_network.html#ae2a0addfd5f44276735debc5db8faab1">output_seq_length</a></td></tr>
-<tr class="separator:ae2a0addfd5f44276735debc5db8faab1"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a5fe428e3a50dd7e42b5f3f5b6c8a5e4d"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_recurrent_neural_network.html#a5fe428e3a50dd7e42b5f3f5b6c8a5e4d">output_seq_delay</a></td></tr>
-<tr class="separator:a5fe428e3a50dd7e42b5f3f5b6c8a5e4d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a352de4f1cc8595429ca6126478878a0c"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structcattle_1_1_recurrent_neural_network_1_1_cell.html">Cell</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_recurrent_neural_network.html#a352de4f1cc8595429ca6126478878a0c">main_cell</a></td></tr>
+<tr class="separator:a352de4f1cc8595429ca6126478878a0c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4f21b0f580f4550786a6b8c6daba7874"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classcattle_1_1_recurrent_neural_network.html#a8e6160930a2609eb0f4906e8ad878ac9">OutputSeqSizeFunc</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_recurrent_neural_network.html#a4f21b0f580f4550786a6b8c6daba7874">output_seq_size_func</a></td></tr>
+<tr class="separator:a4f21b0f580f4550786a6b8c6daba7874"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a81ef0726ad9e89f33145cc59a81e1898"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_recurrent_neural_network.html#a81ef0726ad9e89f33145cc59a81e1898">reversed</a></td></tr>
+<tr class="separator:a81ef0726ad9e89f33145cc59a81e1898"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3373cd0fe4d1808b1c65a98f9c15be4e"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_recurrent_neural_network.html#a3373cd0fe4d1808b1c65a98f9c15be4e">foremost</a></td></tr>
+<tr class="separator:a3373cd0fe4d1808b1c65a98f9c15be4e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:acc04af88e5afbc44ca922df4cbb46436"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classcattle_1_1_neural_network.html#ab3608ae118bbbacbc9161f489afcd562">Root::Dims</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_recurrent_neural_network.html#acc04af88e5afbc44ca922df4cbb46436">input_dims</a></td></tr>
+<tr class="separator:acc04af88e5afbc44ca922df4cbb46436"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae3286a3b183c89aaebd7648e31b6d875"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classcattle_1_1_neural_network.html#ab3608ae118bbbacbc9161f489afcd562">Root::Dims</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_recurrent_neural_network.html#ae3286a3b183c89aaebd7648e31b6d875">output_dims</a></td></tr>
+<tr class="separator:ae3286a3b183c89aaebd7648e31b6d875"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a045efbeb14ea6841681d792f5793b9ec"><td class="memItemLeft" align="right" valign="top">std::vector&lt; <a class="el" href="structcattle_1_1_recurrent_neural_network_1_1_cell.html">Cell</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_recurrent_neural_network.html#a045efbeb14ea6841681d792f5793b9ec">cells</a></td></tr>
+<tr class="separator:a045efbeb14ea6841681d792f5793b9ec"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3e53f24946eabcf3b8155f4c182fbb87"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classcattle_1_1_recurrent_neural_network.html#ac019582577b2e88293a140eb49bdf567">TimeStepData</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_recurrent_neural_network.html#a3e53f24946eabcf3b8155f4c182fbb87">state</a></td></tr>
+<tr class="separator:a3e53f24946eabcf3b8155f4c182fbb87"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aae491e073adbbdfc491efba9f79174b9"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_recurrent_neural_network.html#aae491e073adbbdfc491efba9f79174b9">batch_size</a></td></tr>
+<tr class="separator:aae491e073adbbdfc491efba9f79174b9"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aea2a09deca988d94757ce847dc21fa9b"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_recurrent_neural_network.html#aea2a09deca988d94757ce847dc21fa9b">input_seq_length</a></td></tr>
+<tr class="separator:aea2a09deca988d94757ce847dc21fa9b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa09d08ae0fcbb7cecb225613086dc32f"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_recurrent_neural_network.html#aa09d08ae0fcbb7cecb225613086dc32f">output_seq_length</a></td></tr>
+<tr class="separator:aa09d08ae0fcbb7cecb225613086dc32f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad9c29792a2bd73a456392fef730e516b"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_recurrent_neural_network.html#ad9c29792a2bd73a456392fef730e516b">output_seq_delay</a></td></tr>
+<tr class="separator:ad9c29792a2bd73a456392fef730e516b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="friends"></a>
 Friends</h2></td></tr>
-<tr class="memitem:a12bf02ce4346879f204aed9ccd4f9dab"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_recurrent_neural_network.html#a12bf02ce4346879f204aed9ccd4f9dab">swap</a> (<a class="el" href="classcattle_1_1_recurrent_neural_network.html#a506a66d30d4bb202e16ce69b851c5a3c">Self</a> &amp;network1, <a class="el" href="classcattle_1_1_recurrent_neural_network.html#a506a66d30d4bb202e16ce69b851c5a3c">Self</a> &amp;network2)</td></tr>
+<tr class="memitem:a12bf02ce4346879f204aed9ccd4f9dab"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_recurrent_neural_network.html#a12bf02ce4346879f204aed9ccd4f9dab">swap</a> (<a class="el" href="classcattle_1_1_recurrent_neural_network.html#a53ea28c420bef143f4b615be678df495">Self</a> &amp;network1, <a class="el" href="classcattle_1_1_recurrent_neural_network.html#a53ea28c420bef143f4b615be678df495">Self</a> &amp;network2)</td></tr>
 <tr class="separator:a12bf02ce4346879f204aed9ccd4f9dab"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="inherited"></a>
@@ -222,24 +218,24 @@ Additional Inherited Members</h2></td></tr>
 <tr class="separator:a0b8194350bbd1abc1c9118b3d34fede4 inherit pro_static_attribs_classcattle_1_1_neural_network"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
-<div class="textblock"><h3>template&lt;typename Scalar, std::size_t Rank&gt;<br />
-class cattle::RecurrentNeuralNetwork&lt; Scalar, Rank &gt;</h3>
+<div class="textblock"><h3>template&lt;typename Scalar, std::size_t Rank, bool MulInt = false, bool Stateful = false&gt;<br />
+class cattle::RecurrentNeuralNetwork&lt; Scalar, Rank, MulInt, Stateful &gt;</h3>
 
-<p>A class template for a simple recurrent neural network (RNN). </p>
+<p>A class template for a simple recurrent neural network (RNN). The network can use multiplicative integration to combine its linearly transformed input and its linearly transformed previous hidden state. A stateful network retains its hidden state across sequences as long as the batch size is constant. </p>
 </div><h2 class="groupheader">Member Typedef Documentation</h2>
-<a id="ae652c0d21be9ecba58710f8d581a5d38"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ae652c0d21be9ecba58710f8d581a5d38">&#9670;&nbsp;</a></span>OutputSeqSizeFunc</h2>
+<a id="a8e6160930a2609eb0f4906e8ad878ac9"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a8e6160930a2609eb0f4906e8ad878ac9">&#9670;&nbsp;</a></span>OutputSeqSizeFunc</h2>
 
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;typename Scalar , std::size_t Rank&gt; </div>
+template&lt;typename Scalar , std::size_t Rank, bool MulInt = false, bool Stateful = false&gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">typedef std::function&lt;std::pair&lt;std::size_t,std::size_t&gt;std::size_t)&gt; <a class="el" href="classcattle_1_1_recurrent_neural_network.html">cattle::RecurrentNeuralNetwork</a>&lt; Scalar, Rank &gt;::<a class="el" href="classcattle_1_1_recurrent_neural_network.html#ae652c0d21be9ecba58710f8d581a5d38">OutputSeqSizeFunc</a></td>
+          <td class="memname">typedef std::function&lt;std::pair&lt;std::size_t,std::size_t&gt;std::size_t)&gt; <a class="el" href="classcattle_1_1_recurrent_neural_network.html">cattle::RecurrentNeuralNetwork</a>&lt; Scalar, Rank, MulInt, Stateful &gt;::<a class="el" href="classcattle_1_1_recurrent_neural_network.html#a8e6160930a2609eb0f4906e8ad878ac9">OutputSeqSizeFunc</a></td>
         </tr>
       </table>
   </td>
@@ -251,19 +247,19 @@ template&lt;typename Scalar , std::size_t Rank&gt; </div>
 
 </div>
 </div>
-<a id="a989205119d36f4a6d5160430a8cb6999"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a989205119d36f4a6d5160430a8cb6999">&#9670;&nbsp;</a></span>RankwiseBoolArray</h2>
+<a id="add2c484eb253ae143c3f223d2cc4ea80"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#add2c484eb253ae143c3f223d2cc4ea80">&#9670;&nbsp;</a></span>RankwiseBoolArray</h2>
 
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;typename Scalar , std::size_t Rank&gt; </div>
+template&lt;typename Scalar , std::size_t Rank, bool MulInt = false, bool Stateful = false&gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">typedef std::array&lt;bool,<a class="el" href="classcattle_1_1_neural_network.html#a0b8194350bbd1abc1c9118b3d34fede4">Root::DATA_RANKS</a>&gt; <a class="el" href="classcattle_1_1_recurrent_neural_network.html">cattle::RecurrentNeuralNetwork</a>&lt; Scalar, Rank &gt;::<a class="el" href="classcattle_1_1_recurrent_neural_network.html#a989205119d36f4a6d5160430a8cb6999">RankwiseBoolArray</a></td>
+          <td class="memname">typedef std::array&lt;bool,<a class="el" href="classcattle_1_1_neural_network.html#a0b8194350bbd1abc1c9118b3d34fede4">Root::DATA_RANKS</a>&gt; <a class="el" href="classcattle_1_1_recurrent_neural_network.html">cattle::RecurrentNeuralNetwork</a>&lt; Scalar, Rank, MulInt, Stateful &gt;::<a class="el" href="classcattle_1_1_recurrent_neural_network.html#add2c484eb253ae143c3f223d2cc4ea80">RankwiseBoolArray</a></td>
         </tr>
       </table>
   </td>
@@ -275,19 +271,19 @@ template&lt;typename Scalar , std::size_t Rank&gt; </div>
 
 </div>
 </div>
-<a id="a0b418f38bc49109e297c375223eee5d4"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a0b418f38bc49109e297c375223eee5d4">&#9670;&nbsp;</a></span>RankwiseIntArray</h2>
+<a id="a2de90a3cc09508804a7ae29b8ead23be"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a2de90a3cc09508804a7ae29b8ead23be">&#9670;&nbsp;</a></span>RankwiseIntArray</h2>
 
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;typename Scalar , std::size_t Rank&gt; </div>
+template&lt;typename Scalar , std::size_t Rank, bool MulInt = false, bool Stateful = false&gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">typedef std::array&lt;std::size_t,<a class="el" href="classcattle_1_1_neural_network.html#a0b8194350bbd1abc1c9118b3d34fede4">Root::DATA_RANKS</a>&gt; <a class="el" href="classcattle_1_1_recurrent_neural_network.html">cattle::RecurrentNeuralNetwork</a>&lt; Scalar, Rank &gt;::<a class="el" href="classcattle_1_1_recurrent_neural_network.html#a0b418f38bc49109e297c375223eee5d4">RankwiseIntArray</a></td>
+          <td class="memname">typedef std::array&lt;std::size_t,<a class="el" href="classcattle_1_1_neural_network.html#a0b8194350bbd1abc1c9118b3d34fede4">Root::DATA_RANKS</a>&gt; <a class="el" href="classcattle_1_1_recurrent_neural_network.html">cattle::RecurrentNeuralNetwork</a>&lt; Scalar, Rank, MulInt, Stateful &gt;::<a class="el" href="classcattle_1_1_recurrent_neural_network.html#a2de90a3cc09508804a7ae29b8ead23be">RankwiseIntArray</a></td>
         </tr>
       </table>
   </td>
@@ -299,19 +295,19 @@ template&lt;typename Scalar , std::size_t Rank&gt; </div>
 
 </div>
 </div>
-<a id="af905e833cc41b2db045192abf2fa84ef"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#af905e833cc41b2db045192abf2fa84ef">&#9670;&nbsp;</a></span>Root</h2>
+<a id="a8a25ffa831603c9392b09c90af368180"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a8a25ffa831603c9392b09c90af368180">&#9670;&nbsp;</a></span>Root</h2>
 
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;typename Scalar , std::size_t Rank&gt; </div>
+template&lt;typename Scalar , std::size_t Rank, bool MulInt = false, bool Stateful = false&gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">typedef <a class="el" href="classcattle_1_1_neural_network.html">NeuralNetwork</a>&lt;Scalar,Rank,true&gt; <a class="el" href="classcattle_1_1_recurrent_neural_network.html">cattle::RecurrentNeuralNetwork</a>&lt; Scalar, Rank &gt;::<a class="el" href="classcattle_1_1_recurrent_neural_network.html#af905e833cc41b2db045192abf2fa84ef">Root</a></td>
+          <td class="memname">typedef <a class="el" href="classcattle_1_1_neural_network.html">NeuralNetwork</a>&lt;Scalar,Rank,true&gt; <a class="el" href="classcattle_1_1_recurrent_neural_network.html">cattle::RecurrentNeuralNetwork</a>&lt; Scalar, Rank, MulInt, Stateful &gt;::<a class="el" href="classcattle_1_1_recurrent_neural_network.html#a8a25ffa831603c9392b09c90af368180">Root</a></td>
         </tr>
       </table>
   </td>
@@ -323,19 +319,19 @@ template&lt;typename Scalar , std::size_t Rank&gt; </div>
 
 </div>
 </div>
-<a id="a506a66d30d4bb202e16ce69b851c5a3c"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a506a66d30d4bb202e16ce69b851c5a3c">&#9670;&nbsp;</a></span>Self</h2>
+<a id="a53ea28c420bef143f4b615be678df495"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a53ea28c420bef143f4b615be678df495">&#9670;&nbsp;</a></span>Self</h2>
 
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;typename Scalar , std::size_t Rank&gt; </div>
+template&lt;typename Scalar , std::size_t Rank, bool MulInt = false, bool Stateful = false&gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">typedef <a class="el" href="classcattle_1_1_recurrent_neural_network.html">RecurrentNeuralNetwork</a>&lt;Scalar,Rank&gt; <a class="el" href="classcattle_1_1_recurrent_neural_network.html">cattle::RecurrentNeuralNetwork</a>&lt; Scalar, Rank &gt;::<a class="el" href="classcattle_1_1_recurrent_neural_network.html#a506a66d30d4bb202e16ce69b851c5a3c">Self</a></td>
+          <td class="memname">typedef <a class="el" href="classcattle_1_1_recurrent_neural_network.html">RecurrentNeuralNetwork</a>&lt;Scalar,Rank&gt; <a class="el" href="classcattle_1_1_recurrent_neural_network.html">cattle::RecurrentNeuralNetwork</a>&lt; Scalar, Rank, MulInt, Stateful &gt;::<a class="el" href="classcattle_1_1_recurrent_neural_network.html#a53ea28c420bef143f4b615be678df495">Self</a></td>
         </tr>
       </table>
   </td>
@@ -347,19 +343,19 @@ template&lt;typename Scalar , std::size_t Rank&gt; </div>
 
 </div>
 </div>
-<a id="aac3fa894e227a3df0836496f2640bfc5"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aac3fa894e227a3df0836496f2640bfc5">&#9670;&nbsp;</a></span>TimeStepData</h2>
+<a id="ac019582577b2e88293a140eb49bdf567"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac019582577b2e88293a140eb49bdf567">&#9670;&nbsp;</a></span>TimeStepData</h2>
 
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;typename Scalar , std::size_t Rank&gt; </div>
+template&lt;typename Scalar , std::size_t Rank, bool MulInt = false, bool Stateful = false&gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">typedef <a class="el" href="namespacecattle.html#a8b9323ad928764340e46f0802bf27fbb">Tensor</a>&lt;Scalar,Rank + 1&gt; <a class="el" href="classcattle_1_1_recurrent_neural_network.html">cattle::RecurrentNeuralNetwork</a>&lt; Scalar, Rank &gt;::<a class="el" href="classcattle_1_1_recurrent_neural_network.html#aac3fa894e227a3df0836496f2640bfc5">TimeStepData</a></td>
+          <td class="memname">typedef <a class="el" href="namespacecattle.html#a8b9323ad928764340e46f0802bf27fbb">Tensor</a>&lt;Scalar,Rank + 1&gt; <a class="el" href="classcattle_1_1_recurrent_neural_network.html">cattle::RecurrentNeuralNetwork</a>&lt; Scalar, Rank, MulInt, Stateful &gt;::<a class="el" href="classcattle_1_1_recurrent_neural_network.html#ac019582577b2e88293a140eb49bdf567">TimeStepData</a></td>
         </tr>
       </table>
   </td>
@@ -372,19 +368,19 @@ template&lt;typename Scalar , std::size_t Rank&gt; </div>
 </div>
 </div>
 <h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
-<a id="a6003fcca479a0b6f7ee6f3209a3fe09e"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a6003fcca479a0b6f7ee6f3209a3fe09e">&#9670;&nbsp;</a></span>RecurrentNeuralNetwork() <span class="overload">[1/3]</span></h2>
+<a id="ad788443003ca3d8300198398627e812e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad788443003ca3d8300198398627e812e">&#9670;&nbsp;</a></span>RecurrentNeuralNetwork() <span class="overload">[1/3]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;typename Scalar , std::size_t Rank&gt; </div>
+template&lt;typename Scalar , std::size_t Rank, bool MulInt = false, bool Stateful = false&gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="classcattle_1_1_recurrent_neural_network.html">cattle::RecurrentNeuralNetwork</a>&lt; Scalar, Rank &gt;::<a class="el" href="classcattle_1_1_recurrent_neural_network.html">RecurrentNeuralNetwork</a> </td>
+          <td class="memname"><a class="el" href="classcattle_1_1_recurrent_neural_network.html">cattle::RecurrentNeuralNetwork</a>&lt; Scalar, Rank, MulInt, Stateful &gt;::<a class="el" href="classcattle_1_1_recurrent_neural_network.html">RecurrentNeuralNetwork</a> </td>
           <td>(</td>
           <td class="paramtype"><a class="el" href="namespacecattle.html#a540d630253530c3530f6af1c31b82c44">KernelPtr</a>&lt; Scalar, Rank &gt;&#160;</td>
           <td class="paramname"><em>input_kernel</em>, </td>
@@ -416,20 +412,8 @@ template&lt;typename Scalar , std::size_t Rank&gt; </div>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype"><a class="el" href="classcattle_1_1_recurrent_neural_network.html#ae652c0d21be9ecba58710f8d581a5d38">OutputSeqSizeFunc</a>&#160;</td>
+          <td class="paramtype"><a class="el" href="classcattle_1_1_recurrent_neural_network.html#a8e6160930a2609eb0f4906e8ad878ac9">OutputSeqSizeFunc</a>&#160;</td>
           <td class="paramname"><em>output_seq_size_func</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">bool&#160;</td>
-          <td class="paramname"><em>stateful</em> = <code>false</code>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">bool&#160;</td>
-          <td class="paramname"><em>mul_int</em> = <code>false</code>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -463,8 +447,6 @@ template&lt;typename Scalar , std::size_t Rank&gt; </div>
     <tr><td class="paramname">state_act</td><td>The activation function applied to the hidden state at each time step. </td></tr>
     <tr><td class="paramname">output_act</td><td>The activation function applied to the linearly transformed hidden state of the network at each time step with an output. </td></tr>
     <tr><td class="paramname">output_seq_size_func</td><td>A function parameterized by the input sequence length that determines the output sequence delay and length </td></tr>
-    <tr><td class="paramname">stateful</td><td>Whether the network is to be stateful. A stateful network retains its hidden state across sequences as long as the batch size is constant. </td></tr>
-    <tr><td class="paramname">mul_int</td><td>Whether multiplicative integration should be used to combine the linearly transformed input and the linearly transformed previous hidden state. </td></tr>
     <tr><td class="paramname">reversed</td><td>Whether the network is to reverse its inputs along the time-step rank. </td></tr>
     <tr><td class="paramname">foremost</td><td>Whether the network is to function as a foremost network. </td></tr>
   </table>
@@ -473,21 +455,21 @@ template&lt;typename Scalar , std::size_t Rank&gt; </div>
 
 </div>
 </div>
-<a id="a61d02c11439c2e679b89c1cf81f12f71"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a61d02c11439c2e679b89c1cf81f12f71">&#9670;&nbsp;</a></span>RecurrentNeuralNetwork() <span class="overload">[2/3]</span></h2>
+<a id="a0c83d0a6d53f10accb7d9600de0b4cf4"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a0c83d0a6d53f10accb7d9600de0b4cf4">&#9670;&nbsp;</a></span>RecurrentNeuralNetwork() <span class="overload">[2/3]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;typename Scalar , std::size_t Rank&gt; </div>
+template&lt;typename Scalar , std::size_t Rank, bool MulInt = false, bool Stateful = false&gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="classcattle_1_1_recurrent_neural_network.html">cattle::RecurrentNeuralNetwork</a>&lt; Scalar, Rank &gt;::<a class="el" href="classcattle_1_1_recurrent_neural_network.html">RecurrentNeuralNetwork</a> </td>
+          <td class="memname"><a class="el" href="classcattle_1_1_recurrent_neural_network.html">cattle::RecurrentNeuralNetwork</a>&lt; Scalar, Rank, MulInt, Stateful &gt;::<a class="el" href="classcattle_1_1_recurrent_neural_network.html">RecurrentNeuralNetwork</a> </td>
           <td>(</td>
-          <td class="paramtype">const <a class="el" href="classcattle_1_1_recurrent_neural_network.html#a506a66d30d4bb202e16ce69b851c5a3c">Self</a> &amp;&#160;</td>
+          <td class="paramtype">const <a class="el" href="classcattle_1_1_recurrent_neural_network.html#a53ea28c420bef143f4b615be678df495">Self</a> &amp;&#160;</td>
           <td class="paramname"><em>network</em></td><td>)</td>
           <td></td>
         </tr>
@@ -501,21 +483,21 @@ template&lt;typename Scalar , std::size_t Rank&gt; </div>
 
 </div>
 </div>
-<a id="a972c132c500e331b07fe8cef68de67f1"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a972c132c500e331b07fe8cef68de67f1">&#9670;&nbsp;</a></span>RecurrentNeuralNetwork() <span class="overload">[3/3]</span></h2>
+<a id="ace6a5ef741e365dca5dd65bf74a725fa"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ace6a5ef741e365dca5dd65bf74a725fa">&#9670;&nbsp;</a></span>RecurrentNeuralNetwork() <span class="overload">[3/3]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;typename Scalar , std::size_t Rank&gt; </div>
+template&lt;typename Scalar , std::size_t Rank, bool MulInt = false, bool Stateful = false&gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="classcattle_1_1_recurrent_neural_network.html">cattle::RecurrentNeuralNetwork</a>&lt; Scalar, Rank &gt;::<a class="el" href="classcattle_1_1_recurrent_neural_network.html">RecurrentNeuralNetwork</a> </td>
+          <td class="memname"><a class="el" href="classcattle_1_1_recurrent_neural_network.html">cattle::RecurrentNeuralNetwork</a>&lt; Scalar, Rank, MulInt, Stateful &gt;::<a class="el" href="classcattle_1_1_recurrent_neural_network.html">RecurrentNeuralNetwork</a> </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="classcattle_1_1_recurrent_neural_network.html#a506a66d30d4bb202e16ce69b851c5a3c">Self</a> &amp;&amp;&#160;</td>
+          <td class="paramtype"><a class="el" href="classcattle_1_1_recurrent_neural_network.html#a53ea28c420bef143f4b615be678df495">Self</a> &amp;&amp;&#160;</td>
           <td class="paramname"><em>network</em></td><td>)</td>
           <td></td>
         </tr>
@@ -529,19 +511,19 @@ template&lt;typename Scalar , std::size_t Rank&gt; </div>
 
 </div>
 </div>
-<a id="a9b81d56d692fcb9780dab6b652b797ad"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a9b81d56d692fcb9780dab6b652b797ad">&#9670;&nbsp;</a></span>~RecurrentNeuralNetwork()</h2>
+<a id="aceb9eb9a590cfa390664cd874886c67f"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aceb9eb9a590cfa390664cd874886c67f">&#9670;&nbsp;</a></span>~RecurrentNeuralNetwork()</h2>
 
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;typename Scalar , std::size_t Rank&gt; </div>
+template&lt;typename Scalar , std::size_t Rank, bool MulInt = false, bool Stateful = false&gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="classcattle_1_1_recurrent_neural_network.html">cattle::RecurrentNeuralNetwork</a>&lt; Scalar, Rank &gt;::~<a class="el" href="classcattle_1_1_recurrent_neural_network.html">RecurrentNeuralNetwork</a> </td>
+          <td class="memname"><a class="el" href="classcattle_1_1_recurrent_neural_network.html">cattle::RecurrentNeuralNetwork</a>&lt; Scalar, Rank, MulInt, Stateful &gt;::~<a class="el" href="classcattle_1_1_recurrent_neural_network.html">RecurrentNeuralNetwork</a> </td>
           <td>(</td>
           <td class="paramname"></td><td>)</td>
           <td></td>
@@ -557,19 +539,19 @@ template&lt;typename Scalar , std::size_t Rank&gt; </div>
 </div>
 </div>
 <h2 class="groupheader">Member Function Documentation</h2>
-<a id="a5778649f7723ad6bc45712b79014d910"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a5778649f7723ad6bc45712b79014d910">&#9670;&nbsp;</a></span>backpropagate()</h2>
+<a id="ab1f3f5c4f17a92260c9aced80b7cf125"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab1f3f5c4f17a92260c9aced80b7cf125">&#9670;&nbsp;</a></span>backpropagate()</h2>
 
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;typename Scalar , std::size_t Rank&gt; </div>
+template&lt;typename Scalar , std::size_t Rank, bool MulInt = false, bool Stateful = false&gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="classcattle_1_1_neural_network.html#a817609dfe2b6a9f825da6f2fb2124aca">Root::Data</a> <a class="el" href="classcattle_1_1_recurrent_neural_network.html">cattle::RecurrentNeuralNetwork</a>&lt; Scalar, Rank &gt;::backpropagate </td>
+          <td class="memname"><a class="el" href="classcattle_1_1_neural_network.html#a817609dfe2b6a9f825da6f2fb2124aca">Root::Data</a> <a class="el" href="classcattle_1_1_recurrent_neural_network.html">cattle::RecurrentNeuralNetwork</a>&lt; Scalar, Rank, MulInt, Stateful &gt;::backpropagate </td>
           <td>(</td>
           <td class="paramtype">typename <a class="el" href="classcattle_1_1_neural_network.html#a817609dfe2b6a9f825da6f2fb2124aca">Root::Data</a>&#160;</td>
           <td class="paramname"><em>out_grads</em></td><td>)</td>
@@ -595,19 +577,19 @@ template&lt;typename Scalar , std::size_t Rank&gt; </div>
 
 </div>
 </div>
-<a id="ad57c74a9fa42ad3a114b6f8d314d6fac"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ad57c74a9fa42ad3a114b6f8d314d6fac">&#9670;&nbsp;</a></span>clone()</h2>
+<a id="a24cdf0e19a4704b59d22d23ec371e6c3"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a24cdf0e19a4704b59d22d23ec371e6c3">&#9670;&nbsp;</a></span>clone()</h2>
 
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;typename Scalar , std::size_t Rank&gt; </div>
+template&lt;typename Scalar , std::size_t Rank, bool MulInt = false, bool Stateful = false&gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="classcattle_1_1_recurrent_neural_network.html#af905e833cc41b2db045192abf2fa84ef">Root</a>* <a class="el" href="classcattle_1_1_recurrent_neural_network.html">cattle::RecurrentNeuralNetwork</a>&lt; Scalar, Rank &gt;::clone </td>
+          <td class="memname"><a class="el" href="classcattle_1_1_recurrent_neural_network.html#a8a25ffa831603c9392b09c90af368180">Root</a>* <a class="el" href="classcattle_1_1_recurrent_neural_network.html">cattle::RecurrentNeuralNetwork</a>&lt; Scalar, Rank, MulInt, Stateful &gt;::clone </td>
           <td>(</td>
           <td class="paramname"></td><td>)</td>
           <td> const</td>
@@ -626,19 +608,19 @@ template&lt;typename Scalar , std::size_t Rank&gt; </div>
 
 </div>
 </div>
-<a id="a788a2b4afe9d8d02c57aea29df8f0ebc"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a788a2b4afe9d8d02c57aea29df8f0ebc">&#9670;&nbsp;</a></span>empty_caches()</h2>
+<a id="a8a742415e4090e8512ee34d33c22be25"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a8a742415e4090e8512ee34d33c22be25">&#9670;&nbsp;</a></span>empty_caches()</h2>
 
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;typename Scalar , std::size_t Rank&gt; </div>
+template&lt;typename Scalar , std::size_t Rank, bool MulInt = false, bool Stateful = false&gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">void <a class="el" href="classcattle_1_1_recurrent_neural_network.html">cattle::RecurrentNeuralNetwork</a>&lt; Scalar, Rank &gt;::empty_caches </td>
+          <td class="memname">void <a class="el" href="classcattle_1_1_recurrent_neural_network.html">cattle::RecurrentNeuralNetwork</a>&lt; Scalar, Rank, MulInt, Stateful &gt;::empty_caches </td>
           <td>(</td>
           <td class="paramname"></td><td>)</td>
           <td></td>
@@ -656,19 +638,19 @@ template&lt;typename Scalar , std::size_t Rank&gt; </div>
 
 </div>
 </div>
-<a id="ac1b7c1725083e347c24d8d50480681b2"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ac1b7c1725083e347c24d8d50480681b2">&#9670;&nbsp;</a></span>get_input_dims()</h2>
+<a id="aa570e1c7a8baa09fbee96aa9457050dd"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa570e1c7a8baa09fbee96aa9457050dd">&#9670;&nbsp;</a></span>get_input_dims()</h2>
 
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;typename Scalar , std::size_t Rank&gt; </div>
+template&lt;typename Scalar , std::size_t Rank, bool MulInt = false, bool Stateful = false&gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">const <a class="el" href="classcattle_1_1_neural_network.html#ab3608ae118bbbacbc9161f489afcd562">Root::Dims</a>&amp; <a class="el" href="classcattle_1_1_recurrent_neural_network.html">cattle::RecurrentNeuralNetwork</a>&lt; Scalar, Rank &gt;::get_input_dims </td>
+          <td class="memname">const <a class="el" href="classcattle_1_1_neural_network.html#ab3608ae118bbbacbc9161f489afcd562">Root::Dims</a>&amp; <a class="el" href="classcattle_1_1_recurrent_neural_network.html">cattle::RecurrentNeuralNetwork</a>&lt; Scalar, Rank, MulInt, Stateful &gt;::get_input_dims </td>
           <td>(</td>
           <td class="paramname"></td><td>)</td>
           <td> const</td>
@@ -686,19 +668,19 @@ template&lt;typename Scalar , std::size_t Rank&gt; </div>
 
 </div>
 </div>
-<a id="a3eb2b2f59e5d675e4af08104228c635b"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a3eb2b2f59e5d675e4af08104228c635b">&#9670;&nbsp;</a></span>get_layers()</h2>
+<a id="a4938ecae0c0430d75f7f57e732a10c8b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a4938ecae0c0430d75f7f57e732a10c8b">&#9670;&nbsp;</a></span>get_layers()</h2>
 
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;typename Scalar , std::size_t Rank&gt; </div>
+template&lt;typename Scalar , std::size_t Rank, bool MulInt = false, bool Stateful = false&gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">std::vector&lt;<a class="el" href="classcattle_1_1_layer.html">Layer</a>&lt;Scalar,Rank&gt;*&gt; <a class="el" href="classcattle_1_1_recurrent_neural_network.html">cattle::RecurrentNeuralNetwork</a>&lt; Scalar, Rank &gt;::get_layers </td>
+          <td class="memname">std::vector&lt;<a class="el" href="classcattle_1_1_layer.html">Layer</a>&lt;Scalar,Rank&gt;*&gt; <a class="el" href="classcattle_1_1_recurrent_neural_network.html">cattle::RecurrentNeuralNetwork</a>&lt; Scalar, Rank, MulInt, Stateful &gt;::get_layers </td>
           <td>(</td>
           <td class="paramname"></td><td>)</td>
           <td></td>
@@ -716,19 +698,19 @@ template&lt;typename Scalar , std::size_t Rank&gt; </div>
 
 </div>
 </div>
-<a id="ab3f1161d480723bb99c9a0a74a0d34f6"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ab3f1161d480723bb99c9a0a74a0d34f6">&#9670;&nbsp;</a></span>get_output_dims()</h2>
+<a id="a65378382938c173044d138d1fe35f84e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a65378382938c173044d138d1fe35f84e">&#9670;&nbsp;</a></span>get_output_dims()</h2>
 
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;typename Scalar , std::size_t Rank&gt; </div>
+template&lt;typename Scalar , std::size_t Rank, bool MulInt = false, bool Stateful = false&gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">const <a class="el" href="classcattle_1_1_neural_network.html#ab3608ae118bbbacbc9161f489afcd562">Root::Dims</a>&amp; <a class="el" href="classcattle_1_1_recurrent_neural_network.html">cattle::RecurrentNeuralNetwork</a>&lt; Scalar, Rank &gt;::get_output_dims </td>
+          <td class="memname">const <a class="el" href="classcattle_1_1_neural_network.html#ab3608ae118bbbacbc9161f489afcd562">Root::Dims</a>&amp; <a class="el" href="classcattle_1_1_recurrent_neural_network.html">cattle::RecurrentNeuralNetwork</a>&lt; Scalar, Rank, MulInt, Stateful &gt;::get_output_dims </td>
           <td>(</td>
           <td class="paramname"></td><td>)</td>
           <td> const</td>
@@ -746,19 +728,19 @@ template&lt;typename Scalar , std::size_t Rank&gt; </div>
 
 </div>
 </div>
-<a id="a0cc59d127eb866ebfd10b24dae192ee1"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a0cc59d127eb866ebfd10b24dae192ee1">&#9670;&nbsp;</a></span>is_foremost()</h2>
+<a id="ab3790738cc9ac1b654a2e357465d0ce1"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab3790738cc9ac1b654a2e357465d0ce1">&#9670;&nbsp;</a></span>is_foremost()</h2>
 
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;typename Scalar , std::size_t Rank&gt; </div>
+template&lt;typename Scalar , std::size_t Rank, bool MulInt = false, bool Stateful = false&gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">bool <a class="el" href="classcattle_1_1_recurrent_neural_network.html">cattle::RecurrentNeuralNetwork</a>&lt; Scalar, Rank &gt;::is_foremost </td>
+          <td class="memname">bool <a class="el" href="classcattle_1_1_recurrent_neural_network.html">cattle::RecurrentNeuralNetwork</a>&lt; Scalar, Rank, MulInt, Stateful &gt;::is_foremost </td>
           <td>(</td>
           <td class="paramname"></td><td>)</td>
           <td> const</td>
@@ -776,19 +758,19 @@ template&lt;typename Scalar , std::size_t Rank&gt; </div>
 
 </div>
 </div>
-<a id="a89012091d0206ee2515e488677eab240"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a89012091d0206ee2515e488677eab240">&#9670;&nbsp;</a></span>is_reversed()</h2>
+<a id="a1d2d1d83cd4b9acdc364fb8684d7443a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a1d2d1d83cd4b9acdc364fb8684d7443a">&#9670;&nbsp;</a></span>is_reversed()</h2>
 
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;typename Scalar , std::size_t Rank&gt; </div>
+template&lt;typename Scalar , std::size_t Rank, bool MulInt = false, bool Stateful = false&gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">bool <a class="el" href="classcattle_1_1_recurrent_neural_network.html">cattle::RecurrentNeuralNetwork</a>&lt; Scalar, Rank &gt;::is_reversed </td>
+          <td class="memname">bool <a class="el" href="classcattle_1_1_recurrent_neural_network.html">cattle::RecurrentNeuralNetwork</a>&lt; Scalar, Rank, MulInt, Stateful &gt;::is_reversed </td>
           <td>(</td>
           <td class="paramname"></td><td>)</td>
           <td> const</td>
@@ -806,21 +788,21 @@ template&lt;typename Scalar , std::size_t Rank&gt; </div>
 
 </div>
 </div>
-<a id="a5af8fafb68754cbdc6316bad625e82e6"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a5af8fafb68754cbdc6316bad625e82e6">&#9670;&nbsp;</a></span>operator=()</h2>
+<a id="ae884d327ff5815a1d05e448767f1010f"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae884d327ff5815a1d05e448767f1010f">&#9670;&nbsp;</a></span>operator=()</h2>
 
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;typename Scalar , std::size_t Rank&gt; </div>
+template&lt;typename Scalar , std::size_t Rank, bool MulInt = false, bool Stateful = false&gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="classcattle_1_1_recurrent_neural_network.html#a506a66d30d4bb202e16ce69b851c5a3c">Self</a>&amp; <a class="el" href="classcattle_1_1_recurrent_neural_network.html">cattle::RecurrentNeuralNetwork</a>&lt; Scalar, Rank &gt;::operator= </td>
+          <td class="memname"><a class="el" href="classcattle_1_1_recurrent_neural_network.html#a53ea28c420bef143f4b615be678df495">Self</a>&amp; <a class="el" href="classcattle_1_1_recurrent_neural_network.html">cattle::RecurrentNeuralNetwork</a>&lt; Scalar, Rank, MulInt, Stateful &gt;::operator= </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="classcattle_1_1_recurrent_neural_network.html#a506a66d30d4bb202e16ce69b851c5a3c">Self</a>&#160;</td>
+          <td class="paramtype"><a class="el" href="classcattle_1_1_recurrent_neural_network.html#a53ea28c420bef143f4b615be678df495">Self</a>&#160;</td>
           <td class="paramname"><em>network</em></td><td>)</td>
           <td></td>
         </tr>
@@ -834,19 +816,19 @@ template&lt;typename Scalar , std::size_t Rank&gt; </div>
 
 </div>
 </div>
-<a id="ad9263e8f76fb79cd117edddcf22b7d9d"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ad9263e8f76fb79cd117edddcf22b7d9d">&#9670;&nbsp;</a></span>propagate()</h2>
+<a id="ad280f608bd81c202f82ab497e203e11e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad280f608bd81c202f82ab497e203e11e">&#9670;&nbsp;</a></span>propagate()</h2>
 
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;typename Scalar , std::size_t Rank&gt; </div>
+template&lt;typename Scalar , std::size_t Rank, bool MulInt = false, bool Stateful = false&gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="classcattle_1_1_neural_network.html#a817609dfe2b6a9f825da6f2fb2124aca">Root::Data</a> <a class="el" href="classcattle_1_1_recurrent_neural_network.html">cattle::RecurrentNeuralNetwork</a>&lt; Scalar, Rank &gt;::propagate </td>
+          <td class="memname"><a class="el" href="classcattle_1_1_neural_network.html#a817609dfe2b6a9f825da6f2fb2124aca">Root::Data</a> <a class="el" href="classcattle_1_1_recurrent_neural_network.html">cattle::RecurrentNeuralNetwork</a>&lt; Scalar, Rank, MulInt, Stateful &gt;::propagate </td>
           <td>(</td>
           <td class="paramtype">typename <a class="el" href="classcattle_1_1_neural_network.html#a817609dfe2b6a9f825da6f2fb2124aca">Root::Data</a>&#160;</td>
           <td class="paramname"><em>input</em>, </td>
@@ -883,19 +865,19 @@ template&lt;typename Scalar , std::size_t Rank&gt; </div>
 
 </div>
 </div>
-<a id="ae5fb378d85d9f990a640df087ca6d971"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ae5fb378d85d9f990a640df087ca6d971">&#9670;&nbsp;</a></span>reverse()</h2>
+<a id="a315780fd2e06405a11065e903c0561eb"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a315780fd2e06405a11065e903c0561eb">&#9670;&nbsp;</a></span>reverse()</h2>
 
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;typename Scalar , std::size_t Rank&gt; </div>
+template&lt;typename Scalar , std::size_t Rank, bool MulInt = false, bool Stateful = false&gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">void <a class="el" href="classcattle_1_1_recurrent_neural_network.html">cattle::RecurrentNeuralNetwork</a>&lt; Scalar, Rank &gt;::reverse </td>
+          <td class="memname">void <a class="el" href="classcattle_1_1_recurrent_neural_network.html">cattle::RecurrentNeuralNetwork</a>&lt; Scalar, Rank, MulInt, Stateful &gt;::reverse </td>
           <td>(</td>
           <td class="paramname"></td><td>)</td>
           <td></td>
@@ -913,19 +895,19 @@ template&lt;typename Scalar , std::size_t Rank&gt; </div>
 
 </div>
 </div>
-<a id="a104288442cc436a54b6ff3ae75fd237c"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a104288442cc436a54b6ff3ae75fd237c">&#9670;&nbsp;</a></span>set_foremost()</h2>
+<a id="afa0abaa4d3214a0d57fa615f532093a2"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#afa0abaa4d3214a0d57fa615f532093a2">&#9670;&nbsp;</a></span>set_foremost()</h2>
 
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;typename Scalar , std::size_t Rank&gt; </div>
+template&lt;typename Scalar , std::size_t Rank, bool MulInt = false, bool Stateful = false&gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">void <a class="el" href="classcattle_1_1_recurrent_neural_network.html">cattle::RecurrentNeuralNetwork</a>&lt; Scalar, Rank &gt;::set_foremost </td>
+          <td class="memname">void <a class="el" href="classcattle_1_1_recurrent_neural_network.html">cattle::RecurrentNeuralNetwork</a>&lt; Scalar, Rank, MulInt, Stateful &gt;::set_foremost </td>
           <td>(</td>
           <td class="paramtype">bool&#160;</td>
           <td class="paramname"><em>foremost</em></td><td>)</td>
@@ -957,7 +939,7 @@ template&lt;typename Scalar , std::size_t Rank&gt; </div>
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;typename Scalar , std::size_t Rank&gt; </div>
+template&lt;typename Scalar , std::size_t Rank, bool MulInt = false, bool Stateful = false&gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
@@ -965,13 +947,13 @@ template&lt;typename Scalar , std::size_t Rank&gt; </div>
         <tr>
           <td class="memname">void swap </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="classcattle_1_1_recurrent_neural_network.html#a506a66d30d4bb202e16ce69b851c5a3c">Self</a> &amp;&#160;</td>
+          <td class="paramtype"><a class="el" href="classcattle_1_1_recurrent_neural_network.html#a53ea28c420bef143f4b615be678df495">Self</a> &amp;&#160;</td>
           <td class="paramname"><em>network1</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype"><a class="el" href="classcattle_1_1_recurrent_neural_network.html#a506a66d30d4bb202e16ce69b851c5a3c">Self</a> &amp;&#160;</td>
+          <td class="paramtype"><a class="el" href="classcattle_1_1_recurrent_neural_network.html#a53ea28c420bef143f4b615be678df495">Self</a> &amp;&#160;</td>
           <td class="paramname"><em>network2</em>&#160;</td>
         </tr>
         <tr>
@@ -990,19 +972,19 @@ template&lt;typename Scalar , std::size_t Rank&gt; </div>
 </div>
 </div>
 <h2 class="groupheader">Member Data Documentation</h2>
-<a id="a0f6495d9dd408c27fc7615a9dd3cd5ba"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a0f6495d9dd408c27fc7615a9dd3cd5ba">&#9670;&nbsp;</a></span>batch_size</h2>
+<a id="aae491e073adbbdfc491efba9f79174b9"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aae491e073adbbdfc491efba9f79174b9">&#9670;&nbsp;</a></span>batch_size</h2>
 
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;typename Scalar , std::size_t Rank&gt; </div>
+template&lt;typename Scalar , std::size_t Rank, bool MulInt = false, bool Stateful = false&gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">int <a class="el" href="classcattle_1_1_recurrent_neural_network.html">cattle::RecurrentNeuralNetwork</a>&lt; Scalar, Rank &gt;::batch_size</td>
+          <td class="memname">int <a class="el" href="classcattle_1_1_recurrent_neural_network.html">cattle::RecurrentNeuralNetwork</a>&lt; Scalar, Rank, MulInt, Stateful &gt;::batch_size</td>
         </tr>
       </table>
   </td>
@@ -1014,19 +996,19 @@ template&lt;typename Scalar , std::size_t Rank&gt; </div>
 
 </div>
 </div>
-<a id="ac07d422d964845f0b94dfbf611f35790"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ac07d422d964845f0b94dfbf611f35790">&#9670;&nbsp;</a></span>cells</h2>
+<a id="a045efbeb14ea6841681d792f5793b9ec"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a045efbeb14ea6841681d792f5793b9ec">&#9670;&nbsp;</a></span>cells</h2>
 
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;typename Scalar , std::size_t Rank&gt; </div>
+template&lt;typename Scalar , std::size_t Rank, bool MulInt = false, bool Stateful = false&gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">std::vector&lt;<a class="el" href="structcattle_1_1_recurrent_neural_network_1_1_cell.html">Cell</a>&gt; <a class="el" href="classcattle_1_1_recurrent_neural_network.html">cattle::RecurrentNeuralNetwork</a>&lt; Scalar, Rank &gt;::cells</td>
+          <td class="memname">std::vector&lt;<a class="el" href="structcattle_1_1_recurrent_neural_network_1_1_cell.html">Cell</a>&gt; <a class="el" href="classcattle_1_1_recurrent_neural_network.html">cattle::RecurrentNeuralNetwork</a>&lt; Scalar, Rank, MulInt, Stateful &gt;::cells</td>
         </tr>
       </table>
   </td>
@@ -1038,19 +1020,19 @@ template&lt;typename Scalar , std::size_t Rank&gt; </div>
 
 </div>
 </div>
-<a id="aecb9ee3a8b0f3ce2512fc7401cb3d7c3"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aecb9ee3a8b0f3ce2512fc7401cb3d7c3">&#9670;&nbsp;</a></span>foremost</h2>
+<a id="a3373cd0fe4d1808b1c65a98f9c15be4e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a3373cd0fe4d1808b1c65a98f9c15be4e">&#9670;&nbsp;</a></span>foremost</h2>
 
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;typename Scalar , std::size_t Rank&gt; </div>
+template&lt;typename Scalar , std::size_t Rank, bool MulInt = false, bool Stateful = false&gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">bool <a class="el" href="classcattle_1_1_recurrent_neural_network.html">cattle::RecurrentNeuralNetwork</a>&lt; Scalar, Rank &gt;::foremost</td>
+          <td class="memname">bool <a class="el" href="classcattle_1_1_recurrent_neural_network.html">cattle::RecurrentNeuralNetwork</a>&lt; Scalar, Rank, MulInt, Stateful &gt;::foremost</td>
         </tr>
       </table>
   </td>
@@ -1062,19 +1044,19 @@ template&lt;typename Scalar , std::size_t Rank&gt; </div>
 
 </div>
 </div>
-<a id="a9ae16df90cf30573612de97e13734443"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a9ae16df90cf30573612de97e13734443">&#9670;&nbsp;</a></span>input_dims</h2>
+<a id="acc04af88e5afbc44ca922df4cbb46436"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#acc04af88e5afbc44ca922df4cbb46436">&#9670;&nbsp;</a></span>input_dims</h2>
 
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;typename Scalar , std::size_t Rank&gt; </div>
+template&lt;typename Scalar , std::size_t Rank, bool MulInt = false, bool Stateful = false&gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="classcattle_1_1_neural_network.html#ab3608ae118bbbacbc9161f489afcd562">Root::Dims</a> <a class="el" href="classcattle_1_1_recurrent_neural_network.html">cattle::RecurrentNeuralNetwork</a>&lt; Scalar, Rank &gt;::input_dims</td>
+          <td class="memname"><a class="el" href="classcattle_1_1_neural_network.html#ab3608ae118bbbacbc9161f489afcd562">Root::Dims</a> <a class="el" href="classcattle_1_1_recurrent_neural_network.html">cattle::RecurrentNeuralNetwork</a>&lt; Scalar, Rank, MulInt, Stateful &gt;::input_dims</td>
         </tr>
       </table>
   </td>
@@ -1086,19 +1068,19 @@ template&lt;typename Scalar , std::size_t Rank&gt; </div>
 
 </div>
 </div>
-<a id="a0616a15c39755162f97b43625db8be10"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a0616a15c39755162f97b43625db8be10">&#9670;&nbsp;</a></span>input_seq_length</h2>
+<a id="aea2a09deca988d94757ce847dc21fa9b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aea2a09deca988d94757ce847dc21fa9b">&#9670;&nbsp;</a></span>input_seq_length</h2>
 
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;typename Scalar , std::size_t Rank&gt; </div>
+template&lt;typename Scalar , std::size_t Rank, bool MulInt = false, bool Stateful = false&gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">int <a class="el" href="classcattle_1_1_recurrent_neural_network.html">cattle::RecurrentNeuralNetwork</a>&lt; Scalar, Rank &gt;::input_seq_length</td>
+          <td class="memname">int <a class="el" href="classcattle_1_1_recurrent_neural_network.html">cattle::RecurrentNeuralNetwork</a>&lt; Scalar, Rank, MulInt, Stateful &gt;::input_seq_length</td>
         </tr>
       </table>
   </td>
@@ -1110,19 +1092,19 @@ template&lt;typename Scalar , std::size_t Rank&gt; </div>
 
 </div>
 </div>
-<a id="abdb97737aaaf35b3a220db3e96b32d0b"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#abdb97737aaaf35b3a220db3e96b32d0b">&#9670;&nbsp;</a></span>main_cell</h2>
+<a id="a352de4f1cc8595429ca6126478878a0c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a352de4f1cc8595429ca6126478878a0c">&#9670;&nbsp;</a></span>main_cell</h2>
 
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;typename Scalar , std::size_t Rank&gt; </div>
+template&lt;typename Scalar , std::size_t Rank, bool MulInt = false, bool Stateful = false&gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="structcattle_1_1_recurrent_neural_network_1_1_cell.html">Cell</a> <a class="el" href="classcattle_1_1_recurrent_neural_network.html">cattle::RecurrentNeuralNetwork</a>&lt; Scalar, Rank &gt;::main_cell</td>
+          <td class="memname"><a class="el" href="structcattle_1_1_recurrent_neural_network_1_1_cell.html">Cell</a> <a class="el" href="classcattle_1_1_recurrent_neural_network.html">cattle::RecurrentNeuralNetwork</a>&lt; Scalar, Rank, MulInt, Stateful &gt;::main_cell</td>
         </tr>
       </table>
   </td>
@@ -1134,19 +1116,19 @@ template&lt;typename Scalar , std::size_t Rank&gt; </div>
 
 </div>
 </div>
-<a id="a402cd4a5f756f22d15321387160ecffb"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a402cd4a5f756f22d15321387160ecffb">&#9670;&nbsp;</a></span>mul_int</h2>
+<a id="ae3286a3b183c89aaebd7648e31b6d875"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae3286a3b183c89aaebd7648e31b6d875">&#9670;&nbsp;</a></span>output_dims</h2>
 
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;typename Scalar , std::size_t Rank&gt; </div>
+template&lt;typename Scalar , std::size_t Rank, bool MulInt = false, bool Stateful = false&gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">bool <a class="el" href="classcattle_1_1_recurrent_neural_network.html">cattle::RecurrentNeuralNetwork</a>&lt; Scalar, Rank &gt;::mul_int</td>
+          <td class="memname"><a class="el" href="classcattle_1_1_neural_network.html#ab3608ae118bbbacbc9161f489afcd562">Root::Dims</a> <a class="el" href="classcattle_1_1_recurrent_neural_network.html">cattle::RecurrentNeuralNetwork</a>&lt; Scalar, Rank, MulInt, Stateful &gt;::output_dims</td>
         </tr>
       </table>
   </td>
@@ -1158,19 +1140,19 @@ template&lt;typename Scalar , std::size_t Rank&gt; </div>
 
 </div>
 </div>
-<a id="a659b99b5ca3caeaa1ffdd0743003830f"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a659b99b5ca3caeaa1ffdd0743003830f">&#9670;&nbsp;</a></span>output_dims</h2>
+<a id="ad9c29792a2bd73a456392fef730e516b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad9c29792a2bd73a456392fef730e516b">&#9670;&nbsp;</a></span>output_seq_delay</h2>
 
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;typename Scalar , std::size_t Rank&gt; </div>
+template&lt;typename Scalar , std::size_t Rank, bool MulInt = false, bool Stateful = false&gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="classcattle_1_1_neural_network.html#ab3608ae118bbbacbc9161f489afcd562">Root::Dims</a> <a class="el" href="classcattle_1_1_recurrent_neural_network.html">cattle::RecurrentNeuralNetwork</a>&lt; Scalar, Rank &gt;::output_dims</td>
+          <td class="memname">int <a class="el" href="classcattle_1_1_recurrent_neural_network.html">cattle::RecurrentNeuralNetwork</a>&lt; Scalar, Rank, MulInt, Stateful &gt;::output_seq_delay</td>
         </tr>
       </table>
   </td>
@@ -1182,19 +1164,19 @@ template&lt;typename Scalar , std::size_t Rank&gt; </div>
 
 </div>
 </div>
-<a id="a5fe428e3a50dd7e42b5f3f5b6c8a5e4d"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a5fe428e3a50dd7e42b5f3f5b6c8a5e4d">&#9670;&nbsp;</a></span>output_seq_delay</h2>
+<a id="aa09d08ae0fcbb7cecb225613086dc32f"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa09d08ae0fcbb7cecb225613086dc32f">&#9670;&nbsp;</a></span>output_seq_length</h2>
 
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;typename Scalar , std::size_t Rank&gt; </div>
+template&lt;typename Scalar , std::size_t Rank, bool MulInt = false, bool Stateful = false&gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">int <a class="el" href="classcattle_1_1_recurrent_neural_network.html">cattle::RecurrentNeuralNetwork</a>&lt; Scalar, Rank &gt;::output_seq_delay</td>
+          <td class="memname">int <a class="el" href="classcattle_1_1_recurrent_neural_network.html">cattle::RecurrentNeuralNetwork</a>&lt; Scalar, Rank, MulInt, Stateful &gt;::output_seq_length</td>
         </tr>
       </table>
   </td>
@@ -1206,19 +1188,19 @@ template&lt;typename Scalar , std::size_t Rank&gt; </div>
 
 </div>
 </div>
-<a id="ae2a0addfd5f44276735debc5db8faab1"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ae2a0addfd5f44276735debc5db8faab1">&#9670;&nbsp;</a></span>output_seq_length</h2>
+<a id="a4f21b0f580f4550786a6b8c6daba7874"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a4f21b0f580f4550786a6b8c6daba7874">&#9670;&nbsp;</a></span>output_seq_size_func</h2>
 
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;typename Scalar , std::size_t Rank&gt; </div>
+template&lt;typename Scalar , std::size_t Rank, bool MulInt = false, bool Stateful = false&gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">int <a class="el" href="classcattle_1_1_recurrent_neural_network.html">cattle::RecurrentNeuralNetwork</a>&lt; Scalar, Rank &gt;::output_seq_length</td>
+          <td class="memname"><a class="el" href="classcattle_1_1_recurrent_neural_network.html#a8e6160930a2609eb0f4906e8ad878ac9">OutputSeqSizeFunc</a> <a class="el" href="classcattle_1_1_recurrent_neural_network.html">cattle::RecurrentNeuralNetwork</a>&lt; Scalar, Rank, MulInt, Stateful &gt;::output_seq_size_func</td>
         </tr>
       </table>
   </td>
@@ -1230,19 +1212,19 @@ template&lt;typename Scalar , std::size_t Rank&gt; </div>
 
 </div>
 </div>
-<a id="a718a560afcc0d47a3d0aee3f3f1d0f34"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a718a560afcc0d47a3d0aee3f3f1d0f34">&#9670;&nbsp;</a></span>output_seq_size_func</h2>
+<a id="a81ef0726ad9e89f33145cc59a81e1898"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a81ef0726ad9e89f33145cc59a81e1898">&#9670;&nbsp;</a></span>reversed</h2>
 
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;typename Scalar , std::size_t Rank&gt; </div>
+template&lt;typename Scalar , std::size_t Rank, bool MulInt = false, bool Stateful = false&gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="classcattle_1_1_recurrent_neural_network.html#ae652c0d21be9ecba58710f8d581a5d38">OutputSeqSizeFunc</a> <a class="el" href="classcattle_1_1_recurrent_neural_network.html">cattle::RecurrentNeuralNetwork</a>&lt; Scalar, Rank &gt;::output_seq_size_func</td>
+          <td class="memname">bool <a class="el" href="classcattle_1_1_recurrent_neural_network.html">cattle::RecurrentNeuralNetwork</a>&lt; Scalar, Rank, MulInt, Stateful &gt;::reversed</td>
         </tr>
       </table>
   </td>
@@ -1254,67 +1236,19 @@ template&lt;typename Scalar , std::size_t Rank&gt; </div>
 
 </div>
 </div>
-<a id="a90ba4b8a45e036a604c4e3fba218fd84"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a90ba4b8a45e036a604c4e3fba218fd84">&#9670;&nbsp;</a></span>reversed</h2>
+<a id="a3e53f24946eabcf3b8155f4c182fbb87"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a3e53f24946eabcf3b8155f4c182fbb87">&#9670;&nbsp;</a></span>state</h2>
 
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;typename Scalar , std::size_t Rank&gt; </div>
+template&lt;typename Scalar , std::size_t Rank, bool MulInt = false, bool Stateful = false&gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">bool <a class="el" href="classcattle_1_1_recurrent_neural_network.html">cattle::RecurrentNeuralNetwork</a>&lt; Scalar, Rank &gt;::reversed</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">private</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a id="ac39b967c905da39d3662078e98ac084e"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ac39b967c905da39d3662078e98ac084e">&#9670;&nbsp;</a></span>state</h2>
-
-<div class="memitem">
-<div class="memproto">
-<div class="memtemplate">
-template&lt;typename Scalar , std::size_t Rank&gt; </div>
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="classcattle_1_1_recurrent_neural_network.html#aac3fa894e227a3df0836496f2640bfc5">TimeStepData</a> <a class="el" href="classcattle_1_1_recurrent_neural_network.html">cattle::RecurrentNeuralNetwork</a>&lt; Scalar, Rank &gt;::state</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">private</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a id="adb1c2701a00f2533a9111809a8e83e62"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#adb1c2701a00f2533a9111809a8e83e62">&#9670;&nbsp;</a></span>stateful</h2>
-
-<div class="memitem">
-<div class="memproto">
-<div class="memtemplate">
-template&lt;typename Scalar , std::size_t Rank&gt; </div>
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">bool <a class="el" href="classcattle_1_1_recurrent_neural_network.html">cattle::RecurrentNeuralNetwork</a>&lt; Scalar, Rank &gt;::stateful</td>
+          <td class="memname"><a class="el" href="classcattle_1_1_recurrent_neural_network.html#ac019582577b2e88293a140eb49bdf567">TimeStepData</a> <a class="el" href="classcattle_1_1_recurrent_neural_network.html">cattle::RecurrentNeuralNetwork</a>&lt; Scalar, Rank, MulInt, Stateful &gt;::state</td>
         </tr>
       </table>
   </td>

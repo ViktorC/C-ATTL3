@@ -69,7 +69,8 @@ $(function() {
   <div class="summary">
 <a href="#nested-classes">Classes</a> &#124;
 <a href="#namespaces">Namespaces</a> &#124;
-<a href="#typedef-members">Typedefs</a>  </div>
+<a href="#typedef-members">Typedefs</a> &#124;
+<a href="#enum-members">Enumerations</a>  </div>
   <div class="headertitle">
 <div class="title">NeuralNetwork.h File Reference</div>  </div>
 </div><!--header-->
@@ -98,51 +99,39 @@ $(function() {
 Classes</h2></td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_optimizer.html">cattle::Optimizer&lt; Scalar, Rank, Sequential &gt;</a></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_composite_neural_network.html">cattle::CompositeNeuralNetwork&lt; Scalar, Rank, Sequential &gt;</a></td></tr>
-<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_parallel_neural_network.html">cattle::ParallelNeuralNetwork&lt; Scalar, Rank &gt;</a></td></tr>
-<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_sequential_neural_network.html">cattle::SequentialNeuralNetwork&lt; Scalar, Rank &gt;</a></td></tr>
-<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_neural_network.html">cattle::NeuralNetwork&lt; Scalar, Rank, Sequential &gt;</a></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_residual_neural_network.html">cattle::ResidualNeuralNetwork&lt; Scalar, Rank &gt;</a></td></tr>
-<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_dense_neural_network.html">cattle::DenseNeuralNetwork&lt; Scalar, Rank &gt;</a></td></tr>
-<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_composite_neural_network.html">cattle::CompositeNeuralNetwork&lt; Scalar, Rank, Sequential &gt;</a></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_parallel_neural_network.html">cattle::ParallelNeuralNetwork&lt; Scalar, Rank &gt;</a></td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_parallel_neural_network.html">cattle::ParallelNeuralNetwork&lt; Scalar, Rank, MergeType &gt;</a></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structcattle_1_1_parallel_neural_network_1_1_prop_args.html">cattle::ParallelNeuralNetwork&lt; Scalar, Rank &gt;::PropArgs</a></td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structcattle_1_1_parallel_neural_network_1_1_prop_args.html">cattle::ParallelNeuralNetwork&lt; Scalar, Rank, MergeType &gt;::PropArgs</a></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structcattle_1_1_parallel_neural_network_1_1_backprop_args.html">cattle::ParallelNeuralNetwork&lt; Scalar, Rank &gt;::BackpropArgs</a></td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structcattle_1_1_parallel_neural_network_1_1_backprop_args.html">cattle::ParallelNeuralNetwork&lt; Scalar, Rank, MergeType &gt;::BackpropArgs</a></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_feedforward_neural_network.html">cattle::FeedforwardNeuralNetwork&lt; Scalar, Rank &gt;</a></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_residual_neural_network.html">cattle::ResidualNeuralNetwork&lt; Scalar, Rank &gt;</a></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_dense_neural_network.html">cattle::DenseNeuralNetwork&lt; Scalar, Rank &gt;</a></td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_dense_neural_network.html">cattle::DenseNeuralNetwork&lt; Scalar, Rank, ConcatType &gt;</a></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_sequential_neural_network.html">cattle::SequentialNeuralNetwork&lt; Scalar, Rank &gt;</a></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_bidirectional_neural_network.html">cattle::BidirectionalNeuralNetwork&lt; Scalar, Rank &gt;</a></td></tr>
-<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_unidirectional_neural_network.html">cattle::UnidirectionalNeuralNetwork&lt; Scalar, Rank &gt;</a></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_bidirectional_neural_network.html">cattle::BidirectionalNeuralNetwork&lt; Scalar, Rank &gt;</a></td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_bidirectional_neural_network.html">cattle::BidirectionalNeuralNetwork&lt; Scalar, Rank, MergeType &gt;</a></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structcattle_1_1_bidirectional_neural_network_1_1_prop_args.html">cattle::BidirectionalNeuralNetwork&lt; Scalar, Rank &gt;::PropArgs</a></td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structcattle_1_1_bidirectional_neural_network_1_1_prop_args.html">cattle::BidirectionalNeuralNetwork&lt; Scalar, Rank, MergeType &gt;::PropArgs</a></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structcattle_1_1_bidirectional_neural_network_1_1_backprop_args.html">cattle::BidirectionalNeuralNetwork&lt; Scalar, Rank &gt;::BackpropArgs</a></td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structcattle_1_1_bidirectional_neural_network_1_1_backprop_args.html">cattle::BidirectionalNeuralNetwork&lt; Scalar, Rank, MergeType &gt;::BackpropArgs</a></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_recurrent_neural_network.html">cattle::RecurrentNeuralNetwork&lt; Scalar, Rank &gt;</a></td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_recurrent_neural_network.html">cattle::RecurrentNeuralNetwork&lt; Scalar, Rank, MulInt, Stateful &gt;</a></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structcattle_1_1_recurrent_neural_network_1_1_cell.html">cattle::RecurrentNeuralNetwork&lt; Scalar, Rank &gt;::Cell</a></td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structcattle_1_1_recurrent_neural_network_1_1_cell.html">cattle::RecurrentNeuralNetwork&lt; Scalar, Rank, MulInt, Stateful &gt;::Cell</a></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_l_s_t_m_neural_network.html">cattle::LSTMNeuralNetwork&lt; Scalar, Rank &gt;</a></td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_l_s_t_m_neural_network.html">cattle::LSTMNeuralNetwork&lt; Scalar, Rank, MulInt, Stateful &gt;</a></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structcattle_1_1_l_s_t_m_neural_network_1_1_cell.html">cattle::LSTMNeuralNetwork&lt; Scalar, Rank &gt;::Cell</a></td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structcattle_1_1_l_s_t_m_neural_network_1_1_cell.html">cattle::LSTMNeuralNetwork&lt; Scalar, Rank, MulInt, Stateful &gt;::Cell</a></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="namespaces"></a>
@@ -167,6 +156,18 @@ Typedefs</h2></td></tr>
 <tr class="memitem:a33c43d0983f054e904daa2806ce17231"><td class="memTemplParams" colspan="2">template&lt;typename Scalar , std::size_t Rank&gt; </td></tr>
 <tr class="memitem:a33c43d0983f054e904daa2806ce17231"><td class="memTemplItemLeft" align="right" valign="top">using&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespacecattle.html#a33c43d0983f054e904daa2806ce17231">cattle::ActivationPtr</a> = std::unique_ptr&lt; ActivationLayer&lt; Scalar, Rank &gt; &gt;</td></tr>
 <tr class="separator:a33c43d0983f054e904daa2806ce17231"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="enum-members"></a>
+Enumerations</h2></td></tr>
+<tr class="memitem:adf6ad5e38e7c96e1d70ac1f180c71c42"><td class="memItemLeft" align="right" valign="top">enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacecattle.html#adf6ad5e38e7c96e1d70ac1f180c71c42">cattle::OutputMergeType</a> { <a class="el" href="namespacecattle.html#adf6ad5e38e7c96e1d70ac1f180c71c42ac4fdb8bb48df5d92e20f52dfc8093901">cattle::CONCAT_LO_RANK</a>, 
+<a class="el" href="namespacecattle.html#adf6ad5e38e7c96e1d70ac1f180c71c42a41a1611c1ddfc609ed9ecaa408c9d884">cattle::CONCAT_HI_RANK</a>, 
+<a class="el" href="namespacecattle.html#adf6ad5e38e7c96e1d70ac1f180c71c42afac639c656f43a4b6dfa36dac7e63d91">cattle::SUM</a>
+ }</td></tr>
+<tr class="separator:adf6ad5e38e7c96e1d70ac1f180c71c42"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a962c4b25a74fac744864b9fa4fca4a0b"><td class="memItemLeft" align="right" valign="top">enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacecattle.html#a962c4b25a74fac744864b9fa4fca4a0b">cattle::DenseConcatType</a> { <a class="el" href="namespacecattle.html#a962c4b25a74fac744864b9fa4fca4a0babbc4bcb3979298a6e91d5b8dbaefc54c">cattle::LOWEST_RANK</a>, 
+<a class="el" href="namespacecattle.html#a962c4b25a74fac744864b9fa4fca4a0ba3a66f5af721d665773837d90d64d8928">cattle::HIGHEST_RANK</a>
+ }</td></tr>
+<tr class="separator:a962c4b25a74fac744864b9fa4fca4a0b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 </div><!-- contents -->
 <!-- start footer part -->

@@ -64,7 +64,8 @@ $(function() {
 <div class="header">
   <div class="summary">
 <a href="#nested-classes">Classes</a> &#124;
-<a href="#typedef-members">Typedefs</a>  </div>
+<a href="#typedef-members">Typedefs</a> &#124;
+<a href="#enum-members">Enumerations</a>  </div>
   <div class="headertitle">
 <div class="title">cattle Namespace Reference</div>  </div>
 </div><!--header-->
@@ -301,6 +302,18 @@ Typedefs</h2></td></tr>
 <tr class="memitem:a7dfcb4d57e2c5da3170ebd8d13fd0431"><td class="memTemplParams" colspan="2">template&lt;typename Scalar , std::size_t Rank&gt; </td></tr>
 <tr class="memitem:a7dfcb4d57e2c5da3170ebd8d13fd0431"><td class="memTemplItemLeft" align="right" valign="top">using&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespacecattle.html#a7dfcb4d57e2c5da3170ebd8d13fd0431">TensorMap</a> = Eigen::TensorMap&lt; <a class="el" href="namespacecattle.html#a8b9323ad928764340e46f0802bf27fbb">Tensor</a>&lt; Scalar, Rank &gt; &gt;</td></tr>
 <tr class="separator:a7dfcb4d57e2c5da3170ebd8d13fd0431"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="enum-members"></a>
+Enumerations</h2></td></tr>
+<tr class="memitem:adf6ad5e38e7c96e1d70ac1f180c71c42"><td class="memItemLeft" align="right" valign="top">enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacecattle.html#adf6ad5e38e7c96e1d70ac1f180c71c42">OutputMergeType</a> { <a class="el" href="namespacecattle.html#adf6ad5e38e7c96e1d70ac1f180c71c42ac4fdb8bb48df5d92e20f52dfc8093901">CONCAT_LO_RANK</a>, 
+<a class="el" href="namespacecattle.html#adf6ad5e38e7c96e1d70ac1f180c71c42a41a1611c1ddfc609ed9ecaa408c9d884">CONCAT_HI_RANK</a>, 
+<a class="el" href="namespacecattle.html#adf6ad5e38e7c96e1d70ac1f180c71c42afac639c656f43a4b6dfa36dac7e63d91">SUM</a>
+ }</td></tr>
+<tr class="separator:adf6ad5e38e7c96e1d70ac1f180c71c42"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a962c4b25a74fac744864b9fa4fca4a0b"><td class="memItemLeft" align="right" valign="top">enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacecattle.html#a962c4b25a74fac744864b9fa4fca4a0b">DenseConcatType</a> { <a class="el" href="namespacecattle.html#a962c4b25a74fac744864b9fa4fca4a0babbc4bcb3979298a6e91d5b8dbaefc54c">LOWEST_RANK</a>, 
+<a class="el" href="namespacecattle.html#a962c4b25a74fac744864b9fa4fca4a0ba3a66f5af721d665773837d90d64d8928">HIGHEST_RANK</a>
+ }</td></tr>
+<tr class="separator:a962c4b25a74fac744864b9fa4fca4a0b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>The namespace containing all classes and typedefs of the C-ATTL3 library. </p>
@@ -574,6 +587,46 @@ template&lt;typename Scalar &gt; </div>
       </table>
 </div><div class="memdoc">
 <p>An alias for a shared pointer to a <a class="el" href="classcattle_1_1_weight_initialization.html">WeightInitialization</a> implementation instance of an arbitrary scalar type. </p>
+
+</div>
+</div>
+<h2 class="groupheader">Enumeration Type Documentation</h2>
+<a id="a962c4b25a74fac744864b9fa4fca4a0b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a962c4b25a74fac744864b9fa4fca4a0b">&#9670;&nbsp;</a></span>DenseConcatType</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">enum <a class="el" href="namespacecattle.html#a962c4b25a74fac744864b9fa4fca4a0b">cattle::DenseConcatType</a></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>An enumeration type for the different ways the input of a layer in a dense network may be concatenated to its output. </p>
+<table class="fieldtable">
+<tr><th colspan="2">Enumerator</th></tr><tr><td class="fieldname"><a id="a962c4b25a74fac744864b9fa4fca4a0babbc4bcb3979298a6e91d5b8dbaefc54c"></a>LOWEST_RANK&#160;</td><td class="fielddoc"></td></tr>
+<tr><td class="fieldname"><a id="a962c4b25a74fac744864b9fa4fca4a0ba3a66f5af721d665773837d90d64d8928"></a>HIGHEST_RANK&#160;</td><td class="fielddoc"></td></tr>
+</table>
+
+</div>
+</div>
+<a id="adf6ad5e38e7c96e1d70ac1f180c71c42"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#adf6ad5e38e7c96e1d70ac1f180c71c42">&#9670;&nbsp;</a></span>OutputMergeType</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">enum <a class="el" href="namespacecattle.html#adf6ad5e38e7c96e1d70ac1f180c71c42">cattle::OutputMergeType</a></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>An enumeration type for the different ways the outputs of sub-modules of neural networks may be merged. </p>
+<table class="fieldtable">
+<tr><th colspan="2">Enumerator</th></tr><tr><td class="fieldname"><a id="adf6ad5e38e7c96e1d70ac1f180c71c42ac4fdb8bb48df5d92e20f52dfc8093901"></a>CONCAT_LO_RANK&#160;</td><td class="fielddoc"></td></tr>
+<tr><td class="fieldname"><a id="adf6ad5e38e7c96e1d70ac1f180c71c42a41a1611c1ddfc609ed9ecaa408c9d884"></a>CONCAT_HI_RANK&#160;</td><td class="fielddoc"></td></tr>
+<tr><td class="fieldname"><a id="adf6ad5e38e7c96e1d70ac1f180c71c42afac639c656f43a4b6dfa36dac7e63d91"></a>SUM&#160;</td><td class="fielddoc"></td></tr>
+</table>
 
 </div>
 </div>

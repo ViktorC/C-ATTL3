@@ -5,7 +5,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
 <meta name="generator" content="Doxygen 1.8.14"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>C-ATTL3: cattle::BidirectionalNeuralNetwork&lt; Scalar, Rank &gt;::BackpropArgs Struct Reference</title>
+<title>C-ATTL3: cattle::BidirectionalNeuralNetwork&lt; Scalar, Rank, MergeType &gt;::BackpropArgs Struct Reference</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -70,67 +70,67 @@ $(function() {
 <a href="#pub-attribs">Public Attributes</a> &#124;
 <a href="structcattle_1_1_bidirectional_neural_network_1_1_backprop_args-members.html">List of all members</a>  </div>
   <div class="headertitle">
-<div class="title">cattle::BidirectionalNeuralNetwork&lt; Scalar, Rank &gt;::BackpropArgs Struct Reference</div>  </div>
+<div class="title">cattle::BidirectionalNeuralNetwork&lt; Scalar, Rank, MergeType &gt;::BackpropArgs Struct Reference</div>  </div>
 </div><!--header-->
 <div class="contents">
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-attribs"></a>
 Public Attributes</h2></td></tr>
-<tr class="memitem:a64e79dc9defca569a60dff1034f3e65d"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classcattle_1_1_bidirectional_neural_network.html#aeed9183b05e318aaaec68454dc4574c4">Self</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structcattle_1_1_bidirectional_neural_network_1_1_backprop_args.html#a64e79dc9defca569a60dff1034f3e65d">obj</a></td></tr>
-<tr class="separator:a64e79dc9defca569a60dff1034f3e65d"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a13460fe94211e3473f76f92af8446de6"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classcattle_1_1_neural_network.html#a817609dfe2b6a9f825da6f2fb2124aca">Base::Data</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structcattle_1_1_bidirectional_neural_network_1_1_backprop_args.html#a13460fe94211e3473f76f92af8446de6">out_grads</a></td></tr>
-<tr class="separator:a13460fe94211e3473f76f92af8446de6"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a651f8e2c46f44cedef233a4940474699"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classcattle_1_1_neural_network.html#a817609dfe2b6a9f825da6f2fb2124aca">Base::Data</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structcattle_1_1_bidirectional_neural_network_1_1_backprop_args.html#a651f8e2c46f44cedef233a4940474699">prev_out_grads</a></td></tr>
-<tr class="separator:a651f8e2c46f44cedef233a4940474699"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad984026a3a6d8e1fb27213286c882173"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classcattle_1_1_bidirectional_neural_network.html#aad1ae57124cc3e0905de24bbc6dfa8c9">Self</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structcattle_1_1_bidirectional_neural_network_1_1_backprop_args.html#ad984026a3a6d8e1fb27213286c882173">obj</a></td></tr>
+<tr class="separator:ad984026a3a6d8e1fb27213286c882173"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a253d6d3fdbec589763d65b8e72b1b422"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classcattle_1_1_neural_network.html#a817609dfe2b6a9f825da6f2fb2124aca">Base::Data</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structcattle_1_1_bidirectional_neural_network_1_1_backprop_args.html#a253d6d3fdbec589763d65b8e72b1b422">out_grads</a></td></tr>
+<tr class="separator:a253d6d3fdbec589763d65b8e72b1b422"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0e59b0fbdde6f1db36156a4ca4ebf12f"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classcattle_1_1_neural_network.html#a817609dfe2b6a9f825da6f2fb2124aca">Base::Data</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structcattle_1_1_bidirectional_neural_network_1_1_backprop_args.html#a0e59b0fbdde6f1db36156a4ca4ebf12f">prev_out_grads</a></td></tr>
+<tr class="separator:a0e59b0fbdde6f1db36156a4ca4ebf12f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
-<div class="textblock"><h3>template&lt;typename Scalar, std::size_t Rank&gt;<br />
-struct cattle::BidirectionalNeuralNetwork&lt; Scalar, Rank &gt;::BackpropArgs</h3>
+<div class="textblock"><h3>template&lt;typename Scalar, std::size_t Rank, OutputMergeType MergeType = CONCAT_LO_RANK&gt;<br />
+struct cattle::BidirectionalNeuralNetwork&lt; Scalar, Rank, MergeType &gt;::BackpropArgs</h3>
 
 <p>A struct containing the data require for back-propagation. </p>
 </div><h2 class="groupheader">Member Data Documentation</h2>
-<a id="a64e79dc9defca569a60dff1034f3e65d"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a64e79dc9defca569a60dff1034f3e65d">&#9670;&nbsp;</a></span>obj</h2>
+<a id="ad984026a3a6d8e1fb27213286c882173"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad984026a3a6d8e1fb27213286c882173">&#9670;&nbsp;</a></span>obj</h2>
 
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;typename Scalar , std::size_t Rank&gt; </div>
+template&lt;typename Scalar , std::size_t Rank, OutputMergeType MergeType = CONCAT_LO_RANK&gt; </div>
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="classcattle_1_1_bidirectional_neural_network.html#aeed9183b05e318aaaec68454dc4574c4">Self</a>* <a class="el" href="classcattle_1_1_bidirectional_neural_network.html">cattle::BidirectionalNeuralNetwork</a>&lt; Scalar, Rank &gt;::BackpropArgs::obj</td>
+          <td class="memname"><a class="el" href="classcattle_1_1_bidirectional_neural_network.html#aad1ae57124cc3e0905de24bbc6dfa8c9">Self</a>* <a class="el" href="classcattle_1_1_bidirectional_neural_network.html">cattle::BidirectionalNeuralNetwork</a>&lt; Scalar, Rank, MergeType &gt;::BackpropArgs::obj</td>
         </tr>
       </table>
 </div><div class="memdoc">
 
 </div>
 </div>
-<a id="a13460fe94211e3473f76f92af8446de6"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a13460fe94211e3473f76f92af8446de6">&#9670;&nbsp;</a></span>out_grads</h2>
+<a id="a253d6d3fdbec589763d65b8e72b1b422"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a253d6d3fdbec589763d65b8e72b1b422">&#9670;&nbsp;</a></span>out_grads</h2>
 
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;typename Scalar , std::size_t Rank&gt; </div>
+template&lt;typename Scalar , std::size_t Rank, OutputMergeType MergeType = CONCAT_LO_RANK&gt; </div>
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="classcattle_1_1_neural_network.html#a817609dfe2b6a9f825da6f2fb2124aca">Base::Data</a>* <a class="el" href="classcattle_1_1_bidirectional_neural_network.html">cattle::BidirectionalNeuralNetwork</a>&lt; Scalar, Rank &gt;::BackpropArgs::out_grads</td>
+          <td class="memname"><a class="el" href="classcattle_1_1_neural_network.html#a817609dfe2b6a9f825da6f2fb2124aca">Base::Data</a>* <a class="el" href="classcattle_1_1_bidirectional_neural_network.html">cattle::BidirectionalNeuralNetwork</a>&lt; Scalar, Rank, MergeType &gt;::BackpropArgs::out_grads</td>
         </tr>
       </table>
 </div><div class="memdoc">
 
 </div>
 </div>
-<a id="a651f8e2c46f44cedef233a4940474699"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a651f8e2c46f44cedef233a4940474699">&#9670;&nbsp;</a></span>prev_out_grads</h2>
+<a id="a0e59b0fbdde6f1db36156a4ca4ebf12f"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a0e59b0fbdde6f1db36156a4ca4ebf12f">&#9670;&nbsp;</a></span>prev_out_grads</h2>
 
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;typename Scalar , std::size_t Rank&gt; </div>
+template&lt;typename Scalar , std::size_t Rank, OutputMergeType MergeType = CONCAT_LO_RANK&gt; </div>
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="classcattle_1_1_neural_network.html#a817609dfe2b6a9f825da6f2fb2124aca">Base::Data</a> <a class="el" href="classcattle_1_1_bidirectional_neural_network.html">cattle::BidirectionalNeuralNetwork</a>&lt; Scalar, Rank &gt;::BackpropArgs::prev_out_grads</td>
+          <td class="memname"><a class="el" href="classcattle_1_1_neural_network.html#a817609dfe2b6a9f825da6f2fb2124aca">Base::Data</a> <a class="el" href="classcattle_1_1_bidirectional_neural_network.html">cattle::BidirectionalNeuralNetwork</a>&lt; Scalar, Rank, MergeType &gt;::BackpropArgs::prev_out_grads</td>
         </tr>
       </table>
 </div><div class="memdoc">

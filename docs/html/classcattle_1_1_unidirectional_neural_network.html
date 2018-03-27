@@ -83,9 +83,9 @@ Inheritance diagram for cattle::UnidirectionalNeuralNetwork&lt; Scalar, Rank &gt
  <div class="center">
   <img src="classcattle_1_1_unidirectional_neural_network.png" usemap="#cattle::UnidirectionalNeuralNetwork_3C_20Scalar_2C_20Rank_20_3E_map" alt=""/>
   <map id="cattle::UnidirectionalNeuralNetwork_3C_20Scalar_2C_20Rank_20_3E_map" name="cattle::UnidirectionalNeuralNetwork_3C_20Scalar_2C_20Rank_20_3E_map">
-<area href="classcattle_1_1_neural_network.html" alt="cattle::NeuralNetwork&lt; Scalar, Rank, true &gt;" shape="rect" coords="158,0,465,24"/>
-<area href="classcattle_1_1_l_s_t_m_neural_network.html" alt="cattle::LSTMNeuralNetwork&lt; Scalar, Rank &gt;" shape="rect" coords="0,112,307,136"/>
-<area href="classcattle_1_1_recurrent_neural_network.html" alt="cattle::RecurrentNeuralNetwork&lt; Scalar, Rank &gt;" shape="rect" coords="317,112,624,136"/>
+<area href="classcattle_1_1_neural_network.html" alt="cattle::NeuralNetwork&lt; Scalar, Rank, true &gt;" shape="rect" coords="195,0,575,24"/>
+<area href="classcattle_1_1_l_s_t_m_neural_network.html" alt="cattle::LSTMNeuralNetwork&lt; Scalar, Rank, MulInt, Stateful &gt;" shape="rect" coords="0,112,380,136"/>
+<area href="classcattle_1_1_recurrent_neural_network.html" alt="cattle::RecurrentNeuralNetwork&lt; Scalar, Rank, MulInt, Stateful &gt;" shape="rect" coords="390,112,770,136"/>
 </map>
  </div></div>
 <table class="memberdecls">
@@ -131,8 +131,9 @@ Protected Member Functions</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="friends"></a>
 Friends</h2></td></tr>
-<tr class="memitem:af2505667080b300d80eaa7e423ab93b9"><td class="memItemLeft" align="right" valign="top">class&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_unidirectional_neural_network.html#af2505667080b300d80eaa7e423ab93b9">BidirectionalNeuralNetwork&lt; Scalar, Rank &gt;</a></td></tr>
-<tr class="separator:af2505667080b300d80eaa7e423ab93b9"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1fbd1d929111271a7beacd4073e4559d"><td class="memTemplParams" colspan="2">template&lt;typename _Scalar , std::size_t _Rank, OutputMergeType MergeType&gt; </td></tr>
+<tr class="memitem:a1fbd1d929111271a7beacd4073e4559d"><td class="memTemplItemLeft" align="right" valign="top">class&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classcattle_1_1_unidirectional_neural_network.html#a1fbd1d929111271a7beacd4073e4559d">BidirectionalNeuralNetwork</a></td></tr>
+<tr class="separator:a1fbd1d929111271a7beacd4073e4559d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="inherited"></a>
 Additional Inherited Members</h2></td></tr>
@@ -218,7 +219,7 @@ template&lt;typename Scalar , std::size_t Rank&gt; </div>
 </div><div class="memdoc">
 <dl class="section return"><dt>Returns</dt><dd>Whether the direction along the time-step rank in which the network processes its inputs is reversed. </dd></dl>
 
-<p>Reimplemented in <a class="el" href="classcattle_1_1_l_s_t_m_neural_network.html#a6ef660974765939b1e9c34c7b2b10978">cattle::LSTMNeuralNetwork&lt; Scalar, Rank &gt;</a>, and <a class="el" href="classcattle_1_1_recurrent_neural_network.html#a89012091d0206ee2515e488677eab240">cattle::RecurrentNeuralNetwork&lt; Scalar, Rank &gt;</a>.</p>
+<p>Reimplemented in <a class="el" href="classcattle_1_1_l_s_t_m_neural_network.html#a83421c050b636f88c130cf98cb90f2e1">cattle::LSTMNeuralNetwork&lt; Scalar, Rank, MulInt, Stateful &gt;</a>, and <a class="el" href="classcattle_1_1_recurrent_neural_network.html#a1d2d1d83cd4b9acdc364fb8684d7443a">cattle::RecurrentNeuralNetwork&lt; Scalar, Rank, MulInt, Stateful &gt;</a>.</p>
 
 </div>
 </div>
@@ -248,24 +249,26 @@ template&lt;typename Scalar , std::size_t Rank&gt; </div>
 </div><div class="memdoc">
 <p>Flips the direction along the time-step rank in which the network processes its inputs is reversed. </p>
 
-<p>Reimplemented in <a class="el" href="classcattle_1_1_l_s_t_m_neural_network.html#a5d9115e16b00b9a53b774c939e518587">cattle::LSTMNeuralNetwork&lt; Scalar, Rank &gt;</a>, and <a class="el" href="classcattle_1_1_recurrent_neural_network.html#ae5fb378d85d9f990a640df087ca6d971">cattle::RecurrentNeuralNetwork&lt; Scalar, Rank &gt;</a>.</p>
+<p>Reimplemented in <a class="el" href="classcattle_1_1_l_s_t_m_neural_network.html#a9501074043d5ea041ed5cd58767c3754">cattle::LSTMNeuralNetwork&lt; Scalar, Rank, MulInt, Stateful &gt;</a>, and <a class="el" href="classcattle_1_1_recurrent_neural_network.html#a315780fd2e06405a11065e903c0561eb">cattle::RecurrentNeuralNetwork&lt; Scalar, Rank, MulInt, Stateful &gt;</a>.</p>
 
 </div>
 </div>
 <h2 class="groupheader">Friends And Related Function Documentation</h2>
-<a id="af2505667080b300d80eaa7e423ab93b9"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#af2505667080b300d80eaa7e423ab93b9">&#9670;&nbsp;</a></span>BidirectionalNeuralNetwork&lt; Scalar, Rank &gt;</h2>
+<a id="a1fbd1d929111271a7beacd4073e4559d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a1fbd1d929111271a7beacd4073e4559d">&#9670;&nbsp;</a></span>BidirectionalNeuralNetwork</h2>
 
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
 template&lt;typename Scalar , std::size_t Rank&gt; </div>
+<div class="memtemplate">
+template&lt;typename _Scalar , std::size_t _Rank, OutputMergeType MergeType&gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">friend class <a class="el" href="classcattle_1_1_bidirectional_neural_network.html">BidirectionalNeuralNetwork</a>&lt; Scalar, Rank &gt;</td>
+          <td class="memname">friend class <a class="el" href="classcattle_1_1_bidirectional_neural_network.html">BidirectionalNeuralNetwork</a></td>
         </tr>
       </table>
   </td>

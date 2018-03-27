@@ -67,8 +67,8 @@ $(function() {
 <h3><a id="index_i"></a>- i -</h3><ul>
 <li>in
 : <a class="el" href="classcattle_1_1_activation_layer.html#a8371d124018454612de72ed0fce50208">cattle::ActivationLayer&lt; Scalar, Rank &gt;</a>
-, <a class="el" href="structcattle_1_1_bidirectional_neural_network_1_1_prop_args.html#ae5adb6c30bca6e2c53c44d82a96fd0fa">cattle::BidirectionalNeuralNetwork&lt; Scalar, Rank &gt;::PropArgs</a>
-, <a class="el" href="structcattle_1_1_parallel_neural_network_1_1_prop_args.html#a8be1a7e0ef83a80d7c1096876689ec08">cattle::ParallelNeuralNetwork&lt; Scalar, Rank &gt;::PropArgs</a>
+, <a class="el" href="structcattle_1_1_bidirectional_neural_network_1_1_prop_args.html#a6cd8dbc48787796a9de88a6d85da1e89">cattle::BidirectionalNeuralNetwork&lt; Scalar, Rank, MergeType &gt;::PropArgs</a>
+, <a class="el" href="structcattle_1_1_parallel_neural_network_1_1_prop_args.html#aad62818b11d99620819f99ee9f30f36b">cattle::ParallelNeuralNetwork&lt; Scalar, Rank, MergeType &gt;::PropArgs</a>
 </li>
 <li>init_alpha
 : <a class="el" href="classcattle_1_1_p_re_l_u_activation_layer.html#abf99cdbf870dee97c75e6746dbc792e7">cattle::PReLUActivationLayer&lt; Scalar, Rank &gt;</a>
@@ -77,29 +77,29 @@ $(function() {
 : <a class="el" href="classcattle_1_1_momentum_accelerated_s_g_d_optimizer.html#a07ffa93ecd360c659417cba4a187d811">cattle::MomentumAcceleratedSGDOptimizer&lt; Scalar, Rank, Sequential &gt;</a>
 </li>
 <li>input_candidate_kernel
-: <a class="el" href="structcattle_1_1_l_s_t_m_neural_network_1_1_cell.html#a69489bf9ede710bb321e2b6a422cc212">cattle::LSTMNeuralNetwork&lt; Scalar, Rank &gt;::Cell</a>
+: <a class="el" href="structcattle_1_1_l_s_t_m_neural_network_1_1_cell.html#a8faad1ee3ca89b3dda55e82bf5a11828">cattle::LSTMNeuralNetwork&lt; Scalar, Rank, MulInt, Stateful &gt;::Cell</a>
 </li>
 <li>input_dims
-: <a class="el" href="classcattle_1_1_bidirectional_neural_network.html#a21c7b90c0ca9b5c2f0d5fa85be343ddd">cattle::BidirectionalNeuralNetwork&lt; Scalar, Rank &gt;</a>
+: <a class="el" href="classcattle_1_1_bidirectional_neural_network.html#a7a17210f3a0b5b41b1370e3f27457f8d">cattle::BidirectionalNeuralNetwork&lt; Scalar, Rank, MergeType &gt;</a>
 , <a class="el" href="classcattle_1_1_composite_neural_network.html#a956c848e8766ac5c65e2389243fc510e">cattle::CompositeNeuralNetwork&lt; Scalar, Rank, Sequential &gt;</a>
-, <a class="el" href="classcattle_1_1_dense_neural_network.html#a5092c4c53bd3fd9f7786e8f52c383b41">cattle::DenseNeuralNetwork&lt; Scalar, Rank &gt;</a>
+, <a class="el" href="classcattle_1_1_dense_neural_network.html#a67bd8b125e536ffb27f8f0681636b5fb">cattle::DenseNeuralNetwork&lt; Scalar, Rank, ConcatType &gt;</a>
 , <a class="el" href="classcattle_1_1_feedforward_neural_network.html#ae71dc69b5f13db8a2080717e3d370bc1">cattle::FeedforwardNeuralNetwork&lt; Scalar, Rank &gt;</a>
 , <a class="el" href="classcattle_1_1_kernel_layer.html#a9acecaf6a36c0b25a5f403faeda6dafe">cattle::KernelLayer&lt; Scalar, Rank &gt;</a>
-, <a class="el" href="classcattle_1_1_l_s_t_m_neural_network.html#a5324e5c8bb29feed06357aada8e75520">cattle::LSTMNeuralNetwork&lt; Scalar, Rank &gt;</a>
-, <a class="el" href="classcattle_1_1_parallel_neural_network.html#aa8fbd604ad8f855fd08657633aa62101">cattle::ParallelNeuralNetwork&lt; Scalar, Rank &gt;</a>
+, <a class="el" href="classcattle_1_1_l_s_t_m_neural_network.html#a446ecbc74d148906d1177c61774111a1">cattle::LSTMNeuralNetwork&lt; Scalar, Rank, MulInt, Stateful &gt;</a>
+, <a class="el" href="classcattle_1_1_parallel_neural_network.html#af4e81a9be21340418f6a4c586992c88d">cattle::ParallelNeuralNetwork&lt; Scalar, Rank, MergeType &gt;</a>
 , <a class="el" href="classcattle_1_1_pooling_layer.html#a99c9c59105235c0d3892429aef5c1699">cattle::PoolingLayer&lt; Scalar &gt;</a>
-, <a class="el" href="classcattle_1_1_recurrent_neural_network.html#a9ae16df90cf30573612de97e13734443">cattle::RecurrentNeuralNetwork&lt; Scalar, Rank &gt;</a>
+, <a class="el" href="classcattle_1_1_recurrent_neural_network.html#acc04af88e5afbc44ca922df4cbb46436">cattle::RecurrentNeuralNetwork&lt; Scalar, Rank, MulInt, Stateful &gt;</a>
 , <a class="el" href="classcattle_1_1_residual_neural_network.html#a58a98e562cb9b1b9a033f535b710b18e">cattle::ResidualNeuralNetwork&lt; Scalar, Rank &gt;</a>
 , <a class="el" href="classcattle_1_1_sequential_neural_network.html#ad88075b30084d1e258b4332bb79b4513">cattle::SequentialNeuralNetwork&lt; Scalar, Rank &gt;</a>
 </li>
 <li>input_forget_kernel
-: <a class="el" href="structcattle_1_1_l_s_t_m_neural_network_1_1_cell.html#ace6ed18996bdc8e1949eb036f00b02cc">cattle::LSTMNeuralNetwork&lt; Scalar, Rank &gt;::Cell</a>
+: <a class="el" href="structcattle_1_1_l_s_t_m_neural_network_1_1_cell.html#ad14876a7aa79334d3a6b8c6155239b0d">cattle::LSTMNeuralNetwork&lt; Scalar, Rank, MulInt, Stateful &gt;::Cell</a>
 </li>
 <li>input_kernel
-: <a class="el" href="structcattle_1_1_recurrent_neural_network_1_1_cell.html#a793e49e3eddb66ceaa38e3118bb2e466">cattle::RecurrentNeuralNetwork&lt; Scalar, Rank &gt;::Cell</a>
+: <a class="el" href="structcattle_1_1_recurrent_neural_network_1_1_cell.html#acf3024336a3aa322a0ea1678812584be">cattle::RecurrentNeuralNetwork&lt; Scalar, Rank, MulInt, Stateful &gt;::Cell</a>
 </li>
 <li>input_kernel_cache
-: <a class="el" href="structcattle_1_1_recurrent_neural_network_1_1_cell.html#a28cf7f72547245efda2038b71ea4498d">cattle::RecurrentNeuralNetwork&lt; Scalar, Rank &gt;::Cell</a>
+: <a class="el" href="structcattle_1_1_recurrent_neural_network_1_1_cell.html#a3ac2bc92b0c5e6a2f2d44f7b7df6d833">cattle::RecurrentNeuralNetwork&lt; Scalar, Rank, MulInt, Stateful &gt;::Cell</a>
 </li>
 <li>input_layer
 : <a class="el" href="classcattle_1_1_activation_layer.html#af560c46c2e6f118508d81bae6cb9d84f">cattle::ActivationLayer&lt; Scalar, Rank &gt;</a>
@@ -109,14 +109,14 @@ $(function() {
 , <a class="el" href="classcattle_1_1_pooling_layer.html#a30ea56804aab72285a8c442a3beb712f">cattle::PoolingLayer&lt; Scalar &gt;</a>
 </li>
 <li>input_read_kernel
-: <a class="el" href="structcattle_1_1_l_s_t_m_neural_network_1_1_cell.html#add25632e4b3a8f44df6d28948d01335d">cattle::LSTMNeuralNetwork&lt; Scalar, Rank &gt;::Cell</a>
+: <a class="el" href="structcattle_1_1_l_s_t_m_neural_network_1_1_cell.html#a55f8bcfa75caa272fc35a89893327027">cattle::LSTMNeuralNetwork&lt; Scalar, Rank, MulInt, Stateful &gt;::Cell</a>
 </li>
 <li>input_seq_length
-: <a class="el" href="classcattle_1_1_l_s_t_m_neural_network.html#a56f2f67ef5b92e20a17cae64a93a14f5">cattle::LSTMNeuralNetwork&lt; Scalar, Rank &gt;</a>
-, <a class="el" href="classcattle_1_1_recurrent_neural_network.html#a0616a15c39755162f97b43625db8be10">cattle::RecurrentNeuralNetwork&lt; Scalar, Rank &gt;</a>
+: <a class="el" href="classcattle_1_1_l_s_t_m_neural_network.html#ad7d6db55ebb3819e78fac4cc2531b4fa">cattle::LSTMNeuralNetwork&lt; Scalar, Rank, MulInt, Stateful &gt;</a>
+, <a class="el" href="classcattle_1_1_recurrent_neural_network.html#aea2a09deca988d94757ce847dc21fa9b">cattle::RecurrentNeuralNetwork&lt; Scalar, Rank, MulInt, Stateful &gt;</a>
 </li>
 <li>input_write_kernel
-: <a class="el" href="structcattle_1_1_l_s_t_m_neural_network_1_1_cell.html#a3cda4aa5c16b9d48aa8bf8dba98a7b5a">cattle::LSTMNeuralNetwork&lt; Scalar, Rank &gt;::Cell</a>
+: <a class="el" href="structcattle_1_1_l_s_t_m_neural_network_1_1_cell.html#af600e0fd81fd64afaa6a30957c437a8f">cattle::LSTMNeuralNetwork&lt; Scalar, Rank, MulInt, Stateful &gt;::Cell</a>
 </li>
 <li>INSTANCE_LENGTH
 : <a class="el" href="classcattle_1_1_c_i_f_a_r10_data_provider.html#a4588a40ebd424871d40ee5dfc6597d64">cattle::CIFAR10DataProvider&lt; Scalar &gt;</a>

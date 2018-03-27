@@ -25,8 +25,6 @@
 
 namespace cattle {
 
-// TODO Specialized data providers for the MNIST, CIFAR, and ImageNet data sets.
-
 /**
  * An alias for a unique tensor pointer.
  */
@@ -200,7 +198,7 @@ public:
 		return offsets[0] < (int) instances;
 	}
 	inline DataPair<Scalar,Rank,Sequential> get_data(std::size_t batch_size) {
-		if (!has_more)
+		if (!has_more())
 			throw std::out_of_range("no more data left to fetch");
 		std::size_t max_batch_size = std::min(batch_size, instances - offsets[0]);
 		data_extents[0] = max_batch_size;
@@ -423,19 +421,66 @@ private:
 	std::size_t current_stream_pair;
 };
 
+///**
+// * A data provider template for the MNIST data set.
+// */
+//template<typename Scalar>
+//class MNISTDataProvider : public SplitFileDataProvider<Scalar,3,false> {
+//	typedef DataProvider<Scalar,3,false> Root;
+//	typedef SplitFileDataProvider<Scalar,3,false> Base;
+//	static constexpr std::size_t OBS_INSTANCE_LENGTH = 769;
+//	static constexpr std::size_t LABEL_INSTANCE_LENGTH = 1;
+//public:
+//	MNISTDataProvider(std::string obs_path, std::string labels_path) :
+//			Base::SplitFileDataProvider(std::make_pair(obs, path), true, true),
+//			obs({ 28u, 28u, 1u }),
+//			obj({ 10u, 1u, 1u }) { }
+//	inline const Dimensions<std::size_t,3>& get_obs_dims() const {
+//		return obs;
+//	}
+//	inline const Dimensions<std::size_t,3>& get_obj_dims() const {
+//		return obj;
+//	}
+//protected:
+//	inline DataPair<Scalar,Rank,Sequential> _get_data(std::ifstream& obs_input_stream,
+//				std::ifstream& obj_input_stream, std::size_t batch_size) {
+//
+//	}
+//	inline std::size_t _skip(std::ifstream& obs_input_stream, std::ifstream& obj_input_stream,
+//				std::size_t instances) {
+//		std::streampos curr_pos = data_stream.tellg();
+//		data_stream.seekg(0, std::ios::end);
+//		std::size_t skip_extent = data_stream.tellg() - curr_pos;
+//		data_stream.seekg(curr_pos);
+//		data_stream.ignore(instances * INSTANCE_LENGTH);
+//		return std::min(instances, skip_extent / INSTANCE_LENGTH);
+//	}
+//private:
+//	const Dimensions<std::size_t,3> obs;
+//	const Dimensions<std::size_t,3> obj;
+//	char obs_buffer[INSTANCE_LENGTH];
+//};
+
 /**
- * A data provider template for the CIFAR-10 data set.
+ * An enum denoting different CIFAR data set types.
  */
-template<typename Scalar>
-class CIFAR10DataProvider : public JointFileDataProvider<Scalar,3,false> {
+enum CIFARType { CIFAR_10, CIFAR_100 };
+
+/**
+ * A data provider template for the CIFAR-10 and CIFAR-100 data sets.
+ */
+template<typename Scalar, CIFARType CIFARType = CIFAR_10>
+class CIFARDataProvider : public JointFileDataProvider<Scalar,3,false> {
 	typedef DataProvider<Scalar,3,false> Root;
 	typedef JointFileDataProvider<Scalar,3,false> Base;
-	static constexpr std::size_t INSTANCE_LENGTH = 3073;
+	static_assert(CIFARType == CIFAR_10 || CIFARType == CIFAR_100, "invalid CIFAR type");
+	static constexpr std::size_t INSTANCE_LENGTH = CIFARType == CIFAR_10 ? 3073 : 3074;
+	static constexpr std::size_t NUM_LABELS = CIFAR_10 ? 10 : 100;
 public:
-	inline CIFAR10DataProvider(std::vector<std::string> file_paths) :
+	inline CIFARDataProvider(std::vector<std::string> file_paths) :
 			Base::JointFileDataProvider(file_paths, true),
 			obs({ 32u, 32u, 3u }),
-			obj({ 10u, 1u, 1u }) { }
+			obj({ NUM_LABELS, 1u, 1u }) { }
 	inline const Dimensions<std::size_t,3>& get_obs_dims() const {
 		return obs;
 	}
@@ -446,13 +491,21 @@ protected:
 	inline DataPair<Scalar,3,false> _get_data(std::ifstream& data_stream,
 				std::size_t batch_size) {
 		Tensor<Scalar,4> obs(batch_size, 32u, 32u, 3u);
-		Tensor<Scalar,4> obj(batch_size, 10u, 1u, 1u);
+		Tensor<Scalar,4> obj(batch_size, NUM_LABELS, 1u, 1u);
 		obj.setZero();
 		std::size_t i;
 		for (i = 0; i < batch_size && data_stream.read(buffer, INSTANCE_LENGTH); ++i) {
 			unsigned char* u_buffer = reinterpret_cast<unsigned char*>(buffer);
-			obj(i,u_buffer[0],0u,0u) = (Scalar) 1;
-			std::size_t buffer_ind = 1;
+			std::size_t buffer_ind = 0;
+			// Read the label.
+			if (CIFARType == CIFAR_10)
+				obj(i,u_buffer[buffer_ind++],0u,0u) = (Scalar) 1;
+			else {
+				std::size_t coarse_label = u_buffer[buffer_ind++];
+				std::size_t fine_label = u_buffer[buffer_ind++];
+				obj(i,(std::size_t) (coarse_label * 5 + fine_label),0u,0u) = (Scalar) 1;
+			}
+			// Read the image.
 			for (std::size_t channel = 0; channel < 3; ++channel) {
 				for (std::size_t row = 0; row < 32; ++row) {
 					for (std::size_t column = 0; column < 32; ++column)
@@ -465,7 +518,7 @@ protected:
 			return std::make_pair(obs, obj);
 		std::array<std::size_t,4> offsets({ 0, 0, 0, 0 });
 		std::array<std::size_t,4> obs_extents({ i, 32u, 32u, 3u });
-		std::array<std::size_t,4> obj_extents({ i, 10u, 1u, 1u });
+		std::array<std::size_t,4> obj_extents({ i, NUM_LABELS, 1u, 1u });
 		return std::make_pair(obs.slice(offsets, obs_extents), obj.slice(offsets, obj_extents));
 	}
 	inline std::size_t _skip(std::ifstream& data_stream, std::size_t instances) {

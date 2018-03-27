@@ -20,7 +20,7 @@
 
 namespace cattle {
 
-// TODO Fix for sequential data.
+// TODO Preprocessor for sequential data.
 
 /**
  * An abstract class template for data preprocessors.
