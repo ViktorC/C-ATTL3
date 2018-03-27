@@ -12,7 +12,7 @@ var searchData=
   ['input_5fread_5fkernel',['input_read_kernel',['../structcattle_1_1_l_s_t_m_neural_network_1_1_cell.html#a55f8bcfa75caa272fc35a89893327027',1,'cattle::LSTMNeuralNetwork::Cell']]],
   ['input_5fseq_5flength',['input_seq_length',['../classcattle_1_1_recurrent_neural_network.html#aea2a09deca988d94757ce847dc21fa9b',1,'cattle::RecurrentNeuralNetwork::input_seq_length()'],['../classcattle_1_1_l_s_t_m_neural_network.html#ad7d6db55ebb3819e78fac4cc2531b4fa',1,'cattle::LSTMNeuralNetwork::input_seq_length()']]],
   ['input_5fwrite_5fkernel',['input_write_kernel',['../structcattle_1_1_l_s_t_m_neural_network_1_1_cell.html#af600e0fd81fd64afaa6a30957c437a8f',1,'cattle::LSTMNeuralNetwork::Cell']]],
-  ['instance_5flength',['INSTANCE_LENGTH',['../classcattle_1_1_c_i_f_a_r10_data_provider.html#a4588a40ebd424871d40ee5dfc6597d64',1,'cattle::CIFAR10DataProvider']]],
+  ['instance_5flength',['INSTANCE_LENGTH',['../classcattle_1_1_c_i_f_a_r_data_provider.html#a4f315489c6951db6b6304600c6ef6dea',1,'cattle::CIFARDataProvider']]],
   ['instances',['instances',['../classcattle_1_1_memory_data_provider.html#a3f310788f40b9e827f76d6ff067c0339',1,'cattle::MemoryDataProvider']]],
   ['instances_5fread',['instances_read',['../classcattle_1_1_partition_data_provider.html#ac98b6948046108a860880cccd6063993',1,'cattle::PartitionDataProvider']]],
   ['inv_5fin_5fsd',['inv_in_sd',['../structcattle_1_1_batch_norm_layer_base_1_1_cache.html#a90e210ee58a274cc232f6a91086dafb0',1,'cattle::BatchNormLayerBase::Cache']]]

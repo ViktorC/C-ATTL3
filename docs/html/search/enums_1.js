@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['outputmergetype',['OutputMergeType',['../namespacecattle.html#adf6ad5e38e7c96e1d70ac1f180c71c42',1,'cattle']]]
+  ['denseconcattype',['DenseConcatType',['../namespacecattle.html#a962c4b25a74fac744864b9fa4fca4a0b',1,'cattle']]]
 ];

@@ -3,6 +3,7 @@ var searchData=
   ['dataprovider',['DataProvider',['../classcattle_1_1_data_provider.html',1,'cattle']]],
   ['denseneuralnetwork',['DenseNeuralNetwork',['../classcattle_1_1_dense_neural_network.html',1,'cattle']]],
   ['dimensions',['Dimensions',['../classcattle_1_1_dimensions.html',1,'cattle']]],
+  ['dimensions_3c_20std_3a_3asize_5ft_2c_202_20_3e',['Dimensions&lt; std::size_t, 2 &gt;',['../classcattle_1_1_dimensions.html',1,'cattle']]],
   ['dimensions_3c_20std_3a_3asize_5ft_2c_203_20_3e',['Dimensions&lt; std::size_t, 3 &gt;',['../classcattle_1_1_dimensions.html',1,'cattle']]],
   ['dimensions_3c_20std_3a_3asize_5ft_2c_20rank_20_3e',['Dimensions&lt; std::size_t, Rank &gt;',['../classcattle_1_1_dimensions.html',1,'cattle']]],
   ['dimexpression',['DimExpression',['../classcattle_1_1_dim_expression.html',1,'cattle']]],

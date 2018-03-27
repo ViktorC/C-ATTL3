@@ -112,6 +112,8 @@ Protected Member Functions</h2></td></tr>
 <tr class="separator:a8dec60a3ecaadaed1911037acf102133"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ab478acb0e74b3526811666e0d880c898"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_split_file_data_provider.html#ab478acb0e74b3526811666e0d880c898">SplitFileDataProvider</a> (std::pair&lt; std::string, std::string &gt; dataset_path_pair, bool obs_binary, bool obj_binary)</td></tr>
 <tr class="separator:ab478acb0e74b3526811666e0d880c898"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab7c90fc6487d0031616d2d193002b63e"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_split_file_data_provider.html#ab7c90fc6487d0031616d2d193002b63e">_set_to_beg</a> (std::ifstream &amp;obs_input_stream, std::ifstream &amp;obj_input_stream)</td></tr>
+<tr class="separator:ab7c90fc6487d0031616d2d193002b63e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a6fd281af7d4b19881c71f413bb8a4ef8"><td class="memItemLeft" align="right" valign="top">virtual <a class="el" href="namespacecattle.html#aaf234deaf1504300126fed57912a132e">DataPair</a>&lt; Scalar, Rank, Sequential &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_split_file_data_provider.html#a6fd281af7d4b19881c71f413bb8a4ef8">_get_data</a> (std::ifstream &amp;obs_input_stream, std::ifstream &amp;obj_input_stream, std::size_t batch_size)=0</td></tr>
 <tr class="separator:a6fd281af7d4b19881c71f413bb8a4ef8"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:adc88e4a81d5b5f9601c8f01c011897f9"><td class="memItemLeft" align="right" valign="top">virtual std::size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_split_file_data_provider.html#adc88e4a81d5b5f9601c8f01c011897f9">_skip</a> (std::ifstream &amp;obs_input_stream, std::ifstream &amp;obj_input_stream, std::size_t instances)=0</td></tr>
@@ -154,7 +156,7 @@ class cattle::SplitFileDataProvider&lt; Scalar, Rank, Sequential &gt;</h3>
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;typename Scalar , std::size_t Rank, bool Sequential&gt; </div>
+template&lt;typename Scalar, std::size_t Rank, bool Sequential&gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
@@ -179,7 +181,7 @@ template&lt;typename Scalar , std::size_t Rank, bool Sequential&gt; </div>
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;typename Scalar , std::size_t Rank, bool Sequential&gt; </div>
+template&lt;typename Scalar, std::size_t Rank, bool Sequential&gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
@@ -206,7 +208,7 @@ template&lt;typename Scalar , std::size_t Rank, bool Sequential&gt; </div>
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;typename Scalar , std::size_t Rank, bool Sequential&gt; </div>
+template&lt;typename Scalar, std::size_t Rank, bool Sequential&gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
@@ -250,7 +252,7 @@ template&lt;typename Scalar , std::size_t Rank, bool Sequential&gt; </div>
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;typename Scalar , std::size_t Rank, bool Sequential&gt; </div>
+template&lt;typename Scalar, std::size_t Rank, bool Sequential&gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
@@ -295,7 +297,7 @@ template&lt;typename Scalar , std::size_t Rank, bool Sequential&gt; </div>
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;typename Scalar , std::size_t Rank, bool Sequential&gt; </div>
+template&lt;typename Scalar, std::size_t Rank, bool Sequential&gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
@@ -341,6 +343,56 @@ template&lt;typename Scalar , std::size_t Rank, bool Sequential&gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>The paired observations and objectives. </dd></dl>
 
+<p>Implemented in <a class="el" href="classcattle_1_1_m_n_i_s_t_data_provider.html#adb011fccf14be5b53edb2bd2e270dd07">cattle::MNISTDataProvider&lt; Scalar &gt;</a>.</p>
+
+</div>
+</div>
+<a id="ab7c90fc6487d0031616d2d193002b63e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab7c90fc6487d0031616d2d193002b63e">&#9670;&nbsp;</a></span>_set_to_beg()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename Scalar, std::size_t Rank, bool Sequential&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual void <a class="el" href="classcattle_1_1_split_file_data_provider.html">cattle::SplitFileDataProvider</a>&lt; Scalar, Rank, Sequential &gt;::_set_to_beg </td>
+          <td>(</td>
+          <td class="paramtype">std::ifstream &amp;&#160;</td>
+          <td class="paramname"><em>obs_input_stream</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">std::ifstream &amp;&#160;</td>
+          <td class="paramname"><em>obj_input_stream</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">protected</span><span class="mlabel">virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p>It sets the positions of the file streams to the beginning of the observation data set and the objective data set respectively.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">obs_input_stream</td><td>A reference to the file stream to a file containing observations. </td></tr>
+    <tr><td class="paramname">obj_input_stream</td><td>A reference to the file stream to a file containing objectives. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+<p>Reimplemented in <a class="el" href="classcattle_1_1_m_n_i_s_t_data_provider.html#ae41c52d34d99be6bbb990f6971ead881">cattle::MNISTDataProvider&lt; Scalar &gt;</a>.</p>
+
 </div>
 </div>
 <a id="adc88e4a81d5b5f9601c8f01c011897f9"></a>
@@ -349,7 +401,7 @@ template&lt;typename Scalar , std::size_t Rank, bool Sequential&gt; </div>
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;typename Scalar , std::size_t Rank, bool Sequential&gt; </div>
+template&lt;typename Scalar, std::size_t Rank, bool Sequential&gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
@@ -395,6 +447,8 @@ template&lt;typename Scalar , std::size_t Rank, bool Sequential&gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>The number of actual data points skipped. It may be less than the specified amount if there are fewer remaining instances in the data streams. </dd></dl>
 
+<p>Implemented in <a class="el" href="classcattle_1_1_m_n_i_s_t_data_provider.html#a0f43935423fff83bb8c88a027ee6283f">cattle::MNISTDataProvider&lt; Scalar &gt;</a>.</p>
+
 </div>
 </div>
 <a id="aa33075e9c055d66dcf14225933ed8041"></a>
@@ -403,7 +457,7 @@ template&lt;typename Scalar , std::size_t Rank, bool Sequential&gt; </div>
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;typename Scalar , std::size_t Rank, bool Sequential&gt; </div>
+template&lt;typename Scalar, std::size_t Rank, bool Sequential&gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
@@ -441,7 +495,7 @@ template&lt;typename Scalar , std::size_t Rank, bool Sequential&gt; </div>
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;typename Scalar , std::size_t Rank, bool Sequential&gt; </div>
+template&lt;typename Scalar, std::size_t Rank, bool Sequential&gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
@@ -472,7 +526,7 @@ template&lt;typename Scalar , std::size_t Rank, bool Sequential&gt; </div>
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;typename Scalar , std::size_t Rank, bool Sequential&gt; </div>
+template&lt;typename Scalar, std::size_t Rank, bool Sequential&gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
@@ -502,7 +556,7 @@ template&lt;typename Scalar , std::size_t Rank, bool Sequential&gt; </div>
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;typename Scalar , std::size_t Rank, bool Sequential&gt; </div>
+template&lt;typename Scalar, std::size_t Rank, bool Sequential&gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
@@ -540,7 +594,7 @@ template&lt;typename Scalar , std::size_t Rank, bool Sequential&gt; </div>
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;typename Scalar , std::size_t Rank, bool Sequential&gt; </div>
+template&lt;typename Scalar, std::size_t Rank, bool Sequential&gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
@@ -564,7 +618,7 @@ template&lt;typename Scalar , std::size_t Rank, bool Sequential&gt; </div>
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;typename Scalar , std::size_t Rank, bool Sequential&gt; </div>
+template&lt;typename Scalar, std::size_t Rank, bool Sequential&gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">

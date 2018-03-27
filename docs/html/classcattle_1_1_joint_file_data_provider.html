@@ -112,6 +112,8 @@ Protected Member Functions</h2></td></tr>
 <tr class="separator:a3a78c9e0d7788467683abf119373e929"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ae0bd1bf9117ff96373685a5c0c02de55"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_joint_file_data_provider.html#ae0bd1bf9117ff96373685a5c0c02de55">JointFileDataProvider</a> (std::string dataset_path, bool binary)</td></tr>
 <tr class="separator:ae0bd1bf9117ff96373685a5c0c02de55"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a8bd6dfac9e9854d978094d54e1528a7c"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_joint_file_data_provider.html#a8bd6dfac9e9854d978094d54e1528a7c">_set_to_beg</a> (std::ifstream &amp;data_stream)</td></tr>
+<tr class="separator:a8bd6dfac9e9854d978094d54e1528a7c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a20fbbc639d077036dd1105cd042bbf0b"><td class="memItemLeft" align="right" valign="top">virtual <a class="el" href="namespacecattle.html#aaf234deaf1504300126fed57912a132e">DataPair</a>&lt; Scalar, Rank, Sequential &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_joint_file_data_provider.html#a20fbbc639d077036dd1105cd042bbf0b">_get_data</a> (std::ifstream &amp;data_stream, std::size_t batch_size)=0</td></tr>
 <tr class="separator:a20fbbc639d077036dd1105cd042bbf0b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ab17c09b84854d76e9867c4c6d7f3106d"><td class="memItemLeft" align="right" valign="top">virtual std::size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_joint_file_data_provider.html#ab17c09b84854d76e9867c4c6d7f3106d">_skip</a> (std::ifstream &amp;data_stream, std::size_t instances)=0</td></tr>
@@ -322,7 +324,42 @@ template&lt;typename Scalar, std::size_t Rank, bool Sequential&gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>A pair of tensors containing the data batch. </dd></dl>
 
-<p>Implemented in <a class="el" href="classcattle_1_1_c_i_f_a_r10_data_provider.html#aba54062a6c65f1ce83b81c5ceea6cb88">cattle::CIFAR10DataProvider&lt; Scalar &gt;</a>.</p>
+<p>Implemented in <a class="el" href="classcattle_1_1_c_i_f_a_r_data_provider.html#a8c5b73c553f06a7dbfeff57d87e9d5d9">cattle::CIFARDataProvider&lt; Scalar, CIFARType &gt;</a>.</p>
+
+</div>
+</div>
+<a id="a8bd6dfac9e9854d978094d54e1528a7c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a8bd6dfac9e9854d978094d54e1528a7c">&#9670;&nbsp;</a></span>_set_to_beg()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename Scalar, std::size_t Rank, bool Sequential&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual void <a class="el" href="classcattle_1_1_joint_file_data_provider.html">cattle::JointFileDataProvider</a>&lt; Scalar, Rank, Sequential &gt;::_set_to_beg </td>
+          <td>(</td>
+          <td class="paramtype">std::ifstream &amp;&#160;</td>
+          <td class="paramname"><em>data_stream</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">protected</span><span class="mlabel">virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p>It sets the position of the file stream to the beginning of the data set.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">data_stream</td><td>A reference to the file stream of the data set. </td></tr>
+  </table>
+  </dd>
+</dl>
 
 </div>
 </div>
@@ -371,7 +408,7 @@ template&lt;typename Scalar, std::size_t Rank, bool Sequential&gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>The number of instances actually skipped. It may be less than the specified amount if there are fewer remaining instances in the data stream. </dd></dl>
 
-<p>Implemented in <a class="el" href="classcattle_1_1_c_i_f_a_r10_data_provider.html#a7982cbf3ffb228d81f085565e8767884">cattle::CIFAR10DataProvider&lt; Scalar &gt;</a>.</p>
+<p>Implemented in <a class="el" href="classcattle_1_1_c_i_f_a_r_data_provider.html#a739f67300be83feea721a755d8d6e091">cattle::CIFARDataProvider&lt; Scalar, CIFARType &gt;</a>.</p>
 
 </div>
 </div>

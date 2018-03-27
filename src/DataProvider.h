@@ -257,15 +257,23 @@ public:
 			DataPair<Scalar,Rank,Sequential> add_data_pair = _get_data(data_streams[current_stream],
 					batch_size - data_pair.first.dimension(0));
 			assert(add_data_pair.first.dimension(0) == add_data_pair.second.dimension(0));
-			data_pair.first = data_pair.first.concatenate(add_data_pair.first, 0);
-			data_pair.second = data_pair.second.concatenate(add_data_pair.second, 0);
+			// It has to be evaluated into a temporary due to the dimension incompatibility.
+			typename Base::Data obs_concat =
+					data_pair.first.concatenate(std::move(add_data_pair.first),0);
+			data_pair.first = std::move(obs_concat);
+			typename Base::Data obj_concat =
+					data_pair.second.concatenate(std::move(add_data_pair.second), 0);
+			data_pair.second = std::move(obj_concat);
 		}
 		return data_pair;
 	}
 	inline void reset() {
 		std::size_t max_ind = std::min(current_stream, (std::size_t) (data_streams.size() - 1));
-		for (std::size_t i = 0; i <= max_ind; ++i)
-			data_streams[i].seekg(0, std::ios::beg);
+		for (std::size_t i = 0; i <= max_ind; ++i) {
+			std::ifstream& data_stream = data_streams[i];
+			data_stream.clear();
+			_set_to_beg(data_stream);
+		}
 		current_stream = 0;
 	}
 protected:
@@ -275,11 +283,21 @@ protected:
 		assert(!dataset_paths.empty());
 		for (std::size_t i = 0; i < dataset_paths.size(); ++i) {
 			data_streams[i] = std::ifstream(dataset_paths[i], binary ? std::ios::binary : std::ios::in);
-			assert(data_streams[i].is_open());
+			std::ifstream& data_stream = data_streams[i];
+			assert(data_stream.is_open());
+			_set_to_beg(data_stream);
 		}
 	}
 	inline JointFileDataProvider(std::string dataset_path, bool binary) :
 			JointFileDataProvider({ dataset_path }, binary) { }
+	/**
+	 * It sets the position of the file stream to the beginning of the data set.
+	 *
+	 * @param data_stream A reference to the file stream of the data set.
+	 */
+	virtual inline void _set_to_beg(std::ifstream& data_stream) {
+		data_stream.seekg(0, std::ios::beg);
+	}
 	/**
 	 * It reads at most the specified number of observation-objective pairs from the provided
 	 * file stream. The file stream can be expected not to have any of its fail flags set
@@ -342,11 +360,15 @@ public:
 		assert(data_pair.first.dimension(0) == data_pair.second.dimension(0));
 		while (data_pair.first.dimension(0) < batch_size && has_more()) {
 			std::pair<std::ifstream,std::ifstream>& stream_pair = data_stream_pairs[current_stream_pair];
-			DataPair<Scalar,Rank,Sequential> additional_data_pair = _get_data(stream_pair.first,
+			DataPair<Scalar,Rank,Sequential> add_data_pair = _get_data(stream_pair.first,
 					stream_pair.second, batch_size - data_pair.first.dimension(0));
-			assert(additional_data_pair.first.dimension(0) == additional_data_pair.second.dimension(0));
-			data_pair.first = data_pair.first.concatenate(additional_data_pair.first, 0);
-			data_pair.second = data_pair.second.concatenate(additional_data_pair.second, 0);
+			assert(add_data_pair.first.dimension(0) == add_data_pair.second.dimension(0));
+			typename Base::Data obs_concat =
+					data_pair.first.concatenate(std::move(add_data_pair.first),0);
+			data_pair.first = std::move(obs_concat);
+			typename Base::Data obj_concat =
+					data_pair.second.concatenate(std::move(add_data_pair.second), 0);
+			data_pair.second = std::move(obj_concat);
 		}
 		return data_pair;
 	}
@@ -354,8 +376,9 @@ public:
 		std::size_t max_ind = std::min(current_stream_pair, (std::size_t) (data_stream_pairs.size() - 1));
 		for (std::size_t i = 0; i <= max_ind; ++i) {
 			std::pair<std::ifstream,std::ifstream>& stream_pair = data_stream_pairs[i];
-			stream_pair.first.seekg(0, std::ios::beg);
-			stream_pair.second.seekg(0, std::ios::beg);
+			stream_pair.first.clear();
+			stream_pair.second.clear();
+			_set_to_beg(stream_pair.first, stream_pair.second);
 		}
 		current_stream_pair = 0;
 	}
@@ -371,6 +394,7 @@ protected:
 			assert(obs_stream.is_open());
 			std::ifstream obj_stream(path_pair.second, obj_binary ? std::ios::binary : std::ios::in);
 			assert(obj_stream.is_open());
+			_set_to_beg(obs_stream, obj_stream);
 			data_stream_pairs[i] = std::make_pair(obs_stream, obj_stream);
 		}
 	}
@@ -378,15 +402,24 @@ protected:
 			bool obj_binary) :
 				SplitFileDataProvider({ dataset_path_pair }, obs_binary, obj_binary) { }
 	/**
+	 * It sets the positions of the file streams to the beginning of the observation data set and
+	 * the objective data set respectively.
+	 *
+	 * @param obs_input_stream A reference to the file stream to a file containing observations.
+	 * @param obj_input_stream A reference to the file stream to a file containing objectives.
+	 */
+	virtual inline void _set_to_beg(std::ifstream& obs_input_stream, std::ifstream& obj_input_stream) {
+		obs_input_stream.seekg(0, std::ios::beg);
+		obj_input_stream.seekg(0, std::ios::beg);
+	}
+	/**
 	 * It reads at most the specified number of observations from the observation-file and at
 	 * most the specified number of objectives from the objective-file. The file streams can
 	 * be expected not to have any of their fail flags set initially and to have at least 1
 	 * more character left to read in each.
 	 *
-	 * @param obs_input_stream A reference to the file stream to a file containing
-	 * observations.
-	 * @param obj_input_stream A reference to the file stream to a file containing
-	 * objectives.
+	 * @param obs_input_stream A reference to the file stream to a file containing observations.
+	 * @param obj_input_stream A reference to the file stream to a file containing objectives.
 	 * @param batch_size The number of data points to read.
 	 * @return The paired observations and objectives.
 	 */
@@ -396,10 +429,8 @@ protected:
 	 * Skips at most the specified number of instances in the data streams. The file streams can
 	 * be expected not to have any of their fail flags set initially.
 	 *
-	 * @param obs_input_stream A reference to the file stream to a file containing
-	 * observations.
-	 * @param obj_input_stream A reference to the file stream to a file containing
-	 * objectives.
+	 * @param obs_input_stream A reference to the file stream to a file containing observations.
+	 * @param obj_input_stream A reference to the file stream to a file containing objectives.
 	 * @param instances The number of data points to skip.
 	 * @return The number of actual data points skipped. It may be less than the specified
 	 * amount if there are fewer remaining instances in the data streams.
@@ -421,45 +452,89 @@ private:
 	std::size_t current_stream_pair;
 };
 
-///**
-// * A data provider template for the MNIST data set.
-// */
-//template<typename Scalar>
-//class MNISTDataProvider : public SplitFileDataProvider<Scalar,3,false> {
-//	typedef DataProvider<Scalar,3,false> Root;
-//	typedef SplitFileDataProvider<Scalar,3,false> Base;
-//	static constexpr std::size_t OBS_INSTANCE_LENGTH = 769;
-//	static constexpr std::size_t LABEL_INSTANCE_LENGTH = 1;
-//public:
-//	MNISTDataProvider(std::string obs_path, std::string labels_path) :
-//			Base::SplitFileDataProvider(std::make_pair(obs, path), true, true),
-//			obs({ 28u, 28u, 1u }),
-//			obj({ 10u, 1u, 1u }) { }
-//	inline const Dimensions<std::size_t,3>& get_obs_dims() const {
-//		return obs;
-//	}
-//	inline const Dimensions<std::size_t,3>& get_obj_dims() const {
-//		return obj;
-//	}
-//protected:
-//	inline DataPair<Scalar,Rank,Sequential> _get_data(std::ifstream& obs_input_stream,
-//				std::ifstream& obj_input_stream, std::size_t batch_size) {
-//
-//	}
-//	inline std::size_t _skip(std::ifstream& obs_input_stream, std::ifstream& obj_input_stream,
-//				std::size_t instances) {
-//		std::streampos curr_pos = data_stream.tellg();
-//		data_stream.seekg(0, std::ios::end);
-//		std::size_t skip_extent = data_stream.tellg() - curr_pos;
-//		data_stream.seekg(curr_pos);
-//		data_stream.ignore(instances * INSTANCE_LENGTH);
-//		return std::min(instances, skip_extent / INSTANCE_LENGTH);
-//	}
-//private:
-//	const Dimensions<std::size_t,3> obs;
-//	const Dimensions<std::size_t,3> obj;
-//	char obs_buffer[INSTANCE_LENGTH];
-//};
+/**
+ * A data provider template for the MNIST data set.
+ */
+template<typename Scalar>
+class MNISTDataProvider : public SplitFileDataProvider<Scalar,2,false> {
+	typedef DataProvider<Scalar,2,false> Root;
+	typedef SplitFileDataProvider<Scalar,2,false> Base;
+	static constexpr std::size_t OBS_OFFSET = 16;
+	static constexpr std::size_t LABEL_OFFSET = 8;
+	static constexpr std::size_t OBS_INSTANCE_LENGTH = 784;
+	static constexpr std::size_t LABEL_INSTANCE_LENGTH = 1;
+public:
+	/**
+	 * @param obs_path The path to the file containing the observations.
+	 * @param labels_path The path to the file containing the corresponding labels.
+	 */
+	MNISTDataProvider(std::string obs_path, std::string labels_path) :
+			Base::SplitFileDataProvider(std::make_pair(obs_path, labels_path), true, true),
+			obs({ 28u, 28u }),
+			obj({ 10u, 1u }) { }
+	inline const Dimensions<std::size_t,2>& get_obs_dims() const {
+		return obs;
+	}
+	inline const Dimensions<std::size_t,2>& get_obj_dims() const {
+		return obj;
+	}
+protected:
+	inline void _set_to_beg(std::ifstream& obs_input_stream, std::ifstream& obj_input_stream) {
+		Base::set_to_beg(obs_input_stream, obj_input_stream);
+		obs_input_stream.ignore(OBS_OFFSET);
+		obs_input_stream.ignore(LABEL_OFFSET);
+	}
+	inline DataPair<Scalar,2,false> _get_data(std::ifstream& obs_input_stream,
+				std::ifstream& obj_input_stream, std::size_t batch_size) {
+		Tensor<Scalar,3> obs(batch_size, 28u, 28u);
+		Tensor<Scalar,3> obj(batch_size, 10u, 1u);
+		obj.setZero();
+		std::size_t i;
+		unsigned char label;
+		for (i = 0; i < batch_size && obs_input_stream.read(obs_buffer, OBS_INSTANCE_LENGTH) &&
+				obj_input_stream >> label; ++i) {
+			unsigned char* u_buffer = reinterpret_cast<unsigned char*>(obs_buffer);
+			// Set the label.
+			obj(i,label,0u) = (Scalar) 1;
+			// Set the image.
+			std::size_t buffer_ind = 0;
+			for (std::size_t height = 0; height < 28; ++height) {
+				for (std::size_t width = 0; width < 28; ++width)
+					obs(i,height,width) = (Scalar) u_buffer[buffer_ind++];
+			}
+			assert(buffer_ind == OBS_INSTANCE_LENGTH);
+		}
+		if (i == batch_size)
+			return std::make_pair(obs, obj);
+		std::array<std::size_t,3> offsets({ 0, 0, 0 });
+		std::array<std::size_t,3> obs_extents({ i, 28u, 28u });
+		std::array<std::size_t,3> obj_extents({ i, 10u, 1u });
+		return std::make_pair(obs.slice(offsets, obs_extents), obj.slice(offsets, obj_extents));
+	}
+	inline std::size_t _skip(std::ifstream& obs_input_stream, std::ifstream& obj_input_stream,
+				std::size_t instances) {
+		// Skip observations.
+		std::streampos curr_obs_pos = obs_input_stream.tellg();
+		obs_input_stream.seekg(0, std::ios::end);
+		std::size_t obs_skip_extent = obs_input_stream.tellg() - curr_obs_pos;
+		obs_input_stream.seekg(curr_obs_pos);
+		obs_input_stream.ignore(instances * OBS_INSTANCE_LENGTH);
+		std::size_t skipped_obs = std::min(instances, obs_skip_extent / OBS_INSTANCE_LENGTH);
+		// Skip labels.
+		std::streampos curr_label_pos = obj_input_stream.tellg();
+		obj_input_stream.seekg(0, std::ios::end);
+		std::size_t label_skip_extent = obj_input_stream.tellg() - curr_label_pos;
+		obj_input_stream.seekg(curr_label_pos);
+		obj_input_stream.ignore(instances * LABEL_INSTANCE_LENGTH);
+		std::size_t skipped_labels = std::min(instances, label_skip_extent / LABEL_INSTANCE_LENGTH);
+		assert(skipped_obs == skipped_labels);
+		return skipped_obs;
+	}
+private:
+	const Dimensions<std::size_t,2> obs;
+	const Dimensions<std::size_t,2> obj;
+	char obs_buffer[OBS_INSTANCE_LENGTH];
+};
 
 /**
  * An enum denoting different CIFAR data set types.
@@ -475,8 +550,11 @@ class CIFARDataProvider : public JointFileDataProvider<Scalar,3,false> {
 	typedef JointFileDataProvider<Scalar,3,false> Base;
 	static_assert(CIFARType == CIFAR_10 || CIFARType == CIFAR_100, "invalid CIFAR type");
 	static constexpr std::size_t INSTANCE_LENGTH = CIFARType == CIFAR_10 ? 3073 : 3074;
-	static constexpr std::size_t NUM_LABELS = CIFAR_10 ? 10 : 100;
+	static constexpr std::size_t NUM_LABELS = CIFARType == CIFAR_10 ? 10 : 100;
 public:
+	/**
+	 * @param file_paths The paths to the data set files.
+	 */
 	inline CIFARDataProvider(std::vector<std::string> file_paths) :
 			Base::JointFileDataProvider(file_paths, true),
 			obs({ 32u, 32u, 3u }),
@@ -497,19 +575,15 @@ protected:
 		for (i = 0; i < batch_size && data_stream.read(buffer, INSTANCE_LENGTH); ++i) {
 			unsigned char* u_buffer = reinterpret_cast<unsigned char*>(buffer);
 			std::size_t buffer_ind = 0;
-			// Read the label.
-			if (CIFARType == CIFAR_10)
-				obj(i,u_buffer[buffer_ind++],0u,0u) = (Scalar) 1;
-			else {
-				std::size_t coarse_label = u_buffer[buffer_ind++];
-				std::size_t fine_label = u_buffer[buffer_ind++];
-				obj(i,(std::size_t) (coarse_label * 5 + fine_label),0u,0u) = (Scalar) 1;
-			}
-			// Read the image.
+			// Set the label.
+			if (CIFARType == CIFAR_100)
+				buffer_ind++;
+			obj(i,u_buffer[buffer_ind++],0u,0u) = (Scalar) 1;
+			// Set the image.
 			for (std::size_t channel = 0; channel < 3; ++channel) {
-				for (std::size_t row = 0; row < 32; ++row) {
-					for (std::size_t column = 0; column < 32; ++column)
-						obs(i,column,row,channel) = (Scalar) u_buffer[buffer_ind++];
+				for (std::size_t height = 0; height < 32; ++height) {
+					for (std::size_t width = 0; width < 32; ++width)
+						obs(i,height,width,channel) = (Scalar) u_buffer[buffer_ind++];
 				}
 			}
 			assert(buffer_ind == INSTANCE_LENGTH);

@@ -90,7 +90,9 @@ Inheritance diagram for cattle::DataProvider&lt; Scalar, Rank, Sequential &gt;:<
 <area href="classcattle_1_1_partition_data_provider.html" alt="cattle::PartitionDataProvider&lt; Scalar, Rank, Sequential &gt;" shape="rect" coords="692,56,1028,80"/>
 <area href="classcattle_1_1_split_file_data_provider.html" alt="cattle::SplitFileDataProvider&lt; Scalar, Rank, Sequential &gt;" shape="rect" coords="1038,56,1374,80"/>
 <area href="classcattle_1_1_joint_file_data_provider.html" alt="cattle::JointFileDataProvider&lt; Scalar, 3, false &gt;" shape="rect" coords="1384,56,1720,80"/>
-<area href="classcattle_1_1_c_i_f_a_r10_data_provider.html" alt="cattle::CIFAR10DataProvider&lt; Scalar &gt;" shape="rect" coords="1384,112,1720,136"/>
+<area href="classcattle_1_1_split_file_data_provider.html" alt="cattle::SplitFileDataProvider&lt; Scalar, 2, false &gt;" shape="rect" coords="1730,56,2066,80"/>
+<area href="classcattle_1_1_c_i_f_a_r_data_provider.html" alt="cattle::CIFARDataProvider&lt; Scalar, CIFARType &gt;" shape="rect" coords="1384,112,1720,136"/>
+<area href="classcattle_1_1_m_n_i_s_t_data_provider.html" alt="cattle::MNISTDataProvider&lt; Scalar &gt;" shape="rect" coords="1730,112,2066,136"/>
 </map>
  </div></div>
 <table class="memberdecls">
@@ -248,7 +250,7 @@ template&lt;typename Scalar , std::size_t Rank, bool Sequential&gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>At most batch_size number of observation-objective pairs. If the number of unread pairs is less than batch_size, the number of returned pairs is that of the unread ones. </dd></dl>
 
-<p>Implemented in <a class="el" href="classcattle_1_1_split_file_data_provider.html#aa33075e9c055d66dcf14225933ed8041">cattle::SplitFileDataProvider&lt; Scalar, Rank, Sequential &gt;</a>, <a class="el" href="classcattle_1_1_joint_file_data_provider.html#a1c3d1bef8f840904640885752bd8a5ca">cattle::JointFileDataProvider&lt; Scalar, Rank, Sequential &gt;</a>, <a class="el" href="classcattle_1_1_joint_file_data_provider.html#a1c3d1bef8f840904640885752bd8a5ca">cattle::JointFileDataProvider&lt; Scalar, 3, false &gt;</a>, <a class="el" href="classcattle_1_1_memory_data_provider.html#a1fa4c4176131ea96b4e200a41d5dfc4e">cattle::MemoryDataProvider&lt; Scalar, Rank, Sequential &gt;</a>, and <a class="el" href="classcattle_1_1_partition_data_provider.html#a70fcceb9f194d09ec53cb92b4c323eea">cattle::PartitionDataProvider&lt; Scalar, Rank, Sequential &gt;</a>.</p>
+<p>Implemented in <a class="el" href="classcattle_1_1_split_file_data_provider.html#aa33075e9c055d66dcf14225933ed8041">cattle::SplitFileDataProvider&lt; Scalar, Rank, Sequential &gt;</a>, <a class="el" href="classcattle_1_1_split_file_data_provider.html#aa33075e9c055d66dcf14225933ed8041">cattle::SplitFileDataProvider&lt; Scalar, 2, false &gt;</a>, <a class="el" href="classcattle_1_1_joint_file_data_provider.html#a1c3d1bef8f840904640885752bd8a5ca">cattle::JointFileDataProvider&lt; Scalar, Rank, Sequential &gt;</a>, <a class="el" href="classcattle_1_1_joint_file_data_provider.html#a1c3d1bef8f840904640885752bd8a5ca">cattle::JointFileDataProvider&lt; Scalar, 3, false &gt;</a>, <a class="el" href="classcattle_1_1_memory_data_provider.html#a1fa4c4176131ea96b4e200a41d5dfc4e">cattle::MemoryDataProvider&lt; Scalar, Rank, Sequential &gt;</a>, and <a class="el" href="classcattle_1_1_partition_data_provider.html#a70fcceb9f194d09ec53cb92b4c323eea">cattle::PartitionDataProvider&lt; Scalar, Rank, Sequential &gt;</a>.</p>
 
 </div>
 </div>
@@ -279,7 +281,7 @@ template&lt;typename Scalar , std::size_t Rank, bool Sequential&gt; </div>
 <p>A simple constant getter method for the dimensions of the objectives.</p>
 <dl class="section return"><dt>Returns</dt><dd>A constant reference to the dimensions of the objectives. </dd></dl>
 
-<p>Implemented in <a class="el" href="classcattle_1_1_c_i_f_a_r10_data_provider.html#a0414650a3a904f0837bab543f9bc9b7c">cattle::CIFAR10DataProvider&lt; Scalar &gt;</a>, <a class="el" href="classcattle_1_1_memory_data_provider.html#ad67b322886acffee1dfe7ed6625acf4c">cattle::MemoryDataProvider&lt; Scalar, Rank, Sequential &gt;</a>, and <a class="el" href="classcattle_1_1_partition_data_provider.html#af9402bd795c770fc8fdcc5249a3b9f2f">cattle::PartitionDataProvider&lt; Scalar, Rank, Sequential &gt;</a>.</p>
+<p>Implemented in <a class="el" href="classcattle_1_1_c_i_f_a_r_data_provider.html#af60eefbce63dbbfb982807c160768f61">cattle::CIFARDataProvider&lt; Scalar, CIFARType &gt;</a>, <a class="el" href="classcattle_1_1_m_n_i_s_t_data_provider.html#a8494c92d24122ced6df875c92de504f9">cattle::MNISTDataProvider&lt; Scalar &gt;</a>, <a class="el" href="classcattle_1_1_memory_data_provider.html#ad67b322886acffee1dfe7ed6625acf4c">cattle::MemoryDataProvider&lt; Scalar, Rank, Sequential &gt;</a>, and <a class="el" href="classcattle_1_1_partition_data_provider.html#af9402bd795c770fc8fdcc5249a3b9f2f">cattle::PartitionDataProvider&lt; Scalar, Rank, Sequential &gt;</a>.</p>
 
 </div>
 </div>
@@ -310,7 +312,7 @@ template&lt;typename Scalar , std::size_t Rank, bool Sequential&gt; </div>
 <p>A simple constant getter method for the dimensions of the observations.</p>
 <dl class="section return"><dt>Returns</dt><dd>A constant reference to the dimensions of the observations. </dd></dl>
 
-<p>Implemented in <a class="el" href="classcattle_1_1_c_i_f_a_r10_data_provider.html#afe4ed83691153e265444965f734a4441">cattle::CIFAR10DataProvider&lt; Scalar &gt;</a>, <a class="el" href="classcattle_1_1_memory_data_provider.html#a7eca09e5fbd7926babd19199b7c7697a">cattle::MemoryDataProvider&lt; Scalar, Rank, Sequential &gt;</a>, and <a class="el" href="classcattle_1_1_partition_data_provider.html#aab3579161e485a3f2776f2939eec692e">cattle::PartitionDataProvider&lt; Scalar, Rank, Sequential &gt;</a>.</p>
+<p>Implemented in <a class="el" href="classcattle_1_1_c_i_f_a_r_data_provider.html#ab8c86d2e8a78146b84e070b879c9ab85">cattle::CIFARDataProvider&lt; Scalar, CIFARType &gt;</a>, <a class="el" href="classcattle_1_1_m_n_i_s_t_data_provider.html#ad2479b5ee8fcc922ede1d1a20ae6ebb1">cattle::MNISTDataProvider&lt; Scalar &gt;</a>, <a class="el" href="classcattle_1_1_memory_data_provider.html#a7eca09e5fbd7926babd19199b7c7697a">cattle::MemoryDataProvider&lt; Scalar, Rank, Sequential &gt;</a>, and <a class="el" href="classcattle_1_1_partition_data_provider.html#aab3579161e485a3f2776f2939eec692e">cattle::PartitionDataProvider&lt; Scalar, Rank, Sequential &gt;</a>.</p>
 
 </div>
 </div>
@@ -341,7 +343,7 @@ template&lt;typename Scalar , std::size_t Rank, bool Sequential&gt; </div>
 <p>A method that returns whether the data provider instance has more data to provide. It should always be called before calling <a class="el" href="classcattle_1_1_data_provider.html#a2545442faef51fda5466054df0ae929a">get_data(std::size_t)</a>.</p>
 <dl class="section return"><dt>Returns</dt><dd>Whether there are more observation-objective pairs to read from the instance. </dd></dl>
 
-<p>Implemented in <a class="el" href="classcattle_1_1_split_file_data_provider.html#a20b7b824add5db25f28f570dd6b4d878">cattle::SplitFileDataProvider&lt; Scalar, Rank, Sequential &gt;</a>, <a class="el" href="classcattle_1_1_joint_file_data_provider.html#a4a8d2732230135eb7777f5f1a6df9ef1">cattle::JointFileDataProvider&lt; Scalar, Rank, Sequential &gt;</a>, <a class="el" href="classcattle_1_1_joint_file_data_provider.html#a4a8d2732230135eb7777f5f1a6df9ef1">cattle::JointFileDataProvider&lt; Scalar, 3, false &gt;</a>, <a class="el" href="classcattle_1_1_memory_data_provider.html#add05cbeadc13198dd6e344c33a29be8b">cattle::MemoryDataProvider&lt; Scalar, Rank, Sequential &gt;</a>, and <a class="el" href="classcattle_1_1_partition_data_provider.html#a4ba68492ada3b7a268b75b9d162b9958">cattle::PartitionDataProvider&lt; Scalar, Rank, Sequential &gt;</a>.</p>
+<p>Implemented in <a class="el" href="classcattle_1_1_split_file_data_provider.html#a20b7b824add5db25f28f570dd6b4d878">cattle::SplitFileDataProvider&lt; Scalar, Rank, Sequential &gt;</a>, <a class="el" href="classcattle_1_1_split_file_data_provider.html#a20b7b824add5db25f28f570dd6b4d878">cattle::SplitFileDataProvider&lt; Scalar, 2, false &gt;</a>, <a class="el" href="classcattle_1_1_joint_file_data_provider.html#a4a8d2732230135eb7777f5f1a6df9ef1">cattle::JointFileDataProvider&lt; Scalar, Rank, Sequential &gt;</a>, <a class="el" href="classcattle_1_1_joint_file_data_provider.html#a4a8d2732230135eb7777f5f1a6df9ef1">cattle::JointFileDataProvider&lt; Scalar, 3, false &gt;</a>, <a class="el" href="classcattle_1_1_memory_data_provider.html#add05cbeadc13198dd6e344c33a29be8b">cattle::MemoryDataProvider&lt; Scalar, Rank, Sequential &gt;</a>, and <a class="el" href="classcattle_1_1_partition_data_provider.html#a4ba68492ada3b7a268b75b9d162b9958">cattle::PartitionDataProvider&lt; Scalar, Rank, Sequential &gt;</a>.</p>
 
 </div>
 </div>
@@ -371,7 +373,7 @@ template&lt;typename Scalar , std::size_t Rank, bool Sequential&gt; </div>
 </div><div class="memdoc">
 <p>It resets the reader head to the beginning of the data storage. </p>
 
-<p>Implemented in <a class="el" href="classcattle_1_1_split_file_data_provider.html#a343544860dd9929320f290c5532a4e59">cattle::SplitFileDataProvider&lt; Scalar, Rank, Sequential &gt;</a>, <a class="el" href="classcattle_1_1_joint_file_data_provider.html#af3bd0cb5a2758293d3bc2d6195061d04">cattle::JointFileDataProvider&lt; Scalar, Rank, Sequential &gt;</a>, <a class="el" href="classcattle_1_1_joint_file_data_provider.html#af3bd0cb5a2758293d3bc2d6195061d04">cattle::JointFileDataProvider&lt; Scalar, 3, false &gt;</a>, <a class="el" href="classcattle_1_1_memory_data_provider.html#a2448244ba6e5efc108b005ad0d256305">cattle::MemoryDataProvider&lt; Scalar, Rank, Sequential &gt;</a>, and <a class="el" href="classcattle_1_1_partition_data_provider.html#a6bb5fe3fad3e118440be1249ce2726b2">cattle::PartitionDataProvider&lt; Scalar, Rank, Sequential &gt;</a>.</p>
+<p>Implemented in <a class="el" href="classcattle_1_1_split_file_data_provider.html#a343544860dd9929320f290c5532a4e59">cattle::SplitFileDataProvider&lt; Scalar, Rank, Sequential &gt;</a>, <a class="el" href="classcattle_1_1_split_file_data_provider.html#a343544860dd9929320f290c5532a4e59">cattle::SplitFileDataProvider&lt; Scalar, 2, false &gt;</a>, <a class="el" href="classcattle_1_1_joint_file_data_provider.html#af3bd0cb5a2758293d3bc2d6195061d04">cattle::JointFileDataProvider&lt; Scalar, Rank, Sequential &gt;</a>, <a class="el" href="classcattle_1_1_joint_file_data_provider.html#af3bd0cb5a2758293d3bc2d6195061d04">cattle::JointFileDataProvider&lt; Scalar, 3, false &gt;</a>, <a class="el" href="classcattle_1_1_memory_data_provider.html#a2448244ba6e5efc108b005ad0d256305">cattle::MemoryDataProvider&lt; Scalar, Rank, Sequential &gt;</a>, and <a class="el" href="classcattle_1_1_partition_data_provider.html#a6bb5fe3fad3e118440be1249ce2726b2">cattle::PartitionDataProvider&lt; Scalar, Rank, Sequential &gt;</a>.</p>
 
 </div>
 </div>
@@ -408,7 +410,7 @@ template&lt;typename Scalar , std::size_t Rank, bool Sequential&gt; </div>
   </dd>
 </dl>
 
-<p>Implemented in <a class="el" href="classcattle_1_1_split_file_data_provider.html#a45ee1ff4a2709ab2d8bd6d680e5ad818">cattle::SplitFileDataProvider&lt; Scalar, Rank, Sequential &gt;</a>, <a class="el" href="classcattle_1_1_joint_file_data_provider.html#a9338d16a678742f47ff619a286e28729">cattle::JointFileDataProvider&lt; Scalar, Rank, Sequential &gt;</a>, <a class="el" href="classcattle_1_1_joint_file_data_provider.html#a9338d16a678742f47ff619a286e28729">cattle::JointFileDataProvider&lt; Scalar, 3, false &gt;</a>, <a class="el" href="classcattle_1_1_memory_data_provider.html#a1e5affa93986946c549e9535a49deecf">cattle::MemoryDataProvider&lt; Scalar, Rank, Sequential &gt;</a>, and <a class="el" href="classcattle_1_1_partition_data_provider.html#a2b9c2b86265360d5d44512b9d4851609">cattle::PartitionDataProvider&lt; Scalar, Rank, Sequential &gt;</a>.</p>
+<p>Implemented in <a class="el" href="classcattle_1_1_split_file_data_provider.html#a45ee1ff4a2709ab2d8bd6d680e5ad818">cattle::SplitFileDataProvider&lt; Scalar, Rank, Sequential &gt;</a>, <a class="el" href="classcattle_1_1_split_file_data_provider.html#a45ee1ff4a2709ab2d8bd6d680e5ad818">cattle::SplitFileDataProvider&lt; Scalar, 2, false &gt;</a>, <a class="el" href="classcattle_1_1_joint_file_data_provider.html#a9338d16a678742f47ff619a286e28729">cattle::JointFileDataProvider&lt; Scalar, Rank, Sequential &gt;</a>, <a class="el" href="classcattle_1_1_joint_file_data_provider.html#a9338d16a678742f47ff619a286e28729">cattle::JointFileDataProvider&lt; Scalar, 3, false &gt;</a>, <a class="el" href="classcattle_1_1_memory_data_provider.html#a1e5affa93986946c549e9535a49deecf">cattle::MemoryDataProvider&lt; Scalar, Rank, Sequential &gt;</a>, and <a class="el" href="classcattle_1_1_partition_data_provider.html#a2b9c2b86265360d5d44512b9d4851609">cattle::PartitionDataProvider&lt; Scalar, Rank, Sequential &gt;</a>.</p>
 
 </div>
 </div>

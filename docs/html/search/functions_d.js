@@ -6,6 +6,7 @@ var searchData=
   ['maxpoolinglayer',['MaxPoolingLayer',['../classcattle_1_1_max_pooling_layer.html#a715131cbf6e87de022efb74109d2a914',1,'cattle::MaxPoolingLayer']]],
   ['meanpoolinglayer',['MeanPoolingLayer',['../classcattle_1_1_mean_pooling_layer.html#ab3fd6ed7d159ab1553f35032562135a3',1,'cattle::MeanPoolingLayer']]],
   ['memorydataprovider',['MemoryDataProvider',['../classcattle_1_1_memory_data_provider.html#aa262ef9fadf3a94be6f94eec2d49e800',1,'cattle::MemoryDataProvider']]],
+  ['mnistdataprovider',['MNISTDataProvider',['../classcattle_1_1_m_n_i_s_t_data_provider.html#a6ea7c7026514c600ed595c6f7fdb5696',1,'cattle::MNISTDataProvider']]],
   ['momentumacceleratedsgdoptimizer',['MomentumAcceleratedSGDOptimizer',['../classcattle_1_1_momentum_accelerated_s_g_d_optimizer.html#ac47fc3616c893415feaf0fab928a77aa',1,'cattle::MomentumAcceleratedSGDOptimizer']]],
   ['multilabellogloss',['MultiLabelLogLoss',['../classcattle_1_1_multi_label_log_loss.html#a47c504330c9041efe42f5881c091a6bf',1,'cattle::MultiLabelLogLoss']]],
   ['multiply_5falong_5frank',['multiply_along_rank',['../classcattle_1_1_dim_expression.html#a821851314cfe561bbb35050016ef615f',1,'cattle::DimExpression']]]

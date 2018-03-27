@@ -5,5 +5,5 @@ var searchData=
   ['biased_5fin',['biased_in',['../classcattle_1_1_f_c_layer.html#ad07b61aeaead63cb48eba1b1758cc4f4',1,'cattle::FCLayer']]],
   ['biased_5fin_5fvec',['biased_in_vec',['../classcattle_1_1_conv_layer.html#a55b0678a8dfc82eefd15d40702462183',1,'cattle::ConvLayer']]],
   ['blocks',['blocks',['../classcattle_1_1_composite_neural_network.html#aa6eacce69c37f3566e302b68512cf5c8',1,'cattle::CompositeNeuralNetwork']]],
-  ['buffer',['buffer',['../classcattle_1_1_c_i_f_a_r10_data_provider.html#abf73b1c95f7e69717cdd8377a8cb344b',1,'cattle::CIFAR10DataProvider']]]
+  ['buffer',['buffer',['../classcattle_1_1_c_i_f_a_r_data_provider.html#a4207186b0588ed835e30e03be970d402',1,'cattle::CIFARDataProvider']]]
 ];

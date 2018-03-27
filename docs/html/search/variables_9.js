@@ -4,6 +4,8 @@ var searchData=
   ['l1_5flambda',['l1_lambda',['../classcattle_1_1_elastic_net_regularization_penalty.html#a280a4d17046b34d3c67a4b4bb5fa1083',1,'cattle::ElasticNetRegularizationPenalty']]],
   ['l2_5fdecay',['l2_decay',['../classcattle_1_1_r_m_s_prop_optimizer.html#ac3a77464c09969f84b5468c48be4612c',1,'cattle::RMSPropOptimizer::l2_decay()'],['../classcattle_1_1_adam_optimizer.html#a9db28d5da3625cf7ab52fdcbec0f23d8',1,'cattle::AdamOptimizer::l2_decay()']]],
   ['l2_5flambda',['l2_lambda',['../classcattle_1_1_elastic_net_regularization_penalty.html#ad9c33162818db4b03b259ef6ca530edb',1,'cattle::ElasticNetRegularizationPenalty']]],
+  ['label_5finstance_5flength',['LABEL_INSTANCE_LENGTH',['../classcattle_1_1_m_n_i_s_t_data_provider.html#ad097ae3cba076a1594af22238a36a67b',1,'cattle::MNISTDataProvider']]],
+  ['label_5foffset',['LABEL_OFFSET',['../classcattle_1_1_m_n_i_s_t_data_provider.html#ac8b82ce68cda99910f68759a14e54b9d',1,'cattle::MNISTDataProvider']]],
   ['lambda',['lambda',['../classcattle_1_1_l1_regularization_penalty.html#a41e180d88d5b454f8ef20cdbc1b42f6b',1,'cattle::L1RegularizationPenalty::lambda()'],['../classcattle_1_1_l2_regularization_penalty.html#a9414f803e6f913d5e136282fcdca1c1c',1,'cattle::L2RegularizationPenalty::lambda()']]],
   ['lane_5fid',['lane_id',['../structcattle_1_1_parallel_neural_network_1_1_prop_args.html#a58aca19ef9d40f72d7be6aaff498d566',1,'cattle::ParallelNeuralNetwork::PropArgs::lane_id()'],['../structcattle_1_1_parallel_neural_network_1_1_backprop_args.html#a47c6d7eff77f7b6e5e242fd660b80a8e',1,'cattle::ParallelNeuralNetwork::BackpropArgs::lane_id()']]],
   ['lanes',['lanes',['../classcattle_1_1_parallel_neural_network.html#a6923216c8576663ce02522dc676e97d7',1,'cattle::ParallelNeuralNetwork']]],

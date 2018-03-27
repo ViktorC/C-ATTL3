@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['denseconcattype',['DenseConcatType',['../namespacecattle.html#a962c4b25a74fac744864b9fa4fca4a0b',1,'cattle']]]
+  ['cifartype',['CIFARType',['../namespacecattle.html#a3aba4c1d42028d369dfb60a0507d3785',1,'cattle']]]
 ];
