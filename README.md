@@ -77,9 +77,11 @@ The library also provides optimizers that can be used to train the networks via 
 Similarly to the layers, these optimizers rely on several hyper-parameters as well. Besides the hyper-parameters, optimizers also require 'practically' differentiable loss functions and regularization penalty functions. The library provides the following out of the box loss functions:
 * [Loss](https://viktorc.github.io/C-ATTL3/html/classcattle_1_1_loss.html) [A]
   * [UniversalLoss](https://viktorc.github.io/C-ATTL3/html/classcattle_1_1_universal_loss.html) [A]
+    * [AbsoluteLoss](https://viktorc.github.io/C-ATTL3/html/classcattle_1_1_absolute_loss.html)
     * [QuadraticLoss](https://viktorc.github.io/C-ATTL3/html/classcattle_1_1_quadratic_loss.html)
     * [HingeLoss](https://viktorc.github.io/C-ATTL3/html/classcattle_1_1_hinge_loss.html)
     * [CrossEntropyLoss](https://viktorc.github.io/C-ATTL3/html/classcattle_1_1_cross_entropy_loss.html)
+    * [SoftmaxCrossEntropyLoss](https://viktorc.github.io/C-ATTL3/html/classcattle_1_1_softmax_cross_entropy_loss.html)
     * [MultiLabelHingeLoss](https://viktorc.github.io/C-ATTL3/html/classcattle_1_1_multi_label_hinge_loss.html)
     * [MultiLabelLogLoss](https://viktorc.github.io/C-ATTL3/html/classcattle_1_1_multi_label_log_loss.html)
 

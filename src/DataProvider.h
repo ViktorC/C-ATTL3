@@ -94,9 +94,9 @@ protected:
 	 */
 	virtual void skip(std::size_t instances) = 0;
 protected:
-	static constexpr std::size_t DATA_RANKS = Rank + Sequential + 1;
-	typedef Tensor<Scalar,DATA_RANKS> Data;
-	typedef TensorPtr<Scalar,DATA_RANKS> DataPtr;
+	static constexpr std::size_t DATA_RANK = Rank + Sequential + 1;
+	typedef Tensor<Scalar,DATA_RANK> Data;
+	typedef TensorPtr<Scalar,DATA_RANK> DataPtr;
 };
 
 /**
@@ -169,14 +169,14 @@ public:
 				offsets() {
 		assert(this->obs != nullptr);
 		assert(this->obj != nullptr);
-		Utils<Scalar>::template check_dim_validity<Base::DATA_RANKS>(*this->obs);
-		Utils<Scalar>::template check_dim_validity<Base::DATA_RANKS>(*this->obj);
+		Utils<Scalar>::template check_dim_validity<Base::DATA_RANK>(*this->obs);
+		Utils<Scalar>::template check_dim_validity<Base::DATA_RANK>(*this->obj);
 		assert(this->obs->dimension(0) == this->obj->dimension(0) &&
 				"mismatched data and obj tensor row numbers");
-		Dimensions<std::size_t,Base::DATA_RANKS> obs_dims =
-				Utils<Scalar>::template get_dims<Base::DATA_RANKS>(*this->obs);
-		Dimensions<std::size_t,Base::DATA_RANKS> obj_dims =
-				Utils<Scalar>::template get_dims<Base::DATA_RANKS>(*this->obj);
+		Dimensions<std::size_t,Base::DATA_RANK> obs_dims =
+				Utils<Scalar>::template get_dims<Base::DATA_RANK>(*this->obs);
+		Dimensions<std::size_t,Base::DATA_RANK> obj_dims =
+				Utils<Scalar>::template get_dims<Base::DATA_RANK>(*this->obj);
 		this->obs_dims = obs_dims.template demote<Sequential + 1>();
 		this->obj_dims = obj_dims.template demote<Sequential + 1>();
 		instances = (std::size_t) this->obs->dimension(0);
@@ -184,8 +184,8 @@ public:
 		data_extents = obs_dims;
 		obj_extents = obj_dims;
 		if (shuffle) {
-			Utils<Scalar>::template shuffle_tensor_rows<Base::DATA_RANKS>(*this->obs);
-			Utils<Scalar>::template shuffle_tensor_rows<Base::DATA_RANKS>(*this->obj);
+			Utils<Scalar>::template shuffle_tensor_rows<Base::DATA_RANK>(*this->obs);
+			Utils<Scalar>::template shuffle_tensor_rows<Base::DATA_RANK>(*this->obj);
 		}
 	}
 	inline const Dimensions<std::size_t,Rank>& get_obs_dims() const {
@@ -221,9 +221,9 @@ private:
 	Dimensions<std::size_t,Rank> obs_dims;
 	Dimensions<std::size_t,Rank> obj_dims;
 	std::size_t instances;
-	std::array<std::size_t,Base::DATA_RANKS> offsets;
-	std::array<std::size_t,Base::DATA_RANKS> data_extents;
-	std::array<std::size_t,Base::DATA_RANKS> obj_extents;
+	std::array<std::size_t,Base::DATA_RANK> offsets;
+	std::array<std::size_t,Base::DATA_RANK> data_extents;
+	std::array<std::size_t,Base::DATA_RANK> obj_extents;
 };
 
 /**
@@ -345,8 +345,8 @@ public:
 	inline bool has_more() {
 		for (; current_stream_pair < data_stream_pairs.size(); ++current_stream_pair) {
 			std::pair<std::ifstream,std::ifstream>& stream_pair = data_stream_pairs[current_stream_pair];
-			if (stream_pair.first() && stream_pair.first.peek() != EOF &&
-					stream_pair.second && stream_pair.second.peek() != EOF)
+			if (stream_pair.first && (stream_pair.first.peek() != EOF) &&
+					stream_pair.second && (stream_pair.second.peek() != EOF))
 				return true;
 		}
 		return false;
@@ -395,12 +395,13 @@ protected:
 			std::ifstream obj_stream(path_pair.second, obj_binary ? std::ios::binary : std::ios::in);
 			assert(obj_stream.is_open());
 			_set_to_beg(obs_stream, obj_stream);
-			data_stream_pairs[i] = std::make_pair(obs_stream, obj_stream);
+			data_stream_pairs[i] = std::make_pair(std::move(obs_stream), std::move(obj_stream));
 		}
 	}
 	inline SplitFileDataProvider(std::pair<std::string,std::string> dataset_path_pair, bool obs_binary,
 			bool obj_binary) :
-				SplitFileDataProvider({ dataset_path_pair }, obs_binary, obj_binary) { }
+				SplitFileDataProvider(std::vector<std::pair<std::string,std::string>>({ dataset_path_pair }),
+						obs_binary, obj_binary) { }
 	/**
 	 * It sets the positions of the file streams to the beginning of the observation data set and
 	 * the objective data set respectively.
@@ -456,9 +457,9 @@ private:
  * A data provider template for the MNIST data set.
  */
 template<typename Scalar>
-class MNISTDataProvider : public SplitFileDataProvider<Scalar,2,false> {
-	typedef DataProvider<Scalar,2,false> Root;
-	typedef SplitFileDataProvider<Scalar,2,false> Base;
+class MNISTDataProvider : public SplitFileDataProvider<Scalar,3,false> {
+	typedef DataProvider<Scalar,3,false> Root;
+	typedef SplitFileDataProvider<Scalar,3,false> Base;
 	static constexpr std::size_t OBS_OFFSET = 16;
 	static constexpr std::size_t LABEL_OFFSET = 8;
 	static constexpr std::size_t OBS_INSTANCE_LENGTH = 784;
@@ -470,45 +471,45 @@ public:
 	 */
 	MNISTDataProvider(std::string obs_path, std::string labels_path) :
 			Base::SplitFileDataProvider(std::make_pair(obs_path, labels_path), true, true),
-			obs({ 28u, 28u }),
-			obj({ 10u, 1u }) { }
-	inline const Dimensions<std::size_t,2>& get_obs_dims() const {
+			obs({ 28u, 28u, 1u }),
+			obj({ 10u, 1u, 1u }) { }
+	inline const Dimensions<std::size_t,3>& get_obs_dims() const {
 		return obs;
 	}
-	inline const Dimensions<std::size_t,2>& get_obj_dims() const {
+	inline const Dimensions<std::size_t,3>& get_obj_dims() const {
 		return obj;
 	}
 protected:
 	inline void _set_to_beg(std::ifstream& obs_input_stream, std::ifstream& obj_input_stream) {
-		Base::set_to_beg(obs_input_stream, obj_input_stream);
+		Base::_set_to_beg(obs_input_stream, obj_input_stream);
 		obs_input_stream.ignore(OBS_OFFSET);
-		obs_input_stream.ignore(LABEL_OFFSET);
+		obj_input_stream.ignore(LABEL_OFFSET);
 	}
-	inline DataPair<Scalar,2,false> _get_data(std::ifstream& obs_input_stream,
+	inline DataPair<Scalar,3,false> _get_data(std::ifstream& obs_input_stream,
 				std::ifstream& obj_input_stream, std::size_t batch_size) {
-		Tensor<Scalar,3> obs(batch_size, 28u, 28u);
-		Tensor<Scalar,3> obj(batch_size, 10u, 1u);
+		Tensor<Scalar,4> obs(batch_size, 28u, 28u, 1u);
+		Tensor<Scalar,4> obj(batch_size, 10u, 1u, 1u);
 		obj.setZero();
 		std::size_t i;
-		unsigned char label;
-		for (i = 0; i < batch_size && obs_input_stream.read(obs_buffer, OBS_INSTANCE_LENGTH) &&
-				obj_input_stream >> label; ++i) {
-			unsigned char* u_buffer = reinterpret_cast<unsigned char*>(obs_buffer);
-			// Set the label.
-			obj(i,label,0u) = (Scalar) 1;
+		for (i = 0; i < batch_size && obs_input_stream.read(obs_buffer, OBS_INSTANCE_LENGTH); ++i) {
+			// Read and set the label.
+			unsigned char label;
+			obj_input_stream >> label;
+			obj(i,(std::size_t) label,0u,0u) = (Scalar) 1;
 			// Set the image.
+			unsigned char* u_buffer = reinterpret_cast<unsigned char*>(obs_buffer);
 			std::size_t buffer_ind = 0;
 			for (std::size_t height = 0; height < 28; ++height) {
 				for (std::size_t width = 0; width < 28; ++width)
-					obs(i,height,width) = (Scalar) u_buffer[buffer_ind++];
+					obs(i,height,width,0u) = (Scalar) u_buffer[buffer_ind++];
 			}
 			assert(buffer_ind == OBS_INSTANCE_LENGTH);
 		}
 		if (i == batch_size)
 			return std::make_pair(obs, obj);
-		std::array<std::size_t,3> offsets({ 0, 0, 0 });
-		std::array<std::size_t,3> obs_extents({ i, 28u, 28u });
-		std::array<std::size_t,3> obj_extents({ i, 10u, 1u });
+		std::array<std::size_t,4> offsets({ 0u, 0u, 0u, 0u });
+		std::array<std::size_t,4> obs_extents({ i, 28u, 28u, 1u });
+		std::array<std::size_t,4> obj_extents({ i, 10u, 1u, 1u });
 		return std::make_pair(obs.slice(offsets, obs_extents), obj.slice(offsets, obj_extents));
 	}
 	inline std::size_t _skip(std::ifstream& obs_input_stream, std::ifstream& obj_input_stream,
@@ -531,8 +532,8 @@ protected:
 		return skipped_obs;
 	}
 private:
-	const Dimensions<std::size_t,2> obs;
-	const Dimensions<std::size_t,2> obj;
+	const Dimensions<std::size_t,3> obs;
+	const Dimensions<std::size_t,3> obj;
 	char obs_buffer[OBS_INSTANCE_LENGTH];
 };
 
@@ -578,7 +579,7 @@ protected:
 			// Set the label.
 			if (CIFARType == CIFAR_100)
 				buffer_ind++;
-			obj(i,u_buffer[buffer_ind++],0u,0u) = (Scalar) 1;
+			obj(i,u_buffer[buffer_ind++],0,0) = (Scalar) 1;
 			// Set the image.
 			for (std::size_t channel = 0; channel < 3; ++channel) {
 				for (std::size_t height = 0; height < 32; ++height) {
@@ -590,7 +591,7 @@ protected:
 		}
 		if (i == batch_size)
 			return std::make_pair(obs, obj);
-		std::array<std::size_t,4> offsets({ 0, 0, 0, 0 });
+		std::array<std::size_t,4> offsets({ 0u, 0u, 0u, 0u });
 		std::array<std::size_t,4> obs_extents({ i, 32u, 32u, 3u });
 		std::array<std::size_t,4> obj_extents({ i, NUM_LABELS, 1u, 1u });
 		return std::make_pair(obs.slice(offsets, obs_extents), obj.slice(offsets, obj_extents));

@@ -56,8 +56,8 @@ class NeuralNetwork {
 	template<typename _Scalar, std::size_t _Rank>
 	friend class SequentialNeuralNetwork;
 protected:
-	static constexpr std::size_t DATA_RANKS = Rank + Sequential + 1;
-	typedef Tensor<Scalar,DATA_RANKS> Data;
+	static constexpr std::size_t DATA_RANK = Rank + Sequential + 1;
+	typedef Tensor<Scalar,DATA_RANK> Data;
 	typedef Dimensions<std::size_t,Rank> Dims;
 public:
 	virtual ~NeuralNetwork() = default;
@@ -378,15 +378,15 @@ protected:
 		return layers;
 	}
 	inline typename Base::Data propagate(typename Base::Data input, bool training) {
-		Utils<Scalar>::template check_dim_validity<Base::DATA_RANKS>(input);
-		assert(input_dims == Utils<Scalar>::template get_dims<Base::DATA_RANKS>(input).template demote<>());
+		Utils<Scalar>::template check_dim_validity<Base::DATA_RANK>(input);
+		assert(input_dims == Utils<Scalar>::template get_dims<Base::DATA_RANK>(input).template demote<>());
 		for (unsigned i = 0; i < blocks.size(); ++i)
 			input = blocks[i]->propagate(std::move(input), training);
 		return input;
 	}
 	inline typename Base::Data backpropagate(typename Base::Data out_grads) {
-		Utils<Scalar>::template check_dim_validity<Base::DATA_RANKS>(out_grads);
-		assert(output_dims == Utils<Scalar>::template get_dims<Base::DATA_RANKS>(out_grads).template demote<>());
+		Utils<Scalar>::template check_dim_validity<Base::DATA_RANK>(out_grads);
+		assert(output_dims == Utils<Scalar>::template get_dims<Base::DATA_RANK>(out_grads).template demote<>());
 		for (int i = blocks.size() - 1; i >= 0; --i)
 			out_grads = blocks[i]->backpropagate(std::move(out_grads));
 		return out_grads;
@@ -421,7 +421,7 @@ class ParallelNeuralNetwork : public NeuralNetwork<Scalar,Rank,false> {
 	typedef NeuralNetwork<Scalar,Rank,false> Base;
 	typedef ParallelNeuralNetwork<Scalar,Rank,MergeType> Self;
 	typedef NeuralNetPtr<Scalar,Rank,false> Lane;
-	typedef std::array<std::size_t,Base::DATA_RANKS> RankwiseArray;
+	typedef std::array<std::size_t,Base::DATA_RANK> RankwiseArray;
 	static_assert(MergeType >= CONCAT_LO_RANK && MergeType <= SUM, "illegal merge type value");
 	static const std::size_t CONCAT_RANK = MergeType == CONCAT_HI_RANK ? Rank - 1 : 0;
 	static const std::size_t CONCAT_BATCH_RANK = CONCAT_RANK + 1;
@@ -520,8 +520,8 @@ protected:
 		return layers;
 	}
 	inline typename Base::Data propagate(typename Base::Data input, bool training) {
-		Utils<Scalar>::template check_dim_validity<Base::DATA_RANKS>(input);
-		assert(input_dims == Utils<Scalar>::template get_dims<Base::DATA_RANKS>(input).template demote<>());
+		Utils<Scalar>::template check_dim_validity<Base::DATA_RANK>(input);
+		assert(input_dims == Utils<Scalar>::template get_dims<Base::DATA_RANK>(input).template demote<>());
 		std::size_t rows = input.dimension(0);
 		typename Base::Data out;
 		unsigned lane_num = lanes.size();
@@ -565,8 +565,8 @@ protected:
 		return out;
 	}
 	inline typename Base::Data backpropagate(typename Base::Data out_grads) {
-		Utils<Scalar>::template check_dim_validity<Base::DATA_RANKS>(out_grads);
-		assert(output_dims == Utils<Scalar>::template get_dims<Base::DATA_RANKS>(out_grads).template demote<>());
+		Utils<Scalar>::template check_dim_validity<Base::DATA_RANK>(out_grads);
+		assert(output_dims == Utils<Scalar>::template get_dims<Base::DATA_RANK>(out_grads).template demote<>());
 		typename Base::Data prev_out_grads;
 		if (foremost)
 			prev_out_grads = typename Base::Data();
@@ -785,8 +785,8 @@ protected:
 		return layers_raw;
 	}
 	inline typename Base::Data propagate(typename Base::Data input, bool training) {
-		Utils<Scalar>::template check_dim_validity<Base::DATA_RANKS>(input);
-		assert(input_dims == Utils<Scalar>::template get_dims<Base::DATA_RANKS>(input).template demote<>());
+		Utils<Scalar>::template check_dim_validity<Base::DATA_RANK>(input);
+		assert(input_dims == Utils<Scalar>::template get_dims<Base::DATA_RANK>(input).template demote<>());
 		for (unsigned i = 0; i < layers.size(); ++i) {
 			Layer<Scalar,Rank>& layer = *layers[i];
 			input = Base::pass_forward(layer, std::move(input), training);
@@ -796,8 +796,8 @@ protected:
 		return input;
 	}
 	inline typename Base::Data backpropagate(typename Base::Data out_grads) {
-		Utils<Scalar>::template check_dim_validity<Base::DATA_RANKS>(out_grads);
-		assert(output_dims == Utils<Scalar>::template get_dims<Base::DATA_RANKS>(out_grads).template demote<>());
+		Utils<Scalar>::template check_dim_validity<Base::DATA_RANK>(out_grads);
+		assert(output_dims == Utils<Scalar>::template get_dims<Base::DATA_RANK>(out_grads).template demote<>());
 		for (int i = layers.size() - 1; i >= 0; --i) {
 			Layer<Scalar,Rank>& layer = *layers[i];
 			out_grads = Base::pass_back(layer, std::move(out_grads));
@@ -878,8 +878,8 @@ protected:
 		return layers;
 	}
 	inline typename Base::Data propagate(typename Base::Data input, bool training) {
-		Utils<Scalar>::template check_dim_validity<Base::DATA_RANKS>(input);
-		assert(input_dims == Utils<Scalar>::template get_dims<Base::DATA_RANKS>(input).template demote<>());
+		Utils<Scalar>::template check_dim_validity<Base::DATA_RANK>(input);
+		assert(input_dims == Utils<Scalar>::template get_dims<Base::DATA_RANK>(input).template demote<>());
 		for (unsigned i = 0; i < modules.size(); ++i) {
 			std::pair<Module,bool>& module = modules[i];
 			if (module.second) // If it is a residual module, propagate the sum of the input and the output.
@@ -890,8 +890,8 @@ protected:
 		return input;
 	}
 	inline Tensor<Scalar,Rank + 1> backpropagate(Tensor<Scalar,Rank + 1> out_grads) {
-		Utils<Scalar>::template check_dim_validity<Base::DATA_RANKS>(out_grads);
-		assert(output_dims == Utils<Scalar>::template get_dims<Base::DATA_RANKS>(out_grads).template demote<>());
+		Utils<Scalar>::template check_dim_validity<Base::DATA_RANK>(out_grads);
+		assert(output_dims == Utils<Scalar>::template get_dims<Base::DATA_RANK>(out_grads).template demote<>());
 		for (int i = modules.size() - 1; i >= 0; --i) {
 			std::pair<Module,bool>& module = modules[i];
 			if (module.second)
@@ -918,7 +918,7 @@ template<typename Scalar, std::size_t Rank, DenseConcatType ConcatType = HIGHEST
 class DenseNeuralNetwork : public NeuralNetwork<Scalar,Rank,false> {
 	typedef NeuralNetwork<Scalar,Rank,false> Base;
 	typedef CompositeNeuralNetwork<Scalar,Rank,false> Module;
-	typedef std::array<std::size_t,Base::DATA_RANKS> RankwiseArray;
+	typedef std::array<std::size_t,Base::DATA_RANK> RankwiseArray;
 	static_assert(ConcatType >= LOWEST_RANK && ConcatType <= HIGHEST_RANK, "illegal merge type value");
 	static const std::size_t CONCAT_RANK = ConcatType == HIGHEST_RANK ? Rank - 1 : 0;
 	static const std::size_t CONCAT_BATCH_RANK = CONCAT_RANK + 1;
@@ -983,8 +983,8 @@ protected:
 		return layers;
 	}
 	inline typename Base::Data propagate(typename Base::Data input, bool training) {
-		Utils<Scalar>::template check_dim_validity<Base::DATA_RANKS>(input);
-		Dimensions<std::size_t,Base::DATA_RANKS> dims = Utils<Scalar>::template get_dims<Base::DATA_RANKS>(input);
+		Utils<Scalar>::template check_dim_validity<Base::DATA_RANK>(input);
+		Dimensions<std::size_t,Base::DATA_RANK> dims = Utils<Scalar>::template get_dims<Base::DATA_RANK>(input);
 		assert(input_dims == dims.template demote<>());
 		RankwiseArray offsets;
 		RankwiseArray extents = dims;
@@ -996,8 +996,8 @@ protected:
 		return input;
 	}
 	inline typename Base::Data backpropagate(typename Base::Data out_grads) {
-		Utils<Scalar>::template check_dim_validity<Base::DATA_RANKS>(out_grads);
-		assert(output_dims == Utils<Scalar>::template get_dims<Base::DATA_RANKS>(out_grads).template demote<>());
+		Utils<Scalar>::template check_dim_validity<Base::DATA_RANK>(out_grads);
+		assert(output_dims == Utils<Scalar>::template get_dims<Base::DATA_RANK>(out_grads).template demote<>());
 		RankwiseArray offsets;
 		RankwiseArray extents = input_dims.template promote<>();
 		offsets.fill(0);
@@ -1032,7 +1032,7 @@ class SequentialNeuralNetwork : public NeuralNetwork<Scalar,Rank,true> {
 	typedef NeuralNetwork<Scalar,Rank,true> Base;
 	typedef SequentialNeuralNetwork<Scalar,Rank> Self;
 	typedef NeuralNetPtr<Scalar,Rank,false> Net;
-	typedef std::array<std::size_t,Base::DATA_RANKS> RankwiseArray;
+	typedef std::array<std::size_t,Base::DATA_RANK> RankwiseArray;
 public:
 	/**
 	 * @param network A unique pointer to a non-sequential neural network to wrap.
@@ -1094,21 +1094,21 @@ protected:
 		return net->get_layers();
 	}
 	inline typename Base::Data propagate(typename Base::Data input, bool training) {
-		Utils<Scalar>::template check_dim_validity<Base::DATA_RANKS>(input);
-		assert(input_dims == Utils<Scalar>::template get_dims<Base::DATA_RANKS>(input).template demote<2>());
+		Utils<Scalar>::template check_dim_validity<Base::DATA_RANK>(input);
+		assert(input_dims == Utils<Scalar>::template get_dims<Base::DATA_RANK>(input).template demote<2>());
 		batch_size = input.dimension(0);
 		int seq_length = input.dimension(1);
-		return Utils<Scalar>::template split_first_rank<Base::DATA_RANKS - 1>(
-				net->propagate(Utils<Scalar>::template join_first_two_ranks<Base::DATA_RANKS>(std::move(input)), training),
+		return Utils<Scalar>::template split_first_rank<Base::DATA_RANK - 1>(
+				net->propagate(Utils<Scalar>::template join_first_two_ranks<Base::DATA_RANK>(std::move(input)), training),
 				batch_size, seq_length);
 	}
 	inline typename Base::Data backpropagate(typename Base::Data out_grads) {
-		Utils<Scalar>::template check_dim_validity<Base::DATA_RANKS>(out_grads);
-		assert(output_dims == Utils<Scalar>::template get_dims<Base::DATA_RANKS>(out_grads).template demote<2>());
+		Utils<Scalar>::template check_dim_validity<Base::DATA_RANK>(out_grads);
+		assert(output_dims == Utils<Scalar>::template get_dims<Base::DATA_RANK>(out_grads).template demote<2>());
 		assert(batch_size == out_grads.dimension(0));
 		int seq_length = out_grads.dimension(1);
-		return Utils<Scalar>::template split_first_rank<Base::DATA_RANKS - 1>(
-				net->backpropagate(Utils<Scalar>::template join_first_two_ranks<Base::DATA_RANKS>(std::move(out_grads))),
+		return Utils<Scalar>::template split_first_rank<Base::DATA_RANK - 1>(
+				net->backpropagate(Utils<Scalar>::template join_first_two_ranks<Base::DATA_RANK>(std::move(out_grads))),
 				batch_size, seq_length);
 	}
 private:
@@ -1159,7 +1159,7 @@ class BidirectionalNeuralNetwork : public NeuralNetwork<Scalar,Rank,true> {
 	typedef NeuralNetwork<Scalar,Rank,true> Base;
 	typedef BidirectionalNeuralNetwork<Scalar,Rank,MergeType> Self;
 	typedef UnidirNeuralNetPtr<Scalar,Rank> UnidirNet;
-	typedef std::array<std::size_t,Base::DATA_RANKS> RankwiseArray;
+	typedef std::array<std::size_t,Base::DATA_RANK> RankwiseArray;
 	static_assert(MergeType >= CONCAT_LO_RANK && MergeType <= SUM, "illegal merge type value");
 	static const std::size_t CONCAT_RANK = MergeType == CONCAT_HI_RANK ? Rank - 1 : 0;
 	static const std::size_t CONCAT_BATCH_RANK = CONCAT_RANK + 2;
@@ -1235,8 +1235,8 @@ protected:
 		return layers;
 	}
 	inline typename Base::Data propagate(typename Base::Data input, bool training) {
-		Utils<Scalar>::template check_dim_validity<Base::DATA_RANKS>(input);
-		assert(input_dims == Utils<Scalar>::template get_dims<Base::DATA_RANKS>(input).template demote<2>());
+		Utils<Scalar>::template check_dim_validity<Base::DATA_RANK>(input);
+		assert(input_dims == Utils<Scalar>::template get_dims<Base::DATA_RANK>(input).template demote<2>());
 		pthread_attr_t attr;
 		pthread_t helper_thread;
 		pthread_attr_init(&attr);
@@ -1256,8 +1256,8 @@ protected:
 			return forward_out + args.out;
 	}
 	inline typename Base::Data backpropagate(typename Base::Data out_grads) {
-		Utils<Scalar>::template check_dim_validity<Base::DATA_RANKS>(out_grads);
-		Dimensions<std::size_t,Base::DATA_RANKS> dims = Utils<Scalar>::template get_dims<Base::DATA_RANKS>(out_grads);
+		Utils<Scalar>::template check_dim_validity<Base::DATA_RANK>(out_grads);
+		Dimensions<std::size_t,Base::DATA_RANK> dims = Utils<Scalar>::template get_dims<Base::DATA_RANK>(out_grads);
 		assert(output_dims == dims.template demote<2>());
 		pthread_attr_t attr;
 		pthread_t helper_thread;
@@ -1361,8 +1361,8 @@ template<typename Scalar, std::size_t Rank, bool MulInt = false, bool Stateful =
 class RecurrentNeuralNetwork : public UnidirectionalNeuralNetwork<Scalar,Rank> {
 	typedef NeuralNetwork<Scalar,Rank,true> Root;
 	typedef RecurrentNeuralNetwork<Scalar,Rank> Self;
-	typedef std::array<std::size_t,Root::DATA_RANKS> RankwiseIntArray;
-	typedef std::array<bool,Root::DATA_RANKS> RankwiseBoolArray;
+	typedef std::array<std::size_t,Root::DATA_RANK> RankwiseIntArray;
+	typedef std::array<bool,Root::DATA_RANK> RankwiseBoolArray;
 	typedef std::function<std::pair<std::size_t,std::size_t>(std::size_t)> OutputSeqSizeFunc;
 	typedef Tensor<Scalar,Rank + 1> TimeStepData;
 public:
@@ -1520,8 +1520,8 @@ protected:
 		return layers;
 	}
 	inline typename Root::Data propagate(typename Root::Data input, bool training) {
-		Utils<Scalar>::template check_dim_validity<Root::DATA_RANKS>(input);
-		Dimensions<std::size_t,Root::DATA_RANKS> data_dims = Utils<Scalar>::template get_dims<Root::DATA_RANKS>(input);
+		Utils<Scalar>::template check_dim_validity<Root::DATA_RANK>(input);
+		Dimensions<std::size_t,Root::DATA_RANK> data_dims = Utils<Scalar>::template get_dims<Root::DATA_RANK>(input);
 		assert(input_dims == data_dims.template demote<2>());
 		int samples = data_dims(0);
 		int input_seq_length = data_dims(1);
@@ -1628,16 +1628,16 @@ protected:
 						 * the function can be differentiated in the backward pass. */
 						cell.state_kernel_cache = state;
 						cell.input_kernel_cache = Root::pass_forward(*cell.input_kernel,
-								Utils<Scalar>::template map_tensor_to_tensor<Root::DATA_RANKS,Rank + 1>(std::move(in_i_seq),
+								Utils<Scalar>::template map_tensor_to_tensor<Root::DATA_RANK,Rank + 1>(std::move(in_i_seq),
 										input_time_step_dims), training);
 						state *= cell.input_kernel_cache;
 					} else
 						state *= Root::pass_forward(*cell.input_kernel,
-								Utils<Scalar>::template map_tensor_to_tensor<Root::DATA_RANKS,Rank + 1>(std::move(in_i_seq),
+								Utils<Scalar>::template map_tensor_to_tensor<Root::DATA_RANK,Rank + 1>(std::move(in_i_seq),
 										input_time_step_dims), training);
 				} else
 					state += Root::pass_forward(*cell.input_kernel,
-							Utils<Scalar>::template map_tensor_to_tensor<Root::DATA_RANKS,Rank + 1>(std::move(in_i_seq),
+							Utils<Scalar>::template map_tensor_to_tensor<Root::DATA_RANK,Rank + 1>(std::move(in_i_seq),
 								input_time_step_dims), training);
 				if (!training)
 					Root::empty_cache(*cell.input_kernel);
@@ -1652,12 +1652,12 @@ protected:
 					Root::empty_cache(*cell.output_kernel);
 				// If the output is a single time step prediction, just return it.
 				if (output_seq_length == 1)
-					out = Utils<Scalar>::template map_tensor_to_tensor<Rank + 1,Root::DATA_RANKS>(
+					out = Utils<Scalar>::template map_tensor_to_tensor<Rank + 1,Root::DATA_RANK>(
 							Root::pass_forward(*cell.output_act, std::move(out_i), training),
 							output_extents);
 				else {
 					out.slice(output_offsets, output_extents) = Utils<Scalar>::template map_tensor_to_tensor<
-							Rank + 1,Root::DATA_RANKS>(Root::pass_forward(*cell.output_act, std::move(out_i),
+							Rank + 1,Root::DATA_RANK>(Root::pass_forward(*cell.output_act, std::move(out_i),
 									training), output_extents);
 					output_offsets[1] += 1;
 				}
@@ -1672,8 +1672,8 @@ protected:
 		return out;
 	}
 	inline typename Root::Data backpropagate(typename Root::Data out_grads) {
-		Utils<Scalar>::template check_dim_validity<Root::DATA_RANKS>(out_grads);
-		Dimensions<std::size_t,Root::DATA_RANKS> data_dims = Utils<Scalar>::template get_dims<Root::DATA_RANKS>(out_grads);
+		Utils<Scalar>::template check_dim_validity<Root::DATA_RANK>(out_grads);
+		Dimensions<std::size_t,Root::DATA_RANK> data_dims = Utils<Scalar>::template get_dims<Root::DATA_RANK>(out_grads);
 		assert(output_dims == data_dims.template demote<2>() && batch_size == data_dims(0) &&
 				output_seq_length == data_dims(1));
 		TimeStepData null_tensor;
@@ -1711,7 +1711,7 @@ protected:
 					output_offsets[1] -= 1;
 				}
 				TimeStepData out_grads_i = Root::pass_back(*cell.output_act,
-						Utils<Scalar>::template map_tensor_to_tensor<Root::DATA_RANKS,Rank + 1>(
+						Utils<Scalar>::template map_tensor_to_tensor<Root::DATA_RANK,Rank + 1>(
 								std::move(out_grads_seq_i), out_time_step_dims));
 				Root::empty_cache(*cell.output_act);
 				state_grads += Root::pass_back(*cell.output_kernel, std::move(out_grads_i));
@@ -1731,21 +1731,21 @@ protected:
 						Root::pass_back(*cell.input_kernel, state_grads);
 				} else if (input_seq_length == 1) {
 					if (MulInt) {
-						prev_out_grads = Utils<Scalar>::template map_tensor_to_tensor<Rank + 1,Root::DATA_RANKS>(
+						prev_out_grads = Utils<Scalar>::template map_tensor_to_tensor<Rank + 1,Root::DATA_RANK>(
 								Root::pass_back(*cell.input_kernel, cell.state_kernel_cache * state_grads), input_extents);
 						cell.state_kernel_cache = null_tensor;
 					} else
-						prev_out_grads = Utils<Scalar>::template map_tensor_to_tensor<Rank + 1,Root::DATA_RANKS>(
+						prev_out_grads = Utils<Scalar>::template map_tensor_to_tensor<Rank + 1,Root::DATA_RANK>(
 								Root::pass_back(*cell.input_kernel, state_grads), input_extents);
 				} else {
 					if (MulInt) {
 						prev_out_grads.slice(input_offsets, input_extents) =
-								Utils<Scalar>::template map_tensor_to_tensor<Rank + 1,Root::DATA_RANKS>(
+								Utils<Scalar>::template map_tensor_to_tensor<Rank + 1,Root::DATA_RANK>(
 										Root::pass_back(*cell.input_kernel, cell.state_kernel_cache * state_grads), input_extents);
 						cell.state_kernel_cache = null_tensor;
 					} else
 						prev_out_grads.slice(input_offsets, input_extents) =
-								Utils<Scalar>::template map_tensor_to_tensor<Rank + 1,Root::DATA_RANKS>(
+								Utils<Scalar>::template map_tensor_to_tensor<Rank + 1,Root::DATA_RANK>(
 										Root::pass_back(*cell.input_kernel, state_grads), input_extents);
 					input_offsets[1] -= 1;
 				}
@@ -1818,8 +1818,8 @@ template<typename Scalar, std::size_t Rank, bool MulInt = false, bool Stateful =
 class LSTMNeuralNetwork : public UnidirectionalNeuralNetwork<Scalar,Rank> {
 	typedef NeuralNetwork<Scalar,Rank,true> Root;
 	typedef LSTMNeuralNetwork<Scalar,Rank> Self;
-	typedef std::array<std::size_t,Root::DATA_RANKS> RankwiseIntArray;
-	typedef std::array<bool,Root::DATA_RANKS> RankwiseBoolArray;
+	typedef std::array<std::size_t,Root::DATA_RANK> RankwiseIntArray;
+	typedef std::array<bool,Root::DATA_RANK> RankwiseBoolArray;
 	typedef std::function<std::pair<std::size_t,std::size_t>(std::size_t)> OutputSeqSizeFunc;
 	typedef Tensor<Scalar,Rank + 1> TimeStepData;
 public:
@@ -2111,8 +2111,8 @@ protected:
 		return layers;
 	}
 	inline typename Root::Data propagate(typename Root::Data input, bool training) {
-		Utils<Scalar>::template check_dim_validity<Root::DATA_RANKS>(input);
-		Dimensions<std::size_t,Root::DATA_RANKS> data_dims = Utils<Scalar>::template get_dims<Root::DATA_RANKS>(input);
+		Utils<Scalar>::template check_dim_validity<Root::DATA_RANK>(input);
+		Dimensions<std::size_t,Root::DATA_RANK> data_dims = Utils<Scalar>::template get_dims<Root::DATA_RANK>(input);
 		assert(input_dims == data_dims.template demote<2>());
 		int samples = data_dims(0);
 		int input_seq_length = data_dims(1);
@@ -2214,10 +2214,10 @@ protected:
 				if (input_seq_length > 1) {
 					typename Root::Data input_slice = input.slice(input_offsets, input_extents);
 					input_offsets[1] += 1;
-					input_res = Utils<Scalar>::template map_tensor_to_tensor<Root::DATA_RANKS,Rank + 1>(std::move(input_slice),
+					input_res = Utils<Scalar>::template map_tensor_to_tensor<Root::DATA_RANK,Rank + 1>(std::move(input_slice),
 							input_time_step_dims);
 				} else
-					input_res = Utils<Scalar>::template map_tensor_to_tensor<Root::DATA_RANKS,Rank + 1>(std::move(input),
+					input_res = Utils<Scalar>::template map_tensor_to_tensor<Root::DATA_RANK,Rank + 1>(std::move(input),
 							input_time_step_dims);
 				if (i == 0) {
 					// There must be an input at this time step and there cannot be an output from the previous one.
@@ -2398,11 +2398,11 @@ protected:
 			// If there is a non-hidden output at this time step...
 			if (i >= output_seq_delay && i < output_end) {
 				if (output_seq_length > 1) {
-					out.slice(output_offsets, output_extents) = Utils<Scalar>::template map_tensor_to_tensor<Rank + 1,Root::DATA_RANKS>(
+					out.slice(output_offsets, output_extents) = Utils<Scalar>::template map_tensor_to_tensor<Rank + 1,Root::DATA_RANK>(
 							hidden_out, output_extents);
 					output_offsets[1] += 1;
 				} else
-					out = Utils<Scalar>::template map_tensor_to_tensor<Rank + 1,Root::DATA_RANKS>(hidden_out, output_extents);
+					out = Utils<Scalar>::template map_tensor_to_tensor<Rank + 1,Root::DATA_RANK>(hidden_out, output_extents);
 			}
 		}
 		batch_size = samples;
@@ -2412,8 +2412,8 @@ protected:
 		return out;
 	}
 	inline typename Root::Data backpropagate(typename Root::Data out_grads) {
-		Utils<Scalar>::template check_dim_validity<Root::DATA_RANKS>(out_grads);
-		Dimensions<std::size_t,Root::DATA_RANKS> data_dims = Utils<Scalar>::template get_dims<Root::DATA_RANKS>(out_grads);
+		Utils<Scalar>::template check_dim_validity<Root::DATA_RANK>(out_grads);
+		Dimensions<std::size_t,Root::DATA_RANK> data_dims = Utils<Scalar>::template get_dims<Root::DATA_RANK>(out_grads);
 		assert(output_dims == data_dims.template demote<2>() && batch_size == data_dims(0) &&
 				output_seq_length == data_dims(1));
 		TimeStepData null_tensor;
@@ -2446,12 +2446,12 @@ protected:
 			// If there was a non-hidden output at the time step, let the gradients flow into the hidden output gradients.
 			if (i >= output_seq_delay && i < output_end) {
 				if (output_seq_length == 1)
-					hidden_out_grads += Utils<Scalar>::template map_tensor_to_tensor<Root::DATA_RANKS,Rank + 1>(std::move(out_grads),
+					hidden_out_grads += Utils<Scalar>::template map_tensor_to_tensor<Root::DATA_RANK,Rank + 1>(std::move(out_grads),
 							out_time_step_dims);
 				else {
 					typename Root::Data out_grads_seq = out_grads.slice(output_offsets, output_extents);
 					output_offsets[1] -= 1;
-					hidden_out_grads += Utils<Scalar>::template map_tensor_to_tensor<Root::DATA_RANKS,Rank + 1>(std::move(out_grads_seq),
+					hidden_out_grads += Utils<Scalar>::template map_tensor_to_tensor<Root::DATA_RANK,Rank + 1>(std::move(out_grads_seq),
 							out_time_step_dims);
 				}
 			}
@@ -2525,11 +2525,11 @@ protected:
 				if (!foremost) {
 					if (input_seq_length > 1) {
 						prev_out_grads.slice(input_offsets, input_extents) =
-								Utils<Scalar>::template map_tensor_to_tensor<Rank + 1,Root::DATA_RANKS>(
+								Utils<Scalar>::template map_tensor_to_tensor<Rank + 1,Root::DATA_RANK>(
 										std::move(prev_out_grads_i), input_extents);
 						input_offsets[1] -= 1;
 					} else
-						prev_out_grads = Utils<Scalar>::template map_tensor_to_tensor<Rank + 1,Root::DATA_RANKS>(
+						prev_out_grads = Utils<Scalar>::template map_tensor_to_tensor<Rank + 1,Root::DATA_RANK>(
 								std::move(prev_out_grads_i), input_extents);
 				}
 			} else {

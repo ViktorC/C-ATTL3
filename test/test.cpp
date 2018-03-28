@@ -233,25 +233,31 @@ static int test_bdrnn() {
 }
 
 int main() {
-	CIFARDataProvider<float,CIFAR_10> training_prov({ "C:\\Users\\Viktor\\Downloads\\cifar-10-batches-bin\\data_batch_1.bin",
-			"C:\\Users\\Viktor\\Downloads\\cifar-10-batches-bin\\data_batch_2.bin" });
-	CIFARDataProvider<float,CIFAR_10> test_prov({ "C:\\Users\\Viktor\\Downloads\\cifar-10-batches-bin\\test_batch.bin" });
-	WeightInitSharedPtr<float> init(new HeWeightInitialization<float>());
-	std::vector<LayerPtr<float,3>> layers(9);
-	layers[0] = LayerPtr<float,3>(new ConvLayer<float>(training_prov.get_obs_dims(), 10, init, 5, 2));
+	std::string mnist_folder = "C:\\Users\\A6714\\Downloads\\mnist\\";
+	MNISTDataProvider<float> prov(mnist_folder + "train-images.idx3-ubyte", mnist_folder + "train-labels.idx1-ubyte");
+//	MNISTDataProvider<float> test_prov(mnist_folder + "t10k-images.idx3-ubyte", mnist_folder + "t10k-labels.idx1-ubyte");
+	PartitionDataProvider<float,3,false> training_prov(prov, 178, 1000);
+	PartitionDataProvider<float,3,false> test_prov(prov, 7981, 500);
+	WeightInitSharedPtr<float> init(new LeCunWeightInitialization<float>());
+	std::vector<LayerPtr<float,3>> layers(12);
+	layers[0] = LayerPtr<float,3>(new ConvLayer<float>(training_prov.get_obs_dims(), 6, init, 5, 2));
 	layers[1] = LayerPtr<float,3>(new ReLUActivationLayer<float,3>(layers[0]->get_output_dims()));
 	layers[2] = LayerPtr<float,3>(new MaxPoolingLayer<float>(layers[1]->get_output_dims()));
-	layers[3] = LayerPtr<float,3>(new ConvLayer<float>(layers[2]->get_output_dims(), 5, init));
+	layers[3] = LayerPtr<float,3>(new ConvLayer<float>(layers[2]->get_output_dims(), 16, init, 5, 0));
 	layers[4] = LayerPtr<float,3>(new ReLUActivationLayer<float,3>(layers[3]->get_output_dims()));
 	layers[5] = LayerPtr<float,3>(new MaxPoolingLayer<float>(layers[4]->get_output_dims()));
-	layers[6] = LayerPtr<float,3>(new FCLayer<float,3>(layers[5]->get_output_dims(), 10, init));
-	layers[7] = LayerPtr<float,3>(new TanhActivationLayer<float,3>(layers[6]->get_output_dims()));
-	layers[8] = LayerPtr<float,3>(new SoftmaxActivationLayer<float,3>(layers[7]->get_output_dims()));
+	layers[6] = LayerPtr<float,3>(new FCLayer<float,3>(layers[5]->get_output_dims(), 120, init));
+	layers[7] = LayerPtr<float,3>(new ReLUActivationLayer<float,3>(layers[6]->get_output_dims()));
+	layers[8] = LayerPtr<float,3>(new FCLayer<float,3>(layers[7]->get_output_dims(), 84, init));
+	layers[9] = LayerPtr<float,3>(new ReLUActivationLayer<float,3>(layers[8]->get_output_dims()));
+	layers[10] = LayerPtr<float,3>(new FCLayer<float,3>(layers[9]->get_output_dims(), 10, init));
+	layers[11] = LayerPtr<float,3>(new SoftmaxActivationLayer<float,3>(layers[10]->get_output_dims()));
 	FeedforwardNeuralNetwork<float,3> nn(std::move(layers));
 	nn.init();
+	std::cout << nn << std::endl << std::endl;
 	LossSharedPtr<float,3,false> loss(new CrossEntropyLoss<float,3,false>());
 	RegPenSharedPtr<float> reg(new ElasticNetRegularizationPenalty<float>(1e-4, 1e-4));
-	NadamOptimizer<float,3,false> opt(loss, reg, 1500);
+	NadamOptimizer<float,3,false> opt(loss, reg, 64);
 	opt.optimize(nn, training_prov, test_prov, 500);
 //	assert(test_parallel() & test_residual() & test_dense() & test_seqnn() & test_rnn() & test_lstm() & test_bdrnn());
 	return 0;
