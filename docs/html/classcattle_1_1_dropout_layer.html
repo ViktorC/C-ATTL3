@@ -92,8 +92,8 @@ Inheritance diagram for cattle::DropoutLayer&lt; Scalar, Rank &gt;:</div>
 Public Member Functions</h2></td></tr>
 <tr class="memitem:a0baff1ba5aac9893f88a0047bbf7d026"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_dropout_layer.html#a0baff1ba5aac9893f88a0047bbf7d026">DropoutLayer</a> (const <a class="el" href="classcattle_1_1_dimensions.html">Dimensions</a>&lt; std::size_t, Rank &gt; &amp;<a class="el" href="classcattle_1_1_dropout_layer.html#aef040fb82a09b78559230822ed0e6c86">dims</a>, Scalar <a class="el" href="classcattle_1_1_dropout_layer.html#ae5e6d7a6fcd54aa840c0a7525ed81fc6">dropout_prob</a>, Scalar <a class="el" href="classcattle_1_1_dropout_layer.html#a5dd9d880c1a1ea750b8f253299fbe76c">epsilon</a>=<a class="el" href="classcattle_1_1_utils.html">Utils</a>&lt; Scalar &gt;::EPSILON3)</td></tr>
 <tr class="separator:a0baff1ba5aac9893f88a0047bbf7d026"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aba7a95e4173e1adfb276b10556560d90"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classcattle_1_1_layer.html">Layer</a>&lt; Scalar, Rank &gt; *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_dropout_layer.html#aba7a95e4173e1adfb276b10556560d90">clone</a> () const</td></tr>
-<tr class="separator:aba7a95e4173e1adfb276b10556560d90"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0206c8917c45b9ac3f4388fa29ab9a26"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classcattle_1_1_dropout_layer.html#aee9dfee4323cf72e93e3033578a2e0ae">Base</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_dropout_layer.html#a0206c8917c45b9ac3f4388fa29ab9a26">clone</a> () const</td></tr>
+<tr class="separator:a0206c8917c45b9ac3f4388fa29ab9a26"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a24cc229aaaa68fe8889c4c05f5a1529a"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="classcattle_1_1_dimensions.html">Dimensions</a>&lt; std::size_t, Rank &gt; &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_dropout_layer.html#a24cc229aaaa68fe8889c4c05f5a1529a">get_input_dims</a> () const</td></tr>
 <tr class="separator:a24cc229aaaa68fe8889c4c05f5a1529a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a4eaac782e31cae389237b843ce7569e5"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="classcattle_1_1_dimensions.html">Dimensions</a>&lt; std::size_t, Rank &gt; &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_dropout_layer.html#a4eaac782e31cae389237b843ce7569e5">get_output_dims</a> () const</td></tr>
@@ -122,15 +122,15 @@ Protected Member Functions</h2></td></tr>
 <tr class="separator:ac72ed377cf408274f15e280de3266044"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a21cafbb1c42e3fd63551e4056eaa9d8a"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_dropout_layer.html#a21cafbb1c42e3fd63551e4056eaa9d8a">enforce_constraints</a> ()</td></tr>
 <tr class="separator:a21cafbb1c42e3fd63551e4056eaa9d8a"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ac970c39f7e10dde5a6bcda91674c5f64"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classcattle_1_1_layer.html#ae63e6a1e862cea9b83b5c93fe1d9a6a3">Data</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_dropout_layer.html#ac970c39f7e10dde5a6bcda91674c5f64">pass_forward</a> (<a class="el" href="classcattle_1_1_layer.html#ae63e6a1e862cea9b83b5c93fe1d9a6a3">Data</a> in, bool training)</td></tr>
-<tr class="separator:ac970c39f7e10dde5a6bcda91674c5f64"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ab3d4cbb2b735ea76f20ba440e63a9948"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classcattle_1_1_layer.html#ae63e6a1e862cea9b83b5c93fe1d9a6a3">Data</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_dropout_layer.html#ab3d4cbb2b735ea76f20ba440e63a9948">pass_back</a> (<a class="el" href="classcattle_1_1_layer.html#ae63e6a1e862cea9b83b5c93fe1d9a6a3">Data</a> out_grads)</td></tr>
-<tr class="separator:ab3d4cbb2b735ea76f20ba440e63a9948"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0c833b2176304d5f975e7f66ac203d15"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classcattle_1_1_layer.html#a8c0af442a18521dea2406d0878e7db61">Base::Data</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_dropout_layer.html#a0c833b2176304d5f975e7f66ac203d15">pass_forward</a> (typename <a class="el" href="classcattle_1_1_layer.html#a8c0af442a18521dea2406d0878e7db61">Base::Data</a> in, bool training)</td></tr>
+<tr class="separator:a0c833b2176304d5f975e7f66ac203d15"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad9051080cb02890f57ee277c9b3094bc"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classcattle_1_1_layer.html#a8c0af442a18521dea2406d0878e7db61">Base::Data</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_dropout_layer.html#ad9051080cb02890f57ee277c9b3094bc">pass_back</a> (typename <a class="el" href="classcattle_1_1_layer.html#a8c0af442a18521dea2406d0878e7db61">Base::Data</a> out_grads)</td></tr>
+<tr class="separator:ad9051080cb02890f57ee277c9b3094bc"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pri-types"></a>
 Private Types</h2></td></tr>
-<tr class="memitem:a6c7918da86c2ad36c6c62e09e108e401"><td class="memItemLeft" align="right" valign="top">typedef <a class="el" href="namespacecattle.html#a8b9323ad928764340e46f0802bf27fbb">Tensor</a>&lt; Scalar, Rank+1 &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_dropout_layer.html#a6c7918da86c2ad36c6c62e09e108e401">Data</a></td></tr>
-<tr class="separator:a6c7918da86c2ad36c6c62e09e108e401"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aee9dfee4323cf72e93e3033578a2e0ae"><td class="memItemLeft" align="right" valign="top">typedef <a class="el" href="classcattle_1_1_layer.html">Layer</a>&lt; Scalar, Rank &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_dropout_layer.html#aee9dfee4323cf72e93e3033578a2e0ae">Base</a></td></tr>
+<tr class="separator:aee9dfee4323cf72e93e3033578a2e0ae"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pri-attribs"></a>
 Private Attributes</h2></td></tr>
@@ -154,8 +154,11 @@ Private Attributes</h2></td></tr>
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="inherited"></a>
 Additional Inherited Members</h2></td></tr>
 <tr class="inherit_header pro_types_classcattle_1_1_layer"><td colspan="2" onclick="javascript:toggleInherit('pro_types_classcattle_1_1_layer')"><img src="closed.png" alt="-"/>&#160;Protected Types inherited from <a class="el" href="classcattle_1_1_layer.html">cattle::Layer&lt; Scalar, Rank &gt;</a></td></tr>
-<tr class="memitem:ae63e6a1e862cea9b83b5c93fe1d9a6a3 inherit pro_types_classcattle_1_1_layer"><td class="memItemLeft" align="right" valign="top">typedef <a class="el" href="namespacecattle.html#a8b9323ad928764340e46f0802bf27fbb">Tensor</a>&lt; Scalar, Rank+1 &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_layer.html#ae63e6a1e862cea9b83b5c93fe1d9a6a3">Data</a></td></tr>
-<tr class="separator:ae63e6a1e862cea9b83b5c93fe1d9a6a3 inherit pro_types_classcattle_1_1_layer"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a8c0af442a18521dea2406d0878e7db61 inherit pro_types_classcattle_1_1_layer"><td class="memItemLeft" align="right" valign="top">typedef <a class="el" href="namespacecattle.html#a8b9323ad928764340e46f0802bf27fbb">Tensor</a>&lt; Scalar, <a class="el" href="classcattle_1_1_layer.html#af7f8bccf684ef96e791adbfc56b60e09">DATA_RANK</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_layer.html#a8c0af442a18521dea2406d0878e7db61">Data</a></td></tr>
+<tr class="separator:a8c0af442a18521dea2406d0878e7db61 inherit pro_types_classcattle_1_1_layer"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="inherit_header pro_static_attribs_classcattle_1_1_layer"><td colspan="2" onclick="javascript:toggleInherit('pro_static_attribs_classcattle_1_1_layer')"><img src="closed.png" alt="-"/>&#160;Static Protected Attributes inherited from <a class="el" href="classcattle_1_1_layer.html">cattle::Layer&lt; Scalar, Rank &gt;</a></td></tr>
+<tr class="memitem:af7f8bccf684ef96e791adbfc56b60e09 inherit pro_static_attribs_classcattle_1_1_layer"><td class="memItemLeft" align="right" valign="top">static constexpr std::size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_layer.html#af7f8bccf684ef96e791adbfc56b60e09">DATA_RANK</a> = Rank + 1</td></tr>
+<tr class="separator:af7f8bccf684ef96e791adbfc56b60e09 inherit pro_static_attribs_classcattle_1_1_layer"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><h3>template&lt;typename Scalar, std::size_t Rank&gt;<br />
@@ -163,8 +166,8 @@ class cattle::DropoutLayer&lt; Scalar, Rank &gt;</h3>
 
 <p>A class template representing a drop-out layer. </p>
 </div><h2 class="groupheader">Member Typedef Documentation</h2>
-<a id="a6c7918da86c2ad36c6c62e09e108e401"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a6c7918da86c2ad36c6c62e09e108e401">&#9670;&nbsp;</a></span>Data</h2>
+<a id="aee9dfee4323cf72e93e3033578a2e0ae"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aee9dfee4323cf72e93e3033578a2e0ae">&#9670;&nbsp;</a></span>Base</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -175,7 +178,7 @@ template&lt;typename Scalar , std::size_t Rank&gt; </div>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">typedef <a class="el" href="namespacecattle.html#a8b9323ad928764340e46f0802bf27fbb">Tensor</a>&lt;Scalar,Rank + 1&gt; <a class="el" href="classcattle_1_1_dropout_layer.html">cattle::DropoutLayer</a>&lt; Scalar, Rank &gt;::<a class="el" href="classcattle_1_1_layer.html#ae63e6a1e862cea9b83b5c93fe1d9a6a3">Data</a></td>
+          <td class="memname">typedef <a class="el" href="classcattle_1_1_layer.html">Layer</a>&lt;Scalar,Rank&gt; <a class="el" href="classcattle_1_1_dropout_layer.html">cattle::DropoutLayer</a>&lt; Scalar, Rank &gt;::<a class="el" href="classcattle_1_1_dropout_layer.html#aee9dfee4323cf72e93e3033578a2e0ae">Base</a></td>
         </tr>
       </table>
   </td>
@@ -241,8 +244,8 @@ template&lt;typename Scalar , std::size_t Rank&gt; </div>
 </div>
 </div>
 <h2 class="groupheader">Member Function Documentation</h2>
-<a id="aba7a95e4173e1adfb276b10556560d90"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aba7a95e4173e1adfb276b10556560d90">&#9670;&nbsp;</a></span>clone()</h2>
+<a id="a0206c8917c45b9ac3f4388fa29ab9a26"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a0206c8917c45b9ac3f4388fa29ab9a26">&#9670;&nbsp;</a></span>clone()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -253,7 +256,7 @@ template&lt;typename Scalar , std::size_t Rank&gt; </div>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="classcattle_1_1_layer.html">Layer</a>&lt;Scalar,Rank&gt;* <a class="el" href="classcattle_1_1_dropout_layer.html">cattle::DropoutLayer</a>&lt; Scalar, Rank &gt;::clone </td>
+          <td class="memname"><a class="el" href="classcattle_1_1_dropout_layer.html#aee9dfee4323cf72e93e3033578a2e0ae">Base</a>* <a class="el" href="classcattle_1_1_dropout_layer.html">cattle::DropoutLayer</a>&lt; Scalar, Rank &gt;::clone </td>
           <td>(</td>
           <td class="paramname"></td><td>)</td>
           <td> const</td>
@@ -548,8 +551,8 @@ template&lt;typename Scalar , std::size_t Rank&gt; </div>
 
 </div>
 </div>
-<a id="ab3d4cbb2b735ea76f20ba440e63a9948"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ab3d4cbb2b735ea76f20ba440e63a9948">&#9670;&nbsp;</a></span>pass_back()</h2>
+<a id="ad9051080cb02890f57ee277c9b3094bc"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad9051080cb02890f57ee277c9b3094bc">&#9670;&nbsp;</a></span>pass_back()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -560,9 +563,9 @@ template&lt;typename Scalar , std::size_t Rank&gt; </div>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="classcattle_1_1_layer.html#ae63e6a1e862cea9b83b5c93fe1d9a6a3">Data</a> <a class="el" href="classcattle_1_1_dropout_layer.html">cattle::DropoutLayer</a>&lt; Scalar, Rank &gt;::pass_back </td>
+          <td class="memname"><a class="el" href="classcattle_1_1_layer.html#a8c0af442a18521dea2406d0878e7db61">Base::Data</a> <a class="el" href="classcattle_1_1_dropout_layer.html">cattle::DropoutLayer</a>&lt; Scalar, Rank &gt;::pass_back </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="classcattle_1_1_layer.html#ae63e6a1e862cea9b83b5c93fe1d9a6a3">Data</a>&#160;</td>
+          <td class="paramtype">typename <a class="el" href="classcattle_1_1_layer.html#a8c0af442a18521dea2406d0878e7db61">Base::Data</a>&#160;</td>
           <td class="paramname"><em>out_grads</em></td><td>)</td>
           <td></td>
         </tr>
@@ -586,8 +589,8 @@ template&lt;typename Scalar , std::size_t Rank&gt; </div>
 
 </div>
 </div>
-<a id="ac970c39f7e10dde5a6bcda91674c5f64"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ac970c39f7e10dde5a6bcda91674c5f64">&#9670;&nbsp;</a></span>pass_forward()</h2>
+<a id="a0c833b2176304d5f975e7f66ac203d15"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a0c833b2176304d5f975e7f66ac203d15">&#9670;&nbsp;</a></span>pass_forward()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -598,9 +601,9 @@ template&lt;typename Scalar , std::size_t Rank&gt; </div>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="classcattle_1_1_layer.html#ae63e6a1e862cea9b83b5c93fe1d9a6a3">Data</a> <a class="el" href="classcattle_1_1_dropout_layer.html">cattle::DropoutLayer</a>&lt; Scalar, Rank &gt;::pass_forward </td>
+          <td class="memname"><a class="el" href="classcattle_1_1_layer.html#a8c0af442a18521dea2406d0878e7db61">Base::Data</a> <a class="el" href="classcattle_1_1_dropout_layer.html">cattle::DropoutLayer</a>&lt; Scalar, Rank &gt;::pass_forward </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="classcattle_1_1_layer.html#ae63e6a1e862cea9b83b5c93fe1d9a6a3">Data</a>&#160;</td>
+          <td class="paramtype">typename <a class="el" href="classcattle_1_1_layer.html#a8c0af442a18521dea2406d0878e7db61">Base::Data</a>&#160;</td>
           <td class="paramname"><em>in</em>, </td>
         </tr>
         <tr>

@@ -83,12 +83,14 @@ Inheritance diagram for cattle::Loss&lt; Scalar, Rank, Sequential &gt;:</div>
  <div class="center">
   <img src="classcattle_1_1_loss.png" usemap="#cattle::Loss_3C_20Scalar_2C_20Rank_2C_20Sequential_20_3E_map" alt=""/>
   <map id="cattle::Loss_3C_20Scalar_2C_20Rank_2C_20Sequential_20_3E_map" name="cattle::Loss_3C_20Scalar_2C_20Rank_2C_20Sequential_20_3E_map">
-<area href="classcattle_1_1_universal_loss.html" alt="cattle::UniversalLoss&lt; Scalar, Rank, Sequential &gt;" shape="rect" coords="792,56,1178,80"/>
-<area href="classcattle_1_1_cross_entropy_loss.html" alt="cattle::CrossEntropyLoss&lt; Scalar, Rank, Sequential &gt;" shape="rect" coords="0,112,386,136"/>
-<area href="classcattle_1_1_hinge_loss.html" alt="cattle::HingeLoss&lt; Scalar, Rank, Sequential, Squared &gt;" shape="rect" coords="396,112,782,136"/>
-<area href="classcattle_1_1_multi_label_hinge_loss.html" alt="cattle::MultiLabelHingeLoss&lt; Scalar, Rank, Sequential, Squared &gt;" shape="rect" coords="792,112,1178,136"/>
-<area href="classcattle_1_1_multi_label_log_loss.html" alt="cattle::MultiLabelLogLoss&lt; Scalar, Rank, Sequential &gt;" shape="rect" coords="1188,112,1574,136"/>
-<area href="classcattle_1_1_quadratic_loss.html" alt="cattle::QuadraticLoss&lt; Scalar, Rank, Sequential &gt;" shape="rect" coords="1584,112,1970,136"/>
+<area href="classcattle_1_1_universal_loss.html" alt="cattle::UniversalLoss&lt; Scalar, Rank, Sequential &gt;" shape="rect" coords="1188,56,1574,80"/>
+<area href="classcattle_1_1_absolute_loss.html" alt="cattle::AbsoluteLoss&lt; Scalar, Rank, Sequential &gt;" shape="rect" coords="0,112,386,136"/>
+<area href="classcattle_1_1_cross_entropy_loss.html" alt="cattle::CrossEntropyLoss&lt; Scalar, Rank, Sequential &gt;" shape="rect" coords="396,112,782,136"/>
+<area href="classcattle_1_1_hinge_loss.html" alt="cattle::HingeLoss&lt; Scalar, Rank, Sequential, Squared &gt;" shape="rect" coords="792,112,1178,136"/>
+<area href="classcattle_1_1_multi_label_hinge_loss.html" alt="cattle::MultiLabelHingeLoss&lt; Scalar, Rank, Sequential, Squared &gt;" shape="rect" coords="1188,112,1574,136"/>
+<area href="classcattle_1_1_multi_label_log_loss.html" alt="cattle::MultiLabelLogLoss&lt; Scalar, Rank, Sequential &gt;" shape="rect" coords="1584,112,1970,136"/>
+<area href="classcattle_1_1_quadratic_loss.html" alt="cattle::QuadraticLoss&lt; Scalar, Rank, Sequential &gt;" shape="rect" coords="1980,112,2366,136"/>
+<area href="classcattle_1_1_softmax_cross_entropy_loss.html" alt="cattle::SoftmaxCrossEntropyLoss&lt; Scalar, Rank, Sequential &gt;" shape="rect" coords="2376,112,2762,136"/>
 </map>
  </div></div>
 <table class="memberdecls">
@@ -96,20 +98,20 @@ Inheritance diagram for cattle::Loss&lt; Scalar, Rank, Sequential &gt;:</div>
 Public Member Functions</h2></td></tr>
 <tr class="memitem:a410e7c356768182077d6e1c1d31aa61b"><td class="memItemLeft" align="right" valign="top">virtual&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_loss.html#a410e7c356768182077d6e1c1d31aa61b">~Loss</a> ()=default</td></tr>
 <tr class="separator:a410e7c356768182077d6e1c1d31aa61b"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ac1f6ad0d36df441134e10037e2b3ef18"><td class="memItemLeft" align="right" valign="top">virtual <a class="el" href="namespacecattle.html#a6763ba5ba9b418d5da581630de564cf9">ColVector</a>&lt; Scalar &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_loss.html#ac1f6ad0d36df441134e10037e2b3ef18">function</a> (const <a class="el" href="classcattle_1_1_loss.html#a671fb8d7adceb4e140295360a94cb6f0">Data</a> &amp;out, const <a class="el" href="classcattle_1_1_loss.html#a671fb8d7adceb4e140295360a94cb6f0">Data</a> &amp;obj) const =0</td></tr>
+<tr class="memitem:ac1f6ad0d36df441134e10037e2b3ef18"><td class="memItemLeft" align="right" valign="top">virtual <a class="el" href="namespacecattle.html#a6763ba5ba9b418d5da581630de564cf9">ColVector</a>&lt; Scalar &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_loss.html#ac1f6ad0d36df441134e10037e2b3ef18">function</a> (const <a class="el" href="classcattle_1_1_loss.html#ad7ec07554c59ac32f7d4ef70cc2ec44a">Data</a> &amp;out, const <a class="el" href="classcattle_1_1_loss.html#ad7ec07554c59ac32f7d4ef70cc2ec44a">Data</a> &amp;obj) const =0</td></tr>
 <tr class="separator:ac1f6ad0d36df441134e10037e2b3ef18"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a1d273aef7621664857d3f4f4c73e919d"><td class="memItemLeft" align="right" valign="top">virtual <a class="el" href="classcattle_1_1_loss.html#a671fb8d7adceb4e140295360a94cb6f0">Data</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_loss.html#a1d273aef7621664857d3f4f4c73e919d">d_function</a> (const <a class="el" href="classcattle_1_1_loss.html#a671fb8d7adceb4e140295360a94cb6f0">Data</a> &amp;out, const <a class="el" href="classcattle_1_1_loss.html#a671fb8d7adceb4e140295360a94cb6f0">Data</a> &amp;obj) const =0</td></tr>
+<tr class="memitem:a1d273aef7621664857d3f4f4c73e919d"><td class="memItemLeft" align="right" valign="top">virtual <a class="el" href="classcattle_1_1_loss.html#ad7ec07554c59ac32f7d4ef70cc2ec44a">Data</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_loss.html#a1d273aef7621664857d3f4f4c73e919d">d_function</a> (const <a class="el" href="classcattle_1_1_loss.html#ad7ec07554c59ac32f7d4ef70cc2ec44a">Data</a> &amp;out, const <a class="el" href="classcattle_1_1_loss.html#ad7ec07554c59ac32f7d4ef70cc2ec44a">Data</a> &amp;obj) const =0</td></tr>
 <tr class="separator:a1d273aef7621664857d3f4f4c73e919d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pro-types"></a>
 Protected Types</h2></td></tr>
-<tr class="memitem:a671fb8d7adceb4e140295360a94cb6f0"><td class="memItemLeft" align="right" valign="top">typedef <a class="el" href="namespacecattle.html#a8b9323ad928764340e46f0802bf27fbb">Tensor</a>&lt; Scalar, <a class="el" href="classcattle_1_1_loss.html#adb8c52376c99fb73c74a79ac3bed9e64">DATA_RANKS</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_loss.html#a671fb8d7adceb4e140295360a94cb6f0">Data</a></td></tr>
-<tr class="separator:a671fb8d7adceb4e140295360a94cb6f0"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad7ec07554c59ac32f7d4ef70cc2ec44a"><td class="memItemLeft" align="right" valign="top">typedef <a class="el" href="namespacecattle.html#a8b9323ad928764340e46f0802bf27fbb">Tensor</a>&lt; Scalar, <a class="el" href="classcattle_1_1_loss.html#a4de1c7a4a2356e0bd49e5ba1b38cd6a7">DATA_RANK</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_loss.html#ad7ec07554c59ac32f7d4ef70cc2ec44a">Data</a></td></tr>
+<tr class="separator:ad7ec07554c59ac32f7d4ef70cc2ec44a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pro-static-attribs"></a>
 Static Protected Attributes</h2></td></tr>
-<tr class="memitem:adb8c52376c99fb73c74a79ac3bed9e64"><td class="memItemLeft" align="right" valign="top">static constexpr std::size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_loss.html#adb8c52376c99fb73c74a79ac3bed9e64">DATA_RANKS</a> = Rank + Sequential + 1</td></tr>
-<tr class="separator:adb8c52376c99fb73c74a79ac3bed9e64"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4de1c7a4a2356e0bd49e5ba1b38cd6a7"><td class="memItemLeft" align="right" valign="top">static constexpr std::size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_loss.html#a4de1c7a4a2356e0bd49e5ba1b38cd6a7">DATA_RANK</a> = Rank + Sequential + 1</td></tr>
+<tr class="separator:a4de1c7a4a2356e0bd49e5ba1b38cd6a7"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><h3>template&lt;typename Scalar, std::size_t Rank, bool Sequential&gt;<br />
@@ -117,8 +119,8 @@ class cattle::Loss&lt; Scalar, Rank, Sequential &gt;</h3>
 
 <p>An abstract class template for loss functions. Implementations of this class should be stateless. </p>
 </div><h2 class="groupheader">Member Typedef Documentation</h2>
-<a id="a671fb8d7adceb4e140295360a94cb6f0"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a671fb8d7adceb4e140295360a94cb6f0">&#9670;&nbsp;</a></span>Data</h2>
+<a id="ad7ec07554c59ac32f7d4ef70cc2ec44a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad7ec07554c59ac32f7d4ef70cc2ec44a">&#9670;&nbsp;</a></span>Data</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -129,7 +131,7 @@ template&lt;typename Scalar, std::size_t Rank, bool Sequential&gt; </div>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">typedef <a class="el" href="namespacecattle.html#a8b9323ad928764340e46f0802bf27fbb">Tensor</a>&lt;Scalar,<a class="el" href="classcattle_1_1_loss.html#adb8c52376c99fb73c74a79ac3bed9e64">DATA_RANKS</a>&gt; <a class="el" href="classcattle_1_1_loss.html">cattle::Loss</a>&lt; Scalar, Rank, Sequential &gt;::<a class="el" href="classcattle_1_1_loss.html#a671fb8d7adceb4e140295360a94cb6f0">Data</a></td>
+          <td class="memname">typedef <a class="el" href="namespacecattle.html#a8b9323ad928764340e46f0802bf27fbb">Tensor</a>&lt;Scalar,<a class="el" href="classcattle_1_1_loss.html#a4de1c7a4a2356e0bd49e5ba1b38cd6a7">DATA_RANK</a>&gt; <a class="el" href="classcattle_1_1_loss.html">cattle::Loss</a>&lt; Scalar, Rank, Sequential &gt;::<a class="el" href="classcattle_1_1_loss.html#ad7ec07554c59ac32f7d4ef70cc2ec44a">Data</a></td>
         </tr>
       </table>
   </td>
@@ -182,15 +184,15 @@ template&lt;typename Scalar, std::size_t Rank, bool Sequential&gt; </div>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">virtual <a class="el" href="classcattle_1_1_loss.html#a671fb8d7adceb4e140295360a94cb6f0">Data</a> <a class="el" href="classcattle_1_1_loss.html">cattle::Loss</a>&lt; Scalar, Rank, Sequential &gt;::d_function </td>
+          <td class="memname">virtual <a class="el" href="classcattle_1_1_loss.html#ad7ec07554c59ac32f7d4ef70cc2ec44a">Data</a> <a class="el" href="classcattle_1_1_loss.html">cattle::Loss</a>&lt; Scalar, Rank, Sequential &gt;::d_function </td>
           <td>(</td>
-          <td class="paramtype">const <a class="el" href="classcattle_1_1_loss.html#a671fb8d7adceb4e140295360a94cb6f0">Data</a> &amp;&#160;</td>
+          <td class="paramtype">const <a class="el" href="classcattle_1_1_loss.html#ad7ec07554c59ac32f7d4ef70cc2ec44a">Data</a> &amp;&#160;</td>
           <td class="paramname"><em>out</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const <a class="el" href="classcattle_1_1_loss.html#a671fb8d7adceb4e140295360a94cb6f0">Data</a> &amp;&#160;</td>
+          <td class="paramtype">const <a class="el" href="classcattle_1_1_loss.html#ad7ec07554c59ac32f7d4ef70cc2ec44a">Data</a> &amp;&#160;</td>
           <td class="paramname"><em>obj</em>&#160;</td>
         </tr>
         <tr>
@@ -231,13 +233,13 @@ template&lt;typename Scalar, std::size_t Rank, bool Sequential&gt; </div>
         <tr>
           <td class="memname">virtual <a class="el" href="namespacecattle.html#a6763ba5ba9b418d5da581630de564cf9">ColVector</a>&lt;Scalar&gt; <a class="el" href="classcattle_1_1_loss.html">cattle::Loss</a>&lt; Scalar, Rank, Sequential &gt;::function </td>
           <td>(</td>
-          <td class="paramtype">const <a class="el" href="classcattle_1_1_loss.html#a671fb8d7adceb4e140295360a94cb6f0">Data</a> &amp;&#160;</td>
+          <td class="paramtype">const <a class="el" href="classcattle_1_1_loss.html#ad7ec07554c59ac32f7d4ef70cc2ec44a">Data</a> &amp;&#160;</td>
           <td class="paramname"><em>out</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const <a class="el" href="classcattle_1_1_loss.html#a671fb8d7adceb4e140295360a94cb6f0">Data</a> &amp;&#160;</td>
+          <td class="paramtype">const <a class="el" href="classcattle_1_1_loss.html#ad7ec07554c59ac32f7d4ef70cc2ec44a">Data</a> &amp;&#160;</td>
           <td class="paramname"><em>obj</em>&#160;</td>
         </tr>
         <tr>
@@ -265,8 +267,8 @@ template&lt;typename Scalar, std::size_t Rank, bool Sequential&gt; </div>
 </div>
 </div>
 <h2 class="groupheader">Member Data Documentation</h2>
-<a id="adb8c52376c99fb73c74a79ac3bed9e64"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#adb8c52376c99fb73c74a79ac3bed9e64">&#9670;&nbsp;</a></span>DATA_RANKS</h2>
+<a id="a4de1c7a4a2356e0bd49e5ba1b38cd6a7"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a4de1c7a4a2356e0bd49e5ba1b38cd6a7">&#9670;&nbsp;</a></span>DATA_RANK</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -277,7 +279,7 @@ template&lt;typename Scalar, std::size_t Rank, bool Sequential&gt; </div>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">constexpr std::size_t <a class="el" href="classcattle_1_1_loss.html">cattle::Loss</a>&lt; Scalar, Rank, Sequential &gt;::DATA_RANKS = Rank + Sequential + 1</td>
+          <td class="memname">constexpr std::size_t <a class="el" href="classcattle_1_1_loss.html">cattle::Loss</a>&lt; Scalar, Rank, Sequential &gt;::DATA_RANK = Rank + Sequential + 1</td>
         </tr>
       </table>
   </td>

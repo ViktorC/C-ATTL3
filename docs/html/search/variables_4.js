@@ -1,7 +1,7 @@
 var searchData=
 [
-  ['data_5fextents',['data_extents',['../classcattle_1_1_memory_data_provider.html#a05a2830c8cdc6dc8716bba59fbcfe43f',1,'cattle::MemoryDataProvider']]],
-  ['data_5franks',['DATA_RANKS',['../classcattle_1_1_data_provider.html#a855bc7164d051fca67a6368b308aed05',1,'cattle::DataProvider::DATA_RANKS()'],['../classcattle_1_1_loss.html#adb8c52376c99fb73c74a79ac3bed9e64',1,'cattle::Loss::DATA_RANKS()'],['../classcattle_1_1_neural_network.html#a0b8194350bbd1abc1c9118b3d34fede4',1,'cattle::NeuralNetwork::DATA_RANKS()']]],
+  ['data_5fextents',['data_extents',['../classcattle_1_1_memory_data_provider.html#a430f0ecee4d33eb3a77719ea92cbce7b',1,'cattle::MemoryDataProvider']]],
+  ['data_5frank',['DATA_RANK',['../classcattle_1_1_data_provider.html#a8db59369ae8c577bad4fb33c770745fb',1,'cattle::DataProvider::DATA_RANK()'],['../classcattle_1_1_layer.html#af7f8bccf684ef96e791adbfc56b60e09',1,'cattle::Layer::DATA_RANK()'],['../classcattle_1_1_loss.html#a4de1c7a4a2356e0bd49e5ba1b38cd6a7',1,'cattle::Loss::DATA_RANK()'],['../classcattle_1_1_neural_network.html#a5d62d6f65e26bbd730d36ab417aacb79',1,'cattle::NeuralNetwork::DATA_RANK()']]],
   ['data_5fstream_5fpairs',['data_stream_pairs',['../classcattle_1_1_split_file_data_provider.html#af68f874a90696cdbe639fbd852652cb8',1,'cattle::SplitFileDataProvider']]],
   ['data_5fstreams',['data_streams',['../classcattle_1_1_joint_file_data_provider.html#aebc4137f2f37e973dee297feaf16a74e',1,'cattle::JointFileDataProvider']]],
   ['decay',['decay',['../classcattle_1_1_adadelta_optimizer.html#a8f2c1f0593ea951e49652d23f6a22ae3',1,'cattle::AdadeltaOptimizer']]],
