@@ -206,7 +206,7 @@ public:
 		typename Base::Data data_batch = obs->slice(offsets, data_extents);
 		typename Base::Data obj_batch = obj->slice(offsets, obj_extents);
 		offsets[0] = std::min(instances, offsets[0] + max_batch_size);
-		return std::make_pair(data_batch, obj_batch);
+		return std::make_pair(std::move(data_batch), std::move(obj_batch));
 	}
 	inline void reset() {
 		offsets[0] = 0;
@@ -268,8 +268,7 @@ public:
 		return data_pair;
 	}
 	inline void reset() {
-		std::size_t max_ind = std::min(current_stream, (std::size_t) (data_streams.size() - 1));
-		for (std::size_t i = 0; i <= max_ind; ++i) {
+		for (std::size_t i = 0; i < data_streams.size(); ++i) {
 			std::ifstream& data_stream = data_streams[i];
 			data_stream.clear();
 			_set_to_beg(data_stream);
@@ -285,7 +284,6 @@ protected:
 			data_streams[i] = std::ifstream(dataset_paths[i], binary ? std::ios::binary : std::ios::in);
 			std::ifstream& data_stream = data_streams[i];
 			assert(data_stream.is_open());
-			_set_to_beg(data_stream);
 		}
 	}
 	inline JointFileDataProvider(std::string dataset_path, bool binary) :
@@ -373,8 +371,7 @@ public:
 		return data_pair;
 	}
 	inline void reset() {
-		std::size_t max_ind = std::min(current_stream_pair, (std::size_t) (data_stream_pairs.size() - 1));
-		for (std::size_t i = 0; i <= max_ind; ++i) {
+		for (std::size_t i = 0; i < data_stream_pairs.size(); ++i) {
 			std::pair<std::ifstream,std::ifstream>& stream_pair = data_stream_pairs[i];
 			stream_pair.first.clear();
 			stream_pair.second.clear();
@@ -394,7 +391,6 @@ protected:
 			assert(obs_stream.is_open());
 			std::ifstream obj_stream(path_pair.second, obj_binary ? std::ios::binary : std::ios::in);
 			assert(obj_stream.is_open());
-			_set_to_beg(obs_stream, obj_stream);
 			data_stream_pairs[i] = std::make_pair(std::move(obs_stream), std::move(obj_stream));
 		}
 	}
@@ -472,7 +468,9 @@ public:
 	MNISTDataProvider(std::string obs_path, std::string labels_path) :
 			Base::SplitFileDataProvider(std::make_pair(obs_path, labels_path), true, true),
 			obs({ 28u, 28u, 1u }),
-			obj({ 10u, 1u, 1u }) { }
+			obj({ 10u, 1u, 1u }) {
+		Base::reset();
+	}
 	inline const Dimensions<std::size_t,3>& get_obs_dims() const {
 		return obs;
 	}
@@ -559,7 +557,9 @@ public:
 	inline CIFARDataProvider(std::vector<std::string> file_paths) :
 			Base::JointFileDataProvider(file_paths, true),
 			obs({ 32u, 32u, 3u }),
-			obj({ NUM_LABELS, 1u, 1u }) { }
+			obj({ NUM_LABELS, 1u, 1u }) {
+		Base::reset();
+	}
 	inline const Dimensions<std::size_t,3>& get_obs_dims() const {
 		return obs;
 	}

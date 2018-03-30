@@ -317,22 +317,21 @@ public:
 protected:
 	inline ColVector<Scalar> _function(const typename Root::Data& out,
 			const typename Root::Data& obj) const {
-		return (softmax(Utils<Scalar>::template map_tensor_to_mat<Root::DATA_RANK>(out)).array().log() *
+		Matrix<Scalar> out_mat = Utils<Scalar>::template map_tensor_to_mat<Root::DATA_RANK>(out);
+		Matrix<Scalar> out_exp = (out_mat.array().colwise() - out_mat.array().rowwise().maxCoeff()).exp();
+		return ((out_exp.array().colwise() / (out_exp.array().rowwise().sum() + epsilon)).log() *
 				Utils<Scalar>::template map_tensor_to_mat<Root::DATA_RANK>(obj).array())
 				.matrix().rowwise().sum() * -1;
 	}
 	inline typename Root::Data _d_function(const typename Root::Data& out,
 			const typename Root::Data& obj, const Dimensions<std::size_t,Root::DATA_RANK - 1>& grad_dims) const {
+		Matrix<Scalar> out_mat = Utils<Scalar>::template map_tensor_to_mat<Root::DATA_RANK>(out);
+		Matrix<Scalar> out_exp = (out_mat.array().colwise() - out_mat.array().rowwise().maxCoeff()).exp();
 		return Utils<Scalar>::template map_mat_to_tensor<Root::DATA_RANK>(
-				(-Utils<Scalar>::template map_tensor_to_mat<Root::DATA_RANK>(obj).array() /
-				(softmax(Utils<Scalar>::template map_tensor_to_mat<Root::DATA_RANK>(out)).array() + epsilon))
-				.matrix().eval(), grad_dims);
+				(out_exp.array().colwise() / (out_exp.array().rowwise().sum() + epsilon)) -
+				Utils<Scalar>::template map_tensor_to_mat<Root::DATA_RANK>(obj).array(), grad_dims);
 	}
 private:
-	inline Matrix<Scalar> softmax(Matrix<Scalar> out) const {
-		Matrix<Scalar> out_exp = (out.array().colwise() - out.array().rowwise().maxCoeff()).exp();
-		return out_exp.array().colwise() / (out_exp.array().rowwise().sum() + epsilon);
-	}
 	Scalar epsilon;
 };
 

@@ -153,18 +153,18 @@ public:
 				std::cout << "\ttraining loss: " << std::to_string(train(net, training_prov, i)) << std::endl;
 			}
 			// Validate.
-			test_prov.reset();
-			Scalar test_loss = test(net, test_prov, i);
-			std::cout << "\ttest loss: " << std::to_string(test_loss);
-			if (test_loss >= prev_test_loss) {
-				cons_loss_inc++;
-				std::cout << " *****INCREASED LOSS*****";
-				if (early_stop > 0 && cons_loss_inc >= early_stop)
-					return prev_test_loss;
-			} else
-				cons_loss_inc = 0;
-			std::cout << std::endl << std::endl;
-			prev_test_loss = test_loss;
+//			test_prov.reset();
+//			Scalar test_loss = test(net, test_prov, i);
+//			std::cout << "\ttest loss: " << std::to_string(test_loss);
+//			if (test_loss >= prev_test_loss) {
+//				cons_loss_inc++;
+//				std::cout << " *****INCREASED LOSS*****";
+//				if (early_stop > 0 && cons_loss_inc >= early_stop)
+//					return prev_test_loss;
+//			} else
+//				cons_loss_inc = 0;
+//			std::cout << std::endl << std::endl;
+//			prev_test_loss = test_loss;
 		}
 		// Empty the network caches.
 		net.empty_caches();
