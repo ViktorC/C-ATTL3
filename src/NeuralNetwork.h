@@ -984,11 +984,7 @@ protected:
 	}
 	inline typename Base::Data propagate(typename Base::Data input, bool training) {
 		Utils<Scalar>::template check_dim_validity<Base::DATA_RANK>(input);
-		Dimensions<std::size_t,Base::DATA_RANK> dims = Utils<Scalar>::template get_dims<Base::DATA_RANK>(input);
-		assert(input_dims == dims.template demote<>());
-		RankwiseArray offsets;
-		RankwiseArray extents = dims;
-		offsets.fill(0);
+		assert(input_dims == Utils<Scalar>::template get_dims<Base::DATA_RANK>(input).template demote<>());
 		for (unsigned i = 0; i < modules.size(); ++i) {
 			typename Base::Data concat = input.concatenate(modules[i].propagate(input, training), CONCAT_BATCH_RANK);
 			input = std::move(concat);
@@ -1011,8 +1007,11 @@ protected:
 			typename Base::Data out_grads_i = out_grads.slice(offsets, extents);
 			offsets[CONCAT_BATCH_RANK] = 0;
 			extents[CONCAT_BATCH_RANK] = layer_input_concat_rank_dim;
-			out_grads = typename Base::Data(out_grads.slice(offsets, extents) +
-					module.backpropagate(std::move(out_grads_i)));
+			if (foremost && i == 0)
+				module.backpropagate(std::move(out_grads_i));
+			else
+				out_grads = typename Base::Data(out_grads.slice(offsets, extents) +
+						module.backpropagate(std::move(out_grads_i)));
 		}
 		return out_grads;
 	}
@@ -1097,26 +1096,34 @@ protected:
 		Utils<Scalar>::template check_dim_validity<Base::DATA_RANK>(input);
 		assert(input_dims == Utils<Scalar>::template get_dims<Base::DATA_RANK>(input).template demote<2>());
 		batch_size = input.dimension(0);
-		int seq_length = input.dimension(1);
-		return Utils<Scalar>::template split_first_rank<Base::DATA_RANK - 1>(
-				net->propagate(Utils<Scalar>::template join_first_two_ranks<Base::DATA_RANK>(std::move(input)), training),
-				batch_size, seq_length);
+		std::size_t seq_length = input.dimension(1);
+		typename Base::Data out = Utils<Scalar>::template split_first_rank<Base::DATA_RANK - 1>(
+				net->propagate(Utils<Scalar>::template join_first_two_ranks<Base::DATA_RANK>(std::move(input)),
+						training), batch_size, seq_length);
+		return out;
 	}
 	inline typename Base::Data backpropagate(typename Base::Data out_grads) {
 		Utils<Scalar>::template check_dim_validity<Base::DATA_RANK>(out_grads);
 		assert(output_dims == Utils<Scalar>::template get_dims<Base::DATA_RANK>(out_grads).template demote<2>());
 		assert(batch_size == out_grads.dimension(0));
-		int seq_length = out_grads.dimension(1);
-		return Utils<Scalar>::template split_first_rank<Base::DATA_RANK - 1>(
-				net->backpropagate(Utils<Scalar>::template join_first_two_ranks<Base::DATA_RANK>(std::move(out_grads))),
-				batch_size, seq_length);
+		std::size_t seq_length = out_grads.dimension(1);
+		if (foremost) {
+			net->backpropagate(Utils<Scalar>::template join_first_two_ranks<Base::DATA_RANK>(
+					std::move(out_grads)));
+			return typename Base::Data();
+		} else {
+			std::size_t seq_length = out_grads.dimension(1);
+			return Utils<Scalar>::template split_first_rank<Base::DATA_RANK - 1>(net->backpropagate(
+					Utils<Scalar>::template join_first_two_ranks<Base::DATA_RANK>(std::move(out_grads))),
+					batch_size, seq_length);
+		}
 	}
 private:
 	Net net;
 	bool foremost;
 	typename Base::Dims input_dims;
 	typename Base::Dims output_dims;
-	int batch_size;
+	std::size_t batch_size;
 };
 
 /**

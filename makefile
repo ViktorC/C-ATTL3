@@ -2,8 +2,8 @@ MAKE := make -f makefile
 CC := g++
 ARCH := -m64
 CFLAGS := -std=c++11 -fopenmp -fmessage-length=0 -Wno-ignored-attributes
-DEF_OPT_FLAGS := -O3
-DEBUG_OPT_FLAGS := -g3 -Wa,-mbig-obj -O1
+DEF_OPT_FLAGS := -O3 -DNDEBUG
+DEBUG_OPT_FLAGS := -g -Wa,-mbig-obj -O1
 SOURCE_DIR := test
 SOURCES := test.cpp
 INCLUDES := -Isrc/ -Itest/ -Iext/Eigen/
@@ -24,7 +24,7 @@ $(TARGET): $(OBJECTS)
 .DEFAULT_GOAL: all
 all:
 	$(MAKE) $(TARGET) \
-		OPT_FLAGS='$(DEF_OPT_FLAGS)'
+		OPT_FLAGS='$(DEBUG_OPT_FLAGS)'
 debug:
 	$(MAKE) $(TARGET) \
 		OPT_FLAGS='$(DEBUG_OPT_FLAGS)'

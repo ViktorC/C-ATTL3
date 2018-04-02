@@ -341,7 +341,7 @@ protected:
 			 * not divisible by the batch size and the last batch of the epoch contains fewer
 			 * instances than the others) to make sure that the magnitude of the gradient is
 			 * proportional to the batch size (just like its 'accuracy' is). */
-			Base::backpropagate(net, Base::loss->d_function(out, data_pair.second) / (Scalar) batch_size);
+			Base::backpropagate(net, Base::loss->d_function(std::move(out), std::move(data_pair.second)) / (Scalar) batch_size);
 			for (unsigned k = 0; k < layers.size(); ++k) {
 				Layer<Scalar,Rank>& layer = *(layers[k]);
 				if (Base::is_parametric(layer)) {
@@ -360,7 +360,7 @@ protected:
 		while (test_prov.has_more()) {
 			DataPair<Scalar,Rank,Sequential> data_pair = test_prov.get_data(batch_size);
 			instances += data_pair.first.dimension(0);
-			obj_loss += Base::loss->function(net.infer(std::move(data_pair.first)), data_pair.second).sum();
+			obj_loss += Base::loss->function(net.infer(std::move(data_pair.first)), std::move(data_pair.second)).sum();
 		}
 		Scalar mean_obj_loss = obj_loss / instances;
 		Scalar reg_loss = 0;

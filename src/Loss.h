@@ -15,6 +15,7 @@
 #include <cstdlib>
 #include <string>
 #include <type_traits>
+#include <utility>
 #include "Utils.h"
 
 namespace cattle {
@@ -40,7 +41,7 @@ public:
 	 * @param obj The objective tensor (of the same dimensionality as the output).
 	 * @return A column vector containing the loss for each sample.
 	 */
-	virtual ColVector<Scalar> function(const Data& out, const Data& obj) const = 0;
+	virtual ColVector<Scalar> function(Data out, Data obj) const = 0;
 	/**
 	 * It calculates the derivative of the loss function w.r.t. the output.
 	 *
@@ -48,7 +49,7 @@ public:
 	 * @param obj The objective tensor (of the same dimensionality as the output).
 	 * @return The derivative of the loss function w.r.t. the output.
 	 */
-	virtual Data d_function(const Data& out, const Data& obj) const = 0;
+	virtual Data d_function(Data out, Data obj) const = 0;
 };
 
 /**
@@ -59,6 +60,7 @@ template<typename Scalar, std::size_t Rank, bool Sequential>
 class UniversalLoss : public Loss<Scalar,Rank,Sequential> {
 	typedef Loss<Scalar,Rank,Sequential> Base;
 protected:
+	typedef std::array<std::size_t,Base::DATA_RANK> RankwiseArray;
 	/**
 	 * It computes the loss of a batch of non-sequential data.
 	 *
@@ -66,7 +68,7 @@ protected:
 	 * @param obj The objective tensor.
 	 * @return A column vector representing the losses of the samples in the batch.
 	 */
-	virtual ColVector<Scalar> _function(const typename Base::Data& out, const typename Base::Data& obj) const = 0;
+	virtual ColVector<Scalar> _function(typename Base::Data out, typename Base::Data obj) const = 0;
 	/**
 	 * It computes the gradient of the output batch.
 	 *
@@ -75,19 +77,19 @@ protected:
 	 * @param grad_dims The dimensions of the gradient tensor.
 	 * @return The gradient tensor of the output batch.
 	 */
-	virtual typename Base::Data _d_function(const typename Base::Data& out, const typename Base::Data& obj,
-			const Dimensions<std::size_t,Base::DATA_RANK - 1>& grad_dims) const = 0;
+	virtual typename Base::Data _d_function(typename Base::Data out, typename Base::Data obj,
+			const RankwiseArray& grad_dims) const = 0;
 public:
 	virtual ~UniversalLoss() = default;
-	inline ColVector<Scalar> function(const typename Base::Data& out, const typename Base::Data& obj) const {
+	inline ColVector<Scalar> function(typename Base::Data out, typename Base::Data obj) const {
 		assert(Utils<Scalar>::template get_dims<Base::DATA_RANK>(out) ==
 				Utils<Scalar>::template get_dims<Base::DATA_RANK>(obj));
-		return _function(out, obj);
+		return _function(std::move(out), std::move(obj));
 	}
-	inline typename Base::Data d_function(const typename Base::Data& out, const typename Base::Data& obj) const {
+	inline typename Base::Data d_function(typename Base::Data out, typename Base::Data obj) const {
 		Dimensions<std::size_t,Base::DATA_RANK> dims = Utils<Scalar>::template get_dims<Base::DATA_RANK>(out);
 		assert(dims == Utils<Scalar>::template get_dims<Base::DATA_RANK>(obj));
-		return _d_function(out, obj, dims.template demote<>());
+		return _d_function(std::move(out), std::move(obj), dims);
 	}
 };
 
@@ -99,6 +101,7 @@ template<typename Scalar, std::size_t Rank>
 class UniversalLoss<Scalar,Rank,true> : public Loss<Scalar,Rank,true> {
 	typedef Loss<Scalar,Rank,true> Base;
 protected:
+	typedef std::array<std::size_t,Base::DATA_RANK> RankwiseArray;
 	/**
 	 * It computes the loss of a single time step in a batch. The total loss of the batch is the sum of the losses
 	 * of all its time steps.
@@ -107,7 +110,7 @@ protected:
 	 * @param obj The objective tensor.
 	 * @return A column vector representing the losses of the samples in the batch for the given time step.
 	 */
-	virtual ColVector<Scalar> _function(const typename Base::Data& out, const typename Base::Data& obj) const = 0;
+	virtual ColVector<Scalar> _function(typename Base::Data out, typename Base::Data obj) const = 0;
 	/**
 	 * It computes the gradient of a single time step of the output sequence batch.
 	 *
@@ -116,18 +119,18 @@ protected:
 	 * @param grad_dims The dimensions of the gradient tensor.
 	 * @return The gradient tensor of the provided time step of the output batch.
 	 */
-	virtual typename Base::Data _d_function(const typename Base::Data& out, const typename Base::Data& obj,
-			const Dimensions<std::size_t,Base::DATA_RANK - 1>& grad_dims) const = 0;
+	virtual typename Base::Data _d_function(typename Base::Data out, typename Base::Data obj,
+			const RankwiseArray& grad_dims) const = 0;
 public:
 	virtual ~UniversalLoss() = default;
-	inline ColVector<Scalar> function(const typename Base::Data& out, const typename Base::Data& obj) const {
+	inline ColVector<Scalar> function(typename Base::Data out, typename Base::Data obj) const {
 		Dimensions<std::size_t,Base::DATA_RANK> dims = Utils<Scalar>::template get_dims<Base::DATA_RANK>(out);
 		assert(dims == Utils<Scalar>::template get_dims<Base::DATA_RANK>(obj));
 		int time_steps = dims(1);
 		if (time_steps == 1)
-			return _function(out, obj);
-		std::array<std::size_t,Base::DATA_RANK> offsets;
-		std::array<std::size_t,Base::DATA_RANK> extents = dims;
+			return _function(std::move(out), std::move(obj));
+		RankwiseArray offsets;
+		RankwiseArray extents = dims;
 		offsets.fill(0);
 		extents[1] = 1;
 		ColVector<Scalar> loss = ColVector<Scalar>::Zero(dims(0), 1);
@@ -135,28 +138,27 @@ public:
 			offsets[1] = i;
 			typename Base::Data out_i = out.slice(offsets, extents);
 			typename Base::Data obj_i = obj.slice(offsets, extents);
-			loss += _function(out_i, obj_i);
+			loss += _function(std::move(out_i), std::move(obj_i));
 		}
 		return loss;
 	}
-	inline typename Base::Data d_function(const typename Base::Data& out, const typename Base::Data& obj) const {
+	inline typename Base::Data d_function(const typename Base::Data out, const typename Base::Data obj) const {
 		Dimensions<std::size_t,Base::DATA_RANK> dims = Utils<Scalar>::template get_dims<Base::DATA_RANK>(out);
 		assert(dims == Utils<Scalar>::template get_dims<Base::DATA_RANK>(obj));
 		int time_steps = dims(1);
 		if (time_steps == 1)
-			return _d_function(out, obj, dims.template demote<>());
+			return _d_function(std::move(out), std::move(obj), dims);
 		typename Base::Data grads(dims);
 		grads.setZero();
 		dims(1) = 1;
-		std::array<std::size_t,Base::DATA_RANK> offsets;
-		std::array<std::size_t,Base::DATA_RANK> extents = dims;
+		RankwiseArray offsets;
+		RankwiseArray extents = dims;
 		offsets.fill(0);
-		Dimensions<std::size_t,Base::DATA_RANK - 1> grad_dims = dims.template demote<>();
 		for (int i = 0; i < time_steps; ++i) {
 			offsets[1] = i;
 			typename Base::Data out_i = out.slice(offsets, extents);
 			typename Base::Data obj_i = obj.slice(offsets, extents);
-			grads.slice(offsets, extents) += _d_function(out_i, obj_i, grad_dims);
+			grads.slice(offsets, extents) += _d_function(std::move(out_i), std::move(obj_i), extents);
 		}
 		return grads;
 	}
@@ -168,15 +170,16 @@ public:
 template<typename Scalar, std::size_t Rank, bool Sequential>
 class AbsoluteLoss : public UniversalLoss<Scalar,Rank,Sequential> {
 	typedef Loss<Scalar,Rank,Sequential> Root;
+	typedef UniversalLoss<Scalar,Rank,Sequential> Base;
 protected:
-	inline ColVector<Scalar> _function(const typename Root::Data& out,
-			const typename Root::Data& obj) const {
-		return (Utils<Scalar>::template map_tensor_to_mat<Root::DATA_RANK>(out) -
-				Utils<Scalar>::template map_tensor_to_mat<Root::DATA_RANK>(obj))
+	inline ColVector<Scalar> _function(typename Root::Data out, typename Root::Data obj) const {
+		std::size_t rows = out.dimension(0);
+		std::size_t cols = out.size() / rows;
+		return (MatrixMap<Scalar>(out.data, rows, cols) - MatrixMap<Scalar>(obj.data, rows, cols))
 				.array().abs().rowwise().sum();
 	}
-	inline typename Root::Data _d_function(const typename Root::Data& out,
-			const typename Root::Data& obj, const Dimensions<std::size_t,Root::DATA_RANK - 1>& grad_dims) const {
+	inline typename Root::Data _d_function(typename Root::Data out, typename Root::Data obj,
+			const typename Base::RankwiseArray& grad_dims) const {
 		return out.exp() / out - obj;
 	}
 };
@@ -187,15 +190,16 @@ protected:
 template<typename Scalar, std::size_t Rank, bool Sequential>
 class QuadraticLoss : public UniversalLoss<Scalar,Rank,Sequential> {
 	typedef Loss<Scalar,Rank,Sequential> Root;
+	typedef UniversalLoss<Scalar,Rank,Sequential> Base;
 protected:
-	inline ColVector<Scalar> _function(const typename Root::Data& out,
-			const typename Root::Data& obj) const {
-		return (Utils<Scalar>::template map_tensor_to_mat<Root::DATA_RANK>(out) -
-				Utils<Scalar>::template map_tensor_to_mat<Root::DATA_RANK>(obj))
+	inline ColVector<Scalar> _function(typename Root::Data out, typename Root::Data obj) const {
+		std::size_t rows = out.dimension(0);
+		std::size_t cols = out.size() / rows;
+		return (MatrixMap<Scalar>(out.data, rows, cols) - MatrixMap<Scalar>(obj.data, rows, cols))
 				.array().square().rowwise().sum();
 	}
-	inline typename Root::Data _d_function(const typename Root::Data& out,
-			const typename Root::Data& obj, const Dimensions<std::size_t,Root::DATA_RANK - 1>& grad_dims) const {
+	inline typename Root::Data _d_function(typename Root::Data out, typename Root::Data obj,
+			const typename Base::RankwiseArray& grad_dims) const {
 		return 2 * (out - obj);
 	}
 };
@@ -207,10 +211,13 @@ protected:
 template<typename Scalar, std::size_t Rank, bool Sequential, bool Squared = false>
 class HingeLoss : public UniversalLoss<Scalar,Rank,Sequential> {
 	typedef Loss<Scalar,Rank,Sequential> Root;
+	typedef UniversalLoss<Scalar,Rank,Sequential> Base;
 protected:
-	inline ColVector<Scalar> _function(const typename Root::Data& out, const typename Root::Data& obj) const {
-		Matrix<Scalar> out_mat = Utils<Scalar>::template map_tensor_to_mat<Root::DATA_RANK>(out);
-		Matrix<Scalar> obj_mat = Utils<Scalar>::template map_tensor_to_mat<Root::DATA_RANK>(obj);
+	inline ColVector<Scalar> _function(typename Root::Data out, typename Root::Data obj) const {
+		std::size_t rows = out.dimension(0);
+		std::size_t cols = out.size() / rows;
+		MatrixMap<Scalar> out_mat(out.data(), rows, cols);
+		MatrixMap<Scalar> obj_mat(obj.data(), rows, cols);
 		ColVector<Scalar> loss(out_mat.rows());
 		for (int i = 0; i < obj_mat.rows(); ++i) {
 			unsigned ones = 0;
@@ -237,10 +244,12 @@ protected:
 		}
 		return loss;
 	}
-	inline typename Root::Data _d_function(const typename Root::Data& out,
-			const typename Root::Data& obj, const Dimensions<std::size_t,Root::DATA_RANK - 1>& grad_dims) const {
-		Matrix<Scalar> out_mat = Utils<Scalar>::template map_tensor_to_mat<Root::DATA_RANK>(out);
-		Matrix<Scalar> obj_mat = Utils<Scalar>::template map_tensor_to_mat<Root::DATA_RANK>(obj);
+	inline typename Root::Data _d_function(typename Root::Data out, typename Root::Data obj,
+			const typename Base::RankwiseArray& grad_dims) const {
+		std::size_t rows = out.dimension(0);
+		std::size_t cols = out.size() / rows;
+		MatrixMap<Scalar> out_mat(out.data(), rows, cols);
+		MatrixMap<Scalar> obj_mat(obj.data(), rows, cols);
 		Matrix<Scalar> out_grads(out_mat.rows(), out_mat.cols());
 		for (int i = 0; i < out_mat.rows(); ++i) {
 			unsigned ones = 0;
@@ -271,7 +280,7 @@ protected:
 			}
 			out_grads(i,correct_class_ind) = -total_out_grad;
 		}
-		return Utils<Scalar>::template map_mat_to_tensor<Root::DATA_RANK>(out_grads, grad_dims);
+		return TensorMap<Scalar,Root::DATA_RANK>(out_grads.data(), grad_dims);
 	}
 };
 
@@ -282,20 +291,21 @@ protected:
 template<typename Scalar, std::size_t Rank, bool Sequential>
 class CrossEntropyLoss : public UniversalLoss<Scalar,Rank,Sequential> {
 	typedef Loss<Scalar,Rank,Sequential> Root;
+	typedef UniversalLoss<Scalar,Rank,Sequential> Base;
 public:
 	/**
 	 * @param epsilon A small constant used to maintain numerical stability.
 	 */
 	CrossEntropyLoss(Scalar epsilon = Utils<Scalar>::EPSILON2) : epsilon(epsilon) { };
 protected:
-	inline ColVector<Scalar> _function(const typename Root::Data& out,
-			const typename Root::Data& obj) const {
-		return (Utils<Scalar>::template map_tensor_to_mat<Root::DATA_RANK>(out).array().log() *
-				Utils<Scalar>::template map_tensor_to_mat<Root::DATA_RANK>(obj).array())
-				.matrix().rowwise().sum() * -1;
+	inline ColVector<Scalar> _function(typename Root::Data out, typename Root::Data obj) const {
+		std::size_t rows = out.dimension(0);
+		std::size_t cols = out.size() / rows;
+		return -(MatrixMap<Scalar>(out.data, rows, cols).array().log() *
+				MatrixMap<Scalar>(obj.data, rows, cols).array()).matrix().rowwise().sum();
 	}
-	inline typename Root::Data _d_function(const typename Root::Data& out,
-			const typename Root::Data& obj, const Dimensions<std::size_t,Root::DATA_RANK - 1>& grad_dims) const {
+	inline typename Root::Data _d_function(typename Root::Data out, typename Root::Data obj,
+			const typename Base::RankwiseArray& grad_dims) const {
 		return -obj / (out + epsilon);
 	}
 private:
@@ -309,27 +319,30 @@ private:
 template<typename Scalar, std::size_t Rank, bool Sequential>
 class SoftmaxCrossEntropyLoss : public UniversalLoss<Scalar,Rank,Sequential> {
 	typedef Loss<Scalar,Rank,Sequential> Root;
+	typedef UniversalLoss<Scalar,Rank,Sequential> Base;
 public:
 	/**
 	 * @param epsilon A small constant used to maintain numerical stability.
 	 */
 	SoftmaxCrossEntropyLoss(Scalar epsilon = Utils<Scalar>::EPSILON2) : epsilon(epsilon) { };
 protected:
-	inline ColVector<Scalar> _function(const typename Root::Data& out,
-			const typename Root::Data& obj) const {
-		Matrix<Scalar> out_mat = Utils<Scalar>::template map_tensor_to_mat<Root::DATA_RANK>(out);
+	inline ColVector<Scalar> _function(typename Root::Data out, typename Root::Data obj) const {
+		std::size_t rows = out.dimension(0);
+		std::size_t cols = out.size() / rows;
+		MatrixMap<Scalar> out_mat(out.data(), rows, cols);
 		Matrix<Scalar> out_exp = (out_mat.array().colwise() - out_mat.array().rowwise().maxCoeff()).exp();
-		return ((out_exp.array().colwise() / (out_exp.array().rowwise().sum() + epsilon)).log() *
-				Utils<Scalar>::template map_tensor_to_mat<Root::DATA_RANK>(obj).array())
-				.matrix().rowwise().sum() * -1;
+		return -((out_exp.array().colwise() / (out_exp.array().rowwise().sum() + epsilon)).log() *
+				MatrixMap<Scalar>(obj.data(), rows, cols).array()).matrix().rowwise().sum();
 	}
-	inline typename Root::Data _d_function(const typename Root::Data& out,
-			const typename Root::Data& obj, const Dimensions<std::size_t,Root::DATA_RANK - 1>& grad_dims) const {
-		Matrix<Scalar> out_mat = Utils<Scalar>::template map_tensor_to_mat<Root::DATA_RANK>(out);
+	inline typename Root::Data _d_function(typename Root::Data out, typename Root::Data obj,
+			const typename Base::RankwiseArray& grad_dims) const {
+		std::size_t rows = out.dimension(0);
+		std::size_t cols = out.size() / rows;
+		MatrixMap<Scalar> out_mat(out.data(), rows, cols);
 		Matrix<Scalar> out_exp = (out_mat.array().colwise() - out_mat.array().rowwise().maxCoeff()).exp();
-		return Utils<Scalar>::template map_mat_to_tensor<Root::DATA_RANK>(
-				(out_exp.array().colwise() / (out_exp.array().rowwise().sum() + epsilon)) -
-				Utils<Scalar>::template map_tensor_to_mat<Root::DATA_RANK>(obj).array(), grad_dims);
+		Matrix<Scalar> grads = (out_exp.array().colwise() / (out_exp.array().rowwise().sum() + epsilon)) -
+				MatrixMap<Scalar>(obj.data(), rows, cols).array();
+		return TensorMap<Scalar,Root::DATA_RANK>(grads.data(), grad_dims);
 	}
 private:
 	Scalar epsilon;
@@ -342,11 +355,13 @@ private:
 template<typename Scalar, std::size_t Rank, bool Sequential, bool Squared = false>
 class MultiLabelHingeLoss : public UniversalLoss<Scalar,Rank,Sequential> {
 	typedef Loss<Scalar,Rank,Sequential> Root;
+	typedef UniversalLoss<Scalar,Rank,Sequential> Base;
 protected:
-	inline ColVector<Scalar> _function(const typename Root::Data& out,
-			const typename Root::Data& obj) const {
-		Matrix<Scalar> out_mat = Utils<Scalar>::template map_tensor_to_mat<Root::DATA_RANK>(out);
-		Matrix<Scalar> obj_mat = Utils<Scalar>::template map_tensor_to_mat<Root::DATA_RANK>(obj);
+	inline ColVector<Scalar> _function(typename Root::Data out, typename Root::Data obj) const {
+		std::size_t rows = out.dimension(0);
+		std::size_t cols = out.size() / rows;
+		MatrixMap<Scalar> out_mat(out.data(), rows, cols);
+		MatrixMap<Scalar> obj_mat(obj.data(), rows, cols);
 		ColVector<Scalar> loss(out_mat.rows());
 		for (int i = 0; i < obj_mat.rows(); ++i) {
 			Scalar loss_i = 0;
@@ -361,10 +376,12 @@ protected:
 		}
 		return loss;
 	}
-	inline typename Root::Data _d_function(const typename Root::Data& out,
-			const typename Root::Data& obj, const Dimensions<std::size_t,Root::DATA_RANK - 1>& grad_dims) const {
-		Matrix<Scalar> out_mat = Utils<Scalar>::template map_tensor_to_mat<Root::DATA_RANK>(out);
-		Matrix<Scalar> obj_mat = Utils<Scalar>::template map_tensor_to_mat<Root::DATA_RANK>(obj);
+	inline typename Root::Data _d_function(typename Root::Data out, typename Root::Data obj,
+			const typename Base::RankwiseArray& grad_dims) const {
+		std::size_t rows = out.dimension(0);
+		std::size_t cols = out.size() / rows;
+		MatrixMap<Scalar> out_mat(out.data(), rows, cols);
+		MatrixMap<Scalar> obj_mat(obj.data(), rows, cols);
 		Matrix<Scalar> out_grads(out_mat.rows(), out_mat.cols());
 		for (int i = 0; i < out_mat.rows(); ++i) {
 			for (int j = 0; j < out_mat.cols(); ++j) {
@@ -379,7 +396,7 @@ protected:
 					out_grads(i,j) = 0;
 			}
 		}
-		return Utils<Scalar>::template map_mat_to_tensor<Root::DATA_RANK>(out_grads, grad_dims);
+		return TensorMap<Scalar,Root::DATA_RANK>(out_grads.data(), grad_dims);
 	}
 };
 
@@ -391,6 +408,7 @@ protected:
 template<typename Scalar, std::size_t Rank, bool Sequential>
 class MultiLabelLogLoss : public UniversalLoss<Scalar,Rank,Sequential> {
 	typedef Loss<Scalar,Rank,Sequential> Root;
+	typedef UniversalLoss<Scalar,Rank,Sequential> Base;
 public:
 	/**
 	 * @param epsilon A small constant used to maintain numerical stability.
@@ -398,10 +416,11 @@ public:
 	MultiLabelLogLoss(Scalar epsilon = Utils<Scalar>::EPSILON2) :
 		epsilon(epsilon) { };
 protected:
-	inline ColVector<Scalar> _function(const typename Root::Data& out,
-			const typename Root::Data& obj) const {
-		Matrix<Scalar> out_mat = Utils<Scalar>::template map_tensor_to_mat<Root::DATA_RANK>(out);
-		Matrix<Scalar> obj_mat = Utils<Scalar>::template map_tensor_to_mat<Root::DATA_RANK>(obj);
+	inline ColVector<Scalar> _function(typename Root::Data out, typename Root::Data obj) const {
+		std::size_t rows = out.dimension(0);
+		std::size_t cols = out.size() / rows;
+		MatrixMap<Scalar> out_mat(out.data(), rows, cols);
+		MatrixMap<Scalar> obj_mat(obj.data(), rows, cols);
 		ColVector<Scalar> loss(out_mat.rows());
 		for (int i = 0; i < out_mat.rows(); ++i) {
 			Scalar loss_i = 0;
@@ -416,11 +435,12 @@ protected:
 		}
 		return loss;
 	}
-	inline typename Root::Data _d_function(const typename Root::Data& out,
-			const typename Root::Data& obj, const Dimensions<std::size_t,Root::DATA_RANK - 1>& grad_dims) const {
-		Matrix<Scalar> out_mat = Utils<Scalar>::template map_tensor_to_mat<Root::DATA_RANK>(out);
-		Matrix<Scalar> obj_mat = Utils<Scalar>::template map_tensor_to_mat<Root::DATA_RANK>(obj);
-		int rows = out_mat.rows();
+	inline typename Root::Data _d_function(typename Root::Data out, typename Root::Data obj,
+			const typename Base::RankwiseArray& grad_dims) const {
+		std::size_t rows = out.dimension(0);
+		std::size_t cols = out.size() / rows;
+		MatrixMap<Scalar> out_mat(out.data(), rows, cols);
+		MatrixMap<Scalar> obj_mat(obj.data(), rows, cols);
 		Matrix<Scalar> out_grads(rows, out_mat.cols());
 		for (int i = 0; i < rows; ++i) {
 			for (int j = 0; j < out_grads.cols(); ++j) {
@@ -433,7 +453,7 @@ protected:
 				out_grads(i,j) = 1 / (denominator * rows);
 			}
 		}
-		return Utils<Scalar>::template map_mat_to_tensor<Root::DATA_RANK>(out_grads, grad_dims);
+		return TensorMap<Scalar,Root::DATA_RANK>(out_grads.data(), grad_dims);
 	}
 private:
 	Scalar epsilon;

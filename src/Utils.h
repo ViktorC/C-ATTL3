@@ -55,6 +55,9 @@ using MatrixMap = Eigen::Map<Matrix<Scalar>>;
 template<typename Scalar, std::size_t Rank>
 using Tensor = Eigen::Tensor<Scalar,Rank,Eigen::ColMajor,std::size_t>;
 
+template<typename Derived>
+using TensorExp = Eigen::TensorBase<Derived>;
+
 /**
  * An for a class that can be used to map raw pointer data to a tensor of arbitrary
  * rank and scalar type with dynamic dimensionality.
@@ -308,7 +311,7 @@ public:
 			std::size_t rank1_size) {
 		static_assert(Rank > 0, "illegal tensor rank");
 		Dimensions<std::size_t,Rank> dims = get_dims<Rank>(tensor);
-		assert(dims(0) == (int) (rank0_size * rank1_size));
+		assert(dims(0) == rank0_size * rank1_size);
 		Dimensions<std::size_t,Rank + 1> split_dims = dims.template promote<>();
 		split_dims(0) = rank0_size;
 		split_dims(1) = rank1_size;

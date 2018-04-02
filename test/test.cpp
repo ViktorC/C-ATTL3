@@ -41,7 +41,7 @@ typedef double fp;
 //	lanes[0] = NeuralNetPtr<fp,RANK,false>(new FeedforwardNeuralNetwork<fp,RANK>(std::move(layers1)));
 //	std::vector<LayerPtr<fp,RANK>> layers2(2);
 //	layers2[0] = LayerPtr<fp,RANK>(new FCLayer<fp,RANK>(test_prov.get_obs_dims(), 5, init));
-//	layers2[1] = LayerPtr<fp,RANK>(new TanhActivationLayer<fp,RANK>(layers2[0]->get_output_dims()));
+//	layers2[1] = LayerPtr<fp,RANK>(new SigmoidActivationLayer<fp,RANK>(layers2[0]->get_output_dims()));
 //	lanes[1] = NeuralNetPtr<fp,RANK,false>(new FeedforwardNeuralNetwork<fp,RANK>(std::move(layers2)));
 //	ParallelNeuralNetwork<fp,RANK,CONCAT_LO_RANK> pnn(std::move(lanes));
 //	pnn.init();
@@ -63,9 +63,9 @@ typedef double fp;
 //	std::vector<NeuralNetPtr<fp,RANK,false>> comp_mods;
 //	std::vector<NeuralNetPtr<fp,RANK,false>> parallel_lanes;
 //	parallel_lanes.push_back(NeuralNetPtr<fp,RANK,false>(new FeedforwardNeuralNetwork<fp,RANK>(
-//			LayerPtr<fp,RANK>(new ConvLayer<fp>(test_prov.get_obs_dims(), 5, init, 1, 0)))));
+//			LayerPtr<fp,RANK>(new ConvLayer<fp>(test_prov.get_obs_dims(), 5, init, 1, 1, 0)))));
 //	parallel_lanes.push_back(NeuralNetPtr<fp,RANK,false>(new FeedforwardNeuralNetwork<fp,RANK>(
-//			LayerPtr<fp,RANK>(new ConvLayer<fp>(test_prov.get_obs_dims(), 3, init, 5, 2)))));
+//			LayerPtr<fp,RANK>(new ConvLayer<fp>(test_prov.get_obs_dims(), 3, init, 5, 5, 2)))));
 //	comp_mods.push_back(NeuralNetPtr<fp,RANK,false>(
 //			new ParallelNeuralNetwork<fp,RANK>(std::move(parallel_lanes))));
 //	std::vector<LayerPtr<fp,RANK>> layers1(7);
@@ -73,14 +73,14 @@ typedef double fp;
 //	layers1[1] = LayerPtr<fp,RANK>(new LeakyReLUActivationLayer<fp,RANK>(layers1[0]->get_output_dims()));
 //	layers1[2] = LayerPtr<fp,RANK>(new BatchNormLayer<fp,RANK>(layers1[1]->get_output_dims()));
 //	layers1[3] = LayerPtr<fp,RANK>(new ConvLayer<fp>(layers1[2]->get_output_dims(), 8, init));
-//	layers1[4] = LayerPtr<fp,RANK>(new MaxPoolingLayer<fp>(layers1[3]->get_output_dims()));
-//	layers1[5] = LayerPtr<fp,RANK>(new LeakyReLUActivationLayer<fp,RANK>(layers1[4]->get_output_dims()));
+//	layers1[4] = LayerPtr<fp,RANK>(new SumPoolingLayer<fp>(layers1[3]->get_output_dims()));
+//	layers1[5] = LayerPtr<fp,RANK>(new ELUActivationLayer<fp,RANK>(layers1[4]->get_output_dims()));
 //	layers1[6] = LayerPtr<fp,RANK>(new BatchNormLayer<fp,RANK>(layers1[5]->get_output_dims()));
 //	comp_mods.push_back(NeuralNetPtr<fp,RANK,false>(new FeedforwardNeuralNetwork<fp,RANK>(std::move(layers1))));
 //	res_modules.push_back(std::make_pair(CompositeNeuralNetwork<fp,RANK,false>(std::move(comp_mods)), false));
 //	std::vector<LayerPtr<fp,RANK>> layers2(3);
 //	layers2[0] = LayerPtr<fp,RANK>(new ConvLayer<fp>(res_modules[0].first.get_output_dims(), 8, init));
-//	layers2[1] = LayerPtr<fp,RANK>(new LeakyReLUActivationLayer<fp,RANK>(layers2[0]->get_output_dims()));
+//	layers2[1] = LayerPtr<fp,RANK>(new PReLUActivationLayer<fp,RANK>(layers2[0]->get_output_dims()));
 //	layers2[2] = LayerPtr<fp,RANK>(new BatchNormLayer<fp,RANK>(layers2[1]->get_output_dims()));
 //	res_modules.push_back(std::make_pair(CompositeNeuralNetwork<fp,RANK,false>(NeuralNetPtr<fp,RANK,false>(
 //			new FeedforwardNeuralNetwork<fp,RANK>(std::move(layers2)))), false));
@@ -94,7 +94,7 @@ typedef double fp;
 //	res_modules.push_back(std::make_pair(CompositeNeuralNetwork<fp,RANK,false>(NeuralNetPtr<fp,RANK,false>(
 //			new FeedforwardNeuralNetwork<fp,RANK>(std::move(layers3)))), false));
 //	std::vector<LayerPtr<fp,RANK>> layers4(5);
-//	layers4[0] = LayerPtr<fp,RANK>(new MaxPoolingLayer<fp>(res_modules[3].first.get_output_dims()));
+//	layers4[0] = LayerPtr<fp,RANK>(new MeanPoolingLayer<fp>(res_modules[3].first.get_output_dims()));
 //	layers4[1] = LayerPtr<fp,RANK>(new LeakyReLUActivationLayer<fp,RANK>(layers4[0]->get_output_dims()));
 //	layers4[2] = LayerPtr<fp,RANK>(new FCLayer<fp,RANK>(layers4[1]->get_output_dims(), 50, init));
 //	layers4[3] = LayerPtr<fp,RANK>(new LeakyReLUActivationLayer<fp,RANK>(layers4[2]->get_output_dims()));
@@ -234,7 +234,7 @@ typedef double fp;
 //}
 
 int main() {
-	std::string mnist_folder = "C:\\Users\\A6714\\Downloads\\mnist\\";
+	std::string mnist_folder = "C:\\Users\\Viktor\\Downloads\\mnist\\";
 	MNISTDataProvider<float> prov(mnist_folder + "train-images.idx3-ubyte", mnist_folder + "train-labels.idx1-ubyte");
 	DataPair<float,3,false> data = prov.get_data(60000);
 	TensorPtr<float,4> obs(new Tensor<float,4>(std::move(data.first)));
@@ -242,28 +242,28 @@ int main() {
 	MemoryDataProvider<float,3,false> training_prov(std::move(obs), std::move(obj));
 	MNISTDataProvider<float> test_prov(mnist_folder + "t10k-images.idx3-ubyte", mnist_folder + "t10k-labels.idx1-ubyte");
 	WeightInitSharedPtr<float> init(new LeCunWeightInitialization<float>());
-	std::vector<LayerPtr<float,3>> layers(5);
-//	layers[0] = LayerPtr<float,3>(new ConvLayer<float>(training_prov.get_obs_dims(), 8, init, 5, 2));
-//	layers[1] = LayerPtr<float,3>(new SigmoidActivationLayer<float,3>(layers[0]->get_output_dims()));
-//	layers[2] = LayerPtr<float,3>(new MaxPoolingLayer<float>(layers[1]->get_output_dims()));
-//	layers[3] = LayerPtr<float,3>(new ConvLayer<float>(layers[2]->get_output_dims(), 8, init, 5, 2));
-//	layers[4] = LayerPtr<float,3>(new SigmoidActivationLayer<float,3>(layers[3]->get_output_dims()));
-//	layers[5] = LayerPtr<float,3>(new MaxPoolingLayer<float>(layers[4]->get_output_dims()));
-//	layers[6] = LayerPtr<float,3>(new FCLayer<float,3>(layers[5]->get_output_dims(), 150, init));
-//	layers[7] = LayerPtr<float,3>(new SigmoidActivationLayer<float,3>(layers[6]->get_output_dims()));
-//	layers[8] = LayerPtr<float,3>(new FCLayer<float,3>(layers[7]->get_output_dims(), 10, init));
-	layers[0] = LayerPtr<float,3>(new FCLayer<float,3>(training_prov.get_obs_dims(), 500, init));
+	std::vector<LayerPtr<float,3>> layers(9);
+	layers[0] = LayerPtr<float,3>(new ConvLayer<float>(training_prov.get_obs_dims(), 8, init, 5, 5, 2));
 	layers[1] = LayerPtr<float,3>(new SigmoidActivationLayer<float,3>(layers[0]->get_output_dims()));
-	layers[2] = LayerPtr<float,3>(new FCLayer<float,3>(layers[1]->get_output_dims(), 250, init));
-	layers[3] = LayerPtr<float,3>(new SigmoidActivationLayer<float,3>(layers[2]->get_output_dims()));
-	layers[4] = LayerPtr<float,3>(new FCLayer<float,3>(layers[3]->get_output_dims(), 10, init));
+	layers[2] = LayerPtr<float,3>(new SumPoolingLayer<float>(layers[1]->get_output_dims()));
+	layers[3] = LayerPtr<float,3>(new ConvLayer<float>(layers[2]->get_output_dims(), 8, init, 5, 5, 2));
+	layers[4] = LayerPtr<float,3>(new SigmoidActivationLayer<float,3>(layers[3]->get_output_dims()));
+	layers[5] = LayerPtr<float,3>(new SumPoolingLayer<float>(layers[4]->get_output_dims()));
+	layers[6] = LayerPtr<float,3>(new FCLayer<float,3>(layers[5]->get_output_dims(), 150, init));
+	layers[7] = LayerPtr<float,3>(new SigmoidActivationLayer<float,3>(layers[6]->get_output_dims()));
+	layers[8] = LayerPtr<float,3>(new FCLayer<float,3>(layers[7]->get_output_dims(), 10, init));
+//	layers[0] = LayerPtr<float,3>(new FCLayer<float,3>(training_prov.get_obs_dims(), 500, init));
+//	layers[1] = LayerPtr<float,3>(new SigmoidActivationLayer<float,3>(layers[0]->get_output_dims()));
+//	layers[2] = LayerPtr<float,3>(new FCLayer<float,3>(layers[1]->get_output_dims(), 250, init));
+//	layers[3] = LayerPtr<float,3>(new SigmoidActivationLayer<float,3>(layers[2]->get_output_dims()));
+//	layers[4] = LayerPtr<float,3>(new FCLayer<float,3>(layers[3]->get_output_dims(), 10, init));
 	FeedforwardNeuralNetwork<float,3> nn(std::move(layers));
 	nn.init();
 	LossSharedPtr<float,3,false> loss(new SoftmaxCrossEntropyLoss<float,3,false>());
 	RegPenSharedPtr<float> reg(new NoRegularizationPenalty<float>());
 	MomentumAcceleratedSGDOptimizer<float,3,false> opt(loss, reg, 100);
 	std::chrono::steady_clock::time_point begin = std::chrono::steady_clock::now();
-	opt.optimize(nn, training_prov, test_prov, 50);
+	opt.optimize(nn, training_prov, test_prov, 1);
 	std::cout << "Duration: " << std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now() -
 			begin).count() << std::endl;
 //	assert(test_parallel() & test_residual() & test_dense() & test_seqnn() & test_rnn() & test_lstm() & test_bdrnn());
