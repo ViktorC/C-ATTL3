@@ -22,7 +22,7 @@
 
 namespace cattle {
 
-// TODO 1D and 2D convolution and pooling.
+// TODO CPU convolution performance improvement.
 // TODO Optional GPU acceleration using cuBLAS and cuDNN.
 
 // Forward declarations to NeuralNetwork and Optimizer so they can be friended.
@@ -399,8 +399,9 @@ protected:
 		std::size_t rows = in.dimension(0);
 		std::size_t total_patches = rows * Base::output_dims(0) * Base::output_dims(1);
 		std::size_t receptor_vol = Base::weights_ref.rows() - 1;
-		/* Stretch the receptor locations into row vectors, concatenate them, and form a matrix out of them
-		 * where the rows are the samples and columns are the concatenated receptor locations. */
+		/* Flatten the receptor cuboids into row vectors and concatenate them. Each row stands for one stretched
+		 * out receptor of one sample. The same receptor location along all samples of the batch is represented
+		 * by a contiguous block of these rows. There is one block for each receptor location. */
 		std::size_t patch_ind = 0;
 		patch_extents[0] = rows;
 		biased_in = Matrix<Scalar>(total_patches, receptor_vol + 1);
@@ -409,7 +410,7 @@ protected:
 			for (std::size_t k = 0; k <= padded_width - dil_receptor_width; k += stride) {
 				patch_offsets[2] = k;
 				typename Root::Data patch;
-				// If the patch is dilated, skip the 'internal padding' when stretching it into a row.
+				// If the patch is dilated, skip the 'internal padding' when flattening it into a matrix.
 				if (dilation > 0)
 					patch = in.slice(patch_offsets, patch_extents).stride(dil_strides);
 				else
@@ -470,14 +471,14 @@ protected:
 			return prev_out_grads;
 	}
 	/**
-	 * It computes the dimension of the channel-rank of the output tensor of the layer.
+	 * It computes the dimension of the output tensor along a rank.
 	 *
 	 * @param input_dim The dimensionality of the input tensor.
 	 * @param receptor_size The spatial extent of the receptor.
 	 * @param padding The spatial padding.
 	 * @param dilation The dilation of the receptor.
 	 * @param stride The convolution stride.
-	 * @return The depth of the output tensors produced by the layer.
+	 * @return The dimension of the output tensor along the specified rank.
 	 */
 	static std::size_t calculate_output_dim(std::size_t input_dim, std::size_t receptor_size, std::size_t padding,
 			std::size_t dilation, std::size_t stride) {
@@ -942,21 +943,20 @@ protected:
 			out = this->in.unaryExpr([this](Scalar i) {
 				return (Scalar) (i > .0 ? i : (alpha * (exp(i) - 1)));
 			});
-			return out;
+			conversion_dims[0] = out.rows();
+			return TensorMap<Scalar,Root::DATA_RANK>(out.data(), conversion_dims);
 		}
-		return in.unaryExpr([this](Scalar i) { return (Scalar) (i > .0 ? i : (alpha * (exp(i) - 1))); });
+		return in.unaryExpr([this](Scalar i) { return (Scalar) (i > 0 ? i : (alpha * (exp(i) - 1))); });
 	}
 	inline typename Root::Data pass_back(typename Root::Data out_grads) {
 		assert(Utils<Scalar>::template get_dims<Base::DATA_RANK>(out_grads).template demote<>() == Base::dims);
-		assert(out_grads.dimension(0) > 0 && in.dimension(0) == out_grads.dimension(0));
-		std::size_t rows = out_grads.dimension(0);
-		MatrixMap<Scalar> out_grads_mat(out_grads.data(), rows, Base::dims.get_volume());
+		assert(out_grads.dimension(0) > 0 && conversion_dims[0] == out_grads.dimension(0));
+		MatrixMap<Scalar> out_grads_mat(out_grads.data(), conversion_dims[0], Base::dims.get_volume());
 		Matrix<Scalar> prev_out_grads(in.rows(), in.cols());
 		for (int i = 0; i < in.cols(); ++i) {
 			for (int j = 0; j < in.rows(); ++j)
-				prev_out_grads(j,i) = (in(j,i) > .0 ? 1.0 : (out(j,i) + alpha)) * out_grads_mat(j,i);
+				prev_out_grads(j,i) = (Scalar) ((in(j,i) > 0 ? 1 : (out(j,i) + alpha)) * out_grads_mat(j,i));
 		}
-		conversion_dims[0] = rows;
 		return TensorMap<Scalar,Root::DATA_RANK>(prev_out_grads.data(), conversion_dims);
 	}
 private:
@@ -1026,7 +1026,7 @@ protected:
 					prev_out_grads(j,i) = out_grads_map(j,i);
 				else {
 					Scalar out_ji = out_grads_map(j,i);
-					prev_out_grads(j,i) = Base::params(0,i) * out_ji;
+					prev_out_grads(j,i) = Base::params_ref(0,i) * out_ji;
 					Base::params_grad(0,i) += in_ji * out_ji;
 				}
 			}
@@ -1057,26 +1057,31 @@ protected:
 	typedef std::array<std::size_t,4> RankwiseArray;
 	typedef std::array<std::size_t,2> ReductionRanksArray;
 	typedef Tensor<Scalar,2> ReducedData;
-	inline PoolingLayer(const Dimensions<std::size_t,3>& input_dims, std::size_t receptor_size, std::size_t stride) :
-			input_dims(input_dims),
-			output_dims({ calculate_output_dim(input_dims(0), receptor_size, stride),
-					calculate_output_dim(input_dims(1), receptor_size, stride), input_dims(2) }),
-			receptor_size(receptor_size),
-			stride(stride),
-			receptor_area(receptor_size * receptor_size),
-			height_rem(input_dims(0) - receptor_size),
-			width_rem(input_dims(1) - receptor_size),
-			input_layer(false),
-			reduction_ranks({ 1u, 2u }),
-			broadcast({ 1u, receptor_size, receptor_size, 1u }),
-			patch_offsets({ 0u, 0u, 0u, 0u }),
-			patch_extents({ 0u, receptor_size, receptor_size, input_dims(2) }),
-			reduced_patch_offsets({ 0u, 0u, 0u, 0u }),
-			reduced_patch_extents({ 0u, 1u, 1u, input_dims(2) }),
-			params(0, 0),
-			params_grad(0, 0) {
-		assert(input_dims(0) >= receptor_size && input_dims(1) >= receptor_size);
-		assert(receptor_size > 0);
+	inline PoolingLayer(const Dimensions<std::size_t,3>& input_dims, std::size_t receptor_height, std::size_t receptor_width,
+			std::size_t stride, std::size_t dilation) :
+				input_dims(input_dims),
+				output_dims({ calculate_output_dim(input_dims(0), receptor_height, dilation, stride),
+						calculate_output_dim(input_dims(1), receptor_width, dilation, stride), input_dims(2) }),
+				receptor_height(receptor_height),
+				receptor_width(receptor_width),
+				stride(stride),
+				dilation(dilation),
+				dil_receptor_height(receptor_height + (receptor_height - 1) * dilation),
+				dil_receptor_width(receptor_width + (receptor_width - 1) * dilation),
+				height_rem(input_dims(0) - dil_receptor_height),
+				width_rem(input_dims(1) - dil_receptor_width),
+				input_layer(false),
+				reduction_ranks({ 1u, 2u }),
+				broadcast({ 1u, receptor_height, receptor_width, 1u }),
+				patch_offsets({ 0u, 0u, 0u, 0u }),
+				patch_extents({ 0u, dil_receptor_height, dil_receptor_width, input_dims(2) }),
+				reduced_patch_offsets({ 0u, 0u, 0u, 0u }),
+				reduced_patch_extents({ 0u, 1u, 1u, input_dims(2) }),
+				dil_strides({ 1u, dilation + 1u, dilation + 1u, 1u }),
+				params(0, 0),
+				params_grad(0, 0) {
+		assert(input_dims(0) >= dil_receptor_height && input_dims(1) >= dil_receptor_width);
+		assert(receptor_height > 0 && receptor_width > 0);
 		assert(stride > 0);
 	}
 	/**
@@ -1090,7 +1095,7 @@ protected:
 	 * @param patch_ind The index of the patch.
 	 * @return The reduced tensor.
 	 */
-	virtual typename Base::Data reduce(const typename Base::Data& patch, unsigned patch_ind) = 0;
+	virtual typename Base::Data reduce(const typename Base::Data& patch, std::size_t patch_ind) = 0;
 	/**
 	 * Differentiates the reduction function and returns the derivative of the loss function
 	 * w.r.t. the non-reduced patch.
@@ -1099,7 +1104,7 @@ protected:
 	 * @param patch_ind The index of the patch.
 	 * @return The derivative of the loss function w.r.t. the non-reduced patch.
 	 */
-	virtual typename Base::Data d_reduce(typename Base::Data grad, unsigned patch_ind) = 0;
+	virtual typename Base::Data d_reduce(const typename Base::Data& grad, std::size_t patch_ind) = 0;
 	inline bool is_input_layer() const {
 		return input_layer;
 	}
@@ -1131,7 +1136,12 @@ protected:
 			for (std::size_t j = 0; j <= width_rem; j += stride, ++out_j) {
 				patch_offsets[2] = j;
 				reduced_patch_offsets[2] = out_j;
-				typename Base::Data patch = in.slice(patch_offsets, patch_extents);
+				typename Base::Data patch;
+				// Dilated receptor support.
+				if (dilation > 0)
+					patch = in.slice(patch_offsets, patch_extents).stride(dil_strides);
+				else
+					patch = in.slice(patch_offsets, patch_extents);
 				out.slice(reduced_patch_offsets, reduced_patch_extents) = reduce(patch, patch_ind++);
 			}
 		}
@@ -1154,7 +1164,12 @@ protected:
 				patch_offsets[2] = j;
 				reduced_patch_offsets[2] = out_grads_j;
 				typename Base::Data reduced_patch_grads = out_grads.slice(reduced_patch_offsets, reduced_patch_extents);
-				prev_out_grads.slice(patch_offsets, patch_extents) = d_reduce(reduced_patch_grads, patch_ind++);
+				// Accumulate the gradients where the patches overlap.
+				if (dilation > 0)
+					prev_out_grads.slice(patch_offsets, patch_extents).stride(dil_strides) +=
+							d_reduce(reduced_patch_grads, patch_ind++);
+				else
+					prev_out_grads.slice(patch_offsets, patch_extents) += d_reduce(reduced_patch_grads, patch_ind++);
 			}
 		}
 		return prev_out_grads;
@@ -1165,26 +1180,33 @@ protected:
 	 *
 	 * @param input_dim The dimensionality of the input tensor.
 	 * @param receptor_size The spatial extent of the receptor.
+	 * @param dilation The dilation of the receptor.
 	 * @param stride The stride at which the receptor is applied to the input tensor.
 	 * @return The depth of the output tensor.
 	 */
-	static std::size_t calculate_output_dim(std::size_t input_dim, std::size_t receptor_size, std::size_t stride) {
-		return (input_dim - receptor_size) / stride + 1;
+	static std::size_t calculate_output_dim(std::size_t input_dim, std::size_t receptor_size, std::size_t dilation,
+			std::size_t stride) {
+		return (input_dim - receptor_size - (receptor_size - 1) * dilation) / stride + 1;
 	}
 	const Dimensions<std::size_t,3> input_dims;
 	const Dimensions<std::size_t,3> output_dims;
-	const std::size_t receptor_size;
+	const std::size_t receptor_height;
+	const std::size_t receptor_width;
 	const std::size_t stride;
-	const std::size_t receptor_area;
+	const std::size_t dilation;
+	const std::size_t dil_receptor_height;
+	const std::size_t dil_receptor_width;
 	const std::size_t height_rem;
 	const std::size_t width_rem;
 	bool input_layer;
+	// Arrays for tensor manipulation.
 	ReductionRanksArray reduction_ranks;
 	RankwiseArray broadcast;
 	RankwiseArray patch_offsets;
 	RankwiseArray patch_extents;
 	RankwiseArray reduced_patch_offsets;
 	RankwiseArray reduced_patch_extents;
+	RankwiseArray dil_strides;
 	// No actual parameters.
 	Matrix<Scalar> params;
 	Matrix<Scalar> params_grad;
@@ -1201,12 +1223,15 @@ class SumPoolingLayer : public PoolingLayer<Scalar> {
 public:
 	/**
 	 * @param input_dims The dimensionality of the input tensor.
-	 * @param receptor_size The spatial extent of the pooling receptor.
+	 * @param receptor_height The height of the pooling receptor.
+	 * @param receptor_width The width of the pooling receptor.
 	 * @param stride The stride at which the input is to be pooled (i.e. the number of elements
 	 * by which the receptor is to be shifted after every step of the pooling process).
+	 * @param dilation The extent of the dilation to apply to the receptor field.
 	 */
-	inline SumPoolingLayer(const Dimensions<std::size_t,3>& input_dims, std::size_t receptor_size = 2, std::size_t stride = 2) :
-			Base::PoolingLayer(input_dims, receptor_size, stride) { }
+	inline SumPoolingLayer(const Dimensions<std::size_t,3>& input_dims, std::size_t receptor_height = 2,
+			std::size_t receptor_width = 2, std::size_t stride = 2, std::size_t dilation = 0) :
+				Base::PoolingLayer(input_dims, receptor_height, receptor_width, stride, dilation) { }
 	inline Root* clone() const {
 		return new SumPoolingLayer(*this);
 	}
@@ -1215,11 +1240,11 @@ protected:
 		return clone();
 	}
 	inline void init_cache() { };
-	inline typename Root::Data reduce(const typename Root::Data& patch, unsigned patch_ind) {
+	inline typename Root::Data reduce(const typename Root::Data& patch, std::size_t patch_ind) {
 		typename Base::ReducedData reduced_patch = patch.sum(Base::reduction_ranks);
 		return TensorMap<Scalar,4>(reduced_patch.data(), Base::reduced_patch_extents);
 	}
-	inline typename Base::Data d_reduce(typename Base::Data grad, unsigned patch_ind) {
+	inline typename Root::Data d_reduce(const typename Root::Data& grad, std::size_t patch_ind) {
 		return grad.broadcast(Base::broadcast);
 	}
 	inline void empty_cache() { }
@@ -1236,12 +1261,16 @@ class MeanPoolingLayer : public PoolingLayer<Scalar> {
 public:
 	/**
 	 * @param input_dims The dimensionality of the input tensor.
-	 * @param receptor_size The spatial extent of the pooling receptor.
+	 * @param receptor_height The height of the pooling receptor.
+	 * @param receptor_width The width of the pooling receptor.
 	 * @param stride The stride at which the input is to be pooled (i.e. the number of elements
 	 * by which the receptor is to be shifted after every step of the pooling process).
+	 * @param dilation The extent of the dilation to apply to the receptor field.
 	 */
-	inline MeanPoolingLayer(const Dimensions<std::size_t,3>& input_dims, std::size_t receptor_size = 2, std::size_t stride = 2) :
-			Base::PoolingLayer(input_dims, receptor_size, stride) { }
+	inline MeanPoolingLayer(const Dimensions<std::size_t,3>& input_dims, std::size_t receptor_height = 2,
+			std::size_t receptor_width = 2, std::size_t stride = 2, std::size_t dilation = 0) :
+				Base::PoolingLayer(input_dims, receptor_height, receptor_width, stride, dilation),
+				receptor_area(receptor_height * receptor_width) { }
 	inline Root* clone() const {
 		return new MeanPoolingLayer(*this);
 	}
@@ -1250,57 +1279,98 @@ protected:
 		return clone();
 	}
 	inline void init_cache() { }
-	inline typename Root::Data reduce(const typename Root::Data& patch, unsigned patch_ind) {
+	inline typename Root::Data reduce(const typename Root::Data& patch, std::size_t patch_ind) {
 		typename Base::ReducedData reduced_patch = patch.mean(Base::reduction_ranks);
 		return TensorMap<Scalar,4>(reduced_patch.data(), Base::reduced_patch_extents);
 	}
-	inline typename Base::Data d_reduce(typename Base::Data grad, unsigned patch_ind) {
-		return (grad / (Scalar) Base::receptor_area).broadcast(Base::broadcast);
+	inline typename Root::Data d_reduce(const typename Root::Data& grad, std::size_t patch_ind) {
+		return (grad / (Scalar) receptor_area).broadcast(Base::broadcast);
 	}
 	inline void empty_cache() { }
+private:
+	std::size_t receptor_area;
 };
 
 /**
  * A class template representing a pooling layer that reduces patches of the input by taking their
  * maximums.
  */
-//template<typename Scalar>
-//class MaxPoolingLayer : public PoolingLayer<Scalar> {
-//	typedef Layer<Scalar,3> Root;
-//	typedef PoolingLayer<Scalar> Base;
-//public:
-//	/**
-//	 * @param input_dims The dimensionality of the input tensor.
-//	 * @param receptor_size The spatial extent of the pooling receptor.
-//	 * @param stride The stride at which the input is to be pooled (i.e. the number of elements
-//	 * by which the receptor is to be shifted after every step of the pooling process).
-//	 */
-//	inline MaxPoolingLayer(const Dimensions<std::size_t,3>& input_dims, unsigned receptor_size = 2, unsigned stride = 2) :
-//			Base::PoolingLayer(input_dims, receptor_size, stride) { }
-//	inline Root* clone() const {
-//		return new MaxPoolingLayer(*this);
-//	}
-//protected:
-//	inline Root* clone_with_shared_params() const {
-//		return clone();
-//	}
-//	inline void init_cache() {
-//		max_inds = std::vector<unsigned>(PoolingLayer<Scalar>::rows *
-//				PoolingLayer<Scalar>::output_dims.get_volume());
-//	}
-//	inline typename Root::Data reduce(const typename Root::Data& patch, unsigned patch_ind) {
-//		typename Base::ReducedData reduced_patch = patch.maximum(Base::reduction_ranks);
-//		return TensorMap<Scalar,4>(reduced_patch.data(), Base::reduced_patch_extents);
-//	}
-//	inline typename Base::Data d_reduce(typename Base::Data grad, unsigned patch_ind) {
-//		return (grad / (Scalar) Base::receptor_area).broadcast(Base::broadcast);
-//	}
-//	inline void empty_cache() {
-//		max_inds = std::vector<unsigned>(0);
-//	}
-//private:
-//	// Cache
-//};
+template<typename Scalar>
+class MaxPoolingLayer : public PoolingLayer<Scalar> {
+	typedef Layer<Scalar,3> Root;
+	typedef PoolingLayer<Scalar> Base;
+public:
+	/**
+	 * @param input_dims The dimensionality of the input tensor.
+	 * @param receptor_height The height of the pooling receptor.
+	 * @param receptor_width The width of the pooling receptor.
+	 * @param stride The stride at which the input is to be pooled (i.e. the number of elements
+	 * by which the receptor is to be shifted after every step of the pooling process).
+	 * @param dilation The extent of the dilation to apply to the receptor field.
+	 */
+	inline MaxPoolingLayer(const Dimensions<std::size_t,3>& input_dims, std::size_t receptor_height = 2,
+			std::size_t receptor_width = 2, std::size_t stride = 2, std::size_t dilation = 0) :
+				Base::PoolingLayer(input_dims, receptor_height, receptor_width, stride, dilation) { }
+	inline Root* clone() const {
+		return new MaxPoolingLayer(*this);
+	}
+protected:
+	inline Root* clone_with_shared_params() const {
+		return clone();
+	}
+	inline void init_cache() {
+		max_inds = std::vector<std::vector<unsigned>>(Base::output_dims(0) * Base::output_dims(1));
+	}
+	inline typename Root::Data reduce(const typename Root::Data& patch, std::size_t patch_ind) {
+		std::size_t rows = patch.dimension(0);
+		std::size_t depth = patch.dimension(3);
+		std::vector<unsigned> inds(rows * depth);
+		typename Root::Data reduced_patch(rows, 1u, 1u, depth);
+		for (std::size_t i = 0; i < rows; ++i) {
+			for (std::size_t j = 0; j < depth; ++j) {
+				Scalar max = Utils<Scalar>::MIN;
+				unsigned max_height = 0;
+				unsigned max_width = 0;
+				for (std::size_t k = 0; k < Base::receptor_height; ++k) {
+					for (std::size_t l = 0; l < Base::receptor_width; ++l) {
+						Scalar val = patch(i,k,l,j);
+						if (val > max) {
+							max = val;
+							max_height = k;
+							max_width = l;
+						}
+					}
+				}
+				inds[i * depth + j] = max_height * Base::receptor_width + max_width;
+				reduced_patch(i,0u,0u,j) = max;
+			}
+		}
+		max_inds[patch_ind] = inds;
+		return reduced_patch;
+	}
+	inline typename Root::Data d_reduce(const typename Root::Data& grad, std::size_t patch_ind) {
+		std::size_t rows = grad.dimension(0);
+		std::size_t depth = grad.dimension(3);
+		typename Root::Data patch(rows, Base::receptor_height, Base::receptor_width, depth);
+		patch.setZero();
+		std::vector<unsigned>& inds = max_inds[patch_ind];
+		for (std::size_t i = 0; i < rows; ++i) {
+			for (std::size_t j = 0; j < depth; ++j) {
+				unsigned max_ind = inds[i * depth + j];
+				unsigned height = max_ind / Base::receptor_width;
+				unsigned width = max_ind % Base::receptor_width;
+				patch(i,height,width,j) = grad(i,0u,0u,j);
+			}
+		}
+		return patch;
+	}
+	inline void empty_cache() {
+		max_inds = std::vector<std::vector<unsigned>>(0);
+	}
+private:
+	// Cache
+	std::vector<std::vector<unsigned>> max_inds;
+};
 
 /**
  * An abstract base class template for a batch normalization layer.

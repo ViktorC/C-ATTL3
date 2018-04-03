@@ -86,7 +86,7 @@ typedef double fp;
 //			new FeedforwardNeuralNetwork<fp,RANK>(std::move(layers2)))), false));
 //	res_modules.push_back(std::make_pair(CompositeNeuralNetwork<fp,RANK,false>(NeuralNetPtr<fp,RANK,false>(
 //			new FeedforwardNeuralNetwork<fp,RANK>(LayerPtr<fp,RANK>(new MaxPoolingLayer<fp>(
-//					res_modules[1].first.get_output_dims()))))), false));
+//					res_modules[1].first.get_output_dims(), 3, 2, 2, 1))))), false));
 //	std::vector<LayerPtr<fp,RANK>> layers3(3);
 //	layers3[0] = LayerPtr<fp,RANK>(new ConvLayer<fp>(res_modules[2].first.get_output_dims(), 8, init));
 //	layers3[1] = LayerPtr<fp,RANK>(new LeakyReLUActivationLayer<fp,RANK>(layers3[0]->get_output_dims()));
@@ -234,7 +234,7 @@ typedef double fp;
 //}
 
 int main() {
-	std::string mnist_folder = "C:\\Users\\Viktor\\Downloads\\mnist\\";
+	std::string mnist_folder = "C:\\Users\\A6714\\Downloads\\mnist\\";
 	MNISTDataProvider<float> prov(mnist_folder + "train-images.idx3-ubyte", mnist_folder + "train-labels.idx1-ubyte");
 	DataPair<float,3,false> data = prov.get_data(60000);
 	TensorPtr<float,4> obs(new Tensor<float,4>(std::move(data.first)));
@@ -245,10 +245,10 @@ int main() {
 	std::vector<LayerPtr<float,3>> layers(9);
 	layers[0] = LayerPtr<float,3>(new ConvLayer<float>(training_prov.get_obs_dims(), 8, init, 5, 5, 2));
 	layers[1] = LayerPtr<float,3>(new SigmoidActivationLayer<float,3>(layers[0]->get_output_dims()));
-	layers[2] = LayerPtr<float,3>(new SumPoolingLayer<float>(layers[1]->get_output_dims()));
+	layers[2] = LayerPtr<float,3>(new MaxPoolingLayer<float>(layers[1]->get_output_dims()));
 	layers[3] = LayerPtr<float,3>(new ConvLayer<float>(layers[2]->get_output_dims(), 8, init, 5, 5, 2));
 	layers[4] = LayerPtr<float,3>(new SigmoidActivationLayer<float,3>(layers[3]->get_output_dims()));
-	layers[5] = LayerPtr<float,3>(new SumPoolingLayer<float>(layers[4]->get_output_dims()));
+	layers[5] = LayerPtr<float,3>(new MaxPoolingLayer<float>(layers[4]->get_output_dims()));
 	layers[6] = LayerPtr<float,3>(new FCLayer<float,3>(layers[5]->get_output_dims(), 150, init));
 	layers[7] = LayerPtr<float,3>(new SigmoidActivationLayer<float,3>(layers[6]->get_output_dims()));
 	layers[8] = LayerPtr<float,3>(new FCLayer<float,3>(layers[7]->get_output_dims(), 10, init));

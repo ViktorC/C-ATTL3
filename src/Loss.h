@@ -175,7 +175,7 @@ protected:
 	inline ColVector<Scalar> _function(typename Root::Data out, typename Root::Data obj) const {
 		std::size_t rows = out.dimension(0);
 		std::size_t cols = out.size() / rows;
-		return (MatrixMap<Scalar>(out.data, rows, cols) - MatrixMap<Scalar>(obj.data, rows, cols))
+		return (MatrixMap<Scalar>(out.data(), rows, cols) - MatrixMap<Scalar>(obj.data(), rows, cols))
 				.array().abs().rowwise().sum();
 	}
 	inline typename Root::Data _d_function(typename Root::Data out, typename Root::Data obj,
@@ -195,7 +195,7 @@ protected:
 	inline ColVector<Scalar> _function(typename Root::Data out, typename Root::Data obj) const {
 		std::size_t rows = out.dimension(0);
 		std::size_t cols = out.size() / rows;
-		return (MatrixMap<Scalar>(out.data, rows, cols) - MatrixMap<Scalar>(obj.data, rows, cols))
+		return (MatrixMap<Scalar>(out.data(), rows, cols) - MatrixMap<Scalar>(obj.data(), rows, cols))
 				.array().square().rowwise().sum();
 	}
 	inline typename Root::Data _d_function(typename Root::Data out, typename Root::Data obj,
@@ -301,8 +301,8 @@ protected:
 	inline ColVector<Scalar> _function(typename Root::Data out, typename Root::Data obj) const {
 		std::size_t rows = out.dimension(0);
 		std::size_t cols = out.size() / rows;
-		return -(MatrixMap<Scalar>(out.data, rows, cols).array().log() *
-				MatrixMap<Scalar>(obj.data, rows, cols).array()).matrix().rowwise().sum();
+		return -(MatrixMap<Scalar>(out.data(), rows, cols).array().log() *
+				MatrixMap<Scalar>(obj.data(), rows, cols).array()).matrix().rowwise().sum();
 	}
 	inline typename Root::Data _d_function(typename Root::Data out, typename Root::Data obj,
 			const typename Base::RankwiseArray& grad_dims) const {
