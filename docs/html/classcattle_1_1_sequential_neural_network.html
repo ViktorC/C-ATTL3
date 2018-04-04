@@ -153,8 +153,14 @@ Private Attributes</h2></td></tr>
 <tr class="separator:ad88075b30084d1e258b4332bb79b4513"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a30b52696a4948b67a023d2e980cbdeb3"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classcattle_1_1_neural_network.html#ab3608ae118bbbacbc9161f489afcd562">Base::Dims</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_sequential_neural_network.html#a30b52696a4948b67a023d2e980cbdeb3">output_dims</a></td></tr>
 <tr class="separator:a30b52696a4948b67a023d2e980cbdeb3"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a38cd8b6425727c33c64a6fcae8a90ceb"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_sequential_neural_network.html#a38cd8b6425727c33c64a6fcae8a90ceb">batch_size</a></td></tr>
-<tr class="separator:a38cd8b6425727c33c64a6fcae8a90ceb"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af5f438d459e3262af31fc307e7e95a28"><td class="memItemLeft" align="right" valign="top">std::array&lt; std::size_t, Rank+1 &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_sequential_neural_network.html#af5f438d459e3262af31fc307e7e95a28">joint_input_dims</a></td></tr>
+<tr class="separator:af5f438d459e3262af31fc307e7e95a28"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a8ad4a2bb31032761ad4a19a1ab93f8e7"><td class="memItemLeft" align="right" valign="top">std::array&lt; std::size_t, Rank+1 &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_sequential_neural_network.html#a8ad4a2bb31032761ad4a19a1ab93f8e7">joint_output_dims</a></td></tr>
+<tr class="separator:a8ad4a2bb31032761ad4a19a1ab93f8e7"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad4f648a2f3d1a17113f78b1e70877ff8"><td class="memItemLeft" align="right" valign="top">std::array&lt; std::size_t, Rank+2 &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_sequential_neural_network.html#ad4f648a2f3d1a17113f78b1e70877ff8">split_input_dims</a></td></tr>
+<tr class="separator:ad4f648a2f3d1a17113f78b1e70877ff8"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a96676bed8197570a0521bc05c02eabb0"><td class="memItemLeft" align="right" valign="top">std::array&lt; std::size_t, Rank+2 &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_sequential_neural_network.html#a96676bed8197570a0521bc05c02eabb0">split_output_dims</a></td></tr>
+<tr class="separator:a96676bed8197570a0521bc05c02eabb0"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="friends"></a>
 Friends</h2></td></tr>
@@ -790,30 +796,6 @@ template&lt;typename Scalar , std::size_t Rank&gt; </div>
 </div>
 </div>
 <h2 class="groupheader">Member Data Documentation</h2>
-<a id="a38cd8b6425727c33c64a6fcae8a90ceb"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a38cd8b6425727c33c64a6fcae8a90ceb">&#9670;&nbsp;</a></span>batch_size</h2>
-
-<div class="memitem">
-<div class="memproto">
-<div class="memtemplate">
-template&lt;typename Scalar , std::size_t Rank&gt; </div>
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">int <a class="el" href="classcattle_1_1_sequential_neural_network.html">cattle::SequentialNeuralNetwork</a>&lt; Scalar, Rank &gt;::batch_size</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">private</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-</div>
-</div>
 <a id="acc2e5e318df75ab979a414c3c07887d2"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#acc2e5e318df75ab979a414c3c07887d2">&#9670;&nbsp;</a></span>foremost</h2>
 
@@ -862,6 +844,54 @@ template&lt;typename Scalar , std::size_t Rank&gt; </div>
 
 </div>
 </div>
+<a id="af5f438d459e3262af31fc307e7e95a28"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af5f438d459e3262af31fc307e7e95a28">&#9670;&nbsp;</a></span>joint_input_dims</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename Scalar , std::size_t Rank&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::array&lt;std::size_t,Rank + 1&gt; <a class="el" href="classcattle_1_1_sequential_neural_network.html">cattle::SequentialNeuralNetwork</a>&lt; Scalar, Rank &gt;::joint_input_dims</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">private</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a8ad4a2bb31032761ad4a19a1ab93f8e7"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a8ad4a2bb31032761ad4a19a1ab93f8e7">&#9670;&nbsp;</a></span>joint_output_dims</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename Scalar , std::size_t Rank&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::array&lt;std::size_t,Rank + 1&gt; <a class="el" href="classcattle_1_1_sequential_neural_network.html">cattle::SequentialNeuralNetwork</a>&lt; Scalar, Rank &gt;::joint_output_dims</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">private</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
 <a id="a52b1f7862ce49e51464442a00b7881a3"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a52b1f7862ce49e51464442a00b7881a3">&#9670;&nbsp;</a></span>net</h2>
 
@@ -899,6 +929,54 @@ template&lt;typename Scalar , std::size_t Rank&gt; </div>
       <table class="memname">
         <tr>
           <td class="memname"><a class="el" href="classcattle_1_1_neural_network.html#ab3608ae118bbbacbc9161f489afcd562">Base::Dims</a> <a class="el" href="classcattle_1_1_sequential_neural_network.html">cattle::SequentialNeuralNetwork</a>&lt; Scalar, Rank &gt;::output_dims</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">private</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="ad4f648a2f3d1a17113f78b1e70877ff8"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad4f648a2f3d1a17113f78b1e70877ff8">&#9670;&nbsp;</a></span>split_input_dims</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename Scalar , std::size_t Rank&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::array&lt;std::size_t,Rank + 2&gt; <a class="el" href="classcattle_1_1_sequential_neural_network.html">cattle::SequentialNeuralNetwork</a>&lt; Scalar, Rank &gt;::split_input_dims</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">private</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a96676bed8197570a0521bc05c02eabb0"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a96676bed8197570a0521bc05c02eabb0">&#9670;&nbsp;</a></span>split_output_dims</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename Scalar , std::size_t Rank&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::array&lt;std::size_t,Rank + 2&gt; <a class="el" href="classcattle_1_1_sequential_neural_network.html">cattle::SequentialNeuralNetwork</a>&lt; Scalar, Rank &gt;::split_output_dims</td>
         </tr>
       </table>
   </td>

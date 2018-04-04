@@ -5,7 +5,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
 <meta name="generator" content="Doxygen 1.8.14"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>C-ATTL3: cattle::PCAPreprocessorBase&lt; Scalar, Rank &gt;::EigenDecomposition Struct Reference</title>
+<title>C-ATTL3: cattle::PCAPreprocessorBase&lt; Scalar, Rank, Standardize, Whiten &gt;::EigenDecomposition Struct Reference</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -70,7 +70,7 @@ $(function() {
 <a href="#pub-attribs">Public Attributes</a> &#124;
 <a href="structcattle_1_1_p_c_a_preprocessor_base_1_1_eigen_decomposition-members.html">List of all members</a>  </div>
   <div class="headertitle">
-<div class="title">cattle::PCAPreprocessorBase&lt; Scalar, Rank &gt;::EigenDecomposition Struct Reference</div>  </div>
+<div class="title">cattle::PCAPreprocessorBase&lt; Scalar, Rank, Standardize, Whiten &gt;::EigenDecomposition Struct Reference</div>  </div>
 </div><!--header-->
 <div class="contents">
 
@@ -78,38 +78,38 @@ $(function() {
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-attribs"></a>
 Public Attributes</h2></td></tr>
-<tr class="memitem:a14ad0f38bdea86904d823b512cea3bff"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespacecattle.html#a1d78623a47279d516750a44dbad6090b">Matrix</a>&lt; Scalar &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structcattle_1_1_p_c_a_preprocessor_base_1_1_eigen_decomposition.html#a14ad0f38bdea86904d823b512cea3bff">eigen_basis</a></td></tr>
-<tr class="separator:a14ad0f38bdea86904d823b512cea3bff"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a3fc989a6206e5efadbd4eb946f9e102e"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespacecattle.html#a3ac7e197e90e292a2db6b2d94f46befa">RowVector</a>&lt; Scalar &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structcattle_1_1_p_c_a_preprocessor_base_1_1_eigen_decomposition.html#a3fc989a6206e5efadbd4eb946f9e102e">eigen_values</a></td></tr>
-<tr class="separator:a3fc989a6206e5efadbd4eb946f9e102e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3b8733e444e177dd5b119318674a4de9"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespacecattle.html#a1d78623a47279d516750a44dbad6090b">Matrix</a>&lt; Scalar &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structcattle_1_1_p_c_a_preprocessor_base_1_1_eigen_decomposition.html#a3b8733e444e177dd5b119318674a4de9">eigen_basis</a></td></tr>
+<tr class="separator:a3b8733e444e177dd5b119318674a4de9"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3687a885dd8d81083fb7456635ad42a9"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespacecattle.html#a3ac7e197e90e292a2db6b2d94f46befa">RowVector</a>&lt; Scalar &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structcattle_1_1_p_c_a_preprocessor_base_1_1_eigen_decomposition.html#a3687a885dd8d81083fb7456635ad42a9">eigen_values</a></td></tr>
+<tr class="separator:a3687a885dd8d81083fb7456635ad42a9"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <h2 class="groupheader">Member Data Documentation</h2>
-<a id="a14ad0f38bdea86904d823b512cea3bff"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a14ad0f38bdea86904d823b512cea3bff">&#9670;&nbsp;</a></span>eigen_basis</h2>
+<a id="a3b8733e444e177dd5b119318674a4de9"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a3b8733e444e177dd5b119318674a4de9">&#9670;&nbsp;</a></span>eigen_basis</h2>
 
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;typename Scalar, std::size_t Rank&gt; </div>
+template&lt;typename Scalar, std::size_t Rank, bool Standardize = false, bool Whiten = false&gt; </div>
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="namespacecattle.html#a1d78623a47279d516750a44dbad6090b">Matrix</a>&lt;Scalar&gt; <a class="el" href="classcattle_1_1_p_c_a_preprocessor_base.html">cattle::PCAPreprocessorBase</a>&lt; Scalar, Rank &gt;::EigenDecomposition::eigen_basis</td>
+          <td class="memname"><a class="el" href="namespacecattle.html#a1d78623a47279d516750a44dbad6090b">Matrix</a>&lt;Scalar&gt; <a class="el" href="classcattle_1_1_p_c_a_preprocessor_base.html">cattle::PCAPreprocessorBase</a>&lt; Scalar, Rank, Standardize, Whiten &gt;::EigenDecomposition::eigen_basis</td>
         </tr>
       </table>
 </div><div class="memdoc">
 
 </div>
 </div>
-<a id="a3fc989a6206e5efadbd4eb946f9e102e"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a3fc989a6206e5efadbd4eb946f9e102e">&#9670;&nbsp;</a></span>eigen_values</h2>
+<a id="a3687a885dd8d81083fb7456635ad42a9"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a3687a885dd8d81083fb7456635ad42a9">&#9670;&nbsp;</a></span>eigen_values</h2>
 
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;typename Scalar, std::size_t Rank&gt; </div>
+template&lt;typename Scalar, std::size_t Rank, bool Standardize = false, bool Whiten = false&gt; </div>
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="namespacecattle.html#a3ac7e197e90e292a2db6b2d94f46befa">RowVector</a>&lt;Scalar&gt; <a class="el" href="classcattle_1_1_p_c_a_preprocessor_base.html">cattle::PCAPreprocessorBase</a>&lt; Scalar, Rank &gt;::EigenDecomposition::eigen_values</td>
+          <td class="memname"><a class="el" href="namespacecattle.html#a3ac7e197e90e292a2db6b2d94f46befa">RowVector</a>&lt;Scalar&gt; <a class="el" href="classcattle_1_1_p_c_a_preprocessor_base.html">cattle::PCAPreprocessorBase</a>&lt; Scalar, Rank, Standardize, Whiten &gt;::EigenDecomposition::eigen_values</td>
         </tr>
       </table>
 </div><div class="memdoc">

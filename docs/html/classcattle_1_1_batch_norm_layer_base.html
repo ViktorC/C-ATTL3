@@ -69,6 +69,7 @@ $(function() {
   <div class="summary">
 <a href="#nested-classes">Classes</a> &#124;
 <a href="#pub-methods">Public Member Functions</a> &#124;
+<a href="#pro-types">Protected Types</a> &#124;
 <a href="#pro-methods">Protected Member Functions</a> &#124;
 <a href="#pro-attribs">Protected Attributes</a> &#124;
 <a href="#pri-types">Private Types</a> &#124;
@@ -112,6 +113,14 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a92963ac4a339d9174a3aef3dbf3c271f inherit pub_methods_classcattle_1_1_layer"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_layer.html#a92963ac4a339d9174a3aef3dbf3c271f">is_parametric</a> ()</td></tr>
 <tr class="separator:a92963ac4a339d9174a3aef3dbf3c271f inherit pub_methods_classcattle_1_1_layer"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pro-types"></a>
+Protected Types</h2></td></tr>
+<tr class="memitem:a38fb1abfae6c8153c29f10e5f5a05c25"><td class="memItemLeft" align="right" valign="top">typedef std::array&lt; std::size_t, <a class="el" href="classcattle_1_1_layer.html#af7f8bccf684ef96e791adbfc56b60e09">Base::DATA_RANK</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_batch_norm_layer_base.html#a38fb1abfae6c8153c29f10e5f5a05c25">RankwiseArray</a></td></tr>
+<tr class="separator:a38fb1abfae6c8153c29f10e5f5a05c25"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="inherit_header pro_types_classcattle_1_1_layer"><td colspan="2" onclick="javascript:toggleInherit('pro_types_classcattle_1_1_layer')"><img src="closed.png" alt="-"/>&#160;Protected Types inherited from <a class="el" href="classcattle_1_1_layer.html">cattle::Layer&lt; Scalar, Rank &gt;</a></td></tr>
+<tr class="memitem:a8c0af442a18521dea2406d0878e7db61 inherit pro_types_classcattle_1_1_layer"><td class="memItemLeft" align="right" valign="top">typedef <a class="el" href="namespacecattle.html#a8b9323ad928764340e46f0802bf27fbb">Tensor</a>&lt; Scalar, <a class="el" href="classcattle_1_1_layer.html#af7f8bccf684ef96e791adbfc56b60e09">DATA_RANK</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_layer.html#a8c0af442a18521dea2406d0878e7db61">Data</a></td></tr>
+<tr class="separator:a8c0af442a18521dea2406d0878e7db61 inherit pro_types_classcattle_1_1_layer"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pro-methods"></a>
 Protected Member Functions</h2></td></tr>
 <tr class="memitem:a1277172da255e16a8fb28db2430872ac"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_batch_norm_layer_base.html#a1277172da255e16a8fb28db2430872ac">BatchNormLayerBase</a> (const <a class="el" href="classcattle_1_1_dimensions.html">Dimensions</a>&lt; std::size_t, Rank &gt; &amp;<a class="el" href="classcattle_1_1_batch_norm_layer_base.html#af38d13e78cbaedbb45b2b44111119e95">dims</a>, std::size_t <a class="el" href="classcattle_1_1_batch_norm_layer_base.html#ac413c9808d0aa65df1d97eb4a45d7601">depth</a>, Scalar <a class="el" href="classcattle_1_1_batch_norm_layer_base.html#aa103f525dbd5e600097438873f1c4ec5">norm_avg_decay</a>, Scalar <a class="el" href="classcattle_1_1_batch_norm_layer_base.html#a00c2735fd09ff6aaac68d436f12c504e">epsilon</a>)</td></tr>
@@ -132,10 +141,10 @@ Protected Member Functions</h2></td></tr>
 <tr class="separator:abeaa4b34bd86ec270705421ff20282fd"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a437a4e58b66b1a917601ad27215f8614"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_batch_norm_layer_base.html#a437a4e58b66b1a917601ad27215f8614">enforce_constraints</a> ()</td></tr>
 <tr class="separator:a437a4e58b66b1a917601ad27215f8614"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aab7a34ec6334f87e1976460de8fb1472"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classcattle_1_1_layer.html#a8c0af442a18521dea2406d0878e7db61">Base::Data</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_batch_norm_layer_base.html#aab7a34ec6334f87e1976460de8fb1472">_pass_forward</a> (typename <a class="el" href="classcattle_1_1_layer.html#a8c0af442a18521dea2406d0878e7db61">Base::Data</a> in, const <a class="el" href="classcattle_1_1_dimensions.html">Dimensions</a>&lt; std::size_t, Rank &gt; &amp;output_dims, bool training, int i)</td></tr>
-<tr class="separator:aab7a34ec6334f87e1976460de8fb1472"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a756e551c846e8d3d1f8aa9357ba1ad43"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classcattle_1_1_layer.html#a8c0af442a18521dea2406d0878e7db61">Base::Data</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_batch_norm_layer_base.html#a756e551c846e8d3d1f8aa9357ba1ad43">_pass_back</a> (typename <a class="el" href="classcattle_1_1_layer.html#a8c0af442a18521dea2406d0878e7db61">Base::Data</a> out_grads, const <a class="el" href="classcattle_1_1_dimensions.html">Dimensions</a>&lt; std::size_t, Rank &gt; &amp;output_dims, int i)</td></tr>
-<tr class="separator:a756e551c846e8d3d1f8aa9357ba1ad43"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a97e8eed541c1a6c35da6de770abbe4f1"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classcattle_1_1_layer.html#a8c0af442a18521dea2406d0878e7db61">Base::Data</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_batch_norm_layer_base.html#a97e8eed541c1a6c35da6de770abbe4f1">_pass_forward</a> (typename <a class="el" href="classcattle_1_1_layer.html#a8c0af442a18521dea2406d0878e7db61">Base::Data</a> in, const <a class="el" href="classcattle_1_1_batch_norm_layer_base.html#a38fb1abfae6c8153c29f10e5f5a05c25">RankwiseArray</a> &amp;output_dims, bool training, int i)</td></tr>
+<tr class="separator:a97e8eed541c1a6c35da6de770abbe4f1"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a395075198fd745928be8035e82137289"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classcattle_1_1_layer.html#a8c0af442a18521dea2406d0878e7db61">Base::Data</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_batch_norm_layer_base.html#a395075198fd745928be8035e82137289">_pass_back</a> (typename <a class="el" href="classcattle_1_1_layer.html#a8c0af442a18521dea2406d0878e7db61">Base::Data</a> out_grads, const <a class="el" href="classcattle_1_1_batch_norm_layer_base.html#a38fb1abfae6c8153c29f10e5f5a05c25">RankwiseArray</a> &amp;prev_out_dims, int i)</td></tr>
+<tr class="separator:a395075198fd745928be8035e82137289"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="inherit_header pro_methods_classcattle_1_1_layer"><td colspan="2" onclick="javascript:toggleInherit('pro_methods_classcattle_1_1_layer')"><img src="closed.png" alt="-"/>&#160;Protected Member Functions inherited from <a class="el" href="classcattle_1_1_layer.html">cattle::Layer&lt; Scalar, Rank &gt;</a></td></tr>
 <tr class="memitem:a725b8784f71f40c162f25a8820c97473 inherit pro_methods_classcattle_1_1_layer"><td class="memItemLeft" align="right" valign="top">virtual <a class="el" href="classcattle_1_1_layer.html">Layer</a>&lt; Scalar, Rank &gt; *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_layer.html#a725b8784f71f40c162f25a8820c97473">clone_with_shared_params</a> () const =0</td></tr>
 <tr class="separator:a725b8784f71f40c162f25a8820c97473 inherit pro_methods_classcattle_1_1_layer"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -181,9 +190,6 @@ Private Attributes</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="inherited"></a>
 Additional Inherited Members</h2></td></tr>
-<tr class="inherit_header pro_types_classcattle_1_1_layer"><td colspan="2" onclick="javascript:toggleInherit('pro_types_classcattle_1_1_layer')"><img src="closed.png" alt="-"/>&#160;Protected Types inherited from <a class="el" href="classcattle_1_1_layer.html">cattle::Layer&lt; Scalar, Rank &gt;</a></td></tr>
-<tr class="memitem:a8c0af442a18521dea2406d0878e7db61 inherit pro_types_classcattle_1_1_layer"><td class="memItemLeft" align="right" valign="top">typedef <a class="el" href="namespacecattle.html#a8b9323ad928764340e46f0802bf27fbb">Tensor</a>&lt; Scalar, <a class="el" href="classcattle_1_1_layer.html#af7f8bccf684ef96e791adbfc56b60e09">DATA_RANK</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_layer.html#a8c0af442a18521dea2406d0878e7db61">Data</a></td></tr>
-<tr class="separator:a8c0af442a18521dea2406d0878e7db61 inherit pro_types_classcattle_1_1_layer"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="inherit_header pro_static_attribs_classcattle_1_1_layer"><td colspan="2" onclick="javascript:toggleInherit('pro_static_attribs_classcattle_1_1_layer')"><img src="closed.png" alt="-"/>&#160;Static Protected Attributes inherited from <a class="el" href="classcattle_1_1_layer.html">cattle::Layer&lt; Scalar, Rank &gt;</a></td></tr>
 <tr class="memitem:af7f8bccf684ef96e791adbfc56b60e09 inherit pro_static_attribs_classcattle_1_1_layer"><td class="memItemLeft" align="right" valign="top">static constexpr std::size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_layer.html#af7f8bccf684ef96e791adbfc56b60e09">DATA_RANK</a> = Rank + 1</td></tr>
 <tr class="separator:af7f8bccf684ef96e791adbfc56b60e09 inherit pro_static_attribs_classcattle_1_1_layer"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -212,6 +218,30 @@ template&lt;typename Scalar, std::size_t Rank&gt; </div>
   </td>
   <td class="mlabels-right">
 <span class="mlabels"><span class="mlabel">private</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a38fb1abfae6c8153c29f10e5f5a05c25"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a38fb1abfae6c8153c29f10e5f5a05c25">&#9670;&nbsp;</a></span>RankwiseArray</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename Scalar, std::size_t Rank&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">typedef std::array&lt;std::size_t,<a class="el" href="classcattle_1_1_layer.html#af7f8bccf684ef96e791adbfc56b60e09">Base::DATA_RANK</a>&gt; <a class="el" href="classcattle_1_1_batch_norm_layer_base.html">cattle::BatchNormLayerBase</a>&lt; Scalar, Rank &gt;::<a class="el" href="classcattle_1_1_batch_norm_layer_base.html#a38fb1abfae6c8153c29f10e5f5a05c25">RankwiseArray</a></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">protected</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
@@ -335,8 +365,8 @@ template&lt;typename Scalar, std::size_t Rank&gt; </div>
 </div>
 </div>
 <h2 class="groupheader">Member Function Documentation</h2>
-<a id="a756e551c846e8d3d1f8aa9357ba1ad43"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a756e551c846e8d3d1f8aa9357ba1ad43">&#9670;&nbsp;</a></span>_pass_back()</h2>
+<a id="a395075198fd745928be8035e82137289"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a395075198fd745928be8035e82137289">&#9670;&nbsp;</a></span>_pass_back()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -355,8 +385,8 @@ template&lt;typename Scalar, std::size_t Rank&gt; </div>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const <a class="el" href="classcattle_1_1_dimensions.html">Dimensions</a>&lt; std::size_t, Rank &gt; &amp;&#160;</td>
-          <td class="paramname"><em>output_dims</em>, </td>
+          <td class="paramtype">const <a class="el" href="classcattle_1_1_batch_norm_layer_base.html#a38fb1abfae6c8153c29f10e5f5a05c25">RankwiseArray</a> &amp;&#160;</td>
+          <td class="paramname"><em>prev_out_dims</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -379,8 +409,8 @@ template&lt;typename Scalar, std::size_t Rank&gt; </div>
 
 </div>
 </div>
-<a id="aab7a34ec6334f87e1976460de8fb1472"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aab7a34ec6334f87e1976460de8fb1472">&#9670;&nbsp;</a></span>_pass_forward()</h2>
+<a id="a97e8eed541c1a6c35da6de770abbe4f1"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a97e8eed541c1a6c35da6de770abbe4f1">&#9670;&nbsp;</a></span>_pass_forward()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -399,7 +429,7 @@ template&lt;typename Scalar, std::size_t Rank&gt; </div>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const <a class="el" href="classcattle_1_1_dimensions.html">Dimensions</a>&lt; std::size_t, Rank &gt; &amp;&#160;</td>
+          <td class="paramtype">const <a class="el" href="classcattle_1_1_batch_norm_layer_base.html#a38fb1abfae6c8153c29f10e5f5a05c25">RankwiseArray</a> &amp;&#160;</td>
           <td class="paramname"><em>output_dims</em>, </td>
         </tr>
         <tr>

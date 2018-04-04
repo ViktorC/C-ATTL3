@@ -66,13 +66,13 @@ $(function() {
 
 <h3><a id="index_e"></a>- e -</h3><ul>
 <li>ed_vec
-: <a class="el" href="classcattle_1_1_p_c_a_preprocessor_base.html#a07623716a95731b2f9ff08cfae054d5b">cattle::PCAPreprocessorBase&lt; Scalar, Rank &gt;</a>
+: <a class="el" href="classcattle_1_1_p_c_a_preprocessor_base.html#a4cfbadd9ab3a4e68f393b20dc5ae3a5e">cattle::PCAPreprocessorBase&lt; Scalar, Rank, Standardize, Whiten &gt;</a>
 </li>
 <li>eigen_basis
-: <a class="el" href="structcattle_1_1_p_c_a_preprocessor_base_1_1_eigen_decomposition.html#a14ad0f38bdea86904d823b512cea3bff">cattle::PCAPreprocessorBase&lt; Scalar, Rank &gt;::EigenDecomposition</a>
+: <a class="el" href="structcattle_1_1_p_c_a_preprocessor_base_1_1_eigen_decomposition.html#a3b8733e444e177dd5b119318674a4de9">cattle::PCAPreprocessorBase&lt; Scalar, Rank, Standardize, Whiten &gt;::EigenDecomposition</a>
 </li>
 <li>eigen_values
-: <a class="el" href="structcattle_1_1_p_c_a_preprocessor_base_1_1_eigen_decomposition.html#a3fc989a6206e5efadbd4eb946f9e102e">cattle::PCAPreprocessorBase&lt; Scalar, Rank &gt;::EigenDecomposition</a>
+: <a class="el" href="structcattle_1_1_p_c_a_preprocessor_base_1_1_eigen_decomposition.html#a3687a885dd8d81083fb7456635ad42a9">cattle::PCAPreprocessorBase&lt; Scalar, Rank, Standardize, Whiten &gt;::EigenDecomposition</a>
 </li>
 <li>ElasticNetRegularizationPenalty()
 : <a class="el" href="classcattle_1_1_elastic_net_regularization_penalty.html#a06fc881e7dc12f7c2bf20eb377bd7c36">cattle::ElasticNetRegularizationPenalty&lt; Scalar &gt;</a>
@@ -85,12 +85,19 @@ $(function() {
 , <a class="el" href="classcattle_1_1_batch_norm_layer_base.html#aca777ac62f98c22b431ef92e0da2c903">cattle::BatchNormLayerBase&lt; Scalar, Rank &gt;</a>
 , <a class="el" href="classcattle_1_1_conv_layer.html#af036959fae8f4cbced4bb8297c3f7a18">cattle::ConvLayer&lt; Scalar &gt;</a>
 , <a class="el" href="classcattle_1_1_dropout_layer.html#af82f4022e6bbd0c328729342d18432cd">cattle::DropoutLayer&lt; Scalar, Rank &gt;</a>
+, <a class="el" href="classcattle_1_1_e_l_u_activation_layer.html#a04933fe8b46478f608062e88ac549ed9">cattle::ELUActivationLayer&lt; Scalar, Rank &gt;</a>
 , <a class="el" href="classcattle_1_1_f_c_layer.html#a86230294be15ca6137f3f5770d500018">cattle::FCLayer&lt; Scalar, Rank &gt;</a>
 , <a class="el" href="classcattle_1_1_layer.html#ae3d00e9fb6079e4b4990b3a14625a93d">cattle::Layer&lt; Scalar, Rank &gt;</a>
+, <a class="el" href="classcattle_1_1_leaky_re_l_u_activation_layer.html#a3ca83e1f497e8d9e07dd043fecf9cd10">cattle::LeakyReLUActivationLayer&lt; Scalar, Rank &gt;</a>
 , <a class="el" href="classcattle_1_1_max_pooling_layer.html#a8d1ea828d14b4af70c95bb60f08c3e84">cattle::MaxPoolingLayer&lt; Scalar &gt;</a>
 , <a class="el" href="classcattle_1_1_mean_pooling_layer.html#aec3c18951452ecc00852a1357170967f">cattle::MeanPoolingLayer&lt; Scalar &gt;</a>
 , <a class="el" href="classcattle_1_1_neural_network.html#a417cb77f47eab00bb62f2f5347aff86f">cattle::NeuralNetwork&lt; Scalar, Rank, Sequential &gt;</a>
+, <a class="el" href="classcattle_1_1_p_re_l_u_activation_layer.html#a7ac09416efe5d2cd6cc73df9890e9725">cattle::PReLUActivationLayer&lt; Scalar, Rank &gt;</a>
+, <a class="el" href="classcattle_1_1_re_l_u_activation_layer.html#ad9fecbc7c7a552e89eae61034ad89cf9">cattle::ReLUActivationLayer&lt; Scalar, Rank &gt;</a>
+, <a class="el" href="classcattle_1_1_sigmoid_activation_layer.html#af39afa34fcfd33a14a95fc2518be1c19">cattle::SigmoidActivationLayer&lt; Scalar, Rank &gt;</a>
+, <a class="el" href="classcattle_1_1_softmax_activation_layer.html#a7c642043ac4d852b0a6b7373c57a2206">cattle::SoftmaxActivationLayer&lt; Scalar, Rank &gt;</a>
 , <a class="el" href="classcattle_1_1_sum_pooling_layer.html#accf594c64620ed1fe414db68bb43f807">cattle::SumPoolingLayer&lt; Scalar &gt;</a>
+, <a class="el" href="classcattle_1_1_tanh_activation_layer.html#ad0164a3bcb90574df7b5865e6a3c4a33">cattle::TanhActivationLayer&lt; Scalar, Rank &gt;</a>
 </li>
 <li>empty_caches()
 : <a class="el" href="classcattle_1_1_bidirectional_neural_network.html#a03dd8e8bc89e04cb56887463e3fc9d5b">cattle::BidirectionalNeuralNetwork&lt; Scalar, Rank, MergeType &gt;</a>
@@ -121,22 +128,25 @@ $(function() {
 , <a class="el" href="classcattle_1_1_cross_entropy_loss.html#abbfe112cec1703aa8780a1e3f45e45a9">cattle::CrossEntropyLoss&lt; Scalar, Rank, Sequential &gt;</a>
 , <a class="el" href="classcattle_1_1_dropout_layer.html#a5dd9d880c1a1ea750b8f253299fbe76c">cattle::DropoutLayer&lt; Scalar, Rank &gt;</a>
 , <a class="el" href="classcattle_1_1_multi_label_log_loss.html#a73d4c7139631e4e15c15dab8e0e33501">cattle::MultiLabelLogLoss&lt; Scalar, Rank, Sequential &gt;</a>
-, <a class="el" href="classcattle_1_1_normalization_preprocessor.html#a85be9eacc4b55bbeb504ac399ba15923">cattle::NormalizationPreprocessor&lt; Scalar, Rank &gt;</a>
-, <a class="el" href="classcattle_1_1_normalization_preprocessor_3_01_scalar_00_013_01_4.html#a1b10a334b3957947de199b2345589e3f">cattle::NormalizationPreprocessor&lt; Scalar, 3 &gt;</a>
+, <a class="el" href="classcattle_1_1_normalization_preprocessor.html#a7073e1c85a1d3d0d94bcfb4f67c9cd1b">cattle::NormalizationPreprocessor&lt; Scalar, Rank, Standardize &gt;</a>
+, <a class="el" href="classcattle_1_1_normalization_preprocessor_3_01_scalar_00_013_00_01_standardize_01_4.html#ac19ba970f313545c2d524d8a25f235ed">cattle::NormalizationPreprocessor&lt; Scalar, 3, Standardize &gt;</a>
 , <a class="el" href="classcattle_1_1_softmax_activation_layer.html#aa349527c1725a88c9c23f803ec6bda8a">cattle::SoftmaxActivationLayer&lt; Scalar, Rank &gt;</a>
 , <a class="el" href="classcattle_1_1_softmax_cross_entropy_loss.html#adce540c2a4f6f80c1e8d5b89b4158c22">cattle::SoftmaxCrossEntropyLoss&lt; Scalar, Rank, Sequential &gt;</a>
 </li>
 <li>EPSILON1
-: <a class="el" href="classcattle_1_1_utils.html#a7a27c5c317bb28810941597cd19c9d08">cattle::Utils&lt; Scalar &gt;</a>
+: <a class="el" href="classcattle_1_1internal_1_1_utils.html#a4e9605aa5a3c229914e6cbc1881cbb9d">cattle::internal::Utils&lt; Scalar &gt;</a>
 </li>
 <li>EPSILON2
-: <a class="el" href="classcattle_1_1_utils.html#a470503e37f928ed16eaf6b0b3d9dc7b3">cattle::Utils&lt; Scalar &gt;</a>
+: <a class="el" href="classcattle_1_1internal_1_1_utils.html#a05e56dc79223e0c4e2d4b7f21ae93574">cattle::internal::Utils&lt; Scalar &gt;</a>
 </li>
 <li>EPSILON3
-: <a class="el" href="classcattle_1_1_utils.html#a9e2217bc789e17eabcb490e337d40a20">cattle::Utils&lt; Scalar &gt;</a>
+: <a class="el" href="classcattle_1_1internal_1_1_utils.html#afbf9c6dd551255e79709461d99256bdb">cattle::internal::Utils&lt; Scalar &gt;</a>
 </li>
 <li>eval()
 : <a class="el" href="classcattle_1_1_dim_expression.html#a80900ec3799e55374ee393327ead0279">cattle::DimExpression&lt; Derived, IndexType, Rank &gt;</a>
+</li>
+<li>extents
+: <a class="el" href="classcattle_1_1_batch_norm_layer_3_01_scalar_00_013_01_4.html#a95133ef54eef605f79df3da32328c2bb">cattle::BatchNormLayer&lt; Scalar, 3 &gt;</a>
 </li>
 </ul>
 </div><!-- contents -->

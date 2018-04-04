@@ -126,6 +126,8 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a4ab9882ff98f50aeb8c6dbd6bfa09d4b"><td class="memTemplParams" colspan="2">template&lt;typename OtherDerived &gt; </td></tr>
 <tr class="memitem:a4ab9882ff98f50aeb8c6dbd6bfa09d4b"><td class="memTemplItemLeft" align="right" valign="top">bool&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classcattle_1_1_dim_expression.html#a4ab9882ff98f50aeb8c6dbd6bfa09d4b">operator==</a> (const <a class="el" href="classcattle_1_1_dim_expression.html#aceb32c6dd9f288d3867c2db242b9d988">Other</a>&lt; OtherDerived &gt; &amp;dims) const</td></tr>
 <tr class="separator:a4ab9882ff98f50aeb8c6dbd6bfa09d4b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9e3b5ce43b3414edda58f7b1f12ecdd1"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_dim_expression.html#a9e3b5ce43b3414edda58f7b1f12ecdd1">operator==</a> (const std::array&lt; IndexType, Rank &gt; &amp;dims) const</td></tr>
+<tr class="separator:a9e3b5ce43b3414edda58f7b1f12ecdd1"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pri-types"></a>
 Private Types</h2></td></tr>
@@ -707,7 +709,7 @@ template&lt;typename Derived, typename IndexType, std::size_t Rank&gt; </div>
 </div>
 </div>
 <a id="ac2fb665fd63477ff87ac5af1620804d1"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ac2fb665fd63477ff87ac5af1620804d1">&#9670;&nbsp;</a></span>operator==() <span class="overload">[1/2]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#ac2fb665fd63477ff87ac5af1620804d1">&#9670;&nbsp;</a></span>operator==() <span class="overload">[1/3]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -737,7 +739,7 @@ template&lt;typename OtherDerived , typename OtherIndexType , std::size_t OtherR
 </div>
 </div>
 <a id="a4ab9882ff98f50aeb8c6dbd6bfa09d4b"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a4ab9882ff98f50aeb8c6dbd6bfa09d4b">&#9670;&nbsp;</a></span>operator==() <span class="overload">[2/2]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#a4ab9882ff98f50aeb8c6dbd6bfa09d4b">&#9670;&nbsp;</a></span>operator==() <span class="overload">[2/3]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -753,6 +755,34 @@ template&lt;typename OtherDerived &gt; </div>
           <td class="memname">bool <a class="el" href="classcattle_1_1_dim_expression.html">cattle::DimExpression</a>&lt; Derived, IndexType, Rank &gt;::operator== </td>
           <td>(</td>
           <td class="paramtype">const <a class="el" href="classcattle_1_1_dim_expression.html#aceb32c6dd9f288d3867c2db242b9d988">Other</a>&lt; OtherDerived &gt; &amp;&#160;</td>
+          <td class="paramname"><em>dims</em></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a9e3b5ce43b3414edda58f7b1f12ecdd1"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a9e3b5ce43b3414edda58f7b1f12ecdd1">&#9670;&nbsp;</a></span>operator==() <span class="overload">[3/3]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename Derived, typename IndexType, std::size_t Rank&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool <a class="el" href="classcattle_1_1_dim_expression.html">cattle::DimExpression</a>&lt; Derived, IndexType, Rank &gt;::operator== </td>
+          <td>(</td>
+          <td class="paramtype">const std::array&lt; IndexType, Rank &gt; &amp;&#160;</td>
           <td class="paramname"><em>dims</em></td><td>)</td>
           <td> const</td>
         </tr>

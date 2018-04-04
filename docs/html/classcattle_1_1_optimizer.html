@@ -104,8 +104,8 @@ Public Member Functions</h2></td></tr>
 <tr class="separator:ad26c752cffbd9e33d9d88b606c301874"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a125a4d35cd81c567abca5def2c92947f"><td class="memItemLeft" align="right" valign="top">virtual&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_optimizer.html#a125a4d35cd81c567abca5def2c92947f">~Optimizer</a> ()=default</td></tr>
 <tr class="separator:a125a4d35cd81c567abca5def2c92947f"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a77818ccd1cd4a319d260b32b32fc4439"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_optimizer.html#a77818ccd1cd4a319d260b32b32fc4439">verify_gradients</a> (<a class="el" href="classcattle_1_1_optimizer.html#aa52f7eca506ab86e29639e6bd753cbb3">Net</a> &amp;net, <a class="el" href="classcattle_1_1_optimizer.html#ace96fe401c80b2c1c8008d091bea3bc3">Provider</a> &amp;provider, Scalar step_size=1e-5, Scalar abs_epsilon=Utils&lt; Scalar &gt;::EPSILON2, Scalar rel_epsilon=Utils&lt; Scalar &gt;::EPSILON3) const</td></tr>
-<tr class="separator:a77818ccd1cd4a319d260b32b32fc4439"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4f7fb68867acaa7b53b048afc13d1c2f"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_optimizer.html#a4f7fb68867acaa7b53b048afc13d1c2f">verify_gradients</a> (<a class="el" href="classcattle_1_1_optimizer.html#aa52f7eca506ab86e29639e6bd753cbb3">Net</a> &amp;net, <a class="el" href="classcattle_1_1_optimizer.html#ace96fe401c80b2c1c8008d091bea3bc3">Provider</a> &amp;provider, Scalar step_size=<a class="el" href="classcattle_1_1internal_1_1_utils.html">internal::Utils</a>&lt; Scalar &gt;::EPSILON2, Scalar abs_epsilon=<a class="el" href="classcattle_1_1internal_1_1_utils.html">internal::Utils</a>&lt; Scalar &gt;::EPSILON2, Scalar rel_epsilon=<a class="el" href="classcattle_1_1internal_1_1_utils.html">internal::Utils</a>&lt; Scalar &gt;::EPSILON3) const</td></tr>
+<tr class="separator:a4f7fb68867acaa7b53b048afc13d1c2f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:abd96aab852071300003b1b71e97207ef"><td class="memItemLeft" align="right" valign="top">Scalar&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_optimizer.html#abd96aab852071300003b1b71e97207ef">optimize</a> (<a class="el" href="classcattle_1_1_optimizer.html#aa52f7eca506ab86e29639e6bd753cbb3">Net</a> &amp;net, <a class="el" href="classcattle_1_1_optimizer.html#ace96fe401c80b2c1c8008d091bea3bc3">Provider</a> &amp;training_prov, <a class="el" href="classcattle_1_1_optimizer.html#ace96fe401c80b2c1c8008d091bea3bc3">Provider</a> &amp;test_prov, unsigned epochs, unsigned early_stop=0)</td></tr>
 <tr class="separator:abd96aab852071300003b1b71e97207ef"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
@@ -787,8 +787,8 @@ template&lt;typename Scalar , std::size_t Rank, bool Sequential&gt; </div>
 
 </div>
 </div>
-<a id="a77818ccd1cd4a319d260b32b32fc4439"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a77818ccd1cd4a319d260b32b32fc4439">&#9670;&nbsp;</a></span>verify_gradients()</h2>
+<a id="a4f7fb68867acaa7b53b048afc13d1c2f"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a4f7fb68867acaa7b53b048afc13d1c2f">&#9670;&nbsp;</a></span>verify_gradients()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -814,19 +814,19 @@ template&lt;typename Scalar , std::size_t Rank, bool Sequential&gt; </div>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">Scalar&#160;</td>
-          <td class="paramname"><em>step_size</em> = <code>1e-5</code>, </td>
+          <td class="paramname"><em>step_size</em> = <code><a class="el" href="classcattle_1_1internal_1_1_utils.html">internal::Utils</a>&lt;Scalar&gt;::EPSILON2</code>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">Scalar&#160;</td>
-          <td class="paramname"><em>abs_epsilon</em> = <code><a class="el" href="classcattle_1_1_utils.html">Utils</a>&lt;Scalar&gt;::EPSILON2</code>, </td>
+          <td class="paramname"><em>abs_epsilon</em> = <code><a class="el" href="classcattle_1_1internal_1_1_utils.html">internal::Utils</a>&lt;Scalar&gt;::EPSILON2</code>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">Scalar&#160;</td>
-          <td class="paramname"><em>rel_epsilon</em> = <code><a class="el" href="classcattle_1_1_utils.html">Utils</a>&lt;Scalar&gt;::EPSILON3</code>&#160;</td>
+          <td class="paramname"><em>rel_epsilon</em> = <code><a class="el" href="classcattle_1_1internal_1_1_utils.html">internal::Utils</a>&lt;Scalar&gt;::EPSILON3</code>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -840,7 +840,7 @@ template&lt;typename Scalar , std::size_t Rank, bool Sequential&gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
-<p>It performs a gradient check to verify the correctness of the neural network and layer implementations. Theoretically not differentiable layers such rectified linear units may fail.</p>
+<p>It performs a gradient check to verify the correctness of the neural network and layer implementations. It is recommended to use double precision floating points; however, non-differentiable layers such as rectified linear units may still fail.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">net</td><td>A reference to the network on which the gradient check is to be performed. </td></tr>

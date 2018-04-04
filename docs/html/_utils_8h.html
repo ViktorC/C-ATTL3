@@ -69,6 +69,7 @@ $(function() {
   <div class="summary">
 <a href="#nested-classes">Classes</a> &#124;
 <a href="#namespaces">Namespaces</a> &#124;
+<a href="#define-members">Macros</a> &#124;
 <a href="#typedef-members">Typedefs</a>  </div>
   <div class="headertitle">
 <div class="title">Utils.h File Reference</div>  </div>
@@ -77,9 +78,7 @@ $(function() {
 <div class="textblock"><code>#include &lt;algorithm&gt;</code><br />
 <code>#include &lt;cstddef&gt;</code><br />
 <code>#include &lt;limits&gt;</code><br />
-<code>#include &lt;memory&gt;</code><br />
 <code>#include &lt;type_traits&gt;</code><br />
-<code>#include &lt;utility&gt;</code><br />
 <code>#include &quot;Eigen/Dense&quot;</code><br />
 <code>#include &quot;unsupported/Eigen/CXX11/Tensor&quot;</code><br />
 <code>#include &quot;<a class="el" href="_dimensions_8h_source.html">Dimensions.h</a>&quot;</code><br />
@@ -88,13 +87,20 @@ $(function() {
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="nested-classes"></a>
 Classes</h2></td></tr>
-<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_utils.html">cattle::Utils&lt; Scalar &gt;</a></td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1internal_1_1_utils.html">cattle::internal::Utils&lt; Scalar &gt;</a></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="namespaces"></a>
 Namespaces</h2></td></tr>
 <tr class="memitem:namespacecattle"><td class="memItemLeft" align="right" valign="top"> &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacecattle.html">cattle</a></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:namespacecattle_1_1internal"><td class="memItemLeft" align="right" valign="top"> &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacecattle_1_1internal.html">cattle::internal</a></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="define-members"></a>
+Macros</h2></td></tr>
+<tr class="memitem:a86a59fe12b00dac8ede2329ebba1d766"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="_utils_8h.html#a86a59fe12b00dac8ede2329ebba1d766">EIGEN_USE_THREADS</a></td></tr>
+<tr class="separator:a86a59fe12b00dac8ede2329ebba1d766"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="typedef-members"></a>
 Typedefs</h2></td></tr>
@@ -110,13 +116,33 @@ Typedefs</h2></td></tr>
 <tr class="memitem:afe8803bdb57fb149be7d7b7916f30ca9"><td class="memTemplParams" colspan="2">template&lt;typename Scalar &gt; </td></tr>
 <tr class="memitem:afe8803bdb57fb149be7d7b7916f30ca9"><td class="memTemplItemLeft" align="right" valign="top">using&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespacecattle.html#afe8803bdb57fb149be7d7b7916f30ca9">cattle::MatrixMap</a> = Eigen::Map&lt; Matrix&lt; Scalar &gt; &gt;</td></tr>
 <tr class="separator:afe8803bdb57fb149be7d7b7916f30ca9"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4e83e75cf6fc91facbcae6c5bb14c09a"><td class="memItemLeft" align="right" valign="top">using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacecattle.html#a4e83e75cf6fc91facbcae6c5bb14c09a">cattle::PermMatrix</a> = Eigen::PermutationMatrix&lt; Eigen::Dynamic, Eigen::Dynamic &gt;</td></tr>
+<tr class="separator:a4e83e75cf6fc91facbcae6c5bb14c09a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a8b9323ad928764340e46f0802bf27fbb"><td class="memTemplParams" colspan="2">template&lt;typename Scalar , std::size_t Rank&gt; </td></tr>
 <tr class="memitem:a8b9323ad928764340e46f0802bf27fbb"><td class="memTemplItemLeft" align="right" valign="top">using&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespacecattle.html#a8b9323ad928764340e46f0802bf27fbb">cattle::Tensor</a> = Eigen::Tensor&lt; Scalar, Rank, Eigen::ColMajor, std::size_t &gt;</td></tr>
 <tr class="separator:a8b9323ad928764340e46f0802bf27fbb"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab758a65062937afea9d08ce8ca611d07"><td class="memTemplParams" colspan="2">template&lt;typename Derived &gt; </td></tr>
+<tr class="memitem:ab758a65062937afea9d08ce8ca611d07"><td class="memTemplItemLeft" align="right" valign="top">using&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespacecattle.html#ab758a65062937afea9d08ce8ca611d07">cattle::TensorExp</a> = Eigen::TensorBase&lt; Derived &gt;</td></tr>
+<tr class="separator:ab758a65062937afea9d08ce8ca611d07"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a7dfcb4d57e2c5da3170ebd8d13fd0431"><td class="memTemplParams" colspan="2">template&lt;typename Scalar , std::size_t Rank&gt; </td></tr>
 <tr class="memitem:a7dfcb4d57e2c5da3170ebd8d13fd0431"><td class="memTemplItemLeft" align="right" valign="top">using&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespacecattle.html#a7dfcb4d57e2c5da3170ebd8d13fd0431">cattle::TensorMap</a> = Eigen::TensorMap&lt; Tensor&lt; Scalar, Rank &gt; &gt;</td></tr>
 <tr class="separator:a7dfcb4d57e2c5da3170ebd8d13fd0431"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
+<h2 class="groupheader">Macro Definition Documentation</h2>
+<a id="a86a59fe12b00dac8ede2329ebba1d766"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a86a59fe12b00dac8ede2329ebba1d766">&#9670;&nbsp;</a></span>EIGEN_USE_THREADS</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define EIGEN_USE_THREADS</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>

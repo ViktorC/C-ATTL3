@@ -66,7 +66,7 @@ $(function() {
 
 <h3><a id="index_d"></a>- d -</h3><ul>
 <li>data_extents
-: <a class="el" href="classcattle_1_1_memory_data_provider.html#a430f0ecee4d33eb3a77719ea92cbce7b">cattle::MemoryDataProvider&lt; Scalar, Rank, Sequential &gt;</a>
+: <a class="el" href="classcattle_1_1_memory_data_provider.html#abc63a6d4e3acff35211ae86c3d639112">cattle::MemoryDataProvider&lt; Scalar, Rank, Sequential, Shuffle &gt;</a>
 </li>
 <li>DATA_RANK
 : <a class="el" href="classcattle_1_1_data_provider.html#a8db59369ae8c577bad4fb33c770745fb">cattle::DataProvider&lt; Scalar, Rank, Sequential &gt;</a>
@@ -75,10 +75,10 @@ $(function() {
 , <a class="el" href="classcattle_1_1_neural_network.html#a5d62d6f65e26bbd730d36ab417aacb79">cattle::NeuralNetwork&lt; Scalar, Rank, Sequential &gt;</a>
 </li>
 <li>data_stream_pairs
-: <a class="el" href="classcattle_1_1_split_file_data_provider.html#af68f874a90696cdbe639fbd852652cb8">cattle::SplitFileDataProvider&lt; Scalar, Rank, Sequential &gt;</a>
+: <a class="el" href="classcattle_1_1_split_file_data_provider.html#ad67d64e8ec2e83be491eda494d94ed8c">cattle::SplitFileDataProvider&lt; Scalar, Rank, Sequential, ObsBinary, ObjBinary &gt;</a>
 </li>
 <li>data_streams
-: <a class="el" href="classcattle_1_1_joint_file_data_provider.html#aebc4137f2f37e973dee297feaf16a74e">cattle::JointFileDataProvider&lt; Scalar, Rank, Sequential &gt;</a>
+: <a class="el" href="classcattle_1_1_joint_file_data_provider.html#a472732f6dd35b5ca135c68a4de3bbeff">cattle::JointFileDataProvider&lt; Scalar, Rank, Sequential, Binary &gt;</a>
 </li>
 <li>decay
 : <a class="el" href="classcattle_1_1_adadelta_optimizer.html#a8f2c1f0593ea951e49652d23f6a22ae3">cattle::AdadeltaOptimizer&lt; Scalar, Rank, Sequential &gt;</a>
@@ -86,24 +86,34 @@ $(function() {
 <li>depth
 : <a class="el" href="classcattle_1_1_batch_norm_layer_base.html#ac413c9808d0aa65df1d97eb4a45d7601">cattle::BatchNormLayerBase&lt; Scalar, Rank &gt;</a>
 </li>
-<li>dil_receptor_size
-: <a class="el" href="classcattle_1_1_conv_layer.html#aca40e699bd8f03113dff8814d2175464">cattle::ConvLayer&lt; Scalar &gt;</a>
+<li>dil_receptor_height
+: <a class="el" href="classcattle_1_1_conv_layer.html#a92d4090ac9cd1912325f1775e38f60a1">cattle::ConvLayer&lt; Scalar &gt;</a>
+, <a class="el" href="classcattle_1_1_pooling_layer.html#a99342c5d92a3f4520fbf3cff0fd77035">cattle::PoolingLayer&lt; Scalar &gt;</a>
+</li>
+<li>dil_receptor_width
+: <a class="el" href="classcattle_1_1_conv_layer.html#a70715bddaba7da95a78c8950d3e9d789">cattle::ConvLayer&lt; Scalar &gt;</a>
+, <a class="el" href="classcattle_1_1_pooling_layer.html#ac016a2a3dcf94943cbab7def42cf2d8a">cattle::PoolingLayer&lt; Scalar &gt;</a>
+</li>
+<li>dil_strides
+: <a class="el" href="classcattle_1_1_conv_layer.html#a045319d345fa69fca17291d5a8933ae5">cattle::ConvLayer&lt; Scalar &gt;</a>
+, <a class="el" href="classcattle_1_1_pooling_layer.html#a90e6afbe4bfe5b097d46c33b849c13f2">cattle::PoolingLayer&lt; Scalar &gt;</a>
 </li>
 <li>dilation
 : <a class="el" href="classcattle_1_1_conv_layer.html#a6cfb03d64cf45628295ae8d57fd02a39">cattle::ConvLayer&lt; Scalar &gt;</a>
+, <a class="el" href="classcattle_1_1_pooling_layer.html#ae23cea49b5208f50f1e4062d4d885b58">cattle::PoolingLayer&lt; Scalar &gt;</a>
 </li>
 <li>dims
 : <a class="el" href="classcattle_1_1_activation_layer.html#a224fa07aab3164b4aa81e17d03d73dff">cattle::ActivationLayer&lt; Scalar, Rank &gt;</a>
 , <a class="el" href="classcattle_1_1_batch_norm_layer_base.html#af38d13e78cbaedbb45b2b44111119e95">cattle::BatchNormLayerBase&lt; Scalar, Rank &gt;</a>
 , <a class="el" href="classcattle_1_1_dropout_layer.html#aef040fb82a09b78559230822ed0e6c86">cattle::DropoutLayer&lt; Scalar, Rank &gt;</a>
-, <a class="el" href="classcattle_1_1_normalization_preprocessor.html#a8d2a62d339f0a51f0d4ab849b24731b9">cattle::NormalizationPreprocessor&lt; Scalar, Rank &gt;</a>
-, <a class="el" href="classcattle_1_1_normalization_preprocessor_3_01_scalar_00_013_01_4.html#ad7903dbc38b065ee7f5203fbd41e320a">cattle::NormalizationPreprocessor&lt; Scalar, 3 &gt;</a>
+, <a class="el" href="classcattle_1_1_normalization_preprocessor.html#a332b671ed6c522c5689552efc3d02e18">cattle::NormalizationPreprocessor&lt; Scalar, Rank, Standardize &gt;</a>
+, <a class="el" href="classcattle_1_1_normalization_preprocessor_3_01_scalar_00_013_00_01_standardize_01_4.html#a7e44d9c955682d56c4beccda32294333">cattle::NormalizationPreprocessor&lt; Scalar, 3, Standardize &gt;</a>
 </li>
 <li>dropout
 : <a class="el" href="classcattle_1_1_dropout_layer.html#a71f2a2b37398749e0e30b09d0e50e7b6">cattle::DropoutLayer&lt; Scalar, Rank &gt;</a>
 </li>
 <li>dropout_mask
-: <a class="el" href="classcattle_1_1_dropout_layer.html#af6cb6696bc9495053e8e9283505f8bce">cattle::DropoutLayer&lt; Scalar, Rank &gt;</a>
+: <a class="el" href="classcattle_1_1_dropout_layer.html#a74e0a3e7f57c96193a5dc37bfcbdb055">cattle::DropoutLayer&lt; Scalar, Rank &gt;</a>
 </li>
 <li>dropout_prob
 : <a class="el" href="classcattle_1_1_dropout_layer.html#ae5e6d7a6fcd54aa840c0a7525ed81fc6">cattle::DropoutLayer&lt; Scalar, Rank &gt;</a>

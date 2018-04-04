@@ -68,6 +68,7 @@ $(function() {
 <div class="header">
   <div class="summary">
 <a href="#pub-methods">Public Member Functions</a> &#124;
+<a href="#pro-types">Protected Types</a> &#124;
 <a href="#pro-methods">Protected Member Functions</a> &#124;
 <a href="#pro-static-methods">Static Protected Member Functions</a> &#124;
 <a href="#pro-attribs">Protected Attributes</a> &#124;
@@ -106,16 +107,28 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a92963ac4a339d9174a3aef3dbf3c271f inherit pub_methods_classcattle_1_1_layer"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_layer.html#a92963ac4a339d9174a3aef3dbf3c271f">is_parametric</a> ()</td></tr>
 <tr class="separator:a92963ac4a339d9174a3aef3dbf3c271f inherit pub_methods_classcattle_1_1_layer"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pro-types"></a>
+Protected Types</h2></td></tr>
+<tr class="memitem:a9d4df1ff9464cad150d5b5a7a3ee0769"><td class="memItemLeft" align="right" valign="top">typedef std::array&lt; std::size_t, 4 &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_pooling_layer.html#a9d4df1ff9464cad150d5b5a7a3ee0769">RankwiseArray</a></td></tr>
+<tr class="separator:a9d4df1ff9464cad150d5b5a7a3ee0769"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aaab8c366381b3c0470e8dd2467444423"><td class="memItemLeft" align="right" valign="top">typedef std::array&lt; std::size_t, 2 &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_pooling_layer.html#aaab8c366381b3c0470e8dd2467444423">ReductionRanksArray</a></td></tr>
+<tr class="separator:aaab8c366381b3c0470e8dd2467444423"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a6187db120d876456766e79b7092975ee"><td class="memItemLeft" align="right" valign="top">typedef <a class="el" href="namespacecattle.html#a8b9323ad928764340e46f0802bf27fbb">Tensor</a>&lt; Scalar, 2 &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_pooling_layer.html#a6187db120d876456766e79b7092975ee">ReducedData</a></td></tr>
+<tr class="separator:a6187db120d876456766e79b7092975ee"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="inherit_header pro_types_classcattle_1_1_layer"><td colspan="2" onclick="javascript:toggleInherit('pro_types_classcattle_1_1_layer')"><img src="closed.png" alt="-"/>&#160;Protected Types inherited from <a class="el" href="classcattle_1_1_layer.html">cattle::Layer&lt; Scalar, 3 &gt;</a></td></tr>
+<tr class="memitem:a8c0af442a18521dea2406d0878e7db61 inherit pro_types_classcattle_1_1_layer"><td class="memItemLeft" align="right" valign="top">typedef <a class="el" href="namespacecattle.html#a8b9323ad928764340e46f0802bf27fbb">Tensor</a>&lt; Scalar, <a class="el" href="classcattle_1_1_layer.html#af7f8bccf684ef96e791adbfc56b60e09">DATA_RANK</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_layer.html#a8c0af442a18521dea2406d0878e7db61">Data</a></td></tr>
+<tr class="separator:a8c0af442a18521dea2406d0878e7db61 inherit pro_types_classcattle_1_1_layer"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pro-methods"></a>
 Protected Member Functions</h2></td></tr>
-<tr class="memitem:aace4969a3f4c858f594f30b2c34a4ab4"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_pooling_layer.html#aace4969a3f4c858f594f30b2c34a4ab4">PoolingLayer</a> (const <a class="el" href="classcattle_1_1_dimensions.html">Dimensions</a>&lt; std::size_t, 3 &gt; &amp;<a class="el" href="classcattle_1_1_pooling_layer.html#a99c9c59105235c0d3892429aef5c1699">input_dims</a>, std::size_t <a class="el" href="classcattle_1_1_pooling_layer.html#a6a2ad633805d6a629cd6d7076d9a9d45">receptor_size</a>, std::size_t <a class="el" href="classcattle_1_1_pooling_layer.html#a752ccf3dca5e4a20db1ed87acfd75bef">stride</a>)</td></tr>
-<tr class="separator:aace4969a3f4c858f594f30b2c34a4ab4"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a30b9febf3d3719899c3c692de7c9865a"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_pooling_layer.html#a30b9febf3d3719899c3c692de7c9865a">PoolingLayer</a> (const <a class="el" href="classcattle_1_1_dimensions.html">Dimensions</a>&lt; std::size_t, 3 &gt; &amp;<a class="el" href="classcattle_1_1_pooling_layer.html#a99c9c59105235c0d3892429aef5c1699">input_dims</a>, std::size_t <a class="el" href="classcattle_1_1_pooling_layer.html#a1cd30c4e6ae0c2ec0b1feabcb65e52c4">receptor_height</a>, std::size_t <a class="el" href="classcattle_1_1_pooling_layer.html#a5116a4187c3c6f3352844c770f76d7d1">receptor_width</a>, std::size_t <a class="el" href="classcattle_1_1_pooling_layer.html#a752ccf3dca5e4a20db1ed87acfd75bef">stride</a>, std::size_t <a class="el" href="classcattle_1_1_pooling_layer.html#ae23cea49b5208f50f1e4062d4d885b58">dilation</a>)</td></tr>
+<tr class="separator:a30b9febf3d3719899c3c692de7c9865a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a13a6322ba734b360ad678becbe5a2d00"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_pooling_layer.html#a13a6322ba734b360ad678becbe5a2d00">init_cache</a> ()=0</td></tr>
 <tr class="separator:a13a6322ba734b360ad678becbe5a2d00"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a3aa2d8b47ec61f47f9b91b63b9e5fc6d"><td class="memItemLeft" align="right" valign="top">virtual Scalar&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_pooling_layer.html#a3aa2d8b47ec61f47f9b91b63b9e5fc6d">reduce</a> (const <a class="el" href="namespacecattle.html#a3ac7e197e90e292a2db6b2d94f46befa">RowVector</a>&lt; Scalar &gt; &amp;patch, unsigned patch_ind)=0</td></tr>
-<tr class="separator:a3aa2d8b47ec61f47f9b91b63b9e5fc6d"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a4e6023b45c2ed4a8f3257863ee43eb2f"><td class="memItemLeft" align="right" valign="top">virtual <a class="el" href="namespacecattle.html#a3ac7e197e90e292a2db6b2d94f46befa">RowVector</a>&lt; Scalar &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_pooling_layer.html#a4e6023b45c2ed4a8f3257863ee43eb2f">d_reduce</a> (Scalar grad, unsigned patch_ind)=0</td></tr>
-<tr class="separator:a4e6023b45c2ed4a8f3257863ee43eb2f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a546a0072cfaa93fd77cae8eb491f4c85"><td class="memItemLeft" align="right" valign="top">virtual <a class="el" href="classcattle_1_1_layer.html#a8c0af442a18521dea2406d0878e7db61">Base::Data</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_pooling_layer.html#a546a0072cfaa93fd77cae8eb491f4c85">reduce</a> (const typename <a class="el" href="classcattle_1_1_layer.html#a8c0af442a18521dea2406d0878e7db61">Base::Data</a> &amp;patch, std::size_t patch_ind)=0</td></tr>
+<tr class="separator:a546a0072cfaa93fd77cae8eb491f4c85"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9f49671bf17852c234eb3bcd172e66d1"><td class="memItemLeft" align="right" valign="top">virtual <a class="el" href="classcattle_1_1_layer.html#a8c0af442a18521dea2406d0878e7db61">Base::Data</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_pooling_layer.html#a9f49671bf17852c234eb3bcd172e66d1">d_reduce</a> (const typename <a class="el" href="classcattle_1_1_layer.html#a8c0af442a18521dea2406d0878e7db61">Base::Data</a> &amp;grad, std::size_t patch_ind)=0</td></tr>
+<tr class="separator:a9f49671bf17852c234eb3bcd172e66d1"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a5ee003390561ac32d9d4277eaa4fece7"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_pooling_layer.html#a5ee003390561ac32d9d4277eaa4fece7">is_input_layer</a> () const</td></tr>
 <tr class="separator:a5ee003390561ac32d9d4277eaa4fece7"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a49b4cdf91303b773f7e33f1f1c73be6b"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_pooling_layer.html#a49b4cdf91303b773f7e33f1f1c73be6b">set_input_layer</a> (bool <a class="el" href="classcattle_1_1_pooling_layer.html#a30ea56804aab72285a8c442a3beb712f">input_layer</a>)</td></tr>
@@ -140,8 +153,8 @@ Protected Member Functions</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pro-static-methods"></a>
 Static Protected Member Functions</h2></td></tr>
-<tr class="memitem:a670385053ee69d94092d63a9478d084c"><td class="memItemLeft" align="right" valign="top">static std::size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_pooling_layer.html#a670385053ee69d94092d63a9478d084c">calculate_output_dim</a> (std::size_t input_dim, std::size_t <a class="el" href="classcattle_1_1_pooling_layer.html#a6a2ad633805d6a629cd6d7076d9a9d45">receptor_size</a>, std::size_t <a class="el" href="classcattle_1_1_pooling_layer.html#a752ccf3dca5e4a20db1ed87acfd75bef">stride</a>)</td></tr>
-<tr class="separator:a670385053ee69d94092d63a9478d084c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab46620c48c2cf3459f38d0ff69dd4f78"><td class="memItemLeft" align="right" valign="top">static std::size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_pooling_layer.html#ab46620c48c2cf3459f38d0ff69dd4f78">calculate_output_dim</a> (std::size_t input_dim, std::size_t receptor_size, std::size_t <a class="el" href="classcattle_1_1_pooling_layer.html#ae23cea49b5208f50f1e4062d4d885b58">dilation</a>, std::size_t <a class="el" href="classcattle_1_1_pooling_layer.html#a752ccf3dca5e4a20db1ed87acfd75bef">stride</a>)</td></tr>
+<tr class="separator:ab46620c48c2cf3459f38d0ff69dd4f78"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pro-attribs"></a>
 Protected Attributes</h2></td></tr>
@@ -149,37 +162,50 @@ Protected Attributes</h2></td></tr>
 <tr class="separator:a99c9c59105235c0d3892429aef5c1699"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:af70e71ec5595db8a30004292150ea0f7"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="classcattle_1_1_dimensions.html">Dimensions</a>&lt; std::size_t, 3 &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_pooling_layer.html#af70e71ec5595db8a30004292150ea0f7">output_dims</a></td></tr>
 <tr class="separator:af70e71ec5595db8a30004292150ea0f7"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a6a2ad633805d6a629cd6d7076d9a9d45"><td class="memItemLeft" align="right" valign="top">const std::size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_pooling_layer.html#a6a2ad633805d6a629cd6d7076d9a9d45">receptor_size</a></td></tr>
-<tr class="separator:a6a2ad633805d6a629cd6d7076d9a9d45"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1cd30c4e6ae0c2ec0b1feabcb65e52c4"><td class="memItemLeft" align="right" valign="top">const std::size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_pooling_layer.html#a1cd30c4e6ae0c2ec0b1feabcb65e52c4">receptor_height</a></td></tr>
+<tr class="separator:a1cd30c4e6ae0c2ec0b1feabcb65e52c4"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5116a4187c3c6f3352844c770f76d7d1"><td class="memItemLeft" align="right" valign="top">const std::size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_pooling_layer.html#a5116a4187c3c6f3352844c770f76d7d1">receptor_width</a></td></tr>
+<tr class="separator:a5116a4187c3c6f3352844c770f76d7d1"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a752ccf3dca5e4a20db1ed87acfd75bef"><td class="memItemLeft" align="right" valign="top">const std::size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_pooling_layer.html#a752ccf3dca5e4a20db1ed87acfd75bef">stride</a></td></tr>
 <tr class="separator:a752ccf3dca5e4a20db1ed87acfd75bef"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a41c7587beed0e68246b9cffe0b8c7de9"><td class="memItemLeft" align="right" valign="top">const std::size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_pooling_layer.html#a41c7587beed0e68246b9cffe0b8c7de9">receptor_area</a></td></tr>
-<tr class="separator:a41c7587beed0e68246b9cffe0b8c7de9"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae23cea49b5208f50f1e4062d4d885b58"><td class="memItemLeft" align="right" valign="top">const std::size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_pooling_layer.html#ae23cea49b5208f50f1e4062d4d885b58">dilation</a></td></tr>
+<tr class="separator:ae23cea49b5208f50f1e4062d4d885b58"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a99342c5d92a3f4520fbf3cff0fd77035"><td class="memItemLeft" align="right" valign="top">const std::size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_pooling_layer.html#a99342c5d92a3f4520fbf3cff0fd77035">dil_receptor_height</a></td></tr>
+<tr class="separator:a99342c5d92a3f4520fbf3cff0fd77035"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac016a2a3dcf94943cbab7def42cf2d8a"><td class="memItemLeft" align="right" valign="top">const std::size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_pooling_layer.html#ac016a2a3dcf94943cbab7def42cf2d8a">dil_receptor_width</a></td></tr>
+<tr class="separator:ac016a2a3dcf94943cbab7def42cf2d8a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a0afbbe08c83cf34f86feebb629c2e62a"><td class="memItemLeft" align="right" valign="top">const std::size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_pooling_layer.html#a0afbbe08c83cf34f86feebb629c2e62a">height_rem</a></td></tr>
 <tr class="separator:a0afbbe08c83cf34f86feebb629c2e62a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a9833f8360941213c0719e97a1cbfbe71"><td class="memItemLeft" align="right" valign="top">const std::size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_pooling_layer.html#a9833f8360941213c0719e97a1cbfbe71">width_rem</a></td></tr>
 <tr class="separator:a9833f8360941213c0719e97a1cbfbe71"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a30ea56804aab72285a8c442a3beb712f"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_pooling_layer.html#a30ea56804aab72285a8c442a3beb712f">input_layer</a></td></tr>
 <tr class="separator:a30ea56804aab72285a8c442a3beb712f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab31ade18d5386ac2cb56108305d83ede"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classcattle_1_1_pooling_layer.html#aaab8c366381b3c0470e8dd2467444423">ReductionRanksArray</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_pooling_layer.html#ab31ade18d5386ac2cb56108305d83ede">reduction_ranks</a></td></tr>
+<tr class="separator:ab31ade18d5386ac2cb56108305d83ede"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a730f1f96f09ad079030b2f4bab9d8345"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classcattle_1_1_pooling_layer.html#a9d4df1ff9464cad150d5b5a7a3ee0769">RankwiseArray</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_pooling_layer.html#a730f1f96f09ad079030b2f4bab9d8345">broadcast</a></td></tr>
+<tr class="separator:a730f1f96f09ad079030b2f4bab9d8345"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aaad4dd68a3eeb74f595b285c5528e1de"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classcattle_1_1_pooling_layer.html#a9d4df1ff9464cad150d5b5a7a3ee0769">RankwiseArray</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_pooling_layer.html#aaad4dd68a3eeb74f595b285c5528e1de">patch_offsets</a></td></tr>
+<tr class="separator:aaad4dd68a3eeb74f595b285c5528e1de"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4c42801c0d52ac0e426bb16330ed0baa"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classcattle_1_1_pooling_layer.html#a9d4df1ff9464cad150d5b5a7a3ee0769">RankwiseArray</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_pooling_layer.html#a4c42801c0d52ac0e426bb16330ed0baa">patch_extents</a></td></tr>
+<tr class="separator:a4c42801c0d52ac0e426bb16330ed0baa"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a66c53ea70e0818d8e94a8a7508e65f94"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classcattle_1_1_pooling_layer.html#a9d4df1ff9464cad150d5b5a7a3ee0769">RankwiseArray</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_pooling_layer.html#a66c53ea70e0818d8e94a8a7508e65f94">reduced_patch_offsets</a></td></tr>
+<tr class="separator:a66c53ea70e0818d8e94a8a7508e65f94"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4ef762095173a40edeb82cdffd848dd1"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classcattle_1_1_pooling_layer.html#a9d4df1ff9464cad150d5b5a7a3ee0769">RankwiseArray</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_pooling_layer.html#a4ef762095173a40edeb82cdffd848dd1">reduced_patch_extents</a></td></tr>
+<tr class="separator:a4ef762095173a40edeb82cdffd848dd1"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a90e6afbe4bfe5b097d46c33b849c13f2"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classcattle_1_1_pooling_layer.html#a9d4df1ff9464cad150d5b5a7a3ee0769">RankwiseArray</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_pooling_layer.html#a90e6afbe4bfe5b097d46c33b849c13f2">dil_strides</a></td></tr>
+<tr class="separator:a90e6afbe4bfe5b097d46c33b849c13f2"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a7b83dbbc568ab3350d8b8919fb74afbe"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespacecattle.html#a1d78623a47279d516750a44dbad6090b">Matrix</a>&lt; Scalar &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_pooling_layer.html#a7b83dbbc568ab3350d8b8919fb74afbe">params</a></td></tr>
 <tr class="separator:a7b83dbbc568ab3350d8b8919fb74afbe"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:adee8941f25dc3a88b0f4cd8f2b2aa4ac"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespacecattle.html#a1d78623a47279d516750a44dbad6090b">Matrix</a>&lt; Scalar &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_pooling_layer.html#adee8941f25dc3a88b0f4cd8f2b2aa4ac">params_grad</a></td></tr>
 <tr class="separator:adee8941f25dc3a88b0f4cd8f2b2aa4ac"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a40f661d343c3852ea0efe2efcfecf287"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_pooling_layer.html#a40f661d343c3852ea0efe2efcfecf287">rows</a></td></tr>
-<tr class="separator:a40f661d343c3852ea0efe2efcfecf287"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pri-types"></a>
 Private Types</h2></td></tr>
 <tr class="memitem:a1d020fb796168ac477067f7667093a38"><td class="memItemLeft" align="right" valign="top">typedef <a class="el" href="classcattle_1_1_layer.html">Layer</a>&lt; Scalar, 3 &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_pooling_layer.html#a1d020fb796168ac477067f7667093a38">Base</a></td></tr>
 <tr class="separator:a1d020fb796168ac477067f7667093a38"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a9d4df1ff9464cad150d5b5a7a3ee0769"><td class="memItemLeft" align="right" valign="top">typedef std::array&lt; std::size_t, 4 &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_pooling_layer.html#a9d4df1ff9464cad150d5b5a7a3ee0769">RankwiseArray</a></td></tr>
-<tr class="separator:a9d4df1ff9464cad150d5b5a7a3ee0769"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="inherited"></a>
 Additional Inherited Members</h2></td></tr>
-<tr class="inherit_header pro_types_classcattle_1_1_layer"><td colspan="2" onclick="javascript:toggleInherit('pro_types_classcattle_1_1_layer')"><img src="closed.png" alt="-"/>&#160;Protected Types inherited from <a class="el" href="classcattle_1_1_layer.html">cattle::Layer&lt; Scalar, 3 &gt;</a></td></tr>
-<tr class="memitem:a8c0af442a18521dea2406d0878e7db61 inherit pro_types_classcattle_1_1_layer"><td class="memItemLeft" align="right" valign="top">typedef <a class="el" href="namespacecattle.html#a8b9323ad928764340e46f0802bf27fbb">Tensor</a>&lt; Scalar, <a class="el" href="classcattle_1_1_layer.html#af7f8bccf684ef96e791adbfc56b60e09">DATA_RANK</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_layer.html#a8c0af442a18521dea2406d0878e7db61">Data</a></td></tr>
-<tr class="separator:a8c0af442a18521dea2406d0878e7db61 inherit pro_types_classcattle_1_1_layer"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="inherit_header pro_static_attribs_classcattle_1_1_layer"><td colspan="2" onclick="javascript:toggleInherit('pro_static_attribs_classcattle_1_1_layer')"><img src="closed.png" alt="-"/>&#160;Static Protected Attributes inherited from <a class="el" href="classcattle_1_1_layer.html">cattle::Layer&lt; Scalar, 3 &gt;</a></td></tr>
 <tr class="memitem:af7f8bccf684ef96e791adbfc56b60e09 inherit pro_static_attribs_classcattle_1_1_layer"><td class="memItemLeft" align="right" valign="top">static constexpr std::size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_layer.html#af7f8bccf684ef96e791adbfc56b60e09">DATA_RANK</a></td></tr>
 <tr class="separator:af7f8bccf684ef96e791adbfc56b60e09 inherit pro_static_attribs_classcattle_1_1_layer"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -231,7 +257,55 @@ template&lt;typename Scalar &gt; </div>
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">private</span></span>  </td>
+<span class="mlabels"><span class="mlabel">protected</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a6187db120d876456766e79b7092975ee"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a6187db120d876456766e79b7092975ee">&#9670;&nbsp;</a></span>ReducedData</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename Scalar &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">typedef <a class="el" href="namespacecattle.html#a8b9323ad928764340e46f0802bf27fbb">Tensor</a>&lt;Scalar,2&gt; <a class="el" href="classcattle_1_1_pooling_layer.html">cattle::PoolingLayer</a>&lt; Scalar &gt;::<a class="el" href="classcattle_1_1_pooling_layer.html#a6187db120d876456766e79b7092975ee">ReducedData</a></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">protected</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="aaab8c366381b3c0470e8dd2467444423"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aaab8c366381b3c0470e8dd2467444423">&#9670;&nbsp;</a></span>ReductionRanksArray</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename Scalar &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">typedef std::array&lt;std::size_t,2&gt; <a class="el" href="classcattle_1_1_pooling_layer.html">cattle::PoolingLayer</a>&lt; Scalar &gt;::<a class="el" href="classcattle_1_1_pooling_layer.html#aaab8c366381b3c0470e8dd2467444423">ReductionRanksArray</a></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">protected</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
@@ -239,8 +313,8 @@ template&lt;typename Scalar &gt; </div>
 </div>
 </div>
 <h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
-<a id="aace4969a3f4c858f594f30b2c34a4ab4"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aace4969a3f4c858f594f30b2c34a4ab4">&#9670;&nbsp;</a></span>PoolingLayer()</h2>
+<a id="a30b9febf3d3719899c3c692de7c9865a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a30b9febf3d3719899c3c692de7c9865a">&#9670;&nbsp;</a></span>PoolingLayer()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -260,13 +334,25 @@ template&lt;typename Scalar &gt; </div>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">std::size_t&#160;</td>
-          <td class="paramname"><em>receptor_size</em>, </td>
+          <td class="paramname"><em>receptor_height</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">std::size_t&#160;</td>
-          <td class="paramname"><em>stride</em>&#160;</td>
+          <td class="paramname"><em>receptor_width</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">std::size_t&#160;</td>
+          <td class="paramname"><em>stride</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">std::size_t&#160;</td>
+          <td class="paramname"><em>dilation</em>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -284,8 +370,8 @@ template&lt;typename Scalar &gt; </div>
 </div>
 </div>
 <h2 class="groupheader">Member Function Documentation</h2>
-<a id="a670385053ee69d94092d63a9478d084c"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a670385053ee69d94092d63a9478d084c">&#9670;&nbsp;</a></span>calculate_output_dim()</h2>
+<a id="ab46620c48c2cf3459f38d0ff69dd4f78"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab46620c48c2cf3459f38d0ff69dd4f78">&#9670;&nbsp;</a></span>calculate_output_dim()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -311,6 +397,12 @@ template&lt;typename Scalar &gt; </div>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">std::size_t&#160;</td>
+          <td class="paramname"><em>dilation</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">std::size_t&#160;</td>
           <td class="paramname"><em>stride</em>&#160;</td>
         </tr>
         <tr>
@@ -330,6 +422,7 @@ template&lt;typename Scalar &gt; </div>
   <table class="params">
     <tr><td class="paramname">input_dim</td><td>The dimensionality of the input tensor. </td></tr>
     <tr><td class="paramname">receptor_size</td><td>The spatial extent of the receptor. </td></tr>
+    <tr><td class="paramname">dilation</td><td>The dilation of the receptor. </td></tr>
     <tr><td class="paramname">stride</td><td>The stride at which the receptor is applied to the input tensor. </td></tr>
   </table>
   </dd>
@@ -338,8 +431,8 @@ template&lt;typename Scalar &gt; </div>
 
 </div>
 </div>
-<a id="a4e6023b45c2ed4a8f3257863ee43eb2f"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a4e6023b45c2ed4a8f3257863ee43eb2f">&#9670;&nbsp;</a></span>d_reduce()</h2>
+<a id="a9f49671bf17852c234eb3bcd172e66d1"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a9f49671bf17852c234eb3bcd172e66d1">&#9670;&nbsp;</a></span>d_reduce()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -350,15 +443,15 @@ template&lt;typename Scalar &gt; </div>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">virtual <a class="el" href="namespacecattle.html#a3ac7e197e90e292a2db6b2d94f46befa">RowVector</a>&lt;Scalar&gt; <a class="el" href="classcattle_1_1_pooling_layer.html">cattle::PoolingLayer</a>&lt; Scalar &gt;::d_reduce </td>
+          <td class="memname">virtual <a class="el" href="classcattle_1_1_layer.html#a8c0af442a18521dea2406d0878e7db61">Base::Data</a> <a class="el" href="classcattle_1_1_pooling_layer.html">cattle::PoolingLayer</a>&lt; Scalar &gt;::d_reduce </td>
           <td>(</td>
-          <td class="paramtype">Scalar&#160;</td>
+          <td class="paramtype">const typename <a class="el" href="classcattle_1_1_layer.html#a8c0af442a18521dea2406d0878e7db61">Base::Data</a> &amp;&#160;</td>
           <td class="paramname"><em>grad</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">unsigned&#160;</td>
+          <td class="paramtype">std::size_t&#160;</td>
           <td class="paramname"><em>patch_ind</em>&#160;</td>
         </tr>
         <tr>
@@ -373,17 +466,17 @@ template&lt;typename Scalar &gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
-<p>Differentiates the reduction function and returns the derivative of the loss function w.r.t. the output of the previous layer.</p>
+<p>Differentiates the reduction function and returns the derivative of the loss function w.r.t. the non-reduced patch.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">grad</td><td>The derivative of the loss function w.r.t. the output of this layer. </td></tr>
+    <tr><td class="paramname">grad</td><td>The derivative of the loss function w.r.t. the reduced patch. </td></tr>
     <tr><td class="paramname">patch_ind</td><td>The index of the patch. </td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>The derivative of the loss function w.r.t. the output of the previous layer. </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>The derivative of the loss function w.r.t. the non-reduced patch. </dd></dl>
 
-<p>Implemented in <a class="el" href="classcattle_1_1_max_pooling_layer.html#ab877a00722264d97fe51b47353319ebe">cattle::MaxPoolingLayer&lt; Scalar &gt;</a>, <a class="el" href="classcattle_1_1_mean_pooling_layer.html#aaafeb9b58de5776946a0a7f5e7e8d7b7">cattle::MeanPoolingLayer&lt; Scalar &gt;</a>, and <a class="el" href="classcattle_1_1_sum_pooling_layer.html#ae4e066f00b2101a2275c90357589c436">cattle::SumPoolingLayer&lt; Scalar &gt;</a>.</p>
+<p>Implemented in <a class="el" href="classcattle_1_1_max_pooling_layer.html#a845fb7c5d253b81abf623e0685baac3f">cattle::MaxPoolingLayer&lt; Scalar &gt;</a>, <a class="el" href="classcattle_1_1_mean_pooling_layer.html#a4ba23630acbb315efc4cf4d6a46ce53a">cattle::MeanPoolingLayer&lt; Scalar &gt;</a>, and <a class="el" href="classcattle_1_1_sum_pooling_layer.html#a25a75f3cfb708e966ede4e17c87ee521">cattle::SumPoolingLayer&lt; Scalar &gt;</a>.</p>
 
 </div>
 </div>
@@ -719,8 +812,8 @@ template&lt;typename Scalar &gt; </div>
 
 </div>
 </div>
-<a id="a3aa2d8b47ec61f47f9b91b63b9e5fc6d"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a3aa2d8b47ec61f47f9b91b63b9e5fc6d">&#9670;&nbsp;</a></span>reduce()</h2>
+<a id="a546a0072cfaa93fd77cae8eb491f4c85"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a546a0072cfaa93fd77cae8eb491f4c85">&#9670;&nbsp;</a></span>reduce()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -731,15 +824,15 @@ template&lt;typename Scalar &gt; </div>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">virtual Scalar <a class="el" href="classcattle_1_1_pooling_layer.html">cattle::PoolingLayer</a>&lt; Scalar &gt;::reduce </td>
+          <td class="memname">virtual <a class="el" href="classcattle_1_1_layer.html#a8c0af442a18521dea2406d0878e7db61">Base::Data</a> <a class="el" href="classcattle_1_1_pooling_layer.html">cattle::PoolingLayer</a>&lt; Scalar &gt;::reduce </td>
           <td>(</td>
-          <td class="paramtype">const <a class="el" href="namespacecattle.html#a3ac7e197e90e292a2db6b2d94f46befa">RowVector</a>&lt; Scalar &gt; &amp;&#160;</td>
+          <td class="paramtype">const typename <a class="el" href="classcattle_1_1_layer.html#a8c0af442a18521dea2406d0878e7db61">Base::Data</a> &amp;&#160;</td>
           <td class="paramname"><em>patch</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">unsigned&#160;</td>
+          <td class="paramtype">std::size_t&#160;</td>
           <td class="paramname"><em>patch_ind</em>&#160;</td>
         </tr>
         <tr>
@@ -754,17 +847,17 @@ template&lt;typename Scalar &gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
-<p>Reduces the input vector into a single coefficient.</p>
+<p>Reduces the input tensor patch along the specified ranks.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">patch</td><td>A spatial patch of the input tensor (of size receptor*receptor) stretched into a row vector. </td></tr>
+    <tr><td class="paramname">patch</td><td>A tensor representing a spatial patch of the input tensor. </td></tr>
     <tr><td class="paramname">patch_ind</td><td>The index of the patch. </td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>The single numeral representing the result of the reduction. </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>The reduced tensor. </dd></dl>
 
-<p>Implemented in <a class="el" href="classcattle_1_1_max_pooling_layer.html#ae37204eee033f4b86277992cec0ff9db">cattle::MaxPoolingLayer&lt; Scalar &gt;</a>, <a class="el" href="classcattle_1_1_mean_pooling_layer.html#a36acc4e38977038c3e94c8509d32925b">cattle::MeanPoolingLayer&lt; Scalar &gt;</a>, and <a class="el" href="classcattle_1_1_sum_pooling_layer.html#ad56189d473bcdeb0f7169427f62948c4">cattle::SumPoolingLayer&lt; Scalar &gt;</a>.</p>
+<p>Implemented in <a class="el" href="classcattle_1_1_max_pooling_layer.html#a5491d6647bb7eaa876eefa0154fa5aa7">cattle::MaxPoolingLayer&lt; Scalar &gt;</a>, <a class="el" href="classcattle_1_1_mean_pooling_layer.html#aaa547d14581876d6db33ba146d7d237b">cattle::MeanPoolingLayer&lt; Scalar &gt;</a>, and <a class="el" href="classcattle_1_1_sum_pooling_layer.html#ab5da45d23b21527cb29c744a9ae48555">cattle::SumPoolingLayer&lt; Scalar &gt;</a>.</p>
 
 </div>
 </div>
@@ -806,6 +899,126 @@ template&lt;typename Scalar &gt; </div>
 </div>
 </div>
 <h2 class="groupheader">Member Data Documentation</h2>
+<a id="a730f1f96f09ad079030b2f4bab9d8345"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a730f1f96f09ad079030b2f4bab9d8345">&#9670;&nbsp;</a></span>broadcast</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename Scalar &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classcattle_1_1_pooling_layer.html#a9d4df1ff9464cad150d5b5a7a3ee0769">RankwiseArray</a> <a class="el" href="classcattle_1_1_pooling_layer.html">cattle::PoolingLayer</a>&lt; Scalar &gt;::broadcast</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">protected</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a99342c5d92a3f4520fbf3cff0fd77035"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a99342c5d92a3f4520fbf3cff0fd77035">&#9670;&nbsp;</a></span>dil_receptor_height</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename Scalar &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">const std::size_t <a class="el" href="classcattle_1_1_pooling_layer.html">cattle::PoolingLayer</a>&lt; Scalar &gt;::dil_receptor_height</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">protected</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="ac016a2a3dcf94943cbab7def42cf2d8a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac016a2a3dcf94943cbab7def42cf2d8a">&#9670;&nbsp;</a></span>dil_receptor_width</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename Scalar &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">const std::size_t <a class="el" href="classcattle_1_1_pooling_layer.html">cattle::PoolingLayer</a>&lt; Scalar &gt;::dil_receptor_width</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">protected</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a90e6afbe4bfe5b097d46c33b849c13f2"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a90e6afbe4bfe5b097d46c33b849c13f2">&#9670;&nbsp;</a></span>dil_strides</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename Scalar &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classcattle_1_1_pooling_layer.html#a9d4df1ff9464cad150d5b5a7a3ee0769">RankwiseArray</a> <a class="el" href="classcattle_1_1_pooling_layer.html">cattle::PoolingLayer</a>&lt; Scalar &gt;::dil_strides</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">protected</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="ae23cea49b5208f50f1e4062d4d885b58"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae23cea49b5208f50f1e4062d4d885b58">&#9670;&nbsp;</a></span>dilation</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename Scalar &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">const std::size_t <a class="el" href="classcattle_1_1_pooling_layer.html">cattle::PoolingLayer</a>&lt; Scalar &gt;::dilation</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">protected</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
 <a id="a0afbbe08c83cf34f86feebb629c2e62a"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a0afbbe08c83cf34f86feebb629c2e62a">&#9670;&nbsp;</a></span>height_rem</h2>
 
@@ -950,8 +1163,8 @@ template&lt;typename Scalar &gt; </div>
 
 </div>
 </div>
-<a id="a41c7587beed0e68246b9cffe0b8c7de9"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a41c7587beed0e68246b9cffe0b8c7de9">&#9670;&nbsp;</a></span>receptor_area</h2>
+<a id="a4c42801c0d52ac0e426bb16330ed0baa"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a4c42801c0d52ac0e426bb16330ed0baa">&#9670;&nbsp;</a></span>patch_extents</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -962,7 +1175,7 @@ template&lt;typename Scalar &gt; </div>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">const std::size_t <a class="el" href="classcattle_1_1_pooling_layer.html">cattle::PoolingLayer</a>&lt; Scalar &gt;::receptor_area</td>
+          <td class="memname"><a class="el" href="classcattle_1_1_pooling_layer.html#a9d4df1ff9464cad150d5b5a7a3ee0769">RankwiseArray</a> <a class="el" href="classcattle_1_1_pooling_layer.html">cattle::PoolingLayer</a>&lt; Scalar &gt;::patch_extents</td>
         </tr>
       </table>
   </td>
@@ -974,8 +1187,8 @@ template&lt;typename Scalar &gt; </div>
 
 </div>
 </div>
-<a id="a6a2ad633805d6a629cd6d7076d9a9d45"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a6a2ad633805d6a629cd6d7076d9a9d45">&#9670;&nbsp;</a></span>receptor_size</h2>
+<a id="aaad4dd68a3eeb74f595b285c5528e1de"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aaad4dd68a3eeb74f595b285c5528e1de">&#9670;&nbsp;</a></span>patch_offsets</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -986,7 +1199,7 @@ template&lt;typename Scalar &gt; </div>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">const std::size_t <a class="el" href="classcattle_1_1_pooling_layer.html">cattle::PoolingLayer</a>&lt; Scalar &gt;::receptor_size</td>
+          <td class="memname"><a class="el" href="classcattle_1_1_pooling_layer.html#a9d4df1ff9464cad150d5b5a7a3ee0769">RankwiseArray</a> <a class="el" href="classcattle_1_1_pooling_layer.html">cattle::PoolingLayer</a>&lt; Scalar &gt;::patch_offsets</td>
         </tr>
       </table>
   </td>
@@ -998,8 +1211,8 @@ template&lt;typename Scalar &gt; </div>
 
 </div>
 </div>
-<a id="a40f661d343c3852ea0efe2efcfecf287"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a40f661d343c3852ea0efe2efcfecf287">&#9670;&nbsp;</a></span>rows</h2>
+<a id="a1cd30c4e6ae0c2ec0b1feabcb65e52c4"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a1cd30c4e6ae0c2ec0b1feabcb65e52c4">&#9670;&nbsp;</a></span>receptor_height</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -1010,7 +1223,103 @@ template&lt;typename Scalar &gt; </div>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">int <a class="el" href="classcattle_1_1_pooling_layer.html">cattle::PoolingLayer</a>&lt; Scalar &gt;::rows</td>
+          <td class="memname">const std::size_t <a class="el" href="classcattle_1_1_pooling_layer.html">cattle::PoolingLayer</a>&lt; Scalar &gt;::receptor_height</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">protected</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a5116a4187c3c6f3352844c770f76d7d1"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a5116a4187c3c6f3352844c770f76d7d1">&#9670;&nbsp;</a></span>receptor_width</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename Scalar &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">const std::size_t <a class="el" href="classcattle_1_1_pooling_layer.html">cattle::PoolingLayer</a>&lt; Scalar &gt;::receptor_width</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">protected</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a4ef762095173a40edeb82cdffd848dd1"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a4ef762095173a40edeb82cdffd848dd1">&#9670;&nbsp;</a></span>reduced_patch_extents</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename Scalar &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classcattle_1_1_pooling_layer.html#a9d4df1ff9464cad150d5b5a7a3ee0769">RankwiseArray</a> <a class="el" href="classcattle_1_1_pooling_layer.html">cattle::PoolingLayer</a>&lt; Scalar &gt;::reduced_patch_extents</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">protected</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a66c53ea70e0818d8e94a8a7508e65f94"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a66c53ea70e0818d8e94a8a7508e65f94">&#9670;&nbsp;</a></span>reduced_patch_offsets</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename Scalar &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classcattle_1_1_pooling_layer.html#a9d4df1ff9464cad150d5b5a7a3ee0769">RankwiseArray</a> <a class="el" href="classcattle_1_1_pooling_layer.html">cattle::PoolingLayer</a>&lt; Scalar &gt;::reduced_patch_offsets</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">protected</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="ab31ade18d5386ac2cb56108305d83ede"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab31ade18d5386ac2cb56108305d83ede">&#9670;&nbsp;</a></span>reduction_ranks</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename Scalar &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classcattle_1_1_pooling_layer.html#aaab8c366381b3c0470e8dd2467444423">ReductionRanksArray</a> <a class="el" href="classcattle_1_1_pooling_layer.html">cattle::PoolingLayer</a>&lt; Scalar &gt;::reduction_ranks</td>
         </tr>
       </table>
   </td>

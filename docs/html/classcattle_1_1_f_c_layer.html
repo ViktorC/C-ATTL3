@@ -144,9 +144,15 @@ Private Types</h2></td></tr>
 <tr class="separator:a3a64f46171f8a0ff499bc38803769d05"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ada9858c79f9d6e00cc8074a95850b31d"><td class="memItemLeft" align="right" valign="top">typedef <a class="el" href="classcattle_1_1_kernel_layer.html">KernelLayer</a>&lt; Scalar, Rank &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_f_c_layer.html#ada9858c79f9d6e00cc8074a95850b31d">Base</a></td></tr>
 <tr class="separator:ada9858c79f9d6e00cc8074a95850b31d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0553611341f96fd86f14b53a7f6e56ff"><td class="memItemLeft" align="right" valign="top">typedef std::array&lt; std::size_t, <a class="el" href="classcattle_1_1_layer.html#af7f8bccf684ef96e791adbfc56b60e09">Root::DATA_RANK</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_f_c_layer.html#a0553611341f96fd86f14b53a7f6e56ff">RankwiseArray</a></td></tr>
+<tr class="separator:a0553611341f96fd86f14b53a7f6e56ff"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pri-attribs"></a>
 Private Attributes</h2></td></tr>
+<tr class="memitem:a1ad0bb74fe761f1a35e5ef9f201f13da"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classcattle_1_1_f_c_layer.html#a0553611341f96fd86f14b53a7f6e56ff">RankwiseArray</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_f_c_layer.html#a1ad0bb74fe761f1a35e5ef9f201f13da">out_conversion_dims</a></td></tr>
+<tr class="separator:a1ad0bb74fe761f1a35e5ef9f201f13da"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab0aa347b9cca59919b91f8b203b5a550"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classcattle_1_1_f_c_layer.html#a0553611341f96fd86f14b53a7f6e56ff">RankwiseArray</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_f_c_layer.html#ab0aa347b9cca59919b91f8b203b5a550">prev_out_conversion_dims</a></td></tr>
+<tr class="separator:ab0aa347b9cca59919b91f8b203b5a550"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ad07b61aeaead63cb48eba1b1758cc4f4"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespacecattle.html#a1d78623a47279d516750a44dbad6090b">Matrix</a>&lt; Scalar &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_f_c_layer.html#ad07b61aeaead63cb48eba1b1758cc4f4">biased_in</a></td></tr>
 <tr class="separator:ad07b61aeaead63cb48eba1b1758cc4f4"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
@@ -195,6 +201,30 @@ template&lt;typename Scalar, std::size_t Rank&gt; </div>
       <table class="memname">
         <tr>
           <td class="memname">typedef <a class="el" href="classcattle_1_1_kernel_layer.html">KernelLayer</a>&lt;Scalar,Rank&gt; <a class="el" href="classcattle_1_1_f_c_layer.html">cattle::FCLayer</a>&lt; Scalar, Rank &gt;::<a class="el" href="classcattle_1_1_f_c_layer.html#ada9858c79f9d6e00cc8074a95850b31d">Base</a></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">private</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a0553611341f96fd86f14b53a7f6e56ff"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a0553611341f96fd86f14b53a7f6e56ff">&#9670;&nbsp;</a></span>RankwiseArray</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename Scalar, std::size_t Rank&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">typedef std::array&lt;std::size_t,<a class="el" href="classcattle_1_1_layer.html#af7f8bccf684ef96e791adbfc56b60e09">Root::DATA_RANK</a>&gt; <a class="el" href="classcattle_1_1_f_c_layer.html">cattle::FCLayer</a>&lt; Scalar, Rank &gt;::<a class="el" href="classcattle_1_1_f_c_layer.html#a0553611341f96fd86f14b53a7f6e56ff">RankwiseArray</a></td>
         </tr>
       </table>
   </td>
@@ -522,6 +552,54 @@ template&lt;typename Scalar, std::size_t Rank&gt; </div>
       <table class="memname">
         <tr>
           <td class="memname"><a class="el" href="namespacecattle.html#a1d78623a47279d516750a44dbad6090b">Matrix</a>&lt;Scalar&gt; <a class="el" href="classcattle_1_1_f_c_layer.html">cattle::FCLayer</a>&lt; Scalar, Rank &gt;::biased_in</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">private</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a1ad0bb74fe761f1a35e5ef9f201f13da"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a1ad0bb74fe761f1a35e5ef9f201f13da">&#9670;&nbsp;</a></span>out_conversion_dims</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename Scalar, std::size_t Rank&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classcattle_1_1_f_c_layer.html#a0553611341f96fd86f14b53a7f6e56ff">RankwiseArray</a> <a class="el" href="classcattle_1_1_f_c_layer.html">cattle::FCLayer</a>&lt; Scalar, Rank &gt;::out_conversion_dims</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">private</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="ab0aa347b9cca59919b91f8b203b5a550"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab0aa347b9cca59919b91f8b203b5a550">&#9670;&nbsp;</a></span>prev_out_conversion_dims</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename Scalar, std::size_t Rank&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classcattle_1_1_f_c_layer.html#a0553611341f96fd86f14b53a7f6e56ff">RankwiseArray</a> <a class="el" href="classcattle_1_1_f_c_layer.html">cattle::FCLayer</a>&lt; Scalar, Rank &gt;::prev_out_conversion_dims</td>
         </tr>
       </table>
   </td>
