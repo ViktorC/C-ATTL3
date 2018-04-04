@@ -234,7 +234,7 @@ typedef double fp;
 //}
 
 int main() {
-	std::string mnist_folder = "C:\\Users\\A6714\\Downloads\\mnist\\";
+	std::string mnist_folder = "C:\\Users\\Viktor\\Downloads\\mnist\\";
 	MNISTDataProvider<float> prov(mnist_folder + "train-images.idx3-ubyte", mnist_folder + "train-labels.idx1-ubyte");
 	DataPair<float,3,false> data = prov.get_data(60000);
 	TensorPtr<float,4> obs(new Tensor<float,4>(std::move(data.first)));

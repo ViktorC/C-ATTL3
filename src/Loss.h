@@ -82,14 +82,12 @@ protected:
 public:
 	virtual ~UniversalLoss() = default;
 	inline ColVector<Scalar> function(typename Base::Data out, typename Base::Data obj) const {
-		assert(Utils<Scalar>::template get_dims<Base::DATA_RANK>(out) ==
-				Utils<Scalar>::template get_dims<Base::DATA_RANK>(obj));
+		assert(out.dimensions() == obj.dimensions());
 		return _function(std::move(out), std::move(obj));
 	}
 	inline typename Base::Data d_function(typename Base::Data out, typename Base::Data obj) const {
-		Dimensions<std::size_t,Base::DATA_RANK> dims = Utils<Scalar>::template get_dims<Base::DATA_RANK>(out);
-		assert(dims == Utils<Scalar>::template get_dims<Base::DATA_RANK>(obj));
-		return _d_function(std::move(out), std::move(obj), dims);
+		assert(out.dimensions() == obj.dimensions());
+		return _d_function(std::move(out), std::move(obj), out.dimensions());
 	}
 };
 
@@ -124,16 +122,15 @@ protected:
 public:
 	virtual ~UniversalLoss() = default;
 	inline ColVector<Scalar> function(typename Base::Data out, typename Base::Data obj) const {
-		Dimensions<std::size_t,Base::DATA_RANK> dims = Utils<Scalar>::template get_dims<Base::DATA_RANK>(out);
-		assert(dims == Utils<Scalar>::template get_dims<Base::DATA_RANK>(obj));
-		int time_steps = dims(1);
+		assert(out.dimensions() == obj.dimensions());
+		int time_steps = out.dimension(1);
 		if (time_steps == 1)
 			return _function(std::move(out), std::move(obj));
 		RankwiseArray offsets;
-		RankwiseArray extents = dims;
+		RankwiseArray extents = out.dimensions();
 		offsets.fill(0);
 		extents[1] = 1;
-		ColVector<Scalar> loss = ColVector<Scalar>::Zero(dims(0), 1);
+		ColVector<Scalar> loss = ColVector<Scalar>::Zero(out.dimension(0), 1);
 		for (int i = 0; i < time_steps; ++i) {
 			offsets[1] = i;
 			typename Base::Data out_i = out.slice(offsets, extents);
@@ -143,17 +140,16 @@ public:
 		return loss;
 	}
 	inline typename Base::Data d_function(const typename Base::Data out, const typename Base::Data obj) const {
-		Dimensions<std::size_t,Base::DATA_RANK> dims = Utils<Scalar>::template get_dims<Base::DATA_RANK>(out);
-		assert(dims == Utils<Scalar>::template get_dims<Base::DATA_RANK>(obj));
-		int time_steps = dims(1);
+		assert(out.dimensions() == obj.dimensions());
+		int time_steps = out.dimension(1);
 		if (time_steps == 1)
-			return _d_function(std::move(out), std::move(obj), dims);
-		typename Base::Data grads(dims);
-		grads.setZero();
-		dims(1) = 1;
+			return _d_function(std::move(out), std::move(obj), out.dimensions());
 		RankwiseArray offsets;
-		RankwiseArray extents = dims;
+		RankwiseArray extents = out.dimensions();
 		offsets.fill(0);
+		typename Base::Data grads(extents);
+		extents[1] = 1;
+		grads.setZero();
 		for (int i = 0; i < time_steps; ++i) {
 			offsets[1] = i;
 			typename Base::Data out_i = out.slice(offsets, extents);

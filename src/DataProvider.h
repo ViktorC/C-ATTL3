@@ -169,24 +169,20 @@ public:
 				offsets() {
 		assert(this->obs != nullptr);
 		assert(this->obj != nullptr);
-		Utils<Scalar>::template check_dim_validity<Base::DATA_RANK>(*this->obs);
-		Utils<Scalar>::template check_dim_validity<Base::DATA_RANK>(*this->obj);
 		assert(this->obs->dimension(0) == this->obj->dimension(0) &&
 				"mismatched data and obj tensor row numbers");
-		Dimensions<std::size_t,Base::DATA_RANK> obs_dims =
-				Utils<Scalar>::template get_dims<Base::DATA_RANK>(*this->obs);
-		Dimensions<std::size_t,Base::DATA_RANK> obj_dims =
-				Utils<Scalar>::template get_dims<Base::DATA_RANK>(*this->obj);
+		Dimensions<std::size_t,Base::DATA_RANK> obs_dims = this->obs->dimensions();
+		Dimensions<std::size_t,Base::DATA_RANK> obj_dims = this->obj->dimensions();
 		this->obs_dims = obs_dims.template demote<Sequential + 1>();
 		this->obj_dims = obj_dims.template demote<Sequential + 1>();
 		instances = (std::size_t) this->obs->dimension(0);
 		offsets.fill(0);
 		data_extents = obs_dims;
 		obj_extents = obj_dims;
-		if (shuffle) {
-			Utils<Scalar>::template shuffle_tensor_rows<Base::DATA_RANK>(*this->obs);
-			Utils<Scalar>::template shuffle_tensor_rows<Base::DATA_RANK>(*this->obj);
-		}
+//		if (shuffle) {
+//			Utils<Scalar>::template shuffle_tensor_rows<Base::DATA_RANK>(*this->obs);
+//			Utils<Scalar>::template shuffle_tensor_rows<Base::DATA_RANK>(*this->obj);
+//		}
 	}
 	inline const Dimensions<std::size_t,Rank>& get_obs_dims() const {
 		return obs_dims;

@@ -272,7 +272,7 @@ protected:
 		biased_in = Matrix<Scalar>(0, 0);
 	}
 	inline typename Root::Data pass_forward(typename Root::Data in, bool training) {
-		assert(Utils<Scalar>::template get_dims<Root::DATA_RANK>(in).template demote<>() == Base::input_dims);
+		assert((Dimensions<std::size_t,Root::DATA_RANK>(in.dimensions()).template demote<>()) == Base::input_dims);
 		assert(in.dimension(0) > 0);
 		unsigned input_size = Base::input_dims.get_volume();
 		// Add a 1-column to the input for the bias trick.
@@ -284,7 +284,7 @@ protected:
 		return TensorMap<Scalar,Root::DATA_RANK>(out.data(), out_conversion_dims);
 	}
 	inline typename Root::Data pass_back(typename Root::Data out_grads) {
-		assert(Utils<Scalar>::template get_dims<Rank + 1>(out_grads).template demote<>() == Base::output_dims);
+		assert((Dimensions<std::size_t,Root::DATA_RANK>(out_grads.dimensions()).template demote<>()) == Base::output_dims);
 		assert(out_grads.dimension(0) > 0 && biased_in.rows() == out_grads.dimension(0));
 		MatrixMap<Scalar> out_grads_mat(out_grads.data(), out_grads.dimension(0), Base::output_dims.get_volume());
 		// Compute the gradient of the outputs with respect to the weights.
@@ -391,7 +391,7 @@ protected:
 		biased_in = Matrix<Scalar>(0, 0);
 	}
 	inline typename Root::Data pass_forward(typename Root::Data in, bool training) {
-		assert(Utils<Scalar>::template get_dims<4>(in).template demote<>() == Base::input_dims);
+		assert((Dimensions<std::size_t,4>(in.dimensions()).template demote<>()) == Base::input_dims);
 		assert(in.dimension(0) > 0);
 		// Spatial padding.
 		if (padding > 0)
@@ -427,7 +427,7 @@ protected:
 		return TensorMap<Scalar,4>(out.data(), out_conversion_dims);
 	}
 	inline typename Root::Data pass_back(typename Root::Data out_grads) {
-		assert(Utils<Scalar>::template get_dims<4>(out_grads).template demote<>() == Base::output_dims);
+		assert((Dimensions<std::size_t,4>(out_grads.dimensions()).template demote<>()) == Base::output_dims);
 		assert(out_grads.dimension(0) > 0 && biased_in.rows() / (Base::output_dims(0) *
 				Base::output_dims(1)) == out_grads.dimension(0));
 		std::size_t rows = out_grads.dimension(0);
@@ -579,13 +579,13 @@ protected:
 		return clone();
 	}
 	inline typename Root::Data pass_forward(typename Root::Data in, bool training) {
-		assert(Utils<Scalar>::template get_dims<Base::DATA_RANK>(in).template demote<>() == Base::dims);
+		assert((Dimensions<std::size_t,Base::DATA_RANK>(in.dimensions()).template demote<>()) == Base::dims);
 		assert(in.dimension(0) > 0);
 		batch_size = in.dimension(0);
 		return in;
 	}
 	inline typename Root::Data pass_back(typename Root::Data out_grads) {
-		assert(Utils<Scalar>::template get_dims<Base::DATA_RANK>(out_grads).template demote<>() == Base::dims);
+		assert((Dimensions<std::size_t,Base::DATA_RANK>(out_grads.dimensions()).template demote<>()) == Base::dims);
 		assert(out_grads.dimension(0) > 0 && batch_size == out_grads.dimension(0));
 		return out_grads;
 	}
@@ -616,13 +616,13 @@ protected:
 		return clone();
 	}
 	inline typename Root::Data pass_forward(typename Root::Data in, bool training) {
-		assert(Utils<Scalar>::template get_dims<Base::DATA_RANK>(in).template demote<>() == Base::dims);
+		assert((Dimensions<std::size_t,Base::DATA_RANK>(in.dimensions()).template demote<>()) == Base::dims);
 		assert(in.dimension(0) > 0);
 		batch_size = in.dimension(0);
 		return in * scale;
 	}
 	inline typename Root::Data pass_back(typename Root::Data out_grads) {
-		assert(Utils<Scalar>::template get_dims<Base::DATA_RANK>(out_grads).template demote<>() == Base::dims);
+		assert((Dimensions<std::size_t,Base::DATA_RANK>(out_grads.dimensions()).template demote<>()) == Base::dims);
 		assert(out_grads.dimension(0) > 0 && batch_size == out_grads.dimension(0));
 		return out_grads * scale;
 	}
@@ -653,13 +653,13 @@ protected:
 		return clone();
 	}
 	inline typename Root::Data pass_forward(typename Root::Data in, bool training) {
-		assert(Utils<Scalar>::template get_dims<Base::DATA_RANK>(in).template demote<>() == Base::dims);
+		assert((Dimensions<std::size_t,Base::DATA_RANK>(in.dimensions()).template demote<>()) == Base::dims);
 		assert(in.dimension(0) > 0);
 		batch_size = in.dimension(0);
 		return in.unaryExpr([](Scalar i) { return (Scalar) (i >= .0 ? 1.0 : .0); });
 	}
 	inline typename Root::Data pass_back(typename Root::Data out_grads) {
-		assert(Utils<Scalar>::template get_dims<Base::DATA_RANK>(out_grads).template demote<>() == Base::dims);
+		assert((Dimensions<std::size_t,Base::DATA_RANK>(out_grads.dimensions()).template demote<>()) == Base::dims);
 		assert(out_grads.dimension(0) > 0 && batch_size == out_grads.dimension(0));
 		return out_grads.constant((Scalar) 0);
 	}
@@ -691,7 +691,7 @@ protected:
 		out = typename Root::Data();
 	}
 	inline typename Root::Data pass_forward(typename Root::Data in, bool training) {
-		assert(Utils<Scalar>::template get_dims<Base::DATA_RANK>(in).template demote<>() == Base::dims);
+		assert((Dimensions<std::size_t,Base::DATA_RANK>(in.dimensions()).template demote<>()) == Base::dims);
 		assert(in.dimension(0) > 0);
 		auto act = ((-in).exp() + in.constant((Scalar) 1)).inverse();
 		if (training) {
@@ -701,7 +701,7 @@ protected:
 		return act;
 	}
 	inline typename Root::Data pass_back(typename Root::Data out_grads) {
-		assert(Utils<Scalar>::template get_dims<Base::DATA_RANK>(out_grads).template demote<>() == Base::dims);
+		assert((Dimensions<std::size_t,Base::DATA_RANK>(out_grads.dimensions()).template demote<>()) == Base::dims);
 		assert(out_grads.dimension(0) > 0 && out.dimension(0) == out_grads.dimension(0));
 		return (out * (-out + out.constant((Scalar) 1))) * out_grads;
 	}
@@ -734,7 +734,7 @@ protected:
 		out = typename Root::Data();
 	}
 	inline typename Root::Data pass_forward(typename Root::Data in, bool training) {
-		assert(Utils<Scalar>::template get_dims<Base::DATA_RANK>(in).template demote<>() == Base::dims);
+		assert((Dimensions<std::size_t,Base::DATA_RANK>(in.dimensions()).template demote<>()) == Base::dims);
 		assert(in.dimension(0) > 0);
 		auto act = in.tanh();
 		if (training) {
@@ -744,7 +744,7 @@ protected:
 		return act;
 	}
 	inline typename Root::Data pass_back(typename Root::Data out_grads) {
-		assert(Utils<Scalar>::template get_dims<Base::DATA_RANK>(out_grads).template demote<>() == Base::dims);
+		assert((Dimensions<std::size_t,Base::DATA_RANK>(out_grads.dimensions()).template demote<>()) == Base::dims);
 		assert(out_grads.dimension(0) > 0 && out.dimension(0) == out_grads.dimension(0));
 		return (-out * out + out.constant((Scalar) 1)) * out_grads;
 	}
@@ -782,7 +782,7 @@ protected:
 		out = Matrix<Scalar>(0, 0);
 	}
 	inline typename Root::Data pass_forward(typename Root::Data in, bool training) {
-		assert(Utils<Scalar>::template get_dims<Base::DATA_RANK>(in).template demote<>() == Base::dims);
+		assert((Dimensions<std::size_t,Base::DATA_RANK>(in.dimensions()).template demote<>()) == Base::dims);
 		assert(in.dimension(0) > 0);
 		std::size_t rows = in.dimension(0);
 		MatrixMap<Scalar> in_mat(in.data(), rows, in.size() / rows);
@@ -798,7 +798,7 @@ protected:
 		return TensorMap<Scalar,Root::DATA_RANK>(act.data(), conversion_dims);
 	}
 	inline typename Root::Data pass_back(typename Root::Data out_grads) {
-		assert(Utils<Scalar>::template get_dims<Base::DATA_RANK>(out_grads).template demote<>() == Base::dims);
+		assert((Dimensions<std::size_t,Base::DATA_RANK>(out_grads.dimensions()).template demote<>()) == Base::dims);
 		assert(out_grads.dimension(0) > 0 && out.rows() == out_grads.dimension(0));
 		std::size_t rows = out_grads.dimension(0);
 		MatrixMap<Scalar> out_grads_mat(out_grads.data(), rows, out_grads.size() / rows);
@@ -845,14 +845,14 @@ protected:
 		in = typename Root::Data();
 	}
 	inline typename Root::Data pass_forward(typename Root::Data in, bool training) {
-		assert(Utils<Scalar>::template get_dims<Base::DATA_RANK>(in).template demote<>() == Base::dims);
+		assert((Dimensions<std::size_t,Base::DATA_RANK>(in.dimensions()).template demote<>()) == Base::dims);
 		assert(in.dimension(0) > 0);
 		if (training)
 			this->in = in;
 		return in.cwiseMax((Scalar) 0);
 	}
 	inline typename Root::Data pass_back(typename Root::Data out_grads) {
-		assert(Utils<Scalar>::template get_dims<Base::DATA_RANK>(out_grads).template demote<>() == Base::dims);
+		assert((Dimensions<std::size_t,Base::DATA_RANK>(out_grads.dimensions()).template demote<>()) == Base::dims);
 		assert(out_grads.dimension(0) > 0 && in.dimension(0) == out_grads.dimension(0));
 		return in.unaryExpr([](Scalar i) { return (Scalar) (i >= 0); }) * out_grads;
 	}
@@ -889,14 +889,14 @@ protected:
 		in = typename Root::Data();
 	}
 	inline typename Root::Data pass_forward(typename Root::Data in, bool training) {
-		assert(Utils<Scalar>::template get_dims<Base::DATA_RANK>(in).template demote<>() == Base::dims);
+		assert((Dimensions<std::size_t,Base::DATA_RANK>(in.dimensions()).template demote<>()) == Base::dims);
 		assert(in.dimension(0) > 0);
 		if (training)
 			this->in = in;
 		return in.cwiseMax(in * alpha);
 	}
 	inline typename Root::Data pass_back(typename Root::Data out_grads) {
-		assert(Utils<Scalar>::template get_dims<Base::DATA_RANK>(out_grads).template demote<>() == Base::dims);
+		assert((Dimensions<std::size_t,Base::DATA_RANK>(out_grads.dimensions()).template demote<>()) == Base::dims);
 		assert(out_grads.dimension(0) > 0 && in.dimension(0) == out_grads.dimension(0));
 		return in.unaryExpr([this](Scalar i) { return (Scalar) (i >= 0 ? 1 : alpha); }) * out_grads;
 	}
@@ -936,7 +936,7 @@ protected:
 		out = Matrix<Scalar>(0, 0);
 	}
 	inline typename Root::Data pass_forward(typename Root::Data in, bool training) {
-		assert(Utils<Scalar>::template get_dims<Base::DATA_RANK>(in).template demote<>() == Base::dims);
+		assert((Dimensions<std::size_t,Base::DATA_RANK>(in.dimensions()).template demote<>()) == Base::dims);
 		assert(in.dimension(0) > 0);
 		if (training) {
 			this->in = MatrixMap<Scalar>(in.data(), in.dimension(0), Base::dims.get_volume());
@@ -949,7 +949,7 @@ protected:
 		return in.unaryExpr([this](Scalar i) { return (Scalar) (i > 0 ? i : (alpha * (exp(i) - 1))); });
 	}
 	inline typename Root::Data pass_back(typename Root::Data out_grads) {
-		assert(Utils<Scalar>::template get_dims<Base::DATA_RANK>(out_grads).template demote<>() == Base::dims);
+		assert((Dimensions<std::size_t,Base::DATA_RANK>(out_grads.dimensions()).template demote<>()) == Base::dims);
 		assert(out_grads.dimension(0) > 0 && conversion_dims[0] == out_grads.dimension(0));
 		MatrixMap<Scalar> out_grads_mat(out_grads.data(), conversion_dims[0], Base::dims.get_volume());
 		Matrix<Scalar> prev_out_grads(in.rows(), in.cols());
@@ -1005,7 +1005,7 @@ protected:
 		in = Matrix<Scalar>(0, 0);
 	}
 	inline typename Root::Data pass_forward(typename Root::Data in, bool training) {
-		assert(Utils<Scalar>::template get_dims<Base::DATA_RANK>(in).template demote<>() == Base::dims);
+		assert((Dimensions<std::size_t,Base::DATA_RANK>(in.dimensions()).template demote<>()) == Base::dims);
 		assert(in.dimension(0) > 0);
 		std::size_t rows = in.dimension(0);
 		this->in = MatrixMap<Scalar>(in.data(), rows, Base::dims.get_volume());
@@ -1014,7 +1014,7 @@ protected:
 		return TensorMap<Scalar,Root::DATA_RANK>(out.data(), conversion_dims);
 	}
 	inline typename Root::Data pass_back(typename Root::Data out_grads) {
-		assert(Utils<Scalar>::template get_dims<Base::DATA_RANK>(out_grads).template demote<>() == Base::dims);
+		assert((Dimensions<std::size_t,Base::DATA_RANK>(out_grads.dimensions()).template demote<>()) == Base::dims);
 		assert(out_grads.dimension(0) > 0 && conversion_dims[0] == out_grads.dimension(0));
 		Base::params_grad.row(0).setZero();
 		MatrixMap<Scalar> out_grads_map(out_grads.data(), conversion_dims[0], Base::dims.get_volume());
@@ -1120,7 +1120,7 @@ protected:
 	}
 	inline void enforce_constraints() { };
 	inline typename Base::Data pass_forward(typename Base::Data in, bool training) {
-		assert(Utils<Scalar>::template get_dims<4>(in).template demote<>() == input_dims);
+		assert((Dimensions<std::size_t,4>(in.dimensions()).template demote<>()) == input_dims);
 		assert(in.dimension(0) > 0);
 		std::size_t rows = in.dimension(0);
 		patch_extents[0] = rows;
@@ -1148,7 +1148,7 @@ protected:
 		return out;
 	}
 	inline typename Base::Data pass_back(typename Base::Data out_grads) {
-		assert(Utils<Scalar>::template get_dims<4>(out_grads).template demote<>() == output_dims);
+		assert((Dimensions<std::size_t,4>(out_grads.dimensions()).template demote<>()) == output_dims);
 		assert(out_grads.dimension(0) > 0 && patch_extents[0] == out_grads.dimension(0));
 		if (input_layer)
 			return typename Base::Data();
@@ -1543,13 +1543,13 @@ protected:
 		return new BatchNormLayer(*this, true);
 	}
 	inline typename Root::Data pass_forward(typename Root::Data in, bool training) {
-		assert(Utils<Scalar>::template get_dims<Root::DATA_RANK>(in).template demote<>() == Base::dims);
+		assert((Dimensions<std::size_t,Root::DATA_RANK>(in.dimensions()).template demote<>()) == Base::dims);
 		assert(in.dimension(0) > 0);
 		conversion_dims[0] = in.dimension();
 		return Base::_pass_forward(std::move(in), conversion_dims, training, 0);
 	}
 	inline typename Root::Data pass_back(typename Root::Data out_grads) {
-		assert(Utils<Scalar>::template get_dims<Root::DATA_RANK>(out_grads).template demote<>() == Base::dims);
+		assert((Dimensions<std::size_t,Root::DATA_RANK>(out_grads.dimensions()).template demote<>()) == Base::dims);
 		assert(out_grads.dimension(0) > 0 && conversion_dims[0] == out_grads.dimension(0));
 		return Base::_pass_back(std::move(out_grads), conversion_dims, 0);
 	}
@@ -1586,7 +1586,7 @@ protected:
 		return new BatchNormLayer(*this, true);
 	}
 	inline typename Base::Data pass_forward(typename Root::Data in, bool training) {
-		assert(Utils<Scalar>::template get_dims<4>(in).template demote<>() == Base::dims);
+		assert((Dimensions<std::size_t,4>(in.dimensions()).template demote<>()) == Base::dims);
 		assert(in.dimension(0) > 0);
 		std::size_t rows = in.dimension(0);
 		if (Base::depth == 1) {
@@ -1605,7 +1605,7 @@ protected:
 		}
 	}
 	inline typename Root::Data pass_back(typename Root::Data out_grads) {
-		assert(Utils<Scalar>::template get_dims<4>(out_grads).template demote<>() == Base::dims);
+		assert((Dimensions<std::size_t,4>(out_grads.dimensions()).template demote<>()) == Base::dims);
 		assert(out_grads.dimension(0) > 0 && extents[0] == out_grads.dimension(0));
 		std::size_t rows = out_grads.dimension(0);
 		if (Base::depth == 1) {
@@ -1686,7 +1686,7 @@ protected:
 	}
 	inline void enforce_constraints() { }
 	inline typename Base::Data pass_forward(typename Base::Data in, bool training) {
-		assert(Utils<Scalar>::template get_dims<Base::DATA_RANK>(in).template demote<>() == dims);
+		assert((Dimensions<std::size_t,Base::DATA_RANK>(in.dimensions()).template demote<>()) == dims);
 		assert(in.dimension(0) > 0);
 		if (training && dropout) {
 			typename Base::Data random_tensor(in.dimensions());
@@ -1700,7 +1700,7 @@ protected:
 		return in;
 	}
 	inline typename Base::Data pass_back(typename Base::Data out_grads) {
-		assert(Utils<Scalar>::template get_dims<Base::DATA_RANK>(out_grads).template demote<>() == dims);
+		assert((Dimensions<std::size_t,Base::DATA_RANK>(out_grads.dimensions()).template demote<>()) == dims);
 		assert(out_grads.dimension(0) > 0 && dropout_mask.rows() == out_grads.dimension(0));
 		if (input_layer)
 			return typename Base::Data();

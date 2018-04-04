@@ -377,12 +377,18 @@ public:
 	}
 	template<typename OtherDerived>
 	inline bool operator==(const Other<OtherDerived>& dims) const {
-		bool equal = true;
 		for (std::size_t i = 0; i < Rank; ++i) {
 			if ((*this)(i) != dims(i))
-				equal = false;
+				return false;
 		}
-		return equal;
+		return true;
+	}
+	inline bool operator==(const std::array<IndexType,Rank>& dims) const {
+		for (std::size_t i = 0; i < Rank; ++i) {
+			if ((*this)(i) != dims[i])
+				return false;
+		}
+		return true;
 	}
 	inline friend std::ostream& operator<<(std::ostream& os, const Self& dims) {
 		return os << dims.to_string();
