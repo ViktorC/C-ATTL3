@@ -1016,103 +1016,106 @@ protected:
  * sequential data by joining the 'samples' and 'time steps' ranks of the tensors and splitting them
  * again once the internal, non-sequential network is done processing them.
  */
-template<typename Scalar, std::size_t Rank>
-class SequentialNeuralNetwork : public NeuralNetwork<Scalar,Rank,true> {
-	typedef NeuralNetwork<Scalar,Rank,true> Base;
-	typedef SequentialNeuralNetwork<Scalar,Rank> Self;
-	typedef NeuralNetPtr<Scalar,Rank,false> Net;
-	typedef std::array<std::size_t,Base::DATA_RANK> RankwiseArray;
-public:
-	/**
-	 * @param network A unique pointer to a non-sequential neural network to wrap.
-	 * @param foremost Whether the network is to function as a foremost network.
-	 */
-	inline SequentialNeuralNetwork(Net network, bool foremost = true) :
-			net(std::move(network)),
-			foremost(foremost),
-			batch_size(-1) {
-		assert(net);
-		input_dims = net->get_input_dims();
-		output_dims = net->get_output_dims();
-		set_foremost(foremost);
-	}
-	inline SequentialNeuralNetwork(const Self& network) {
-		net = Net(network.net->clone());
-		foremost = network.foremost;
-		input_dims = network.input_dims;
-		output_dims = network.output_dims;
-		batch_size = network.batch_size;
-	}
-	inline SequentialNeuralNetwork(Self&& network) {
-		swap(*this, network);
-	}
-	~SequentialNeuralNetwork() = default;
-	inline Self& operator=(Self network) {
-		swap(*this, network);
-		return *this;
-	}
-	inline Base* clone() const {
-		return new SequentialNeuralNetwork(*this);
-	}
-	inline bool is_foremost() const {
-		return foremost;
-	}
-	inline const typename Base::Dims& get_input_dims() const {
-		return input_dims;
-	}
-	inline const typename Base::Dims& get_output_dims() const {
-		return output_dims;
-	}
-	inline friend void swap(Self& network1, Self& network2) {
-		using std::swap;
-		swap(network1.net, network2.net);
-		swap(network1.foremost, network2.foremost);
-		swap(network1.input_dims, network2.input_dims);
-		swap(network1.output_dims, network2.output_dims);
-		swap(network1.batch_size, network2.batch_size);
-	}
-protected:
-	inline void set_foremost(bool foremost) {
-		net->set_foremost(foremost);
-		this->foremost = foremost;
-	}
-	inline void empty_caches() {
-		net->empty_caches();
-	}
-	inline std::vector<Layer<Scalar,Rank>*> get_layers() {
-		return net->get_layers();
-	}
-	inline typename Base::Data propagate(typename Base::Data input, bool training) {
-		assert(input_dims == (Dimensions<std::size_t,Base::DATA_RANK>(input.dimensions()).template demote<2>()));
-		batch_size = input.dimension(0);
-		std::size_t seq_length = input.dimension(1);
-		typename Base::Data out = Utils<Scalar>::template split_first_rank<Base::DATA_RANK - 1>(
-				net->propagate(Utils<Scalar>::template join_first_two_ranks<Base::DATA_RANK>(std::move(input)),
-						training), batch_size, seq_length);
-		return out;
-	}
-	inline typename Base::Data backpropagate(typename Base::Data out_grads) {
-		assert(output_dims == (Dimensions<std::size_t,Base::DATA_RANK>(out_grads.dimensions()).template demote<2>()));
-		assert(batch_size == out_grads.dimension(0));
-		std::size_t seq_length = out_grads.dimension(1);
-		if (foremost) {
-			net->backpropagate(Utils<Scalar>::template join_first_two_ranks<Base::DATA_RANK>(
-					std::move(out_grads)));
-			return typename Base::Data();
-		} else {
-			std::size_t seq_length = out_grads.dimension(1);
-			return Utils<Scalar>::template split_first_rank<Base::DATA_RANK - 1>(net->backpropagate(
-					Utils<Scalar>::template join_first_two_ranks<Base::DATA_RANK>(std::move(out_grads))),
-					batch_size, seq_length);
-		}
-	}
-private:
-	Net net;
-	bool foremost;
-	typename Base::Dims input_dims;
-	typename Base::Dims output_dims;
-	std::size_t batch_size;
-};
+//template<typename Scalar, std::size_t Rank>
+//class SequentialNeuralNetwork : public NeuralNetwork<Scalar,Rank,true> {
+//	typedef NeuralNetwork<Scalar,Rank,true> Base;
+//	typedef SequentialNeuralNetwork<Scalar,Rank> Self;
+//	typedef NeuralNetPtr<Scalar,Rank,false> Net;
+//	typedef std::array<std::size_t,Base::DATA_RANK> RankwiseArray;
+//public:
+//	/**
+//	 * @param network A unique pointer to a non-sequential neural network to wrap.
+//	 * @param foremost Whether the network is to function as a foremost network.
+//	 */
+//	inline SequentialNeuralNetwork(Net network, bool foremost = true) :
+//			net(std::move(network)),
+//			foremost(foremost),
+//			batch_size(-1) {
+//		assert(net);
+//		input_dims = net->get_input_dims();
+//		output_dims = net->get_output_dims();
+//		set_foremost(foremost);
+//	}
+//	inline SequentialNeuralNetwork(const Self& network) {
+//		net = Net(network.net->clone());
+//		foremost = network.foremost;
+//		input_dims = network.input_dims;
+//		output_dims = network.output_dims;
+//		batch_size = network.batch_size;
+//	}
+//	inline SequentialNeuralNetwork(Self&& network) {
+//		swap(*this, network);
+//	}
+//	~SequentialNeuralNetwork() = default;
+//	inline Self& operator=(Self network) {
+//		swap(*this, network);
+//		return *this;
+//	}
+//	inline Base* clone() const {
+//		return new SequentialNeuralNetwork(*this);
+//	}
+//	inline bool is_foremost() const {
+//		return foremost;
+//	}
+//	inline const typename Base::Dims& get_input_dims() const {
+//		return input_dims;
+//	}
+//	inline const typename Base::Dims& get_output_dims() const {
+//		return output_dims;
+//	}
+//	inline friend void swap(Self& network1, Self& network2) {
+//		using std::swap;
+//		swap(network1.net, network2.net);
+//		swap(network1.foremost, network2.foremost);
+//		swap(network1.input_dims, network2.input_dims);
+//		swap(network1.output_dims, network2.output_dims);
+//		swap(network1.batch_size, network2.batch_size);
+//	}
+//protected:
+//	inline void set_foremost(bool foremost) {
+//		net->set_foremost(foremost);
+//		this->foremost = foremost;
+//	}
+//	inline void empty_caches() {
+//		net->empty_caches();
+//	}
+//	inline std::vector<Layer<Scalar,Rank>*> get_layers() {
+//		return net->get_layers();
+//	}
+//	inline typename Base::Data propagate(typename Base::Data input, bool training) {
+//		assert(input_dims == (Dimensions<std::size_t,Base::DATA_RANK>(input.dimensions()).template demote<2>()));
+//		batch_size = input.dimension(0);
+//		std::size_t seq_length = input.dimension(1);
+//		Dimensions<std::size_t,Base::DATA_RANK> dims = input.dimensions();
+//
+//		TensorMap<Scalar,Rank + 1> joint_input =
+//		typename Base::Data out = internal::Utils<Scalar>::template split_first_rank<Base::DATA_RANK - 1>(
+//				net->propagate(internal::Utils<Scalar>::template join_first_two_ranks<Base::DATA_RANK>(std::move(input)),
+//						training), batch_size, seq_length);
+//		return out;
+//	}
+//	inline typename Base::Data backpropagate(typename Base::Data out_grads) {
+//		assert(output_dims == (Dimensions<std::size_t,Base::DATA_RANK>(out_grads.dimensions()).template demote<2>()));
+//		assert(batch_size == out_grads.dimension(0));
+//		std::size_t seq_length = out_grads.dimension(1);
+//		if (foremost) {
+//			net->backpropagate(internal::Utils<Scalar>::template join_first_two_ranks<Base::DATA_RANK>(
+//					std::move(out_grads)));
+//			return typename Base::Data();
+//		} else {
+//			std::size_t seq_length = out_grads.dimension(1);
+//			return internal::Utils<Scalar>::template split_first_rank<Base::DATA_RANK - 1>(net->backpropagate(
+//					internal::Utils<Scalar>::template join_first_two_ranks<Base::DATA_RANK>(std::move(out_grads))),
+//					batch_size, seq_length);
+//		}
+//	}
+//private:
+//	Net net;
+//	bool foremost;
+//	typename Base::Dims input_dims;
+//	typename Base::Dims output_dims;
+//	std::size_t batch_size;
+//};
 
 /**
  * An abstract class template for unidirectional recurrent neural networks.
@@ -1353,7 +1356,7 @@ using ActivationPtr = std::unique_ptr<ActivationLayer<Scalar,Rank>>;
 template<typename Scalar, std::size_t Rank, bool MulInt = false, bool Stateful = false>
 class RecurrentNeuralNetwork : public UnidirectionalNeuralNetwork<Scalar,Rank> {
 	typedef NeuralNetwork<Scalar,Rank,true> Root;
-	typedef RecurrentNeuralNetwork<Scalar,Rank> Self;
+	typedef RecurrentNeuralNetwork<Scalar,Rank,MulInt,Stateful> Self;
 	typedef std::array<std::size_t,Root::DATA_RANK> RankwiseIntArray;
 	typedef std::array<bool,Root::DATA_RANK> RankwiseBoolArray;
 	typedef std::function<std::pair<std::size_t,std::size_t>(std::size_t)> OutputSeqSizeFunc;
@@ -1800,7 +1803,7 @@ private:
 template<typename Scalar, std::size_t Rank, bool MulInt = false, bool Stateful = false>
 class LSTMNeuralNetwork : public UnidirectionalNeuralNetwork<Scalar,Rank> {
 	typedef NeuralNetwork<Scalar,Rank,true> Root;
-	typedef LSTMNeuralNetwork<Scalar,Rank> Self;
+	typedef LSTMNeuralNetwork<Scalar,Rank,MulInt,Stateful> Self;
 	typedef std::array<std::size_t,Root::DATA_RANK> RankwiseIntArray;
 	typedef std::array<bool,Root::DATA_RANK> RankwiseBoolArray;
 	typedef std::function<std::pair<std::size_t,std::size_t>(std::size_t)> OutputSeqSizeFunc;

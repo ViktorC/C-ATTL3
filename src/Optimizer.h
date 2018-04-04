@@ -60,7 +60,8 @@ public:
 	virtual ~Optimizer() = default;
 	/**
 	 * It performs a gradient check to verify the correctness of the neural network and layer implementations.
-	 * Theoretically not differentiable layers such rectified linear units may fail.
+	 * It is recommended to use double precision floating points; however, non-differentiable layers such as
+	 * rectified linear units may still fail.
 	 *
 	 * @param net A reference to the network on which the gradient check is to be performed.
 	 * @param provider A reference to the data provider to use for the gradient check.
@@ -71,8 +72,8 @@ public:
 	 * the numerical and analytic gradients.
 	 * @return Whether the gradient check has been passed or failed.
 	 */
-	inline bool verify_gradients(Net& net, Provider& provider, Scalar step_size = 1e-5, Scalar abs_epsilon = Utils<Scalar>::EPSILON2,
-			Scalar rel_epsilon = Utils<Scalar>::EPSILON3) const {
+	inline bool verify_gradients(Net& net, Provider& provider, Scalar step_size = internal::Utils<Scalar>::EPSILON2,
+			Scalar abs_epsilon = internal::Utils<Scalar>::EPSILON2, Scalar rel_epsilon = internal::Utils<Scalar>::EPSILON3) const {
 		assert(net.get_input_dims() == provider.get_obs_dims());
 		assert(net.get_output_dims() == provider.get_obj_dims());
 		assert(step_size > 0);
@@ -108,7 +109,7 @@ public:
 						params(j,k) = param;
 						Scalar num_grad = (loss_inc - loss_dec) / (2 * step_size);
 						std::cout << "\t\tNumerical gradient = " << num_grad;
-						if (!Utils<Scalar>::almost_equal(ana_grad, num_grad, abs_epsilon, rel_epsilon)) {
+						if (!internal::Utils<Scalar>::almost_equal(ana_grad, num_grad, abs_epsilon, rel_epsilon)) {
 							std::cout << " *****FAIL*****";
 							failure = true;
 						}
@@ -142,7 +143,7 @@ public:
 		assert(epochs > 0);
 		// Fit the optimizer parameters to the network.
 		fit(net);
-		Scalar prev_test_loss = Utils<Scalar>::MAX;
+		Scalar prev_test_loss = internal::Utils<Scalar>::MAX;
 		unsigned cons_loss_inc = 0;
 		// Start the optimization iterations.
 		for (unsigned i = 0; i <= epochs; ++i) {
@@ -153,18 +154,18 @@ public:
 				std::cout << "\ttraining loss: " << std::to_string(train(net, training_prov, i)) << std::endl;
 			}
 			// Validate.
-//			test_prov.reset();
-//			Scalar test_loss = test(net, test_prov, i);
-//			std::cout << "\ttest loss: " << std::to_string(test_loss);
-//			if (test_loss >= prev_test_loss) {
-//				cons_loss_inc++;
-//				std::cout << " *****INCREASED LOSS*****";
-//				if (early_stop > 0 && cons_loss_inc >= early_stop)
-//					return prev_test_loss;
-//			} else
-//				cons_loss_inc = 0;
-//			std::cout << std::endl << std::endl;
-//			prev_test_loss = test_loss;
+			test_prov.reset();
+			Scalar test_loss = test(net, test_prov, i);
+			std::cout << "\ttest loss: " << std::to_string(test_loss);
+			if (test_loss >= prev_test_loss) {
+				cons_loss_inc++;
+				std::cout << " *****INCREASED LOSS*****";
+				if (early_stop > 0 && cons_loss_inc >= early_stop)
+					return prev_test_loss;
+			} else
+				cons_loss_inc = 0;
+			std::cout << std::endl << std::endl;
+			prev_test_loss = test_loss;
 		}
 		// Empty the network caches.
 		net.empty_caches();
@@ -532,7 +533,7 @@ public:
 	 * @param epsilon A small constant used to maintain numerical stability.
 	 */
 	inline AdagradOptimizer(LossSharedPtr<Scalar,Rank,Sequential> loss, RegPenSharedPtr<Scalar> reg, unsigned batch_size = 1,
-			Scalar learning_rate = 1e-2, Scalar epsilon = Utils<Scalar>::EPSILON2) :
+			Scalar learning_rate = 1e-2, Scalar epsilon = internal::Utils<Scalar>::EPSILON2) :
 				SGDOptimizer<Scalar,Rank,Sequential>::SGDOptimizer(loss, reg, batch_size),
 				learning_rate(learning_rate),
 				epsilon(epsilon) {
@@ -596,7 +597,7 @@ public:
 	 */
 	inline RMSPropOptimizer(LossSharedPtr<Scalar,Rank,Sequential> loss, RegPenSharedPtr<Scalar> reg,
 			unsigned batch_size = 1, Scalar learning_rate = 1e-3, Scalar l2_decay = 1e-1,
-			Scalar epsilon = Utils<Scalar>::EPSILON) :
+			Scalar epsilon = internal::Utils<Scalar>::EPSILON) :
 				AdagradOptimizer<Scalar,Rank,Sequential>::AdagradOptimizer(loss, reg, batch_size, learning_rate, epsilon),
 				l2_decay(l2_decay) {
 		assert(l2_decay >= 0 && l2_decay <= 1);
@@ -626,7 +627,7 @@ public:
 	 * @param epsilon A small constant used to maintain numerical stability.
 	 */
 	inline AdadeltaOptimizer(LossSharedPtr<Scalar,Rank,Sequential> loss, RegPenSharedPtr<Scalar> reg, unsigned batch_size = 1,
-			Scalar decay = 5e-2, Scalar epsilon = Utils<Scalar>::EPSILON2) :
+			Scalar decay = 5e-2, Scalar epsilon = internal::Utils<Scalar>::EPSILON2) :
 				SGDOptimizer<Scalar,Rank,Sequential>::SGDOptimizer(loss, reg, batch_size),
 				decay(decay),
 				epsilon(epsilon) {
@@ -693,7 +694,7 @@ public:
 	 */
 	inline AdamOptimizer(LossSharedPtr<Scalar,Rank,Sequential> loss, RegPenSharedPtr<Scalar> reg, unsigned batch_size = 1,
 			Scalar learning_rate = 1e-3, Scalar l1_decay = 1e-1, Scalar l2_decay = 1e-3,
-			Scalar epsilon = Utils<Scalar>::EPSILON2) :
+			Scalar epsilon = internal::Utils<Scalar>::EPSILON2) :
 				SGDOptimizer<Scalar,Rank,Sequential>::SGDOptimizer(loss, reg, batch_size),
 				learning_rate(learning_rate),
 				l1_decay(l1_decay),
@@ -771,7 +772,7 @@ public:
 	 */
 	inline AdaMaxOptimizer(LossSharedPtr<Scalar,Rank,Sequential> loss, RegPenSharedPtr<Scalar> reg, unsigned batch_size = 1,
 			Scalar learning_rate = 1e-3, Scalar l1_decay = 1e-1, Scalar l2_decay = 1e-3,
-			Scalar epsilon = Utils<Scalar>::EPSILON2) :
+			Scalar epsilon = internal::Utils<Scalar>::EPSILON2) :
 				Base::AdamOptimizer(loss, reg, batch_size, learning_rate,
 						l1_decay, l2_decay, epsilon) { }
 protected:
@@ -812,7 +813,7 @@ public:
 	 */
 	inline NadamOptimizer(LossSharedPtr<Scalar,Rank,Sequential> loss, RegPenSharedPtr<Scalar> reg, unsigned batch_size = 1,
 			Scalar learning_rate = 1e-3, Scalar l1_decay = 1e-1, Scalar l2_decay = 1e-3,
-			Scalar epsilon = Utils<Scalar>::EPSILON2) :
+			Scalar epsilon = internal::Utils<Scalar>::EPSILON2) :
 				Base::AdamOptimizer(loss, reg, batch_size, learning_rate, l1_decay, l2_decay, epsilon) { }
 protected:
 	inline void update_params(Layer<Scalar,Rank>& layer, unsigned i, unsigned epoch) {

@@ -57,6 +57,9 @@ using MatrixMap = Eigen::Map<Matrix<Scalar>>;
 template<typename Scalar, std::size_t Rank>
 using Tensor = Eigen::Tensor<Scalar,Rank,Eigen::ColMajor,std::size_t>;
 
+/**
+ * An alias for an arbitrary tensor expression.
+ */
 template<typename Derived>
 using TensorExp = Eigen::TensorBase<Derived>;
 
@@ -66,6 +69,8 @@ using TensorExp = Eigen::TensorBase<Derived>;
  */
 template<typename Scalar, std::size_t Rank>
 using TensorMap = Eigen::TensorMap<Tensor<Scalar,Rank>>;
+
+namespace internal {
 
 /**
  * A utility class template containing static methods and variables to help with
@@ -183,21 +188,6 @@ public:
 		return n1 < n2 || almost_equal(n1, n2, abs_epsilon, rel_epsilon);
 	}
 	/**
-	 * It maps a tensor to another tensor of arbitrary rank.
-	 *
-	 * @param tensor The tensor whose backing data is to be mapped onto another tensor.
-	 * @param dims The dimensionality of the new tensor. The volume should equal the
-	 * total size of the tensor to be mapped.
-	 * @return A tensor backed by the data of the original tensor.
-	 */
-	template<std::size_t Rank, std::size_t NewRank>
-	inline static Tensor<Scalar,NewRank> map_tensor_to_tensor(Tensor<Scalar,Rank> tensor,
-			const Dimensions<std::size_t,NewRank>& dims) {
-		static_assert(Rank > 0 && NewRank > 0, "illegal tensor rank");
-		assert(tensor.size() == dims.get_volume());
-		return TensorMap<Scalar,NewRank>(tensor.data(), dims);
-	}
-	/**
 	 * It removes the first rank of the tensor and extends the new first rank by a factor
 	 * equal to the dimensionality of the removed rank.
 	 *
@@ -242,15 +232,16 @@ public:
 	inline static void shuffle_tensor_rows(Tensor<Scalar,Rank>& tensor) {
 		static_assert(Rank > 1, "illegal tensor rank");
 		std::size_t rows = tensor.dimension(0);
-		Matrix<Scalar> mat = MatrixMap<Scalar>(tensor.data(), rows, tensor.size());
+		MatrixMap<Scalar> mat(tensor.data(), rows, tensor.size() / rows);
 		Eigen::PermutationMatrix<Eigen::Dynamic,Eigen::Dynamic> perm(mat.rows());
 		perm.setIdentity();
 		// Shuffle the indices of the identity matrix.
 		std::random_shuffle(perm.indices().data(), perm.indices().data() + perm.indices().size());
 		mat = perm * mat;
-		tensor = TensorMap<Scalar,Rank>(mat.data(), tensor.dimensions());
 	}
 };
+
+}
 
 }
 

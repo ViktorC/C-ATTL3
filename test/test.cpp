@@ -32,6 +32,9 @@ typedef double fp;
 //	TensorPtr<fp,RANK + 1> test_obj_ptr(new Tensor<fp,RANK + 1>(5u, 10u, 1u, 1u));
 //	test_obs_ptr->setRandom();
 //	test_obj_ptr->setRandom();
+//	PCAPreprocessor<fp,RANK,true,true> preproc;
+//	preproc.fit(*test_obs_ptr);
+//	preproc.transform(*test_obs_ptr);
 //	MemoryDataProvider<fp,RANK,false> test_prov(std::move(test_obs_ptr), std::move(test_obj_ptr));
 //	WeightInitSharedPtr<fp> init(new HeWeightInitialization<fp>());
 //	std::vector<NeuralNetPtr<fp,RANK,false>> lanes(2);
@@ -167,8 +170,8 @@ typedef double fp;
 //	KernelPtr<fp,RANK> output_kernel(new FCLayer<fp,RANK>(input_kernel->get_output_dims(), 2, init));
 //	ActivationPtr<fp,RANK> state_act(new SigmoidActivationLayer<fp,RANK>(input_kernel->get_output_dims()));
 //	ActivationPtr<fp,RANK> output_act(new IdentityActivationLayer<fp,RANK>(output_kernel->get_output_dims()));
-//	RecurrentNeuralNetwork<fp,RANK> rnn(std::move(input_kernel), std::move(state_kernel), std::move(output_kernel), std::move(state_act),
-//			std::move(output_act), [](int input_seq_length) { return std::make_pair(3, input_seq_length - 3); }, false, true);
+//	RecurrentNeuralNetwork<fp,RANK,true> rnn(std::move(input_kernel), std::move(state_kernel), std::move(output_kernel), std::move(state_act),
+//			std::move(output_act), [](int input_seq_length) { return std::make_pair(3, input_seq_length - 3); });
 //	rnn.init();
 //	LossSharedPtr<fp,RANK,true> loss(new QuadraticLoss<fp,RANK,true>());
 //	RegPenSharedPtr<fp> reg(new ElasticNetRegularizationPenalty<fp>());
@@ -199,10 +202,10 @@ typedef double fp;
 //	ActivationPtr<fp,RANK> candidate_act(new TanhActivationLayer<fp,RANK>(output_dims));
 //	ActivationPtr<fp,RANK> state_act(new TanhActivationLayer<fp,RANK>(output_dims));
 //	ActivationPtr<fp,RANK> read_act(new SigmoidActivationLayer<fp,RANK>(output_dims));
-//	LSTMNeuralNetwork<fp,RANK> lstm(std::move(forget_input_kernel), std::move(forget_output_kernel), std::move(write_input_kernel),
+//	LSTMNeuralNetwork<fp,RANK,true> lstm(std::move(forget_input_kernel), std::move(forget_output_kernel), std::move(write_input_kernel),
 //			std::move(write_output_kernel), std::move(candidate_input_kernel), std::move(candidate_output_kernel), std::move(read_input_kernel),
 //			std::move(read_output_kernel), std::move(forget_act), std::move(write_act), std::move(candidate_act), std::move(state_act),
-//			std::move(read_act), [](int input_seq_length) { return std::make_pair(3, input_seq_length - 3); }, false, true);
+//			std::move(read_act), [](int input_seq_length) { return std::make_pair(3, input_seq_length - 3); });
 //	lstm.init();
 //	LossSharedPtr<fp,RANK,true> loss(new QuadraticLoss<fp,RANK,true>());
 //	RegPenSharedPtr<fp> reg(new ElasticNetRegularizationPenalty<fp>());
@@ -225,7 +228,7 @@ typedef double fp;
 //	ActivationPtr<fp,RANK> output_act(new IdentityActivationLayer<fp,RANK>(output_kernel->get_output_dims()));
 //	BidirectionalNeuralNetwork<fp,RANK,CONCAT_LO_RANK> bdrnn(UnidirNeuralNetPtr<fp,RANK>(new RecurrentNeuralNetwork<fp,RANK>(
 //			std::move(input_kernel), std::move(state_kernel), std::move(output_kernel), std::move(state_act), std::move(output_act),
-//			[](int input_seq_length) { return std::make_pair(3, 2); }, false, true)));
+//			[](int input_seq_length) { return std::make_pair(3, 2); })));
 //	bdrnn.init();
 //	LossSharedPtr<fp,RANK,true> loss(new QuadraticLoss<fp,RANK,true>());
 //	RegPenSharedPtr<fp> reg(new ElasticNetRegularizationPenalty<fp>());

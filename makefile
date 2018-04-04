@@ -2,7 +2,7 @@ MAKE := make -f makefile
 CC := g++
 ARCH := -m64
 CFLAGS := -std=c++11 -fopenmp -fmessage-length=0 -ftemplate-backtrace-limit=0 -Wno-ignored-attributes #-march=native
-DEF_OPT_FLAGS := -O3 #-DNDEBUG #-g # without the debug flag, the tensor module is unstable if vectorization is enabled
+DEF_OPT_FLAGS := -O3 -DNDEBUG
 DEBUG_OPT_FLAGS := -O1 -Wa,-mbig-obj -g
 SOURCE_DIR := test
 SOURCES := test.cpp

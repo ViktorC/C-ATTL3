@@ -1,5 +1,5 @@
 # C-ATTL3 [![Build Status](https://travis-ci.org/ViktorC/C-ATTL3.svg?branch=master)](https://travis-ci.org/ViktorC/C-ATTL3)
-A header-only neural network template library written in C++. C-ATTL3 relies heavily on [Eigen](http://eigen.tuxfamily.org), the popular linear algebra library. It allows for the easy construction and training of both feed-forward and recurrent neural networks ranging from simple MLPs and RNNs to state-of-the-art InceptionNets, ResNets, DenseNets, convolutional LSTMs, and other complex architectures. C-ATTL3 supports data samples of different ranks and different floating point scalar types such as `float`, `double`, and `long double`. The Doxygen documentation of the library can be found [here](https://viktorc.github.io/C-ATTL3/html/).
+A header-only neural network template library written in C++. C-ATTL3 relies heavily on [Eigen](http://eigen.tuxfamily.org), the popular linear algebra library. It allows for the easy construction and training of both feed-forward and recurrent neural networks ranging from simple MLPs and RNNs to state-of-the-art InceptionNets, ResNets, DenseNets, convolutional LSTMs, and other complex architectures. C-ATTL3 supports data samples of different ranks and different floating point scalar types such as the single precision `float` and the double precision `double`. The Doxygen documentation of the library can be found [here](https://viktorc.github.io/C-ATTL3/html/).
 
 ## Components
 The following sub-sections describe the main components of the C-ATTL3 deep learning library. Knowledge of these components and their relations is required for the effective usage of the library.
@@ -103,9 +103,9 @@ Data providers are responsible for supplying the data used for gradient verifica
   * [JointFileDataProvider](https://viktorc.github.io/C-ATTL3/html/classcattle_1_1_joint_file_data_provider.html) [A]
     * [CIFARDataProvider](https://viktorc.github.io/C-ATTL3/html/classcattle_1_1_c_i_f_a_r_data_provider.html) (3,NS)
   * [SplitFileDataProvider](https://viktorc.github.io/C-ATTL3/html/classcattle_1_1_split_file_data_provider.html) [A]
-    * [MNISTDataProvider](https://viktorc.github.io/C-ATTL3/html/classcattle_1_1_m_n_i_s_t_data_provider.html) (2,NS)
+    * [MNISTDataProvider](https://viktorc.github.io/C-ATTL3/html/classcattle_1_1_m_n_i_s_t_data_provider.html) (3,NS)
 
-The partition data provider maps to a continuous segment of the data backing another data provider. This allows for the partitioning of a single provider into training and test data providers. The memory data provider is backed by two in-memory tensors containing the observations and the objectives. The joint file data provider supports the processing of data sets stored in an arbitrary number of files that each contain both the observations and their respective objectives. On the other hand, the split file data provider is backed by an arbitrary number of file pairs for when the observations and the objectives are stored in separate files. C-ATTL3 includes a specialized data provider for the popular MNIST data set for the easy comparison of the performance of different network architectures to published results. The library also ships a specialized data provider for the CIFAR data set which supports both CIFAR-10 and CIFAR-100.
+The partition data provider maps to a continuous segment of the data backing another data provider. This allows for the partitioning of a single provider into training and test data providers. The memory data provider is backed by two in-memory tensors containing the observations and the objectives. The library also provides file-based data providers that allow for the training of networks without the need to load entire data sets into memory. The joint file data provider supports the processing of data sets stored in an arbitrary number of files that each contain both the observations and their respective objectives. On the other hand, the split file data provider is backed by an arbitrary number of file pairs for when the observations and the objectives are stored in separate files. C-ATTL3 includes a specialized data provider for the popular MNIST data set for the easy comparison of the performance of different network architectures to published results. The library also ships a specialized data provider for the CIFAR data set which supports both CIFAR-10 and CIFAR-100.
 
 ### Preprocessor
 C-ATTL3 also contains two preporcessors that can be used to transform the input data. They are:
@@ -117,34 +117,38 @@ C-ATTL3 also contains two preporcessors that can be used to transform the input 
 The following code snippets demonstrate the usage of the library via a simple example.
 ```cpp
 using namespace cattle;
-TensorPtr<float,4> training_obs_ptr(new Tensor<float,4>(80u, 32u, 32u, 3u));
-TensorPtr<float,4> training_obj_ptr(new Tensor<float,4>(80u, 1u, 1u, 1u));
+TensorPtr<double,4> training_obs_ptr(new Tensor<double,4>(80u, 32u, 32u, 3u));
+TensorPtr<double,4> training_obj_ptr(new Tensor<double,4>(80u, 1u, 1u, 1u));
 training_obs_ptr->setRandom();
 training_obj_ptr->setRandom();
+PCAPreprocessor<double,3> preproc;
+preproc.fit(*training_obs_ptr);
+preproc.transform(*training_obs_ptr);
 MemoryDataProvider<float,3,false> training_prov(std::move(training_obs_ptr), std::move(training_obj_ptr));
 ```
-To demonstrate the usage of the library's in-memory data provider, some random training data is generated. The training data is comprised of two tensors of rank 4 and type `float`; one for the observations and one for the objectives. The function to be approximated by the neural network is the mapping function between the observations and the objectives. The first rank of these tensors always denotes the samples and its value must be the same in the two tensors. In the example above, the training data consists of 80 observation-objective pairs. In case of sequential data, the second rank of the tensors denotes the time steps which can differ between the observations and the objectives (if the output sequence length of the network does not match the input sequence length); however, in this example, the tensors represent non-sequential data (see the third template argument of the data providers or the optimizer; or the fact that the network to be trained is an inherently non-sequential feed-forward neural network), thus the last 3 ranks describe the individual observation and objective instances. The nominal rank of the data here is thus 3; representing height, width, and depth. The observations are images with a resolution of 32x32 and 3 color channels, while the objectives are single scalars. The data is generated by filling the two tensors with random values between 0 and 1. Finally, the training data provider is created out of the two tensors by moving the two unique pointers referencing them to the `InMemoryDataProvider` constructor.
+To demonstrate the usage of the library's in-memory data provider, some random training data is generated. The training data is comprised of two tensors of rank 4 and type `double`; one for the observations and one for the objectives. The function to be approximated by the neural network is the mapping function between the observations and the objectives. The first rank of these tensors always denotes the samples and its value must be the same in the two tensors. In the example above, the training data consists of 80 observation-objective pairs. In case of sequential data, the second rank of the tensors denotes the time steps which can differ between the observations and the objectives (if the output sequence length of the network does not match the input sequence length); however, in this example, the tensors represent non-sequential data (see the third template argument of the data providers or the optimizer; or the fact that the network to be trained is an inherently non-sequential feed-forward neural network), thus the last 3 ranks describe the individual observation and objective instances. The nominal rank of the data here is thus 3; representing height, width, and depth. The observations are images with a resolution of 32x32 and 3 color channels, while the objectives are single scalars. The data is generated by filling the two tensors with random values between 0 and 1. A PCA preprocessor is then created and fit to the training observation set. After it is fit to the data, it is used to project it into the feature space where its variance along its features is the highest. Finally, the training data provider is created out of the two tensors by moving the two unique pointers referencing them to the `InMemoryDataProvider` constructor.
 ```cpp
-TensorPtr<float,4> test_obs_ptr(new Tensor<float,4>(20u, 32u, 32u, 3u));
-TensorPtr<float,4> test_obj_ptr(new Tensor<float,4>(20u, 1u, 1u, 1u));
+TensorPtr<double,4> test_obs_ptr(new Tensor<double,4>(20u, 32u, 32u, 3u));
+TensorPtr<double,4> test_obj_ptr(new Tensor<double,4>(20u, 1u, 1u, 1u));
 test_obs_ptr->setRandom();
 test_obj_ptr->setRandom();
-MemoryDataProvider<float,3,false> test_prov(std::move(test_obs_ptr), std::move(test_obj_ptr));
+preproc.transform(*test_obs_ptr);
+MemoryDataProvider<double,3,false> test_prov(std::move(test_obs_ptr), std::move(test_obj_ptr));
 ```
-The test data provider is created the same way. This test data is used to assess the accuracy of the neural network on data it has not encountered during the training process. This provides a measure of the network's generalization ability; the difference between the network's accuracy on the training data and that on the test data is a metric of overfitting. The test data is usually a smaller portion of all the available data than the training data. In our example, it is 20 samples as opposed to the 80 comprising the training data. Note that all the other ranks of the test observation and objective tensors must match those of the training observation and objective tensors.
+The test data provider is created similarly. However, it is important not to re-fit the preprocessor to the observation data set to ensure that the same transformation is applied to both the training and the test data. This test data is used to assess the accuracy of the neural network on data it has not encountered during the training process. This provides a measure of the network's generalization ability; the difference between the network's accuracy on the training data and that on the test data is a metric of overfitting. The test data is usually a smaller portion of all the available data than the training data. In our example, it is 20 samples as opposed to the 80 comprising the training data. Note that all the other ranks of the test observation and objective tensors must match those of the training observation and objective tensors.
 ```cpp
-WeightInitSharedPtr<float> init(new HeWeightInitialization<float>());
-std::vector<LayerPtr<float,3>> layers(9);
-layers[0] = LayerPtr<float,3>(new ConvLayer<float>(training_prov.get_obs_dims(), 10, init, 5, 2));
-layers[1] = LayerPtr<float,3>(new ReLUActivationLayer<float,3>(layers[0]->get_output_dims()));
-layers[2] = LayerPtr<float,3>(new MaxPoolingLayer<float>(layers[1]->get_output_dims()));
-layers[3] = LayerPtr<float,3>(new ConvLayer<float>(layers[2]->get_output_dims(), 20, init));
-layers[4] = LayerPtr<float,3>(new ReLUActivationLayer<float,3>(layers[3]->get_output_dims()));
-layers[5] = LayerPtr<float,3>(new MaxPoolingLayer<float>(layers[4]->get_output_dims()));
-layers[6] = LayerPtr<float,3>(new FCLayer<float,3>(layers[5]->get_output_dims(), 500, init));
-layers[7] = LayerPtr<float,3>(new ReLUActivationLayer<float,3>(layers[6]->get_output_dims()));
-layers[8] = LayerPtr<float,3>(new FCLayer<float,3>(layers[7]->get_output_dims(), 1, init));
-FeedforwardNeuralNetwork<float,3> nn(std::move(layers));
+WeightInitSharedPtr<double> init(new HeWeightInitialization<double>());
+std::vector<LayerPtr<double,3>> layers(9);
+layers[0] = LayerPtr<double,3>(new ConvLayer<double>(training_prov.get_obs_dims(), 10, init, 5, 2));
+layers[1] = LayerPtr<double,3>(new ReLUActivationLayer<double,3>(layers[0]->get_output_dims()));
+layers[2] = LayerPtr<double,3>(new MaxPoolingLayer<double>(layers[1]->get_output_dims()));
+layers[3] = LayerPtr<double,3>(new ConvLayer<double>(layers[2]->get_output_dims(), 20, init));
+layers[4] = LayerPtr<double,3>(new ReLUActivationLayer<double,3>(layers[3]->get_output_dims()));
+layers[5] = LayerPtr<double,3>(new MaxPoolingLayer<double>(layers[4]->get_output_dims()));
+layers[6] = LayerPtr<double,3>(new FCLayer<double,3>(layers[5]->get_output_dims(), 500, init));
+layers[7] = LayerPtr<double,3>(new ReLUActivationLayer<double,3>(layers[6]->get_output_dims()));
+layers[8] = LayerPtr<double,3>(new FCLayer<double,3>(layers[7]->get_output_dims(), 1, init));
+FeedforwardNeuralNetwork<double,3> nn(std::move(layers));
 ```
 The next step is the construction of the neural network. The above snippet demonstrates that of a simple convolutional neural network. The neural network implementation used is `FeedforwardNeuralNetwork` which takes a vector of unique layer pointers. Each layer in the vector must have the same input dimensions as the output dimensions of the preceding layer. Notice how the dimensions of the outputs of the layers do not need to be calculated manually; they can be simply retrieved using the `get_output_dims` members of the previous layers. It should also be noted that all neural networks require their layers to be of the same nominal rank and scalar type as the network itself. The example network consists of convolutional, max pooling, rectified linear unit, and fully connected layers. Convolutional and fully connected layers require weight initialization; due to its well-known compatibility with ReLU activations, He weight initialization is a good choice in our situation. As the `WeightInitialization` class specifies a stateless interface, multiple layers can use the same implementation instance (this is the reason they take a shared pointer). Similarly to the unique tensor pointer arguments of the data providers, the vector of unique layer pointers required by the network's constructor must be moved as well, as unique smart pointers cannot be copied.
 ```cpp
@@ -152,9 +156,9 @@ nn.init();
 ```
 Once the network is constructed, it is appropriate to initialize it. An unitialized network is in an undefined state. The initialization of the network entails the initialization of all its layers' parameters. Care must be taken not to unintentionally overwrite learned parameters by re-initializing the network.
 ```cpp
-LossSharedPtr<float,3,false> loss(new QuadraticLoss<float,3,false>());
-RegPenSharedPtr<float> reg(new ElasticNetRegularizationPenalty<float>());
-NadamOptimizer<float,3,false> opt(loss, reg, 20);
+LossSharedPtr<double,3,false> loss(new QuadraticLoss<double,3,false>());
+RegPenSharedPtr<double> reg(new ElasticNetRegularizationPenalty<double>());
+NadamOptimizer<double,3,false> opt(loss, reg, 20);
 ```
 Having set up the data providers and the network, it is time to specify the loss function, the regularization penalty, and the optimizer. For the sake of simplicity (concerning the data generation), the quadratic loss function is used in our example. Like `WeightInitialization`, both `Loss` and `RegularizationPenalty` define stateless interfaces; this is why they are wrapped in shared pointers and why single instances can be used by multiple optimizers. The optimizer used in our example is the `NadamOptimizer` which is generally a good first choice. Note the consistency of the template arguments; the data providers, the preprocessor, the neural network, the loss function, and the optimizer must all have the same scalar type, rank, and sequentiality (and the regularization penalty must have the same scalar type as well). As specified by the third argument of the optimizer's constructor, the batch size used for training and testing is 20. This means that both the training and the test data instances are processed in batches of 20. After the processing of each training batch, the parameters of the network's layers are updated. In our case, an epoch thus involves 4 parameter updates. It should be noted that most optimizers have several hyper-parameters that usually have reasonable default values and thus do not necessarily need to be specified.
 ```cpp
@@ -162,11 +166,12 @@ opt.optimize(nn, training_prov, test_prov, 500);
 ```	
 With everything set up and ready, the optimization can commence. The four non-optional paramaters of the `optimize` method are the neural network whose paramaters are to be optimized, the training data provider, the test data provider, and the number of epochs for which the optimization should go on. For our optimizer, these 500 epochs mean 2000 parameter updates alltogether. The `optimize` method is moderately verbose; for every epoch, it prints the training and test losses to the standard out stream. It also prints a warning message in case the test loss is greater than at the previous epoch.
 ```cpp
-Tensor<float,4> input(5u, 32u, 32u, 3u);
+Tensor<double,4> input(5u, 32u, 32u, 3u);
 input.setRandom();
-Tensor<float,4> prediction = nn.infer(input);
+preproc.transform(input);
+Tensor<double,4> prediction = nn.infer(input);
 ```	
-The final code snippet demonstrates the usage of the trained neural network for inference. A random input tensor of the correct nominal input dimensions is generated and fed to the `infer` method which has the neural network propagate the tensor through its layers and output its prediction. As seen above, inference is not restricted to single instances but can be performed on batches of data as well.
+The final code snippet demonstrates the usage of the trained neural network for inference. A random input tensor of the correct nominal input dimensions is generated, transformed using the PCA preprocessor, and fed to the `infer` method which has the neural network propagate the tensor through its layers and output its prediction. As seen above, inference is not restricted to single instances but can be performed on batches of data as well.
 
 More examples of neural network constructs can be found [here](https://github.com/ViktorC/C-ATTL3/blob/master/test/test.cpp).
 

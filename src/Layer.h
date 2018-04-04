@@ -179,7 +179,7 @@ protected:
 				output_dims(output_dims),
 				weight_init(weight_init),
 				max_norm_constraint(max_norm_constraint),
-				max_norm(Utils<Scalar>::decidedly_greater(max_norm_constraint, .0)),
+				max_norm(internal::Utils<Scalar>::decidedly_greater(max_norm_constraint, .0)),
 				input_layer(false),
 				weights(weight_rows, weight_cols),
 				weights_grad(weight_rows, weight_cols),
@@ -767,7 +767,7 @@ public:
 	 * @param dims The dimensionality of the input tensor.
 	 * @param epsilon A small constant to maintain numerical stability.
 	 */
-	inline SoftmaxActivationLayer(const Dimensions<std::size_t,Rank>& dims, Scalar epsilon = Utils<Scalar>::EPSILON2) :
+	inline SoftmaxActivationLayer(const Dimensions<std::size_t,Rank>& dims, Scalar epsilon = internal::Utils<Scalar>::EPSILON2) :
 			ActivationLayer<Scalar,Rank>::ActivationLayer(dims),
 			epsilon(epsilon),
 			conversion_dims(dims.template promote<>()) { }
@@ -1328,7 +1328,7 @@ protected:
 		typename Root::Data reduced_patch(rows, 1u, 1u, depth);
 		for (std::size_t i = 0; i < rows; ++i) {
 			for (std::size_t j = 0; j < depth; ++j) {
-				Scalar max = Utils<Scalar>::MIN;
+				Scalar max = internal::Utils<Scalar>::MIN;
 				unsigned max_height = 0;
 				unsigned max_width = 0;
 				for (std::size_t k = 0; k < Base::receptor_height; ++k) {
@@ -1458,6 +1458,7 @@ protected:
 			Cache& cache = cache_vec[i];
 			RowVector<Scalar> means = in_mat.colwise().mean();
 			Matrix<Scalar> norm_in = in_mat.rowwise() - means;
+			// FIXME If the squared mean is close to 0, the gradients are inaccurate. If epsilon is small, they explode, too.
 			cache.inv_in_sd = (norm_in.array().square().colwise().mean() + epsilon).sqrt().inverse();
 			cache.std_in = norm_in * cache.inv_in_sd.asDiagonal();
 			in_mat = cache.std_in;
@@ -1530,9 +1531,10 @@ public:
 	 * @param norm_avg_decay The decay rate of the maintained means and variances.
 	 * @param epsilon A small constant used to maintain numerical stability.
 	 */
-	inline BatchNormLayer(const Dimensions<std::size_t,Rank>& dims, Scalar norm_avg_decay = .1, Scalar epsilon = Utils<Scalar>::EPSILON3) :
-			Base::BatchNormLayerBase(dims, 1, norm_avg_decay, epsilon),
-			conversion_dims(Base::dims.template promote<>()) { }
+	inline BatchNormLayer(const Dimensions<std::size_t,Rank>& dims, Scalar norm_avg_decay = .1,
+			Scalar epsilon = internal::Utils<Scalar>::EPSILON3) :
+				Base::BatchNormLayerBase(dims, 1, norm_avg_decay, epsilon),
+				conversion_dims(Base::dims.template promote<>()) { }
 	inline Root* clone() const {
 		return new BatchNormLayer(*this);
 	}
@@ -1570,10 +1572,11 @@ public:
 	 * @param norm_avg_decay The decay rate of the maintained means and variances.
 	 * @param epsilon A small constant used to maintain numerical stability.
 	 */
-	inline BatchNormLayer(Dimensions<std::size_t,3> dims, Scalar norm_avg_decay = .1, Scalar epsilon = Utils<Scalar>::EPSILON3) :
-			Base::BatchNormLayerBase(dims, dims(2), norm_avg_decay, epsilon),
-			offsets({ 0u, 0u, 0u, 0u }),
-			extents({ 0u, dims(0), dims(1), 1u }) { }
+	inline BatchNormLayer(Dimensions<std::size_t,3> dims, Scalar norm_avg_decay = .1,
+			Scalar epsilon = internal::Utils<Scalar>::EPSILON3) :
+				Base::BatchNormLayerBase(dims, dims(2), norm_avg_decay, epsilon),
+				offsets({ 0u, 0u, 0u, 0u }),
+				extents({ 0u, dims(0), dims(1), 1u }) { }
 	inline Root* clone() const {
 		return new BatchNormLayer(*this);
 	}
@@ -1644,14 +1647,15 @@ public:
 	 * @param dropout_prob The probability of an element of the input tensor being set to 0.
 	 * @param epsilon A small constant used to maintain numerical stability.
 	 */
-	inline DropoutLayer(const Dimensions<std::size_t,Rank>& dims, Scalar dropout_prob, Scalar epsilon = Utils<Scalar>::EPSILON3) :
-			dims(dims),
-			dropout_prob(dropout_prob),
-			epsilon(epsilon),
-			dropout(Utils<Scalar>::decidedly_greater(dropout_prob, .0)),
-			input_layer(false),
-			params(0, 0),
-			params_grad(0, 0) {
+	inline DropoutLayer(const Dimensions<std::size_t,Rank>& dims, Scalar dropout_prob,
+			Scalar epsilon = internal::Utils<Scalar>::EPSILON3) :
+				dims(dims),
+				dropout_prob(dropout_prob),
+				epsilon(epsilon),
+				dropout(internal::Utils<Scalar>::decidedly_greater(dropout_prob, .0)),
+				input_layer(false),
+				params(0, 0),
+				params_grad(0, 0) {
 		assert(dropout_prob <= 1 && "dropout prob must not be greater than 1");
 		assert(epsilon > 0 && "epsilon must be greater than 0");
 	}

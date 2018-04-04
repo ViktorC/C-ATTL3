@@ -150,7 +150,7 @@ private:
  * A data provider that reads from the memory. It requires the entire observation and
  * objective data sets to be loaded into memory, but it fetches pairs faster.
  */
-template<typename Scalar, std::size_t Rank, bool Sequential>
+template<typename Scalar, std::size_t Rank, bool Sequential, bool Shuffle = true>
 class MemoryDataProvider : public DataProvider<Scalar,Rank,Sequential> {
 	typedef DataProvider<Scalar,Rank,Sequential> Base;
 public:
@@ -162,11 +162,10 @@ public:
 	 * @param shuffle Whether the 'rows' (first ranks) of the tensors should be randomly
 	 * shuffled.
 	 */
-	inline MemoryDataProvider(typename Base::DataPtr obs, typename Base::DataPtr obj,
-			bool shuffle = true) :
-				obs(std::move(obs)),
-				obj(std::move(obj)),
-				offsets() {
+	inline MemoryDataProvider(typename Base::DataPtr obs, typename Base::DataPtr obj) :
+			obs(std::move(obs)),
+			obj(std::move(obj)),
+			offsets() {
 		assert(this->obs != nullptr);
 		assert(this->obj != nullptr);
 		assert(this->obs->dimension(0) == this->obj->dimension(0) &&
@@ -179,10 +178,10 @@ public:
 		offsets.fill(0);
 		data_extents = obs_dims;
 		obj_extents = obj_dims;
-//		if (shuffle) {
-//			Utils<Scalar>::template shuffle_tensor_rows<Base::DATA_RANK>(*this->obs);
-//			Utils<Scalar>::template shuffle_tensor_rows<Base::DATA_RANK>(*this->obj);
-//		}
+		if (Shuffle) {
+			internal::Utils<Scalar>::template shuffle_tensor_rows<Base::DATA_RANK>(*this->obs);
+			internal::Utils<Scalar>::template shuffle_tensor_rows<Base::DATA_RANK>(*this->obj);
+		}
 	}
 	inline const Dimensions<std::size_t,Rank>& get_obs_dims() const {
 		return obs_dims;
@@ -228,7 +227,7 @@ private:
  * for specifying the dimensions of both the observations and the objectives, for reading batches of
  * observation-objective pairs from the file, and for skipping arbitrary number of data instances.
  */
-template<typename Scalar, std::size_t Rank, bool Sequential>
+template<typename Scalar, std::size_t Rank, bool Sequential, bool Binary = false>
 class JointFileDataProvider : public DataProvider<Scalar,Rank,Sequential> {
 	typedef DataProvider<Scalar,Rank,Sequential> Base;
 public:
@@ -272,18 +271,18 @@ public:
 		current_stream = 0;
 	}
 protected:
-	inline JointFileDataProvider(std::vector<std::string> dataset_paths, bool binary) :
+	inline JointFileDataProvider(std::vector<std::string> dataset_paths) :
 			data_streams(dataset_paths.size()),
 			current_stream(0) {
 		assert(!dataset_paths.empty());
 		for (std::size_t i = 0; i < dataset_paths.size(); ++i) {
-			data_streams[i] = std::ifstream(dataset_paths[i], binary ? std::ios::binary : std::ios::in);
+			data_streams[i] = std::ifstream(dataset_paths[i], Binary ? std::ios::binary : std::ios::in);
 			std::ifstream& data_stream = data_streams[i];
 			assert(data_stream.is_open());
 		}
 	}
-	inline JointFileDataProvider(std::string dataset_path, bool binary) :
-			JointFileDataProvider({ dataset_path }, binary) { }
+	inline JointFileDataProvider(std::string dataset_path) :
+			JointFileDataProvider({ dataset_path }) { }
 	/**
 	 * It sets the position of the file stream to the beginning of the data set.
 	 *
@@ -331,7 +330,7 @@ private:
  * specifying the dimensions of both the observations and the objectives, for reading batches of
  * observation-objective pairs from the file, and for skipping arbitrary number of data instances.
  */
-template<typename Scalar, std::size_t Rank, bool Sequential>
+template<typename Scalar, std::size_t Rank, bool Sequential, bool ObsBinary = false, bool ObjBinary = false>
 class SplitFileDataProvider : public DataProvider<Scalar,Rank,Sequential> {
 	typedef DataProvider<Scalar,Rank,Sequential> Base;
 public:
@@ -376,24 +375,21 @@ public:
 		current_stream_pair = 0;
 	}
 protected:
-	inline SplitFileDataProvider(std::vector<std::pair<std::string,std::string>> dataset_path_pairs,
-			bool obs_binary, bool obj_binary) :
-				data_stream_pairs(dataset_path_pairs.size()),
-				current_stream_pair(0) {
+	inline SplitFileDataProvider(std::vector<std::pair<std::string,std::string>> dataset_path_pairs) :
+			data_stream_pairs(dataset_path_pairs.size()),
+			current_stream_pair(0) {
 		assert(!dataset_path_pairs.empty());
 		for (std::size_t i = 0; i < dataset_path_pairs.size(); ++i) {
 			std::pair<std::string,std::string>& path_pair = dataset_path_pairs[i];
-			std::ifstream obs_stream(path_pair.first, obs_binary ? std::ios::binary : std::ios::in);
+			std::ifstream obs_stream(path_pair.first, ObsBinary ? std::ios::binary : std::ios::in);
 			assert(obs_stream.is_open());
-			std::ifstream obj_stream(path_pair.second, obj_binary ? std::ios::binary : std::ios::in);
+			std::ifstream obj_stream(path_pair.second, ObjBinary ? std::ios::binary : std::ios::in);
 			assert(obj_stream.is_open());
 			data_stream_pairs[i] = std::make_pair(std::move(obs_stream), std::move(obj_stream));
 		}
 	}
-	inline SplitFileDataProvider(std::pair<std::string,std::string> dataset_path_pair, bool obs_binary,
-			bool obj_binary) :
-				SplitFileDataProvider(std::vector<std::pair<std::string,std::string>>({ dataset_path_pair }),
-						obs_binary, obj_binary) { }
+	inline SplitFileDataProvider(std::pair<std::string,std::string> dataset_path_pair) :
+			SplitFileDataProvider(std::vector<std::pair<std::string,std::string>>({ dataset_path_pair })) { }
 	/**
 	 * It sets the positions of the file streams to the beginning of the observation data set and
 	 * the objective data set respectively.
@@ -449,9 +445,9 @@ private:
  * A data provider template for the MNIST data set.
  */
 template<typename Scalar>
-class MNISTDataProvider : public SplitFileDataProvider<Scalar,3,false> {
+class MNISTDataProvider : public SplitFileDataProvider<Scalar,3,false,true,true> {
 	typedef DataProvider<Scalar,3,false> Root;
-	typedef SplitFileDataProvider<Scalar,3,false> Base;
+	typedef SplitFileDataProvider<Scalar,3,false,true,true> Base;
 	static constexpr std::size_t OBS_OFFSET = 16;
 	static constexpr std::size_t LABEL_OFFSET = 8;
 	static constexpr std::size_t OBS_INSTANCE_LENGTH = 784;
@@ -462,7 +458,7 @@ public:
 	 * @param labels_path The path to the file containing the corresponding labels.
 	 */
 	MNISTDataProvider(std::string obs_path, std::string labels_path) :
-			Base::SplitFileDataProvider(std::make_pair(obs_path, labels_path), true, true),
+			Base::SplitFileDataProvider(std::make_pair(obs_path, labels_path)),
 			obs({ 28u, 28u, 1u }),
 			obj({ 10u, 1u, 1u }) {
 		Base::reset();
@@ -540,9 +536,9 @@ enum CIFARType { CIFAR_10, CIFAR_100 };
  * A data provider template for the CIFAR-10 and CIFAR-100 data sets.
  */
 template<typename Scalar, CIFARType CIFARType = CIFAR_10>
-class CIFARDataProvider : public JointFileDataProvider<Scalar,3,false> {
+class CIFARDataProvider : public JointFileDataProvider<Scalar,3,false,true> {
 	typedef DataProvider<Scalar,3,false> Root;
-	typedef JointFileDataProvider<Scalar,3,false> Base;
+	typedef JointFileDataProvider<Scalar,3,false,true> Base;
 	static_assert(CIFARType == CIFAR_10 || CIFARType == CIFAR_100, "invalid CIFAR type");
 	static constexpr std::size_t INSTANCE_LENGTH = CIFARType == CIFAR_10 ? 3073 : 3074;
 	static constexpr std::size_t NUM_LABELS = CIFARType == CIFAR_10 ? 10 : 100;
@@ -551,7 +547,7 @@ public:
 	 * @param file_paths The paths to the data set files.
 	 */
 	inline CIFARDataProvider(std::vector<std::string> file_paths) :
-			Base::JointFileDataProvider(file_paths, true),
+			Base::JointFileDataProvider(file_paths),
 			obs({ 32u, 32u, 3u }),
 			obj({ NUM_LABELS, 1u, 1u }) {
 		Base::reset();
