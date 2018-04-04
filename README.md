@@ -108,10 +108,12 @@ Data providers are responsible for supplying the data used for gradient verifica
 The partition data provider maps to a continuous segment of the data backing another data provider. This allows for the partitioning of a single provider into training and test data providers. The memory data provider is backed by two in-memory tensors containing the observations and the objectives. The library also provides file-based data providers that allow for the training of networks without the need to load entire data sets into memory. The joint file data provider supports the processing of data sets stored in an arbitrary number of files that each contain both the observations and their respective objectives. On the other hand, the split file data provider is backed by an arbitrary number of file pairs for when the observations and the objectives are stored in separate files. C-ATTL3 includes a specialized data provider for the popular MNIST data set for the easy comparison of the performance of different network architectures to published results. The library also ships a specialized data provider for the CIFAR data set which supports both CIFAR-10 and CIFAR-100.
 
 ### Preprocessor
-C-ATTL3 also contains two preporcessors that can be used to transform the input data. They are:
+C-ATTL3 also contains a few preporcessors that can be used to transform the input data. They are:
 * [Preprocessor](https://viktorc.github.io/C-ATTL3/html/classcattle_1_1_preprocessor.html) [A]
   * [NormalizationPreprocessor](https://viktorc.github.io/C-ATTL3/html/classcattle_1_1_normalization_preprocessor.html) (NS)
   * [PCAPreprocessor](https://viktorc.github.io/C-ATTL3/html/classcattle_1_1_p_c_a_preprocessor.html) (NS)
+
+Both normalization preprocessors and PCA preprocessors support the centering and optionally the standardization of data. PCA preprocessors can also utilize whitening and, in case of single-channel data, dimensionality reduction.
 
 ## Usage
 The following code snippets demonstrate the usage of the library via a simple example.
@@ -176,4 +178,4 @@ The final code snippet demonstrates the usage of the trained neural network for 
 More examples of neural network constructs can be found [here](https://github.com/ViktorC/C-ATTL3/blob/master/test/test.cpp).
 
 ## TODO
-Planned features include additional data providers, network serialization and de-serialization, GRU neural net, CTC loss, evolutionary and second order optimization algorithms, GPU acceleration via the use of cuBLAS and cuDNN, proper automated testing using CMake, and more extensive documentation including practical examples.
+Planned features include additional data providers, network serialization and de-serialization, GRU neural net, CTC loss, evolutionary and second order optimization algorithms, GPU acceleration via the use of OpenCL and/or CUDA (with cuBLAS and cuDNN), proper automated testing using CMake, and more extensive documentation including practical examples.

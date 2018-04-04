@@ -178,10 +178,8 @@ public:
 		offsets.fill(0);
 		data_extents = obs_dims;
 		obj_extents = obj_dims;
-		if (Shuffle) {
-			internal::Utils<Scalar>::template shuffle_tensor_rows<Base::DATA_RANK>(*this->obs);
-			internal::Utils<Scalar>::template shuffle_tensor_rows<Base::DATA_RANK>(*this->obj);
-		}
+		if (Shuffle)
+			shuffle_tensor_rows();
 	}
 	inline const Dimensions<std::size_t,Rank>& get_obs_dims() const {
 		return obs_dims;
@@ -209,6 +207,17 @@ public:
 protected:
 	inline void skip(std::size_t instances) {
 		offsets[0] = std::min((int) this->instances, (int) (offsets[0] + instances));
+	}
+	inline void shuffle_tensor_rows() {
+		std::size_t rows = obs->dimension(0);
+		MatrixMap<Scalar> obs_mat(obs->data(), rows, obs->size() / rows);
+		MatrixMap<Scalar> obj_mat(obj->data(), rows, obj->size() / rows);
+		PermMatrix perm(rows);
+		perm.setIdentity();
+		// Shuffle the indices of the identity matrix.
+		std::random_shuffle(perm.indices().data(), perm.indices().data() + perm.indices().size());
+		obs_mat = perm * obs_mat;
+		obj_mat = perm * obj_mat;
 	}
 private:
 	typename Base::DataPtr obs;
@@ -460,7 +469,10 @@ public:
 	MNISTDataProvider(std::string obs_path, std::string labels_path) :
 			Base::SplitFileDataProvider(std::make_pair(obs_path, labels_path)),
 			obs({ 28u, 28u, 1u }),
-			obj({ 10u, 1u, 1u }) {
+			obj({ 10u, 1u, 1u }),
+			offsets({ 0u, 0u, 0u, 0u }),
+			obs_extents({ 0u, 28u, 28u, 1u }),
+			obj_extents({ 0u, 10u, 1u, 1u }) {
 		Base::reset();
 	}
 	inline const Dimensions<std::size_t,3>& get_obs_dims() const {
@@ -497,9 +509,8 @@ protected:
 		}
 		if (i == batch_size)
 			return std::make_pair(obs, obj);
-		std::array<std::size_t,4> offsets({ 0u, 0u, 0u, 0u });
-		std::array<std::size_t,4> obs_extents({ i, 28u, 28u, 1u });
-		std::array<std::size_t,4> obj_extents({ i, 10u, 1u, 1u });
+		obs_extents[0] = i;
+		obj_extents[0] = i;
 		return std::make_pair(obs.slice(offsets, obs_extents), obj.slice(offsets, obj_extents));
 	}
 	inline std::size_t _skip(std::ifstream& obs_input_stream, std::ifstream& obj_input_stream,
@@ -525,6 +536,9 @@ private:
 	const Dimensions<std::size_t,3> obs;
 	const Dimensions<std::size_t,3> obj;
 	char obs_buffer[OBS_INSTANCE_LENGTH];
+	std::array<std::size_t,4> offsets;
+	std::array<std::size_t,4> obs_extents;
+	std::array<std::size_t,4> obj_extents;
 };
 
 /**
@@ -549,7 +563,10 @@ public:
 	inline CIFARDataProvider(std::vector<std::string> file_paths) :
 			Base::JointFileDataProvider(file_paths),
 			obs({ 32u, 32u, 3u }),
-			obj({ NUM_LABELS, 1u, 1u }) {
+			obj({ NUM_LABELS, 1u, 1u }),
+			offsets({ 0u, 0u, 0u, 0u }),
+			obs_extents({ 0u, 32u, 32u, 3u }),
+			obj_extents({ 0u, NUM_LABELS, 1u, 1u }) {
 		Base::reset();
 	}
 	inline const Dimensions<std::size_t,3>& get_obs_dims() const {
@@ -583,9 +600,8 @@ protected:
 		}
 		if (i == batch_size)
 			return std::make_pair(obs, obj);
-		std::array<std::size_t,4> offsets({ 0u, 0u, 0u, 0u });
-		std::array<std::size_t,4> obs_extents({ i, 32u, 32u, 3u });
-		std::array<std::size_t,4> obj_extents({ i, NUM_LABELS, 1u, 1u });
+		obs_extents[0] = i;
+		obj_extents[0] = i;
 		return std::make_pair(obs.slice(offsets, obs_extents), obj.slice(offsets, obj_extents));
 	}
 	inline std::size_t _skip(std::ifstream& data_stream, std::size_t instances) {
@@ -600,6 +616,9 @@ private:
 	const Dimensions<std::size_t,3> obs;
 	const Dimensions<std::size_t,3> obj;
 	char buffer[INSTANCE_LENGTH];
+	std::array<std::size_t,4> offsets;
+	std::array<std::size_t,4> obs_extents;
+	std::array<std::size_t,4> obj_extents;
 };
 
 } /* namespace cattle */

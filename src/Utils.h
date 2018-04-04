@@ -13,9 +13,7 @@
 #include <algorithm>
 #include <cstddef>
 #include <limits>
-#include <memory>
 #include <type_traits>
-#include <utility>
 #include "Eigen/Dense"
 #include "unsupported/Eigen/CXX11/Tensor"
 #include "Dimensions.h"
@@ -50,6 +48,11 @@ using Matrix = Eigen::Matrix<Scalar,Eigen::Dynamic,Eigen::Dynamic,Eigen::ColMajo
  */
 template<typename Scalar>
 using MatrixMap = Eigen::Map<Matrix<Scalar>>;
+
+/**
+ * An alias for permutation matrices.
+ */
+using PermMatrix = Eigen::PermutationMatrix<Eigen::Dynamic,Eigen::Dynamic>;
 
 /**
  * An alias for a tensor of arbitrary rank and scalar type with dynamic dimensionality.
@@ -186,58 +189,6 @@ public:
 	inline static bool lesser_or_almost_equal(Scalar n1, Scalar n2, Scalar abs_epsilon = EPSILON1,
 			Scalar rel_epsilon = EPSILON1) {
 		return n1 < n2 || almost_equal(n1, n2, abs_epsilon, rel_epsilon);
-	}
-	/**
-	 * It removes the first rank of the tensor and extends the new first rank by a factor
-	 * equal to the dimensionality of the removed rank.
-	 *
-	 * @param tensor The tensor whose first two ranks are to be joined.
-	 * @return The tensor with the first two ranks joined.
-	 */
-	template<std::size_t Rank>
-	inline static Tensor<Scalar,Rank - 1> join_first_two_ranks(Tensor<Scalar,Rank> tensor) {
-		static_assert(Rank > 1, "illegal tensor rank");
-		Dimensions<std::size_t,Rank> dims = tensor.dimensions();
-		int lowest_dim = dims(0);
-		Dimensions<std::size_t,Rank - 1> joined_dims = dims.template demote<>();
-		joined_dims(0) *= lowest_dim;
-		return TensorMap<Scalar,Rank - 1>(tensor.data(), joined_dims);
-	}
-	/**
-	 * It splits the first rank of the tensor into two ranks. The product of the two rank sizes
-	 * specified must match the size of the tensor's first rank.
-	 *
-	 * @param tensor The tensor whose first rank is to be split.
-	 * @param rank0_size The size of the new first rank.
-	 * @param rank1_size The size of the new second rank.
-	 * @return The tensor with the first rank split into two ranks.
-	 */
-	template<std::size_t Rank>
-	inline static Tensor<Scalar,Rank + 1> split_first_rank(Tensor<Scalar,Rank> tensor, std::size_t rank0_size,
-			std::size_t rank1_size) {
-		static_assert(Rank > 0, "illegal tensor rank");
-		Dimensions<std::size_t,Rank> dims = tensor.dimensions();
-		assert(dims(0) == rank0_size * rank1_size);
-		Dimensions<std::size_t,Rank + 1> split_dims = dims.template promote<>();
-		split_dims(0) = rank0_size;
-		split_dims(1) = rank1_size;
-		return TensorMap<Scalar,Rank + 1>(tensor.data(), split_dims);
-	}
-	/**
-	 * It randomly shuffles the first rank of the tensor.
-	 *
-	 * @param tensor A reference to the tensor whose first rank is to be shuffled.
-	 */
-	template<std::size_t Rank>
-	inline static void shuffle_tensor_rows(Tensor<Scalar,Rank>& tensor) {
-		static_assert(Rank > 1, "illegal tensor rank");
-		std::size_t rows = tensor.dimension(0);
-		MatrixMap<Scalar> mat(tensor.data(), rows, tensor.size() / rows);
-		Eigen::PermutationMatrix<Eigen::Dynamic,Eigen::Dynamic> perm(mat.rows());
-		perm.setIdentity();
-		// Shuffle the indices of the identity matrix.
-		std::random_shuffle(perm.indices().data(), perm.indices().data() + perm.indices().size());
-		mat = perm * mat;
 	}
 };
 
