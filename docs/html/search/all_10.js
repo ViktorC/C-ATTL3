@@ -26,7 +26,7 @@ var searchData=
   ['pcapreprocessor_3c_20scalar_2c_203_2c_20standardize_2c_20whiten_20_3e',['PCAPreprocessor&lt; Scalar, 3, Standardize, Whiten &gt;',['../classcattle_1_1_p_c_a_preprocessor_3_01_scalar_00_013_00_01_standardize_00_01_whiten_01_4.html',1,'cattle']]],
   ['pcapreprocessorbase',['PCAPreprocessorBase',['../classcattle_1_1_p_c_a_preprocessor_base.html',1,'cattle::PCAPreprocessorBase&lt; Scalar, Rank, Standardize, Whiten &gt;'],['../classcattle_1_1_p_c_a_preprocessor_base.html#a45fce9afee9f3789234cbfabb14fd8c9',1,'cattle::PCAPreprocessorBase::PCAPreprocessorBase()']]],
   ['pcapreprocessorbase_3c_20scalar_2c_203_2c_20standardize_2c_20whiten_20_3e',['PCAPreprocessorBase&lt; Scalar, 3, Standardize, Whiten &gt;',['../classcattle_1_1_p_c_a_preprocessor_base.html',1,'cattle']]],
-  ['permmatrix',['PermMatrix',['../namespacecattle.html#a4e83e75cf6fc91facbcae6c5bb14c09a',1,'cattle']]],
+  ['permmatrix',['PermMatrix',['../namespacecattle_1_1internal.html#a7091932f25b7326f10fc49f79d38ca76',1,'cattle::internal']]],
   ['pgn_5fvec',['pgn_vec',['../classcattle_1_1_adam_optimizer.html#a8e391a8340238522868e7a5a7d4cd83f',1,'cattle::AdamOptimizer']]],
   ['pgus_5fvec',['pgus_vec',['../classcattle_1_1_adadelta_optimizer.html#a7c1a3f5aad732a4159d4482ee9edccb5',1,'cattle::AdadeltaOptimizer']]],
   ['poolinglayer',['PoolingLayer',['../classcattle_1_1_pooling_layer.html',1,'cattle::PoolingLayer&lt; Scalar &gt;'],['../classcattle_1_1_pooling_layer.html#a30b9febf3d3719899c3c692de7c9865a',1,'cattle::PoolingLayer::PoolingLayer()']]],

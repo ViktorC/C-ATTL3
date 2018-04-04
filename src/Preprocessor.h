@@ -169,7 +169,7 @@ protected:
 		// Compute the covariance matrix.
 		Matrix<Scalar> cov = normalized_data.transpose() * normalized_data / normalized_data.rows();
 		// Eigen decomposition.
-		Eigen::SelfAdjointEigenSolver<Matrix<Scalar>> eigen_solver(cov);
+		internal::EigenSolver<Scalar> eigen_solver(cov);
 		// Determine the number of components to retain.
 		const ColVector<Scalar>& eigen_values = eigen_solver.eigenvalues();
 		int dims_to_retain = 0;

@@ -306,14 +306,9 @@ Typedefs</h2></td></tr>
 <tr class="memitem:afe8803bdb57fb149be7d7b7916f30ca9"><td class="memTemplParams" colspan="2">template&lt;typename Scalar &gt; </td></tr>
 <tr class="memitem:afe8803bdb57fb149be7d7b7916f30ca9"><td class="memTemplItemLeft" align="right" valign="top">using&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespacecattle.html#afe8803bdb57fb149be7d7b7916f30ca9">MatrixMap</a> = Eigen::Map&lt; <a class="el" href="namespacecattle.html#a1d78623a47279d516750a44dbad6090b">Matrix</a>&lt; Scalar &gt; &gt;</td></tr>
 <tr class="separator:afe8803bdb57fb149be7d7b7916f30ca9"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a4e83e75cf6fc91facbcae6c5bb14c09a"><td class="memItemLeft" align="right" valign="top">using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacecattle.html#a4e83e75cf6fc91facbcae6c5bb14c09a">PermMatrix</a> = Eigen::PermutationMatrix&lt; Eigen::Dynamic, Eigen::Dynamic &gt;</td></tr>
-<tr class="separator:a4e83e75cf6fc91facbcae6c5bb14c09a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a8b9323ad928764340e46f0802bf27fbb"><td class="memTemplParams" colspan="2">template&lt;typename Scalar , std::size_t Rank&gt; </td></tr>
 <tr class="memitem:a8b9323ad928764340e46f0802bf27fbb"><td class="memTemplItemLeft" align="right" valign="top">using&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespacecattle.html#a8b9323ad928764340e46f0802bf27fbb">Tensor</a> = Eigen::Tensor&lt; Scalar, Rank, Eigen::ColMajor, std::size_t &gt;</td></tr>
 <tr class="separator:a8b9323ad928764340e46f0802bf27fbb"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ab758a65062937afea9d08ce8ca611d07"><td class="memTemplParams" colspan="2">template&lt;typename Derived &gt; </td></tr>
-<tr class="memitem:ab758a65062937afea9d08ce8ca611d07"><td class="memTemplItemLeft" align="right" valign="top">using&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespacecattle.html#ab758a65062937afea9d08ce8ca611d07">TensorExp</a> = Eigen::TensorBase&lt; Derived &gt;</td></tr>
-<tr class="separator:ab758a65062937afea9d08ce8ca611d07"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a7dfcb4d57e2c5da3170ebd8d13fd0431"><td class="memTemplParams" colspan="2">template&lt;typename Scalar , std::size_t Rank&gt; </td></tr>
 <tr class="memitem:a7dfcb4d57e2c5da3170ebd8d13fd0431"><td class="memTemplItemLeft" align="right" valign="top">using&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespacecattle.html#a7dfcb4d57e2c5da3170ebd8d13fd0431">TensorMap</a> = Eigen::TensorMap&lt; <a class="el" href="namespacecattle.html#a8b9323ad928764340e46f0802bf27fbb">Tensor</a>&lt; Scalar, Rank &gt; &gt;</td></tr>
 <tr class="separator:a7dfcb4d57e2c5da3170ebd8d13fd0431"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -490,21 +485,6 @@ template&lt;typename Scalar , std::size_t Rank, bool Sequential&gt; </div>
 
 </div>
 </div>
-<a id="a4e83e75cf6fc91facbcae6c5bb14c09a"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a4e83e75cf6fc91facbcae6c5bb14c09a">&#9670;&nbsp;</a></span>PermMatrix</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">using <a class="el" href="namespacecattle.html#a4e83e75cf6fc91facbcae6c5bb14c09a">cattle::PermMatrix</a> = typedef Eigen::PermutationMatrix&lt;Eigen::Dynamic,Eigen::Dynamic&gt;</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-<p>An alias for permutation matrices. </p>
-
-</div>
-</div>
 <a id="af01c35d5a6127252427cffc91b52a616"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#af01c35d5a6127252427cffc91b52a616">&#9670;&nbsp;</a></span>RegPenSharedPtr</h2>
 
@@ -553,23 +533,6 @@ template&lt;typename Scalar , std::size_t Rank&gt; </div>
       </table>
 </div><div class="memdoc">
 <p>An alias for a tensor of arbitrary rank and scalar type with dynamic dimensionality. </p>
-
-</div>
-</div>
-<a id="ab758a65062937afea9d08ce8ca611d07"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ab758a65062937afea9d08ce8ca611d07">&#9670;&nbsp;</a></span>TensorExp</h2>
-
-<div class="memitem">
-<div class="memproto">
-<div class="memtemplate">
-template&lt;typename Derived &gt; </div>
-      <table class="memname">
-        <tr>
-          <td class="memname">using <a class="el" href="namespacecattle.html#ab758a65062937afea9d08ce8ca611d07">cattle::TensorExp</a> = typedef Eigen::TensorBase&lt;Derived&gt;</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-<p>An alias for an arbitrary tensor expression. </p>
 
 </div>
 </div>

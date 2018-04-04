@@ -1,8 +1,4 @@
 var searchData=
 [
-  ['tensor',['Tensor',['../namespacecattle.html#a8b9323ad928764340e46f0802bf27fbb',1,'cattle']]],
-  ['tensorexp',['TensorExp',['../namespacecattle.html#ab758a65062937afea9d08ce8ca611d07',1,'cattle']]],
-  ['tensormap',['TensorMap',['../namespacecattle.html#a7dfcb4d57e2c5da3170ebd8d13fd0431',1,'cattle']]],
-  ['tensorptr',['TensorPtr',['../namespacecattle.html#ae90497baf0bcd6d9b075aa3287bcd475',1,'cattle']]],
-  ['timestepdata',['TimeStepData',['../classcattle_1_1_recurrent_neural_network.html#ac019582577b2e88293a140eb49bdf567',1,'cattle::RecurrentNeuralNetwork::TimeStepData()'],['../classcattle_1_1_l_s_t_m_neural_network.html#a40bf2c9ac78c2fda00d2bc8e1fdad473',1,'cattle::LSTMNeuralNetwork::TimeStepData()']]]
+  ['self',['Self',['../classcattle_1_1_dim_expression.html#a51aa030935c467cf158c24924b3ea0a8',1,'cattle::DimExpression::Self()'],['../classcattle_1_1_composite_neural_network.html#a4de52a8ebbac0dee405d6ac0008b8d3b',1,'cattle::CompositeNeuralNetwork::Self()'],['../classcattle_1_1_parallel_neural_network.html#af6f433b59f5062c4a7aacbd10cbc6613',1,'cattle::ParallelNeuralNetwork::Self()'],['../classcattle_1_1_feedforward_neural_network.html#a9481cf455aefd4150857f078a52ee364',1,'cattle::FeedforwardNeuralNetwork::Self()'],['../classcattle_1_1_sequential_neural_network.html#aea345aff29adb836aa0b7fd37e85d1ac',1,'cattle::SequentialNeuralNetwork::Self()'],['../classcattle_1_1_bidirectional_neural_network.html#aad1ae57124cc3e0905de24bbc6dfa8c9',1,'cattle::BidirectionalNeuralNetwork::Self()'],['../classcattle_1_1_recurrent_neural_network.html#ac76df4e05eb0db8c18e913116da3e6f4',1,'cattle::RecurrentNeuralNetwork::Self()'],['../classcattle_1_1_l_s_t_m_neural_network.html#abf8eada326c7e250f0fd165e8f6398e3',1,'cattle::LSTMNeuralNetwork::Self()']]]
 ];

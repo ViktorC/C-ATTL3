@@ -50,21 +50,10 @@ template<typename Scalar>
 using MatrixMap = Eigen::Map<Matrix<Scalar>>;
 
 /**
- * An alias for permutation matrices.
- */
-using PermMatrix = Eigen::PermutationMatrix<Eigen::Dynamic,Eigen::Dynamic>;
-
-/**
  * An alias for a tensor of arbitrary rank and scalar type with dynamic dimensionality.
  */
 template<typename Scalar, std::size_t Rank>
 using Tensor = Eigen::Tensor<Scalar,Rank,Eigen::ColMajor,std::size_t>;
-
-/**
- * An alias for an arbitrary tensor expression.
- */
-template<typename Derived>
-using TensorExp = Eigen::TensorBase<Derived>;
 
 /**
  * An for a class that can be used to map raw pointer data to a tensor of arbitrary
@@ -73,7 +62,21 @@ using TensorExp = Eigen::TensorBase<Derived>;
 template<typename Scalar, std::size_t Rank>
 using TensorMap = Eigen::TensorMap<Tensor<Scalar,Rank>>;
 
+/**
+ * A namespace for utilities used by C-ATTL3 internally.
+ */
 namespace internal {
+
+/**
+ * An alias for permutation matrices.
+ */
+using PermMatrix = Eigen::PermutationMatrix<Eigen::Dynamic,Eigen::Dynamic>;
+
+/**
+ * An alias for self-adjoint eigen solvers.
+ */
+template<typename Scalar>
+using EigenSolver = Eigen::SelfAdjointEigenSolver<Matrix<Scalar>>;
 
 /**
  * A utility class template containing static methods and variables to help with

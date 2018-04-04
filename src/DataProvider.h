@@ -159,7 +159,6 @@ public:
 	 *
 	 * @param obs A unique pointer to the tensor containing the observations.
 	 * @param obj A unique pointer to the tensor containing the objectives.
-	 * @param shuffle Whether the 'rows' (first ranks) of the tensors should be randomly
 	 * shuffled.
 	 */
 	inline MemoryDataProvider(typename Base::DataPtr obs, typename Base::DataPtr obj) :
@@ -212,10 +211,12 @@ protected:
 		std::size_t rows = obs->dimension(0);
 		MatrixMap<Scalar> obs_mat(obs->data(), rows, obs->size() / rows);
 		MatrixMap<Scalar> obj_mat(obj->data(), rows, obj->size() / rows);
-		PermMatrix perm(rows);
+		// Create an identity matrix.
+		internal::PermMatrix perm(rows);
 		perm.setIdentity();
-		// Shuffle the indices of the identity matrix.
+		// Shuffle its indices.
 		std::random_shuffle(perm.indices().data(), perm.indices().data() + perm.indices().size());
+		// And apply the same row permutation transformation to both the observations and the objectives.
 		obs_mat = perm * obs_mat;
 		obj_mat = perm * obj_mat;
 	}
