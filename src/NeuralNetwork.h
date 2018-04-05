@@ -27,7 +27,7 @@
 #include "Utils.h"
 
 // TODO GRU network.
-// TODO Possibility to add and remove modules (e.g. layers for sequential networks, inception modules for InceptionNets).
+// TODO Possibility to add and remove modules (e.g. layers for simple feed-forward networks, residual modules for ResNets).
 // TODO Serialization.
 
 namespace cattle {

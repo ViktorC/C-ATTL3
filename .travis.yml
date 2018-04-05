@@ -15,8 +15,6 @@ script:
   - export CC=/usr/bin/gcc-7
   - export CXX=/usr/bin/g++-7
   - gcc -v && g++ -v
-  - sudo rm -rf build
-  - sudo mkdir build
   - sudo make -f makefile
 notifications:
   email: false

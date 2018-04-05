@@ -305,12 +305,6 @@ protected:
 };
 
 /**
- * An alias for a shared pointer to a regularization penalty of an arbitrary scalar type.
- */
-template<typename Scalar>
-using RegPenSharedPtr = std::shared_ptr<RegularizationPenalty<Scalar>>;
-
-/**
  * An abstract class template for stochastic gradient descent (SGD) optimizers.
  */
 template<typename Scalar, std::size_t Rank, bool Sequential>

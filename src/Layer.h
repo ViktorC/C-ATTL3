@@ -127,6 +127,12 @@ protected:
 	 */
 	virtual void enforce_constraints() = 0;
 	/**
+	 * It calculates the regularization penalty of the layer's parameters.
+	 *
+	 * @return A scalar representing the penalty on the magnitude of the layer's parameters.
+	 */
+	virtual Scalar regularization_penalty() = 0;
+	/**
 	 * It has the function represented by the layer applied to the input tensor.
 	 *
 	 * @param in A tensor representing a batch of observations. The observations are of
@@ -141,7 +147,9 @@ protected:
 	virtual Data pass_forward(Data in, bool training) = 0;
 	/**
 	 * It back-propagates the derivative of the error function w.r.t. the output of the
-	 * layer updating the gradient of its learnable parameters along the way.
+	 * layer updating the gradient of its learnable parameters along the way if there are
+	 * any. If there are, it also calculates the derivative of the regularization penalty
+	 * w.r.t. to the layer's parameters and adds it to their gradient.
 	 *
 	 * @param out_grads The derivative of the loss function w.r.t. the output of the
 	 * layer
@@ -159,6 +167,12 @@ template<typename Scalar>
 using WeightInitSharedPtr = std::shared_ptr<WeightInitialization<Scalar>>;
 
 /**
+ * An alias for a shared pointer to a regularization penalty of an arbitrary scalar type.
+ */
+template<typename Scalar>
+using RegPenSharedPtr = std::shared_ptr<RegularizationPenalty<Scalar>>;
+
+/**
  * An abstract base class template for layers representing linear kernel-based operations
  * such as matrix multiplication or convolution.
  */
@@ -173,11 +187,13 @@ public:
 		return output_dims;
 	}
 protected:
-	inline KernelLayer(const Dimensions<std::size_t,Rank>& input_dims, Dimensions<std::size_t,Rank> output_dims, WeightInitSharedPtr<Scalar> weight_init,
-			std::size_t weight_rows, std::size_t weight_cols, Scalar max_norm_constraint) :
+	inline KernelLayer(const Dimensions<std::size_t,Rank>& input_dims, Dimensions<std::size_t,Rank> output_dims,
+			WeightInitSharedPtr<Scalar> weight_init, RegPenSharedPtr<Scalar> weight_reg, std::size_t weight_rows,
+			std::size_t weight_cols, Scalar max_norm_constraint) :
 				input_dims(input_dims),
 				output_dims(output_dims),
 				weight_init(weight_init),
+				weight_reg(weight_reg),
 				max_norm_constraint(max_norm_constraint),
 				max_norm(internal::Utils<Scalar>::decidedly_greater(max_norm_constraint, .0)),
 				input_layer(false),
@@ -185,11 +201,13 @@ protected:
 				weights_grad(weight_rows, weight_cols),
 				weights_ref(weights) {
 		assert(weight_init != nullptr);
+		assert(weight_reg != nullptr);
 	}
 	inline KernelLayer(const KernelLayer<Scalar,Rank>& layer, bool share_weights = false) :
 			input_dims(layer.input_dims),
 			output_dims(layer.output_dims),
 			weight_init(layer.weight_init),
+			weight_reg(layer.weight_reg),
 			max_norm_constraint(layer.max_norm_constraint),
 			max_norm(layer.max_norm),
 			input_layer(layer.input_layer),
@@ -219,9 +237,13 @@ protected:
 				weights *= (max_norm_constraint / l2_norm);
 		}
 	}
+	inline Scalar regularization_penalty() {
+		return weight_reg->function(weight_ref);
+	}
 	const Dimensions<std::size_t,Rank> input_dims;
 	const Dimensions<std::size_t,Rank> output_dims;
 	const WeightInitSharedPtr<Scalar> weight_init;
+	const RegPenSharedPtr<Scalar> weight_reg;
 	const Scalar max_norm_constraint;
 	const bool max_norm;
 	bool input_layer;
@@ -247,12 +269,13 @@ public:
 	 * @param output_size The length of the vector output for each sample.
 	 * @param weight_init A shared pointer to a weight initialization used to initialize the
 	 * values of the parametric kernel backing the layer.
+	 * @param weight_reg The regularization function to apply to the layer's parameters.
 	 * @param max_norm_constraint An optional max-norm constraint. If it is 0 or less, no
 	 * constraint is applied.
 	 */
 	inline FCLayer(const Dimensions<std::size_t,Rank>& input_dims, std::size_t output_size, WeightInitSharedPtr<Scalar> weight_init,
-			Scalar max_norm_constraint = 0) :
-				Base::KernelLayer(input_dims, Dimensions<std::size_t,Rank>({ output_size }), weight_init,
+			RegPenSharedPtr<Scalar> weight_reg, Scalar max_norm_constraint = 0) :
+				Base::KernelLayer(input_dims, Dimensions<std::size_t,Rank>({ output_size }), weight_init, weight_reg,
 						input_dims.get_volume() + 1, output_size, max_norm_constraint),
 				out_conversion_dims(Base::output_dims.template promote<>()),
 				prev_out_conversion_dims(Base::input_dims.template promote<>()) { }
@@ -288,7 +311,7 @@ protected:
 		assert(out_grads.dimension(0) > 0 && biased_in.rows() == out_grads.dimension(0));
 		MatrixMap<Scalar> out_grads_mat(out_grads.data(), out_grads.dimension(0), Base::output_dims.get_volume());
 		// Compute the gradient of the outputs with respect to the weights.
-		Base::weights_grad = biased_in.transpose() * out_grads_mat;
+		Base::weights_grad = biased_in.transpose() * out_grads_mat + Base::weight_reg->d_function(Base::weights_ref);
 		if (Base::is_input_layer())
 			return typename Root::Data();
 		/* Remove the bias row from the weight matrix, transpose it, and compute the derivative w.r.t. the
@@ -320,6 +343,7 @@ public:
 	 * @param filters The number of filters to use.
 	 * @param weight_init A shared pointer to a weight initialization used to initialize the
 	 * values of the parametric kernel backing the layer.
+	 * @param weight_reg The regularization function to apply to the layer's parameters.
 	 * @param receptor_height The height of the base of the receptor cuboid.
 	 * @param receptor_width The width of the base of the receptor cuboid.
 	 * @param padding The length of padding to apply to the input tensor along its width and
@@ -332,14 +356,15 @@ public:
 	 * constraint is applied.
 	 */
 	inline ConvLayer(const Dimensions<std::size_t,3>& input_dims, std::size_t filters, WeightInitSharedPtr<Scalar> weight_init,
-			std::size_t receptor_height = 3, std::size_t receptor_width = 3, std::size_t padding = 1, std::size_t stride = 1,
-			std::size_t dilation = 0, Scalar max_norm_constraint = 0) :
+			RegPenSharedPtr<Scalar> weight_reg, std::size_t receptor_height = 3, std::size_t receptor_width = 3, std::size_t padding = 1,
+			std::size_t stride = 1, std::size_t dilation = 0, Scalar max_norm_constraint = 0) :
 				/* For every filter, there is a column in the weight matrix with the same number of
 				 * elements as the area of the receptive field (F_H * F_W * D) + 1 for the bias row. */
 				Base::KernelLayer(input_dims, Dimensions<std::size_t,3>({
 						calculate_output_dim(input_dims(0), receptor_height, padding, dilation, stride),
 						calculate_output_dim(input_dims(1), receptor_width, padding, dilation, stride),
-						filters }), weight_init, receptor_height * receptor_width * input_dims(2) + 1, filters, max_norm_constraint),
+						filters }), weight_init, weight_reg, receptor_height * receptor_width * input_dims(2) + 1,
+						filters, max_norm_constraint),
 				filters(filters),
 				receptor_height(receptor_height),
 				receptor_width(receptor_width),
@@ -435,7 +460,7 @@ protected:
 		std::size_t receptor_vol = Base::weights_ref.rows() - 1;
 		MatrixMap<Scalar> out_grads_mat_map = MatrixMap<Scalar>(out_grads.data(),
 				rows * Base::output_dims(0) * Base::output_dims(1), filters);
-		Base::weights_grad = biased_in.transpose() * out_grads_mat_map;
+		Base::weights_grad = biased_in.transpose() * out_grads_mat_map + Base::weight_reg->d_function(Base::weights_ref);
 		if (Base::is_input_layer())
 			return typename Root::Data();
 		/* Remove the bias row from the weight matrix, transpose it, and compute the gradient of the
@@ -548,6 +573,7 @@ protected:
 		return params_grad;
 	}
 	inline void enforce_constraints() { }
+	inline Scalar regularization_penalty() { }
 	inline void empty_cache() { }
 	const Dimensions<std::size_t,Rank> dims;
 	bool input_layer;
@@ -982,10 +1008,14 @@ public:
 	 * @param dims The dimensionality of the input tensor.
 	 * @param init_alpha The initial factor by which negative inputs are to be scaled.
 	 */
-	inline PReLUActivationLayer(const Dimensions<std::size_t,Rank>& dims, Scalar init_alpha = 1e-1) :
-			Base::ActivationLayer(dims, 1, dims.get_volume()),
-			init_alpha(init_alpha),
-			conversion_dims(dims.template promote<>()) { }
+	inline PReLUActivationLayer(const Dimensions<std::size_t,Rank>& dims, RegPenSharedPtr<Scalar> param_reg,
+			Scalar init_alpha = 1e-1) :
+				Base::ActivationLayer(dims, 1, dims.get_volume()),
+				param_reg(param_reg),
+				init_alpha(init_alpha),
+				conversion_dims(dims.template promote<>()) {
+		assert(param_reg != nullptr);
+	}
 	inline Layer<Scalar,Rank>* clone() const {
 		return new PReLUActivationLayer(*this);
 	}
@@ -1004,6 +1034,9 @@ protected:
 	inline void empty_cache() {
 		in = Matrix<Scalar>(0, 0);
 	}
+	inline Scalar regularization_penalty() {
+		return param_reg->function(weight_ref);
+	}
 	inline typename Root::Data pass_forward(typename Root::Data in, bool training) {
 		assert((Dimensions<std::size_t,Base::DATA_RANK>(in.dimensions()).template demote<>()) == Base::dims);
 		assert(in.dimension(0) > 0);
@@ -1016,7 +1049,7 @@ protected:
 	inline typename Root::Data pass_back(typename Root::Data out_grads) {
 		assert((Dimensions<std::size_t,Base::DATA_RANK>(out_grads.dimensions()).template demote<>()) == Base::dims);
 		assert(out_grads.dimension(0) > 0 && conversion_dims[0] == out_grads.dimension(0));
-		Base::params_grad.row(0).setZero();
+		Base::params_grad = param_reg->d_function(Base::params_ref);
 		MatrixMap<Scalar> out_grads_map(out_grads.data(), conversion_dims[0], Base::dims.get_volume());
 		Matrix<Scalar> prev_out_grads = Matrix<Scalar>(in.rows(), in.cols());
 		for (int i = 0; i < in.cols(); ++i) {
@@ -1031,9 +1064,11 @@ protected:
 				}
 			}
 		}
+
 		return TensorMap<Scalar,Root::DATA_RANK>(prev_out_grads.data(), conversion_dims);
 	}
 private:
+	const RegPenSharedPtr<Scalar> param_reg;
 	const Scalar init_alpha;
 	RankwiseArray conversion_dims;
 	// Staged computation caches.

@@ -17,6 +17,7 @@ endif
 TARGET := $(BUILD_DIR)/$(TARGET_NAME)
 OBJECTS := $(BUILD_DIR)/$(SOURCES:%.cpp=%.o)
 $(OBJECTS): $(BUILD_DIR)/%.o: $(SOURCE_DIR)/%.cpp
+	@mkdir -p $(BUILD_DIR)
 	$(CC) $(ARCH) $(CFLAGS) $(OPT_FLAGS) $(INCLUDES) -c -o $@ $<
 $(TARGET): $(OBJECTS)
 	$(CC) $(ARCH) $(CFLAGS) $(OPT_FLAGS) $(LIBS) -o $@ $?
