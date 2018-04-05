@@ -17,6 +17,6 @@ script:
   - gcc -v && g++ -v
   - sudo rm -rf build
   - sudo mkdir build
-  - make -f makefile
+  - sudo make -f makefile
 notifications:
   email: false
