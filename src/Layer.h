@@ -18,6 +18,7 @@
 #include <utility>
 #include "Dimensions.h"
 #include "Utils.h"
+#include "RegularizationPenalty.h"
 #include "WeightInitialization.h"
 
 namespace cattle {
@@ -127,11 +128,12 @@ protected:
 	 */
 	virtual void enforce_constraints() = 0;
 	/**
-	 * It calculates the regularization penalty of the layer's parameters.
+	 * It calculates the regularization penalty of the layer's parameters. If the layer is not
+	 * parametric, 0 is returned.
 	 *
 	 * @return A scalar representing the penalty on the magnitude of the layer's parameters.
 	 */
-	virtual Scalar regularization_penalty() = 0;
+	virtual Scalar get_regularization_penalty() = 0;
 	/**
 	 * It has the function represented by the layer applied to the input tensor.
 	 *
@@ -237,8 +239,8 @@ protected:
 				weights *= (max_norm_constraint / l2_norm);
 		}
 	}
-	inline Scalar regularization_penalty() {
-		return weight_reg->function(weight_ref);
+	inline Scalar get_regularization_penalty() {
+		return weight_reg->function(weights_ref);
 	}
 	const Dimensions<std::size_t,Rank> input_dims;
 	const Dimensions<std::size_t,Rank> output_dims;
@@ -246,12 +248,12 @@ protected:
 	const RegPenSharedPtr<Scalar> weight_reg;
 	const Scalar max_norm_constraint;
 	const bool max_norm;
-	bool input_layer;
 	/* Eigen matrices are backed by arrays allocated on the heap, so these
 	 * members do not burden the stack. */
 	Matrix<Scalar> weights_grad;
 	Matrix<Scalar>& weights_ref;
 private:
+	bool input_layer;
 	mutable Matrix<Scalar> weights;
 };
 
@@ -573,13 +575,15 @@ protected:
 		return params_grad;
 	}
 	inline void enforce_constraints() { }
-	inline Scalar regularization_penalty() { }
+	inline Scalar get_regularization_penalty() {
+		return 0;
+	}
 	inline void empty_cache() { }
 	const Dimensions<std::size_t,Rank> dims;
-	bool input_layer;
 	Matrix<Scalar> params_grad;
 	Matrix<Scalar>& params_ref;
 private:
+	bool input_layer;
 	mutable Matrix<Scalar> params;
 };
 
@@ -1034,8 +1038,8 @@ protected:
 	inline void empty_cache() {
 		in = Matrix<Scalar>(0, 0);
 	}
-	inline Scalar regularization_penalty() {
-		return param_reg->function(weight_ref);
+	inline Scalar get_regularization_penalty() {
+		return param_reg->function(Base::params_ref);
 	}
 	inline typename Root::Data pass_forward(typename Root::Data in, bool training) {
 		assert((Dimensions<std::size_t,Base::DATA_RANK>(in.dimensions()).template demote<>()) == Base::dims);
@@ -1049,6 +1053,9 @@ protected:
 	inline typename Root::Data pass_back(typename Root::Data out_grads) {
 		assert((Dimensions<std::size_t,Base::DATA_RANK>(out_grads.dimensions()).template demote<>()) == Base::dims);
 		assert(out_grads.dimension(0) > 0 && conversion_dims[0] == out_grads.dimension(0));
+		std::cout << "params ref: " << Base::params_ref << std::endl << std::endl;
+		std::cout << "params_grad: " << Base::params_grad << std::endl << std::endl;
+		std::cout << "params grad new: " << param_reg->d_function(Base::params_ref) << std::endl << std::endl;
 		Base::params_grad = param_reg->d_function(Base::params_ref);
 		MatrixMap<Scalar> out_grads_map(out_grads.data(), conversion_dims[0], Base::dims.get_volume());
 		Matrix<Scalar> prev_out_grads = Matrix<Scalar>(in.rows(), in.cols());
@@ -1153,7 +1160,10 @@ protected:
 	inline Matrix<Scalar>& get_params_grad() {
 		return params_grad;
 	}
-	inline void enforce_constraints() { };
+	inline void enforce_constraints() { }
+	inline Scalar get_regularization_penalty() {
+		return 0;
+	}
 	inline typename Base::Data pass_forward(typename Base::Data in, bool training) {
 		assert((Dimensions<std::size_t,4>(in.dimensions()).template demote<>()) == input_dims);
 		assert(in.dimension(0) > 0);
@@ -1233,7 +1243,6 @@ protected:
 	const std::size_t dil_receptor_width;
 	const std::size_t height_rem;
 	const std::size_t width_rem;
-	bool input_layer;
 	// Arrays for tensor manipulation.
 	ReductionRanksArray reduction_ranks;
 	RankwiseArray broadcast;
@@ -1242,6 +1251,8 @@ protected:
 	RankwiseArray reduced_patch_offsets;
 	RankwiseArray reduced_patch_extents;
 	RankwiseArray dil_strides;
+private:
+	bool input_layer;
 	// No actual parameters.
 	Matrix<Scalar> params;
 	Matrix<Scalar> params_grad;
@@ -1423,25 +1434,29 @@ public:
 	}
 protected:
 	typedef std::array<std::size_t,Base::DATA_RANK> RankwiseArray;
-	inline BatchNormLayerBase(const Dimensions<std::size_t,Rank>& dims, std::size_t depth, Scalar norm_avg_decay, Scalar epsilon) :
-			dims(dims),
-			depth(depth),
-			norm_avg_decay(norm_avg_decay),
-			epsilon(epsilon),
-			input_layer(false),
-			avg_means(depth, dims.get_volume() / depth),
-			avg_inv_sds(depth, dims.get_volume() / depth),
-			avgs_init(false),
-			params(2 * depth, dims.get_volume() / depth),
-			params_grad(2 * depth, dims.get_volume() / depth),
-			params_ref(params),
-			cache_vec(depth) {
+	inline BatchNormLayerBase(const Dimensions<std::size_t,Rank>& dims, RegPenSharedPtr<Scalar> param_reg,
+			std::size_t depth, Scalar norm_avg_decay, Scalar epsilon) :
+				dims(dims),
+				param_reg(param_reg),
+				depth(depth),
+				norm_avg_decay(norm_avg_decay),
+				epsilon(epsilon),
+				input_layer(false),
+				avg_means(depth, dims.get_volume() / depth),
+				avg_inv_sds(depth, dims.get_volume() / depth),
+				avgs_init(false),
+				params(2 * depth, dims.get_volume() / depth),
+				params_grad(2 * depth, dims.get_volume() / depth),
+				params_ref(params),
+				cache_vec(depth) {
+		assert(param_reg != nullptr);
 		assert(norm_avg_decay >= 0 && norm_avg_decay <= 1 &&
 				"norm avg decay must not be less than 0 or greater than 1");
 		assert(epsilon > 0 && "epsilon must be greater than 0");
 	}
 	inline BatchNormLayerBase(const BatchNormLayerBase<Scalar,Rank>& layer, bool share_weights = false) :
 			dims(layer.dims),
+			param_reg(layer.param_reg),
 			depth(layer.depth),
 			norm_avg_decay(layer.norm_avg_decay),
 			epsilon(layer.epsilon),
@@ -1485,6 +1500,9 @@ protected:
 		return params_grad;
 	}
 	inline void enforce_constraints() { }
+	inline Scalar get_regularization_penalty() {
+		return param_reg->function(params_ref);
+	}
 	inline typename Base::Data _pass_forward(typename Base::Data in, const RankwiseArray& output_dims,
 			bool training, int i) {
 		std::size_t rows = in.dimension(0);
@@ -1532,6 +1550,10 @@ protected:
 		return TensorMap<Scalar,Base::DATA_RANK>(prev_out_grads.data(), prev_out_dims);
 	}
 	const Dimensions<std::size_t,Rank> dims;
+	const RegPenSharedPtr<Scalar> param_reg;
+	Matrix<Scalar> params_grad;
+	Matrix<Scalar>& params_ref;
+private:
 	const std::size_t depth;
 	const Scalar norm_avg_decay;
 	const Scalar epsilon;
@@ -1541,16 +1563,13 @@ protected:
 	Matrix<Scalar> avg_inv_sds;
 	bool avgs_init;
 	// Betas and gammas
-	Matrix<Scalar> params_grad;
-	Matrix<Scalar>& params_ref;
+	mutable Matrix<Scalar> params;
 	// Staged computation cache_vec
 	struct Cache {
 		RowVector<Scalar> inv_in_sd;
 		Matrix<Scalar> std_in;
 	};
 	std::vector<Cache> cache_vec;
-private:
-	mutable Matrix<Scalar> params;
 };
 
 /**
@@ -1566,9 +1585,9 @@ public:
 	 * @param norm_avg_decay The decay rate of the maintained means and variances.
 	 * @param epsilon A small constant used to maintain numerical stability.
 	 */
-	inline BatchNormLayer(const Dimensions<std::size_t,Rank>& dims, Scalar norm_avg_decay = .1,
-			Scalar epsilon = internal::Utils<Scalar>::EPSILON3) :
-				Base::BatchNormLayerBase(dims, 1, norm_avg_decay, epsilon),
+	inline BatchNormLayer(const Dimensions<std::size_t,Rank>& dims, RegPenSharedPtr<Scalar> param_reg,
+			Scalar norm_avg_decay = .1, Scalar epsilon = internal::Utils<Scalar>::EPSILON3) :
+				Base::BatchNormLayerBase(dims, param_reg, 1, norm_avg_decay, epsilon),
 				conversion_dims(Base::dims.template promote<>()) { }
 	inline Root* clone() const {
 		return new BatchNormLayer(*this);
@@ -1588,7 +1607,9 @@ protected:
 	inline typename Root::Data pass_back(typename Root::Data out_grads) {
 		assert((Dimensions<std::size_t,Root::DATA_RANK>(out_grads.dimensions()).template demote<>()) == Base::dims);
 		assert(out_grads.dimension(0) > 0 && conversion_dims[0] == out_grads.dimension(0));
-		return Base::_pass_back(std::move(out_grads), conversion_dims, 0);
+		typename Root::Data prev_out_grads = Base::_pass_back(std::move(out_grads), conversion_dims, 0);
+		Base::params_grad += Base::param_reg->d_function(Base::params_ref);
+		return prev_out_grads;
 	}
 private:
 	typename Base::RankwiseArray conversion_dims;
@@ -1607,9 +1628,9 @@ public:
 	 * @param norm_avg_decay The decay rate of the maintained means and variances.
 	 * @param epsilon A small constant used to maintain numerical stability.
 	 */
-	inline BatchNormLayer(Dimensions<std::size_t,3> dims, Scalar norm_avg_decay = .1,
-			Scalar epsilon = internal::Utils<Scalar>::EPSILON3) :
-				Base::BatchNormLayerBase(dims, dims(2), norm_avg_decay, epsilon),
+	inline BatchNormLayer(Dimensions<std::size_t,3> dims, RegPenSharedPtr<Scalar> param_reg,
+			Scalar norm_avg_decay = .1, Scalar epsilon = internal::Utils<Scalar>::EPSILON3) :
+				Base::BatchNormLayerBase(dims, param_reg, dims(2), norm_avg_decay, epsilon),
 				offsets({ 0u, 0u, 0u, 0u }),
 				extents({ 0u, dims(0), dims(1), 1u }) { }
 	inline Root* clone() const {
@@ -1627,14 +1648,14 @@ protected:
 		assert((Dimensions<std::size_t,4>(in.dimensions()).template demote<>()) == Base::dims);
 		assert(in.dimension(0) > 0);
 		std::size_t rows = in.dimension(0);
-		if (Base::depth == 1) {
+		if (Base::dims(2) == 1) {
 			std::array<std::size_t,Root::DATA_RANK> out_dims = Base::dims.template promote<>();
 			out_dims[0] = rows;
 			return Base::_pass_forward(std::move(in), out_dims, training, 0);
 		} else { // Multi-channel image data; depth-wise normalization.
 			typename Root::Data out(rows, Base::dims(0), Base::dims(1), Base::dims(2));
 			extents[0] = rows;
-			for (int i = 0; i < Base::depth; ++i) {
+			for (int i = 0; i < Base::dims(2); ++i) {
 				offsets[3] = i;
 				typename Root::Data in_slice_i = in.slice(offsets, extents);
 				out.slice(offsets, extents) = Base::_pass_forward(std::move(in_slice_i), extents, training, i);
@@ -1646,15 +1667,15 @@ protected:
 		assert((Dimensions<std::size_t,4>(out_grads.dimensions()).template demote<>()) == Base::dims);
 		assert(out_grads.dimension(0) > 0 && extents[0] == out_grads.dimension(0));
 		std::size_t rows = out_grads.dimension(0);
-		if (Base::depth == 1) {
+		typename Root::Data prev_out_grads;
+		if (Base::dims(2) == 1) {
 			std::array<std::size_t,Root::DATA_RANK> prev_out_dims = Base::dims.template promote<>();
 			prev_out_dims[0] = out_grads.dimension(0);
-			return Base::_pass_back(std::move(out_grads), prev_out_dims, 0);
+			prev_out_grads = Base::_pass_back(std::move(out_grads), prev_out_dims, 0);
 		} else {
-			typename Root::Data prev_out_grads;
 			if (!Base::is_input_layer())
 				prev_out_grads = typename Base::Data(rows, Base::dims(0), Base::dims(1), Base::dims(2));
-			for (int i = 0; i < Base::depth; ++i) {
+			for (int i = 0; i < Base::dims(2); ++i) {
 				offsets[3] = i;
 				typename Root::Data out_grads_slice = out_grads.slice(offsets, extents);
 				if (Base::is_input_layer())
@@ -1662,8 +1683,9 @@ protected:
 				else
 					prev_out_grads.slice(offsets, extents) = Base::_pass_back(std::move(out_grads_slice), extents, i);
 			}
-			return prev_out_grads;
 		}
+		Base::params_grad += Base::param_reg->d_function(Base::params_ref);
+		return prev_out_grads;
 	}
 private:
 	typename Base::RankwiseArray offsets;
@@ -1724,6 +1746,9 @@ protected:
 		return params_grad;
 	}
 	inline void enforce_constraints() { }
+	inline Scalar get_regularization_penalty() {
+		return 0;
+	}
 	inline typename Base::Data pass_forward(typename Base::Data in, bool training) {
 		assert((Dimensions<std::size_t,Base::DATA_RANK>(in.dimensions()).template demote<>()) == dims);
 		assert(in.dimension(0) > 0);

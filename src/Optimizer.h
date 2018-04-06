@@ -86,13 +86,19 @@ public:
 		net.backpropagate(loss->d_function(net.propagate(data_pair.first, true), data_pair.second) / (Scalar) instances);
 		bool failure = false;
 		std::vector<Layer<Scalar,Rank>*> layers = net.get_layers();
-		for (unsigned i = 0; i < layers.size(); ++i) {
+		// Compute the total regularization penalty on the base parameters.
+		Scalar total_reg_pen = 0;
+		for (std::size_t i = 0; i < layers.size(); ++i)
+			total_reg_pen += layers[i]->get_regularization_penalty();
+		for (std::size_t i = 0; i < layers.size(); ++i) {
 			Layer<Scalar,Rank>& layer = *(layers[i]);
 			if (layer.is_parametric()) {
 				std::cout << "Layer " << std::setw(3) << std::to_string(i + 1) <<
 						std::string(28, '-') << std::endl;
 				Matrix<Scalar>& params = layer.get_params();
 				const Matrix<Scalar>& params_grad = layer.get_params_grad();
+				Scalar reg_pen = layer.get_regularization_penalty();
+				total_reg_pen -= reg_pen;
 				for (int j = 0; j < params.rows(); ++j) {
 					for (int k = 0; k < params.cols(); ++k) {
 						std::cout << "\tParam[" << i << "," << j << "," << k << "]:" << std::endl;
@@ -100,14 +106,21 @@ public:
 						std::cout << "\t\tAnalytic gradient = " << ana_grad << std::endl;
 						Scalar param = params(j,k);
 						params(j,k) = param + step_size;
-						/* Compute the numerical gradients in training mode to ensure that the means
-						 * and standard deviations used for batch normalization are the same as those
-						 * used during the analytic gradient computation. */
+						/* Compute the numerical gradients in training mode to ensure that the means and standard
+						 * deviations used for batch normalization are the same as those used during the analytic
+						 * gradient computation. */
 						Scalar loss_inc = loss->function(net.propagate(data_pair.first, true), data_pair.second).mean();
+						/* Calculate the new regularization penalty as its derivative w.r.t. the layer's parameters
+						 * is included in the gradients.
+						 */
+						Scalar reg_pen_inc = layer.get_regularization_penalty();
 						params(j,k) = param - step_size;
 						Scalar loss_dec = loss->function(net.propagate(data_pair.first, true), data_pair.second).mean();
+						Scalar reg_pen_dec = layer.get_regularization_penalty();
 						params(j,k) = param;
-						Scalar num_grad = (loss_inc - loss_dec) / (2 * step_size);
+						// Include the regularization penalty as well.
+						Scalar num_grad = (loss_inc + total_reg_pen + reg_pen_inc -
+								(loss_dec + total_reg_pen + reg_pen_dec)) / (2 * step_size);
 						std::cout << "\t\tNumerical gradient = " << num_grad;
 						if (!internal::Utils<Scalar>::almost_equal(ana_grad, num_grad, abs_epsilon, rel_epsilon)) {
 							std::cout << " *****FAIL*****";
@@ -116,6 +129,7 @@ public:
 						std::cout << std::endl;
 					}
 				}
+				total_reg_pen += reg_pen;
 			}
 		}
 		// Empty the network caches.
@@ -298,8 +312,22 @@ protected:
 	 *
 	 * @param layer The layer whose parameters are to be constrained.
 	 */
-	inline static const void enforce_constraints(Layer<Scalar,Rank>& layer) {
+	inline static void enforce_constraints(Layer<Scalar,Rank>& layer) {
 		layer.enforce_constraints();
+	}
+	/**
+	 * A method to expose protected methods of the Layer class to subclasses of
+	 * Optimizer that are not friend classes of Layer.
+	 *
+	 * \see Layer#get_regularization_penalty()
+	 *
+	 * It calculates the regularization penalty of the layer's parameters.
+	 *
+	 * @param layer The layer whose parameters are to be constrained.
+	 * @return A scalar representing the penalty on the magnitude of the layer's parameters.
+	 */
+	inline static Scalar get_regularization_penalty(Layer<Scalar,Rank>& layer) {
+		return layer.get_regularization_penalty();
 	}
 	const LossSharedPtr<Scalar,Rank,Sequential> loss;
 };
@@ -311,11 +339,9 @@ template<typename Scalar, std::size_t Rank, bool Sequential>
 class SGDOptimizer : public Optimizer<Scalar,Rank,Sequential> {
 	typedef Optimizer<Scalar,Rank,Sequential> Base;
 public:
-	inline SGDOptimizer(LossSharedPtr<Scalar,Rank,Sequential> loss, RegPenSharedPtr<Scalar> reg, unsigned batch_size) :
+	inline SGDOptimizer(LossSharedPtr<Scalar,Rank,Sequential> loss, unsigned batch_size) :
 			Base::Optimizer(loss),
-				reg(reg),
 				batch_size(batch_size) {
-		assert(reg != nullptr);
 		assert(batch_size > 0);
 	}
 	virtual ~SGDOptimizer() = default;
@@ -360,7 +386,7 @@ protected:
 		Scalar mean_obj_loss = obj_loss / instances;
 		Scalar reg_loss = 0;
 		for (unsigned j = 0; j < layers.size(); ++j)
-			reg_loss += reg->function(Base::get_params(*(layers[j])));
+			reg_loss += Base::get_regularization_penalty(*layers[j]);
 		std::cout << "\tobj loss: " << std::to_string(mean_obj_loss) << std::endl;
 		std::cout << "\treg loss: " << std::to_string(reg_loss) << std::endl;
 		return mean_obj_loss + reg_loss;
@@ -374,7 +400,6 @@ protected:
 	 * @param epoch The index of the epoch.
 	 */
 	virtual void update_params(Layer<Scalar,Rank>& layer, unsigned i, unsigned epoch) = 0;
-	const RegPenSharedPtr<Scalar> reg;
 	const unsigned batch_size;
 };
 
@@ -386,15 +411,14 @@ class VanillaSGDOptimizer : public SGDOptimizer<Scalar,Rank,Sequential> {
 public:
 	/**
 	 * @param loss A shared pointer to the loss function to use.
-	 * @param reg A shared pointer to the regularization penalty to use.
 	 * @param batch_size The batch size to use for training and testing. It is expected to
 	 * be greater than 0.
 	 * @param learning_rate The learning rate (a.k.a. step size) to use. It is expected to
 	 * be greater than 0.
 	 */
-	inline VanillaSGDOptimizer(LossSharedPtr<Scalar,Rank,Sequential> loss, RegPenSharedPtr<Scalar> reg, unsigned batch_size = 1,
+	inline VanillaSGDOptimizer(LossSharedPtr<Scalar,Rank,Sequential> loss, unsigned batch_size = 1,
 			Scalar learning_rate = 1e-3) :
-				SGDOptimizer<Scalar,Rank,Sequential>::SGDOptimizer(loss, reg, batch_size),
+				SGDOptimizer<Scalar,Rank,Sequential>::SGDOptimizer(loss, batch_size),
 				learning_rate(learning_rate) {
 		assert(learning_rate > 0);
 	}
@@ -402,8 +426,7 @@ protected:
 	inline void fit(NeuralNetwork<Scalar,Rank,Sequential>& net) { }
 	inline void update_params(Layer<Scalar,Rank>& layer, unsigned i, unsigned epoch) {
 		Matrix<Scalar>& params = Optimizer<Scalar,Rank,Sequential>::get_params(layer);
-		params -= (learning_rate * (Optimizer<Scalar,Rank,Sequential>::get_params_grad(layer) +
-				SGDOptimizer<Scalar,Rank,Sequential>::reg->d_function(params)));
+		params -= learning_rate * Optimizer<Scalar,Rank,Sequential>::get_params_grad(layer);
 	}
 	const Scalar learning_rate;
 };
@@ -416,7 +439,6 @@ class MomentumAcceleratedSGDOptimizer : public SGDOptimizer<Scalar,Rank,Sequenti
 public:
 	/**
 	 * @param loss A shared pointer to the loss function to use.
-	 * @param reg A shared pointer to the regularization penalty to use.
 	 * @param batch_size The batch size to use for training and testing. It is expected to
 	 * be greater than 0.
 	 * @param init_learning_rate The initial learning rate (a.k.a. step size) to use. It
@@ -427,10 +449,9 @@ public:
 	 * @param momentum The momentum rate to use. The greater the momentum, the lesser the
 	 * effect of newer gradients. It is expected to be greater than 0 and less than 1.
 	 */
-	inline MomentumAcceleratedSGDOptimizer(LossSharedPtr<Scalar,Rank,Sequential> loss, RegPenSharedPtr<Scalar> reg,
-			unsigned batch_size = 1, Scalar init_learning_rate = 1e-3, Scalar annealing_rate = 1e-3,
-			Scalar momentum = .9) :
-				SGDOptimizer<Scalar,Rank,Sequential>::SGDOptimizer(loss, reg, batch_size),
+	inline MomentumAcceleratedSGDOptimizer(LossSharedPtr<Scalar,Rank,Sequential> loss, unsigned batch_size = 1,
+			Scalar init_learning_rate = 1e-3, Scalar annealing_rate = 1e-3, Scalar momentum = .9) :
+				SGDOptimizer<Scalar,Rank,Sequential>::SGDOptimizer(loss, batch_size),
 				init_learning_rate(init_learning_rate),
 				annealing_rate(annealing_rate),
 				momentum(momentum) {
@@ -445,19 +466,17 @@ protected:
 		params_grad_vec = std::vector<Matrix<Scalar>>(layers.size());
 		for (unsigned i = 0; i < params_grad_vec.size(); ++i) {
 			Layer<Scalar,Rank>& layer = *(layers[i]);
-			Matrix<Scalar>& params_grad = params_grad_vec[i];
-			params_grad = Matrix<Scalar>(Optimizer<Scalar,Rank,Sequential>::get_params_grad(layer).rows(),
-					Optimizer<Scalar,Rank,Sequential>::get_params_grad(layer).cols());
-			params_grad.setZero(params_grad.rows(), params_grad.cols());
+			const Matrix<Scalar>& params_grad = Optimizer<Scalar,Rank,Sequential>::get_params_grad(layer);
+			Matrix<Scalar> acc_params_grad(params_grad.rows(), params_grad.cols());
+			acc_params_grad.setZero(params_grad.rows(), params_grad.cols());
+			params_grad_vec[i] = acc_params_grad;
 		}
 	}
 	inline void update_params(Layer<Scalar,Rank>& layer, unsigned i, unsigned epoch) {
 		Scalar learning_rate = calculate_learning_rate(epoch);
 		Matrix<Scalar>& params_grad = params_grad_vec[i];
 		Matrix<Scalar>& params = Optimizer<Scalar,Rank,Sequential>::get_params(layer);
-		params_grad = momentum * params_grad - learning_rate * (Optimizer<Scalar,Rank,Sequential>::get_params_grad(layer) +
-				SGDOptimizer<Scalar,Rank,Sequential>::reg->d_function(params));
-		params += params_grad;
+		params += momentum * params_grad - learning_rate * Optimizer<Scalar,Rank,Sequential>::get_params_grad(layer);
 	}
 	/**
 	 * It calculates the annealed learning rate as a function of the epoch index.
@@ -483,7 +502,6 @@ class NesterovMomentumAcceleratedSGDOptimizer : public MomentumAcceleratedSGDOpt
 public:
 	/**
 	 * @param loss A shared pointer to the loss function to use.
-	 * @param reg A shared pointer to the regularization penalty to use.
 	 * @param batch_size The batch size to use for training and testing. It is expected to
 	 * be greater than 0.
 	 * @param init_learning_rate The initial learning rate (a.k.a. step size) to use. It is
@@ -495,19 +513,16 @@ public:
 	 * effect of newer gradients. It is expected to be greater than 0 and less than 1.
 	 */
 	inline NesterovMomentumAcceleratedSGDOptimizer(LossSharedPtr<Scalar,Rank,Sequential> loss,
-			RegPenSharedPtr<Scalar> reg, unsigned batch_size = 1, Scalar init_learning_rate = 1e-3,
-			Scalar annealing_rate = 1e-3, Scalar momentum = .9) :
-				Base::MomentumAcceleratedSGDOptimizer(loss, reg, batch_size, init_learning_rate,
-						annealing_rate, momentum) { };
+			unsigned batch_size = 1, Scalar init_learning_rate = 1e-3, Scalar annealing_rate = 1e-3, Scalar momentum = .9) :
+				Base::MomentumAcceleratedSGDOptimizer(loss, batch_size, init_learning_rate, annealing_rate, momentum) { };
 protected:
 	inline void update_params(Layer<Scalar,Rank>& layer, unsigned i, unsigned epoch) {
 		Scalar learning_rate = Base::calculate_learning_rate(epoch);
-		Matrix<Scalar>& params_grad = Base::params_grad_vec[i];
+		Matrix<Scalar>& acc_params_grad = Base::params_grad_vec[i];
 		Matrix<Scalar>& params = Optimizer<Scalar,Rank,Sequential>::get_params(layer);
-		Matrix<Scalar> params_grad_bak = params_grad;
-		params_grad = Base::momentum * params_grad - learning_rate * (Optimizer<Scalar,Rank,Sequential>::get_params_grad(layer) +
-				SGDOptimizer<Scalar,Rank,Sequential>::reg->d_function(params));
-		params += -Base::momentum * params_grad_bak + (1 + Base::momentum) * params_grad;
+		Matrix<Scalar> params_grad_bak = acc_params_grad;
+		acc_params_grad = Base::momentum * acc_params_grad - learning_rate * Optimizer<Scalar,Rank,Sequential>::get_params_grad(layer);
+		params += -Base::momentum * params_grad_bak + (1 + Base::momentum) * acc_params_grad;
 	}
 };
 
@@ -519,16 +534,15 @@ class AdagradOptimizer : public SGDOptimizer<Scalar,Rank,Sequential> {
 public:
 	/**
 	 * @param loss A shared pointer to the loss function to use.
-	 * @param reg A shared pointer to the regularization penalty to use.
 	 * @param batch_size The batch size to use for training and testing. It is expected to
 	 * be greater than 0.
 	 * @param learning_rate The learning rate (a.k.a. step size) to use. It is expected to
 	 * be greater than 0.
 	 * @param epsilon A small constant used to maintain numerical stability.
 	 */
-	inline AdagradOptimizer(LossSharedPtr<Scalar,Rank,Sequential> loss, RegPenSharedPtr<Scalar> reg, unsigned batch_size = 1,
+	inline AdagradOptimizer(LossSharedPtr<Scalar,Rank,Sequential> loss, unsigned batch_size = 1,
 			Scalar learning_rate = 1e-2, Scalar epsilon = internal::Utils<Scalar>::EPSILON2) :
-				SGDOptimizer<Scalar,Rank,Sequential>::SGDOptimizer(loss, reg, batch_size),
+				SGDOptimizer<Scalar,Rank,Sequential>::SGDOptimizer(loss, batch_size),
 				learning_rate(learning_rate),
 				epsilon(epsilon) {
 		assert(learning_rate > 0);
@@ -541,10 +555,10 @@ protected:
 		params_grad_sqrs_vec = std::vector<Matrix<Scalar>>(layers.size());
 		for (unsigned i = 0; i < params_grad_sqrs_vec.size(); ++i) {
 			Layer<Scalar,Rank>& layer = *(layers[i]);
-			Matrix<Scalar>& params_grad_sqrs = params_grad_sqrs_vec[i];
-			params_grad_sqrs = Matrix<Scalar>(Optimizer<Scalar,Rank,Sequential>::get_params_grad(layer).rows(),
-					Optimizer<Scalar,Rank,Sequential>::get_params_grad(layer).cols());
+			const Matrix<Scalar>& params_grad = Optimizer<Scalar,Rank,Sequential>::get_params_grad(layer);
+			Matrix<Scalar> params_grad_sqrs(params_grad.rows(), params_grad.cols());
 			params_grad_sqrs.setZero(params_grad_sqrs.rows(), params_grad_sqrs.cols());
+			params_grad_sqrs_vec[i] = params_grad_sqrs;
 		}
 	}
 	/**
@@ -561,8 +575,7 @@ protected:
 	inline void update_params(Layer<Scalar,Rank>& layer, unsigned i, unsigned epoch) {
 		Matrix<Scalar>& params_grad_sqrs = params_grad_sqrs_vec[i];
 		Matrix<Scalar>& params = Optimizer<Scalar,Rank,Sequential>::get_params(layer);
-		Matrix<Scalar> params_grad = Optimizer<Scalar,Rank,Sequential>::get_params_grad(layer) +
-				SGDOptimizer<Scalar,Rank,Sequential>::reg->d_function(params);
+		const Matrix<Scalar>& params_grad = Optimizer<Scalar,Rank,Sequential>::get_params_grad(layer);
 		update_acc_params_grad_sqrs(params_grad_sqrs, params_grad);
 		params -= (learning_rate * params_grad.array() / (params_grad_sqrs.array().sqrt() + epsilon)).matrix();
 	}
@@ -579,7 +592,6 @@ class RMSPropOptimizer : public AdagradOptimizer<Scalar,Rank,Sequential> {
 public:
 	/**
 	 * @param loss A shared pointer to the loss function to use.
-	 * @param reg A shared pointer to the regularization penalty to use.
 	 * @param batch_size The batch size to use for training and testing. It is expected to
 	 * be greater than 0.
 	 * @param learning_rate The learning rate (a.k.a. step size) to use. It is expected to
@@ -589,10 +601,9 @@ public:
 	 * gradients decay.
 	 * @param epsilon A small constant used to maintain numerical stability.
 	 */
-	inline RMSPropOptimizer(LossSharedPtr<Scalar,Rank,Sequential> loss, RegPenSharedPtr<Scalar> reg,
-			unsigned batch_size = 1, Scalar learning_rate = 1e-3, Scalar l2_decay = 1e-1,
-			Scalar epsilon = internal::Utils<Scalar>::EPSILON) :
-				AdagradOptimizer<Scalar,Rank,Sequential>::AdagradOptimizer(loss, reg, batch_size, learning_rate, epsilon),
+	inline RMSPropOptimizer(LossSharedPtr<Scalar,Rank,Sequential> loss, unsigned batch_size = 1, Scalar learning_rate = 1e-3,
+			Scalar l2_decay = 1e-1, Scalar epsilon = internal::Utils<Scalar>::EPSILON) :
+				AdagradOptimizer<Scalar,Rank,Sequential>::AdagradOptimizer(loss, batch_size, learning_rate, epsilon),
 				l2_decay(l2_decay) {
 		assert(l2_decay >= 0 && l2_decay <= 1);
 	}
@@ -612,7 +623,6 @@ class AdadeltaOptimizer : public SGDOptimizer<Scalar,Rank,Sequential> {
 public:
 	/**
 	 * @param loss A shared pointer to the loss function to use.
-	 * @param reg A shared pointer to the regularization penalty to use.
 	 * @param batch_size The batch size to use for training and testing. It is expected to
 	 * be greater than 0.
 	 * @param decay The decay rate of the accelerated accumulated parameter gradients.
@@ -620,9 +630,9 @@ public:
 	 * gradients decay.
 	 * @param epsilon A small constant used to maintain numerical stability.
 	 */
-	inline AdadeltaOptimizer(LossSharedPtr<Scalar,Rank,Sequential> loss, RegPenSharedPtr<Scalar> reg, unsigned batch_size = 1,
+	inline AdadeltaOptimizer(LossSharedPtr<Scalar,Rank,Sequential> loss, unsigned batch_size = 1,
 			Scalar decay = 5e-2, Scalar epsilon = internal::Utils<Scalar>::EPSILON2) :
-				SGDOptimizer<Scalar,Rank,Sequential>::SGDOptimizer(loss, reg, batch_size),
+				SGDOptimizer<Scalar,Rank,Sequential>::SGDOptimizer(loss, batch_size),
 				decay(decay),
 				epsilon(epsilon) {
 		assert(decay >= 0 && decay <= 1);
@@ -634,19 +644,19 @@ protected:
 		pgus_vec = std::vector<ParamGradAndUpdateSqrs>(layers.size());
 		for (unsigned i = 0; i < pgus_vec.size(); ++i) {
 			Layer<Scalar,Rank>& layer = *(layers[i]);
-			ParamGradAndUpdateSqrs& pgus = pgus_vec[i];
-			pgus.params_grad = Matrix<Scalar>(Optimizer<Scalar,Rank,Sequential>::get_params_grad(layer).rows(),
-					Optimizer<Scalar,Rank,Sequential>::get_params_grad(layer).cols());
+			const Matrix<Scalar>& param_grads = Optimizer<Scalar,Rank,Sequential>::get_params_grad(layer);
+			ParamGradAndUpdateSqrs pgus;
+			pgus.params_grad = Matrix<Scalar>(param_grads.rows(), param_grads.cols());
 			pgus.params_grad.setZero(pgus.params_grad.rows(), pgus.params_grad.cols());
 			pgus.params_update = Matrix<Scalar>(pgus.params_grad.rows(), pgus.params_grad.cols());
 			pgus.params_update.setZero(pgus.params_update.rows(), pgus.params_update.cols());
+			pgus_vec[i] = pgus;
 		}
 	}
 	inline void update_params(Layer<Scalar,Rank>& layer, unsigned i, unsigned epoch) {
 		ParamGradAndUpdateSqrs& pgus = pgus_vec[i];
 		Matrix<Scalar>& params = Optimizer<Scalar,Rank,Sequential>::get_params(layer);
-		Matrix<Scalar> params_grad = Optimizer<Scalar,Rank,Sequential>::get_params_grad(layer) +
-				SGDOptimizer<Scalar,Rank,Sequential>::reg->d_function(params);
+		const Matrix<Scalar>& params_grad = Optimizer<Scalar,Rank,Sequential>::get_params_grad(layer);
 		pgus.params_grad = (1 - decay) * pgus.params_grad + decay * params_grad.cwiseProduct(params_grad);
 		Matrix<Scalar> weight_updates = -params_grad.array() * (pgus.params_update.array() + epsilon).sqrt() /
 				(pgus.params_grad.array() + epsilon).sqrt();
@@ -673,7 +683,6 @@ class AdamOptimizer : public SGDOptimizer<Scalar,Rank,Sequential> {
 public:
 	/**
 	 * @param loss A shared pointer to the loss function to use.
-	 * @param reg A shared pointer to the regularization penalty to use.
 	 * @param batch_size The batch size to use for training and testing. It is expected to
 	 * be greater than 0.
 	 * @param learning_rate The learning rate (a.k.a. step size) to use. It is expected to
@@ -686,10 +695,9 @@ public:
 	 * squared gradients decay.
 	 * @param epsilon A small constant used to maintain numerical stability.
 	 */
-	inline AdamOptimizer(LossSharedPtr<Scalar,Rank,Sequential> loss, RegPenSharedPtr<Scalar> reg, unsigned batch_size = 1,
-			Scalar learning_rate = 1e-3, Scalar l1_decay = 1e-1, Scalar l2_decay = 1e-3,
-			Scalar epsilon = internal::Utils<Scalar>::EPSILON2) :
-				SGDOptimizer<Scalar,Rank,Sequential>::SGDOptimizer(loss, reg, batch_size),
+	inline AdamOptimizer(LossSharedPtr<Scalar,Rank,Sequential> loss, unsigned batch_size = 1, Scalar learning_rate = 1e-3,
+			Scalar l1_decay = 1e-1, Scalar l2_decay = 1e-3, Scalar epsilon = internal::Utils<Scalar>::EPSILON2) :
+				SGDOptimizer<Scalar,Rank,Sequential>::SGDOptimizer(loss, batch_size),
 				learning_rate(learning_rate),
 				l1_decay(l1_decay),
 				l2_decay(l2_decay),
@@ -706,12 +714,13 @@ protected:
 		pgn_vec = std::vector<ParamGradNorms>(layers.size());
 		for (unsigned i = 0; i < pgn_vec.size(); ++i) {
 			Layer<Scalar,Rank>& layer = *(layers[i]);
-			ParamGradNorms& vel = pgn_vec[i];
-			vel.params_grad_l1 = Matrix<Scalar>(Optimizer<Scalar,Rank,Sequential>::get_params_grad(layer).rows(),
-					Optimizer<Scalar,Rank,Sequential>::get_params_grad(layer).cols());
+			const Matrix<Scalar>& param_grads = Optimizer<Scalar,Rank,Sequential>::get_params_grad(layer);
+			ParamGradNorms vel;
+			vel.params_grad_l1 = Matrix<Scalar>(param_grads.rows(), param_grads.cols());
 			vel.params_grad_l1.setZero(vel.params_grad_l1.rows(), vel.params_grad_l1.cols());
 			vel.params_grad_l2 = Matrix<Scalar>(vel.params_grad_l1.rows(), vel.params_grad_l1.cols());
 			vel.params_grad_l2.setZero(vel.params_grad_l2.rows(), vel.params_grad_l2.cols());
+			pgn_vec[i] = vel;
 		}
 	}
 	inline void update_params(Layer<Scalar,Rank>& layer, unsigned i, unsigned epoch) {
@@ -719,8 +728,7 @@ protected:
 		Scalar l1_corr = 1.0 / (1.0 - pow(1.0 - l1_decay, epoch + 1) + epsilon);
 		Scalar l2_corr = 1.0 / (1.0 - pow(1.0 - l2_decay, epoch + 1) + epsilon);
 		Matrix<Scalar>& params = Optimizer<Scalar,Rank,Sequential>::get_params(layer);
-		Matrix<Scalar> params_grad = Optimizer<Scalar,Rank,Sequential>::get_params_grad(layer) +
-				SGDOptimizer<Scalar,Rank,Sequential>::reg->d_function(params);
+		const Matrix<Scalar>& params_grad = Optimizer<Scalar,Rank,Sequential>::get_params_grad(layer);
 		grad_norms.params_grad_l1 = (1 - l1_decay) * grad_norms.params_grad_l1 + l1_decay * params_grad;
 		grad_norms.params_grad_l2 = (1 - l2_decay) * grad_norms.params_grad_l2 +
 				l2_decay * params_grad.cwiseProduct(params_grad);
@@ -751,7 +759,6 @@ class AdaMaxOptimizer : public AdamOptimizer<Scalar,Rank,Sequential> {
 public:
 	/**
 	 * @param loss A shared pointer to the loss function to use.
-	 * @param reg A shared pointer to the regularization penalty to use.
 	 * @param batch_size The batch size to use for training and testing. It is expected to
 	 * be greater than 0.
 	 * @param learning_rate The learning rate (a.k.a. step size) to use. It is expected to
@@ -764,18 +771,15 @@ public:
 	 * squared gradients decay.
 	 * @param epsilon A small constant used to maintain numerical stability.
 	 */
-	inline AdaMaxOptimizer(LossSharedPtr<Scalar,Rank,Sequential> loss, RegPenSharedPtr<Scalar> reg, unsigned batch_size = 1,
-			Scalar learning_rate = 1e-3, Scalar l1_decay = 1e-1, Scalar l2_decay = 1e-3,
-			Scalar epsilon = internal::Utils<Scalar>::EPSILON2) :
-				Base::AdamOptimizer(loss, reg, batch_size, learning_rate,
-						l1_decay, l2_decay, epsilon) { }
+	inline AdaMaxOptimizer(LossSharedPtr<Scalar,Rank,Sequential> loss, unsigned batch_size = 1, Scalar learning_rate = 1e-3,
+			Scalar l1_decay = 1e-1, Scalar l2_decay = 1e-3, Scalar epsilon = internal::Utils<Scalar>::EPSILON2) :
+				Base::AdamOptimizer(loss, batch_size, learning_rate, l1_decay, l2_decay, epsilon) { }
 protected:
 	inline void update_params(Layer<Scalar,Rank>& layer, unsigned i, unsigned epoch) {
 		typename Base::ParamGradNorms& grad_norms = Base::pgn_vec[i];
 		Scalar l1_corr = 1.0 / (1.0 - pow(1.0 - Base::l1_decay, epoch + 1) + Base::epsilon);
 		Matrix<Scalar>& params = Optimizer<Scalar,Rank,Sequential>::get_params(layer);
-		Matrix<Scalar> params_grad = Optimizer<Scalar,Rank,Sequential>::get_params_grad(layer) +
-				SGDOptimizer<Scalar,Rank,Sequential>::reg->d_function(params);
+		const Matrix<Scalar>& params_grad = Optimizer<Scalar,Rank,Sequential>::get_params_grad(layer);
 		grad_norms.params_grad_l1 = (1 - Base::l1_decay) * grad_norms.params_grad_l1 + Base::l1_decay * params_grad;
 		grad_norms.params_grad_l2 = ((1 - Base::l2_decay) * grad_norms.params_grad_l2).cwiseMax(params_grad.cwiseAbs());
 		params -= (Base::learning_rate * (grad_norms.params_grad_l1 * l1_corr).array() /
@@ -792,7 +796,6 @@ class NadamOptimizer : public AdamOptimizer<Scalar,Rank,Sequential> {
 public:
 	/**
 	 * @param loss A shared pointer to the loss function to use.
-	 * @param reg A shared pointer to the regularization penalty to use.
 	 * @param batch_size The batch size to use for training and testing. It is expected to
 	 * be greater than 0.
 	 * @param learning_rate The learning rate (a.k.a. step size) to use. It is expected to
@@ -805,10 +808,9 @@ public:
 	 * squared gradients decay.
 	 * @param epsilon A small constant used to maintain numerical stability.
 	 */
-	inline NadamOptimizer(LossSharedPtr<Scalar,Rank,Sequential> loss, RegPenSharedPtr<Scalar> reg, unsigned batch_size = 1,
-			Scalar learning_rate = 1e-3, Scalar l1_decay = 1e-1, Scalar l2_decay = 1e-3,
-			Scalar epsilon = internal::Utils<Scalar>::EPSILON2) :
-				Base::AdamOptimizer(loss, reg, batch_size, learning_rate, l1_decay, l2_decay, epsilon) { }
+	inline NadamOptimizer(LossSharedPtr<Scalar,Rank,Sequential> loss, unsigned batch_size = 1, Scalar learning_rate = 1e-3,
+			Scalar l1_decay = 1e-1, Scalar l2_decay = 1e-3, Scalar epsilon = internal::Utils<Scalar>::EPSILON2) :
+				Base::AdamOptimizer(loss, batch_size, learning_rate, l1_decay, l2_decay, epsilon) { }
 protected:
 	inline void update_params(Layer<Scalar,Rank>& layer, unsigned i, unsigned epoch) {
 		typename Base::ParamGradNorms& grad_norms = Base::pgn_vec[i];
@@ -816,8 +818,7 @@ protected:
 		Scalar l1_next_corr = 1.0 / (1.0 - pow(1.0 - Base::l1_decay, epoch + 2) + Base::epsilon);
 		Scalar l2_corr = 1.0 / (1.0 - pow(1.0 - Base::l2_decay, epoch + 1) + Base::epsilon);
 		Matrix<Scalar>& params = Optimizer<Scalar,Rank,Sequential>::get_params(layer);
-		Matrix<Scalar> params_grad = Optimizer<Scalar,Rank,Sequential>::get_params_grad(layer) +
-				SGDOptimizer<Scalar,Rank,Sequential>::reg->d_function(params);
+		const Matrix<Scalar>& params_grad = Optimizer<Scalar,Rank,Sequential>::get_params_grad(layer);
 		grad_norms.params_grad_l1 = (1 - Base::l1_decay) * grad_norms.params_grad_l1 + Base::l1_decay * params_grad;
 		grad_norms.params_grad_l2 = (1 - Base::l2_decay) * grad_norms.params_grad_l2 + Base::l2_decay *
 				params_grad.cwiseProduct(params_grad);
