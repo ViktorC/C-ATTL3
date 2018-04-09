@@ -122,8 +122,9 @@ template<typename Scalar>
 class LeCunWeightInitialization : public GaussianWeightInitialization<Scalar> {
 public:
 	/**
-	 * @param bias The value to which the elements of the bias row are to be
-	 * set.
+	 * @param scaling_factor The value by which the randomly initialized weights
+	 * are to be scaled.
+	 * @param bias The value to which the elements of the bias row are to be set.
 	 */
 	inline LeCunWeightInitialization(Scalar scaling_factor = 1, Scalar bias = 0) :
 		GaussianWeightInitialization<Scalar>::GaussianWeightInitialization(scaling_factor, bias) { }
@@ -140,8 +141,9 @@ template<typename Scalar>
 class GlorotWeightInitialization : public GaussianWeightInitialization<Scalar> {
 public:
 	/**
-	 * @param bias The value to which the elements of the bias row are to be
-	 * set.
+	 * @param scaling_factor The value by which the randomly initialized weights
+	 * are to be scaled.
+	 * @param bias The value to which the elements of the bias row are to be set.
 	 */
 	inline GlorotWeightInitialization(Scalar scaling_factor = 1, Scalar bias = 0) :
 		GaussianWeightInitialization<Scalar>::GaussianWeightInitialization(scaling_factor, bias) { }
@@ -158,8 +160,9 @@ template<typename Scalar>
 class HeWeightInitialization : public GaussianWeightInitialization<Scalar> {
 public:
 	/**
-	 * @param bias The value to which the elements of the bias row are to be
-	 * set.
+	 * @param scaling_factor The value by which the randomly initialized weights
+	 * are to be scaled.
+	 * @param bias The value to which the elements of the bias row are to be set.
 	 */
 	inline HeWeightInitialization(Scalar scaling_factor = 1, Scalar bias = 0) :
 		GaussianWeightInitialization<Scalar>::GaussianWeightInitialization(scaling_factor, bias) { }
@@ -176,9 +179,9 @@ template<typename Scalar>
 class OrthogonalWeightInitialization : public GaussianWeightInitialization<Scalar> {
 public:
 	/**
+	 * @param sd The standard deviation of the normal distribution to sample from.
 	 * @param bias The value to which the elements of the bias row are to be
 	 * set.
-	 * @param sd The standard deviation of the normal distribution to sample from.
 	 */
 	inline OrthogonalWeightInitialization(Scalar sd = 1, Scalar bias = 0) :
 			GaussianWeightInitialization<Scalar>::GaussianWeightInitialization(1, bias),

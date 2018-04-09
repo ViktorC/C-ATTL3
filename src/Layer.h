@@ -738,12 +738,12 @@ protected:
 	inline typename Root::Data pass_forward(typename Root::Data in, bool training) {
 		assert((Dimensions<std::size_t,Base::DATA_RANK>(in.dimensions()).template demote<>()) == Base::dims);
 		assert(in.dimension(0) > 0);
-		auto act = ((-in).exp() + in.constant((Scalar) 1)).inverse();
+		auto out = ((-in).exp() + in.constant((Scalar) 1)).inverse();
 		if (training) {
-			out = act;
-			return out;
+			this->out = out;
+			return this->out;
 		}
-		return act;
+		return out;
 	}
 	inline typename Root::Data pass_back(typename Root::Data out_grads) {
 		assert((Dimensions<std::size_t,Base::DATA_RANK>(out_grads.dimensions()).template demote<>()) == Base::dims);
@@ -781,12 +781,12 @@ protected:
 	inline typename Root::Data pass_forward(typename Root::Data in, bool training) {
 		assert((Dimensions<std::size_t,Base::DATA_RANK>(in.dimensions()).template demote<>()) == Base::dims);
 		assert(in.dimension(0) > 0);
-		auto act = in.tanh();
+		auto out = in.tanh();
 		if (training) {
-			out = act;
-			return out;
+			this->out = out;
+			return this->out;
 		}
-		return act;
+		return out;
 	}
 	inline typename Root::Data pass_back(typename Root::Data out_grads) {
 		assert((Dimensions<std::size_t,Base::DATA_RANK>(out_grads.dimensions()).template demote<>()) == Base::dims);
@@ -819,27 +819,25 @@ protected:
 		return clone();
 	}
 	inline void empty_cache() {
-		out = typename Root::Data();
+		in = typename Root::Data();
 	}
 	inline typename Root::Data pass_forward(typename Root::Data in, bool training) {
 		assert((Dimensions<std::size_t,Base::DATA_RANK>(in.dimensions()).template demote<>()) == Base::dims);
 		assert(in.dimension(0) > 0);
-		auto act = (in.array().exp() + 1).log();
 		if (training) {
-			out = act;
-			return out;
+			this->in = std::move(in);
+			return (this->in.exp() + this->in.constant((Scalar) 1)).log();
 		}
-		return act;
+		return (in.exp() + in.constant((Scalar) 1)).log();
 	}
 	inline typename Root::Data pass_back(typename Root::Data out_grads) {
 		assert((Dimensions<std::size_t,Base::DATA_RANK>(out_grads.dimensions()).template demote<>()) == Base::dims);
-		assert(out_grads.dimension(0) > 0 && out.dimension(0) == out_grads.dimension(0));
-		// TODO
-		return (out * (-out + out.constant((Scalar) 1))) * out_grads;
+		assert(out_grads.dimension(0) > 0 && in.dimension(0) == out_grads.dimension(0));
+		return ((-in).exp() + in.constant((Scalar) 1)).inverse() * out_grads;
 	}
 private:
 	// Staged computation cache.
-	typename Root::Data out;
+	typename Root::Data in;
 };
 
 /**
@@ -1070,7 +1068,10 @@ class PReLUActivationLayer : public ActivationLayer<Scalar,Rank> {
 public:
 	/**
 	 * @param dims The dimensionality of the input tensor.
+	 * @param param_reg The regularization function to apply to the layer's parameters.
 	 * @param init_alpha The initial factor by which negative inputs are to be scaled.
+	 * @param max_norm_constraint An optional max-norm constraint. If it is 0 or less, no
+	 * constraint is applied.
 	 */
 	inline PReLUActivationLayer(const Dimensions<std::size_t,Rank>& dims, ParamRegSharedPtr<Scalar> param_reg = Root::DEFAULT_PARAM_REG,
 			Scalar init_alpha = 1e-1, Scalar max_norm_constraint = 0) :
@@ -1690,6 +1691,12 @@ class BatchNormLayer : public BatchNormLayerBase<Scalar,Rank> {
 public:
 	/**
 	 * @param dims The dimensionality of the input tensor.
+	 * @param gamma_reg The regularization function to apply to the layer's gamma parameters.
+	 * @param beta_reg The regularization function to apply to the layer's beta parameters.
+	 * @param gamma_max_norm_constraint An optional max-norm constraint to enforce on the
+	 * gamma parameters. If it is 0 or less, no constraint is applied.
+	 * @param beta_max_norm_constraint An optional max-norm constraint to enforce on the
+	 * beta parameters. If it is 0 or less, no constraint is applied.
 	 * @param norm_avg_decay The decay rate of the maintained means and variances.
 	 * @param epsilon A small constant used to maintain numerical stability.
 	 */
@@ -1733,10 +1740,16 @@ class BatchNormLayer<Scalar,3> : public BatchNormLayerBase<Scalar,3> {
 	typedef BatchNormLayerBase<Scalar,3> Base;
 public:
 	/**
-	 * @param dims The dimensionality of the input tensor.
-	 * @param norm_avg_decay The decay rate of the maintained means and variances.
-	 * @param epsilon A small constant used to maintain numerical stability.
-	 */
+		 * @param dims The dimensionality of the input tensor.
+		 * @param gamma_reg The regularization function to apply to the layer's gamma parameters.
+		 * @param beta_reg The regularization function to apply to the layer's beta parameters.
+		 * @param gamma_max_norm_constraint An optional max-norm constraint to enforce on the
+		 * gamma parameters. If it is 0 or less, no constraint is applied.
+		 * @param beta_max_norm_constraint An optional max-norm constraint to enforce on the
+		 * beta parameters. If it is 0 or less, no constraint is applied.
+		 * @param norm_avg_decay The decay rate of the maintained means and variances.
+		 * @param epsilon A small constant used to maintain numerical stability.
+		 */
 	inline BatchNormLayer(Dimensions<std::size_t,3> dims, ParamRegSharedPtr<Scalar> gamma_reg = Root::DEFAULT_PARAM_REG,
 			ParamRegSharedPtr<Scalar> beta_reg = Root::DEFAULT_PARAM_REG, Scalar gamma_max_norm_constraint = 0,
 			Scalar beta_max_norm_constraint = 0, Scalar norm_avg_decay = .1, Scalar epsilon = internal::Utils<Scalar>::EPSILON3) :

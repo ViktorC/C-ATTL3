@@ -13,5 +13,5 @@ var searchData=
   ['operator_3d_3d',['operator==',['../classcattle_1_1_dim_expression.html#ac2fb665fd63477ff87ac5af1620804d1',1,'cattle::DimExpression::operator==(const DimExpression&lt; OtherDerived, OtherIndexType, OtherRank &gt; &amp;dims) const'],['../classcattle_1_1_dim_expression.html#a4ab9882ff98f50aeb8c6dbd6bfa09d4b',1,'cattle::DimExpression::operator==(const Other&lt; OtherDerived &gt; &amp;dims) const'],['../classcattle_1_1_dim_expression.html#a9e3b5ce43b3414edda58f7b1f12ecdd1',1,'cattle::DimExpression::operator==(const std::array&lt; IndexType, Rank &gt; &amp;dims) const']]],
   ['optimize',['optimize',['../classcattle_1_1_optimizer.html#abd96aab852071300003b1b71e97207ef',1,'cattle::Optimizer']]],
   ['optimizer',['Optimizer',['../classcattle_1_1_optimizer.html#ad26c752cffbd9e33d9d88b606c301874',1,'cattle::Optimizer']]],
-  ['orthogonalweightinitialization',['OrthogonalWeightInitialization',['../classcattle_1_1_orthogonal_weight_initialization.html#ab9be303db248270141684a0cf57b0cbf',1,'cattle::OrthogonalWeightInitialization']]]
+  ['orthogonalweightinitialization',['OrthogonalWeightInitialization',['../classcattle_1_1_orthogonal_weight_initialization.html#a00998ff9be4fa047fb2505450af2ee4f',1,'cattle::OrthogonalWeightInitialization']]]
 ];

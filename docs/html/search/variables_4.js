@@ -5,6 +5,7 @@ var searchData=
   ['data_5fstream_5fpairs',['data_stream_pairs',['../classcattle_1_1_split_file_data_provider.html#ad67d64e8ec2e83be491eda494d94ed8c',1,'cattle::SplitFileDataProvider']]],
   ['data_5fstreams',['data_streams',['../classcattle_1_1_joint_file_data_provider.html#a472732f6dd35b5ca135c68a4de3bbeff',1,'cattle::JointFileDataProvider']]],
   ['decay',['decay',['../classcattle_1_1_adadelta_optimizer.html#a8f2c1f0593ea951e49652d23f6a22ae3',1,'cattle::AdadeltaOptimizer']]],
+  ['default_5fparam_5freg',['DEFAULT_PARAM_REG',['../classcattle_1_1_layer.html#a1db6f75be0c894b6dee610e45be43b69',1,'cattle::Layer']]],
   ['depth',['depth',['../classcattle_1_1_batch_norm_layer_base.html#ac413c9808d0aa65df1d97eb4a45d7601',1,'cattle::BatchNormLayerBase']]],
   ['dil_5freceptor_5fheight',['dil_receptor_height',['../classcattle_1_1_conv_layer.html#a92d4090ac9cd1912325f1775e38f60a1',1,'cattle::ConvLayer::dil_receptor_height()'],['../classcattle_1_1_pooling_layer.html#a99342c5d92a3f4520fbf3cff0fd77035',1,'cattle::PoolingLayer::dil_receptor_height()']]],
   ['dil_5freceptor_5fwidth',['dil_receptor_width',['../classcattle_1_1_conv_layer.html#a70715bddaba7da95a78c8950d3e9d789',1,'cattle::ConvLayer::dil_receptor_width()'],['../classcattle_1_1_pooling_layer.html#ac016a2a3dcf94943cbab7def42cf2d8a',1,'cattle::PoolingLayer::dil_receptor_width()']]],

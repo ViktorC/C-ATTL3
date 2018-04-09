@@ -107,10 +107,10 @@ Public Member Functions</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pro-methods"></a>
 Protected Member Functions</h2></td></tr>
-<tr class="memitem:a0be2f521c2ca108aa8ba3b8f82106403"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_kernel_layer.html#a0be2f521c2ca108aa8ba3b8f82106403">KernelLayer</a> (const <a class="el" href="classcattle_1_1_dimensions.html">Dimensions</a>&lt; std::size_t, Rank &gt; &amp;<a class="el" href="classcattle_1_1_kernel_layer.html#a9acecaf6a36c0b25a5f403faeda6dafe">input_dims</a>, <a class="el" href="classcattle_1_1_dimensions.html">Dimensions</a>&lt; std::size_t, Rank &gt; <a class="el" href="classcattle_1_1_kernel_layer.html#abb4e84b72abfa71cc8c657bac5fe6cf7">output_dims</a>, <a class="el" href="namespacecattle.html#a96574a467e593e2c62c432b0c8ec8349">WeightInitSharedPtr</a>&lt; Scalar &gt; <a class="el" href="classcattle_1_1_kernel_layer.html#a2af03d22c438b0ab3e118381a48218eb">weight_init</a>, std::size_t weight_rows, std::size_t weight_cols, Scalar <a class="el" href="classcattle_1_1_kernel_layer.html#af43b1b79d6f828829505151ea59ba972">max_norm_constraint</a>)</td></tr>
-<tr class="separator:a0be2f521c2ca108aa8ba3b8f82106403"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ac40cc52bd4b22c2748fe66ad30666658"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_kernel_layer.html#ac40cc52bd4b22c2748fe66ad30666658">KernelLayer</a> (const <a class="el" href="classcattle_1_1_kernel_layer.html">KernelLayer</a>&lt; Scalar, Rank &gt; &amp;layer, bool share_weights=false)</td></tr>
-<tr class="separator:ac40cc52bd4b22c2748fe66ad30666658"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aae5cbcbbf11a2d6113277fd419e288cf"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_kernel_layer.html#aae5cbcbbf11a2d6113277fd419e288cf">KernelLayer</a> (const <a class="el" href="classcattle_1_1_dimensions.html">Dimensions</a>&lt; std::size_t, Rank &gt; &amp;<a class="el" href="classcattle_1_1_kernel_layer.html#a9acecaf6a36c0b25a5f403faeda6dafe">input_dims</a>, <a class="el" href="classcattle_1_1_dimensions.html">Dimensions</a>&lt; std::size_t, Rank &gt; <a class="el" href="classcattle_1_1_kernel_layer.html#abb4e84b72abfa71cc8c657bac5fe6cf7">output_dims</a>, <a class="el" href="namespacecattle.html#a96574a467e593e2c62c432b0c8ec8349">WeightInitSharedPtr</a>&lt; Scalar &gt; <a class="el" href="classcattle_1_1_kernel_layer.html#a2af03d22c438b0ab3e118381a48218eb">weight_init</a>, <a class="el" href="namespacecattle.html#a083ab63c64a5c935b2d2cd3f03c4e27a">ParamRegSharedPtr</a>&lt; Scalar &gt; <a class="el" href="classcattle_1_1_kernel_layer.html#ab96220969abe12d7a4363679e6e1676c">weight_reg</a>, std::size_t weight_rows, std::size_t weight_cols, Scalar <a class="el" href="classcattle_1_1_kernel_layer.html#af43b1b79d6f828829505151ea59ba972">max_norm_constraint</a>)</td></tr>
+<tr class="separator:aae5cbcbbf11a2d6113277fd419e288cf"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a8ff7caeb210952b9fff18418159bd92a"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_kernel_layer.html#a8ff7caeb210952b9fff18418159bd92a">KernelLayer</a> (const <a class="el" href="classcattle_1_1_kernel_layer.html">KernelLayer</a>&lt; Scalar, Rank &gt; &amp;layer, bool share_params=false)</td></tr>
+<tr class="separator:a8ff7caeb210952b9fff18418159bd92a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a93f48e39e3e9af884acc8ddd518c45e4"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_kernel_layer.html#a93f48e39e3e9af884acc8ddd518c45e4">is_input_layer</a> () const</td></tr>
 <tr class="separator:a93f48e39e3e9af884acc8ddd518c45e4"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a2cfd231e456e1f828dc3638b3a5eb0c7"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_kernel_layer.html#a2cfd231e456e1f828dc3638b3a5eb0c7">set_input_layer</a> (bool <a class="el" href="classcattle_1_1_kernel_layer.html#acae055de381c895d5e20eb1908ef8b98">input_layer</a>)</td></tr>
@@ -121,6 +121,10 @@ Protected Member Functions</h2></td></tr>
 <tr class="separator:a9b9896f4bd8461df9021f9ae0c03c5b8"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aa2956ff7c87760f05d4e0d906ed16b10"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespacecattle.html#a1d78623a47279d516750a44dbad6090b">Matrix</a>&lt; Scalar &gt; &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_kernel_layer.html#aa2956ff7c87760f05d4e0d906ed16b10">get_params_grad</a> ()</td></tr>
 <tr class="separator:aa2956ff7c87760f05d4e0d906ed16b10"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a403029b832ce6534577e87dbe4163ccb"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_kernel_layer.html#a403029b832ce6534577e87dbe4163ccb">regularize</a> ()</td></tr>
+<tr class="separator:a403029b832ce6534577e87dbe4163ccb"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a38e8d6f51341821692018c873ee37732"><td class="memItemLeft" align="right" valign="top">Scalar&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_kernel_layer.html#a38e8d6f51341821692018c873ee37732">get_regularization_penalty</a> ()</td></tr>
+<tr class="separator:a38e8d6f51341821692018c873ee37732"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ad324ff93b576e8e542962a4d2d5d18f4"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_kernel_layer.html#ad324ff93b576e8e542962a4d2d5d18f4">enforce_constraints</a> ()</td></tr>
 <tr class="separator:ad324ff93b576e8e542962a4d2d5d18f4"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="inherit_header pro_methods_classcattle_1_1_layer"><td colspan="2" onclick="javascript:toggleInherit('pro_methods_classcattle_1_1_layer')"><img src="closed.png" alt="-"/>&#160;Protected Member Functions inherited from <a class="el" href="classcattle_1_1_layer.html">cattle::Layer&lt; Scalar, Rank &gt;</a></td></tr>
@@ -141,12 +145,12 @@ Protected Attributes</h2></td></tr>
 <tr class="separator:abb4e84b72abfa71cc8c657bac5fe6cf7"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a2af03d22c438b0ab3e118381a48218eb"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="namespacecattle.html#a96574a467e593e2c62c432b0c8ec8349">WeightInitSharedPtr</a>&lt; Scalar &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_kernel_layer.html#a2af03d22c438b0ab3e118381a48218eb">weight_init</a></td></tr>
 <tr class="separator:a2af03d22c438b0ab3e118381a48218eb"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab96220969abe12d7a4363679e6e1676c"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="namespacecattle.html#a083ab63c64a5c935b2d2cd3f03c4e27a">ParamRegSharedPtr</a>&lt; Scalar &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_kernel_layer.html#ab96220969abe12d7a4363679e6e1676c">weight_reg</a></td></tr>
+<tr class="separator:ab96220969abe12d7a4363679e6e1676c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:af43b1b79d6f828829505151ea59ba972"><td class="memItemLeft" align="right" valign="top">const Scalar&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_kernel_layer.html#af43b1b79d6f828829505151ea59ba972">max_norm_constraint</a></td></tr>
 <tr class="separator:af43b1b79d6f828829505151ea59ba972"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:abbcbba245d4916ed18174ad54e17bbf1"><td class="memItemLeft" align="right" valign="top">const bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_kernel_layer.html#abbcbba245d4916ed18174ad54e17bbf1">max_norm</a></td></tr>
 <tr class="separator:abbcbba245d4916ed18174ad54e17bbf1"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:acae055de381c895d5e20eb1908ef8b98"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_kernel_layer.html#acae055de381c895d5e20eb1908ef8b98">input_layer</a></td></tr>
-<tr class="separator:acae055de381c895d5e20eb1908ef8b98"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aa8a0a400d5b5ed4fb107317777843d48"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespacecattle.html#a1d78623a47279d516750a44dbad6090b">Matrix</a>&lt; Scalar &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_kernel_layer.html#aa8a0a400d5b5ed4fb107317777843d48">weights_grad</a></td></tr>
 <tr class="separator:aa8a0a400d5b5ed4fb107317777843d48"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a31713651225cd4a9a5b219fa7ba585c4"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespacecattle.html#a1d78623a47279d516750a44dbad6090b">Matrix</a>&lt; Scalar &gt; &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_kernel_layer.html#a31713651225cd4a9a5b219fa7ba585c4">weights_ref</a></td></tr>
@@ -154,11 +158,16 @@ Protected Attributes</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pri-attribs"></a>
 Private Attributes</h2></td></tr>
+<tr class="memitem:acae055de381c895d5e20eb1908ef8b98"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_kernel_layer.html#acae055de381c895d5e20eb1908ef8b98">input_layer</a></td></tr>
+<tr class="separator:acae055de381c895d5e20eb1908ef8b98"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ae2ec7584aa02d1bae4f47bb57cd71ae5"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespacecattle.html#a1d78623a47279d516750a44dbad6090b">Matrix</a>&lt; Scalar &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_kernel_layer.html#ae2ec7584aa02d1bae4f47bb57cd71ae5">weights</a></td></tr>
 <tr class="separator:ae2ec7584aa02d1bae4f47bb57cd71ae5"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="inherited"></a>
 Additional Inherited Members</h2></td></tr>
+<tr class="inherit_header pub_static_attribs_classcattle_1_1_layer"><td colspan="2" onclick="javascript:toggleInherit('pub_static_attribs_classcattle_1_1_layer')"><img src="closed.png" alt="-"/>&#160;Static Public Attributes inherited from <a class="el" href="classcattle_1_1_layer.html">cattle::Layer&lt; Scalar, Rank &gt;</a></td></tr>
+<tr class="memitem:a1db6f75be0c894b6dee610e45be43b69 inherit pub_static_attribs_classcattle_1_1_layer"><td class="memItemLeft" align="right" valign="top">static const <a class="el" href="namespacecattle.html#a083ab63c64a5c935b2d2cd3f03c4e27a">ParamRegSharedPtr</a>&lt; Scalar &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_layer.html#a1db6f75be0c894b6dee610e45be43b69">DEFAULT_PARAM_REG</a></td></tr>
+<tr class="separator:a1db6f75be0c894b6dee610e45be43b69 inherit pub_static_attribs_classcattle_1_1_layer"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="inherit_header pro_types_classcattle_1_1_layer"><td colspan="2" onclick="javascript:toggleInherit('pro_types_classcattle_1_1_layer')"><img src="closed.png" alt="-"/>&#160;Protected Types inherited from <a class="el" href="classcattle_1_1_layer.html">cattle::Layer&lt; Scalar, Rank &gt;</a></td></tr>
 <tr class="memitem:a8c0af442a18521dea2406d0878e7db61 inherit pro_types_classcattle_1_1_layer"><td class="memItemLeft" align="right" valign="top">typedef <a class="el" href="namespacecattle.html#a8b9323ad928764340e46f0802bf27fbb">Tensor</a>&lt; Scalar, <a class="el" href="classcattle_1_1_layer.html#af7f8bccf684ef96e791adbfc56b60e09">DATA_RANK</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_layer.html#a8c0af442a18521dea2406d0878e7db61">Data</a></td></tr>
 <tr class="separator:a8c0af442a18521dea2406d0878e7db61 inherit pro_types_classcattle_1_1_layer"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -199,8 +208,8 @@ template&lt;typename Scalar, std::size_t Rank&gt; </div>
 
 </div>
 </div>
-<a id="a0be2f521c2ca108aa8ba3b8f82106403"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a0be2f521c2ca108aa8ba3b8f82106403">&#9670;&nbsp;</a></span>KernelLayer() <span class="overload">[1/2]</span></h2>
+<a id="aae5cbcbbf11a2d6113277fd419e288cf"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aae5cbcbbf11a2d6113277fd419e288cf">&#9670;&nbsp;</a></span>KernelLayer() <span class="overload">[1/2]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -227,6 +236,12 @@ template&lt;typename Scalar, std::size_t Rank&gt; </div>
           <td></td>
           <td class="paramtype"><a class="el" href="namespacecattle.html#a96574a467e593e2c62c432b0c8ec8349">WeightInitSharedPtr</a>&lt; Scalar &gt;&#160;</td>
           <td class="paramname"><em>weight_init</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="namespacecattle.html#a083ab63c64a5c935b2d2cd3f03c4e27a">ParamRegSharedPtr</a>&lt; Scalar &gt;&#160;</td>
+          <td class="paramname"><em>weight_reg</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -261,8 +276,8 @@ template&lt;typename Scalar, std::size_t Rank&gt; </div>
 
 </div>
 </div>
-<a id="ac40cc52bd4b22c2748fe66ad30666658"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ac40cc52bd4b22c2748fe66ad30666658">&#9670;&nbsp;</a></span>KernelLayer() <span class="overload">[2/2]</span></h2>
+<a id="a8ff7caeb210952b9fff18418159bd92a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a8ff7caeb210952b9fff18418159bd92a">&#9670;&nbsp;</a></span>KernelLayer() <span class="overload">[2/2]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -282,7 +297,7 @@ template&lt;typename Scalar, std::size_t Rank&gt; </div>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">bool&#160;</td>
-          <td class="paramname"><em>share_weights</em> = <code>false</code>&#160;</td>
+          <td class="paramname"><em>share_params</em> = <code>false</code>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -324,7 +339,7 @@ template&lt;typename Scalar, std::size_t Rank&gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
-<p>It applies constraints such as max-norm to the parameters of the layer if applicable. </p>
+<p>It applies constraints such as max-norm to the parameters of the layer (if applicable). </p>
 
 <p>Implements <a class="el" href="classcattle_1_1_layer.html#ac74dd19ed2f3a253cfbb1d1785f56197">cattle::Layer&lt; Scalar, Rank &gt;</a>.</p>
 
@@ -454,6 +469,37 @@ template&lt;typename Scalar, std::size_t Rank&gt; </div>
 
 </div>
 </div>
+<a id="a38e8d6f51341821692018c873ee37732"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a38e8d6f51341821692018c873ee37732">&#9670;&nbsp;</a></span>get_regularization_penalty()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename Scalar, std::size_t Rank&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">Scalar <a class="el" href="classcattle_1_1_kernel_layer.html">cattle::KernelLayer</a>&lt; Scalar, Rank &gt;::get_regularization_penalty </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">protected</span><span class="mlabel">virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p>It calculates the regularization penalty of the layer's parameters. If the layer is not parametric, 0 is returned.</p>
+<dl class="section return"><dt>Returns</dt><dd>A scalar representing the penalty on the magnitude of the layer's parameters. </dd></dl>
+
+<p>Implements <a class="el" href="classcattle_1_1_layer.html#a3dd89c138cfc74ca6e7572337d68e44e">cattle::Layer&lt; Scalar, Rank &gt;</a>.</p>
+
+</div>
+</div>
 <a id="af6cb82a9e05d72dc92d8a36274e71a63"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#af6cb82a9e05d72dc92d8a36274e71a63">&#9670;&nbsp;</a></span>init()</h2>
 
@@ -512,6 +558,36 @@ template&lt;typename Scalar, std::size_t Rank&gt; </div>
 <dl class="section return"><dt>Returns</dt><dd>Whether this layer is the input layer of the neural network that contains it. </dd></dl>
 
 <p>Reimplemented from <a class="el" href="classcattle_1_1_layer.html#a65bfa4d93279548dad4e57d7f03cbd51">cattle::Layer&lt; Scalar, Rank &gt;</a>.</p>
+
+</div>
+</div>
+<a id="a403029b832ce6534577e87dbe4163ccb"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a403029b832ce6534577e87dbe4163ccb">&#9670;&nbsp;</a></span>regularize()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename Scalar, std::size_t Rank&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void <a class="el" href="classcattle_1_1_kernel_layer.html">cattle::KernelLayer</a>&lt; Scalar, Rank &gt;::regularize </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">protected</span><span class="mlabel">virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p>It computes the derivative of the regularization function w.r.t. the parameters of the layer and adds it to their gradient. If the layer is not parametric, calling this method has no effect. </p>
+
+<p>Implements <a class="el" href="classcattle_1_1_layer.html#aae685cf7e708e0c4f32ddc4c10254046">cattle::Layer&lt; Scalar, Rank &gt;</a>.</p>
 
 </div>
 </div>
@@ -594,7 +670,7 @@ template&lt;typename Scalar, std::size_t Rank&gt; </div>
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">protected</span></span>  </td>
+<span class="mlabels"><span class="mlabel">private</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
@@ -686,6 +762,30 @@ template&lt;typename Scalar, std::size_t Rank&gt; </div>
       <table class="memname">
         <tr>
           <td class="memname">const <a class="el" href="namespacecattle.html#a96574a467e593e2c62c432b0c8ec8349">WeightInitSharedPtr</a>&lt;Scalar&gt; <a class="el" href="classcattle_1_1_kernel_layer.html">cattle::KernelLayer</a>&lt; Scalar, Rank &gt;::weight_init</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">protected</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="ab96220969abe12d7a4363679e6e1676c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab96220969abe12d7a4363679e6e1676c">&#9670;&nbsp;</a></span>weight_reg</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename Scalar, std::size_t Rank&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">const <a class="el" href="namespacecattle.html#a083ab63c64a5c935b2d2cd3f03c4e27a">ParamRegSharedPtr</a>&lt;Scalar&gt; <a class="el" href="classcattle_1_1_kernel_layer.html">cattle::KernelLayer</a>&lt; Scalar, Rank &gt;::weight_reg</td>
         </tr>
       </table>
   </td>

@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['utils_2eh',['Utils.h',['../_utils_8h.html',1,'']]]
+  ['weightinitialization_2eh',['WeightInitialization.h',['../_weight_initialization_8h.html',1,'']]]
 ];

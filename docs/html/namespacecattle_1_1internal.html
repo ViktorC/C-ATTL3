@@ -86,6 +86,11 @@ Typedefs</h2></td></tr>
 <tr class="memitem:a06111765fdc27ecdc122889ac6f0d3d0"><td class="memTemplParams" colspan="2">template&lt;typename Scalar &gt; </td></tr>
 <tr class="memitem:a06111765fdc27ecdc122889ac6f0d3d0"><td class="memTemplItemLeft" align="right" valign="top">using&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespacecattle_1_1internal.html#a06111765fdc27ecdc122889ac6f0d3d0">EigenSolver</a> = Eigen::SelfAdjointEigenSolver&lt; <a class="el" href="namespacecattle.html#a1d78623a47279d516750a44dbad6090b">Matrix</a>&lt; Scalar &gt; &gt;</td></tr>
 <tr class="separator:a06111765fdc27ecdc122889ac6f0d3d0"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3e63c9777951b7b3512ff92061e292d2"><td class="memTemplParams" colspan="2">template&lt;typename Scalar &gt; </td></tr>
+<tr class="memitem:a3e63c9777951b7b3512ff92061e292d2"><td class="memTemplItemLeft" align="right" valign="top">using&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespacecattle_1_1internal.html#a3e63c9777951b7b3512ff92061e292d2">SVD</a> = Eigen::BDCSVD&lt; <a class="el" href="namespacecattle.html#a1d78623a47279d516750a44dbad6090b">Matrix</a>&lt; Scalar &gt; &gt;</td></tr>
+<tr class="separator:a3e63c9777951b7b3512ff92061e292d2"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:afe0f43a473fb65d81bd656efbe10e1c4"><td class="memItemLeft" align="right" valign="top">using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacecattle_1_1internal.html#afe0f43a473fb65d81bd656efbe10e1c4">SVDOptions</a> = Eigen::DecompositionOptions</td></tr>
+<tr class="separator:afe0f43a473fb65d81bd656efbe10e1c4"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>A namespace for utilities used by C-ATTL3 internally. </p>
@@ -119,6 +124,38 @@ template&lt;typename Scalar &gt; </div>
       </table>
 </div><div class="memdoc">
 <p>An alias for permutation matrices. </p>
+
+</div>
+</div>
+<a id="a3e63c9777951b7b3512ff92061e292d2"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a3e63c9777951b7b3512ff92061e292d2">&#9670;&nbsp;</a></span>SVD</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename Scalar &gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname">using <a class="el" href="namespacecattle_1_1internal.html#a3e63c9777951b7b3512ff92061e292d2">cattle::internal::SVD</a> = typedef Eigen::BDCSVD&lt;<a class="el" href="namespacecattle.html#a1d78623a47279d516750a44dbad6090b">Matrix</a>&lt;Scalar&gt; &gt;</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>An alias for Eigen's bi-diagonal divide and conquer singular-value decomposition. </p>
+
+</div>
+</div>
+<a id="afe0f43a473fb65d81bd656efbe10e1c4"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#afe0f43a473fb65d81bd656efbe10e1c4">&#9670;&nbsp;</a></span>SVDOptions</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">using <a class="el" href="namespacecattle_1_1internal.html#afe0f43a473fb65d81bd656efbe10e1c4">cattle::internal::SVDOptions</a> = typedef Eigen::DecompositionOptions</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>An alias for Eigen's singular-value decomposition options. </p>
 
 </div>
 </div>

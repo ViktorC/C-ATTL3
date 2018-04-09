@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['regularizationpenalty_2eh',['RegularizationPenalty.h',['../_regularization_penalty_8h.html',1,'']]]
+  ['utils_2eh',['Utils.h',['../_utils_8h.html',1,'']]]
 ];

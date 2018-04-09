@@ -80,10 +80,6 @@ $(function() {
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-static-methods"></a>
 Static Public Member Functions</h2></td></tr>
-<tr class="memitem:ad02768fee28e5b3cd942eec863d3fd76"><td class="memItemLeft" align="right" valign="top">static int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1internal_1_1_utils.html#ad02768fee28e5b3cd942eec863d3fd76">num_of_eval_threads</a> ()</td></tr>
-<tr class="separator:ad02768fee28e5b3cd942eec863d3fd76"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ace504ae89a6ca257ae1a457f02aa8651"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1internal_1_1_utils.html#ace504ae89a6ca257ae1a457f02aa8651">set_num_of_eval_threads</a> (int num_of_threads)</td></tr>
-<tr class="separator:ace504ae89a6ca257ae1a457f02aa8651"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a590366afa2c2f4933cb6f55fc241da97"><td class="memItemLeft" align="right" valign="top">static bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1internal_1_1_utils.html#a590366afa2c2f4933cb6f55fc241da97">almost_equal</a> (Scalar n1, Scalar n2, Scalar abs_epsilon=<a class="el" href="classcattle_1_1internal_1_1_utils.html#a4e9605aa5a3c229914e6cbc1881cbb9d">EPSILON1</a>, Scalar rel_epsilon=<a class="el" href="classcattle_1_1internal_1_1_utils.html#a4e9605aa5a3c229914e6cbc1881cbb9d">EPSILON1</a>)</td></tr>
 <tr class="separator:a590366afa2c2f4933cb6f55fc241da97"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a41f28abfb774f119cfc96dc12d4b792b"><td class="memItemLeft" align="right" valign="top">static bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1internal_1_1_utils.html#a41f28abfb774f119cfc96dc12d4b792b">decidedly_greater</a> (Scalar n1, Scalar n2, Scalar abs_epsilon=<a class="el" href="classcattle_1_1internal_1_1_utils.html#a4e9605aa5a3c229914e6cbc1881cbb9d">EPSILON1</a>, Scalar rel_epsilon=<a class="el" href="classcattle_1_1internal_1_1_utils.html#a4e9605aa5a3c229914e6cbc1881cbb9d">EPSILON1</a>)</td></tr>
@@ -449,68 +445,6 @@ template&lt;typename Scalar &gt; </div>
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>Whether the the first numeral is sufficiently small enough not to be considered decidedly greater than the second. </dd></dl>
-
-</div>
-</div>
-<a id="ad02768fee28e5b3cd942eec863d3fd76"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ad02768fee28e5b3cd942eec863d3fd76">&#9670;&nbsp;</a></span>num_of_eval_threads()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<div class="memtemplate">
-template&lt;typename Scalar &gt; </div>
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">static int <a class="el" href="classcattle_1_1internal_1_1_utils.html">cattle::internal::Utils</a>&lt; Scalar &gt;::num_of_eval_threads </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-<dl class="section return"><dt>Returns</dt><dd>The number of threads used by Eigen to accelerate operations supporting multithreading. </dd></dl>
-
-</div>
-</div>
-<a id="ace504ae89a6ca257ae1a457f02aa8651"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ace504ae89a6ca257ae1a457f02aa8651">&#9670;&nbsp;</a></span>set_num_of_eval_threads()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<div class="memtemplate">
-template&lt;typename Scalar &gt; </div>
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">static void <a class="el" href="classcattle_1_1internal_1_1_utils.html">cattle::internal::Utils</a>&lt; Scalar &gt;::set_num_of_eval_threads </td>
-          <td>(</td>
-          <td class="paramtype">int&#160;</td>
-          <td class="paramname"><em>num_of_threads</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">num_of_threads</td><td>The number of threads Eigen should use to accelerate operations supporting multithreading. </td></tr>
-  </table>
-  </dd>
-</dl>
 
 </div>
 </div>

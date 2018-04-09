@@ -16,6 +16,7 @@ The lowest level building blocks of neural networks in C-ATTL3 are the layers. T
     * [BinaryStepActivationLayer](https://viktorc.github.io/C-ATTL3/html/classcattle_1_1_binary_step_activation_layer.html)
     * [SigmoidActivationLayer](https://viktorc.github.io/C-ATTL3/html/classcattle_1_1_sigmoid_activation_layer.html)
     * [TanhActivationLayer](https://viktorc.github.io/C-ATTL3/html/classcattle_1_1_tanh_activation_layer.html)
+    * [SoftplusActivationLayer](https://viktorc.github.io/C-ATTL3/html/classcattle_1_1_softplus_activation_layer.html)
     * [SoftmaxActivationLayer](https://viktorc.github.io/C-ATTL3/html/classcattle_1_1_softmax_activation_layer.html)
     * [ReLUActivationLayer](https://viktorc.github.io/C-ATTL3/html/classcattle_1_1_re_l_u_activation_layer.html)
     * [LeakyReLUActivationLayer](https://viktorc.github.io/C-ATTL3/html/classcattle_1_1_leaky_re_l_u_activation_layer.html)

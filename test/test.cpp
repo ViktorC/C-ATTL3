@@ -246,7 +246,7 @@ typedef double fp;
 //}
 
 int main() {
-	std::string mnist_folder = "C:\\Users\\A6714\\Downloads\\mnist\\";
+	std::string mnist_folder = "C:\\Users\\Viktor\\Downloads\\mnist\\";
 	MNISTDataProvider<float> file_train_prov(mnist_folder + "train-images.idx3-ubyte", mnist_folder + "train-labels.idx1-ubyte");
 	DataPair<float,3,false> train_data = file_train_prov.get_data(60000);
 	TensorPtr<float,4> train_obs(new Tensor<float,4>(std::move(train_data.first)));
@@ -259,17 +259,18 @@ int main() {
 	MemoryDataProvider<float,3,false> test_prov(std::move(test_obs), std::move(test_obj));
 	WeightInitSharedPtr<float> init(new HeWeightInitialization<float>(1e-2));
 	ParamRegSharedPtr<float> reg(new L2ParameterRegularization<float>());
-	std::vector<LayerPtr<float,3>> layers(8);
+	std::vector<LayerPtr<float,3>> layers(11);
 	layers[0] = LayerPtr<float,3>(new ConvLayer<float>(train_prov.get_obs_dims(), 8, init));
 	layers[1] = LayerPtr<float,3>(new ReLUActivationLayer<float,3>(layers[0]->get_output_dims()));
-	layers[2] = LayerPtr<float,3>(new ConvLayer<float>(layers[1]->get_output_dims(), 16, init));
-	layers[3] = LayerPtr<float,3>(new ReLUActivationLayer<float,3>(layers[2]->get_output_dims()));
-	layers[4] = LayerPtr<float,3>(new MaxPoolingLayer<float>(layers[3]->get_output_dims()));
-//	layers[5] = LayerPtr<float,3>(new DropoutLayer<float,3>(layers[4]->get_output_dims(), .25));
-	layers[5] = LayerPtr<float,3>(new FCLayer<float,3>(layers[4]->get_output_dims(), 128, init));
-	layers[6] = LayerPtr<float,3>(new ReLUActivationLayer<float,3>(layers[5]->get_output_dims()));
-//	layers[8] = LayerPtr<float,3>(new DropoutLayer<float,3>(layers[7]->get_output_dims(), .5));
-	layers[7] = LayerPtr<float,3>(new FCLayer<float,3>(layers[6]->get_output_dims(), 10, init));
+	layers[2] = LayerPtr<float,3>(new MaxPoolingLayer<float>(layers[1]->get_output_dims()));
+	layers[3] = LayerPtr<float,3>(new ConvLayer<float>(layers[2]->get_output_dims(), 16, init));
+	layers[4] = LayerPtr<float,3>(new ReLUActivationLayer<float,3>(layers[3]->get_output_dims()));
+	layers[5] = LayerPtr<float,3>(new MaxPoolingLayer<float>(layers[4]->get_output_dims()));
+	layers[6] = LayerPtr<float,3>(new DropoutLayer<float,3>(layers[5]->get_output_dims(), .25));
+	layers[7] = LayerPtr<float,3>(new FCLayer<float,3>(layers[6]->get_output_dims(), 100, init));
+	layers[8] = LayerPtr<float,3>(new ReLUActivationLayer<float,3>(layers[7]->get_output_dims()));
+	layers[9] = LayerPtr<float,3>(new DropoutLayer<float,3>(layers[8]->get_output_dims(), .5));
+	layers[10] = LayerPtr<float,3>(new FCLayer<float,3>(layers[9]->get_output_dims(), 10, init));
 //	layers[0] = LayerPtr<float,3>(new FCLayer<float,3>(train_prov.get_obs_dims(), 500, init, reg));
 //	layers[1] = LayerPtr<float,3>(new SigmoidActivationLayer<float,3>(layers[0]->get_output_dims()));
 //	layers[2] = LayerPtr<float,3>(new FCLayer<float,3>(layers[1]->get_output_dims(), 250, init, reg));
@@ -278,36 +279,34 @@ int main() {
 	FeedforwardNeuralNetwork<float,3> nn(std::move(layers));
 	nn.init();
 	LossSharedPtr<float,3,false> loss(new SoftmaxCrossEntropyLoss<float,3,false>());
-	AdadeltaOptimizer<float,3,false> opt(loss, 128);
-	for (int i = 0; i < 12; ++i) {
-		std::chrono::steady_clock::time_point begin = std::chrono::steady_clock::now();
-		opt.optimize(nn, train_prov, test_prov, 1);
-		std::cout << "Training Duration: " << std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now() -
-				begin).count() << std::endl;
-		begin = std::chrono::steady_clock::now();
-		Tensor<float,4> prediction = nn.infer(test_data.first);
-		std::cout << "Inference Duration: " << std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now() -
-				begin).count() << std::endl;
-		unsigned wrong = 0;
-		unsigned correct = 0;
-		for (std::size_t i = 0; i < prediction.dimension(0); ++i) {
-			float max = internal::Utils<float>::MIN;
-			std::size_t max_ind = 0;
-			for (std::size_t j = 0; j < prediction.dimension(1); ++j) {
-				float val = prediction(i,j,0u,0u);
-				if (val > max) {
-					max = val;
-					max_ind = j;
-				}
+	NadamOptimizer<float,3,false> opt(loss, 1000);
+	std::chrono::steady_clock::time_point begin = std::chrono::steady_clock::now();
+	opt.optimize(nn, train_prov, test_prov, 12);
+	std::cout << "Training Duration: " << std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now() -
+			begin).count() << std::endl;
+	begin = std::chrono::steady_clock::now();
+	Tensor<float,4> prediction = nn.infer(test_data.first);
+	std::cout << "Inference Duration: " << std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now() -
+			begin).count() << std::endl;
+	unsigned wrong = 0;
+	unsigned correct = 0;
+	for (std::size_t i = 0; i < prediction.dimension(0); ++i) {
+		float max = internal::Utils<float>::MIN;
+		std::size_t max_ind = 0;
+		for (std::size_t j = 0; j < prediction.dimension(1); ++j) {
+			float val = prediction(i,j,0u,0u);
+			if (val > max) {
+				max = val;
+				max_ind = j;
 			}
-			if (internal::Utils<float>::almost_equal(test_data.second(i,max_ind,0u,0u), 1))
-				correct++;
-			else
-				wrong++;
 		}
-		std::cout << "Correct: " << correct << std::endl;
-		std::cout << "Wrong: " << wrong << std::endl;
+		if (internal::Utils<float>::almost_equal(test_data.second(i,max_ind,0u,0u), 1))
+			correct++;
+		else
+			wrong++;
 	}
+	std::cout << "Correct: " << correct << std::endl;
+	std::cout << "Wrong: " << wrong << std::endl;
 //	assert(test_parallel() & test_residual() & test_dense() & test_seqnn() & test_rnn() & test_lstm() & test_bdrnn());
 	return 0;
 }

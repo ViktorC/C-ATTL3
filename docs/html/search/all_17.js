@@ -1,6 +1,7 @@
 var searchData=
 [
   ['weight_5finit',['weight_init',['../classcattle_1_1_kernel_layer.html#a2af03d22c438b0ab3e118381a48218eb',1,'cattle::KernelLayer']]],
+  ['weight_5freg',['weight_reg',['../classcattle_1_1_kernel_layer.html#ab96220969abe12d7a4363679e6e1676c',1,'cattle::KernelLayer']]],
   ['weighted_5finput_5fcandidate_5fcache',['weighted_input_candidate_cache',['../structcattle_1_1_l_s_t_m_neural_network_1_1_cell.html#ae00da687eb1e4e20a173a34f7ceb4387',1,'cattle::LSTMNeuralNetwork::Cell']]],
   ['weighted_5finput_5fforget_5fcache',['weighted_input_forget_cache',['../structcattle_1_1_l_s_t_m_neural_network_1_1_cell.html#a981690eec34c7cdf0ea9beceecf8f5f3',1,'cattle::LSTMNeuralNetwork::Cell']]],
   ['weighted_5finput_5fread_5fcache',['weighted_input_read_cache',['../structcattle_1_1_l_s_t_m_neural_network_1_1_cell.html#a3d581f508d31b8306504fafcb5083500',1,'cattle::LSTMNeuralNetwork::Cell']]],

@@ -69,7 +69,7 @@ $(function() {
   <div class="summary">
 <a href="#pub-methods">Public Member Functions</a> &#124;
 <a href="#pro-methods">Protected Member Functions</a> &#124;
-<a href="#pro-attribs">Protected Attributes</a> &#124;
+<a href="#pri-attribs">Private Attributes</a> &#124;
 <a href="classcattle_1_1_gaussian_weight_initialization-members.html">List of all members</a>  </div>
   <div class="headertitle">
 <div class="title">cattle::GaussianWeightInitialization&lt; Scalar &gt; Class Template Reference<span class="mlabels"><span class="mlabel">abstract</span></span></div>  </div>
@@ -93,8 +93,8 @@ Inheritance diagram for cattle::GaussianWeightInitialization&lt; Scalar &gt;:</d
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:a0111210fd4fd8eee317573b4b19975c8"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_gaussian_weight_initialization.html#a0111210fd4fd8eee317573b4b19975c8">GaussianWeightInitialization</a> (Scalar <a class="el" href="classcattle_1_1_gaussian_weight_initialization.html#a73253d35ecefc2cfaa626e5a252ccccf">bias</a>)</td></tr>
-<tr class="separator:a0111210fd4fd8eee317573b4b19975c8"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0a439cfd38e9e414db8576f41e4e90fd"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_gaussian_weight_initialization.html#a0a439cfd38e9e414db8576f41e4e90fd">GaussianWeightInitialization</a> (Scalar <a class="el" href="classcattle_1_1_gaussian_weight_initialization.html#a7f5ce477564bd5ff41d144c187caee92">scaling_factor</a>, Scalar <a class="el" href="classcattle_1_1_gaussian_weight_initialization.html#a73253d35ecefc2cfaa626e5a252ccccf">bias</a>)</td></tr>
+<tr class="separator:a0a439cfd38e9e414db8576f41e4e90fd"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a49733140c287473b82193863c8bfa2e2"><td class="memItemLeft" align="right" valign="top">virtual&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_gaussian_weight_initialization.html#a49733140c287473b82193863c8bfa2e2">~GaussianWeightInitialization</a> ()=default</td></tr>
 <tr class="separator:a49733140c287473b82193863c8bfa2e2"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ac40c05d1bc293b57a99cbc68a8204279"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_gaussian_weight_initialization.html#ac40c05d1bc293b57a99cbc68a8204279">apply</a> (<a class="el" href="namespacecattle.html#a1d78623a47279d516750a44dbad6090b">Matrix</a>&lt; Scalar &gt; &amp;weights) const</td></tr>
@@ -108,8 +108,10 @@ Protected Member Functions</h2></td></tr>
 <tr class="memitem:afe2fa9530689b146b8ca009860b9fd64"><td class="memItemLeft" align="right" valign="top">virtual Scalar&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_gaussian_weight_initialization.html#afe2fa9530689b146b8ca009860b9fd64">sd</a> (unsigned fan_ins, unsigned fan_outs) const =0</td></tr>
 <tr class="separator:afe2fa9530689b146b8ca009860b9fd64"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pro-attribs"></a>
-Protected Attributes</h2></td></tr>
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pri-attribs"></a>
+Private Attributes</h2></td></tr>
+<tr class="memitem:a7f5ce477564bd5ff41d144c187caee92"><td class="memItemLeft" align="right" valign="top">const Scalar&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_gaussian_weight_initialization.html#a7f5ce477564bd5ff41d144c187caee92">scaling_factor</a></td></tr>
+<tr class="separator:a7f5ce477564bd5ff41d144c187caee92"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a73253d35ecefc2cfaa626e5a252ccccf"><td class="memItemLeft" align="right" valign="top">const Scalar&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_gaussian_weight_initialization.html#a73253d35ecefc2cfaa626e5a252ccccf">bias</a></td></tr>
 <tr class="separator:a73253d35ecefc2cfaa626e5a252ccccf"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
@@ -119,8 +121,8 @@ class cattle::GaussianWeightInitialization&lt; Scalar &gt;</h3>
 
 <p>An abstract class template representing a random weight initialization method that samples from a Gaussian distribution. </p>
 </div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
-<a id="a0111210fd4fd8eee317573b4b19975c8"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a0111210fd4fd8eee317573b4b19975c8">&#9670;&nbsp;</a></span>GaussianWeightInitialization()</h2>
+<a id="a0a439cfd38e9e414db8576f41e4e90fd"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a0a439cfd38e9e414db8576f41e4e90fd">&#9670;&nbsp;</a></span>GaussianWeightInitialization()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -134,8 +136,18 @@ template&lt;typename Scalar &gt; </div>
           <td class="memname"><a class="el" href="classcattle_1_1_gaussian_weight_initialization.html">cattle::GaussianWeightInitialization</a>&lt; Scalar &gt;::<a class="el" href="classcattle_1_1_gaussian_weight_initialization.html">GaussianWeightInitialization</a> </td>
           <td>(</td>
           <td class="paramtype">Scalar&#160;</td>
-          <td class="paramname"><em>bias</em></td><td>)</td>
+          <td class="paramname"><em>scaling_factor</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
           <td></td>
+          <td class="paramtype">Scalar&#160;</td>
+          <td class="paramname"><em>bias</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
         </tr>
       </table>
   </td>
@@ -281,7 +293,31 @@ template&lt;typename Scalar &gt; </div>
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">protected</span></span>  </td>
+<span class="mlabels"><span class="mlabel">private</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a7f5ce477564bd5ff41d144c187caee92"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a7f5ce477564bd5ff41d144c187caee92">&#9670;&nbsp;</a></span>scaling_factor</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename Scalar &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">const Scalar <a class="el" href="classcattle_1_1_gaussian_weight_initialization.html">cattle::GaussianWeightInitialization</a>&lt; Scalar &gt;::scaling_factor</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">private</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
