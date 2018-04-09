@@ -68,7 +68,7 @@ public:
 		return lambda * params.cwiseAbs().sum();
 	}
 	inline Matrix<Scalar> d_function(const Matrix<Scalar>& params) const {
-		return params.unaryExpr([this](Scalar i) { return (Scalar) (i >= .0 ? lambda : -lambda); });
+		return params.unaryExpr([this](Scalar i) { return (Scalar) (i >= (Scalar) 0 ? lambda : -lambda); });
 	}
 private:
 	const Scalar lambda;
@@ -86,7 +86,7 @@ public:
 	inline L2RegularizationPenalty(Scalar lambda = 1e-2) :
 			lambda(lambda) { }
 	inline Scalar function(const Matrix<Scalar>& params) const {
-		return .5 * lambda * params.array().square().sum();
+		return (Scalar) .5 * lambda * params.array().square().sum();
 	}
 	inline Matrix<Scalar> d_function(const Matrix<Scalar>& params) const {
 		return lambda * params;
@@ -110,10 +110,10 @@ public:
 			l1_lambda(l1_lambda),
 			l2_lambda(l2_lambda) { }
 	inline Scalar function(const Matrix<Scalar>& params) const {
-		return l1_lambda * params.array().abs().sum() + .5 * l2_lambda * params.array().square().sum();
+		return l1_lambda * params.array().abs().sum() + (Scalar) .5 * l2_lambda * params.array().square().sum();
 	}
 	inline Matrix<Scalar> d_function(const Matrix<Scalar>& params) const {
-		return params.unaryExpr([this](Scalar i) { return (Scalar) (i >= .0 ? l1_lambda :
+		return params.unaryExpr([this](Scalar i) { return (Scalar) (i >= (Scalar) 0 ? l1_lambda :
 				-l1_lambda); }) + l2_lambda * params;
 	}
 private:

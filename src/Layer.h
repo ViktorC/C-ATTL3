@@ -26,6 +26,19 @@ namespace cattle {
 // TODO CPU convolution performance improvement.
 // TODO Optional GPU acceleration using cuBLAS and cuDNN.
 
+/**
+ * An alias for a shared pointer to a WeightInitialization implementation instance of
+ * an arbitrary scalar type.
+ */
+template<typename Scalar>
+using WeightInitSharedPtr = std::shared_ptr<WeightInitialization<Scalar>>;
+
+/**
+ * An alias for a shared pointer to a regularization penalty of an arbitrary scalar type.
+ */
+template<typename Scalar>
+using RegPenSharedPtr = std::shared_ptr<RegularizationPenalty<Scalar>>;
+
 // Forward declarations to NeuralNetwork and Optimizer so they can be friended.
 template<typename Scalar, std::size_t Rank, bool Sequential> class NeuralNetwork;
 template<typename Scalar, std::size_t Rank, bool Sequential> class Optimizer;
@@ -42,6 +55,7 @@ class Layer {
 	friend class Optimizer<Scalar,Rank,true>;
 	friend class Optimizer<Scalar,Rank,false>;
 public:
+	static const RegPenSharedPtr<Scalar> DEFAULT_REG_PEN;
 	virtual ~Layer() = default;
 	/**
 	 * A constant method implementing the clone pattern.
@@ -161,18 +175,9 @@ protected:
 	virtual Data pass_back(Data out_grads) = 0;
 };
 
-/**
- * An alias for a shared pointer to a WeightInitialization implementation instance of
- * an arbitrary scalar type.
- */
-template<typename Scalar>
-using WeightInitSharedPtr = std::shared_ptr<WeightInitialization<Scalar>>;
-
-/**
- * An alias for a shared pointer to a regularization penalty of an arbitrary scalar type.
- */
-template<typename Scalar>
-using RegPenSharedPtr = std::shared_ptr<RegularizationPenalty<Scalar>>;
+// Initialize the static default regularization penalty.
+template<typename Scalar, std::size_t Rank>
+const RegPenSharedPtr<Scalar> Layer<Scalar,Rank>::DEFAULT_REG_PEN(new NoRegularizationPenalty<Scalar>());
 
 /**
  * An abstract base class template for layers representing linear kernel-based operations
@@ -197,15 +202,16 @@ protected:
 				weight_init(weight_init),
 				weight_reg(weight_reg),
 				max_norm_constraint(max_norm_constraint),
-				max_norm(internal::Utils<Scalar>::decidedly_greater(max_norm_constraint, .0)),
+				max_norm(internal::Utils<Scalar>::decidedly_greater(max_norm_constraint, (Scalar) 0)),
 				input_layer(false),
+				weights_shared(false),
 				weights(weight_rows, weight_cols),
 				weights_grad(weight_rows, weight_cols),
 				weights_ref(weights) {
 		assert(weight_init != nullptr);
 		assert(weight_reg != nullptr);
 	}
-	inline KernelLayer(const KernelLayer<Scalar,Rank>& layer, bool share_weights = false) :
+	inline KernelLayer(const KernelLayer<Scalar,Rank>& layer, bool share_params = false) :
 			input_dims(layer.input_dims),
 			output_dims(layer.output_dims),
 			weight_init(layer.weight_init),
@@ -213,9 +219,10 @@ protected:
 			max_norm_constraint(layer.max_norm_constraint),
 			max_norm(layer.max_norm),
 			input_layer(layer.input_layer),
-			weights(share_weights ? Matrix<Scalar>(0, 0) : layer.weights),
+			weights_shared(share_params),
+			weights(share_params ? Matrix<Scalar>(0, 0) : layer.weights),
 			weights_grad(layer.weights_grad),
-			weights_ref(share_weights ? layer.weights : weights) { }
+			weights_ref(share_params ? layer.weights : weights) { }
 	inline bool is_input_layer() const {
 		return input_layer;
 	}
@@ -240,7 +247,7 @@ protected:
 		}
 	}
 	inline Scalar get_regularization_penalty() {
-		return weight_reg->function(weights_ref);
+		return weights_shared ? 0 : weight_reg->function(weights_ref);
 	}
 	const Dimensions<std::size_t,Rank> input_dims;
 	const Dimensions<std::size_t,Rank> output_dims;
@@ -248,6 +255,7 @@ protected:
 	const RegPenSharedPtr<Scalar> weight_reg;
 	const Scalar max_norm_constraint;
 	const bool max_norm;
+	const bool weights_shared;
 	/* Eigen matrices are backed by arrays allocated on the heap, so these
 	 * members do not burden the stack. */
 	Matrix<Scalar> weights_grad;
@@ -276,7 +284,7 @@ public:
 	 * constraint is applied.
 	 */
 	inline FCLayer(const Dimensions<std::size_t,Rank>& input_dims, std::size_t output_size, WeightInitSharedPtr<Scalar> weight_init,
-			RegPenSharedPtr<Scalar> weight_reg, Scalar max_norm_constraint = 0) :
+			RegPenSharedPtr<Scalar> weight_reg = Root::DEFAULT_REG_PEN, Scalar max_norm_constraint = 0) :
 				Base::KernelLayer(input_dims, Dimensions<std::size_t,Rank>({ output_size }), weight_init, weight_reg,
 						input_dims.get_volume() + 1, output_size, max_norm_constraint),
 				out_conversion_dims(Base::output_dims.template promote<>()),
@@ -285,8 +293,8 @@ public:
 		return new FCLayer(*this);
 	}
 protected:
-	inline FCLayer(const FCLayer<Scalar,Rank>& layer, bool share_weights = false) :
-			Base::KernelLayer(layer, share_weights),
+	inline FCLayer(const FCLayer<Scalar,Rank>& layer, bool share_params = false) :
+			Base::KernelLayer(layer, share_params),
 			out_conversion_dims(layer.out_conversion_dims),
 			prev_out_conversion_dims(layer.prev_out_conversion_dims),
 			biased_in(layer.biased_in) { }
@@ -313,7 +321,10 @@ protected:
 		assert(out_grads.dimension(0) > 0 && biased_in.rows() == out_grads.dimension(0));
 		MatrixMap<Scalar> out_grads_mat(out_grads.data(), out_grads.dimension(0), Base::output_dims.get_volume());
 		// Compute the gradient of the outputs with respect to the weights.
-		Base::weights_grad = biased_in.transpose() * out_grads_mat + Base::weight_reg->d_function(Base::weights_ref);
+		if (Base::weights_shared)
+			Base::weights_grad = biased_in.transpose() * out_grads_mat;
+		else
+			Base::weights_grad = biased_in.transpose() * out_grads_mat + Base::weight_reg->d_function(Base::weights_ref);
 		if (Base::is_input_layer())
 			return typename Root::Data();
 		/* Remove the bias row from the weight matrix, transpose it, and compute the derivative w.r.t. the
@@ -358,8 +369,8 @@ public:
 	 * constraint is applied.
 	 */
 	inline ConvLayer(const Dimensions<std::size_t,3>& input_dims, std::size_t filters, WeightInitSharedPtr<Scalar> weight_init,
-			RegPenSharedPtr<Scalar> weight_reg, std::size_t receptor_height = 3, std::size_t receptor_width = 3, std::size_t padding = 1,
-			std::size_t stride = 1, std::size_t dilation = 0, Scalar max_norm_constraint = 0) :
+			RegPenSharedPtr<Scalar> weight_reg = Root::DEFAULT_REG_PEN, std::size_t receptor_height = 3, std::size_t receptor_width = 3,
+			std::size_t padding = 1, std::size_t stride = 1, std::size_t dilation = 0, Scalar max_norm_constraint = 0) :
 				/* For every filter, there is a column in the weight matrix with the same number of
 				 * elements as the area of the receptive field (F_H * F_W * D) + 1 for the bias row. */
 				Base::KernelLayer(input_dims, Dimensions<std::size_t,3>({
@@ -394,8 +405,8 @@ public:
 		return new ConvLayer(*this);
 	}
 protected:
-	inline ConvLayer(const ConvLayer<Scalar>& layer, bool share_weights = false) :
-			Base::KernelLayer(layer, share_weights),
+	inline ConvLayer(const ConvLayer<Scalar>& layer, bool share_params = false) :
+			Base::KernelLayer(layer, share_params),
 			filters(layer.filters),
 			receptor_height(layer.receptor_height),
 			receptor_width(layer.receptor_width),
@@ -462,7 +473,10 @@ protected:
 		std::size_t receptor_vol = Base::weights_ref.rows() - 1;
 		MatrixMap<Scalar> out_grads_mat_map = MatrixMap<Scalar>(out_grads.data(),
 				rows * Base::output_dims(0) * Base::output_dims(1), filters);
-		Base::weights_grad = biased_in.transpose() * out_grads_mat_map + Base::weight_reg->d_function(Base::weights_ref);
+		if (Base::weights_shared)
+			Base::weights_grad = biased_in.transpose() * out_grads_mat_map;
+		else
+			Base::weights_grad = biased_in.transpose() * out_grads_mat_map + Base::weight_reg->d_function(Base::weights_ref);
 		if (Base::is_input_layer())
 			return typename Root::Data();
 		/* Remove the bias row from the weight matrix, transpose it, and compute the gradient of the
@@ -555,12 +569,12 @@ protected:
 				params(param_rows, params_cols),
 				params_grad(param_rows, params_cols),
 				params_ref(params) { }
-	inline ActivationLayer(const ActivationLayer<Scalar,Rank>& layer, bool share_weights = false) :
+	inline ActivationLayer(const ActivationLayer<Scalar,Rank>& layer, bool share_params = false) :
 			dims(layer.dims),
 			input_layer(layer.input_layer),
-			params(share_weights ? Matrix<Scalar>(0, 0) : layer.params),
+			params(share_params ? Matrix<Scalar>(0, 0) : layer.params),
 			params_grad(layer.params_grad),
-			params_ref(share_weights ? layer.params : params) { }
+			params_ref(share_params ? layer.params : params) { }
 	inline bool is_input_layer() const {
 		return input_layer;
 	}
@@ -1012,11 +1026,14 @@ public:
 	 * @param dims The dimensionality of the input tensor.
 	 * @param init_alpha The initial factor by which negative inputs are to be scaled.
 	 */
-	inline PReLUActivationLayer(const Dimensions<std::size_t,Rank>& dims, RegPenSharedPtr<Scalar> param_reg,
-			Scalar init_alpha = 1e-1) :
+	inline PReLUActivationLayer(const Dimensions<std::size_t,Rank>& dims, RegPenSharedPtr<Scalar> param_reg = Root::DEFAULT_REG_PEN,
+			Scalar init_alpha = 1e-1, Scalar max_norm_constraint = 0) :
 				Base::ActivationLayer(dims, 1, dims.get_volume()),
 				param_reg(param_reg),
 				init_alpha(init_alpha),
+				max_norm_constraint(max_norm_constraint),
+				max_norm(internal::Utils<Scalar>::decidedly_greater(max_norm_constraint, (Scalar) 0)),
+				params_shared(false),
 				conversion_dims(dims.template promote<>()) {
 		assert(param_reg != nullptr);
 	}
@@ -1024,9 +1041,13 @@ public:
 		return new PReLUActivationLayer(*this);
 	}
 protected:
-	inline PReLUActivationLayer(const PReLUActivationLayer<Scalar,Rank>& layer, bool share_weights = false) :
-			Base::ActivationLayer(layer, share_weights),
+	inline PReLUActivationLayer(const PReLUActivationLayer<Scalar,Rank>& layer, bool share_params = false) :
+			Base::ActivationLayer(layer, share_params),
+			param_reg(layer.param_reg),
 			init_alpha(layer.init_alpha),
+			max_norm_constraint(layer.max_norm_constraint),
+			max_norm(layer.max_norm),
+			params_shared(share_params),
 			conversion_dims(layer.conversion_dims) { }
 	inline Layer<Scalar,Rank>* clone_with_shared_params() const {
 		return new PReLUActivationLayer(*this, true);
@@ -1038,8 +1059,15 @@ protected:
 	inline void empty_cache() {
 		in = Matrix<Scalar>(0, 0);
 	}
+	inline void enforce_constraints() {
+		if (max_norm) {
+			Scalar l2_norm = Base::params_ref.squaredNorm();
+			if (l2_norm > max_norm_constraint)
+				Base::params_ref *= (max_norm_constraint / l2_norm);
+		}
+	}
 	inline Scalar get_regularization_penalty() {
-		return param_reg->function(Base::params_ref);
+		return params_shared ? (Scalar) 0 : param_reg->function(Base::params_ref);
 	}
 	inline typename Root::Data pass_forward(typename Root::Data in, bool training) {
 		assert((Dimensions<std::size_t,Base::DATA_RANK>(in.dimensions()).template demote<>()) == Base::dims);
@@ -1053,10 +1081,10 @@ protected:
 	inline typename Root::Data pass_back(typename Root::Data out_grads) {
 		assert((Dimensions<std::size_t,Base::DATA_RANK>(out_grads.dimensions()).template demote<>()) == Base::dims);
 		assert(out_grads.dimension(0) > 0 && conversion_dims[0] == out_grads.dimension(0));
-		std::cout << "params ref: " << Base::params_ref << std::endl << std::endl;
-		std::cout << "params_grad: " << Base::params_grad << std::endl << std::endl;
-		std::cout << "params grad new: " << param_reg->d_function(Base::params_ref) << std::endl << std::endl;
-		Base::params_grad = param_reg->d_function(Base::params_ref);
+		if (params_shared)
+			Base::params_grad.row(0).setZero();
+		else
+			Base::params_grad = param_reg->d_function(Base::params_ref);
 		MatrixMap<Scalar> out_grads_map(out_grads.data(), conversion_dims[0], Base::dims.get_volume());
 		Matrix<Scalar> prev_out_grads = Matrix<Scalar>(in.rows(), in.cols());
 		for (int i = 0; i < in.cols(); ++i) {
@@ -1077,6 +1105,9 @@ protected:
 private:
 	const RegPenSharedPtr<Scalar> param_reg;
 	const Scalar init_alpha;
+	const Scalar max_norm_constraint;
+	const bool max_norm;
+	const bool params_shared;
 	RankwiseArray conversion_dims;
 	// Staged computation caches.
 	Matrix<Scalar> in;
@@ -1434,14 +1465,21 @@ public:
 	}
 protected:
 	typedef std::array<std::size_t,Base::DATA_RANK> RankwiseArray;
-	inline BatchNormLayerBase(const Dimensions<std::size_t,Rank>& dims, RegPenSharedPtr<Scalar> param_reg,
-			std::size_t depth, Scalar norm_avg_decay, Scalar epsilon) :
+	inline BatchNormLayerBase(const Dimensions<std::size_t,Rank>& dims, std::size_t depth, RegPenSharedPtr<Scalar> gamma_reg,
+			RegPenSharedPtr<Scalar> beta_reg, Scalar gamma_max_norm_constraint, Scalar beta_max_norm_constraint,
+			Scalar norm_avg_decay, Scalar epsilon) :
 				dims(dims),
-				param_reg(param_reg),
 				depth(depth),
+				gamma_reg(gamma_reg),
+				beta_reg(beta_reg),
+				gamma_max_norm_constraint(gamma_max_norm_constraint),
+				beta_max_norm_constraint(beta_max_norm_constraint),
+				gamma_max_norm(internal::Utils<Scalar>::decidedly_greater(gamma_max_norm_constraint, (Scalar) 0)),
+				beta_max_norm(internal::Utils<Scalar>::decidedly_greater(beta_max_norm_constraint, (Scalar) 0)),
 				norm_avg_decay(norm_avg_decay),
 				epsilon(epsilon),
 				input_layer(false),
+				params_shared(false),
 				avg_means(depth, dims.get_volume() / depth),
 				avg_inv_sds(depth, dims.get_volume() / depth),
 				avgs_init(false),
@@ -1449,24 +1487,31 @@ protected:
 				params_grad(2 * depth, dims.get_volume() / depth),
 				params_ref(params),
 				cache_vec(depth) {
-		assert(param_reg != nullptr);
+		assert(gamma_reg != nullptr);
+		assert(beta_reg != nullptr);
 		assert(norm_avg_decay >= 0 && norm_avg_decay <= 1 &&
 				"norm avg decay must not be less than 0 or greater than 1");
 		assert(epsilon > 0 && "epsilon must be greater than 0");
 	}
-	inline BatchNormLayerBase(const BatchNormLayerBase<Scalar,Rank>& layer, bool share_weights = false) :
+	inline BatchNormLayerBase(const BatchNormLayerBase<Scalar,Rank>& layer, bool share_params = false) :
 			dims(layer.dims),
-			param_reg(layer.param_reg),
 			depth(layer.depth),
+			gamma_reg(layer.gamma_reg),
+			beta_reg(layer.beta_reg),
+			gamma_max_norm_constraint(layer.gamma_max_norm_constraint),
+			beta_max_norm_constraint(layer.beta_max_norm_constraint),
+			gamma_max_norm(layer.gamma_max_norm),
+			beta_max_norm(layer.beta_max_norm),
 			norm_avg_decay(layer.norm_avg_decay),
 			epsilon(layer.epsilon),
 			input_layer(layer.input_layer),
+			params_shared(share_params),
 			avg_means(layer.avg_means),
 			avg_inv_sds(layer.avg_inv_sds),
 			avgs_init(layer.avgs_init),
-			params(share_weights ? Matrix<Scalar>(0, 0) : layer.params),
+			params(share_params ? Matrix<Scalar>(0, 0) : layer.params),
 			params_grad(layer.params_grad),
-			params_ref(share_weights ? layer.params : params),
+			params_ref(share_params ? layer.params : params),
 			cache_vec(layer.cache_vec) { }
 	inline bool is_input_layer() const {
 		return input_layer;
@@ -1475,12 +1520,12 @@ protected:
 		this->input_layer = input_layer;
 	}
 	inline void init() {
-		for (int i = 0; i < params_ref.rows(); i += 2) {
-			// Gamma
+		// Gamma.
+		for (int i = 0; i < depth; ++i)
 			params_ref.row(i).setOnes();
-			// Beta
-			params_ref.row(i + 1).setZero();
-		}
+		// Beta.
+		for (int i = depth; i < 2 * depth; ++i)
+			params_ref.row(i).setZero();
 		params_grad.setZero(params_ref.rows(), params_ref.cols());
 		avg_means.setZero(avg_means.rows(), avg_means.cols());
 		avg_inv_sds.setZero(avg_means.rows(), avg_inv_sds.cols());
@@ -1499,9 +1544,22 @@ protected:
 	inline Matrix<Scalar>& get_params_grad() {
 		return params_grad;
 	}
-	inline void enforce_constraints() { }
+	inline void enforce_constraints() {
+		Scalar l2_norm;
+		if (gamma_max_norm) {
+			l2_norm = params_ref.topRows(depth).squaredNorm();
+			if (l2_norm > gamma_max_norm_constraint)
+				params_ref.topRows(depth) *= (gamma_max_norm_constraint / l2_norm);
+		}
+		if (beta_max_norm) {
+			l2_norm = params_ref.bottomRows(depth).squaredNorm();
+			if (l2_norm > beta_max_norm_constraint)
+				params_ref.bottomRows(depth) *= (beta_max_norm_constraint / l2_norm);
+		}
+	}
 	inline Scalar get_regularization_penalty() {
-		return param_reg->function(params_ref);
+		return params_shared ? (Scalar) 0 : (gamma_reg->function(params_ref.topRows(depth)) +
+				beta_reg->function(params_ref.bottomRows(depth)));
 	}
 	inline typename Base::Data _pass_forward(typename Base::Data in, const RankwiseArray& output_dims,
 			bool training, int i) {
@@ -1527,7 +1585,7 @@ protected:
 			}
 		} else // For testing, use the moving averages.
 			in_mat = (in_mat.rowwise() - avg_means.row(i)) * avg_inv_sds.row(i).asDiagonal();
-		Matrix<Scalar> out = (in_mat * params_ref.row(2 * i).asDiagonal()).rowwise() + params_ref.row(2 * i + 1);
+		Matrix<Scalar> out = (in_mat * params_ref.row(i).asDiagonal()).rowwise() + params_ref.row(depth + i);
 		return TensorMap<Scalar,Base::DATA_RANK>(out.data(), output_dims);
 	}
 	inline typename Base::Data _pass_back(typename Base::Data out_grads, const RankwiseArray& prev_out_dims, int i) {
@@ -1538,11 +1596,11 @@ protected:
 		 * gradients of the betas and gammas. */
 		{ // Manage memory by scope restriction.
 			MatrixMap<Scalar> out_grads_mat(out_grads.data(), rows, out_grads.size() / rows);
-			params_grad.row(2 * i) = out_grads_mat.cwiseProduct(cache.std_in).colwise().sum();
-			params_grad.row(2 * i + 1) = out_grads_mat.colwise().sum();
+			params_grad.row(i) = out_grads_mat.cwiseProduct(cache.std_in).colwise().sum();
+			params_grad.row(depth + i) = out_grads_mat.colwise().sum();
 			if (input_layer)
 				return typename Base::Data();
-			std_in_grads = out_grads_mat * params_ref.row(2 * i).asDiagonal();
+			std_in_grads = out_grads_mat * params_ref.row(i).asDiagonal();
 		}
 		Matrix<Scalar> prev_out_grads = (((rows * std_in_grads).rowwise() - std_in_grads.colwise().sum()) -
 				cache.std_in * (cache.std_in.cwiseProduct(std_in_grads).colwise().sum().asDiagonal())) *
@@ -1550,13 +1608,19 @@ protected:
 		return TensorMap<Scalar,Base::DATA_RANK>(prev_out_grads.data(), prev_out_dims);
 	}
 	const Dimensions<std::size_t,Rank> dims;
-	const RegPenSharedPtr<Scalar> param_reg;
+	const std::size_t depth;
+	const RegPenSharedPtr<Scalar> gamma_reg;
+	const RegPenSharedPtr<Scalar> beta_reg;
+	const Scalar gamma_max_norm_constraint;
+	const Scalar beta_max_norm_constraint;
+	const bool gamma_max_norm;
+	const bool beta_max_norm;
+	const Scalar norm_avg_decay;
+	const Scalar epsilon;
+	const bool params_shared;
 	Matrix<Scalar> params_grad;
 	Matrix<Scalar>& params_ref;
 private:
-	const std::size_t depth;
-	const Scalar norm_avg_decay;
-	const Scalar epsilon;
 	bool input_layer;
 	// Dynamic batch normalization parameters.
 	Matrix<Scalar> avg_means;
@@ -1585,16 +1649,18 @@ public:
 	 * @param norm_avg_decay The decay rate of the maintained means and variances.
 	 * @param epsilon A small constant used to maintain numerical stability.
 	 */
-	inline BatchNormLayer(const Dimensions<std::size_t,Rank>& dims, RegPenSharedPtr<Scalar> param_reg,
-			Scalar norm_avg_decay = .1, Scalar epsilon = internal::Utils<Scalar>::EPSILON3) :
-				Base::BatchNormLayerBase(dims, param_reg, 1, norm_avg_decay, epsilon),
+	inline BatchNormLayer(const Dimensions<std::size_t,Rank>& dims, RegPenSharedPtr<Scalar> gamma_reg = Root::DEFAULT_REG_PEN,
+			RegPenSharedPtr<Scalar> beta_reg = Root::DEFAULT_REG_PEN, Scalar gamma_max_norm_constraint = 0,
+			Scalar beta_max_norm_constraint = 0, Scalar norm_avg_decay = .1, Scalar epsilon = internal::Utils<Scalar>::EPSILON3) :
+				Base::BatchNormLayerBase(dims, dims(2), gamma_reg, beta_reg, gamma_max_norm_constraint,
+						beta_max_norm_constraint, norm_avg_decay, epsilon),
 				conversion_dims(Base::dims.template promote<>()) { }
 	inline Root* clone() const {
 		return new BatchNormLayer(*this);
 	}
 protected:
-	inline BatchNormLayer(const BatchNormLayer<Scalar,Rank>& layer, bool share_weights = false) :
-			Base::BatchNormLayerBase(layer, share_weights) { }
+	inline BatchNormLayer(const BatchNormLayer<Scalar,Rank>& layer, bool share_params = false) :
+			Base::BatchNormLayerBase(layer, share_params) { }
 	inline Root* clone_with_shared_params() const {
 		return new BatchNormLayer(*this, true);
 	}
@@ -1608,7 +1674,12 @@ protected:
 		assert((Dimensions<std::size_t,Root::DATA_RANK>(out_grads.dimensions()).template demote<>()) == Base::dims);
 		assert(out_grads.dimension(0) > 0 && conversion_dims[0] == out_grads.dimension(0));
 		typename Root::Data prev_out_grads = Base::_pass_back(std::move(out_grads), conversion_dims, 0);
-		Base::params_grad += Base::param_reg->d_function(Base::params_ref);
+		if (!Base::params_shared) {
+			Base::params_grad.topRows(Base::depth) +=
+					Base::gamma_reg->d_function(Base::params_ref.topRows(Base::depth));
+			Base::params_grad.bottomRows(Base::depth) +=
+					Base::beta_reg->d_function(Base::params_ref.bottomRows(Base::depth));
+		}
 		return prev_out_grads;
 	}
 private:
@@ -1628,17 +1699,19 @@ public:
 	 * @param norm_avg_decay The decay rate of the maintained means and variances.
 	 * @param epsilon A small constant used to maintain numerical stability.
 	 */
-	inline BatchNormLayer(Dimensions<std::size_t,3> dims, RegPenSharedPtr<Scalar> param_reg,
-			Scalar norm_avg_decay = .1, Scalar epsilon = internal::Utils<Scalar>::EPSILON3) :
-				Base::BatchNormLayerBase(dims, param_reg, dims(2), norm_avg_decay, epsilon),
+	inline BatchNormLayer(Dimensions<std::size_t,3> dims, RegPenSharedPtr<Scalar> gamma_reg = Root::DEFAULT_REG_PEN,
+			RegPenSharedPtr<Scalar> beta_reg = Root::DEFAULT_REG_PEN, Scalar gamma_max_norm_constraint = 0,
+			Scalar beta_max_norm_constraint = 0, Scalar norm_avg_decay = .1, Scalar epsilon = internal::Utils<Scalar>::EPSILON3) :
+				Base::BatchNormLayerBase(dims, dims(2), gamma_reg, beta_reg, gamma_max_norm_constraint,
+						beta_max_norm_constraint, norm_avg_decay, epsilon),
 				offsets({ 0u, 0u, 0u, 0u }),
 				extents({ 0u, dims(0), dims(1), 1u }) { }
 	inline Root* clone() const {
 		return new BatchNormLayer(*this);
 	}
 protected:
-	inline BatchNormLayer(const BatchNormLayer<Scalar,3>& layer, bool share_weights = false) :
-			Base::BatchNormLayerBase(layer, share_weights),
+	inline BatchNormLayer(const BatchNormLayer<Scalar,3>& layer, bool share_params = false) :
+			Base::BatchNormLayerBase(layer, share_params),
 			offsets(layer.offsets),
 			extents(layer.extents) { }
 	inline Root* clone_with_shared_params() const {
@@ -1684,7 +1757,12 @@ protected:
 					prev_out_grads.slice(offsets, extents) = Base::_pass_back(std::move(out_grads_slice), extents, i);
 			}
 		}
-		Base::params_grad += Base::param_reg->d_function(Base::params_ref);
+		if (!Base::params_shared) {
+			Base::params_grad.topRows(Base::depth) +=
+					Base::gamma_reg->d_function(Base::params_ref.topRows(Base::depth));
+			Base::params_grad.bottomRows(Base::depth) +=
+					Base::beta_reg->d_function(Base::params_ref.bottomRows(Base::depth));
+		}
 		return prev_out_grads;
 	}
 private:

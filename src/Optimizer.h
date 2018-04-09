@@ -72,8 +72,9 @@ public:
 	 * the numerical and analytic gradients.
 	 * @return Whether the gradient check has been passed or failed.
 	 */
-	inline bool verify_gradients(Net& net, Provider& provider, Scalar step_size = internal::Utils<Scalar>::EPSILON2,
-			Scalar abs_epsilon = internal::Utils<Scalar>::EPSILON2, Scalar rel_epsilon = internal::Utils<Scalar>::EPSILON3) const {
+	inline bool verify_gradients(Net& net, Provider& provider, Scalar step_size = (internal::Utils<Scalar>::EPSILON2 +
+			internal::Utils<Scalar>::EPSILON3) / 2, Scalar abs_epsilon = internal::Utils<Scalar>::EPSILON2,
+			Scalar rel_epsilon = internal::Utils<Scalar>::EPSILON3) const {
 		assert(net.get_input_dims() == provider.get_obs_dims());
 		assert(net.get_output_dims() == provider.get_obj_dims());
 		assert(step_size > 0);
@@ -111,16 +112,15 @@ public:
 						 * gradient computation. */
 						Scalar loss_inc = loss->function(net.propagate(data_pair.first, true), data_pair.second).mean();
 						/* Calculate the new regularization penalty as its derivative w.r.t. the layer's parameters
-						 * is included in the gradients.
-						 */
+						 * is included in the gradients. */
 						Scalar reg_pen_inc = layer.get_regularization_penalty();
 						params(j,k) = param - step_size;
 						Scalar loss_dec = loss->function(net.propagate(data_pair.first, true), data_pair.second).mean();
 						Scalar reg_pen_dec = layer.get_regularization_penalty();
 						params(j,k) = param;
 						// Include the regularization penalty as well.
-						Scalar num_grad = (loss_inc + total_reg_pen + reg_pen_inc -
-								(loss_dec + total_reg_pen + reg_pen_dec)) / (2 * step_size);
+						Scalar num_grad = (loss_inc + total_reg_pen + reg_pen_inc - (loss_dec + total_reg_pen + reg_pen_dec)) /
+								(2 * step_size);
 						std::cout << "\t\tNumerical gradient = " << num_grad;
 						if (!internal::Utils<Scalar>::almost_equal(ana_grad, num_grad, abs_epsilon, rel_epsilon)) {
 							std::cout << " *****FAIL*****";
@@ -467,8 +467,7 @@ protected:
 		for (unsigned i = 0; i < params_grad_vec.size(); ++i) {
 			Layer<Scalar,Rank>& layer = *(layers[i]);
 			const Matrix<Scalar>& params_grad = Optimizer<Scalar,Rank,Sequential>::get_params_grad(layer);
-			Matrix<Scalar> acc_params_grad(params_grad.rows(), params_grad.cols());
-			acc_params_grad.setZero(params_grad.rows(), params_grad.cols());
+			Matrix<Scalar> acc_params_grad = Matrix<Scalar>::Zero(params_grad.rows(), params_grad.cols());
 			params_grad_vec[i] = acc_params_grad;
 		}
 	}
@@ -556,8 +555,7 @@ protected:
 		for (unsigned i = 0; i < params_grad_sqrs_vec.size(); ++i) {
 			Layer<Scalar,Rank>& layer = *(layers[i]);
 			const Matrix<Scalar>& params_grad = Optimizer<Scalar,Rank,Sequential>::get_params_grad(layer);
-			Matrix<Scalar> params_grad_sqrs(params_grad.rows(), params_grad.cols());
-			params_grad_sqrs.setZero(params_grad_sqrs.rows(), params_grad_sqrs.cols());
+			Matrix<Scalar> params_grad_sqrs = Matrix<Scalar>::Zero(params_grad.rows(), params_grad.cols());
 			params_grad_sqrs_vec[i] = params_grad_sqrs;
 		}
 	}
@@ -646,10 +644,8 @@ protected:
 			Layer<Scalar,Rank>& layer = *(layers[i]);
 			const Matrix<Scalar>& param_grads = Optimizer<Scalar,Rank,Sequential>::get_params_grad(layer);
 			ParamGradAndUpdateSqrs pgus;
-			pgus.params_grad = Matrix<Scalar>(param_grads.rows(), param_grads.cols());
-			pgus.params_grad.setZero(pgus.params_grad.rows(), pgus.params_grad.cols());
-			pgus.params_update = Matrix<Scalar>(pgus.params_grad.rows(), pgus.params_grad.cols());
-			pgus.params_update.setZero(pgus.params_update.rows(), pgus.params_update.cols());
+			pgus.params_grad = Matrix<Scalar>::Zero(param_grads.rows(), param_grads.cols());
+			pgus.params_update = Matrix<Scalar>::Zero(pgus.params_grad.rows(), pgus.params_grad.cols());
 			pgus_vec[i] = pgus;
 		}
 	}
@@ -716,10 +712,8 @@ protected:
 			Layer<Scalar,Rank>& layer = *(layers[i]);
 			const Matrix<Scalar>& param_grads = Optimizer<Scalar,Rank,Sequential>::get_params_grad(layer);
 			ParamGradNorms vel;
-			vel.params_grad_l1 = Matrix<Scalar>(param_grads.rows(), param_grads.cols());
-			vel.params_grad_l1.setZero(vel.params_grad_l1.rows(), vel.params_grad_l1.cols());
-			vel.params_grad_l2 = Matrix<Scalar>(vel.params_grad_l1.rows(), vel.params_grad_l1.cols());
-			vel.params_grad_l2.setZero(vel.params_grad_l2.rows(), vel.params_grad_l2.cols());
+			vel.params_grad_l1 = Matrix<Scalar>::Zero(param_grads.rows(), param_grads.cols());
+			vel.params_grad_l2 = Matrix<Scalar>::Zero(vel.params_grad_l1.rows(), vel.params_grad_l1.cols());
 			pgn_vec[i] = vel;
 		}
 	}

@@ -27,6 +27,7 @@ using namespace cattle;
 typedef double fp;
 
 static int test_parallel() {
+	std::cout << "PARALLEL" << std::endl;
 	const std::size_t RANK = 3;
 	TensorPtr<fp,RANK + 1> test_obs_ptr(new Tensor<fp,RANK + 1>(5u, 8u, 8u, 3u));
 	TensorPtr<fp,RANK + 1> test_obj_ptr(new Tensor<fp,RANK + 1>(5u, 10u, 1u, 1u));
@@ -37,7 +38,7 @@ static int test_parallel() {
 	preproc.transform(*test_obs_ptr);
 	MemoryDataProvider<fp,RANK,false> test_prov(std::move(test_obs_ptr), std::move(test_obj_ptr));
 	WeightInitSharedPtr<fp> init(new HeWeightInitialization<fp>());
-	RegPenSharedPtr<fp> reg(new ElasticNetRegularizationPenalty<fp>());
+	RegPenSharedPtr<fp> reg(new L2RegularizationPenalty<fp>());
 	std::vector<NeuralNetPtr<fp,RANK,false>> lanes(2);
 	std::vector<LayerPtr<fp,RANK>> layers1(2);
 	layers1[0] = LayerPtr<fp,RANK>(new FCLayer<fp,RANK>(test_prov.get_obs_dims(), 5, init, reg));
@@ -55,6 +56,7 @@ static int test_parallel() {
 }
 
 static int test_residual() {
+	std::cout << "RESIDUAL" << std::endl;
 	const std::size_t RANK = 3;
 	TensorPtr<fp,RANK + 1> test_obs_ptr(new Tensor<fp,RANK + 1>(5u, 32u, 32u, 3u));
 	TensorPtr<fp,RANK + 1> test_obj_ptr(new Tensor<fp,RANK + 1>(5u, 1u, 1u, 1u));
@@ -62,7 +64,8 @@ static int test_residual() {
 	test_obj_ptr->setRandom();
 	MemoryDataProvider<fp,RANK,false> test_prov(std::move(test_obs_ptr), std::move(test_obj_ptr));
 	WeightInitSharedPtr<fp> init(new HeWeightInitialization<fp>());
-	RegPenSharedPtr<fp> reg(new ElasticNetRegularizationPenalty<fp>());
+	RegPenSharedPtr<fp> reg(new L2RegularizationPenalty<fp>());
+	RegPenSharedPtr<fp> reg2(new L2RegularizationPenalty<fp>());
 	std::vector<std::pair<CompositeNeuralNetwork<fp,RANK,false>,bool>> res_modules;
 	std::vector<NeuralNetPtr<fp,RANK,false>> comp_mods;
 	std::vector<NeuralNetPtr<fp,RANK,false>> parallel_lanes;
@@ -75,17 +78,17 @@ static int test_residual() {
 	std::vector<LayerPtr<fp,RANK>> layers1(7);
 	layers1[0] = LayerPtr<fp,RANK>(new MaxPoolingLayer<fp>(comp_mods[0]->get_output_dims()));
 	layers1[1] = LayerPtr<fp,RANK>(new LeakyReLUActivationLayer<fp,RANK>(layers1[0]->get_output_dims()));
-	layers1[2] = LayerPtr<fp,RANK>(new BatchNormLayer<fp,RANK>(layers1[1]->get_output_dims(), reg));
+	layers1[2] = LayerPtr<fp,RANK>(new BatchNormLayer<fp,RANK>(layers1[1]->get_output_dims(), reg, reg2));
 	layers1[3] = LayerPtr<fp,RANK>(new ConvLayer<fp>(layers1[2]->get_output_dims(), 8, init, reg));
 	layers1[4] = LayerPtr<fp,RANK>(new SumPoolingLayer<fp>(layers1[3]->get_output_dims()));
 	layers1[5] = LayerPtr<fp,RANK>(new ELUActivationLayer<fp,RANK>(layers1[4]->get_output_dims()));
-	layers1[6] = LayerPtr<fp,RANK>(new BatchNormLayer<fp,RANK>(layers1[5]->get_output_dims(), reg));
+	layers1[6] = LayerPtr<fp,RANK>(new BatchNormLayer<fp,RANK>(layers1[5]->get_output_dims(), reg, reg2));
 	comp_mods.push_back(NeuralNetPtr<fp,RANK,false>(new FeedforwardNeuralNetwork<fp,RANK>(std::move(layers1))));
 	res_modules.push_back(std::make_pair(CompositeNeuralNetwork<fp,RANK,false>(std::move(comp_mods)), false));
 	std::vector<LayerPtr<fp,RANK>> layers2(3);
 	layers2[0] = LayerPtr<fp,RANK>(new ConvLayer<fp>(res_modules[0].first.get_output_dims(), 8, init, reg));
 	layers2[1] = LayerPtr<fp,RANK>(new PReLUActivationLayer<fp,RANK>(layers2[0]->get_output_dims(), reg));
-	layers2[2] = LayerPtr<fp,RANK>(new BatchNormLayer<fp,RANK>(layers2[1]->get_output_dims(), reg));
+	layers2[2] = LayerPtr<fp,RANK>(new BatchNormLayer<fp,RANK>(layers2[1]->get_output_dims(), reg, reg2));
 	res_modules.push_back(std::make_pair(CompositeNeuralNetwork<fp,RANK,false>(NeuralNetPtr<fp,RANK,false>(
 			new FeedforwardNeuralNetwork<fp,RANK>(std::move(layers2)))), false));
 	res_modules.push_back(std::make_pair(CompositeNeuralNetwork<fp,RANK,false>(NeuralNetPtr<fp,RANK,false>(
@@ -94,7 +97,7 @@ static int test_residual() {
 	std::vector<LayerPtr<fp,RANK>> layers3(3);
 	layers3[0] = LayerPtr<fp,RANK>(new ConvLayer<fp>(res_modules[2].first.get_output_dims(), 8, init, reg));
 	layers3[1] = LayerPtr<fp,RANK>(new LeakyReLUActivationLayer<fp,RANK>(layers3[0]->get_output_dims()));
-	layers3[2] = LayerPtr<fp,RANK>(new BatchNormLayer<fp,RANK>(layers3[1]->get_output_dims(), reg));
+	layers3[2] = LayerPtr<fp,RANK>(new BatchNormLayer<fp,RANK>(layers3[1]->get_output_dims(), reg, reg2));
 	res_modules.push_back(std::make_pair(CompositeNeuralNetwork<fp,RANK,false>(NeuralNetPtr<fp,RANK,false>(
 			new FeedforwardNeuralNetwork<fp,RANK>(std::move(layers3)))), false));
 	std::vector<LayerPtr<fp,RANK>> layers4(5);
@@ -113,6 +116,7 @@ static int test_residual() {
 }
 
 static int test_dense() {
+	std::cout << "DENSE" << std::endl;
 	const std::size_t RANK = 3;
 	TensorPtr<fp,RANK + 1> test_obs_ptr(new Tensor<fp,RANK + 1>(5u, 8u, 8u, 2u));
 	TensorPtr<fp,RANK + 1> test_obj_ptr(new Tensor<fp,RANK + 1>(5u, 64u, 8u, 2u));
@@ -120,7 +124,7 @@ static int test_dense() {
 	test_obj_ptr->setRandom();
 	MemoryDataProvider<fp,RANK,false> test_prov(std::move(test_obs_ptr), std::move(test_obj_ptr));
 	WeightInitSharedPtr<fp> init(new HeWeightInitialization<fp>());
-	RegPenSharedPtr<fp> reg(new ElasticNetRegularizationPenalty<fp>());
+	RegPenSharedPtr<fp> reg(new L2RegularizationPenalty<fp>());
 	std::vector<CompositeNeuralNetwork<fp,RANK,false>> modules;
 	modules.push_back(CompositeNeuralNetwork<fp,RANK,false>(NeuralNetPtr<fp,RANK,false>(new FeedforwardNeuralNetwork<fp,RANK>(
 			LayerPtr<fp,RANK>(new ConvLayer<fp>(test_prov.get_obs_dims(), 2, init, reg))))));
@@ -136,6 +140,7 @@ static int test_dense() {
 }
 
 static int test_seqnn() {
+	std::cout << "SEQUENTIAL" << std::endl;
 	const std::size_t RANK = 3;
 	TensorPtr<fp,RANK + 2> test_obs_ptr(new Tensor<fp,RANK + 2>(5u, 10u, 8u, 8u, 3u));
 	TensorPtr<fp,RANK + 2> test_obj_ptr(new Tensor<fp,RANK + 2>(5u, 10u, 4u, 1u, 1u));
@@ -143,7 +148,7 @@ static int test_seqnn() {
 	test_obj_ptr->setRandom();
 	MemoryDataProvider<fp,RANK,true> test_prov(std::move(test_obs_ptr), std::move(test_obj_ptr));
 	WeightInitSharedPtr<fp> init(new GlorotWeightInitialization<fp>());
-	RegPenSharedPtr<fp> reg(new ElasticNetRegularizationPenalty<fp>());
+	RegPenSharedPtr<fp> reg(new L2RegularizationPenalty<fp>());
 	std::vector<LayerPtr<fp,RANK>> layers(5);
 	layers[0] = LayerPtr<fp,RANK>(new ConvLayer<fp>(test_prov.get_obs_dims(), 2, init, reg));
 	layers[1] = LayerPtr<fp,RANK>(new TanhActivationLayer<fp,RANK>(layers[0]->get_output_dims()));
@@ -158,6 +163,7 @@ static int test_seqnn() {
 }
 
 static int test_rnn() {
+	std::cout << "RECURRENT" << std::endl;
 	const std::size_t RANK = 3;
 	TensorPtr<fp,RANK + 2> test_obs_ptr(new Tensor<fp,RANK + 2>(5u, 5u, 16u, 16u, 3u));
 	TensorPtr<fp,RANK + 2> test_obj_ptr(new Tensor<fp,RANK + 2>(5u, 3u, 2u, 1u, 1u));
@@ -165,7 +171,7 @@ static int test_rnn() {
 	test_obj_ptr->setRandom();
 	MemoryDataProvider<fp,RANK,true> test_prov(std::move(test_obs_ptr), std::move(test_obj_ptr));
 	WeightInitSharedPtr<fp> init(new OrthogonalWeightInitialization<fp>());
-	RegPenSharedPtr<fp> reg(new ElasticNetRegularizationPenalty<fp>());
+	RegPenSharedPtr<fp> reg(new L2RegularizationPenalty<fp>());
 	KernelPtr<fp,RANK> input_kernel(new ConvLayer<fp>(test_prov.get_obs_dims(), 5, init, reg));
 	KernelPtr<fp,RANK> state_kernel(new ConvLayer<fp>(input_kernel->get_output_dims(), 5, init, reg));
 	KernelPtr<fp,RANK> output_kernel(new FCLayer<fp,RANK>(input_kernel->get_output_dims(), 2, init, reg));
@@ -180,6 +186,7 @@ static int test_rnn() {
 }
 
 static int test_lstm() {
+	std::cout << "LSTM" << std::endl;
 	const std::size_t RANK = 1;
 	TensorPtr<fp,RANK + 2> test_obs_ptr(new Tensor<fp,RANK + 2>(10u, 5u, 32u));
 	TensorPtr<fp,RANK + 2> test_obj_ptr(new Tensor<fp,RANK + 2>(10u, 3u, 5u));
@@ -187,7 +194,7 @@ static int test_lstm() {
 	test_obj_ptr->setRandom();
 	MemoryDataProvider<fp,RANK,true> test_prov(std::move(test_obs_ptr), std::move(test_obj_ptr));
 	WeightInitSharedPtr<fp> init(new OrthogonalWeightInitialization<fp>());
-	RegPenSharedPtr<fp> reg(new ElasticNetRegularizationPenalty<fp>());
+	RegPenSharedPtr<fp> reg(new L2RegularizationPenalty<fp>());
 	const Dimensions<std::size_t,RANK>& input_dims = test_prov.get_obs_dims();
 	const Dimensions<std::size_t,RANK>& output_dims = test_prov.get_obj_dims();
 	KernelPtr<fp,RANK> forget_input_kernel(new FCLayer<fp,RANK>(input_dims, 5, init, reg));
@@ -214,6 +221,7 @@ static int test_lstm() {
 }
 
 static int test_bdrnn() {
+	std::cout << "BIDIRECTIONAL RECURRENT" << std::endl;
 	const std::size_t RANK = 3;
 	TensorPtr<fp,RANK + 2> test_obs_ptr(new Tensor<fp,RANK + 2>(5u, 7u, 8u, 8u, 3u));
 	TensorPtr<fp,RANK + 2> test_obj_ptr(new Tensor<fp,RANK + 2>(5u, 3u, 4u, 1u, 1u));
@@ -221,7 +229,7 @@ static int test_bdrnn() {
 	test_obj_ptr->setRandom();
 	MemoryDataProvider<fp,RANK,true> test_prov(std::move(test_obs_ptr), std::move(test_obj_ptr));
 	WeightInitSharedPtr<fp> init(new OrthogonalWeightInitialization<fp>());
-	RegPenSharedPtr<fp> reg(new ElasticNetRegularizationPenalty<fp>());
+	RegPenSharedPtr<fp> reg(new L2RegularizationPenalty<fp>());
 	KernelPtr<fp,RANK> input_kernel(new ConvLayer<fp>(test_prov.get_obs_dims(), 5, init, reg));
 	KernelPtr<fp,RANK> state_kernel(new ConvLayer<fp>(input_kernel->get_output_dims(), 5, init, reg));
 	KernelPtr<fp,RANK> output_kernel(new FCLayer<fp,RANK>(input_kernel->get_output_dims(), 2, init, reg));
@@ -237,7 +245,7 @@ static int test_bdrnn() {
 }
 
 int main() {
-//	std::string mnist_folder = "C:\\Users\\A6714\\Downloads\\mnist\\";
+//	std::string mnist_folder = "C:\\Users\\Viktor\\Downloads\\mnist\\";
 //	MNISTDataProvider<float> prov(mnist_folder + "train-images.idx3-ubyte", mnist_folder + "train-labels.idx1-ubyte");
 //	DataPair<float,3,false> data = prov.get_data(60000);
 //	TensorPtr<float,4> obs(new Tensor<float,4>(std::move(data.first)));
@@ -269,6 +277,7 @@ int main() {
 //	opt.optimize(nn, training_prov, test_prov, 1);
 //	std::cout << "Duration: " << std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now() -
 //			begin).count() << std::endl;
-	assert(test_residual() & test_dense() & test_seqnn() & test_rnn() & test_lstm() & test_bdrnn());
+//	assert(test_parallel() & test_residual() & test_dense() & test_seqnn());
+	assert(test_rnn() & test_lstm() & test_bdrnn());
 	return 0;
 }
