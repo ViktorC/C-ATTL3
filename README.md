@@ -41,6 +41,18 @@ The kernel layers (fully-connected and convolutional) also require weight initia
     * [HeWeightInitialization](https://viktorc.github.io/C-ATTL3/html/classcattle_1_1_he_weight_initialization.html)
     * [OrthogonalWeightInitialization](https://viktorc.github.io/C-ATTL3/html/classcattle_1_1_orthogonal_weight_initialization.html)
 
+These weight initializations aim to mitigate the problem of vanishing and exploding gradients. Weight initialization can make or break neural networks, however the usage of batch normalization layers may reduce the networks sensitivity to initialization.
+
+#### ParameterRegularization
+Parametric layers, i.e. layers with learnable parameters, also support parameter regularization. The standard regularization penalty functions are:
+* [ParameterRegularization](https://viktorc.github.io/C-ATTL3/html/classcattle_1_1_regularization_penalty.html) [A]
+  * [NoParameterRegularization](https://viktorc.github.io/C-ATTL3/html/classcattle_1_1_no_parameter_regularization.html)
+  * [L1ParameterRegularization](https://viktorc.github.io/C-ATTL3/html/classcattle_1_1_l1_parameter_regularization.html)
+  * [L2ParameterRegularization](https://viktorc.github.io/C-ATTL3/html/classcattle_1_1_l2_parameter_regularization.html)
+  * [ElasticNetParameterRegularization](https://viktorc.github.io/C-ATTL3/html/classcattle_1_1_elastic_net_parameter_regularization.html)
+
+These regularizations are counter measures against overfitting. They are especially useful in complex networks with a huge number of parameters. L1 regularization adds the sum of the absolute values of the parameters to the total loss, L2 regularization adds the sum of the squared values of the paramaters to the loss, and the elastic net regularization combines the other two.
+
 ### NeuralNetwork
 The highest level building blocks of the different architectures are the neural network implementations provided by the library. Using these implementations, either as modules in a composite constellation or as standalone networks, almost any neural network architecture can be constructed. They are the following:
 * [NeuralNetwork](https://viktorc.github.io/C-ATTL3/html/classcattle_1_1_neural_network.html) [A]
@@ -74,7 +86,7 @@ The library also provides optimizers that can be used to train the networks via 
       * [NadamOptimizer](https://viktorc.github.io/C-ATTL3/html/classcattle_1_1_nadam_optimizer.html)
 
 #### Loss
-Similarly to the layers, these optimizers rely on several hyper-parameters as well. Besides the hyper-parameters, optimizers also require 'practically' differentiable loss functions and regularization penalty functions. The library provides the following out of the box loss functions:
+Similarly to the layers, these optimizers rely on several hyper-parameters as well. Besides the hyper-parameters, optimizers also rely on 'practically' differentiable loss functions to minimize. The library provides the following out of the box loss functions:
 * [Loss](https://viktorc.github.io/C-ATTL3/html/classcattle_1_1_loss.html) [A]
   * [UniversalLoss](https://viktorc.github.io/C-ATTL3/html/classcattle_1_1_universal_loss.html) [A]
     * [AbsoluteLoss](https://viktorc.github.io/C-ATTL3/html/classcattle_1_1_absolute_loss.html)
@@ -85,15 +97,7 @@ Similarly to the layers, these optimizers rely on several hyper-parameters as we
     * [MultiLabelHingeLoss](https://viktorc.github.io/C-ATTL3/html/classcattle_1_1_multi_label_hinge_loss.html)
     * [MultiLabelLogLoss](https://viktorc.github.io/C-ATTL3/html/classcattle_1_1_multi_label_log_loss.html)
 
-#### RegularizationPenalty
-The standard regularization penalties are:
-* [RegularizationPenalty](https://viktorc.github.io/C-ATTL3/html/classcattle_1_1_regularization_penalty.html) [A]
-  * [NoRegularizationPenalty](https://viktorc.github.io/C-ATTL3/html/classcattle_1_1_no_regularization_penalty.html)
-  * [L1RegularizationPenalty](https://viktorc.github.io/C-ATTL3/html/classcattle_1_1_l1_regularization_penalty.html)
-  * [L2RegularizationPenalty](https://viktorc.github.io/C-ATTL3/html/classcattle_1_1_l2_regularization_penalty.html)
-  * [ElasticNetRegularizationPenalty](https://viktorc.github.io/C-ATTL3/html/classcattle_1_1_elastic_net_regularization_penalty.html)
-
-Given a loss function and a regularization penalty, optimizers can be constructed and used for gradient checks (e.g. to test self-implemented sub-classes of the core interfaces) and network training. Both of these methods are parameterized by a neural network and data providers.
+Given a loss function and some hyper-parameters, optimizers can be constructed and used for gradient checks (e.g. to test self-implemented sub-classes of the core interfaces) and network training. Both of these methods are parameterized by a neural network and data providers.
 
 ### DataProvider
 Data providers are responsible for supplying the data used for gradient verification, training, and testing. The currently available data providers include:
@@ -140,29 +144,29 @@ MemoryDataProvider<double,3,false> test_prov(std::move(test_obs_ptr), std::move(
 The test data provider is created similarly. However, it is important not to re-fit the preprocessor to the observation data set to ensure that the same transformation is applied to both the training and the test data. This test data is used to assess the accuracy of the neural network on data it has not encountered during the training process. This provides a measure of the network's generalization ability; the difference between the network's accuracy on the training data and that on the test data is a metric of overfitting. The test data is usually a smaller portion of all the available data than the training data. In our example, it is 20 samples as opposed to the 80 comprising the training data. Note that all the other ranks of the test observation and objective tensors must match those of the training observation and objective tensors.
 ```cpp
 WeightInitSharedPtr<double> init(new HeWeightInitialization<double>());
+ParamRegSharedPtr<double> reg(new L2ParameterRegularization<double>());
 std::vector<LayerPtr<double,3>> layers(9);
-layers[0] = LayerPtr<double,3>(new ConvLayer<double>(training_prov.get_obs_dims(), 10, init, 5, 2));
+layers[0] = LayerPtr<double,3>(new ConvLayer<double>(training_prov.get_obs_dims(), 10, init, reg, 5, 2));
 layers[1] = LayerPtr<double,3>(new ReLUActivationLayer<double,3>(layers[0]->get_output_dims()));
 layers[2] = LayerPtr<double,3>(new MaxPoolingLayer<double>(layers[1]->get_output_dims()));
-layers[3] = LayerPtr<double,3>(new ConvLayer<double>(layers[2]->get_output_dims(), 20, init));
+layers[3] = LayerPtr<double,3>(new ConvLayer<double>(layers[2]->get_output_dims(), 20, init, reg));
 layers[4] = LayerPtr<double,3>(new ReLUActivationLayer<double,3>(layers[3]->get_output_dims()));
 layers[5] = LayerPtr<double,3>(new MaxPoolingLayer<double>(layers[4]->get_output_dims()));
-layers[6] = LayerPtr<double,3>(new FCLayer<double,3>(layers[5]->get_output_dims(), 500, init));
+layers[6] = LayerPtr<double,3>(new FCLayer<double,3>(layers[5]->get_output_dims(), 500, init, reg));
 layers[7] = LayerPtr<double,3>(new ReLUActivationLayer<double,3>(layers[6]->get_output_dims()));
-layers[8] = LayerPtr<double,3>(new FCLayer<double,3>(layers[7]->get_output_dims(), 1, init));
+layers[8] = LayerPtr<double,3>(new FCLayer<double,3>(layers[7]->get_output_dims(), 1, init, reg));
 FeedforwardNeuralNetwork<double,3> nn(std::move(layers));
 ```
-The next step is the construction of the neural network. The above snippet demonstrates that of a simple convolutional neural network. The neural network implementation used is `FeedforwardNeuralNetwork` which takes a vector of unique layer pointers. Each layer in the vector must have the same input dimensions as the output dimensions of the preceding layer. Notice how the dimensions of the outputs of the layers do not need to be calculated manually; they can be simply retrieved using the `get_output_dims` members of the previous layers. It should also be noted that all neural networks require their layers to be of the same nominal rank and scalar type as the network itself. The example network consists of convolutional, max pooling, rectified linear unit, and fully connected layers. Convolutional and fully connected layers require weight initialization; due to its well-known compatibility with ReLU activations, He weight initialization is a good choice in our situation. As the `WeightInitialization` class specifies a stateless interface, multiple layers can use the same implementation instance (this is the reason they take a shared pointer). Similarly to the unique tensor pointer arguments of the data providers, the vector of unique layer pointers required by the network's constructor must be moved as well, as unique smart pointers cannot be copied.
+The next step is the construction of the neural network. The above snippet demonstrates that of a simple convolutional neural network. The neural network implementation used is `FeedforwardNeuralNetwork` which takes a vector of unique layer pointers. Each layer in the vector must have the same input dimensions as the output dimensions of the preceding layer. Notice how the dimensions of the outputs of the layers do not need to be calculated manually; they can be simply retrieved using the `get_output_dims` members of the previous layers. It should also be noted that all neural networks require their layers to be of the same nominal rank and scalar type as the network itself. The example network consists of convolutional, max pooling, rectified linear unit, and fully connected layers. Convolutional and fully connected layers require weight initialization; due to its well-known compatibility with ReLU activations, He weight initialization is a good choice in our situation. As the `WeightInitialization` class specifies a stateless interface, multiple layers can use the same implementation instance (this is the reason they take a shared pointer). The same can be said about the`ParameterRegularization` abstract type. All layers with learnable parameters, including the fully connected and convolutional ones above, support optional parameter regularization. In our example, the choice fell upon the popular L2 regularization penalty function for all parameteric layers. Similarly to the unique tensor pointer arguments of the data providers, the vector of unique layer pointers required by the network's constructor must be moved as well, as unique smart pointers cannot be copied.
 ```cpp
 nn.init();
 ```
 Once the network is constructed, it is appropriate to initialize it. An unitialized network is in an undefined state. The initialization of the network entails the initialization of all its layers' parameters. Care must be taken not to unintentionally overwrite learned parameters by re-initializing the network.
 ```cpp
 LossSharedPtr<double,3,false> loss(new QuadraticLoss<double,3,false>());
-RegPenSharedPtr<double> reg(new ElasticNetRegularizationPenalty<double>());
-NadamOptimizer<double,3,false> opt(loss, reg, 20);
+NadamOptimizer<double,3,false> opt(loss, 20);
 ```
-Having set up the data providers and the network, it is time to specify the loss function, the regularization penalty, and the optimizer. For the sake of simplicity (concerning the data generation), the quadratic loss function is used in our example. Like `WeightInitialization`, both `Loss` and `RegularizationPenalty` define stateless interfaces; this is why they are wrapped in shared pointers and why single instances can be used by multiple optimizers. The optimizer used in our example is the `NadamOptimizer` which is generally a good first choice. Note the consistency of the template arguments; the data providers, the preprocessor, the neural network, the loss function, and the optimizer must all have the same scalar type, rank, and sequentiality (and the regularization penalty must have the same scalar type as well). As specified by the third argument of the optimizer's constructor, the batch size used for training and testing is 20. This means that both the training and the test data instances are processed in batches of 20. After the processing of each training batch, the parameters of the network's layers are updated. In our case, an epoch thus involves 4 parameter updates. It should be noted that most optimizers have several hyper-parameters that usually have reasonable default values and thus do not necessarily need to be specified.
+Having set up the data providers and the network, it is time to specify the loss function and the optimizer. For the sake of simplicity (concerning the data generation), the quadratic loss function is used in our example. Like `WeightInitialization`and `ParameterRegularization`, `Loss` also defines a stateless interface; this is why it is wrapped in a shared pointer and why a single instance can be used by multiple optimizers. The optimizer used in our example is the `NadamOptimizer` which is generally a good first choice. Note the consistency of the template arguments; the data providers, the preprocessor, the neural network, the loss function, and the optimizer must all have the same scalar type, rank, and sequentiality. As specified by the third argument of the optimizer's constructor, the batch size used for training and testing is 20. This means that both the training and the test data instances are processed in batches of 20. After the processing of each training batch, the parameters of the network's layers are updated. In our case, an epoch thus involves 4 parameter updates. It should be noted that most optimizers have several hyper-parameters that usually have reasonable default values and thus do not necessarily need to be specified.
 ```cpp
 opt.optimize(nn, training_prov, test_prov, 500);
 ```	

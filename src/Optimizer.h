@@ -21,8 +21,8 @@
 #include "DataProvider.h"
 #include "Loss.h"
 #include "NeuralNetwork.h"
-#include "RegularizationPenalty.h"
 #include "Utils.h"
+#include "ParameterRegularization.h"
 #include "WeightInitialization.h"
 
 namespace cattle {
@@ -79,27 +79,24 @@ public:
 		assert(net.get_output_dims() == provider.get_obj_dims());
 		assert(step_size > 0);
 		assert(abs_epsilon >= 0 && rel_epsilon > 0);
+		bool failure = false;
 		DataPair<Scalar,Rank,Sequential> data_pair = provider.get_data(std::numeric_limits<std::size_t>::max());
 		std::size_t instances = data_pair.first.dimension(0);
 		provider.reset();
 		/* As the loss to minimize is the mean of the losses for all the training observations, the gradient to
 		 * back-propagate is to be divided by the number of observations in the batch. */
 		net.backpropagate(loss->d_function(net.propagate(data_pair.first, true), data_pair.second) / (Scalar) instances);
-		bool failure = false;
 		std::vector<Layer<Scalar,Rank>*> layers = net.get_layers();
-		// Compute the total regularization penalty on the base parameters.
-		Scalar total_reg_pen = 0;
-		for (std::size_t i = 0; i < layers.size(); ++i)
-			total_reg_pen += layers[i]->get_regularization_penalty();
 		for (std::size_t i = 0; i < layers.size(); ++i) {
-			Layer<Scalar,Rank>& layer = *(layers[i]);
+			Layer<Scalar,Rank>& layer = *layers[i];
 			if (layer.is_parametric()) {
 				std::cout << "Layer " << std::setw(3) << std::to_string(i + 1) <<
 						std::string(28, '-') << std::endl;
+				/* Add the derivative of the regularization function w.r.t. to the parameters of the layer to the
+				 * parameters' gradient. */
+				layer.regularize();
 				Matrix<Scalar>& params = layer.get_params();
 				const Matrix<Scalar>& params_grad = layer.get_params_grad();
-				Scalar reg_pen = layer.get_regularization_penalty();
-				total_reg_pen -= reg_pen;
 				for (int j = 0; j < params.rows(); ++j) {
 					for (int k = 0; k < params.cols(); ++k) {
 						std::cout << "\tParam[" << i << "," << j << "," << k << "]:" << std::endl;
@@ -112,15 +109,14 @@ public:
 						 * gradient computation. */
 						Scalar loss_inc = loss->function(net.propagate(data_pair.first, true), data_pair.second).mean();
 						/* Calculate the new regularization penalty as its derivative w.r.t. the layer's parameters
-						 * is included in the gradients. */
+						 * is included in the gradient. */
 						Scalar reg_pen_inc = layer.get_regularization_penalty();
 						params(j,k) = param - step_size;
 						Scalar loss_dec = loss->function(net.propagate(data_pair.first, true), data_pair.second).mean();
 						Scalar reg_pen_dec = layer.get_regularization_penalty();
 						params(j,k) = param;
 						// Include the regularization penalty as well.
-						Scalar num_grad = (loss_inc + total_reg_pen + reg_pen_inc - (loss_dec + total_reg_pen + reg_pen_dec)) /
-								(2 * step_size);
+						Scalar num_grad = (loss_inc + reg_pen_inc - (loss_dec + reg_pen_dec)) / (2 * step_size);
 						std::cout << "\t\tNumerical gradient = " << num_grad;
 						if (!internal::Utils<Scalar>::almost_equal(ana_grad, num_grad, abs_epsilon, rel_epsilon)) {
 							std::cout << " *****FAIL*****";
@@ -129,7 +125,6 @@ public:
 						std::cout << std::endl;
 					}
 				}
-				total_reg_pen += reg_pen;
 			}
 		}
 		// Empty the network caches.
@@ -306,14 +301,15 @@ protected:
 	 * A method to expose protected methods of the Layer class to subclasses of
 	 * Optimizer that are not friend classes of Layer.
 	 *
-	 * \see Layer#enforce_constraints()
+	 * \see Layer#regularize()
 	 *
-	 * It enforces constraints on the parameters of the specified layer if applicable.
+	 * It regularizes the layer's parameters by adding the derivative of the regularization
+	 * function of the layer w.r.t. the parameters to the parameters' gradient.
 	 *
-	 * @param layer The layer whose parameters are to be constrained.
+	 * @param layer The layer whose parameters are to be regularized.
 	 */
-	inline static void enforce_constraints(Layer<Scalar,Rank>& layer) {
-		layer.enforce_constraints();
+	inline static void regularize(Layer<Scalar,Rank>& layer) {
+		return layer.regularize();
 	}
 	/**
 	 * A method to expose protected methods of the Layer class to subclasses of
@@ -328,6 +324,19 @@ protected:
 	 */
 	inline static Scalar get_regularization_penalty(Layer<Scalar,Rank>& layer) {
 		return layer.get_regularization_penalty();
+	}
+	/**
+	 * A method to expose protected methods of the Layer class to subclasses of
+	 * Optimizer that are not friend classes of Layer.
+	 *
+	 * \see Layer#enforce_constraints()
+	 *
+	 * It enforces constraints on the parameters of the specified layer if applicable.
+	 *
+	 * @param layer The layer whose parameters are to be constrained.
+	 */
+	inline static void enforce_constraints(Layer<Scalar,Rank>& layer) {
+		layer.enforce_constraints();
 	}
 	const LossSharedPtr<Scalar,Rank,Sequential> loss;
 };
@@ -366,6 +375,7 @@ protected:
 			for (unsigned k = 0; k < layers.size(); ++k) {
 				Layer<Scalar,Rank>& layer = *(layers[k]);
 				if (Base::is_parametric(layer)) {
+					Base::regularize(layer);
 					update_params(layer, k, epoch - 1);
 					Base::enforce_constraints(layer);
 				}
@@ -600,7 +610,7 @@ public:
 	 * @param epsilon A small constant used to maintain numerical stability.
 	 */
 	inline RMSPropOptimizer(LossSharedPtr<Scalar,Rank,Sequential> loss, unsigned batch_size = 1, Scalar learning_rate = 1e-3,
-			Scalar l2_decay = 1e-1, Scalar epsilon = internal::Utils<Scalar>::EPSILON) :
+			Scalar l2_decay = 1e-1, Scalar epsilon = internal::Utils<Scalar>::EPSILON2) :
 				AdagradOptimizer<Scalar,Rank,Sequential>::AdagradOptimizer(loss, batch_size, learning_rate, epsilon),
 				l2_decay(l2_decay) {
 		assert(l2_decay >= 0 && l2_decay <= 1);

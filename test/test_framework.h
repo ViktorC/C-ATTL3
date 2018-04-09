@@ -90,7 +90,7 @@ static NeuralNetPtr<Scalar,Rank,true> default_network() {
 template<typename Scalar, std::size_t Rank, bool Sequential>
 static std::unique_ptr<Optimizer<Scalar,Rank,Sequential>> default_optimizer() {
 	return OptimizerPtr<Scalar,Rank,Sequential>(new VanillaSGDOptimizer<Scalar,Rank,Sequential>(LossSharedPtr<Scalar,Rank,Sequential>(
-			new QuadraticLoss<Scalar,Rank,Sequential>()), RegPenSharedPtr<Scalar>(new L1RegularizationPenalty<Scalar>())));
+			new QuadraticLoss<Scalar,Rank,Sequential>()), ParamRegSharedPtr<Scalar>(new L1ParameterRegularization<Scalar>())));
 }
 
 template<typename Scalar, std::size_t Rank, bool Sequential>

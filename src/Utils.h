@@ -79,6 +79,32 @@ template<typename Scalar>
 using EigenSolver = Eigen::SelfAdjointEigenSolver<Matrix<Scalar>>;
 
 /**
+ * An alias for Eigen's bi-diagonal divide and conquer singular-value decomposition.
+ */
+template<typename Scalar>
+using SVD = Eigen::BDCSVD<Matrix<Scalar>>;
+
+/**
+ * An alias for Eigen's singular-value decomposition options.
+ */
+using SVDOptions = Eigen::DecompositionOptions;
+
+/**
+ * @return The number of threads used by Eigen to accelerate operations
+ * supporting multithreading.
+ */
+inline static int num_of_eval_threads() {
+	return Eigen::nbThreads();
+}
+/**
+ * @param num_of_threads The number of threads Eigen should use to accelerate
+ * operations supporting multithreading.
+ */
+inline static void set_num_of_eval_threads(int num_of_threads) {
+	Eigen::setNbThreads(num_of_threads);
+}
+
+/**
  * A utility class template containing static methods and variables to help with
  * numerical issues, the manipulation of matrices and tensors, and the conversion
  * between tensors and matrices.
@@ -94,20 +120,6 @@ public:
 	static constexpr Scalar EPSILON1 = std::numeric_limits<Scalar>::epsilon();
 	static constexpr Scalar EPSILON2 = 1e-8;
 	static constexpr Scalar EPSILON3 = 1e-4;
-	/**
-	 * @return The number of threads used by Eigen to accelerate operations
-	 * supporting multithreading.
-	 */
-	inline static int num_of_eval_threads() {
-		return Eigen::nbThreads();
-	}
-	/**
-	 * @param num_of_threads The number of threads Eigen should use to accelerate
-	 * operations supporting multithreading.
-	 */
-	inline static void set_num_of_eval_threads(int num_of_threads) {
-		Eigen::setNbThreads(num_of_threads);
-	}
 	/**
 	 * Returns whether the two numerals are close enough to be considered equal.
 	 *

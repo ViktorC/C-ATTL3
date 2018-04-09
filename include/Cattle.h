@@ -14,8 +14,8 @@
 #include "../src/Loss.h"
 #include "../src/NeuralNetwork.h"
 #include "../src/Optimizer.h"
+#include "../src/ParameterRegularization.h"
 #include "../src/Preprocessor.h"
-#include "../src/RegularizationPenalty.h"
 #include "../src/Utils.h"
 #include "../src/WeightInitialization.h"
 
