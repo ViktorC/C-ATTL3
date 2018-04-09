@@ -1881,8 +1881,8 @@ protected:
 			Scalar scaling_factor = (Scalar) 1 / (1 - dropout_prob + epsilon);
 			typename Base::Data random_tensor(in.dimensions());
 			random_tensor.setRandom();
-			random_tensor = (random_tensor + random_tensor.constant((Scalar) 1)) / (Scalar) 2;
-			dropout_mask = random_tensor.unaryExpr([this,scaling_factor](Scalar i) {
+			dropout_mask = ((random_tensor + random_tensor.constant((Scalar) 1)) / (Scalar) 2)
+					.unaryExpr([this,scaling_factor](Scalar i) {
 				return (Scalar) (i <= dropout_prob ? 0 : scaling_factor);
 			});
 			return in * dropout_mask;
@@ -1891,7 +1891,7 @@ protected:
 	}
 	inline typename Base::Data pass_back(typename Base::Data out_grads) {
 		assert((Dimensions<std::size_t,Base::DATA_RANK>(out_grads.dimensions()).template demote<>()) == dims);
-		assert(out_grads.dimension(0) > 0 && dropout_mask.rows() == out_grads.dimension(0));
+		assert(out_grads.dimension(0) > 0 && dropout_mask.dimension(0) == out_grads.dimension(0));
 		if (input_layer)
 			return typename Base::Data();
 		// The derivative of the dropout 'function'.
