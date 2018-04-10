@@ -176,6 +176,9 @@ public:
 			std::cout << std::endl << std::endl;
 			prev_test_loss = test_loss;
 		}
+		// Reset the providers.
+		training_prov.reset();
+		test_prov.reset();
 		// Empty the network caches.
 		net.empty_caches();
 		return prev_test_loss;
@@ -494,7 +497,7 @@ protected:
 	 * @return The learning rate to use.
 	 */
 	Scalar calculate_learning_rate(unsigned epoch) {
-		return init_learning_rate / (1.0 + annealing_rate * epoch);
+		return init_learning_rate / (1 + annealing_rate * epoch);
 	}
 	const Scalar init_learning_rate;
 	const Scalar annealing_rate;
@@ -729,8 +732,8 @@ protected:
 	}
 	inline void update_params(Layer<Scalar,Rank>& layer, unsigned i, unsigned epoch) {
 		ParamGradNorms& grad_norms = pgn_vec[i];
-		Scalar l1_corr = 1.0 / (1.0 - pow(1.0 - l1_decay, epoch + 1) + epsilon);
-		Scalar l2_corr = 1.0 / (1.0 - pow(1.0 - l2_decay, epoch + 1) + epsilon);
+		Scalar l1_corr = (Scalar) 1 / (1 - pow(1 - l1_decay, epoch + 1) + epsilon);
+		Scalar l2_corr = (Scalar) 1 / (1 - pow(1 - l2_decay, epoch + 1) + epsilon);
 		Matrix<Scalar>& params = Optimizer<Scalar,Rank,Sequential>::get_params(layer);
 		const Matrix<Scalar>& params_grad = Optimizer<Scalar,Rank,Sequential>::get_params_grad(layer);
 		grad_norms.params_grad_l1 = (1 - l1_decay) * grad_norms.params_grad_l1 + l1_decay * params_grad;
@@ -781,7 +784,7 @@ public:
 protected:
 	inline void update_params(Layer<Scalar,Rank>& layer, unsigned i, unsigned epoch) {
 		typename Base::ParamGradNorms& grad_norms = Base::pgn_vec[i];
-		Scalar l1_corr = 1.0 / (1.0 - pow(1.0 - Base::l1_decay, epoch + 1) + Base::epsilon);
+		Scalar l1_corr = (Scalar) 1 / (1 - pow(1 - Base::l1_decay, epoch + 1) + Base::epsilon);
 		Matrix<Scalar>& params = Optimizer<Scalar,Rank,Sequential>::get_params(layer);
 		const Matrix<Scalar>& params_grad = Optimizer<Scalar,Rank,Sequential>::get_params_grad(layer);
 		grad_norms.params_grad_l1 = (1 - Base::l1_decay) * grad_norms.params_grad_l1 + Base::l1_decay * params_grad;
@@ -818,9 +821,9 @@ public:
 protected:
 	inline void update_params(Layer<Scalar,Rank>& layer, unsigned i, unsigned epoch) {
 		typename Base::ParamGradNorms& grad_norms = Base::pgn_vec[i];
-		Scalar l1_corr = 1.0 / (1.0 - pow(1.0 - Base::l1_decay, epoch + 1) + Base::epsilon);
-		Scalar l1_next_corr = 1.0 / (1.0 - pow(1.0 - Base::l1_decay, epoch + 2) + Base::epsilon);
-		Scalar l2_corr = 1.0 / (1.0 - pow(1.0 - Base::l2_decay, epoch + 1) + Base::epsilon);
+		Scalar l1_corr = (Scalar) 1 / (1 - pow(1 - Base::l1_decay, epoch + 1) + Base::epsilon);
+		Scalar l1_next_corr = (Scalar) 1 / (1 - pow(1 - Base::l1_decay, epoch + 2) + Base::epsilon);
+		Scalar l2_corr = (Scalar) 1 / (1 - pow(1 - Base::l2_decay, epoch + 1) + Base::epsilon);
 		Matrix<Scalar>& params = Optimizer<Scalar,Rank,Sequential>::get_params(layer);
 		const Matrix<Scalar>& params_grad = Optimizer<Scalar,Rank,Sequential>::get_params_grad(layer);
 		grad_norms.params_grad_l1 = (1 - Base::l1_decay) * grad_norms.params_grad_l1 + Base::l1_decay * params_grad;

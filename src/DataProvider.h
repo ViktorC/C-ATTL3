@@ -496,9 +496,9 @@ protected:
 		std::size_t i;
 		for (i = 0; i < batch_size && obs_input_stream.read(obs_buffer, OBS_INSTANCE_LENGTH); ++i) {
 			// Read and set the label.
-			unsigned char label;
-			obj_input_stream >> label;
-			obj(i,(std::size_t) label,0u,0u) = (Scalar) 1;
+			char label;
+			obj_input_stream.read(&label, LABEL_INSTANCE_LENGTH);
+			obj(i,static_cast<std::size_t>(label),0u,0u) = (Scalar) 1;
 			// Set the image.
 			unsigned char* u_buffer = reinterpret_cast<unsigned char*>(obs_buffer);
 			std::size_t buffer_ind = 0;
@@ -570,6 +570,11 @@ public:
 			obj_extents({ 0u, NUM_LABELS, 1u, 1u }) {
 		Base::reset();
 	}
+	/**
+	 * @param file_path The path to the data set file.
+	 */
+	inline CIFARDataProvider(std::string file_path) :
+			CIFARDataProvider(std::vector<std::string>({ file_path })) { }
 	inline const Dimensions<std::size_t,3>& get_obs_dims() const {
 		return obs;
 	}
@@ -589,7 +594,7 @@ protected:
 			// Set the label.
 			if (CIFARType == CIFAR_100)
 				buffer_ind++;
-			obj(i,u_buffer[buffer_ind++],0,0) = (Scalar) 1;
+			obj(i,u_buffer[buffer_ind++],0u,0u) = (Scalar) 1;
 			// Set the image.
 			for (std::size_t channel = 0; channel < 3; ++channel) {
 				for (std::size_t height = 0; height < 32; ++height) {

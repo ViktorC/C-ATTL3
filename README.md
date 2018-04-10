@@ -42,7 +42,7 @@ The kernel layers (fully-connected and convolutional) also require weight initia
     * [HeWeightInitialization](https://viktorc.github.io/C-ATTL3/html/classcattle_1_1_he_weight_initialization.html)
     * [OrthogonalWeightInitialization](https://viktorc.github.io/C-ATTL3/html/classcattle_1_1_orthogonal_weight_initialization.html)
 
-These weight initializations aim to mitigate the problem of vanishing and exploding gradients. Weight initialization can make or break neural networks, however the usage of batch normalization layers may reduce the networks sensitivity to initialization.
+These weight initializations aim to mitigate the problem of vanishing and exploding gradients. Weight initialization can make or break neural networks, however the usage of batch normalization layers may reduce the networks' sensitivity to initialization.
 
 #### ParameterRegularization
 Parametric layers, i.e. layers with learnable parameters, also support parameter regularization. The standard regularization penalty functions are:

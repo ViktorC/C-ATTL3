@@ -94,6 +94,8 @@ Inheritance diagram for cattle::CIFARDataProvider&lt; Scalar, CIFARType &gt;:</d
 Public Member Functions</h2></td></tr>
 <tr class="memitem:aea897b5488b2c1f5b1352703de7edc56"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_c_i_f_a_r_data_provider.html#aea897b5488b2c1f5b1352703de7edc56">CIFARDataProvider</a> (std::vector&lt; std::string &gt; file_paths)</td></tr>
 <tr class="separator:aea897b5488b2c1f5b1352703de7edc56"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:acad45a9be6ec504c355d8b82e0b4d20f"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_c_i_f_a_r_data_provider.html#acad45a9be6ec504c355d8b82e0b4d20f">CIFARDataProvider</a> (std::string file_path)</td></tr>
+<tr class="separator:acad45a9be6ec504c355d8b82e0b4d20f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ab8c86d2e8a78146b84e070b879c9ab85"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="classcattle_1_1_dimensions.html">Dimensions</a>&lt; std::size_t, 3 &gt; &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_c_i_f_a_r_data_provider.html#ab8c86d2e8a78146b84e070b879c9ab85">get_obs_dims</a> () const</td></tr>
 <tr class="separator:ab8c86d2e8a78146b84e070b879c9ab85"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:af60eefbce63dbbfb982807c160768f61"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="classcattle_1_1_dimensions.html">Dimensions</a>&lt; std::size_t, 3 &gt; &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_c_i_f_a_r_data_provider.html#af60eefbce63dbbfb982807c160768f61">get_obj_dims</a> () const</td></tr>
@@ -223,7 +225,7 @@ template&lt;typename Scalar , CIFARType CIFARType = CIFAR_10&gt; </div>
 </div>
 <h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
 <a id="aea897b5488b2c1f5b1352703de7edc56"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aea897b5488b2c1f5b1352703de7edc56">&#9670;&nbsp;</a></span>CIFARDataProvider()</h2>
+<h2 class="memtitle"><span class="permalink"><a href="#aea897b5488b2c1f5b1352703de7edc56">&#9670;&nbsp;</a></span>CIFARDataProvider() <span class="overload">[1/2]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -250,6 +252,40 @@ template&lt;typename Scalar , CIFARType CIFARType = CIFAR_10&gt; </div>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">file_paths</td><td>The paths to the data set files. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="acad45a9be6ec504c355d8b82e0b4d20f"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#acad45a9be6ec504c355d8b82e0b4d20f">&#9670;&nbsp;</a></span>CIFARDataProvider() <span class="overload">[2/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename Scalar , CIFARType CIFARType = CIFAR_10&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classcattle_1_1_c_i_f_a_r_data_provider.html">cattle::CIFARDataProvider</a>&lt; Scalar, <a class="el" href="namespacecattle.html#a3aba4c1d42028d369dfb60a0507d3785">CIFARType</a> &gt;::<a class="el" href="classcattle_1_1_c_i_f_a_r_data_provider.html">CIFARDataProvider</a> </td>
+          <td>(</td>
+          <td class="paramtype">std::string&#160;</td>
+          <td class="paramname"><em>file_path</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">file_path</td><td>The path to the data set file. </td></tr>
   </table>
   </dd>
 </dl>
