@@ -8,6 +8,7 @@
 #ifndef PARAMETERREGULARIZATION_H_
 #define PARAMETERREGULARIZATION_H_
 
+#include <memory>
 #include <type_traits>
 #include "Utils.h"
 
@@ -44,6 +45,7 @@ public:
  */
 template<typename Scalar>
 class NoParameterRegularization : public ParamaterRegularization<Scalar> {
+	typedef NoParameterRegularization<Scalar> Self;
 public:
 	inline Scalar function(const Matrix<Scalar>& params) const {
 		return 0;

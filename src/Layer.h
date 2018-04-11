@@ -55,7 +55,7 @@ class Layer {
 	friend class Optimizer<Scalar,Rank,true>;
 	friend class Optimizer<Scalar,Rank,false>;
 public:
-	static const ParamRegSharedPtr<Scalar> DEFAULT_PARAM_REG;
+	static const ParamRegSharedPtr<Scalar> NO_PARAM_REG;
 	virtual ~Layer() = default;
 	/**
 	 * A constant method implementing the clone pattern.
@@ -183,7 +183,7 @@ protected:
 
 // Initialize the static default regularization penalty.
 template<typename Scalar, std::size_t Rank>
-const ParamRegSharedPtr<Scalar> Layer<Scalar,Rank>::DEFAULT_PARAM_REG(new NoParameterRegularization<Scalar>());
+const ParamRegSharedPtr<Scalar> Layer<Scalar,Rank>::NO_PARAM_REG = std::make_shared<NoParameterRegularization<Scalar>>();
 
 /**
  * An abstract base class template for layers representing linear kernel-based operations
@@ -290,7 +290,7 @@ public:
 	 * constraint is applied.
 	 */
 	inline FCLayer(const Dimensions<std::size_t,Rank>& input_dims, std::size_t output_size, WeightInitSharedPtr<Scalar> weight_init,
-			ParamRegSharedPtr<Scalar> weight_reg = Root::DEFAULT_PARAM_REG, Scalar max_norm_constraint = 0) :
+			ParamRegSharedPtr<Scalar> weight_reg = Root::NO_PARAM_REG, Scalar max_norm_constraint = 0) :
 				Base::KernelLayer(input_dims, Dimensions<std::size_t,Rank>({ output_size }), weight_init, weight_reg,
 						input_dims.get_volume() + 1, output_size, max_norm_constraint),
 				out_conversion_dims(Base::output_dims.template promote<>()),
@@ -372,7 +372,7 @@ public:
 	 * constraint is applied.
 	 */
 	inline ConvLayer(const Dimensions<std::size_t,3>& input_dims, std::size_t filters, WeightInitSharedPtr<Scalar> weight_init,
-			ParamRegSharedPtr<Scalar> weight_reg = Root::DEFAULT_PARAM_REG, std::size_t receptor_height = 3, std::size_t receptor_width = 3,
+			ParamRegSharedPtr<Scalar> weight_reg = Root::NO_PARAM_REG, std::size_t receptor_height = 3, std::size_t receptor_width = 3,
 			std::size_t padding = 1, std::size_t stride = 1, std::size_t dilation = 0, Scalar max_norm_constraint = 0) :
 				/* For every filter, there is a column in the weight matrix with the same number of
 				 * elements as the area of the receptive field (F_H * F_W * D) + 1 for the bias row. */
@@ -1073,7 +1073,7 @@ public:
 	 * @param max_norm_constraint An optional max-norm constraint. If it is 0 or less, no
 	 * constraint is applied.
 	 */
-	inline PReLUActivationLayer(const Dimensions<std::size_t,Rank>& dims, ParamRegSharedPtr<Scalar> param_reg = Root::DEFAULT_PARAM_REG,
+	inline PReLUActivationLayer(const Dimensions<std::size_t,Rank>& dims, ParamRegSharedPtr<Scalar> param_reg = Root::NO_PARAM_REG,
 			Scalar init_alpha = 1e-1, Scalar max_norm_constraint = 0) :
 				Base::ActivationLayer(dims, 1, dims.get_volume()),
 				param_reg(param_reg),
@@ -1494,6 +1494,9 @@ private:
 	std::vector<std::vector<unsigned>> max_inds;
 };
 
+// Hide the base batch norm layer from other translation units.
+namespace {
+
 /**
  * An abstract base class template for a batch normalization layer.
  */
@@ -1681,6 +1684,8 @@ private:
 	std::vector<Cache> cache_vec;
 };
 
+}
+
 /**
  * A class template for a batch normalization layer.
  */
@@ -1700,8 +1705,8 @@ public:
 	 * @param norm_avg_decay The decay rate of the maintained means and variances.
 	 * @param epsilon A small constant used to maintain numerical stability.
 	 */
-	inline BatchNormLayer(const Dimensions<std::size_t,Rank>& dims, ParamRegSharedPtr<Scalar> gamma_reg = Root::DEFAULT_PARAM_REG,
-			ParamRegSharedPtr<Scalar> beta_reg = Root::DEFAULT_PARAM_REG, Scalar gamma_max_norm_constraint = 0,
+	inline BatchNormLayer(const Dimensions<std::size_t,Rank>& dims, ParamRegSharedPtr<Scalar> gamma_reg = Root::NO_PARAM_REG,
+			ParamRegSharedPtr<Scalar> beta_reg = Root::NO_PARAM_REG, Scalar gamma_max_norm_constraint = 0,
 			Scalar beta_max_norm_constraint = 0, Scalar norm_avg_decay = .1, Scalar epsilon = internal::Utils<Scalar>::EPSILON3) :
 				Base::BatchNormLayerBase(dims, dims(2), gamma_reg, beta_reg, gamma_max_norm_constraint,
 						beta_max_norm_constraint, norm_avg_decay, epsilon),
@@ -1750,8 +1755,8 @@ public:
 		 * @param norm_avg_decay The decay rate of the maintained means and variances.
 		 * @param epsilon A small constant used to maintain numerical stability.
 		 */
-	inline BatchNormLayer(Dimensions<std::size_t,3> dims, ParamRegSharedPtr<Scalar> gamma_reg = Root::DEFAULT_PARAM_REG,
-			ParamRegSharedPtr<Scalar> beta_reg = Root::DEFAULT_PARAM_REG, Scalar gamma_max_norm_constraint = 0,
+	inline BatchNormLayer(Dimensions<std::size_t,3> dims, ParamRegSharedPtr<Scalar> gamma_reg = Root::NO_PARAM_REG,
+			ParamRegSharedPtr<Scalar> beta_reg = Root::NO_PARAM_REG, Scalar gamma_max_norm_constraint = 0,
 			Scalar beta_max_norm_constraint = 0, Scalar norm_avg_decay = .1, Scalar epsilon = internal::Utils<Scalar>::EPSILON3) :
 				Base::BatchNormLayerBase(dims, dims(2), gamma_reg, beta_reg, gamma_max_norm_constraint,
 						beta_max_norm_constraint, norm_avg_decay, epsilon),

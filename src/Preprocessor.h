@@ -144,6 +144,9 @@ protected:
 	Matrix<Scalar> sd;
 };
 
+// Hide the PCA preprocessor base from other translation units.
+namespace {
+
 /**
  * An abstract base class template for a principal component analysis (PCA) preprocessor that can also
  * standardize and whiten the data.
@@ -211,6 +214,8 @@ protected:
 	};
 	std::vector<EigenDecomposition> ed_vec;
 };
+
+}
 
 /**
  * A class template for a PCA preprocessor that can also standardize and whiten.

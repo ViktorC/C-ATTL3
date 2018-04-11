@@ -1,5 +1,5 @@
 # C-ATTL3 [![Build Status](https://travis-ci.org/ViktorC/C-ATTL3.svg?branch=master)](https://travis-ci.org/ViktorC/C-ATTL3)
-A header-only neural network template library written in C++. C-ATTL3 relies heavily on [Eigen](http://eigen.tuxfamily.org), the popular linear algebra library. It allows for the easy construction and training of both feed-forward and recurrent neural networks ranging from simple MLPs and RNNs to state-of-the-art InceptionNets, ResNets, DenseNets, convolutional LSTMs, and other complex architectures. C-ATTL3 supports data samples of different ranks and different floating point scalar types such as the single precision `float` and the double precision `double`. The Doxygen documentation of the library can be found [here](https://viktorc.github.io/C-ATTL3/html/).
+A header-only neural network template library written in C++11. C-ATTL3 relies heavily on [Eigen](http://eigen.tuxfamily.org), the popular linear algebra library. It allows for the easy construction and training of both feed-forward and recurrent neural networks ranging from simple MLPs and RNNs to state-of-the-art InceptionNets, ResNets, DenseNets, convolutional LSTMs, and other complex architectures. C-ATTL3 supports data samples of different ranks and different floating point scalar types such as the single precision `float` and the double precision `double`. The Doxygen documentation of the library can be found [here](https://viktorc.github.io/C-ATTL3/html/).
 
 ## Components
 The following sub-sections describe the main components of the C-ATTL3 deep learning library. Knowledge of these components and their relations is required for the effective usage of the library.
@@ -144,8 +144,8 @@ MemoryDataProvider<double,3,false> test_prov(std::move(test_obs_ptr), std::move(
 ```
 The test data provider is created similarly. However, it is important not to re-fit the preprocessor to the observation data set to ensure that the same transformation is applied to both the training and the test data. This test data is used to assess the accuracy of the neural network on data it has not encountered during the training process. This provides a measure of the network's generalization ability; the difference between the network's accuracy on the training data and that on the test data is a metric of overfitting. The test data is usually a smaller portion of all the available data than the training data. In our example, it is 20 samples as opposed to the 80 comprising the training data. Note that all the other ranks of the test observation and objective tensors must match those of the training observation and objective tensors.
 ```cpp
-WeightInitSharedPtr<double> init(new HeWeightInitialization<double>());
-ParamRegSharedPtr<double> reg(new L2ParameterRegularization<double>());
+auto init = std::make_shared<HeWeightInitialization<double>>();
+auto reg = std::make_shared<L2ParameterRegularization<double>>();
 std::vector<LayerPtr<double,3>> layers(9);
 layers[0] = LayerPtr<double,3>(new ConvLayer<double>(training_prov.get_obs_dims(), 10, init, reg, 5, 2));
 layers[1] = LayerPtr<double,3>(new ReLUActivationLayer<double,3>(layers[0]->get_output_dims()));
@@ -164,7 +164,7 @@ nn.init();
 ```
 Once the network is constructed, it is appropriate to initialize it. An unitialized network is in an undefined state. The initialization of the network entails the initialization of all its layers' parameters. Care must be taken not to unintentionally overwrite learned parameters by re-initializing the network.
 ```cpp
-LossSharedPtr<double,3,false> loss(new QuadraticLoss<double,3,false>());
+auto loss = std::make_shared<QuadraticLoss<double,3,false>>();
 NadamOptimizer<double,3,false> opt(loss, 20);
 ```
 Having set up the data providers and the network, it is time to specify the loss function and the optimizer. For the sake of simplicity (concerning the data generation), the quadratic loss function is used in our example. Like `WeightInitialization`and `ParameterRegularization`, `Loss` also defines a stateless interface; this is why it is wrapped in a shared pointer and why a single instance can be used by multiple optimizers. The optimizer used in our example is the `NadamOptimizer` which is generally a good first choice. Note the consistency of the template arguments; the data providers, the preprocessor, the neural network, the loss function, and the optimizer must all have the same scalar type, rank, and sequentiality. As specified by the third argument of the optimizer's constructor, the batch size used for training and testing is 20. This means that both the training and the test data instances are processed in batches of 20. After the processing of each training batch, the parameters of the network's layers are updated. In our case, an epoch thus involves 4 parameter updates. It should be noted that most optimizers have several hyper-parameters that usually have reasonable default values and thus do not necessarily need to be specified.

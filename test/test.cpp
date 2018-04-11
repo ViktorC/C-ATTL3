@@ -244,62 +244,134 @@ typedef double fp;
 //	NadamOptimizer<fp,RANK,true> opt(loss, 20);
 //	return opt.verify_gradients(bdrnn, test_prov);
 //}
+//
+//static void std_dataset_test() {
+//	std::string mnist_folder = "C:\\Users\\Viktor\\Downloads\\mnist\\";
+//	MNISTDataProvider<float> file_train_prov(mnist_folder + "train-images.idx3-ubyte", mnist_folder + "train-labels.idx1-ubyte");
+//	MNISTDataProvider<float> file_test_prov(mnist_folder + "t10k-images.idx3-ubyte", mnist_folder + "t10k-labels.idx1-ubyte");
+////	std::string cifar_folder = "C:\\Users\\A6714\\Downloads\\cifar-10-batches-bin\\";
+////	CIFARDataProvider<float> file_train_prov({ cifar_folder + "data_batch_1.bin", cifar_folder + "data_batch_2.bin", cifar_folder + "data_batch_3.bin",
+////			cifar_folder + "data_batch_4.bin", cifar_folder + "data_batch_5.bin", cifar_folder + "data_batch_6.bin", });
+////	CIFARDataProvider<float> file_test_prov(cifar_folder + "test_batch.bin");
+//	WeightInitSharedPtr<float> conv_init(new HeWeightInitialization<float>(1e-1));
+//	WeightInitSharedPtr<float> dense_init(new GlorotWeightInitialization<float>(1e-1));
+//	std::vector<LayerPtr<float,3>> layers(12);
+//	layers[0] = LayerPtr<float,3>(new ConvLayer<float>(file_train_prov.get_obs_dims(), 8, conv_init));
+//	layers[1] = LayerPtr<float,3>(new ReLUActivationLayer<float,3>(layers[0]->get_output_dims()));
+//	layers[2] = LayerPtr<float,3>(new MaxPoolingLayer<float>(layers[1]->get_output_dims()));
+//	layers[3] = LayerPtr<float,3>(new ConvLayer<float>(layers[2]->get_output_dims(), 8, conv_init));
+//	layers[4] = LayerPtr<float,3>(new ReLUActivationLayer<float,3>(layers[3]->get_output_dims()));
+//	layers[5] = LayerPtr<float,3>(new MaxPoolingLayer<float>(layers[4]->get_output_dims()));
+//	layers[6] = LayerPtr<float,3>(new DropoutLayer<float,3>(layers[5]->get_output_dims(), .25));
+//	layers[7] = LayerPtr<float,3>(new FCLayer<float,3>(layers[6]->get_output_dims(), 50, dense_init));
+//	layers[8] = LayerPtr<float,3>(new ReLUActivationLayer<float,3>(layers[7]->get_output_dims()));
+//	layers[9] = LayerPtr<float,3>(new DropoutLayer<float,3>(layers[8]->get_output_dims(), .5));
+//	layers[10] = LayerPtr<float,3>(new FCLayer<float,3>(layers[9]->get_output_dims(), 10, dense_init));
+//	layers[11] = LayerPtr<float,3>(new SoftmaxActivationLayer<float,3>(layers[10]->get_output_dims()));
+//	FeedforwardNeuralNetwork<float,3> nn(std::move(layers));
+//	nn.init();
+//	LossSharedPtr<float,3,false> loss(new CrossEntropyLoss<float,3,false>());
+//	AdadeltaOptimizer<float,3,false> opt(loss, 200);
+//	std::chrono::steady_clock::time_point begin = std::chrono::steady_clock::now();
+//	opt.optimize(nn, file_train_prov, file_test_prov, 10);
+//	std::cout << "Training Duration: " << std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now() -
+//			begin).count() << std::endl;
+//	begin = std::chrono::steady_clock::now();
+//	DataPair<float,3,false> data = file_test_prov.get_data(10000);
+//	Tensor<float,4> prediction = nn.infer(std::move(data.first));
+//	std::cout << "Inference Duration: " << std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now() -
+//			begin).count() << std::endl;
+//	unsigned wrong = 0;
+//	unsigned correct = 0;
+//	for (std::size_t i = 0; i < prediction.dimension(0); ++i) {
+//		float max = internal::Utils<float>::MIN;
+//		std::size_t max_ind = 0;
+//		for (std::size_t j = 0; j < prediction.dimension(1); ++j) {
+//			float val = prediction(i,j,0u,0u);
+//			if (val > max) {
+//				max = val;
+//				max_ind = j;
+//			}
+//		}
+//		if (data.second(i,max_ind,0u,0u) == 1)
+//			correct++;
+//		else
+//			wrong++;
+//	}
+//	std::cout << "Correct: " << correct << std::endl;
+//	std::cout << "Wrong: " << wrong << std::endl;
+//}
+//
+//static void readme_test() {
+//	TensorPtr<double,4> training_obs_ptr(new Tensor<double,4>(80u, 32u, 32u, 3u));
+//	TensorPtr<double,4> training_obj_ptr(new Tensor<double,4>(80u, 1u, 1u, 1u));
+//	training_obs_ptr->setRandom();
+//	training_obj_ptr->setRandom();
+//	PCAPreprocessor<double,3> preproc;
+//	preproc.fit(*training_obs_ptr);
+//	preproc.transform(*training_obs_ptr);
+//	MemoryDataProvider<double,3,false> training_prov(std::move(training_obs_ptr), std::move(training_obj_ptr));
+//	TensorPtr<double,4> test_obs_ptr(new Tensor<double,4>(20u, 32u, 32u, 3u));
+//	TensorPtr<double,4> test_obj_ptr(new Tensor<double,4>(20u, 1u, 1u, 1u));
+//	test_obs_ptr->setRandom();
+//	test_obj_ptr->setRandom();
+//	preproc.transform(*test_obs_ptr);
+//	MemoryDataProvider<double,3,false> test_prov(std::move(test_obs_ptr), std::move(test_obj_ptr));
+//	auto init = std::make_shared<HeWeightInitialization<double>>();
+//	auto reg = std::make_shared<L2ParameterRegularization<double>>();
+//	std::vector<LayerPtr<double,3>> layers(9);
+//	layers[0] = LayerPtr<double,3>(new ConvLayer<double>(training_prov.get_obs_dims(), 10, init, reg, 5, 2));
+//	layers[1] = LayerPtr<double,3>(new ReLUActivationLayer<double,3>(layers[0]->get_output_dims()));
+//	layers[2] = LayerPtr<double,3>(new MaxPoolingLayer<double>(layers[1]->get_output_dims()));
+//	layers[3] = LayerPtr<double,3>(new ConvLayer<double>(layers[2]->get_output_dims(), 20, init, reg));
+//	layers[4] = LayerPtr<double,3>(new ReLUActivationLayer<double,3>(layers[3]->get_output_dims()));
+//	layers[5] = LayerPtr<double,3>(new MaxPoolingLayer<double>(layers[4]->get_output_dims()));
+//	layers[6] = LayerPtr<double,3>(new FCLayer<double,3>(layers[5]->get_output_dims(), 500, init, reg));
+//	layers[7] = LayerPtr<double,3>(new ReLUActivationLayer<double,3>(layers[6]->get_output_dims()));
+//	layers[8] = LayerPtr<double,3>(new FCLayer<double,3>(layers[7]->get_output_dims(), 1, init, reg));
+//	FeedforwardNeuralNetwork<double,3> nn(std::move(layers));
+//	nn.init();
+//	auto loss = std::make_shared<QuadraticLoss<double,3,false>>();
+//	NadamOptimizer<double,3,false> opt(loss, 20);
+//	opt.optimize(nn, training_prov, test_prov, 500);
+//	Tensor<double,4> input(5u, 32u, 32u, 3u);
+//	input.setRandom();
+//	preproc.transform(input);
+//	Tensor<double,4> prediction = nn.infer(input);
+//}
 
 int main() {
 	std::string mnist_folder = "C:\\Users\\A6714\\Downloads\\mnist\\";
 	MNISTDataProvider<float> file_train_prov(mnist_folder + "train-images.idx3-ubyte", mnist_folder + "train-labels.idx1-ubyte");
 	MNISTDataProvider<float> file_test_prov(mnist_folder + "t10k-images.idx3-ubyte", mnist_folder + "t10k-labels.idx1-ubyte");
-//	std::string cifar_folder = "C:\\Users\\A6714\\Downloads\\cifar-10-batches-bin\\";
-//	CIFARDataProvider<float> file_train_prov({ cifar_folder + "data_batch_1.bin", cifar_folder + "data_batch_2.bin", cifar_folder + "data_batch_3.bin",
-//			cifar_folder + "data_batch_4.bin", cifar_folder + "data_batch_5.bin", cifar_folder + "data_batch_6.bin", });
-//	CIFARDataProvider<float> file_test_prov(cifar_folder + "test_batch.bin");
-	WeightInitSharedPtr<float> conv_init(new HeWeightInitialization<float>(1e-1));
-	WeightInitSharedPtr<float> dense_init(new GlorotWeightInitialization<float>(1e-1));
-	std::vector<LayerPtr<float,3>> layers(12);
-	layers[0] = LayerPtr<float,3>(new ConvLayer<float>(file_train_prov.get_obs_dims(), 8, conv_init));
-	layers[1] = LayerPtr<float,3>(new ReLUActivationLayer<float,3>(layers[0]->get_output_dims()));
+	DataPair<float,3,false> train_data = file_train_prov.get_data(60000);
+	TensorPtr<float,4> train_obs(new Tensor<float,4>(std::move(train_data.first)));
+	TensorPtr<float,4> train_obj(new Tensor<float,4>(std::move(train_data.second)));
+	MemoryDataProvider<float,3,false> train_prov(std::move(train_obs), std::move(train_obj));
+	DataPair<float,3,false> test_data = file_test_prov.get_data(1);
+	TensorPtr<float,4> test_obs(new Tensor<float,4>(std::move(test_data.first)));
+	TensorPtr<float,4> test_obj(new Tensor<float,4>(std::move(test_data.second)));
+	MemoryDataProvider<float,3,false> test_prov(std::move(test_obs), std::move(test_obj));
+	auto init = std::make_shared<GlorotWeightInitialization<float>>();
+	std::vector<LayerPtr<float,3>> layers(9);
+	layers[0] = LayerPtr<float,3>(new ConvLayer<float>(train_prov.get_obs_dims(), 8, init, ConvLayer<float>::NO_PARAM_REG, 5, 5, 2));
+	layers[1] = LayerPtr<float,3>(new SigmoidActivationLayer<float,3>(layers[0]->get_output_dims()));
 	layers[2] = LayerPtr<float,3>(new MaxPoolingLayer<float>(layers[1]->get_output_dims()));
-	layers[3] = LayerPtr<float,3>(new ConvLayer<float>(layers[2]->get_output_dims(), 8, conv_init));
-	layers[4] = LayerPtr<float,3>(new ReLUActivationLayer<float,3>(layers[3]->get_output_dims()));
+	layers[3] = LayerPtr<float,3>(new ConvLayer<float>(layers[2]->get_output_dims(), 8, init, ConvLayer<float>::NO_PARAM_REG, 5, 5, 2));
+	layers[4] = LayerPtr<float,3>(new SigmoidActivationLayer<float,3>(layers[3]->get_output_dims()));
 	layers[5] = LayerPtr<float,3>(new MaxPoolingLayer<float>(layers[4]->get_output_dims()));
-	layers[6] = LayerPtr<float,3>(new DropoutLayer<float,3>(layers[5]->get_output_dims(), .25));
-	layers[7] = LayerPtr<float,3>(new FCLayer<float,3>(layers[6]->get_output_dims(), 50, dense_init));
-	layers[8] = LayerPtr<float,3>(new ReLUActivationLayer<float,3>(layers[7]->get_output_dims()));
-	layers[9] = LayerPtr<float,3>(new DropoutLayer<float,3>(layers[8]->get_output_dims(), .5));
-	layers[10] = LayerPtr<float,3>(new FCLayer<float,3>(layers[9]->get_output_dims(), 10, dense_init));
-	layers[11] = LayerPtr<float,3>(new SoftmaxActivationLayer<float,3>(layers[10]->get_output_dims()));
+	layers[6] = LayerPtr<float,3>(new FCLayer<float,3>(layers[5]->get_output_dims(), 128, init));
+	layers[7] = LayerPtr<float,3>(new SigmoidActivationLayer<float,3>(layers[6]->get_output_dims()));
+	layers[8] = LayerPtr<float,3>(new FCLayer<float,3>(layers[7]->get_output_dims(), 10, init));
 	FeedforwardNeuralNetwork<float,3> nn(std::move(layers));
 	nn.init();
-	LossSharedPtr<float,3,false> loss(new CrossEntropyLoss<float,3,false>());
-	AdadeltaOptimizer<float,3,false> opt(loss, 200);
+	auto loss = std::make_shared<SoftmaxCrossEntropyLoss<float,3,false>>();
+	VanillaSGDOptimizer<float,3,false> opt(loss, 100);
 	std::chrono::steady_clock::time_point begin = std::chrono::steady_clock::now();
-	opt.optimize(nn, file_train_prov, file_test_prov, 10);
-	std::cout << "Training Duration: " << std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now() -
-			begin).count() << std::endl;
-	begin = std::chrono::steady_clock::now();
-	DataPair<float,3,false> data = file_test_prov.get_data(10000);
-	Tensor<float,4> prediction = nn.infer(std::move(data.first));
-	std::cout << "Inference Duration: " << std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now() -
-			begin).count() << std::endl;
-	unsigned wrong = 0;
-	unsigned correct = 0;
-	for (std::size_t i = 0; i < prediction.dimension(0); ++i) {
-		float max = internal::Utils<float>::MIN;
-		std::size_t max_ind = 0;
-		for (std::size_t j = 0; j < prediction.dimension(1); ++j) {
-			float val = prediction(i,j,0u,0u);
-			if (val > max) {
-				max = val;
-				max_ind = j;
-			}
-		}
-		if (data.second(i,max_ind,0u,0u) == 1)
-			correct++;
-		else
-			wrong++;
-	}
-	std::cout << "Correct: " << correct << std::endl;
-	std::cout << "Wrong: " << wrong << std::endl;
+	opt.optimize(nn, train_prov, test_prov, 1);
+	std::cout << "Duration: " << std::chrono::duration_cast<std::chrono::milliseconds>(
+			std::chrono::steady_clock::now() - begin).count() << std::endl;
+//	readme_test();
 //	assert(test_parallel() & test_residual() & test_dense() & test_seqnn() & test_rnn() & test_lstm() & test_bdrnn());
 	return 0;
 }
