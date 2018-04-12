@@ -16,6 +16,8 @@
 #include "Dimensions.h"
 #include "NeuralNetwork.h"
 #include "Optimizer.h"
+#include "utils/Eigen.h"
+#include "utils/NumericUtils.h"
 
 using namespace cattle;
 
@@ -97,8 +99,8 @@ template<typename Scalar, std::size_t Rank, bool Sequential>
 static void check_gradient(ProviderBuilder<Scalar,Rank,Sequential> prov_builder = &default_provider<Scalar,Rank,Sequential>,
 		NetworkBuilder<Scalar,Rank,Sequential> net_builder = &default_network<Scalar,Rank,Sequential>,
 		OptimizerBuilder<Scalar,Rank,Sequential> opt_builder = &default_optimizer<Scalar,Rank,Sequential>,
-		Scalar step_size = internal::Utils<Scalar>::EPSILON2, Scalar abs_epsilon = internal::Utils<Scalar>::EPSILON2,
-		Scalar rel_epsilon = internal::Utils<Scalar>::EPSILON3) {
+		Scalar step_size = internal::NumericUtils<Scalar>::EPSILON2, Scalar abs_epsilon = internal::NumericUtils<Scalar>::EPSILON2,
+		Scalar rel_epsilon = internal::NumericUtils<Scalar>::EPSILON3) {
 	NeuralNetPtr<Scalar,Rank,Sequential> net = (*net_builder)();
 	DataProviderPtr<Scalar,Rank,Sequential> prov = (*prov_builder)(net->get_input_dims(), net->get_output_dims());
 	OptimizerPtr<Scalar,Rank,Sequential> opt = (*opt_builder)();

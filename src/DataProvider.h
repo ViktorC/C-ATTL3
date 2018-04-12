@@ -21,7 +21,7 @@
 #include <utility>
 #include <vector>
 #include "Dimensions.h"
-#include "Utils.h"
+#include "utils/Eigen.h"
 
 namespace cattle {
 

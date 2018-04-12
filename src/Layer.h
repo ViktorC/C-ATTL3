@@ -17,9 +17,10 @@
 #include <type_traits>
 #include <utility>
 #include "Dimensions.h"
-#include "Utils.h"
 #include "ParameterRegularization.h"
 #include "WeightInitialization.h"
+#include "utils/NumericUtils.h"
+#include "utils/Eigen.h"
 
 namespace cattle {
 
@@ -208,7 +209,7 @@ protected:
 				weight_init(weight_init),
 				weight_reg(weight_reg),
 				max_norm_constraint(max_norm_constraint),
-				max_norm(internal::Utils<Scalar>::decidedly_greater(max_norm_constraint, (Scalar) 0)),
+				max_norm(internal::NumericUtils<Scalar>::decidedly_greater(max_norm_constraint, (Scalar) 0)),
 				input_layer(false),
 				weights(weight_rows, weight_cols),
 				weights_grad(weight_rows, weight_cols),
@@ -855,7 +856,7 @@ public:
 	 * @param dims The dimensionality of the input tensor.
 	 * @param epsilon A small constant to maintain numerical stability.
 	 */
-	inline SoftmaxActivationLayer(const Dimensions<std::size_t,Rank>& dims, Scalar epsilon = internal::Utils<Scalar>::EPSILON2) :
+	inline SoftmaxActivationLayer(const Dimensions<std::size_t,Rank>& dims, Scalar epsilon = internal::NumericUtils<Scalar>::EPSILON2) :
 			ActivationLayer<Scalar,Rank>::ActivationLayer(dims),
 			epsilon(epsilon),
 			conversion_dims(dims.template promote<>()) { }
@@ -1079,7 +1080,7 @@ public:
 				param_reg(param_reg),
 				init_alpha(init_alpha),
 				max_norm_constraint(max_norm_constraint),
-				max_norm(internal::Utils<Scalar>::decidedly_greater(max_norm_constraint, (Scalar) 0)),
+				max_norm(internal::NumericUtils<Scalar>::decidedly_greater(max_norm_constraint, (Scalar) 0)),
 				conversion_dims(dims.template promote<>()) {
 		assert(param_reg != nullptr);
 	}
@@ -1450,7 +1451,7 @@ protected:
 		typename Root::Data reduced_patch(rows, 1u, 1u, depth);
 		for (std::size_t i = 0; i < rows; ++i) {
 			for (std::size_t j = 0; j < depth; ++j) {
-				Scalar max = internal::Utils<Scalar>::MIN;
+				Scalar max = internal::NumericUtils<Scalar>::MIN;
 				unsigned max_height = 0;
 				unsigned max_width = 0;
 				for (std::size_t k = 0; k < Base::receptor_height; ++k) {
@@ -1522,8 +1523,8 @@ protected:
 				beta_reg(beta_reg),
 				gamma_max_norm_constraint(gamma_max_norm_constraint),
 				beta_max_norm_constraint(beta_max_norm_constraint),
-				gamma_max_norm(internal::Utils<Scalar>::decidedly_greater(gamma_max_norm_constraint, (Scalar) 0)),
-				beta_max_norm(internal::Utils<Scalar>::decidedly_greater(beta_max_norm_constraint, (Scalar) 0)),
+				gamma_max_norm(internal::NumericUtils<Scalar>::decidedly_greater(gamma_max_norm_constraint, (Scalar) 0)),
+				beta_max_norm(internal::NumericUtils<Scalar>::decidedly_greater(beta_max_norm_constraint, (Scalar) 0)),
 				norm_avg_decay(norm_avg_decay),
 				epsilon(epsilon),
 				input_layer(false),
@@ -1707,7 +1708,7 @@ public:
 	 */
 	inline BatchNormLayer(const Dimensions<std::size_t,Rank>& dims, ParamRegSharedPtr<Scalar> gamma_reg = Root::NO_PARAM_REG,
 			ParamRegSharedPtr<Scalar> beta_reg = Root::NO_PARAM_REG, Scalar gamma_max_norm_constraint = 0,
-			Scalar beta_max_norm_constraint = 0, Scalar norm_avg_decay = .1, Scalar epsilon = internal::Utils<Scalar>::EPSILON3) :
+			Scalar beta_max_norm_constraint = 0, Scalar norm_avg_decay = .1, Scalar epsilon = internal::NumericUtils<Scalar>::EPSILON3) :
 				Base::BatchNormLayerBase(dims, dims(2), gamma_reg, beta_reg, gamma_max_norm_constraint,
 						beta_max_norm_constraint, norm_avg_decay, epsilon),
 				conversion_dims(Base::dims.template promote<>()) { }
@@ -1757,7 +1758,7 @@ public:
 		 */
 	inline BatchNormLayer(Dimensions<std::size_t,3> dims, ParamRegSharedPtr<Scalar> gamma_reg = Root::NO_PARAM_REG,
 			ParamRegSharedPtr<Scalar> beta_reg = Root::NO_PARAM_REG, Scalar gamma_max_norm_constraint = 0,
-			Scalar beta_max_norm_constraint = 0, Scalar norm_avg_decay = .1, Scalar epsilon = internal::Utils<Scalar>::EPSILON3) :
+			Scalar beta_max_norm_constraint = 0, Scalar norm_avg_decay = .1, Scalar epsilon = internal::NumericUtils<Scalar>::EPSILON3) :
 				Base::BatchNormLayerBase(dims, dims(2), gamma_reg, beta_reg, gamma_max_norm_constraint,
 						beta_max_norm_constraint, norm_avg_decay, epsilon),
 				offsets({ 0u, 0u, 0u, 0u }),
@@ -1833,11 +1834,11 @@ public:
 	 * @param epsilon A small constant used to maintain numerical stability.
 	 */
 	inline DropoutLayer(const Dimensions<std::size_t,Rank>& dims, Scalar dropout_prob,
-			Scalar epsilon = internal::Utils<Scalar>::EPSILON3) :
+			Scalar epsilon = internal::NumericUtils<Scalar>::EPSILON3) :
 				dims(dims),
 				dropout_prob(dropout_prob),
 				epsilon(epsilon),
-				dropout(internal::Utils<Scalar>::decidedly_greater(dropout_prob, .0)),
+				dropout(internal::NumericUtils<Scalar>::decidedly_greater(dropout_prob, .0)),
 				input_layer(false),
 				params(0, 0),
 				params_grad(0, 0) {

@@ -10,7 +10,7 @@
 
 #include <memory>
 #include <type_traits>
-#include "Utils.h"
+#include "utils/Eigen.h"
 
 namespace cattle {
 

@@ -16,7 +16,8 @@
 #include <string>
 #include <type_traits>
 #include <utility>
-#include "Utils.h"
+#include "utils/Eigen.h"
+#include "utils/NumericUtils.h"
 
 namespace cattle {
 
@@ -221,9 +222,9 @@ protected:
 			int correct_class_ind = -1;
 			for (int j = 0; j < obj_mat.cols(); ++j) {
 				Scalar obj_ij = obj_mat(i,j);
-				assert((internal::Utils<Scalar>::almost_equal(obj_ij, (Scalar) 0) ||
-						internal::Utils<Scalar>::almost_equal(obj_ij, (Scalar) 1)));
-				if (internal::Utils<Scalar>::almost_equal(obj_ij, (Scalar) 1)) {
+				assert((internal::NumericUtils<Scalar>::almost_equal(obj_ij, (Scalar) 0) ||
+						internal::NumericUtils<Scalar>::almost_equal(obj_ij, (Scalar) 1)));
+				if (internal::NumericUtils<Scalar>::almost_equal(obj_ij, (Scalar) 1)) {
 					ones++;
 					correct_class_ind = j;
 				}
@@ -253,9 +254,9 @@ protected:
 			int correct_class_ind = -1;
 			for (int j = 0; j < out_mat.cols(); ++j) {
 				Scalar obj_ij = obj_mat(i,j);
-				assert((internal::Utils<Scalar>::almost_equal(obj_ij, (Scalar) 0) ||
-						internal::Utils<Scalar>::almost_equal(obj_ij, (Scalar) 1)));
-				if (internal::Utils<Scalar>::almost_equal(obj_ij, (Scalar) 1)) {
+				assert((internal::NumericUtils<Scalar>::almost_equal(obj_ij, (Scalar) 0) ||
+						internal::NumericUtils<Scalar>::almost_equal(obj_ij, (Scalar) 1)));
+				if (internal::NumericUtils<Scalar>::almost_equal(obj_ij, (Scalar) 1)) {
 					ones++;
 					correct_class_ind = j;
 				}
@@ -268,7 +269,7 @@ protected:
 					continue;
 				Scalar out_ij = out_mat(i,j);
 				Scalar margin = out_ij - correct_class_score + 1;
-				if (internal::Utils<Scalar>::decidedly_greater(margin, (Scalar) 0)) {
+				if (internal::NumericUtils<Scalar>::decidedly_greater(margin, (Scalar) 0)) {
 					Scalar out_grad = Squared ? 2 * (out_ij - correct_class_score) : 1;
 					total_out_grad += out_grad;
 					out_grads(i,j) = out_grad;
@@ -293,7 +294,7 @@ public:
 	/**
 	 * @param epsilon A small constant used to maintain numerical stability.
 	 */
-	CrossEntropyLoss(Scalar epsilon = internal::Utils<Scalar>::EPSILON2) : epsilon(epsilon) { };
+	CrossEntropyLoss(Scalar epsilon = internal::NumericUtils<Scalar>::EPSILON2) : epsilon(epsilon) { };
 protected:
 	inline ColVector<Scalar> _function(typename Root::Data out, typename Root::Data obj) const {
 		std::size_t rows = out.dimension(0);
@@ -321,7 +322,7 @@ public:
 	/**
 	 * @param epsilon A small constant used to maintain numerical stability.
 	 */
-	SoftmaxCrossEntropyLoss(Scalar epsilon = internal::Utils<Scalar>::EPSILON2) : epsilon(epsilon) { };
+	SoftmaxCrossEntropyLoss(Scalar epsilon = internal::NumericUtils<Scalar>::EPSILON2) : epsilon(epsilon) { };
 protected:
 	inline ColVector<Scalar> _function(typename Root::Data out, typename Root::Data obj) const {
 		std::size_t rows = out.dimension(0);
@@ -364,8 +365,8 @@ protected:
 			Scalar loss_i = 0;
 			for (int j = 0; j < obj_mat.cols(); ++j) {
 				Scalar obj_ij = obj_mat(i,j);
-				assert((internal::Utils<Scalar>::almost_equal(obj_ij, (Scalar) -1) ||
-						internal::Utils<Scalar>::almost_equal(obj_ij, (Scalar) 1)));
+				assert((internal::NumericUtils<Scalar>::almost_equal(obj_ij, (Scalar) -1) ||
+						internal::NumericUtils<Scalar>::almost_equal(obj_ij, (Scalar) 1)));
 				Scalar loss_ij = std::max((Scalar) 0, (Scalar) 1 - obj_ij * out_mat(i,j));
 				loss_i += Squared ? loss_ij * loss_ij : loss_ij;
 			}
@@ -383,11 +384,11 @@ protected:
 		for (int i = 0; i < out_mat.rows(); ++i) {
 			for (int j = 0; j < out_mat.cols(); ++j) {
 				Scalar obj_ij = obj_mat(i,j);
-				assert((internal::Utils<Scalar>::almost_equal(obj_ij, (Scalar) -1) ||
-						internal::Utils<Scalar>::almost_equal(obj_ij, (Scalar) 1)));
+				assert((internal::NumericUtils<Scalar>::almost_equal(obj_ij, (Scalar) -1) ||
+						internal::NumericUtils<Scalar>::almost_equal(obj_ij, (Scalar) 1)));
 				Scalar out_ij = out_mat(i,j);
 				Scalar margin = 1 - obj_ij * out_ij;
-				if (internal::Utils<Scalar>::decidedly_greater(margin, (Scalar) 0))
+				if (internal::NumericUtils<Scalar>::decidedly_greater(margin, (Scalar) 0))
 					out_grads(i,j) = Squared ? 2 * out_ij - 2 * obj_ij : -obj_ij;
 				else
 					out_grads(i,j) = 0;
@@ -410,7 +411,7 @@ public:
 	/**
 	 * @param epsilon A small constant used to maintain numerical stability.
 	 */
-	MultiLabelLogLoss(Scalar epsilon = internal::Utils<Scalar>::EPSILON2) :
+	MultiLabelLogLoss(Scalar epsilon = internal::NumericUtils<Scalar>::EPSILON2) :
 		epsilon(epsilon) { };
 protected:
 	inline ColVector<Scalar> _function(typename Root::Data out, typename Root::Data obj) const {
@@ -423,8 +424,8 @@ protected:
 			Scalar loss_i = 0;
 			for (int j = 0; j < out_mat.cols(); ++j) {
 				Scalar obj_ij = obj_mat(i,j);
-				assert(internal::Utils<Scalar>::almost_equal(obj_ij, (Scalar) 0) ||
-						internal::Utils<Scalar>::almost_equal(obj_ij, (Scalar) 1));
+				assert(internal::NumericUtils<Scalar>::almost_equal(obj_ij, (Scalar) 0) ||
+						internal::NumericUtils<Scalar>::almost_equal(obj_ij, (Scalar) 1));
 				Scalar out_ij = out_mat(i,j);
 				loss_i += (obj_ij * log(out_ij) + (1 - obj_ij) * log(1 - out_ij));
 			}
@@ -442,9 +443,9 @@ protected:
 		for (int i = 0; i < rows; ++i) {
 			for (int j = 0; j < out_grads.cols(); ++j) {
 				Scalar obj_ij = obj_mat(i,j);
-				assert(internal::Utils<Scalar>::almost_equal(obj_ij, (Scalar) 0) ||
-						internal::Utils<Scalar>::almost_equal(obj_ij, (Scalar) 1));
-				Scalar denominator = out_mat(i,j) - (Scalar) (internal::Utils<Scalar>::almost_equal(obj_ij, (Scalar) 0));
+				assert(internal::NumericUtils<Scalar>::almost_equal(obj_ij, (Scalar) 0) ||
+						internal::NumericUtils<Scalar>::almost_equal(obj_ij, (Scalar) 1));
+				Scalar denominator = out_mat(i,j) - (Scalar) (internal::NumericUtils<Scalar>::almost_equal(obj_ij, (Scalar) 0));
 				if (denominator == 0)
 					denominator += (rand() % 2 == 0 ? epsilon : -epsilon);
 				out_grads(i,j) = 1 / (denominator * rows);

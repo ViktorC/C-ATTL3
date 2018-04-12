@@ -16,7 +16,8 @@
 #include <string>
 #include <type_traits>
 #include <vector>
-#include "Utils.h"
+#include "utils/Eigen.h"
+#include "utils/NumericUtils.h"
 
 namespace cattle {
 
@@ -56,7 +57,7 @@ public:
 	/**
 	 * @param epsilon A small constant used to maintain numerical stability.
 	 */
-	inline NormalizationPreprocessor(Scalar epsilon = internal::Utils<Scalar>::EPSILON2) :
+	inline NormalizationPreprocessor(Scalar epsilon = internal::NumericUtils<Scalar>::EPSILON2) :
 			epsilon(epsilon) {
 		assert(epsilon > 0 && "epsilon must be greater than 0");
 	}
@@ -96,7 +97,7 @@ public:
 	/**
 	 * @param epsilon A small constant used to maintain numerical stability.
 	 */
-	inline NormalizationPreprocessor(Scalar epsilon = internal::Utils<Scalar>::EPSILON2) :
+	inline NormalizationPreprocessor(Scalar epsilon = internal::NumericUtils<Scalar>::EPSILON2) :
 			epsilon(epsilon) {
 		assert(epsilon > 0 && "epsilon must be greater than 0");
 	}
@@ -158,7 +159,7 @@ protected:
 	inline PCAPreprocessorBase(Scalar min_rel_var_to_retain, Scalar epsilon) :
 				Base::NormalizationPreprocessor(epsilon),
 				min_rel_var_to_retain(min_rel_var_to_retain),
-				reduce_dims(internal::Utils<Scalar>::decidedly_lesser(min_rel_var_to_retain, (Scalar) 1)) {
+				reduce_dims(internal::NumericUtils<Scalar>::decidedly_lesser(min_rel_var_to_retain, (Scalar) 1)) {
 		assert(min_rel_var_to_retain > 0 && min_rel_var_to_retain <= 1 &&
 				"the minimum relative variance to be retained must be greater "
 				"then 0 and less than or equal to 1");
@@ -182,7 +183,7 @@ protected:
 			for (; dims_to_retain < eigen_values.rows(); ++dims_to_retain) {
 				// The eigen values are in ascending order.
 				var += eigen_values(eigen_values.rows() - (1 + dims_to_retain));
-				if (internal::Utils<Scalar>::decidedly_greater(var, min_var_to_retain))
+				if (internal::NumericUtils<Scalar>::decidedly_greater(var, min_var_to_retain))
 					break;
 			}
 		} else
@@ -232,7 +233,7 @@ public:
 	 * reduced.
 	 * @param epsilon A small consant used to maintain numerical stability.
 	 */
-	inline PCAPreprocessor(Scalar min_rel_var_to_retain = 1, Scalar epsilon = internal::Utils<Scalar>::EPSILON2) :
+	inline PCAPreprocessor(Scalar min_rel_var_to_retain = 1, Scalar epsilon = internal::NumericUtils<Scalar>::EPSILON2) :
 				Base::PCAPreprocessorBase(min_rel_var_to_retain, epsilon) { }
 	inline void fit(const Tensor<Scalar,Rank + 1>& data) {
 		Root::fit(data);
@@ -261,7 +262,7 @@ public:
 	 * tensor.
 	 * @param epsilon A small consant used to maintain numerical stability.
 	 */
-	inline PCAPreprocessor(Scalar min_rel_var_to_retain = 1, Scalar epsilon = internal::Utils<Scalar>::EPSILON2) :
+	inline PCAPreprocessor(Scalar min_rel_var_to_retain = 1, Scalar epsilon = internal::NumericUtils<Scalar>::EPSILON2) :
 				Base::PCAPreprocessorBase(min_rel_var_to_retain, epsilon) { }
 	inline void fit(const Tensor<Scalar,4>& data) {
 		assert((!Base::reduce_dims || data.dimension(3) == 1) && "cannot reduce the dimensionality of multi-channel tensors");

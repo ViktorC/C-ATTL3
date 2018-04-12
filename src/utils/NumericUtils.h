@@ -1,119 +1,29 @@
 /*
- * Utils.h
+ * NumericUtils.h
  *
  *  Created on: 20.12.2017
  *      Author: Viktor Csomor
  */
 
-#ifndef UTILS_H_
-#define UTILS_H_
-
-#define EIGEN_USE_THREADS
+#ifndef UTILS_NUMERICUTILS_H_
+#define UTILS_NUMERICUTILS_H_
 
 #include <algorithm>
-#include <cstddef>
 #include <limits>
 #include <type_traits>
-#include "Eigen/Dense"
-#include "unsupported/Eigen/CXX11/Tensor"
-#include "Dimensions.h"
 
-/**
- * The namespace containing all classes and typedefs of the C-ATTL3 library.
- */
 namespace cattle {
-
-/**
- * An alias for a single row matrix of an arbitrary scalar type.
- */
-template<typename Scalar>
-using RowVector = Eigen::Matrix<Scalar,1,Eigen::Dynamic,Eigen::RowMajor,1,Eigen::Dynamic>;
-
-/**
- * An alias for a single column matrix of an arbitrary scalar type.
- */
-template <typename Scalar>
-using ColVector = Eigen::Matrix<Scalar,Eigen::Dynamic,1,Eigen::ColMajor,Eigen::Dynamic,1>;
-
-/**
- * An alias for a dynamically sized matrix of an arbitrary scalar type.
- */
-template<typename Scalar>
-using Matrix = Eigen::Matrix<Scalar,Eigen::Dynamic,Eigen::Dynamic,Eigen::ColMajor,
-		Eigen::Dynamic,Eigen::Dynamic>;
-
-/**
- * An alias for a class that can be used to map raw pointer data to a dynamically
- * sized Matrix of an arbitrary scalar type.
- */
-template<typename Scalar>
-using MatrixMap = Eigen::Map<Matrix<Scalar>>;
-
-/**
- * An alias for a tensor of arbitrary rank and scalar type with dynamic dimensionality.
- */
-template<typename Scalar, std::size_t Rank>
-using Tensor = Eigen::Tensor<Scalar,Rank,Eigen::ColMajor,std::size_t>;
-
-/**
- * An for a class that can be used to map raw pointer data to a tensor of arbitrary
- * rank and scalar type with dynamic dimensionality.
- */
-template<typename Scalar, std::size_t Rank>
-using TensorMap = Eigen::TensorMap<Tensor<Scalar,Rank>>;
-
-/**
- * A namespace for utilities used by C-ATTL3 internally.
- */
 namespace internal {
 
 /**
- * An alias for permutation matrices.
- */
-using PermMatrix = Eigen::PermutationMatrix<Eigen::Dynamic,Eigen::Dynamic>;
-
-/**
- * An alias for self-adjoint eigen solvers.
- */
-template<typename Scalar>
-using EigenSolver = Eigen::SelfAdjointEigenSolver<Matrix<Scalar>>;
-
-/**
- * An alias for Eigen's bi-diagonal divide and conquer singular-value decomposition.
- */
-template<typename Scalar>
-using SVD = Eigen::BDCSVD<Matrix<Scalar>>;
-
-/**
- * An alias for Eigen's singular-value decomposition options.
- */
-using SVDOptions = Eigen::DecompositionOptions;
-
-/**
- * @return The number of threads used by Eigen to accelerate operations
- * supporting multithreading.
- */
-inline static int num_of_eval_threads() {
-	return Eigen::nbThreads();
-}
-/**
- * @param num_of_threads The number of threads Eigen should use to accelerate
- * operations supporting multithreading.
- */
-inline static void set_num_of_eval_threads(int num_of_threads) {
-	Eigen::setNbThreads(num_of_threads);
-}
-
-/**
  * A utility class template containing static methods and variables to help with
- * numerical issues, the manipulation of matrices and tensors, and the conversion
- * between tensors and matrices.
+ * numerical issues.
  */
 template<typename Scalar>
-class Utils {
+class NumericUtils {
 	static_assert(std::is_floating_point<Scalar>::value, "non floating-point scalar type");
 private:
-	Utils() { };
+	NumericUtils() { };
 public:
 	static constexpr Scalar MIN = std::numeric_limits<Scalar>::lowest();
 	static constexpr Scalar MAX = std::numeric_limits<Scalar>::max();
@@ -208,7 +118,6 @@ public:
 };
 
 }
-
 }
 
-#endif /* UTILS_H_ */
+#endif /* UTILS_NUMERICUTILS_H_ */
