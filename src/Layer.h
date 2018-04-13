@@ -363,10 +363,14 @@ public:
 	 * @param weight_reg The regularization function to apply to the layer's parameters.
 	 * @param receptor_height The height of the base of the receptor cuboid.
 	 * @param receptor_width The width of the base of the receptor cuboid.
-	 * @param padding The length of padding to apply to the input tensor along its width and
-	 * weight.
-	 * @param stride The convolution stride i.e. the number of elements by which the receptor
-	 * is to be shifted at each step of the convolution.
+	 * @param vertical_padding The extent of padding to apply to the input tensor along its height (both
+	 * at the top and at the bottom).
+	 * @param horizontal_padding The extent of padding to apply to the input tensor along its width (both
+	 * at the left and at the right).
+	 * @param vertical_stride The vertical convolution stride i.e. the number of elements by which the
+	 * receptor is to be shifted along the height of the input tensor.
+	 * @param horizontal_stride The horizonzal convolution stride i.e. the number of elements by which the
+	 * receptor is to be shifted along the width of the input tensor.
 	 * @param dilation The size of the spatial (height- and width-wise) padding between voxels
 	 * of the receptor.
 	 * @param max_norm_constraint An optional max-norm constraint. If it is 0 or less, no
@@ -374,36 +378,41 @@ public:
 	 */
 	inline ConvLayer(const Dimensions<std::size_t,3>& input_dims, std::size_t filters, WeightInitSharedPtr<Scalar> weight_init,
 			ParamRegSharedPtr<Scalar> weight_reg = Root::NO_PARAM_REG, std::size_t receptor_height = 3, std::size_t receptor_width = 3,
-			std::size_t padding = 1, std::size_t stride = 1, std::size_t dilation = 0, Scalar max_norm_constraint = 0) :
+			std::size_t vertical_padding = 1, std::size_t horizontal_padding = 1, std::size_t vertical_stride = 1,
+			std::size_t horizontal_stride = 1, std::size_t dilation = 0, Scalar max_norm_constraint = 0) :
 				/* For every filter, there is a column in the weight matrix with the same number of
 				 * elements as the area of the receptive field (F_H * F_W * D) + 1 for the bias row. */
 				Base::KernelLayer(input_dims, Dimensions<std::size_t,3>({
-						calculate_output_dim(input_dims(0), receptor_height, padding, dilation, stride),
-						calculate_output_dim(input_dims(1), receptor_width, padding, dilation, stride),
+						calculate_output_dim(input_dims(0), receptor_height, vertical_padding, dilation, vertical_stride),
+						calculate_output_dim(input_dims(1), receptor_width, horizontal_padding, dilation, horizontal_stride),
 						filters }), weight_init, weight_reg, receptor_height * receptor_width * input_dims(2) + 1,
 						filters, max_norm_constraint),
 				filters(filters),
 				receptor_height(receptor_height),
 				receptor_width(receptor_width),
-				padding(padding),
-				stride(stride),
+				vertical_padding(vertical_padding),
+				horizontal_padding(horizontal_padding),
+				vertical_stride(vertical_stride),
+				horizontal_stride(horizontal_stride),
 				dilation(dilation),
-				padded_height(input_dims(0) + 2 * padding),
-				padded_width(input_dims(1) + 2 * padding),
+				padded_height(input_dims(0) + 2 * vertical_padding),
+				padded_width(input_dims(1) + 2 * horizontal_padding),
 				dil_receptor_height(receptor_height + (receptor_height - 1) * dilation),
 				dil_receptor_width(receptor_width + (receptor_width - 1) * dilation),
 				out_conversion_dims({ 0u, Base::output_dims(0), Base::output_dims(1), Base::output_dims(2) }),
 				patch_offsets({ 0u, 0u, 0u, 0u }),
 				patch_extents({ 0u, dil_receptor_height, dil_receptor_width, input_dims(2) }),
 				dil_strides({ 1u, dilation + 1u, dilation + 1u, 1u }),
-				paddings({ std::make_pair(0, 0), std::make_pair(padding, padding), std::make_pair(padding, padding),
-						std::make_pair(0, 0) }) {
+				no_padding_offsets({ 0u, vertical_padding, horizontal_padding, 0u }),
+				no_padding_extents({ 0u, input_dims(0), input_dims(1), input_dims(2) }),
+				paddings({ std::make_pair(0, 0), std::make_pair(vertical_padding, vertical_padding),
+						std::make_pair(horizontal_padding, horizontal_padding), std::make_pair(0, 0) }) {
 		assert(filters > 0);
 		assert(receptor_height > 0);
 		assert(receptor_width > 0);
-		assert(stride > 0);
-		assert(input_dims(1) + 2 * padding >= dil_receptor_height &&
-				input_dims(2) + 2 * padding >= dil_receptor_width);
+		assert(vertical_stride > 0 && horizontal_stride > 0);
+		assert(input_dims(1) + 2 * vertical_padding >= dil_receptor_height &&
+				input_dims(2) + 2 * horizontal_padding >= dil_receptor_width);
 	}
 	inline Root* clone() const {
 		return new ConvLayer(*this);
@@ -414,8 +423,10 @@ protected:
 			filters(layer.filters),
 			receptor_height(layer.receptor_height),
 			receptor_width(layer.receptor_width),
-			padding(layer.padding),
-			stride(layer.stride),
+			vertical_padding(layer.vertical_padding),
+			horizontal_padding(layer.horizontal_padding),
+			vertical_stride(layer.vertical_stride),
+			horizontal_stride(layer.horizontal_stride),
 			dilation(layer.dilation),
 			padded_height(layer.padded_height),
 			padded_width(layer.padded_width),
@@ -425,6 +436,8 @@ protected:
 			patch_offsets(layer.patch_offsets),
 			patch_extents(layer.patch_extents),
 			dil_strides(layer.dil_strides),
+			no_padding_offsets(layer.no_padding_offsets),
+			no_padding_extents(layer.no_padding_extents),
 			paddings(layer.paddings) { }
 	inline Root* clone_with_shared_params() const {
 		return new ConvLayer(*this, true);
@@ -436,7 +449,7 @@ protected:
 		assert((Dimensions<std::size_t,4>(in.dimensions()).template demote<>()) == Base::input_dims);
 		assert(in.dimension(0) > 0);
 		// Spatial padding.
-		if (padding > 0)
+		if (vertical_padding > 0 || horizontal_padding > 0)
 			in = typename Root::Data(in.pad(paddings));
 		std::size_t rows = in.dimension(0);
 		std::size_t total_patches = rows * Base::output_dims(0) * Base::output_dims(1);
@@ -447,10 +460,10 @@ protected:
 		std::size_t patch_ind = 0;
 		patch_extents[0] = rows;
 		biased_in = Matrix<Scalar>(total_patches, receptor_vol + 1);
-		for (std::size_t j = 0; j <= padded_height - dil_receptor_height; j += stride) {
-			patch_offsets[1] = j;
-			for (std::size_t k = 0; k <= padded_width - dil_receptor_width; k += stride) {
-				patch_offsets[2] = k;
+		for (std::size_t i = 0; i <= padded_width - dil_receptor_width; i += horizontal_stride) {
+			patch_offsets[2] = i;
+			for (std::size_t j = 0; j <= padded_height - dil_receptor_height; j += vertical_stride) {
+				patch_offsets[1] = j;
 				typename Root::Data patch;
 				// If the patch is dilated, skip the 'internal padding' when flattening it into a matrix.
 				if (dilation > 0)
@@ -489,10 +502,10 @@ protected:
 		prev_out_grads.setZero();
 		std::size_t patch_ind = 0;
 		patch_extents[0] = rows;
-		for (std::size_t j = 0; j <= padded_height - dil_receptor_height; j += stride) {
-			patch_offsets[1] = j;
-			for (std::size_t k = 0; k <= padded_width - dil_receptor_width; k += stride) {
-				patch_offsets[2] = k;
+		for (std::size_t i = 0; i <= padded_width - dil_receptor_width; i += horizontal_stride) {
+			patch_offsets[2] = i;
+			for (std::size_t j = 0; j <= padded_height - dil_receptor_height; j += vertical_stride) {
+				patch_offsets[1] = j;
 				// Accumulate the gradients where the receptor-patch-tensors overlap.
 				Matrix<Scalar> prev_out_grads_block = prev_out_grads_mat.block(patch_ind, 0, rows, receptor_vol);
 				TensorMap<Scalar,4> prev_out_grads_block_map(prev_out_grads_block.data(), patch_extents);
@@ -504,10 +517,9 @@ protected:
 			}
 		}
 		assert(patch_ind == prev_out_grads_mat.rows());
-		if (padding > 0) {
+		if (vertical_padding > 0 || horizontal_padding > 0) {
 			// Cut off the padding.
-			RankwiseArray no_padding_offsets({ 0, padding, padding, 0 });
-			RankwiseArray no_padding_extents({ rows, Base::input_dims(0), Base::input_dims(1), Base::input_dims(2) });
+			no_padding_extents[0] = rows;
 			return prev_out_grads.slice(no_padding_offsets, no_padding_extents);
 		} else
 			return prev_out_grads;
@@ -531,8 +543,10 @@ private:
 	const std::size_t filters;
 	const std::size_t receptor_height;
 	const std::size_t receptor_width;
-	const std::size_t padding;
-	const std::size_t stride;
+	const std::size_t vertical_padding;
+	const std::size_t horizontal_padding;
+	const std::size_t vertical_stride;
+	const std::size_t horizontal_stride;
 	const std::size_t dilation;
 	// Pre-computed values to improve propagation-time performance.
 	const std::size_t padded_height;
@@ -543,6 +557,8 @@ private:
 	RankwiseArray patch_offsets;
 	RankwiseArray patch_extents;
 	RankwiseArray dil_strides;
+	RankwiseArray no_padding_offsets;
+	RankwiseArray no_padding_extents;
 	PaddingsArray paddings;
 	// Staged computation caches
 	Matrix<Scalar> biased_in;
@@ -1176,13 +1192,14 @@ protected:
 	typedef std::array<std::size_t,2> ReductionRanksArray;
 	typedef Tensor<Scalar,2> ReducedData;
 	inline PoolingLayer(const Dimensions<std::size_t,3>& input_dims, std::size_t receptor_height, std::size_t receptor_width,
-			std::size_t stride, std::size_t dilation) :
+			std::size_t vertical_stride, std::size_t horizontal_stride, std::size_t dilation) :
 				input_dims(input_dims),
-				output_dims({ calculate_output_dim(input_dims(0), receptor_height, dilation, stride),
-						calculate_output_dim(input_dims(1), receptor_width, dilation, stride), input_dims(2) }),
+				output_dims({ calculate_output_dim(input_dims(0), receptor_height, dilation, vertical_stride),
+						calculate_output_dim(input_dims(1), receptor_width, dilation, horizontal_stride), input_dims(2) }),
 				receptor_height(receptor_height),
 				receptor_width(receptor_width),
-				stride(stride),
+				vertical_stride(vertical_stride),
+				horizontal_stride(horizontal_stride),
 				dilation(dilation),
 				dil_receptor_height(receptor_height + (receptor_height - 1) * dilation),
 				dil_receptor_width(receptor_width + (receptor_width - 1) * dilation),
@@ -1200,7 +1217,7 @@ protected:
 				params_grad(0, 0) {
 		assert(input_dims(0) >= dil_receptor_height && input_dims(1) >= dil_receptor_width);
 		assert(receptor_height > 0 && receptor_width > 0);
-		assert(stride > 0);
+		assert(vertical_stride > 0 && horizontal_stride > 0);
 	}
 	/**
 	 * Initializes the cache required for back-propagation.
@@ -1251,13 +1268,13 @@ protected:
 		init_cache();
 		std::size_t patch_ind = 0;
 		std::size_t out_i = 0;
-		for (std::size_t i = 0; i <= height_rem; i += stride, ++out_i) {
-			patch_offsets[1] = i;
-			reduced_patch_offsets[1] = out_i;
+		for (std::size_t i = 0; i <= width_rem; i += horizontal_stride, ++out_i) {
+			patch_offsets[2] = i;
+			reduced_patch_offsets[2] = out_i;
 			std::size_t out_j = 0;
-			for (std::size_t j = 0; j <= width_rem; j += stride, ++out_j) {
-				patch_offsets[2] = j;
-				reduced_patch_offsets[2] = out_j;
+			for (std::size_t j = 0; j <= height_rem; j += vertical_stride, ++out_j) {
+				patch_offsets[1] = j;
+				reduced_patch_offsets[1] = out_j;
 				typename Base::Data patch;
 				// Dilated receptor support.
 				if (dilation > 0)
@@ -1278,13 +1295,13 @@ protected:
 		prev_out_grads.setZero();
 		std::size_t patch_ind = 0;
 		std::size_t out_grads_i = 0;
-		for (std::size_t i = 0; i <= height_rem; i += stride, ++out_grads_i) {
-			patch_offsets[1] = i;
-			reduced_patch_offsets[1] = out_grads_i;
+		for (std::size_t i = 0; i <= width_rem; i += horizontal_stride, ++out_grads_i) {
+			patch_offsets[2] = i;
+			reduced_patch_offsets[2] = out_grads_i;
 			std::size_t out_grads_j = 0;
-			for (std::size_t j = 0; j <= width_rem; j += stride, ++out_grads_j) {
-				patch_offsets[2] = j;
-				reduced_patch_offsets[2] = out_grads_j;
+			for (std::size_t j = 0; j <= height_rem; j += vertical_stride, ++out_grads_j) {
+				patch_offsets[1] = j;
+				reduced_patch_offsets[1] = out_grads_j;
 				typename Base::Data reduced_patch_grads = out_grads.slice(reduced_patch_offsets, reduced_patch_extents);
 				// Accumulate the gradients where the patches overlap.
 				if (dilation > 0)
@@ -1314,7 +1331,8 @@ protected:
 	const Dimensions<std::size_t,3> output_dims;
 	const std::size_t receptor_height;
 	const std::size_t receptor_width;
-	const std::size_t stride;
+	const std::size_t vertical_stride;
+	const std::size_t horizontal_stride;
 	const std::size_t dilation;
 	const std::size_t dil_receptor_height;
 	const std::size_t dil_receptor_width;
@@ -1348,13 +1366,17 @@ public:
 	 * @param input_dims The dimensionality of the input tensor.
 	 * @param receptor_height The height of the pooling receptor.
 	 * @param receptor_width The width of the pooling receptor.
-	 * @param stride The stride at which the input is to be pooled (i.e. the number of elements
-	 * by which the receptor is to be shifted after every step of the pooling process).
+	 * @param vertical_stride The vertical stride at which the input is to be pooled (i.e. the number of
+	 * elements by which the receptor is to be shifted along the height of the input tensor).
+	 * @param horizontal_stride The horizontal stride at which the input is to be pooled (i.e. the number
+	 * of elements by which the receptor is to be shifted along the width of the input tensor).
 	 * @param dilation The extent of the dilation to apply to the receptor field.
 	 */
 	inline SumPoolingLayer(const Dimensions<std::size_t,3>& input_dims, std::size_t receptor_height = 2,
-			std::size_t receptor_width = 2, std::size_t stride = 2, std::size_t dilation = 0) :
-				Base::PoolingLayer(input_dims, receptor_height, receptor_width, stride, dilation) { }
+			std::size_t receptor_width = 2, std::size_t vertical_stride = 2, std::size_t horizontal_stride = 2,
+			std::size_t dilation = 0) :
+				Base::PoolingLayer(input_dims, receptor_height, receptor_width, vertical_stride,
+						horizontal_stride, dilation) { }
 	inline Root* clone() const {
 		return new SumPoolingLayer(*this);
 	}
@@ -1386,13 +1408,17 @@ public:
 	 * @param input_dims The dimensionality of the input tensor.
 	 * @param receptor_height The height of the pooling receptor.
 	 * @param receptor_width The width of the pooling receptor.
-	 * @param stride The stride at which the input is to be pooled (i.e. the number of elements
-	 * by which the receptor is to be shifted after every step of the pooling process).
+	 * @param vertical_stride The vertical stride at which the input is to be pooled (i.e. the number of
+	 * elements by which the receptor is to be shifted along the height of the input tensor).
+	 * @param horizontal_stride The horizontal stride at which the input is to be pooled (i.e. the number
+	 * of elements by which the receptor is to be shifted along the width of the input tensor).
 	 * @param dilation The extent of the dilation to apply to the receptor field.
 	 */
 	inline MeanPoolingLayer(const Dimensions<std::size_t,3>& input_dims, std::size_t receptor_height = 2,
-			std::size_t receptor_width = 2, std::size_t stride = 2, std::size_t dilation = 0) :
-				Base::PoolingLayer(input_dims, receptor_height, receptor_width, stride, dilation),
+			std::size_t receptor_width = 2, std::size_t vertical_stride = 2, std::size_t horizontal_stride = 2,
+			std::size_t dilation = 0) :
+				Base::PoolingLayer(input_dims, receptor_height, receptor_width, vertical_stride,
+						horizontal_stride, dilation),
 				receptor_area(receptor_height * receptor_width) { }
 	inline Root* clone() const {
 		return new MeanPoolingLayer(*this);
@@ -1427,13 +1453,17 @@ public:
 	 * @param input_dims The dimensionality of the input tensor.
 	 * @param receptor_height The height of the pooling receptor.
 	 * @param receptor_width The width of the pooling receptor.
-	 * @param stride The stride at which the input is to be pooled (i.e. the number of elements
-	 * by which the receptor is to be shifted after every step of the pooling process).
+	 * @param vertical_stride The vertical stride at which the input is to be pooled (i.e. the number of
+	 * elements by which the receptor is to be shifted along the height of the input tensor).
+	 * @param horizontal_stride The horizontal stride at which the input is to be pooled (i.e. the number
+	 * of elements by which the receptor is to be shifted along the width of the input tensor).
 	 * @param dilation The extent of the dilation to apply to the receptor field.
 	 */
 	inline MaxPoolingLayer(const Dimensions<std::size_t,3>& input_dims, std::size_t receptor_height = 2,
-			std::size_t receptor_width = 2, std::size_t stride = 2, std::size_t dilation = 0) :
-				Base::PoolingLayer(input_dims, receptor_height, receptor_width, stride, dilation) { }
+			std::size_t receptor_width = 2, std::size_t vertical_stride = 2, std::size_t horizontal_stride = 2,
+			std::size_t dilation = 0) :
+				Base::PoolingLayer(input_dims, receptor_height, receptor_width, vertical_stride,
+						horizontal_stride, dilation) { }
 	inline Root* clone() const {
 		return new MaxPoolingLayer(*this);
 	}
@@ -1449,23 +1479,23 @@ protected:
 		std::size_t depth = patch.dimension(3);
 		std::vector<unsigned> inds(rows * depth);
 		typename Root::Data reduced_patch(rows, 1u, 1u, depth);
-		for (std::size_t i = 0; i < rows; ++i) {
-			for (std::size_t j = 0; j < depth; ++j) {
+		for (std::size_t i = 0; i < depth; ++i) {
+			for (std::size_t j = 0; j < rows; ++j) {
 				Scalar max = internal::NumericUtils<Scalar>::MIN;
 				unsigned max_height = 0;
 				unsigned max_width = 0;
-				for (std::size_t k = 0; k < Base::receptor_height; ++k) {
-					for (std::size_t l = 0; l < Base::receptor_width; ++l) {
-						Scalar val = patch(i,k,l,j);
+				for (std::size_t k = 0; k < Base::receptor_width; ++k) {
+					for (std::size_t l = 0; l < Base::receptor_height; ++l) {
+						Scalar val = patch(j,l,k,i);
 						if (val > max) {
 							max = val;
-							max_height = k;
-							max_width = l;
+							max_height = l;
+							max_width = k;
 						}
 					}
 				}
-				inds[i * depth + j] = max_height * Base::receptor_width + max_width;
-				reduced_patch(i,0u,0u,j) = max;
+				inds[i * rows + j] = max_width * Base::receptor_height + max_height;
+				reduced_patch(j,0u,0u,i) = max;
 			}
 		}
 		max_inds[patch_ind] = inds;
@@ -1477,12 +1507,12 @@ protected:
 		typename Root::Data patch(rows, Base::receptor_height, Base::receptor_width, depth);
 		patch.setZero();
 		std::vector<unsigned>& inds = max_inds[patch_ind];
-		for (std::size_t i = 0; i < rows; ++i) {
-			for (std::size_t j = 0; j < depth; ++j) {
-				unsigned max_ind = inds[i * depth + j];
-				unsigned height = max_ind / Base::receptor_width;
-				unsigned width = max_ind % Base::receptor_width;
-				patch(i,height,width,j) = grad(i,0u,0u,j);
+		for (std::size_t i = 0; i < depth; ++i) {
+			for (std::size_t j = 0; j < rows; ++j) {
+				unsigned max_ind = inds[i * rows + j];
+				unsigned max_height = max_ind % Base::receptor_height;
+				unsigned max_width = max_ind / Base::receptor_height;
+				patch(j,max_height,max_width,i) = grad(j,0u,0u,i);
 			}
 		}
 		return patch;

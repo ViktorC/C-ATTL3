@@ -8,8 +8,6 @@
 #ifndef INCLUDE_CATTLE_H_
 #define INCLUDE_CATTLE_H_
 
-#include "../src/utils/Eigen.h"
-#include "../src/utils/NumericUtils.h"
 #include "../src/DataProvider.h"
 #include "../src/Dimensions.h"
 #include "../src/Layer.h"

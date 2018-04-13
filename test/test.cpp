@@ -70,9 +70,9 @@ typedef double fp;
 //	std::vector<NeuralNetPtr<fp,RANK,false>> comp_mods;
 //	std::vector<NeuralNetPtr<fp,RANK,false>> parallel_lanes;
 //	parallel_lanes.push_back(NeuralNetPtr<fp,RANK,false>(new FeedforwardNeuralNetwork<fp,RANK>(
-//			LayerPtr<fp,RANK>(new ConvLayer<fp>(test_prov.get_obs_dims(), 5, init, reg, 1, 1, 0)))));
+//			LayerPtr<fp,RANK>(new ConvLayer<fp>(test_prov.get_obs_dims(), 5, init, reg, 1, 1, 0, 0)))));
 //	parallel_lanes.push_back(NeuralNetPtr<fp,RANK,false>(new FeedforwardNeuralNetwork<fp,RANK>(
-//			LayerPtr<fp,RANK>(new ConvLayer<fp>(test_prov.get_obs_dims(), 3, init, reg, 5, 5, 2)))));
+//			LayerPtr<fp,RANK>(new ConvLayer<fp>(test_prov.get_obs_dims(), 3, init, reg, 5, 5, 2, 2)))));
 //	comp_mods.push_back(NeuralNetPtr<fp,RANK,false>(
 //			new ParallelNeuralNetwork<fp,RANK>(std::move(parallel_lanes))));
 //	std::vector<LayerPtr<fp,RANK>> layers1(7);
@@ -354,10 +354,10 @@ int main() {
 	MemoryDataProvider<float,3,false> test_prov(std::move(test_obs), std::move(test_obj));
 	auto init = std::make_shared<GlorotWeightInitialization<float>>();
 	std::vector<LayerPtr<float,3>> layers(9);
-	layers[0] = LayerPtr<float,3>(new ConvLayer<float>(train_prov.get_obs_dims(), 8, init, ConvLayer<float>::NO_PARAM_REG, 5, 5, 2));
+	layers[0] = LayerPtr<float,3>(new ConvLayer<float>(train_prov.get_obs_dims(), 8, init, ConvLayer<float>::NO_PARAM_REG, 5, 5, 2, 2));
 	layers[1] = LayerPtr<float,3>(new SigmoidActivationLayer<float,3>(layers[0]->get_output_dims()));
 	layers[2] = LayerPtr<float,3>(new MaxPoolingLayer<float>(layers[1]->get_output_dims()));
-	layers[3] = LayerPtr<float,3>(new ConvLayer<float>(layers[2]->get_output_dims(), 8, init, ConvLayer<float>::NO_PARAM_REG, 5, 5, 2));
+	layers[3] = LayerPtr<float,3>(new ConvLayer<float>(layers[2]->get_output_dims(), 8, init, ConvLayer<float>::NO_PARAM_REG, 5, 5, 2, 2));
 	layers[4] = LayerPtr<float,3>(new SigmoidActivationLayer<float,3>(layers[3]->get_output_dims()));
 	layers[5] = LayerPtr<float,3>(new MaxPoolingLayer<float>(layers[4]->get_output_dims()));
 	layers[6] = LayerPtr<float,3>(new FCLayer<float,3>(layers[5]->get_output_dims(), 128, init));
@@ -371,6 +371,7 @@ int main() {
 	opt.optimize(nn, train_prov, test_prov, 1);
 	std::cout << "Duration: " << std::chrono::duration_cast<std::chrono::milliseconds>(
 			std::chrono::steady_clock::now() - begin).count() << std::endl;
+//	std_dataset_test();
 //	readme_test();
 //	assert(test_parallel() & test_residual() & test_dense() & test_seqnn() & test_rnn() & test_lstm() & test_bdrnn());
 	return 0;
