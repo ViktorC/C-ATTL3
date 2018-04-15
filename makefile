@@ -40,12 +40,12 @@ all:
 debug:
 	$(MAKE) $(TARGET) \
 		OPT_FLAGS='$(DEBUG_OPT_FLAGS)'
-cublas_all:
+cuda_all:
 	$(MAKE) $(TARGET) \
 		INCLUDES=$(CUDA_INCLUDES) \
 		LIBS=$(CUDA_LIBS) \
 		OPT_FLAGS=$(CUDA_RELEASE_OPT_FLAGS)
-cublas_debug:
+cuda_debug:
 	$(MAKE) $(TARGET) \
 		INCLUDES=$(CUDA_INCLUDES) \
 		LIBS=$(CUDA_LIBS) \
