@@ -81,11 +81,11 @@ $(function() {
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:a7fa7315cc4823bd4703bf2ff45f68c09"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_p_c_a_preprocessor.html#a7fa7315cc4823bd4703bf2ff45f68c09">PCAPreprocessor</a> (Scalar <a class="el" href="_preprocessor_8h.html#aeec5d6cc386e8a55267049fd19427d8f">min_rel_var_to_retain</a>=1, Scalar <a class="el" href="_layer_8h.html#a22c3b4076ffae75ab73aac0928a4f2a2">epsilon</a>=internal::NumericUtils&lt; Scalar &gt;::EPSILON2)</td></tr>
+<tr class="memitem:a7fa7315cc4823bd4703bf2ff45f68c09"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_p_c_a_preprocessor.html#a7fa7315cc4823bd4703bf2ff45f68c09">PCAPreprocessor</a> (Scalar <a class="el" href="_preprocessor_8h.html#aeec5d6cc386e8a55267049fd19427d8f">min_rel_var_to_retain</a>=1, Scalar <a class="el" href="_layer_8h.html#a22c3b4076ffae75ab73aac0928a4f2a2">epsilon</a>=<a class="el" href="classcattle_1_1internal_1_1_numeric_utils.html">internal::NumericUtils</a>&lt; Scalar &gt;::EPSILON2)</td></tr>
 <tr class="separator:a7fa7315cc4823bd4703bf2ff45f68c09"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a8cecc129a38d03027759ae719badd359"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_p_c_a_preprocessor.html#a8cecc129a38d03027759ae719badd359">fit</a> (const Tensor&lt; Scalar, Rank+1 &gt; &amp;data)</td></tr>
+<tr class="memitem:a8cecc129a38d03027759ae719badd359"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_p_c_a_preprocessor.html#a8cecc129a38d03027759ae719badd359">fit</a> (const <a class="el" href="namespacecattle.html#a8b9323ad928764340e46f0802bf27fbb">Tensor</a>&lt; Scalar, Rank+1 &gt; &amp;data)</td></tr>
 <tr class="separator:a8cecc129a38d03027759ae719badd359"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a8b085f4013e2f019c346c513fa1dc3bf"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_p_c_a_preprocessor.html#a8b085f4013e2f019c346c513fa1dc3bf">transform</a> (Tensor&lt; Scalar, Rank+1 &gt; &amp;data) const</td></tr>
+<tr class="memitem:a8b085f4013e2f019c346c513fa1dc3bf"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_p_c_a_preprocessor.html#a8b085f4013e2f019c346c513fa1dc3bf">transform</a> (<a class="el" href="namespacecattle.html#a8b9323ad928764340e46f0802bf27fbb">Tensor</a>&lt; Scalar, Rank+1 &gt; &amp;data) const</td></tr>
 <tr class="separator:a8b085f4013e2f019c346c513fa1dc3bf"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pri-types"></a>
@@ -171,7 +171,7 @@ template&lt;typename Scalar , std::size_t Rank, bool Standardize = false, bool W
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">Scalar&#160;</td>
-          <td class="paramname"><em>epsilon</em> = <code>internal::NumericUtils&lt;Scalar&gt;::EPSILON2</code>&#160;</td>
+          <td class="paramname"><em>epsilon</em> = <code><a class="el" href="classcattle_1_1internal_1_1_numeric_utils.html">internal::NumericUtils</a>&lt;Scalar&gt;::EPSILON2</code>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -210,7 +210,7 @@ template&lt;typename Scalar , std::size_t Rank, bool Standardize = false, bool W
         <tr>
           <td class="memname">void <a class="el" href="classcattle_1_1_p_c_a_preprocessor.html">cattle::PCAPreprocessor</a>&lt; Scalar, Rank, Standardize, Whiten &gt;::fit </td>
           <td>(</td>
-          <td class="paramtype">const Tensor&lt; Scalar, Rank+1 &gt; &amp;&#160;</td>
+          <td class="paramtype">const <a class="el" href="namespacecattle.html#a8b9323ad928764340e46f0802bf27fbb">Tensor</a>&lt; Scalar, Rank+1 &gt; &amp;&#160;</td>
           <td class="paramname"><em>data</em></td><td>)</td>
           <td></td>
         </tr>
@@ -238,7 +238,7 @@ template&lt;typename Scalar , std::size_t Rank, bool Standardize = false, bool W
         <tr>
           <td class="memname">void <a class="el" href="classcattle_1_1_p_c_a_preprocessor.html">cattle::PCAPreprocessor</a>&lt; Scalar, Rank, Standardize, Whiten &gt;::transform </td>
           <td>(</td>
-          <td class="paramtype">Tensor&lt; Scalar, Rank+1 &gt; &amp;&#160;</td>
+          <td class="paramtype"><a class="el" href="namespacecattle.html#a8b9323ad928764340e46f0802bf27fbb">Tensor</a>&lt; Scalar, Rank+1 &gt; &amp;&#160;</td>
           <td class="paramname"><em>data</em></td><td>)</td>
           <td> const</td>
         </tr>

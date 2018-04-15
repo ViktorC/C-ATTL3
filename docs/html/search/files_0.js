@@ -1,5 +1,4 @@
 var searchData=
 [
-  ['dataprovider_2eh',['DataProvider.h',['../_data_provider_8h.html',1,'']]],
-  ['dimensions_2eh',['Dimensions.h',['../_dimensions_8h.html',1,'']]]
+  ['cublasutils_2eh',['CuBLASUtils.h',['../_cu_b_l_a_s_utils_8h.html',1,'']]]
 ];

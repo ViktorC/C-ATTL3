@@ -63,6 +63,7 @@ $(function() {
 </div><!-- top -->
 <div class="header">
   <div class="summary">
+<a href="#namespaces">Namespaces</a> &#124;
 <a href="#nested-classes">Classes</a> &#124;
 <a href="#typedef-members">Typedefs</a> &#124;
 <a href="#enum-members">Enumerations</a>  </div>
@@ -71,6 +72,11 @@ $(function() {
 </div><!--header-->
 <div class="contents">
 <table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="namespaces"></a>
+Namespaces</h2></td></tr>
+<tr class="memitem:namespacecattle_1_1internal"><td class="memItemLeft" align="right" valign="top"> &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacecattle_1_1internal.html">internal</a></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="nested-classes"></a>
 Classes</h2></td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_absolute_loss.html">AbsoluteLoss</a></td></tr>
@@ -257,10 +263,10 @@ Classes</h2></td></tr>
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="typedef-members"></a>
 Typedefs</h2></td></tr>
 <tr class="memitem:ae90497baf0bcd6d9b075aa3287bcd475"><td class="memTemplParams" colspan="2">template&lt;typename Scalar , std::size_t Rank&gt; </td></tr>
-<tr class="memitem:ae90497baf0bcd6d9b075aa3287bcd475"><td class="memTemplItemLeft" align="right" valign="top">using&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespacecattle.html#ae90497baf0bcd6d9b075aa3287bcd475">TensorPtr</a> = std::unique_ptr&lt; Tensor&lt; Scalar, Rank &gt; &gt;</td></tr>
+<tr class="memitem:ae90497baf0bcd6d9b075aa3287bcd475"><td class="memTemplItemLeft" align="right" valign="top">using&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespacecattle.html#ae90497baf0bcd6d9b075aa3287bcd475">TensorPtr</a> = std::unique_ptr&lt; <a class="el" href="namespacecattle.html#a8b9323ad928764340e46f0802bf27fbb">Tensor</a>&lt; Scalar, Rank &gt; &gt;</td></tr>
 <tr class="separator:ae90497baf0bcd6d9b075aa3287bcd475"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aaf234deaf1504300126fed57912a132e"><td class="memTemplParams" colspan="2">template&lt;typename Scalar , std::size_t Rank, bool Sequential&gt; </td></tr>
-<tr class="memitem:aaf234deaf1504300126fed57912a132e"><td class="memTemplItemLeft" align="right" valign="top">using&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespacecattle.html#aaf234deaf1504300126fed57912a132e">DataPair</a> = std::pair&lt; Tensor&lt; Scalar, Rank+Sequential+1 &gt;, Tensor&lt; Scalar, Rank+Sequential+1 &gt; &gt;</td></tr>
+<tr class="memitem:aaf234deaf1504300126fed57912a132e"><td class="memTemplItemLeft" align="right" valign="top">using&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespacecattle.html#aaf234deaf1504300126fed57912a132e">DataPair</a> = std::pair&lt; <a class="el" href="namespacecattle.html#a8b9323ad928764340e46f0802bf27fbb">Tensor</a>&lt; Scalar, Rank+Sequential+1 &gt;, <a class="el" href="namespacecattle.html#a8b9323ad928764340e46f0802bf27fbb">Tensor</a>&lt; Scalar, Rank+Sequential+1 &gt; &gt;</td></tr>
 <tr class="separator:aaf234deaf1504300126fed57912a132e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a96574a467e593e2c62c432b0c8ec8349"><td class="memTemplParams" colspan="2">template&lt;typename Scalar &gt; </td></tr>
 <tr class="memitem:a96574a467e593e2c62c432b0c8ec8349"><td class="memTemplItemLeft" align="right" valign="top">using&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespacecattle.html#a96574a467e593e2c62c432b0c8ec8349">WeightInitSharedPtr</a> = std::shared_ptr&lt; <a class="el" href="classcattle_1_1_weight_initialization.html">WeightInitialization</a>&lt; Scalar &gt; &gt;</td></tr>
@@ -286,6 +292,24 @@ Typedefs</h2></td></tr>
 <tr class="memitem:a5fa4a5f7df1ad35afbadd9975ec24a12"><td class="memTemplParams" colspan="2">template&lt;typename Scalar , std::size_t Rank, bool Sequential&gt; </td></tr>
 <tr class="memitem:a5fa4a5f7df1ad35afbadd9975ec24a12"><td class="memTemplItemLeft" align="right" valign="top">using&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespacecattle.html#a5fa4a5f7df1ad35afbadd9975ec24a12">LossSharedPtr</a> = std::shared_ptr&lt; <a class="el" href="classcattle_1_1_loss.html">Loss</a>&lt; Scalar, Rank, Sequential &gt; &gt;</td></tr>
 <tr class="separator:a5fa4a5f7df1ad35afbadd9975ec24a12"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3ac7e197e90e292a2db6b2d94f46befa"><td class="memTemplParams" colspan="2">template&lt;typename Scalar &gt; </td></tr>
+<tr class="memitem:a3ac7e197e90e292a2db6b2d94f46befa"><td class="memTemplItemLeft" align="right" valign="top">using&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespacecattle.html#a3ac7e197e90e292a2db6b2d94f46befa">RowVector</a> = Eigen::Matrix&lt; Scalar, 1, Eigen::Dynamic, Eigen::RowMajor, 1, Eigen::Dynamic &gt;</td></tr>
+<tr class="separator:a3ac7e197e90e292a2db6b2d94f46befa"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a6763ba5ba9b418d5da581630de564cf9"><td class="memTemplParams" colspan="2">template&lt;typename Scalar &gt; </td></tr>
+<tr class="memitem:a6763ba5ba9b418d5da581630de564cf9"><td class="memTemplItemLeft" align="right" valign="top">using&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespacecattle.html#a6763ba5ba9b418d5da581630de564cf9">ColVector</a> = Eigen::Matrix&lt; Scalar, Eigen::Dynamic, 1, Eigen::ColMajor, Eigen::Dynamic, 1 &gt;</td></tr>
+<tr class="separator:a6763ba5ba9b418d5da581630de564cf9"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1d78623a47279d516750a44dbad6090b"><td class="memTemplParams" colspan="2">template&lt;typename Scalar &gt; </td></tr>
+<tr class="memitem:a1d78623a47279d516750a44dbad6090b"><td class="memTemplItemLeft" align="right" valign="top">using&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespacecattle.html#a1d78623a47279d516750a44dbad6090b">Matrix</a> = Eigen::Matrix&lt; Scalar, Eigen::Dynamic, Eigen::Dynamic, Eigen::ColMajor, Eigen::Dynamic, Eigen::Dynamic &gt;</td></tr>
+<tr class="separator:a1d78623a47279d516750a44dbad6090b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:afe8803bdb57fb149be7d7b7916f30ca9"><td class="memTemplParams" colspan="2">template&lt;typename Scalar &gt; </td></tr>
+<tr class="memitem:afe8803bdb57fb149be7d7b7916f30ca9"><td class="memTemplItemLeft" align="right" valign="top">using&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespacecattle.html#afe8803bdb57fb149be7d7b7916f30ca9">MatrixMap</a> = Eigen::Map&lt; <a class="el" href="namespacecattle.html#a1d78623a47279d516750a44dbad6090b">Matrix</a>&lt; Scalar &gt; &gt;</td></tr>
+<tr class="separator:afe8803bdb57fb149be7d7b7916f30ca9"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a8b9323ad928764340e46f0802bf27fbb"><td class="memTemplParams" colspan="2">template&lt;typename Scalar , std::size_t Rank&gt; </td></tr>
+<tr class="memitem:a8b9323ad928764340e46f0802bf27fbb"><td class="memTemplItemLeft" align="right" valign="top">using&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespacecattle.html#a8b9323ad928764340e46f0802bf27fbb">Tensor</a> = Eigen::Tensor&lt; Scalar, Rank, Eigen::ColMajor, std::size_t &gt;</td></tr>
+<tr class="separator:a8b9323ad928764340e46f0802bf27fbb"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7dfcb4d57e2c5da3170ebd8d13fd0431"><td class="memTemplParams" colspan="2">template&lt;typename Scalar , std::size_t Rank&gt; </td></tr>
+<tr class="memitem:a7dfcb4d57e2c5da3170ebd8d13fd0431"><td class="memTemplItemLeft" align="right" valign="top">using&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespacecattle.html#a7dfcb4d57e2c5da3170ebd8d13fd0431">TensorMap</a> = Eigen::TensorMap&lt; <a class="el" href="namespacecattle.html#a8b9323ad928764340e46f0802bf27fbb">Tensor</a>&lt; Scalar, Rank &gt; &gt;</td></tr>
+<tr class="separator:a7dfcb4d57e2c5da3170ebd8d13fd0431"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="enum-members"></a>
 Enumerations</h2></td></tr>
@@ -303,7 +327,9 @@ Enumerations</h2></td></tr>
  }</td></tr>
 <tr class="separator:a962c4b25a74fac744864b9fa4fca4a0b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
-<h2 class="groupheader">Typedef Documentation</h2>
+<a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
+<div class="textblock"><p>The namespace containing all classes and typedefs of the C-ATTL3 library. </p>
+</div><h2 class="groupheader">Typedef Documentation</h2>
 <a id="a33c43d0983f054e904daa2806ce17231"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a33c43d0983f054e904daa2806ce17231">&#9670;&nbsp;</a></span>ActivationPtr</h2>
 
@@ -321,6 +347,23 @@ template&lt;typename Scalar , std::size_t Rank&gt; </div>
 
 </div>
 </div>
+<a id="a6763ba5ba9b418d5da581630de564cf9"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a6763ba5ba9b418d5da581630de564cf9">&#9670;&nbsp;</a></span>ColVector</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename Scalar &gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname">using <a class="el" href="namespacecattle.html#a6763ba5ba9b418d5da581630de564cf9">cattle::ColVector</a> = typedef Eigen::Matrix&lt;Scalar,Eigen::Dynamic,1,Eigen::ColMajor,Eigen::Dynamic,1&gt;</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>An alias for a single column matrix of an arbitrary scalar type. </p>
+
+</div>
+</div>
 <a id="aaf234deaf1504300126fed57912a132e"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#aaf234deaf1504300126fed57912a132e">&#9670;&nbsp;</a></span>DataPair</h2>
 
@@ -330,7 +373,7 @@ template&lt;typename Scalar , std::size_t Rank&gt; </div>
 template&lt;typename Scalar , std::size_t Rank, bool Sequential&gt; </div>
       <table class="memname">
         <tr>
-          <td class="memname">using <a class="el" href="namespacecattle.html#aaf234deaf1504300126fed57912a132e">cattle::DataPair</a> = typedef std::pair&lt;Tensor&lt;Scalar,Rank + Sequential + 1&gt;,Tensor&lt;Scalar,Rank + Sequential + 1&gt; &gt;</td>
+          <td class="memname">using <a class="el" href="namespacecattle.html#aaf234deaf1504300126fed57912a132e">cattle::DataPair</a> = typedef std::pair&lt;<a class="el" href="namespacecattle.html#a8b9323ad928764340e46f0802bf27fbb">Tensor</a>&lt;Scalar,Rank + Sequential + 1&gt;,<a class="el" href="namespacecattle.html#a8b9323ad928764340e46f0802bf27fbb">Tensor</a>&lt;Scalar,Rank + Sequential + 1&gt; &gt;</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -389,6 +432,40 @@ template&lt;typename Scalar , std::size_t Rank, bool Sequential&gt; </div>
 
 </div>
 </div>
+<a id="a1d78623a47279d516750a44dbad6090b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a1d78623a47279d516750a44dbad6090b">&#9670;&nbsp;</a></span>Matrix</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename Scalar &gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname">using <a class="el" href="namespacecattle.html#a1d78623a47279d516750a44dbad6090b">cattle::Matrix</a> = typedef Eigen::Matrix&lt;Scalar,Eigen::Dynamic,Eigen::Dynamic,Eigen::ColMajor, Eigen::Dynamic,Eigen::Dynamic&gt;</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>An alias for a dynamically sized matrix of an arbitrary scalar type. </p>
+
+</div>
+</div>
+<a id="afe8803bdb57fb149be7d7b7916f30ca9"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#afe8803bdb57fb149be7d7b7916f30ca9">&#9670;&nbsp;</a></span>MatrixMap</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename Scalar &gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname">using <a class="el" href="namespacecattle.html#afe8803bdb57fb149be7d7b7916f30ca9">cattle::MatrixMap</a> = typedef Eigen::Map&lt;<a class="el" href="namespacecattle.html#a1d78623a47279d516750a44dbad6090b">Matrix</a>&lt;Scalar&gt; &gt;</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>An alias for a class that can be used to map raw pointer data to a dynamically sized Matrix of an arbitrary scalar type. </p>
+
+</div>
+</div>
 <a id="a4d754351864153898cdbd3918dc1525b"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a4d754351864153898cdbd3918dc1525b">&#9670;&nbsp;</a></span>NeuralNetPtr</h2>
 
@@ -423,6 +500,57 @@ template&lt;typename Scalar &gt; </div>
 
 </div>
 </div>
+<a id="a3ac7e197e90e292a2db6b2d94f46befa"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a3ac7e197e90e292a2db6b2d94f46befa">&#9670;&nbsp;</a></span>RowVector</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename Scalar &gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname">using <a class="el" href="namespacecattle.html#a3ac7e197e90e292a2db6b2d94f46befa">cattle::RowVector</a> = typedef Eigen::Matrix&lt;Scalar,1,Eigen::Dynamic,Eigen::RowMajor,1,Eigen::Dynamic&gt;</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>An alias for a single row matrix of an arbitrary scalar type. </p>
+
+</div>
+</div>
+<a id="a8b9323ad928764340e46f0802bf27fbb"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a8b9323ad928764340e46f0802bf27fbb">&#9670;&nbsp;</a></span>Tensor</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename Scalar , std::size_t Rank&gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname">using <a class="el" href="namespacecattle.html#a8b9323ad928764340e46f0802bf27fbb">cattle::Tensor</a> = typedef Eigen::Tensor&lt;Scalar,Rank,Eigen::ColMajor,std::size_t&gt;</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>An alias for a tensor of arbitrary rank and scalar type with dynamic dimensionality. </p>
+
+</div>
+</div>
+<a id="a7dfcb4d57e2c5da3170ebd8d13fd0431"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a7dfcb4d57e2c5da3170ebd8d13fd0431">&#9670;&nbsp;</a></span>TensorMap</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename Scalar , std::size_t Rank&gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname">using <a class="el" href="namespacecattle.html#a7dfcb4d57e2c5da3170ebd8d13fd0431">cattle::TensorMap</a> = typedef Eigen::TensorMap&lt;<a class="el" href="namespacecattle.html#a8b9323ad928764340e46f0802bf27fbb">Tensor</a>&lt;Scalar,Rank&gt; &gt;</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>An for a class that can be used to map raw pointer data to a tensor of arbitrary rank and scalar type with dynamic dimensionality. </p>
+
+</div>
+</div>
 <a id="ae90497baf0bcd6d9b075aa3287bcd475"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#ae90497baf0bcd6d9b075aa3287bcd475">&#9670;&nbsp;</a></span>TensorPtr</h2>
 
@@ -432,7 +560,7 @@ template&lt;typename Scalar &gt; </div>
 template&lt;typename Scalar , std::size_t Rank&gt; </div>
       <table class="memname">
         <tr>
-          <td class="memname">using <a class="el" href="namespacecattle.html#ae90497baf0bcd6d9b075aa3287bcd475">cattle::TensorPtr</a> = typedef std::unique_ptr&lt;Tensor&lt;Scalar,Rank&gt; &gt;</td>
+          <td class="memname">using <a class="el" href="namespacecattle.html#ae90497baf0bcd6d9b075aa3287bcd475">cattle::TensorPtr</a> = typedef std::unique_ptr&lt;<a class="el" href="namespacecattle.html#a8b9323ad928764340e46f0802bf27fbb">Tensor</a>&lt;Scalar,Rank&gt; &gt;</td>
         </tr>
       </table>
 </div><div class="memdoc">

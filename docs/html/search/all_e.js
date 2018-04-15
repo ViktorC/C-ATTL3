@@ -16,5 +16,8 @@ var searchData=
   ['norm_5favg_5fdecay',['norm_avg_decay',['../_layer_8h.html#ad7749990311beb2a3459837bf26cf342',1,'Layer.h']]],
   ['normalizationpreprocessor',['NormalizationPreprocessor',['../classcattle_1_1_normalization_preprocessor.html',1,'cattle::NormalizationPreprocessor&lt; Scalar, Rank, Standardize &gt;'],['../classcattle_1_1_normalization_preprocessor.html#a1987f52abf107c7435181946179ac385',1,'cattle::NormalizationPreprocessor::NormalizationPreprocessor()'],['../classcattle_1_1_normalization_preprocessor_3_01_scalar_00_013_00_01_standardize_01_4.html#a240e252e0ff20b0435300fb859f742e2',1,'cattle::NormalizationPreprocessor&lt; Scalar, 3, Standardize &gt;::NormalizationPreprocessor()']]],
   ['normalizationpreprocessor_3c_20scalar_2c_203_2c_20standardize_20_3e',['NormalizationPreprocessor&lt; Scalar, 3, Standardize &gt;',['../classcattle_1_1_normalization_preprocessor_3_01_scalar_00_013_00_01_standardize_01_4.html',1,'cattle']]],
-  ['num_5flabels',['NUM_LABELS',['../classcattle_1_1_c_i_f_a_r_data_provider.html#a92b378a2603f86c0c3d9187bbd5f643a',1,'cattle::CIFARDataProvider']]]
+  ['num_5flabels',['NUM_LABELS',['../classcattle_1_1_c_i_f_a_r_data_provider.html#a92b378a2603f86c0c3d9187bbd5f643a',1,'cattle::CIFARDataProvider']]],
+  ['num_5fof_5feval_5fthreads',['num_of_eval_threads',['../namespacecattle_1_1internal.html#a9ca2fa6208c023409f36b69fcb8eb4bb',1,'cattle::internal']]],
+  ['numericutils',['NumericUtils',['../classcattle_1_1internal_1_1_numeric_utils.html',1,'cattle::internal::NumericUtils&lt; Scalar &gt;'],['../classcattle_1_1internal_1_1_numeric_utils.html#a306157561fb9e9cdc6e60bca718da379',1,'cattle::internal::NumericUtils::NumericUtils()']]],
+  ['numericutils_2eh',['NumericUtils.h',['../_numeric_utils_8h.html',1,'']]]
 ];

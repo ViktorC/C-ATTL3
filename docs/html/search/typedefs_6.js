@@ -1,5 +1,6 @@
 var searchData=
 [
-  ['net',['Net',['../classcattle_1_1_sequential_neural_network.html#abad6ab403cf309ce2fe856dfdfa448fe',1,'cattle::SequentialNeuralNetwork::Net()'],['../classcattle_1_1_optimizer.html#aa52f7eca506ab86e29639e6bd753cbb3',1,'cattle::Optimizer::Net()']]],
-  ['neuralnetptr',['NeuralNetPtr',['../namespacecattle.html#a4d754351864153898cdbd3918dc1525b',1,'cattle']]]
+  ['lane',['Lane',['../classcattle_1_1_parallel_neural_network.html#a9584d93e319dd3c033a5dfd5ba0a1cb5',1,'cattle::ParallelNeuralNetwork']]],
+  ['layerptr',['LayerPtr',['../namespacecattle.html#ad9bc255ce8185babba9c66dbc39ee77f',1,'cattle']]],
+  ['losssharedptr',['LossSharedPtr',['../namespacecattle.html#a5fa4a5f7df1ad35afbadd9975ec24a12',1,'cattle']]]
 ];

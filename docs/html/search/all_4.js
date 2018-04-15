@@ -12,6 +12,8 @@ var searchData=
   ['dataprovider_2eh',['DataProvider.h',['../_data_provider_8h.html',1,'']]],
   ['dataptr',['DataPtr',['../classcattle_1_1_data_provider.html#adb5309644096f7d5ce996c4c5358b558',1,'cattle::DataProvider']]],
   ['decay',['decay',['../classcattle_1_1_adadelta_optimizer.html#a8f2c1f0593ea951e49652d23f6a22ae3',1,'cattle::AdadeltaOptimizer']]],
+  ['decidedly_5fgreater',['decidedly_greater',['../classcattle_1_1internal_1_1_numeric_utils.html#ae73d7c1b4caf84f0227e7b04c4d7512b',1,'cattle::internal::NumericUtils']]],
+  ['decidedly_5flesser',['decidedly_lesser',['../classcattle_1_1internal_1_1_numeric_utils.html#a4ccb98354f5c472bf029545c79ea2cad',1,'cattle::internal::NumericUtils']]],
   ['demote',['demote',['../classcattle_1_1_dimensions.html#a3f279dec6f26b6e1fbe9adb5c1369bab',1,'cattle::Dimensions']]],
   ['denseconcattype',['DenseConcatType',['../namespacecattle.html#a962c4b25a74fac744864b9fa4fca4a0b',1,'cattle']]],
   ['denseneuralnetwork',['DenseNeuralNetwork',['../classcattle_1_1_dense_neural_network.html',1,'cattle::DenseNeuralNetwork&lt; Scalar, Rank, ConcatType &gt;'],['../classcattle_1_1_composite_neural_network.html#a17d0bbb036a9cb76434342ac35939e5a',1,'cattle::CompositeNeuralNetwork::DenseNeuralNetwork()'],['../classcattle_1_1_dense_neural_network.html#a2a9ad924f0d198ba21f5ae62fe2499df',1,'cattle::DenseNeuralNetwork::DenseNeuralNetwork()']]],

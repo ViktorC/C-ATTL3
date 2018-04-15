@@ -104,7 +104,7 @@ Public Member Functions</h2></td></tr>
 <tr class="separator:ad26c752cffbd9e33d9d88b606c301874"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a125a4d35cd81c567abca5def2c92947f"><td class="memItemLeft" align="right" valign="top">virtual&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_optimizer.html#a125a4d35cd81c567abca5def2c92947f">~Optimizer</a> ()=default</td></tr>
 <tr class="separator:a125a4d35cd81c567abca5def2c92947f"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a88c61b44dbe57daea3ec400ad7c38eb6"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_optimizer.html#a88c61b44dbe57daea3ec400ad7c38eb6">verify_gradients</a> (<a class="el" href="classcattle_1_1_optimizer.html#aa52f7eca506ab86e29639e6bd753cbb3">Net</a> &amp;net, <a class="el" href="classcattle_1_1_optimizer.html#ace96fe401c80b2c1c8008d091bea3bc3">Provider</a> &amp;provider, Scalar step_size=(internal::NumericUtils&lt; Scalar &gt;::EPSILON2+internal::NumericUtils&lt; Scalar &gt;::EPSILON3)/2, Scalar abs_epsilon=internal::NumericUtils&lt; Scalar &gt;::EPSILON2, Scalar rel_epsilon=internal::NumericUtils&lt; Scalar &gt;::EPSILON3) const</td></tr>
+<tr class="memitem:a88c61b44dbe57daea3ec400ad7c38eb6"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_optimizer.html#a88c61b44dbe57daea3ec400ad7c38eb6">verify_gradients</a> (<a class="el" href="classcattle_1_1_optimizer.html#aa52f7eca506ab86e29639e6bd753cbb3">Net</a> &amp;net, <a class="el" href="classcattle_1_1_optimizer.html#ace96fe401c80b2c1c8008d091bea3bc3">Provider</a> &amp;provider, Scalar step_size=(<a class="el" href="classcattle_1_1internal_1_1_numeric_utils.html">internal::NumericUtils</a>&lt; Scalar &gt;::EPSILON2+<a class="el" href="classcattle_1_1internal_1_1_numeric_utils.html">internal::NumericUtils</a>&lt; Scalar &gt;::EPSILON3)/2, Scalar abs_epsilon=<a class="el" href="classcattle_1_1internal_1_1_numeric_utils.html">internal::NumericUtils</a>&lt; Scalar &gt;::EPSILON2, Scalar rel_epsilon=<a class="el" href="classcattle_1_1internal_1_1_numeric_utils.html">internal::NumericUtils</a>&lt; Scalar &gt;::EPSILON3) const</td></tr>
 <tr class="separator:a88c61b44dbe57daea3ec400ad7c38eb6"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:abd96aab852071300003b1b71e97207ef"><td class="memItemLeft" align="right" valign="top">Scalar&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_optimizer.html#abd96aab852071300003b1b71e97207ef">optimize</a> (<a class="el" href="classcattle_1_1_optimizer.html#aa52f7eca506ab86e29639e6bd753cbb3">Net</a> &amp;net, <a class="el" href="classcattle_1_1_optimizer.html#ace96fe401c80b2c1c8008d091bea3bc3">Provider</a> &amp;training_prov, <a class="el" href="classcattle_1_1_optimizer.html#ace96fe401c80b2c1c8008d091bea3bc3">Provider</a> &amp;test_prov, unsigned epochs, unsigned early_stop=0)</td></tr>
 <tr class="separator:abd96aab852071300003b1b71e97207ef"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -115,7 +115,7 @@ Protected Types</h2></td></tr>
 <tr class="separator:aa52f7eca506ab86e29639e6bd753cbb3"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ace96fe401c80b2c1c8008d091bea3bc3"><td class="memItemLeft" align="right" valign="top">typedef <a class="el" href="classcattle_1_1_data_provider.html">DataProvider</a>&lt; Scalar, Rank, Sequential &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_optimizer.html#ace96fe401c80b2c1c8008d091bea3bc3">Provider</a></td></tr>
 <tr class="separator:ace96fe401c80b2c1c8008d091bea3bc3"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a0d75182c650ec8e7cf615aad5fef649e"><td class="memItemLeft" align="right" valign="top">typedef Tensor&lt; Scalar, Rank+Sequential+1 &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_optimizer.html#a0d75182c650ec8e7cf615aad5fef649e">Data</a></td></tr>
+<tr class="memitem:a0d75182c650ec8e7cf615aad5fef649e"><td class="memItemLeft" align="right" valign="top">typedef <a class="el" href="namespacecattle.html#a8b9323ad928764340e46f0802bf27fbb">Tensor</a>&lt; Scalar, Rank+Sequential+1 &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_optimizer.html#a0d75182c650ec8e7cf615aad5fef649e">Data</a></td></tr>
 <tr class="separator:a0d75182c650ec8e7cf615aad5fef649e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pro-methods"></a>
@@ -137,9 +137,9 @@ Static Protected Member Functions</h2></td></tr>
 <tr class="separator:ae9504099cd9dbaa6f64450eb6061efe9"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:abc23bf23413dfa4a8c6a8d9b222af7eb"><td class="memItemLeft" align="right" valign="top">static bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_optimizer.html#abc23bf23413dfa4a8c6a8d9b222af7eb">is_parametric</a> (<a class="el" href="classcattle_1_1_layer.html">Layer</a>&lt; Scalar, Rank &gt; &amp;layer)</td></tr>
 <tr class="separator:abc23bf23413dfa4a8c6a8d9b222af7eb"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a03a788c5ce15f611d5c6007d43550ef5"><td class="memItemLeft" align="right" valign="top">static Matrix&lt; Scalar &gt; &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_optimizer.html#a03a788c5ce15f611d5c6007d43550ef5">get_params</a> (<a class="el" href="classcattle_1_1_layer.html">Layer</a>&lt; Scalar, Rank &gt; &amp;layer)</td></tr>
+<tr class="memitem:a03a788c5ce15f611d5c6007d43550ef5"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="namespacecattle.html#a1d78623a47279d516750a44dbad6090b">Matrix</a>&lt; Scalar &gt; &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_optimizer.html#a03a788c5ce15f611d5c6007d43550ef5">get_params</a> (<a class="el" href="classcattle_1_1_layer.html">Layer</a>&lt; Scalar, Rank &gt; &amp;layer)</td></tr>
 <tr class="separator:a03a788c5ce15f611d5c6007d43550ef5"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a4697c3e95df8ae818471c5734b6f5ef6"><td class="memItemLeft" align="right" valign="top">static const Matrix&lt; Scalar &gt; &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_optimizer.html#a4697c3e95df8ae818471c5734b6f5ef6">get_params_grad</a> (<a class="el" href="classcattle_1_1_layer.html">Layer</a>&lt; Scalar, Rank &gt; &amp;layer)</td></tr>
+<tr class="memitem:a4697c3e95df8ae818471c5734b6f5ef6"><td class="memItemLeft" align="right" valign="top">static const <a class="el" href="namespacecattle.html#a1d78623a47279d516750a44dbad6090b">Matrix</a>&lt; Scalar &gt; &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_optimizer.html#a4697c3e95df8ae818471c5734b6f5ef6">get_params_grad</a> (<a class="el" href="classcattle_1_1_layer.html">Layer</a>&lt; Scalar, Rank &gt; &amp;layer)</td></tr>
 <tr class="separator:a4697c3e95df8ae818471c5734b6f5ef6"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a4fb7888b5e5f4bb64378a789d00e5139"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_optimizer.html#a4fb7888b5e5f4bb64378a789d00e5139">regularize</a> (<a class="el" href="classcattle_1_1_layer.html">Layer</a>&lt; Scalar, Rank &gt; &amp;layer)</td></tr>
 <tr class="separator:a4fb7888b5e5f4bb64378a789d00e5139"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -171,7 +171,7 @@ template&lt;typename Scalar , std::size_t Rank, bool Sequential&gt; </div>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">typedef Tensor&lt;Scalar,Rank + Sequential + 1&gt; <a class="el" href="classcattle_1_1_optimizer.html">cattle::Optimizer</a>&lt; Scalar, Rank, Sequential &gt;::<a class="el" href="classcattle_1_1_optimizer.html#a0d75182c650ec8e7cf615aad5fef649e">Data</a></td>
+          <td class="memname">typedef <a class="el" href="namespacecattle.html#a8b9323ad928764340e46f0802bf27fbb">Tensor</a>&lt;Scalar,Rank + Sequential + 1&gt; <a class="el" href="classcattle_1_1_optimizer.html">cattle::Optimizer</a>&lt; Scalar, Rank, Sequential &gt;::<a class="el" href="classcattle_1_1_optimizer.html#a0d75182c650ec8e7cf615aad5fef649e">Data</a></td>
         </tr>
       </table>
   </td>
@@ -324,7 +324,7 @@ template&lt;typename Scalar , std::size_t Rank, bool Sequential&gt; </div>
 </table>
 </div><div class="memdoc">
 <p>A method to expose protected methods of the <a class="el" href="classcattle_1_1_neural_network.html">NeuralNetwork</a> class to subclasses of <a class="el" href="classcattle_1_1_optimizer.html">Optimizer</a> that are not friend classes of <a class="el" href="classcattle_1_1_neural_network.html">NeuralNetwork</a>.</p>
-<dl class="section see"><dt>See also</dt><dd><a class="el" href="classcattle_1_1_neural_network.html#ae4fd8a1e33b0d9cbb975a6ee5c41fa6c">NeuralNetwork::backpropagate</a>(Tensor&lt;Scalar,Rank + Sequential + 1&gt;)</dd></dl>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="classcattle_1_1_neural_network.html#ae4fd8a1e33b0d9cbb975a6ee5c41fa6c">NeuralNetwork::backpropagate</a>(<a class="el" href="namespacecattle.html#a8b9323ad928764340e46f0802bf27fbb">Tensor</a>&lt;Scalar,Rank + Sequential + 1&gt;)</dd></dl>
 <p>It back-propagates the gradients through the specified network.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
@@ -460,7 +460,7 @@ template&lt;typename Scalar , std::size_t Rank, bool Sequential&gt; </div>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">static Matrix&lt;Scalar&gt;&amp; <a class="el" href="classcattle_1_1_optimizer.html">cattle::Optimizer</a>&lt; Scalar, Rank, Sequential &gt;::get_params </td>
+          <td class="memname">static <a class="el" href="namespacecattle.html#a1d78623a47279d516750a44dbad6090b">Matrix</a>&lt;Scalar&gt;&amp; <a class="el" href="classcattle_1_1_optimizer.html">cattle::Optimizer</a>&lt; Scalar, Rank, Sequential &gt;::get_params </td>
           <td>(</td>
           <td class="paramtype"><a class="el" href="classcattle_1_1_layer.html">Layer</a>&lt; Scalar, Rank &gt; &amp;&#160;</td>
           <td class="paramname"><em>layer</em></td><td>)</td>
@@ -498,7 +498,7 @@ template&lt;typename Scalar , std::size_t Rank, bool Sequential&gt; </div>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">static const Matrix&lt;Scalar&gt;&amp; <a class="el" href="classcattle_1_1_optimizer.html">cattle::Optimizer</a>&lt; Scalar, Rank, Sequential &gt;::get_params_grad </td>
+          <td class="memname">static const <a class="el" href="namespacecattle.html#a1d78623a47279d516750a44dbad6090b">Matrix</a>&lt;Scalar&gt;&amp; <a class="el" href="classcattle_1_1_optimizer.html">cattle::Optimizer</a>&lt; Scalar, Rank, Sequential &gt;::get_params_grad </td>
           <td>(</td>
           <td class="paramtype"><a class="el" href="classcattle_1_1_layer.html">Layer</a>&lt; Scalar, Rank &gt; &amp;&#160;</td>
           <td class="paramname"><em>layer</em></td><td>)</td>
@@ -704,7 +704,7 @@ template&lt;typename Scalar , std::size_t Rank, bool Sequential&gt; </div>
 </table>
 </div><div class="memdoc">
 <p>A method to expose protected methods of the <a class="el" href="classcattle_1_1_neural_network.html">NeuralNetwork</a> class to subclasses of <a class="el" href="classcattle_1_1_optimizer.html">Optimizer</a> that are not friend classes of <a class="el" href="classcattle_1_1_neural_network.html">NeuralNetwork</a>.</p>
-<dl class="section see"><dt>See also</dt><dd><a class="el" href="classcattle_1_1_neural_network.html#a6ade9cd95110766ff25e7b157c9fddcf">NeuralNetwork::propagate</a>(Tensor&lt;Scalar,Rank + Sequential + 1&gt;,bool)</dd></dl>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="classcattle_1_1_neural_network.html#a6ade9cd95110766ff25e7b157c9fddcf">NeuralNetwork::propagate</a>(<a class="el" href="namespacecattle.html#a8b9323ad928764340e46f0802bf27fbb">Tensor</a>&lt;Scalar,Rank + Sequential + 1&gt;,bool)</dd></dl>
 <p>It propagates the input tensor through the specified network in training mode.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
@@ -893,19 +893,19 @@ template&lt;typename Scalar , std::size_t Rank, bool Sequential&gt; </div>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">Scalar&#160;</td>
-          <td class="paramname"><em>step_size</em> = <code>(internal::NumericUtils&lt;Scalar&gt;::EPSILON2&#160;+			internal::NumericUtils&lt;Scalar&gt;::EPSILON3)&#160;/&#160;2</code>, </td>
+          <td class="paramname"><em>step_size</em> = <code>(<a class="el" href="classcattle_1_1internal_1_1_numeric_utils.html">internal::NumericUtils</a>&lt;Scalar&gt;::EPSILON2&#160;+			<a class="el" href="classcattle_1_1internal_1_1_numeric_utils.html">internal::NumericUtils</a>&lt;Scalar&gt;::EPSILON3)&#160;/&#160;2</code>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">Scalar&#160;</td>
-          <td class="paramname"><em>abs_epsilon</em> = <code>internal::NumericUtils&lt;Scalar&gt;::EPSILON2</code>, </td>
+          <td class="paramname"><em>abs_epsilon</em> = <code><a class="el" href="classcattle_1_1internal_1_1_numeric_utils.html">internal::NumericUtils</a>&lt;Scalar&gt;::EPSILON2</code>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">Scalar&#160;</td>
-          <td class="paramname"><em>rel_epsilon</em> = <code>internal::NumericUtils&lt;Scalar&gt;::EPSILON3</code>&#160;</td>
+          <td class="paramname"><em>rel_epsilon</em> = <code><a class="el" href="classcattle_1_1internal_1_1_numeric_utils.html">internal::NumericUtils</a>&lt;Scalar&gt;::EPSILON3</code>&#160;</td>
         </tr>
         <tr>
           <td></td>

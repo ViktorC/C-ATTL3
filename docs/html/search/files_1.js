@@ -1,5 +1,5 @@
 var searchData=
 [
-  ['layer_2eh',['Layer.h',['../_layer_8h.html',1,'']]],
-  ['loss_2eh',['Loss.h',['../_loss_8h.html',1,'']]]
+  ['dataprovider_2eh',['DataProvider.h',['../_data_provider_8h.html',1,'']]],
+  ['dimensions_2eh',['Dimensions.h',['../_dimensions_8h.html',1,'']]]
 ];
