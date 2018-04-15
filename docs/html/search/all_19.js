@@ -3,7 +3,6 @@ var searchData=
   ['_7eactivationlayer',['~ActivationLayer',['../classcattle_1_1_activation_layer.html#a666f21aedc7c4483855c0f4078c733a6',1,'cattle::ActivationLayer']]],
   ['_7eadagradoptimizer',['~AdagradOptimizer',['../classcattle_1_1_adagrad_optimizer.html#a3933ae16b7ad97014729625adb82ffb0',1,'cattle::AdagradOptimizer']]],
   ['_7eadamoptimizer',['~AdamOptimizer',['../classcattle_1_1_adam_optimizer.html#a73fa5b266f51c40c94d7b4659c58e838',1,'cattle::AdamOptimizer']]],
-  ['_7ebatchnormlayerbase',['~BatchNormLayerBase',['../classcattle_1_1_batch_norm_layer_base.html#a1c455e14bfa213f0624920d1f39d59e8',1,'cattle::BatchNormLayerBase']]],
   ['_7ebidirectionalneuralnetwork',['~BidirectionalNeuralNetwork',['../classcattle_1_1_bidirectional_neural_network.html#a20e46d0f47f8bf392ab4a4d2b3893a02',1,'cattle::BidirectionalNeuralNetwork']]],
   ['_7ecompositeneuralnetwork',['~CompositeNeuralNetwork',['../classcattle_1_1_composite_neural_network.html#a05ee4d93de3358031f297c24029a0731',1,'cattle::CompositeNeuralNetwork']]],
   ['_7edataprovider',['~DataProvider',['../classcattle_1_1_data_provider.html#a395f1f268fe598fe253e68b259cdc064',1,'cattle::DataProvider']]],

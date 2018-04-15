@@ -23,8 +23,8 @@
 #include <utility>
 #include <vector>
 #include "Dimensions.h"
+#include "Eigen.h"
 #include "Layer.h"
-#include "utils/Eigen.h"
 
 // TODO GRU network.
 // TODO Possibility to add and remove modules (e.g. layers for simple feed-forward networks, residual modules for ResNets).

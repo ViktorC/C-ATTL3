@@ -12,7 +12,7 @@
 #include <random>
 #include <string>
 #include <type_traits>
-#include "utils/Eigen.h"
+#include "Eigen.h"
 
 namespace cattle {
 

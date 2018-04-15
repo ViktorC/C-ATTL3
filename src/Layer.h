@@ -17,15 +17,19 @@
 #include <type_traits>
 #include <utility>
 #include "Dimensions.h"
+#include "Eigen.h"
+#include "NumericUtils.h"
 #include "ParameterRegularization.h"
 #include "WeightInitialization.h"
-#include "utils/NumericUtils.h"
-#include "utils/Eigen.h"
+
+#ifdef CATTLE_USE_CUBLAS
+#include "CuBLASUtils.h"
+#endif
 
 namespace cattle {
 
-// TODO CPU convolution performance improvement.
-// TODO Optional GPU acceleration using cuBLAS and cuDNN.
+// TODO FFT and/or Winograd filtering for convolution.
+// TODO More comprehensive GPU acceleration.
 
 /**
  * An alias for a shared pointer to a WeightInitialization implementation instance of
@@ -319,21 +323,36 @@ protected:
 		biased_in = Matrix<Scalar>(in.dimension(0), input_size + 1);
 		biased_in.leftCols(input_size) = MatrixMap<Scalar>(in.data(), in.dimension(0), input_size);
 		biased_in.col(input_size).setOnes();
+#ifndef CATTLE_USE_CUBLAS
 		Matrix<Scalar> out = biased_in * Base::weights_ref;
+#else
+		Matrix<Scalar> out = internal::CuBLASUtils<Scalar>::mul(biased_in, Base::weights_ref, false, false);
+#endif
 		out_conversion_dims[0] = out.rows();
 		return TensorMap<Scalar,Root::DATA_RANK>(out.data(), out_conversion_dims);
 	}
 	inline typename Root::Data pass_back(typename Root::Data out_grads) {
 		assert((Dimensions<std::size_t,Root::DATA_RANK>(out_grads.dimensions()).template demote<>()) == Base::output_dims);
 		assert(out_grads.dimension(0) > 0 && biased_in.rows() == out_grads.dimension(0));
-		MatrixMap<Scalar> out_grads_mat(out_grads.data(), out_grads.dimension(0), Base::output_dims.get_volume());
 		// Compute the gradient of the outputs with respect to the weights.
+#ifndef CATTLE_USE_CUBLAS
+		MatrixMap<Scalar> out_grads_mat(out_grads.data(), out_grads.dimension(0), Base::output_dims.get_volume());
 		Base::weights_grad = biased_in.transpose() * out_grads_mat;
 		if (Base::is_input_layer())
 			return typename Root::Data();
 		/* Remove the bias row from the weight matrix, transpose it, and compute the derivative w.r.t. the
 		 * previous layer's output. */
 		Matrix<Scalar> prev_out_grads = out_grads_mat * Base::weights_ref.topRows(Base::input_dims.get_volume()).transpose();
+#else
+		Matrix<Scalar> out_grads_mat = MatrixMap<Scalar>(out_grads.data(), out_grads.dimension(0),
+				Base::output_dims.get_volume());
+		Base::weights_grad = internal::CuBLASUtils<Scalar>::mul(biased_in, out_grads_mat, true, false);
+		if (Base::is_input_layer())
+			return typename Root::Data();
+		Matrix<Scalar> weights_without_bias = Base::weights_ref.topRows(Base::input_dims.get_volume());
+		Matrix<Scalar> prev_out_grads = internal::CuBLASUtils<Scalar>::mul(out_grads_mat,
+				weights_without_bias, false, true);
+#endif
 		prev_out_conversion_dims[0] = prev_out_grads.rows();
 		return TensorMap<Scalar,Root::DATA_RANK>(prev_out_grads.data(), prev_out_conversion_dims);
 	}
@@ -371,20 +390,21 @@ public:
 	 * receptor is to be shifted along the height of the input tensor.
 	 * @param horizontal_stride The horizonzal convolution stride i.e. the number of elements by which the
 	 * receptor is to be shifted along the width of the input tensor.
-	 * @param dilation The size of the spatial (height- and width-wise) padding between voxels
-	 * of the receptor.
+	 * @param vertical_dilation The extent of the vertical padding between voxels of the receptor.
+	 * @param horizontal_dilation The extent of the horizontal padding between voxels of the receptor.
 	 * @param max_norm_constraint An optional max-norm constraint. If it is 0 or less, no
 	 * constraint is applied.
 	 */
 	inline ConvLayer(const Dimensions<std::size_t,3>& input_dims, std::size_t filters, WeightInitSharedPtr<Scalar> weight_init,
 			ParamRegSharedPtr<Scalar> weight_reg = Root::NO_PARAM_REG, std::size_t receptor_height = 3, std::size_t receptor_width = 3,
 			std::size_t vertical_padding = 1, std::size_t horizontal_padding = 1, std::size_t vertical_stride = 1,
-			std::size_t horizontal_stride = 1, std::size_t dilation = 0, Scalar max_norm_constraint = 0) :
+			std::size_t horizontal_stride = 1, std::size_t vertical_dilation = 0, std::size_t horizontal_dilation = 0,
+			Scalar max_norm_constraint = 0) :
 				/* For every filter, there is a column in the weight matrix with the same number of
 				 * elements as the area of the receptive field (F_H * F_W * D) + 1 for the bias row. */
 				Base::KernelLayer(input_dims, Dimensions<std::size_t,3>({
-						calculate_output_dim(input_dims(0), receptor_height, vertical_padding, dilation, vertical_stride),
-						calculate_output_dim(input_dims(1), receptor_width, horizontal_padding, dilation, horizontal_stride),
+						calculate_output_dim(input_dims(0), receptor_height, vertical_padding, vertical_dilation, vertical_stride),
+						calculate_output_dim(input_dims(1), receptor_width, horizontal_padding, horizontal_dilation, horizontal_stride),
 						filters }), weight_init, weight_reg, receptor_height * receptor_width * input_dims(2) + 1,
 						filters, max_norm_constraint),
 				filters(filters),
@@ -394,15 +414,16 @@ public:
 				horizontal_padding(horizontal_padding),
 				vertical_stride(vertical_stride),
 				horizontal_stride(horizontal_stride),
-				dilation(dilation),
+				vertical_dilation(vertical_dilation),
+				horizontal_dilation(horizontal_dilation),
 				padded_height(input_dims(0) + 2 * vertical_padding),
 				padded_width(input_dims(1) + 2 * horizontal_padding),
-				dil_receptor_height(receptor_height + (receptor_height - 1) * dilation),
-				dil_receptor_width(receptor_width + (receptor_width - 1) * dilation),
+				dil_receptor_height(receptor_height + (receptor_height - 1) * vertical_dilation),
+				dil_receptor_width(receptor_width + (receptor_width - 1) * horizontal_dilation),
 				out_conversion_dims({ 0u, Base::output_dims(0), Base::output_dims(1), Base::output_dims(2) }),
 				patch_offsets({ 0u, 0u, 0u, 0u }),
 				patch_extents({ 0u, dil_receptor_height, dil_receptor_width, input_dims(2) }),
-				dil_strides({ 1u, dilation + 1u, dilation + 1u, 1u }),
+				dil_strides({ 1u, vertical_dilation + 1u, horizontal_dilation + 1u, 1u }),
 				no_padding_offsets({ 0u, vertical_padding, horizontal_padding, 0u }),
 				no_padding_extents({ 0u, input_dims(0), input_dims(1), input_dims(2) }),
 				paddings({ std::make_pair(0, 0), std::make_pair(vertical_padding, vertical_padding),
@@ -427,7 +448,8 @@ protected:
 			horizontal_padding(layer.horizontal_padding),
 			vertical_stride(layer.vertical_stride),
 			horizontal_stride(layer.horizontal_stride),
-			dilation(layer.dilation),
+			vertical_dilation(layer.vertical_dilation),
+			horizontal_dilation(layer.horizontal_dilation),
 			padded_height(layer.padded_height),
 			padded_width(layer.padded_width),
 			dil_receptor_height(layer.dil_receptor_height),
@@ -466,7 +488,7 @@ protected:
 				patch_offsets[1] = j;
 				typename Root::Data patch;
 				// If the patch is dilated, skip the 'internal padding' when flattening it into a matrix.
-				if (dilation > 0)
+				if (vertical_dilation > 0 || horizontal_dilation > 0)
 					patch = in.slice(patch_offsets, patch_extents).stride(dil_strides);
 				else
 					patch = in.slice(patch_offsets, patch_extents);
@@ -477,7 +499,11 @@ protected:
 		assert(patch_ind == total_patches);
 		// Bias trick.
 		biased_in.col(receptor_vol).setOnes();
+#ifndef CATTLE_USE_CUBLAS
 		Matrix<Scalar> out = biased_in * Base::weights_ref;
+#else
+		Matrix<Scalar> out = internal::CuBLASUtils<Scalar>::mul(biased_in, Base::weights_ref, false, false);
+#endif
 		out_conversion_dims[0] = rows;
 		return TensorMap<Scalar,4>(out.data(), out_conversion_dims);
 	}
@@ -488,14 +514,24 @@ protected:
 		std::size_t rows = out_grads.dimension(0);
 		std::size_t patches = Base::output_dims(0) * Base::output_dims(1);
 		std::size_t receptor_vol = Base::weights_ref.rows() - 1;
-		MatrixMap<Scalar> out_grads_mat_map = MatrixMap<Scalar>(out_grads.data(),
-				rows * Base::output_dims(0) * Base::output_dims(1), filters);
-		Base::weights_grad = biased_in.transpose() * out_grads_mat_map;
+#ifndef CATTLE_USE_CUBLAS
+		MatrixMap<Scalar> out_grads_mat(out_grads.data(), rows * Base::output_dims(0) * Base::output_dims(1), filters);
+		Base::weights_grad = biased_in.transpose() * out_grads_mat;
 		if (Base::is_input_layer())
 			return typename Root::Data();
 		/* Remove the bias row from the weight matrix, transpose it, and compute the gradient of the
 		 * previous layer's output. */
-		Matrix<Scalar> prev_out_grads_mat = out_grads_mat_map * Base::weights_ref.topRows(receptor_vol).transpose();
+		Matrix<Scalar> prev_out_grads_mat = out_grads_mat * Base::weights_ref.topRows(receptor_vol).transpose();
+#else
+		Matrix<Scalar> out_grads_mat = MatrixMap<Scalar>(out_grads.data(),
+				rows * Base::output_dims(0) * Base::output_dims(1), filters);
+		Base::weights_grad = internal::CuBLASUtils<Scalar>::mul(biased_in, out_grads_mat, true, false);
+		if (Base::is_input_layer())
+			return typename Root::Data();
+		Matrix<Scalar> weights_without_bias = Base::weights_ref.topRows(receptor_vol);
+		Matrix<Scalar> prev_out_grads_mat = internal::CuBLASUtils<Scalar>::mul(out_grads_mat,
+				weights_without_bias, false, true);
+#endif
 		/* Given the gradient of the stretched out receptor patches, perform a 'backwards' convolution
 		 * to get the derivative w.r.t. the individual input nodes. */
 		typename Root::Data prev_out_grads(rows, padded_height, padded_width, Base::input_dims(2));
@@ -509,7 +545,7 @@ protected:
 				// Accumulate the gradients where the receptor-patch-tensors overlap.
 				Matrix<Scalar> prev_out_grads_block = prev_out_grads_mat.block(patch_ind, 0, rows, receptor_vol);
 				TensorMap<Scalar,4> prev_out_grads_block_map(prev_out_grads_block.data(), patch_extents);
-				if (dilation > 0)
+				if (vertical_dilation > 0 || horizontal_dilation > 0)
 					prev_out_grads.slice(patch_offsets, patch_extents).stride(dil_strides) += prev_out_grads_block_map;
 				else
 					prev_out_grads.slice(patch_offsets, patch_extents) += prev_out_grads_block_map;
@@ -547,7 +583,8 @@ private:
 	const std::size_t horizontal_padding;
 	const std::size_t vertical_stride;
 	const std::size_t horizontal_stride;
-	const std::size_t dilation;
+	const std::size_t vertical_dilation;
+	const std::size_t horizontal_dilation;
 	// Pre-computed values to improve propagation-time performance.
 	const std::size_t padded_height;
 	const std::size_t padded_width;
@@ -1192,17 +1229,20 @@ protected:
 	typedef std::array<std::size_t,2> ReductionRanksArray;
 	typedef Tensor<Scalar,2> ReducedData;
 	inline PoolingLayer(const Dimensions<std::size_t,3>& input_dims, std::size_t receptor_height, std::size_t receptor_width,
-			std::size_t vertical_stride, std::size_t horizontal_stride, std::size_t dilation) :
+			std::size_t vertical_stride, std::size_t horizontal_stride, std::size_t vertical_dilation,
+			std::size_t horizontal_dilation) :
 				input_dims(input_dims),
-				output_dims({ calculate_output_dim(input_dims(0), receptor_height, dilation, vertical_stride),
-						calculate_output_dim(input_dims(1), receptor_width, dilation, horizontal_stride), input_dims(2) }),
+				output_dims({ calculate_output_dim(input_dims(0), receptor_height, vertical_dilation, vertical_stride),
+						calculate_output_dim(input_dims(1), receptor_width, horizontal_dilation, horizontal_stride),
+						input_dims(2) }),
 				receptor_height(receptor_height),
 				receptor_width(receptor_width),
 				vertical_stride(vertical_stride),
 				horizontal_stride(horizontal_stride),
-				dilation(dilation),
-				dil_receptor_height(receptor_height + (receptor_height - 1) * dilation),
-				dil_receptor_width(receptor_width + (receptor_width - 1) * dilation),
+				vertical_dilation(vertical_dilation),
+				horizontal_dilation(horizontal_dilation),
+				dil_receptor_height(receptor_height + (receptor_height - 1) * vertical_dilation),
+				dil_receptor_width(receptor_width + (receptor_width - 1) * horizontal_dilation),
 				height_rem(input_dims(0) - dil_receptor_height),
 				width_rem(input_dims(1) - dil_receptor_width),
 				input_layer(false),
@@ -1212,7 +1252,7 @@ protected:
 				patch_extents({ 0u, dil_receptor_height, dil_receptor_width, input_dims(2) }),
 				reduced_patch_offsets({ 0u, 0u, 0u, 0u }),
 				reduced_patch_extents({ 0u, 1u, 1u, input_dims(2) }),
-				dil_strides({ 1u, dilation + 1u, dilation + 1u, 1u }),
+				dil_strides({ 1u, vertical_dilation + 1u, horizontal_dilation + 1u, 1u }),
 				params(0, 0),
 				params_grad(0, 0) {
 		assert(input_dims(0) >= dil_receptor_height && input_dims(1) >= dil_receptor_width);
@@ -1277,7 +1317,7 @@ protected:
 				reduced_patch_offsets[1] = out_j;
 				typename Base::Data patch;
 				// Dilated receptor support.
-				if (dilation > 0)
+				if (vertical_dilation > 0 || horizontal_dilation > 0)
 					patch = in.slice(patch_offsets, patch_extents).stride(dil_strides);
 				else
 					patch = in.slice(patch_offsets, patch_extents);
@@ -1304,7 +1344,7 @@ protected:
 				reduced_patch_offsets[1] = out_grads_j;
 				typename Base::Data reduced_patch_grads = out_grads.slice(reduced_patch_offsets, reduced_patch_extents);
 				// Accumulate the gradients where the patches overlap.
-				if (dilation > 0)
+				if (vertical_dilation > 0 || horizontal_dilation > 0)
 					prev_out_grads.slice(patch_offsets, patch_extents).stride(dil_strides) +=
 							d_reduce(reduced_patch_grads, patch_ind++);
 				else
@@ -1333,7 +1373,8 @@ protected:
 	const std::size_t receptor_width;
 	const std::size_t vertical_stride;
 	const std::size_t horizontal_stride;
-	const std::size_t dilation;
+	const std::size_t vertical_dilation;
+	const std::size_t horizontal_dilation;
 	const std::size_t dil_receptor_height;
 	const std::size_t dil_receptor_width;
 	const std::size_t height_rem;
@@ -1370,13 +1411,14 @@ public:
 	 * elements by which the receptor is to be shifted along the height of the input tensor).
 	 * @param horizontal_stride The horizontal stride at which the input is to be pooled (i.e. the number
 	 * of elements by which the receptor is to be shifted along the width of the input tensor).
-	 * @param dilation The extent of the dilation to apply to the receptor field.
+	 * @param vertical_dilation The extent of the vertical dilation to apply to the receptor field.
+	 * @param horizontal_dilation The extent of the horizontal dilation to apply to the receptor field.
 	 */
 	inline SumPoolingLayer(const Dimensions<std::size_t,3>& input_dims, std::size_t receptor_height = 2,
 			std::size_t receptor_width = 2, std::size_t vertical_stride = 2, std::size_t horizontal_stride = 2,
-			std::size_t dilation = 0) :
+			std::size_t vertical_dilation = 0, std::size_t horizontal_dilation = 0) :
 				Base::PoolingLayer(input_dims, receptor_height, receptor_width, vertical_stride,
-						horizontal_stride, dilation) { }
+						horizontal_stride, vertical_dilation, horizontal_dilation) { }
 	inline Root* clone() const {
 		return new SumPoolingLayer(*this);
 	}
@@ -1412,13 +1454,14 @@ public:
 	 * elements by which the receptor is to be shifted along the height of the input tensor).
 	 * @param horizontal_stride The horizontal stride at which the input is to be pooled (i.e. the number
 	 * of elements by which the receptor is to be shifted along the width of the input tensor).
-	 * @param dilation The extent of the dilation to apply to the receptor field.
+	 * @param vertical_dilation The extent of the vertical dilation to apply to the receptor field.
+	 * @param horizontal_dilation The extent of the horizontal dilation to apply to the receptor field.
 	 */
 	inline MeanPoolingLayer(const Dimensions<std::size_t,3>& input_dims, std::size_t receptor_height = 2,
 			std::size_t receptor_width = 2, std::size_t vertical_stride = 2, std::size_t horizontal_stride = 2,
-			std::size_t dilation = 0) :
+			std::size_t vertical_dilation = 0, std::size_t horizontal_dilation = 0) :
 				Base::PoolingLayer(input_dims, receptor_height, receptor_width, vertical_stride,
-						horizontal_stride, dilation),
+						horizontal_stride, vertical_dilation, horizontal_dilation),
 				receptor_area(receptor_height * receptor_width) { }
 	inline Root* clone() const {
 		return new MeanPoolingLayer(*this);
@@ -1457,13 +1500,14 @@ public:
 	 * elements by which the receptor is to be shifted along the height of the input tensor).
 	 * @param horizontal_stride The horizontal stride at which the input is to be pooled (i.e. the number
 	 * of elements by which the receptor is to be shifted along the width of the input tensor).
-	 * @param dilation The extent of the dilation to apply to the receptor field.
+	 * @param vertical_dilation The extent of the vertical dilation to apply to the receptor field.
+	 * @param horizontal_dilation The extent of the horizontal dilation to apply to the receptor field.
 	 */
 	inline MaxPoolingLayer(const Dimensions<std::size_t,3>& input_dims, std::size_t receptor_height = 2,
 			std::size_t receptor_width = 2, std::size_t vertical_stride = 2, std::size_t horizontal_stride = 2,
-			std::size_t dilation = 0) :
+			std::size_t vertical_dilation = 0, std::size_t horizontal_dilation = 0) :
 				Base::PoolingLayer(input_dims, receptor_height, receptor_width, vertical_stride,
-						horizontal_stride, dilation) { }
+						horizontal_stride, vertical_dilation, horizontal_dilation) { }
 	inline Root* clone() const {
 		return new MaxPoolingLayer(*this);
 	}

@@ -83,7 +83,8 @@ $(function() {
 <code>#include &lt;type_traits&gt;</code><br />
 <code>#include &lt;utility&gt;</code><br />
 <code>#include &quot;<a class="el" href="_dimensions_8h_source.html">Dimensions.h</a>&quot;</code><br />
-<code>#include &quot;<a class="el" href="_utils_8h_source.html">Utils.h</a>&quot;</code><br />
+<code>#include &quot;Eigen.h&quot;</code><br />
+<code>#include &quot;NumericUtils.h&quot;</code><br />
 <code>#include &quot;<a class="el" href="_parameter_regularization_8h_source.html">ParameterRegularization.h</a>&quot;</code><br />
 <code>#include &quot;<a class="el" href="_weight_initialization_8h_source.html">WeightInitialization.h</a>&quot;</code><br />
 </div>
@@ -135,10 +136,6 @@ Classes</h2></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_max_pooling_layer.html">cattle::MaxPoolingLayer&lt; Scalar &gt;</a></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_batch_norm_layer_base.html">cattle::BatchNormLayerBase&lt; Scalar, Rank &gt;</a></td></tr>
-<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structcattle_1_1_batch_norm_layer_base_1_1_cache.html">cattle::BatchNormLayerBase&lt; Scalar, Rank &gt;::Cache</a></td></tr>
-<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_batch_norm_layer.html">cattle::BatchNormLayer&lt; Scalar, Rank &gt;</a></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_batch_norm_layer_3_01_scalar_00_013_01_4.html">cattle::BatchNormLayer&lt; Scalar, 3 &gt;</a></td></tr>
@@ -160,6 +157,431 @@ Typedefs</h2></td></tr>
 <tr class="memitem:a083ab63c64a5c935b2d2cd3f03c4e27a"><td class="memTemplItemLeft" align="right" valign="top">using&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespacecattle.html#a083ab63c64a5c935b2d2cd3f03c4e27a">cattle::ParamRegSharedPtr</a> = std::shared_ptr&lt; ParamaterRegularization&lt; Scalar &gt; &gt;</td></tr>
 <tr class="separator:a083ab63c64a5c935b2d2cd3f03c4e27a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
+<h2 class="groupheader">Variable Documentation</h2>
+<a id="a01e3c5af712edb3412e8fb62d5f1881c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a01e3c5af712edb3412e8fb62d5f1881c">&#9670;&nbsp;</a></span>avg_inv_sds</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">Matrix&lt;Scalar&gt; avg_inv_sds</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">private</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="ad72b66cba67384948509510f710676d0"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad72b66cba67384948509510f710676d0">&#9670;&nbsp;</a></span>avg_means</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">Matrix&lt;Scalar&gt; avg_means</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">private</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="abd4cf207be7c859460b1a61d48cda664"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#abd4cf207be7c859460b1a61d48cda664">&#9670;&nbsp;</a></span>avgs_init</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool avgs_init</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">private</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="ae20426fc9459fed989fb5037d97a0150"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae20426fc9459fed989fb5037d97a0150">&#9670;&nbsp;</a></span>beta_max_norm</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">const bool beta_max_norm</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">protected</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a4ef726cbd240ef8bbc00e0b22fcc4284"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a4ef726cbd240ef8bbc00e0b22fcc4284">&#9670;&nbsp;</a></span>beta_max_norm_constraint</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">const Scalar beta_max_norm_constraint</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">protected</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="afac8d12752b67c2408d6b5850922fb93"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#afac8d12752b67c2408d6b5850922fb93">&#9670;&nbsp;</a></span>beta_reg</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">const ParamRegSharedPtr&lt;Scalar&gt; beta_reg</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">protected</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="adec453c68613e94f187b99b08e19e778"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#adec453c68613e94f187b99b08e19e778">&#9670;&nbsp;</a></span>cache_vec</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::vector&lt;Cache&gt; cache_vec</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">private</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a6028c36c6df1d06fdb5e0209dcd94650"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a6028c36c6df1d06fdb5e0209dcd94650">&#9670;&nbsp;</a></span>depth</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">const std::size_t depth</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">protected</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="abee7a0229815bdce582966fdc0faaaba"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#abee7a0229815bdce582966fdc0faaaba">&#9670;&nbsp;</a></span>dims</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">const Dimensions&lt;std::size_t,Rank&gt; dims</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">protected</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a22c3b4076ffae75ab73aac0928a4f2a2"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a22c3b4076ffae75ab73aac0928a4f2a2">&#9670;&nbsp;</a></span>epsilon</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">const Scalar epsilon</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">protected</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="ab0ad1b06ef7f57eb3ddf137cfd594d7b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab0ad1b06ef7f57eb3ddf137cfd594d7b">&#9670;&nbsp;</a></span>gamma_max_norm</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">const bool gamma_max_norm</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">protected</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a9025f68b2f8614ce375f02879ed29c40"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a9025f68b2f8614ce375f02879ed29c40">&#9670;&nbsp;</a></span>gamma_max_norm_constraint</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">const Scalar gamma_max_norm_constraint</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">protected</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a87fb699114eacd85a8d2826b3a7ab0a8"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a87fb699114eacd85a8d2826b3a7ab0a8">&#9670;&nbsp;</a></span>gamma_reg</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">const ParamRegSharedPtr&lt;Scalar&gt; gamma_reg</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">protected</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="aa213d0bc5e12ffa3f7bcf6803bbef05b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa213d0bc5e12ffa3f7bcf6803bbef05b">&#9670;&nbsp;</a></span>input_layer</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool input_layer</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">private</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a94565be230074bc511dc7fbef6d88410"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a94565be230074bc511dc7fbef6d88410">&#9670;&nbsp;</a></span>inv_in_sd</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">RowVector&lt;Scalar&gt; inv_in_sd</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="ad7749990311beb2a3459837bf26cf342"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad7749990311beb2a3459837bf26cf342">&#9670;&nbsp;</a></span>norm_avg_decay</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">const Scalar norm_avg_decay</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">protected</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="ab9ed9dc5121cd268cccb5fd2bc85cd0b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab9ed9dc5121cd268cccb5fd2bc85cd0b">&#9670;&nbsp;</a></span>params</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">Matrix&lt;Scalar&gt; params</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">mutable</span><span class="mlabel">private</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a85e5f7f4b1d1e8a8f9f928b7bf9ddf8e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a85e5f7f4b1d1e8a8f9f928b7bf9ddf8e">&#9670;&nbsp;</a></span>params_grad</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">Matrix&lt;Scalar&gt; params_grad</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">private</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="aad6db16dabb28d040a0dac0131a91999"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aad6db16dabb28d040a0dac0131a91999">&#9670;&nbsp;</a></span>params_ref</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">Matrix&lt;Scalar&gt;&amp; params_ref</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">protected</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="aaf24e91779eb8c6666134d23a9007183"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aaf24e91779eb8c6666134d23a9007183">&#9670;&nbsp;</a></span>std_in</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">Matrix&lt;Scalar&gt; std_in</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>

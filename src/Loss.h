@@ -16,8 +16,8 @@
 #include <string>
 #include <type_traits>
 #include <utility>
-#include "utils/Eigen.h"
-#include "utils/NumericUtils.h"
+#include "Eigen.h"
+#include "NumericUtils.h"
 
 namespace cattle {
 

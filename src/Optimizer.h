@@ -19,12 +19,12 @@
 #include <type_traits>
 #include <vector>
 #include "DataProvider.h"
+#include "Eigen.h"
 #include "Loss.h"
 #include "NeuralNetwork.h"
+#include "NumericUtils.h"
 #include "ParameterRegularization.h"
 #include "WeightInitialization.h"
-#include "utils/Eigen.h"
-#include "utils/NumericUtils.h"
 
 namespace cattle {
 

@@ -81,7 +81,8 @@ $(function() {
 <code>#include &lt;string&gt;</code><br />
 <code>#include &lt;type_traits&gt;</code><br />
 <code>#include &lt;vector&gt;</code><br />
-<code>#include &quot;<a class="el" href="_utils_8h_source.html">Utils.h</a>&quot;</code><br />
+<code>#include &quot;Eigen.h&quot;</code><br />
+<code>#include &quot;NumericUtils.h&quot;</code><br />
 </div>
 <p><a href="_preprocessor_8h_source.html">Go to the source code of this file.</a></p>
 <table class="memberdecls">
@@ -93,10 +94,6 @@ Classes</h2></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_normalization_preprocessor_3_01_scalar_00_013_00_01_standardize_01_4.html">cattle::NormalizationPreprocessor&lt; Scalar, 3, Standardize &gt;</a></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_p_c_a_preprocessor_base.html">cattle::PCAPreprocessorBase&lt; Scalar, Rank, Standardize, Whiten &gt;</a></td></tr>
-<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structcattle_1_1_p_c_a_preprocessor_base_1_1_eigen_decomposition.html">cattle::PCAPreprocessorBase&lt; Scalar, Rank, Standardize, Whiten &gt;::EigenDecomposition</a></td></tr>
-<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_p_c_a_preprocessor.html">cattle::PCAPreprocessor&lt; Scalar, Rank, Standardize, Whiten &gt;</a></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_p_c_a_preprocessor_3_01_scalar_00_013_00_01_standardize_00_01_whiten_01_4.html">cattle::PCAPreprocessor&lt; Scalar, 3, Standardize, Whiten &gt;</a></td></tr>
@@ -107,6 +104,101 @@ Namespaces</h2></td></tr>
 <tr class="memitem:namespacecattle"><td class="memItemLeft" align="right" valign="top"> &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacecattle.html">cattle</a></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
+<h2 class="groupheader">Variable Documentation</h2>
+<a id="aee46ea2932fe255f909d1b8da1dabf0f"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aee46ea2932fe255f909d1b8da1dabf0f">&#9670;&nbsp;</a></span>ed_vec</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::vector&lt;EigenDecomposition&gt; ed_vec</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">protected</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="afeb2fd9b37ae371d1fd7a540d4cf0371"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#afeb2fd9b37ae371d1fd7a540d4cf0371">&#9670;&nbsp;</a></span>eigen_basis</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">Matrix&lt;Scalar&gt; eigen_basis</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a860cec27dded3d977fd7723b5642a11c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a860cec27dded3d977fd7723b5642a11c">&#9670;&nbsp;</a></span>eigen_values</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">RowVector&lt;Scalar&gt; eigen_values</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="aeec5d6cc386e8a55267049fd19427d8f"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aeec5d6cc386e8a55267049fd19427d8f">&#9670;&nbsp;</a></span>min_rel_var_to_retain</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">Scalar min_rel_var_to_retain</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">protected</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="ad99d3cb851821f26e99e8790dded26bd"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad99d3cb851821f26e99e8790dded26bd">&#9670;&nbsp;</a></span>reduce_dims</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool reduce_dims</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">protected</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>

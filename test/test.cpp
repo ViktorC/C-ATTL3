@@ -14,6 +14,7 @@
 #include <vector>
 #include "DataProvider.h"
 #include "Dimensions.h"
+#include "Eigen.h"
 #include "Layer.h"
 #include "Loss.h"
 #include "NeuralNetwork.h"
@@ -21,7 +22,6 @@
 #include "ParameterRegularization.h"
 #include "Preprocessor.h"
 #include "WeightInitialization.h"
-#include "utils/Eigen.h"
 
 using namespace cattle;
 typedef double fp;
@@ -363,6 +363,11 @@ int main() {
 	layers[6] = LayerPtr<float,3>(new FCLayer<float,3>(layers[5]->get_output_dims(), 128, init));
 	layers[7] = LayerPtr<float,3>(new SigmoidActivationLayer<float,3>(layers[6]->get_output_dims()));
 	layers[8] = LayerPtr<float,3>(new FCLayer<float,3>(layers[7]->get_output_dims(), 10, init));
+//	layers[0] = LayerPtr<float,3>(new FCLayer<float,3>(train_prov.get_obs_dims(), 500, init));
+//	layers[1] = LayerPtr<float,3>(new SigmoidActivationLayer<float,3>(layers[0]->get_output_dims()));
+//	layers[2] = LayerPtr<float,3>(new FCLayer<float,3>(layers[1]->get_output_dims(), 250, init));
+//	layers[3] = LayerPtr<float,3>(new SigmoidActivationLayer<float,3>(layers[2]->get_output_dims()));
+//	layers[4] = LayerPtr<float,3>(new FCLayer<float,3>(layers[3]->get_output_dims(), 10, init));
 	FeedforwardNeuralNetwork<float,3> nn(std::move(layers));
 	nn.init();
 	auto loss = std::make_shared<SoftmaxCrossEntropyLoss<float,3,false>>();

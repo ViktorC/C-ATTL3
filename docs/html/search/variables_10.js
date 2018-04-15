@@ -6,7 +6,7 @@ var searchData=
   ['receptor_5farea',['receptor_area',['../classcattle_1_1_mean_pooling_layer.html#aadfaa105623214306175cf400f0a0e23',1,'cattle::MeanPoolingLayer']]],
   ['receptor_5fheight',['receptor_height',['../classcattle_1_1_conv_layer.html#ad2a2f84c8d767c0de3c79e2d97001eab',1,'cattle::ConvLayer::receptor_height()'],['../classcattle_1_1_pooling_layer.html#a1cd30c4e6ae0c2ec0b1feabcb65e52c4',1,'cattle::PoolingLayer::receptor_height()']]],
   ['receptor_5fwidth',['receptor_width',['../classcattle_1_1_conv_layer.html#ab1c8b43866e5c968050139c36645c643',1,'cattle::ConvLayer::receptor_width()'],['../classcattle_1_1_pooling_layer.html#a5116a4187c3c6f3352844c770f76d7d1',1,'cattle::PoolingLayer::receptor_width()']]],
-  ['reduce_5fdims',['reduce_dims',['../classcattle_1_1_p_c_a_preprocessor_base.html#ad35d9121af2da5f7a07c86d19b0e0ed6',1,'cattle::PCAPreprocessorBase']]],
+  ['reduce_5fdims',['reduce_dims',['../_preprocessor_8h.html#ad99d3cb851821f26e99e8790dded26bd',1,'Preprocessor.h']]],
   ['reduced_5fpatch_5fextents',['reduced_patch_extents',['../classcattle_1_1_pooling_layer.html#a4ef762095173a40edeb82cdffd848dd1',1,'cattle::PoolingLayer']]],
   ['reduced_5fpatch_5foffsets',['reduced_patch_offsets',['../classcattle_1_1_pooling_layer.html#a66c53ea70e0818d8e94a8a7508e65f94',1,'cattle::PoolingLayer']]],
   ['reduction_5franks',['reduction_ranks',['../classcattle_1_1_pooling_layer.html#ab31ade18d5386ac2cb56108305d83ede',1,'cattle::PoolingLayer']]],

@@ -14,10 +14,10 @@
 #include <memory>
 #include "DataProvider.h"
 #include "Dimensions.h"
+#include "Eigen.h"
 #include "NeuralNetwork.h"
+#include "NumericUtils.h"
 #include "Optimizer.h"
-#include "utils/Eigen.h"
-#include "utils/NumericUtils.h"
 
 using namespace cattle;
 

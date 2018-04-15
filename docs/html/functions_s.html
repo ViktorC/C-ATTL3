@@ -89,6 +89,7 @@ $(function() {
 , <a class="el" href="classcattle_1_1_dim_expression.html#a51aa030935c467cf158c24924b3ea0a8">cattle::DimExpression&lt; Derived, IndexType, Rank &gt;</a>
 , <a class="el" href="classcattle_1_1_feedforward_neural_network.html#a9481cf455aefd4150857f078a52ee364">cattle::FeedforwardNeuralNetwork&lt; Scalar, Rank &gt;</a>
 , <a class="el" href="classcattle_1_1_l_s_t_m_neural_network.html#abf8eada326c7e250f0fd165e8f6398e3">cattle::LSTMNeuralNetwork&lt; Scalar, Rank, MulInt, Stateful &gt;</a>
+, <a class="el" href="classcattle_1_1_no_parameter_regularization.html#ae7bb42c52ece7ee5ba04716d6119e96a">cattle::NoParameterRegularization&lt; Scalar &gt;</a>
 , <a class="el" href="classcattle_1_1_parallel_neural_network.html#af6f433b59f5062c4a7aacbd10cbc6613">cattle::ParallelNeuralNetwork&lt; Scalar, Rank, MergeType &gt;</a>
 , <a class="el" href="classcattle_1_1_recurrent_neural_network.html#ac76df4e05eb0db8c18e913116da3e6f4">cattle::RecurrentNeuralNetwork&lt; Scalar, Rank, MulInt, Stateful &gt;</a>
 , <a class="el" href="classcattle_1_1_sequential_neural_network.html#aea345aff29adb836aa0b7fd37e85d1ac">cattle::SequentialNeuralNetwork&lt; Scalar, Rank &gt;</a>
@@ -111,7 +112,6 @@ $(function() {
 </li>
 <li>set_input_layer()
 : <a class="el" href="classcattle_1_1_activation_layer.html#a34972577a520dc5e4d34d40c448f127b">cattle::ActivationLayer&lt; Scalar, Rank &gt;</a>
-, <a class="el" href="classcattle_1_1_batch_norm_layer_base.html#a183a44d3eab2fa0912f60b9dd16e7702">cattle::BatchNormLayerBase&lt; Scalar, Rank &gt;</a>
 , <a class="el" href="classcattle_1_1_dropout_layer.html#ae1d090be4a0c212daaf625f5acbd9f22">cattle::DropoutLayer&lt; Scalar, Rank &gt;</a>
 , <a class="el" href="classcattle_1_1_kernel_layer.html#a2cfd231e456e1f828dc3638b3a5eb0c7">cattle::KernelLayer&lt; Scalar, Rank &gt;</a>
 , <a class="el" href="classcattle_1_1_layer.html#a7aafba96b6e30bc67eaef0a9db3ad2e4">cattle::Layer&lt; Scalar, Rank &gt;</a>
@@ -135,10 +135,10 @@ $(function() {
 , <a class="el" href="classcattle_1_1_split_file_data_provider.html#a62fe5de96dc08e51338243ac3b92cb26">cattle::SplitFileDataProvider&lt; Scalar, Rank, Sequential, ObsBinary, ObjBinary &gt;</a>
 </li>
 <li>SoftmaxActivationLayer()
-: <a class="el" href="classcattle_1_1_softmax_activation_layer.html#a64af5333d51a646c74620674aa4bc1cd">cattle::SoftmaxActivationLayer&lt; Scalar, Rank &gt;</a>
+: <a class="el" href="classcattle_1_1_softmax_activation_layer.html#a2a8be6bee1fb6cf884f4f2d3f613257a">cattle::SoftmaxActivationLayer&lt; Scalar, Rank &gt;</a>
 </li>
 <li>SoftmaxCrossEntropyLoss()
-: <a class="el" href="classcattle_1_1_softmax_cross_entropy_loss.html#a3a90ec7a4730e8a46f833d296865d5f8">cattle::SoftmaxCrossEntropyLoss&lt; Scalar, Rank, Sequential &gt;</a>
+: <a class="el" href="classcattle_1_1_softmax_cross_entropy_loss.html#a47e0996c051870e799852a434f297de3">cattle::SoftmaxCrossEntropyLoss&lt; Scalar, Rank, Sequential &gt;</a>
 </li>
 <li>SoftplusActivationLayer()
 : <a class="el" href="classcattle_1_1_softplus_activation_layer.html#ac1533119d3423aa2130d01eb95b12431">cattle::SoftplusActivationLayer&lt; Scalar, Rank &gt;</a>
@@ -150,7 +150,7 @@ $(function() {
 : <a class="el" href="classcattle_1_1_sequential_neural_network.html#a96676bed8197570a0521bc05c02eabb0">cattle::SequentialNeuralNetwork&lt; Scalar, Rank &gt;</a>
 </li>
 <li>SplitFileDataProvider()
-: <a class="el" href="classcattle_1_1_split_file_data_provider.html#a559d2331bf207d22ee6d2955642c68bf">cattle::SplitFileDataProvider&lt; Scalar, Rank, Sequential, ObsBinary, ObjBinary &gt;</a>
+: <a class="el" href="classcattle_1_1_split_file_data_provider.html#a067f617f74afd1438c39719268e7ecd7">cattle::SplitFileDataProvider&lt; Scalar, Rank, Sequential, ObsBinary, ObjBinary &gt;</a>
 </li>
 <li>state
 : <a class="el" href="classcattle_1_1_l_s_t_m_neural_network.html#a619582351bf635f1e6df836beb1db6ef">cattle::LSTMNeuralNetwork&lt; Scalar, Rank, MulInt, Stateful &gt;</a>
@@ -166,18 +166,11 @@ $(function() {
 <li>state_kernel_cache
 : <a class="el" href="structcattle_1_1_recurrent_neural_network_1_1_cell.html#a0c951459a4188ddebad0deb76cf9ef54">cattle::RecurrentNeuralNetwork&lt; Scalar, Rank, MulInt, Stateful &gt;::Cell</a>
 </li>
-<li>std_in
-: <a class="el" href="structcattle_1_1_batch_norm_layer_base_1_1_cache.html#ade3fff30d846fd8935ecf8bc125a490b">cattle::BatchNormLayerBase&lt; Scalar, Rank &gt;::Cache</a>
-</li>
-<li>stride
-: <a class="el" href="classcattle_1_1_conv_layer.html#a4eaf03dc0437ae2d50b2f2d9b23490f1">cattle::ConvLayer&lt; Scalar &gt;</a>
-, <a class="el" href="classcattle_1_1_pooling_layer.html#a752ccf3dca5e4a20db1ed87acfd75bef">cattle::PoolingLayer&lt; Scalar &gt;</a>
-</li>
 <li>subtract_along_rank()
-: <a class="el" href="classcattle_1_1_dim_expression.html#a03ebe75e3fa561f3b2805ec5a733dce4">cattle::DimExpression&lt; Derived, IndexType, Rank &gt;</a>
+: <a class="el" href="classcattle_1_1_dim_expression.html#a9e880d441b13e13f52e25b359780ad82">cattle::DimExpression&lt; Derived, IndexType, Rank &gt;</a>
 </li>
 <li>SumPoolingLayer()
-: <a class="el" href="classcattle_1_1_sum_pooling_layer.html#a5eb3455df8254d2fb183f85e239fe78a">cattle::SumPoolingLayer&lt; Scalar &gt;</a>
+: <a class="el" href="classcattle_1_1_sum_pooling_layer.html#a850921a1a060374c2d8cbf7216fee177">cattle::SumPoolingLayer&lt; Scalar &gt;</a>
 </li>
 <li>swap
 : <a class="el" href="classcattle_1_1_bidirectional_neural_network.html#a12bf02ce4346879f204aed9ccd4f9dab">cattle::BidirectionalNeuralNetwork&lt; Scalar, Rank, MergeType &gt;</a>

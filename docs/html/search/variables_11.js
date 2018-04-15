@@ -9,6 +9,5 @@ var searchData=
   ['state_5fact',['state_act',['../structcattle_1_1_recurrent_neural_network_1_1_cell.html#a0f97adce19d77c8ed25bdce978c444d1',1,'cattle::RecurrentNeuralNetwork::Cell::state_act()'],['../structcattle_1_1_l_s_t_m_neural_network_1_1_cell.html#a24f9704b58e67cfc866ebb6febd525d7',1,'cattle::LSTMNeuralNetwork::Cell::state_act()']]],
   ['state_5fkernel',['state_kernel',['../structcattle_1_1_recurrent_neural_network_1_1_cell.html#aaedd2a35cdf2bb0867f52bd53220105f',1,'cattle::RecurrentNeuralNetwork::Cell']]],
   ['state_5fkernel_5fcache',['state_kernel_cache',['../structcattle_1_1_recurrent_neural_network_1_1_cell.html#a0c951459a4188ddebad0deb76cf9ef54',1,'cattle::RecurrentNeuralNetwork::Cell']]],
-  ['std_5fin',['std_in',['../structcattle_1_1_batch_norm_layer_base_1_1_cache.html#ade3fff30d846fd8935ecf8bc125a490b',1,'cattle::BatchNormLayerBase::Cache']]],
-  ['stride',['stride',['../classcattle_1_1_conv_layer.html#a4eaf03dc0437ae2d50b2f2d9b23490f1',1,'cattle::ConvLayer::stride()'],['../classcattle_1_1_pooling_layer.html#a752ccf3dca5e4a20db1ed87acfd75bef',1,'cattle::PoolingLayer::stride()']]]
+  ['std_5fin',['std_in',['../_layer_8h.html#aaf24e91779eb8c6666134d23a9007183',1,'Layer.h']]]
 ];
