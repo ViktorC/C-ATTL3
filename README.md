@@ -147,7 +147,7 @@ The test data provider is created similarly. However, it is important not to re-
 auto init = std::make_shared<HeWeightInitialization<double>>();
 auto reg = std::make_shared<L2ParameterRegularization<double>>();
 std::vector<LayerPtr<double,3>> layers(9);
-layers[0] = LayerPtr<double,3>(new ConvLayer<double>(training_prov.get_obs_dims(), 10, init, reg, 5, 2));
+layers[0] = LayerPtr<double,3>(new ConvLayer<double>(training_prov.get_obs_dims(), 10, init, reg, 5, 5, 2, 2));
 layers[1] = LayerPtr<double,3>(new ReLUActivationLayer<double,3>(layers[0]->get_output_dims()));
 layers[2] = LayerPtr<double,3>(new MaxPoolingLayer<double>(layers[1]->get_output_dims()));
 layers[3] = LayerPtr<double,3>(new ConvLayer<double>(layers[2]->get_output_dims(), 20, init, reg));
