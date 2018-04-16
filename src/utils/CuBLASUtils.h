@@ -22,23 +22,42 @@ namespace internal {
 namespace {
 
 template<typename Scalar>
-using GemmRoutine = cublasStatus_t (*)(cublasHandle_t, cublasOperation_t, cublasOperation_t, int, int, int,
-		const Scalar*, const Scalar*, int, const Scalar*, int, const Scalar*, Scalar*, int);
+using GemmRoutine = cublasStatus_t (*)(cublasHandle_t, cublasOperation_t, cublasOperation_t,
+		int, int, int, const Scalar*, const Scalar*, int, const Scalar*, int, const Scalar*,
+		Scalar*, int);
 
-template<typename Scalar> __inline__ GemmRoutine<Scalar> getGemmRoutine() { return &cublasDgemm; }
+template<typename Scalar> __inline__ GemmRoutine<Scalar> get_gemm_routine() {
+	return &cublasDgemm;
+}
 
-template<> __inline__ GemmRoutine<float> getGemmRoutine() { return &cublasSgemm; }
+template<> __inline__ GemmRoutine<float> get_gemm_routine() {
+	return &cublasSgemm;
+}
 
 }
 
 /**
- * A utility class providing static methods for GPU accelerated linear algebra operations
+ * A singleton utility class providing methods for GPU accelerated linear algebra operations
  * using cuBLAS.
  */
 template<typename Scalar>
 class CuBLASUtils {
 	static_assert(std::is_floating_point<Scalar>::value, "non floating-point scalar type");
 public:
+	CuBLASUtils(const CuBLASUtils&) = delete;
+	~CuBLASUtils() {
+		// Destroy the cuBLAS handle.
+		cublasStatus_t cublas_stat = cublasDestroy(handle);
+		assert(cublas_stat == CUBLAS_STATUS_SUCCESS);
+	}
+	CuBLASUtils& operator=(const CuBLASUtils&) = delete;
+	/**
+	 * @return A reference to the only instance of the class.
+	 */
+	inline static CuBLASUtils& get_instance() {
+		static CuBLASUtils instance;
+		return instance;
+	}
 	/**
 	 * It computes the product of the matrix multiplication.
 	 *
@@ -48,7 +67,7 @@ public:
 	 * @param transpose_b Whether the multiplier is to be transposed for the operation.
 	 * @return The product of the matrix multiplication.
 	 */
-	inline static Matrix<Scalar> mul(Matrix<Scalar>& a, Matrix<Scalar>& b, bool transpose_a,
+	inline Matrix<Scalar> mul(Matrix<Scalar>& a, Matrix<Scalar>& b, bool transpose_a,
 			bool transpose_b) {
 		std::size_t a_orig_rows = a.rows();
 		std::size_t a_orig_cols = a.cols();
@@ -73,7 +92,6 @@ public:
 		Matrix<Scalar> c(a_rows, b_cols);
 		cudaError_t cuda_stat;
 		cublasStatus_t cublas_stat;
-		cublasHandle_t handle;
 		// Device arrays.
 		Scalar* d_a;
 		Scalar* d_b;
@@ -93,31 +111,21 @@ public:
 			cudaFree(d_b);
 			throw std::runtime_error("cuda malloc failure: " + cuda_stat);
 		}
-		// Create the CUBLAS handle.
-		cublas_stat = cublasCreate(&handle);
-		if (cublas_stat != CUBLAS_STATUS_SUCCESS) {
-			cudaFree(d_a);
-			cudaFree(d_b);
-			cudaFree(d_c);
-			throw std::runtime_error("cublas handle creation failure: " + cublas_stat);
-		}
 		// Copy the contents of the host arrays to the device arrays.
-		cublas_stat = cublasSetMatrix(a_orig_rows, a_orig_cols, sizeof(Scalar), a.data(), a_orig_rows,
-				d_a, a_orig_rows);
+		cublas_stat = cublasSetMatrix(a_orig_rows, a_orig_cols, sizeof(Scalar), a.data(),
+				a_orig_rows, d_a, a_orig_rows);
 		if (cublas_stat != CUBLAS_STATUS_SUCCESS) {
 			cudaFree(d_a);
 			cudaFree(d_b);
 			cudaFree(d_c);
-			cublasDestroy(handle);
 			throw std::runtime_error("cublas matrix mapping failure: " + cublas_stat);
 		}
-		cublas_stat = cublasSetMatrix(b_orig_rows, b_orig_cols, sizeof(Scalar), b.data(), b_orig_rows,
-				d_b, b_orig_rows);
+		cublas_stat = cublasSetMatrix(b_orig_rows, b_orig_cols, sizeof(Scalar), b.data(),
+				b_orig_rows, d_b, b_orig_rows);
 		if (cublas_stat != CUBLAS_STATUS_SUCCESS) {
 			cudaFree(d_a);
 			cudaFree(d_b);
 			cudaFree(d_c);
-			cublasDestroy(handle);
 			throw std::runtime_error("cublas matrix mapping failure: " + cublas_stat);
 		}
 		cublasOperation_t a_op = transpose_a ? CUBLAS_OP_T : CUBLAS_OP_N;
@@ -125,31 +133,35 @@ public:
 		Scalar alpha = 1;
 		Scalar beta = 0;
 		// Resolve the GEMM precision based on the scalar type.
-		GemmRoutine<Scalar> gemm = getGemmRoutine<Scalar>();
+		GemmRoutine<Scalar> gemm = get_gemm_routine<Scalar>();
 		// Perform the matrix multiplication.
-		cublas_stat = gemm(handle, a_op, b_op, a_rows, b_cols, a_cols, &alpha, d_a, a_orig_rows, d_b,
-				b_orig_rows, &beta, d_c, a_rows);
+		cublas_stat = gemm(handle, a_op, b_op, a_rows, b_cols, a_cols, &alpha, d_a,
+				a_orig_rows, d_b, b_orig_rows, &beta, d_c, a_rows);
 		if (cublas_stat != CUBLAS_STATUS_SUCCESS) {
 			cudaFree(d_a);
 			cudaFree(d_b);
 			cudaFree(d_c);
-			cublasDestroy(handle);
 			throw std::runtime_error("cublas gemm failure: " + cublas_stat);
 		}
-		/* Copy the contents of the device array holding the results of the matrix multiplication
-		 * back to the host.
-		 */
-		cublas_stat = cublasGetMatrix(a_rows, b_cols, sizeof(Scalar), d_c, a_rows, c.data(), a_rows);
+		/* Copy the contents of the device array holding the results of the matrix
+		 * multiplication back to the host. */
+		cublas_stat = cublasGetMatrix(a_rows, b_cols, sizeof(Scalar), d_c, a_rows,
+				c.data(), a_rows);
 		cudaFree(d_a);
 		cudaFree(d_b);
 		cudaFree(d_c);
-		cublasDestroy(handle);
 		if (cublas_stat != CUBLAS_STATUS_SUCCESS)
 			throw std::runtime_error("cublas matrix retrieval failure: " + cublas_stat);
 		return c;
 	}
 private:
-	CuBLASUtils() { }
+	CuBLASUtils() :
+			handle() {
+		// Create the CUBLAS handle.
+		cublasStatus_t cublas_stat = cublasCreate(&handle);
+		assert(cublas_stat == CUBLAS_STATUS_SUCCESS);
+	}
+	const cublasHandle_t handle;
 };
 
 }

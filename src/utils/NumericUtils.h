@@ -23,7 +23,7 @@ template<typename Scalar>
 class NumericUtils {
 	static_assert(std::is_floating_point<Scalar>::value, "non floating-point scalar type");
 private:
-	NumericUtils() { };
+	NumericUtils() { }
 public:
 	static constexpr Scalar MIN = std::numeric_limits<Scalar>::lowest();
 	static constexpr Scalar MAX = std::numeric_limits<Scalar>::max();

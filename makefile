@@ -1,6 +1,6 @@
 MAKE := make -f makefile
 CC := g++
-CFLAGS := -std=c++11 -fopenmp -fmessage-length=0 -ftemplate-backtrace-limit=0 #-march=native
+CFLAGS := -std=c++11 -march=native -fopenmp -fmessage-length=0 -ftemplate-backtrace-limit=0
 RELEASE_OPT_FLAGS := -O3 -DNDEBUG
 DEBUG_OPT_FLAGS := -O1 -Wa,-mbig-obj -g
 INCLUDES := -Iext/Eigen/ -Isrc/ -Isrc/utils -Itest/
