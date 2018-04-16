@@ -21,30 +21,22 @@ namespace cattle {
 
 /**
  * An alias for a single row matrix of an arbitrary scalar type.
- *
- * #XXX Memory alignment is disabled to ensure compatibility with AVX instructions.
  */
 template<typename Scalar>
-using RowVector = Eigen::Matrix<Scalar,1,Eigen::Dynamic,Eigen::RowMajor | Eigen::DontAlign,
-		1,Eigen::Dynamic>;
+using RowVector = Eigen::Matrix<Scalar,1,Eigen::Dynamic,Eigen::RowMajor, 1,Eigen::Dynamic>;
 
 /**
  * An alias for a single column matrix of an arbitrary scalar type.
- *
- * #XXX Memory alignment is disabled to ensure compatibility with AVX instructions.
  */
 template <typename Scalar>
-using ColVector = Eigen::Matrix<Scalar,Eigen::Dynamic,1,Eigen::ColMajor | Eigen::DontAlign,
-		Eigen::Dynamic,1>;
+using ColVector = Eigen::Matrix<Scalar,Eigen::Dynamic,1,Eigen::ColMajor,Eigen::Dynamic,1>;
 
 /**
  * An alias for a dynamically sized matrix of an arbitrary scalar type.
- *
- * #XXX Memory alignment is disabled to ensure compatibility with AVX instructions.
  */
 template<typename Scalar>
-using Matrix = Eigen::Matrix<Scalar,Eigen::Dynamic,Eigen::Dynamic,Eigen::ColMajor |
-		Eigen::DontAlign, Eigen::Dynamic,Eigen::Dynamic>;
+using Matrix = Eigen::Matrix<Scalar,Eigen::Dynamic,Eigen::Dynamic,Eigen::ColMajor,
+		Eigen::Dynamic,Eigen::Dynamic>;
 
 /**
  * An alias for a class that can be used to map raw pointer data to a dynamically
@@ -55,11 +47,9 @@ using MatrixMap = Eigen::Map<Matrix<Scalar>>;
 
 /**
  * An alias for a tensor of arbitrary rank and scalar type with dynamic dimensionality.
- *
- * #XXX Memory alignment is disabled to ensure compatibility with AVX instructions.
  */
 template<typename Scalar, std::size_t Rank>
-using Tensor = Eigen::Tensor<Scalar,Rank,Eigen::ColMajor | Eigen::DontAlign,std::size_t>;
+using Tensor = Eigen::Tensor<Scalar,Rank,Eigen::ColMajor,std::size_t>;
 
 /**
  * An for a class that can be used to map raw pointer data to a tensor of arbitrary

@@ -157,11 +157,11 @@ public:
 private:
 	CuBLASUtils() :
 			handle() {
-		// Create the CUBLAS handle.
+		// Create the cuBLAS handle.
 		cublasStatus_t cublas_stat = cublasCreate(&handle);
 		assert(cublas_stat == CUBLAS_STATUS_SUCCESS);
 	}
-	const cublasHandle_t handle;
+	cublasHandle_t handle;
 };
 
 }

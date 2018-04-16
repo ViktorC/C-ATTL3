@@ -1,6 +1,6 @@
 MAKE := make -f makefile
 CC := g++
-CFLAGS := -std=c++11 -march=native -fopenmp -fmessage-length=0 -ftemplate-backtrace-limit=0
+CFLAGS := -std=c++11 -fopenmp -fmessage-length=0 -ftemplate-backtrace-limit=0 #-march=native
 RELEASE_OPT_FLAGS := -O3 -DNDEBUG
 DEBUG_OPT_FLAGS := -O1 -Wa,-mbig-obj -g
 INCLUDES := -Iext/Eigen/ -Isrc/ -Isrc/utils -Itest/
@@ -42,14 +42,14 @@ debug:
 		OPT_FLAGS='$(DEBUG_OPT_FLAGS)'
 cuda_all:
 	$(MAKE) $(TARGET) \
-		INCLUDES=$(CUDA_INCLUDES) \
-		LIBS=$(CUDA_LIBS) \
-		OPT_FLAGS=$(CUDA_RELEASE_OPT_FLAGS)
+		INCLUDES='$(CUDA_INCLUDES)' \
+		LIBS='$(CUDA_LIBS)' \
+		OPT_FLAGS='$(CUDA_RELEASE_OPT_FLAGS)'
 cuda_debug:
 	$(MAKE) $(TARGET) \
-		INCLUDES=$(CUDA_INCLUDES) \
-		LIBS=$(CUDA_LIBS) \
-		OPT_FLAGS=$(CUDA_DEBUG_OPT_FLAGS)
+		INCLUDES='$(CUDA_INCLUDES)' \
+		LIBS='$(CUDA_LIBS)' \
+		OPT_FLAGS='$(CUDA_DEBUG_OPT_FLAGS)'
 clean:
 	$(RM) $(OBJECTS) $(TARGET)
 .depend:
