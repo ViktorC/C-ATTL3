@@ -1,6 +1,8 @@
 MAKE := make -f makefile
-CC := g++
-CFLAGS := -std=c++11 -fopenmp -fmessage-length=0 -ftemplate-backtrace-limit=0 #-march=native
+GCC_CC := g++
+CLANG_CC := clang++
+# AVX instructions are problematic with GCC 64 bit on Windows due to its lack of support for 32 byte stack alignment.
+CFLAGS := -std=c++11 -fopenmp -fmessage-length=0 -ftemplate-backtrace-limit=0 -march=native
 RELEASE_OPT_FLAGS := -O3 -DNDEBUG
 DEBUG_OPT_FLAGS := -O1 -Wa,-mbig-obj -g
 INCLUDES := -Iext/Eigen/ -Isrc/ -Isrc/utils -Itest/
@@ -36,17 +38,29 @@ $(TARGET): $(OBJECTS)
 .DEFAULT_GOAL: all
 all:
 	$(MAKE) $(TARGET) \
+		CC='$(GCC_CC)' \
 		OPT_FLAGS='$(RELEASE_OPT_FLAGS)'
 debug:
 	$(MAKE) $(TARGET) \
+		CC='$(GCC_CC)' \
+		OPT_FLAGS='$(DEBUG_OPT_FLAGS)'
+clang_all:
+	$(MAKE) $(TARGET) \
+		CC='$(CLANG_CC)' \
+		OPT_FLAGS='$(RELEASE_OPT_FLAGS)'
+clang_debug:
+	$(MAKE) $(TARGET) \
+		CC='$(CLANG_CC)' \
 		OPT_FLAGS='$(DEBUG_OPT_FLAGS)'
 cuda_all:
 	$(MAKE) $(TARGET) \
+		CC='$(GCC_CC)' \
 		INCLUDES='$(CUDA_INCLUDES)' \
 		LIBS='$(CUDA_LIBS)' \
 		OPT_FLAGS='$(CUDA_RELEASE_OPT_FLAGS)'
 cuda_debug:
 	$(MAKE) $(TARGET) \
+		CC='$(GCC_CC)' \
 		INCLUDES='$(CUDA_INCLUDES)' \
 		LIBS='$(CUDA_LIBS)' \
 		OPT_FLAGS='$(CUDA_DEBUG_OPT_FLAGS)'

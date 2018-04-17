@@ -341,7 +341,7 @@ typedef double fp;
 //}
 
 int main() {
-	std::string mnist_folder = "C:\\Users\\Viktor\\Downloads\\mnist\\";
+	std::string mnist_folder = "C:\\Users\\A6714\\Downloads\\mnist\\";
 	MNISTDataProvider<float> file_train_prov(mnist_folder + "train-images.idx3-ubyte", mnist_folder + "train-labels.idx1-ubyte");
 	MNISTDataProvider<float> file_test_prov(mnist_folder + "t10k-images.idx3-ubyte", mnist_folder + "t10k-labels.idx1-ubyte");
 	DataPair<float,3,false> train_data = file_train_prov.get_data(60000);
@@ -373,7 +373,7 @@ int main() {
 	auto loss = std::make_shared<SoftmaxCrossEntropyLoss<float,3,false>>();
 	VanillaSGDOptimizer<float,3,false> opt(loss, 100);
 	std::chrono::steady_clock::time_point begin = std::chrono::steady_clock::now();
-	opt.optimize(nn, train_prov, test_prov, 50);
+	opt.optimize(nn, train_prov, test_prov, 1);
 	std::cout << "Duration: " << std::chrono::duration_cast<std::chrono::milliseconds>(
 			std::chrono::steady_clock::now() - begin).count() << std::endl;
 //	std_dataset_test();
