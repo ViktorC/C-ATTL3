@@ -2,31 +2,22 @@ MAKE := make -f makefile
 GCC_CC := g++
 CLANG_CC := clang++
 # AVX instructions are problematic with GCC 64 bit on Windows due to its lack of support for 32 byte stack alignment.
-CFLAGS := -std=c++11 -fopenmp -fmessage-length=0 -ftemplate-backtrace-limit=0 -march=native
+CFLAGS := -std=c++11 -fmessage-length=0 -ftemplate-backtrace-limit=0
+GCC_CFLAGS := $(CFLAGS) -fopenmp
+GCC_CUDA_CFLAGS := $(GCC_CFLAGS) -DCATTLE_USE_CUBLAS
+CLANG_CFLAGS := $(CFLAGS) -march=native -fopenmp=libgomp
+CLANG_CUDA_CFLAGS := $(CLANG_CFLAGS) -DCATTLE_USE_CUBLAS
 RELEASE_OPT_FLAGS := -O3 -DNDEBUG
 DEBUG_OPT_FLAGS := -O1 -Wa,-mbig-obj -g
+# For Clang on Windows, omp.h must be copied from GCC.
 INCLUDES := -Iext/Eigen/ -Isrc/ -Isrc/utils -Itest/
+CUDA_INCLUDES := $(INCLUDES) -I"$(CUDA_INC_PATH)"
 LIBS := -lpthread -lgomp
+CUDA_LIBS := $(LIBS) -L"$(CUDA_LIB_PATH)" -lcudart -lcublas
 SOURCE_DIR := test
 SOURCES := test.cpp
 BUILD_DIR := build
-CUDA_VERSION := 9.1
-ifeq ($(OS),Windows_NT)
-	TARGET_NAME := cattle_test.exe
-	CUDA_TOOLKIT_PATH := C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v$(CUDA_VERSION)
-	CUDA_INCLUDE_PATH := "$(CUDA_TOOLKIT_PATH)\include"
-	CUDA_LIB_PATH = "$(CUDA_TOOLKIT_PATH)\lib\x64"
-else
-	TARGET_NAME := cattle_test
-	CUDA_TOOLKIT_PATH := /usr/local/cuda-$(CUDA_VERSION)
-	CUDA_INCLUDE_PATH := $(CUDA_TOOLKIT_PATH)/include
-	CUDA_LIB_PATH = $(CUDA_TOOLKIT_PATH)/lib64
-endif
-CUDA_TOOLKIT_PATH := C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v9.1
-CUDA_INCLUDES := $(INCLUDES) -I$(CUDA_INCLUDE_PATH)
-CUDA_LIBS := $(LIBS) -L$(CUDA_LIB_PATH) -lcudart -lcublas
-CUDA_RELEASE_OPT_FLAGS := $(RELEASE_OPT_FLAGS) -DCATTLE_USE_CUBLAS
-CUDA_DEBUG_OPT_FLAGS := $(DEBUG_OPT_FLAGS) -DCATTLE_USE_CUBLAS
+TARGET_NAME := cattle_test
 TARGET := $(BUILD_DIR)/$(TARGET_NAME)
 OBJECTS := $(BUILD_DIR)/$(SOURCES:%.cpp=%.o)
 $(OBJECTS): $(BUILD_DIR)/%.o: $(SOURCE_DIR)/%.cpp
@@ -39,31 +30,51 @@ $(TARGET): $(OBJECTS)
 all:
 	$(MAKE) $(TARGET) \
 		CC='$(GCC_CC)' \
+		CFLAGS='$(GCC_CFLAGS)' \
 		OPT_FLAGS='$(RELEASE_OPT_FLAGS)'
 debug:
 	$(MAKE) $(TARGET) \
 		CC='$(GCC_CC)' \
+		CFLAGS='$(GCC_CFLAGS)' \
 		OPT_FLAGS='$(DEBUG_OPT_FLAGS)'
 clang_all:
 	$(MAKE) $(TARGET) \
 		CC='$(CLANG_CC)' \
+		CFLAGS='$(CLANG_CFLAGS)' \
 		OPT_FLAGS='$(RELEASE_OPT_FLAGS)'
 clang_debug:
 	$(MAKE) $(TARGET) \
 		CC='$(CLANG_CC)' \
+		CFLAGS='$(CLANG_CFLAGS)' \
 		OPT_FLAGS='$(DEBUG_OPT_FLAGS)'
 cuda_all:
 	$(MAKE) $(TARGET) \
 		CC='$(GCC_CC)' \
+		CFLAGS='$(GCC_CUDA_CFLAGS)' \
+		OPT_FLAGS='$(RELEASE_OPT_FLAGS)' \
 		INCLUDES='$(CUDA_INCLUDES)' \
-		LIBS='$(CUDA_LIBS)' \
-		OPT_FLAGS='$(CUDA_RELEASE_OPT_FLAGS)'
+		LIBS='$(CUDA_LIBS)'
 cuda_debug:
 	$(MAKE) $(TARGET) \
 		CC='$(GCC_CC)' \
+		CFLAGS='$(GCC_CUDA_CFLAGS)' \
+		OPT_FLAGS='$(DEBUG_OPT_FLAGS)' \
 		INCLUDES='$(CUDA_INCLUDES)' \
-		LIBS='$(CUDA_LIBS)' \
-		OPT_FLAGS='$(CUDA_DEBUG_OPT_FLAGS)'
+		LIBS='$(CUDA_LIBS)'
+clang_cuda_all:
+	$(MAKE) $(TARGET) \
+		CC='$(CLANG_CC)' \
+		CFLAGS='$(CLANG_CUDA_CFLAGS)' \
+		OPT_FLAGS='$(RELEASE_OPT_FLAGS)' \
+		INCLUDES='$(CUDA_INCLUDES)' \
+		LIBS='$(CUDA_LIBS)'
+clang_cuda_debug:
+	$(MAKE) $(TARGET) \
+		CC='$(CLANG_CC)' \
+		CFLAGS='$(CLANG_CUDA_CFLAGS)' \
+		OPT_FLAGS='$(DEBUG_OPT_FLAGS)' \
+		INCLUDES='$(CUDA_INCLUDES)' \
+		LIBS='$(CUDA_LIBS)'
 clean:
 	$(RM) $(OBJECTS) $(TARGET)
 .depend:

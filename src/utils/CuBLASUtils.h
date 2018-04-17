@@ -12,6 +12,7 @@
 #include <cstddef>
 #include <cuda_runtime.h>
 #include <exception>
+#include <string>
 #include <type_traits>
 #include "cublas_v2.h"
 #include "Eigen.h"
@@ -99,17 +100,20 @@ public:
 		// Allocate the memory for the arrays on the device.
 		cuda_stat = cudaMalloc(&d_a, a_rows * a_cols * sizeof(Scalar));
 		if (cuda_stat != cudaSuccess)
-			throw std::runtime_error("cuda malloc failure: " + cuda_stat);
+			throw std::runtime_error("cuda malloc failure: " +
+					std::to_string(cuda_stat));
 		cuda_stat = cudaMalloc(&d_b, b_rows * b_cols * sizeof(Scalar));
 		if (cuda_stat != cudaSuccess) {
 			cudaFree(d_a);
-			throw std::runtime_error("cuda malloc failure: " + cuda_stat);
+			throw std::runtime_error("cuda malloc failure: " +
+					std::to_string(cuda_stat));
 		}
 		cuda_stat = cudaMalloc(&d_c, a_rows * b_cols * sizeof(Scalar));
 		if (cuda_stat != cudaSuccess) {
 			cudaFree(d_a);
 			cudaFree(d_b);
-			throw std::runtime_error("cuda malloc failure: " + cuda_stat);
+			throw std::runtime_error("cuda malloc failure: " +
+					std::to_string(cuda_stat));
 		}
 		// Copy the contents of the host arrays to the device arrays.
 		cublas_stat = cublasSetMatrix(a_orig_rows, a_orig_cols, sizeof(Scalar), a.data(),
@@ -118,7 +122,8 @@ public:
 			cudaFree(d_a);
 			cudaFree(d_b);
 			cudaFree(d_c);
-			throw std::runtime_error("cublas matrix mapping failure: " + cublas_stat);
+			throw std::runtime_error("cublas matrix mapping failure: " +
+					std::to_string(cublas_stat));
 		}
 		cublas_stat = cublasSetMatrix(b_orig_rows, b_orig_cols, sizeof(Scalar), b.data(),
 				b_orig_rows, d_b, b_orig_rows);
@@ -126,7 +131,8 @@ public:
 			cudaFree(d_a);
 			cudaFree(d_b);
 			cudaFree(d_c);
-			throw std::runtime_error("cublas matrix mapping failure: " + cublas_stat);
+			throw std::runtime_error("cublas matrix mapping failure: " +
+					std::to_string(cublas_stat));
 		}
 		cublasOperation_t a_op = transpose_a ? CUBLAS_OP_T : CUBLAS_OP_N;
 		cublasOperation_t b_op = transpose_b ? CUBLAS_OP_T : CUBLAS_OP_N;
@@ -141,7 +147,8 @@ public:
 			cudaFree(d_a);
 			cudaFree(d_b);
 			cudaFree(d_c);
-			throw std::runtime_error("cublas gemm failure: " + cublas_stat);
+			throw std::runtime_error("cublas gemm failure: " +
+					std::to_string(cublas_stat));
 		}
 		/* Copy the contents of the device array holding the results of the matrix
 		 * multiplication back to the host. */
@@ -151,17 +158,18 @@ public:
 		cudaFree(d_b);
 		cudaFree(d_c);
 		if (cublas_stat != CUBLAS_STATUS_SUCCESS)
-			throw std::runtime_error("cublas matrix retrieval failure: " + cublas_stat);
+			throw std::runtime_error("cublas matrix retrieval failure: " +
+					std::to_string(cublas_stat));
 		return c;
 	}
 private:
+	cublasHandle_t handle;
 	CuBLASUtils() :
 			handle() {
 		// Create the cuBLAS handle.
 		cublasStatus_t cublas_stat = cublasCreate(&handle);
 		assert(cublas_stat == CUBLAS_STATUS_SUCCESS);
 	}
-	cublasHandle_t handle;
 };
 
 }

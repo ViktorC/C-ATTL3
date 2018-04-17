@@ -88,7 +88,7 @@ public:
 	 */
 	inline IndexType operator()(std::size_t i) const {
 		if (i < 0 || i >= Rank)
-			throw std::invalid_argument("illegal index value: " + i);
+			throw std::invalid_argument("illegal index value: " + std::to_string(i));
 		return values[i];
 	}
 	/**
@@ -100,7 +100,7 @@ public:
 	 */
 	inline IndexType& operator()(std::size_t i) {
 		if (i < 0 || i >= Rank)
-			throw std::invalid_argument("illegal index value: " + i);
+			throw std::invalid_argument("illegal index value: " + std::to_string(i));
 		return values[i];
 	}
 	/**
@@ -128,7 +128,7 @@ public:
 			rhs(rhs) { };
 	inline IndexType operator()(std::size_t i) const {
 		if (i < 0 || i >= Rank)
-			throw std::invalid_argument("illegal index value: " + i);
+			throw std::invalid_argument("illegal index value: " + std::to_string(i));
 		return OpType::apply(lhs(i), rhs);
 	}
 private:
@@ -151,7 +151,7 @@ public:
 	};
 	inline IndexType operator()(std::size_t i) const {
 		if (i < 0 || i >= Rank)
-			throw std::invalid_argument("illegal index value: " + i);
+			throw std::invalid_argument("illegal index value: " + std::to_string(i));
 		return i == rank ? OpType::apply(lhs(i), rhs) : lhs(i);
 	}
 private:
@@ -172,7 +172,7 @@ public:
 			rhs(rhs) { };
 	inline IndexType operator()(std::size_t i) const {
 		if (i < 0 || i >= Rank)
-			throw std::invalid_argument("illegal index value: " + i);
+			throw std::invalid_argument("illegal index value: " + std::to_string(i));
 		return OpType::apply(lhs(i), rhs(i));
 	}
 protected:
@@ -196,7 +196,7 @@ public:
 	}
 	inline IndexType operator()(std::size_t i) const {
 		if (i < 0 || i >= Rank)
-			throw std::invalid_argument("illegal index value: " + i);
+			throw std::invalid_argument("illegal index value: " + std::to_string(i));
 		return i == rank ? OpType::apply(lhs(i), rhs(i)) : lhs(i);
 	}
 protected:
