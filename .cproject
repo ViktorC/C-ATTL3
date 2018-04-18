@@ -423,6 +423,7 @@
 		<configuration configurationName="Clang Release">
 			<resource resourceType="PROJECT" workspacePath="/C-ATTL3"/>
 		</configuration>
+		<configuration configurationName="Clang CUDA Debug"/>
 		<configuration configurationName="Clang Debug"/>
 		<configuration configurationName="Clang CUDA Release">
 			<resource resourceType="PROJECT" workspacePath="/C-ATTL3"/>

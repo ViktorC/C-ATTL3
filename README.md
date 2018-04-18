@@ -180,7 +180,7 @@ Tensor<double,4> prediction = nn.infer(input);
 ```	
 The final code snippet demonstrates the usage of the trained neural network for inference. A random input tensor of the correct nominal input dimensions is generated, transformed using the PCA preprocessor, and fed to the `infer` method which has the neural network propagate the tensor through its layers and output its prediction. As seen above, inference is not restricted to single instances but can be performed on batches of data as well.
 
-More examples of neural network constructs can be found [here](https://github.com/ViktorC/C-ATTL3/blob/master/test/test.cpp).
+More examples of neural network constructs can be found [here](https://github.com/ViktorC/C-ATTL3/tree/master/examples).
 
 ## TODO
 Planned features include FFT and Winograd filter accelerated convolution, more comprehensive GPU support, proper automated testing using CMake, network serialization and de-serialization, evolutionary and second order optimization algorithms, GRU neural net, CTC loss, and more extensive documentation including practical examples.

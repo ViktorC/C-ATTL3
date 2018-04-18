@@ -8,14 +8,14 @@
 #ifndef INCLUDE_CATTLE_H_
 #define INCLUDE_CATTLE_H_
 
-#include "DataProvider.hpp"
-#include "Dimensions.hpp"
-#include "Layer.hpp"
-#include "Loss.hpp"
-#include "NeuralNetwork.hpp"
-#include "Optimizer.hpp"
-#include "ParameterRegularization.hpp"
-#include "Preprocessor.hpp"
-#include "WeightInitialization.hpp"
+#include "cattle/DataProvider.hpp"
+#include "cattle/Dimensions.hpp"
+#include "cattle/Layer.hpp"
+#include "cattle/Loss.hpp"
+#include "cattle/NeuralNetwork.hpp"
+#include "cattle/Optimizer.hpp"
+#include "cattle/ParameterRegularization.hpp"
+#include "cattle/Preprocessor.hpp"
+#include "cattle/WeightInitialization.hpp"
 
-#endif /* INCLUDE_CATTLE_H_
+#endif /* INCLUDE_CATTLE_H_ */
