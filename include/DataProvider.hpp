@@ -5,8 +5,8 @@
  *      Author: Viktor Csomor
  */
 
-#ifndef DATAPROVIDER_H_
-#define DATAPROVIDER_H_
+#ifndef INCLUDE_DATAPROVIDER_H_
+#define INCLUDE_DATAPROVIDER_H_
 
 #include <algorithm>
 #include <array>
@@ -20,8 +20,9 @@
 #include <type_traits>
 #include <utility>
 #include <vector>
-#include "Dimensions.h"
-#include "Eigen.h"
+
+#include "Dimensions.hpp"
+#include "utils/Eigen.hpp"
 
 namespace cattle {
 
@@ -629,4 +630,4 @@ private:
 
 } /* namespace cattle */
 
-#endif /* DATAPROVIDER_H_ */
+#endif /* INCLUDE_DATAPROVIDER_H_ */

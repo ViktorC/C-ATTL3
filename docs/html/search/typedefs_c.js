@@ -1,6 +1,4 @@
 var searchData=
 [
-  ['self',['Self',['../classcattle_1_1_dim_expression.html#a51aa030935c467cf158c24924b3ea0a8',1,'cattle::DimExpression::Self()'],['../classcattle_1_1_composite_neural_network.html#a4de52a8ebbac0dee405d6ac0008b8d3b',1,'cattle::CompositeNeuralNetwork::Self()'],['../classcattle_1_1_parallel_neural_network.html#af6f433b59f5062c4a7aacbd10cbc6613',1,'cattle::ParallelNeuralNetwork::Self()'],['../classcattle_1_1_feedforward_neural_network.html#a9481cf455aefd4150857f078a52ee364',1,'cattle::FeedforwardNeuralNetwork::Self()'],['../classcattle_1_1_sequential_neural_network.html#aea345aff29adb836aa0b7fd37e85d1ac',1,'cattle::SequentialNeuralNetwork::Self()'],['../classcattle_1_1_bidirectional_neural_network.html#aad1ae57124cc3e0905de24bbc6dfa8c9',1,'cattle::BidirectionalNeuralNetwork::Self()'],['../classcattle_1_1_recurrent_neural_network.html#ac76df4e05eb0db8c18e913116da3e6f4',1,'cattle::RecurrentNeuralNetwork::Self()'],['../classcattle_1_1_l_s_t_m_neural_network.html#abf8eada326c7e250f0fd165e8f6398e3',1,'cattle::LSTMNeuralNetwork::Self()'],['../classcattle_1_1_no_parameter_regularization.html#ae7bb42c52ece7ee5ba04716d6119e96a',1,'cattle::NoParameterRegularization::Self()']]],
-  ['svd',['SVD',['../namespacecattle_1_1internal.html#a3e63c9777951b7b3512ff92061e292d2',1,'cattle::internal']]],
-  ['svdoptions',['SVDOptions',['../namespacecattle_1_1internal.html#afe0f43a473fb65d81bd656efbe10e1c4',1,'cattle::internal']]]
+  ['unidirneuralnetptr',['UnidirNeuralNetPtr',['../namespacecattle.html#a011c68542051b5509475ef3f94aaa048',1,'cattle']]]
 ];

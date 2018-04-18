@@ -22,7 +22,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">C-ATTL3
-   &#160;<span id="projectnumber">0.1</span>
+   &#160;<span id="projectnumber">0.5</span>
    </div>
   </td>
  </tr>
@@ -68,108 +68,29 @@ $(function() {
 <div class="header">
   <div class="summary">
 <a href="#pub-methods">Public Member Functions</a> &#124;
-<a href="#pro-methods">Protected Member Functions</a> &#124;
-<a href="#pri-types">Private Types</a> &#124;
-<a href="#pri-attribs">Private Attributes</a> &#124;
 <a href="classcattle_1_1_batch_norm_layer_3_01_scalar_00_013_01_4-members.html">List of all members</a>  </div>
   <div class="headertitle">
 <div class="title">cattle::BatchNormLayer&lt; Scalar, 3 &gt; Class Template Reference</div>  </div>
 </div><!--header-->
 <div class="contents">
 
-<p><code>#include &lt;<a class="el" href="_layer_8h_source.html">Layer.h</a>&gt;</code></p>
+<p><code>#include &lt;<a class="el" href="_layer_8hpp_source.html">Layer.hpp</a>&gt;</code></p>
 
 <p>Inherits cattle::BatchNormLayerBase&lt; Scalar, Rank &gt;.</p>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:a4d49cccfbf49f095bf1b0d8fd0ad49bf"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_batch_norm_layer_3_01_scalar_00_013_01_4.html#a4d49cccfbf49f095bf1b0d8fd0ad49bf">BatchNormLayer</a> (<a class="el" href="classcattle_1_1_dimensions.html">Dimensions</a>&lt; std::size_t, 3 &gt; <a class="el" href="_layer_8h.html#abee7a0229815bdce582966fdc0faaaba">dims</a>, <a class="el" href="namespacecattle.html#a083ab63c64a5c935b2d2cd3f03c4e27a">ParamRegSharedPtr</a>&lt; Scalar &gt; <a class="el" href="_layer_8h.html#a87fb699114eacd85a8d2826b3a7ab0a8">gamma_reg</a>=Root::NO_PARAM_REG, <a class="el" href="namespacecattle.html#a083ab63c64a5c935b2d2cd3f03c4e27a">ParamRegSharedPtr</a>&lt; Scalar &gt; <a class="el" href="_layer_8h.html#afac8d12752b67c2408d6b5850922fb93">beta_reg</a>=Root::NO_PARAM_REG, Scalar <a class="el" href="_layer_8h.html#a9025f68b2f8614ce375f02879ed29c40">gamma_max_norm_constraint</a>=0, Scalar <a class="el" href="_layer_8h.html#a4ef726cbd240ef8bbc00e0b22fcc4284">beta_max_norm_constraint</a>=0, Scalar <a class="el" href="_layer_8h.html#ad7749990311beb2a3459837bf26cf342">norm_avg_decay</a>=.1, Scalar <a class="el" href="_layer_8h.html#a22c3b4076ffae75ab73aac0928a4f2a2">epsilon</a>=<a class="el" href="classcattle_1_1internal_1_1_numeric_utils.html">internal::NumericUtils</a>&lt; Scalar &gt;::EPSILON3)</td></tr>
+<tr class="memitem:a4d49cccfbf49f095bf1b0d8fd0ad49bf"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_batch_norm_layer_3_01_scalar_00_013_01_4.html#a4d49cccfbf49f095bf1b0d8fd0ad49bf">BatchNormLayer</a> (<a class="el" href="classcattle_1_1_dimensions.html">Dimensions</a>&lt; std::size_t, 3 &gt; dims, <a class="el" href="namespacecattle.html#a083ab63c64a5c935b2d2cd3f03c4e27a">ParamRegSharedPtr</a>&lt; Scalar &gt; gamma_reg=Root::NO_PARAM_REG, <a class="el" href="namespacecattle.html#a083ab63c64a5c935b2d2cd3f03c4e27a">ParamRegSharedPtr</a>&lt; Scalar &gt; beta_reg=Root::NO_PARAM_REG, Scalar gamma_max_norm_constraint=0, Scalar beta_max_norm_constraint=0, Scalar norm_avg_decay=.1, Scalar epsilon=<a class="el" href="classcattle_1_1internal_1_1_numeric_utils.html">internal::NumericUtils</a>&lt; Scalar &gt;::EPSILON3)</td></tr>
 <tr class="separator:a4d49cccfbf49f095bf1b0d8fd0ad49bf"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a8bd0897b558b2e97cd79456243980afe"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classcattle_1_1_batch_norm_layer_3_01_scalar_00_013_01_4.html#ad3b6500256bdb4562a68a2cd5a3b56ad">Root</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_batch_norm_layer_3_01_scalar_00_013_01_4.html#a8bd0897b558b2e97cd79456243980afe">clone</a> () const</td></tr>
-<tr class="separator:a8bd0897b558b2e97cd79456243980afe"><td class="memSeparator" colspan="2">&#160;</td></tr>
-</table><table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pro-methods"></a>
-Protected Member Functions</h2></td></tr>
-<tr class="memitem:a9d61b3a4f9444506662fdd29dd3bd3f5"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_batch_norm_layer_3_01_scalar_00_013_01_4.html#a9d61b3a4f9444506662fdd29dd3bd3f5">BatchNormLayer</a> (const <a class="el" href="classcattle_1_1_batch_norm_layer.html">BatchNormLayer</a>&lt; Scalar, 3 &gt; &amp;layer, bool share_params=false)</td></tr>
-<tr class="separator:a9d61b3a4f9444506662fdd29dd3bd3f5"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a2b55b83e290a10ff3c9eebab94bdeddf"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classcattle_1_1_batch_norm_layer_3_01_scalar_00_013_01_4.html#ad3b6500256bdb4562a68a2cd5a3b56ad">Root</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_batch_norm_layer_3_01_scalar_00_013_01_4.html#a2b55b83e290a10ff3c9eebab94bdeddf">clone_with_shared_params</a> () const</td></tr>
-<tr class="separator:a2b55b83e290a10ff3c9eebab94bdeddf"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a8c8fa4339bf9997ce6ff9006fa19d632"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classcattle_1_1_layer.html#a8c0af442a18521dea2406d0878e7db61">Base::Data</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_batch_norm_layer_3_01_scalar_00_013_01_4.html#a8c8fa4339bf9997ce6ff9006fa19d632">pass_forward</a> (typename <a class="el" href="classcattle_1_1_layer.html#a8c0af442a18521dea2406d0878e7db61">Root::Data</a> in, bool training)</td></tr>
-<tr class="separator:a8c8fa4339bf9997ce6ff9006fa19d632"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a852f358c1af41bfcdcbb718a9a933af7"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classcattle_1_1_layer.html#a8c0af442a18521dea2406d0878e7db61">Root::Data</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_batch_norm_layer_3_01_scalar_00_013_01_4.html#a852f358c1af41bfcdcbb718a9a933af7">pass_back</a> (typename <a class="el" href="classcattle_1_1_layer.html#a8c0af442a18521dea2406d0878e7db61">Root::Data</a> out_grads)</td></tr>
-<tr class="separator:a852f358c1af41bfcdcbb718a9a933af7"><td class="memSeparator" colspan="2">&#160;</td></tr>
-</table><table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pri-types"></a>
-Private Types</h2></td></tr>
-<tr class="memitem:ad3b6500256bdb4562a68a2cd5a3b56ad"><td class="memItemLeft" align="right" valign="top">typedef <a class="el" href="classcattle_1_1_layer.html">Layer</a>&lt; Scalar, 3 &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_batch_norm_layer_3_01_scalar_00_013_01_4.html#ad3b6500256bdb4562a68a2cd5a3b56ad">Root</a></td></tr>
-<tr class="separator:ad3b6500256bdb4562a68a2cd5a3b56ad"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a9a5fd4119a4e3ee373580202eee7172d"><td class="memItemLeft" align="right" valign="top">typedef BatchNormLayerBase&lt; Scalar, 3 &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_batch_norm_layer_3_01_scalar_00_013_01_4.html#a9a5fd4119a4e3ee373580202eee7172d">Base</a></td></tr>
-<tr class="separator:a9a5fd4119a4e3ee373580202eee7172d"><td class="memSeparator" colspan="2">&#160;</td></tr>
-</table><table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pri-attribs"></a>
-Private Attributes</h2></td></tr>
-<tr class="memitem:a11bfab7601af6b7aeb0800fa7691ef63"><td class="memItemLeft" align="right" valign="top">Base::RankwiseArray&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_batch_norm_layer_3_01_scalar_00_013_01_4.html#a11bfab7601af6b7aeb0800fa7691ef63">offsets</a></td></tr>
-<tr class="separator:a11bfab7601af6b7aeb0800fa7691ef63"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a95133ef54eef605f79df3da32328c2bb"><td class="memItemLeft" align="right" valign="top">Base::RankwiseArray&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_batch_norm_layer_3_01_scalar_00_013_01_4.html#a95133ef54eef605f79df3da32328c2bb">extents</a></td></tr>
-<tr class="separator:a95133ef54eef605f79df3da32328c2bb"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><h3>template&lt;typename Scalar&gt;<br />
 class cattle::BatchNormLayer&lt; Scalar, 3 &gt;</h3>
 
 <p>A partial template specialization for multi-channel input tensors. </p>
-</div><h2 class="groupheader">Member Typedef Documentation</h2>
-<a id="a9a5fd4119a4e3ee373580202eee7172d"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a9a5fd4119a4e3ee373580202eee7172d">&#9670;&nbsp;</a></span>Base</h2>
-
-<div class="memitem">
-<div class="memproto">
-<div class="memtemplate">
-template&lt;typename Scalar &gt; </div>
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">typedef BatchNormLayerBase&lt;Scalar,3&gt; <a class="el" href="classcattle_1_1_batch_norm_layer.html">cattle::BatchNormLayer</a>&lt; Scalar, 3 &gt;::<a class="el" href="classcattle_1_1_layer.html">Base</a></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">private</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a id="ad3b6500256bdb4562a68a2cd5a3b56ad"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ad3b6500256bdb4562a68a2cd5a3b56ad">&#9670;&nbsp;</a></span>Root</h2>
-
-<div class="memitem">
-<div class="memproto">
-<div class="memtemplate">
-template&lt;typename Scalar &gt; </div>
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">typedef <a class="el" href="classcattle_1_1_layer.html">Layer</a>&lt;Scalar,3&gt; <a class="el" href="classcattle_1_1_batch_norm_layer.html">cattle::BatchNormLayer</a>&lt; Scalar, 3 &gt;::<a class="el" href="classcattle_1_1_batch_norm_layer_3_01_scalar_00_013_01_4.html#ad3b6500256bdb4562a68a2cd5a3b56ad">Root</a></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">private</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
+</div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
 <a id="a4d49cccfbf49f095bf1b0d8fd0ad49bf"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a4d49cccfbf49f095bf1b0d8fd0ad49bf">&#9670;&nbsp;</a></span>BatchNormLayer() <span class="overload">[1/2]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#a4d49cccfbf49f095bf1b0d8fd0ad49bf">&#9670;&nbsp;</a></span>BatchNormLayer()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -248,216 +169,8 @@ template&lt;typename Scalar &gt; </div>
 
 </div>
 </div>
-<a id="a9d61b3a4f9444506662fdd29dd3bd3f5"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a9d61b3a4f9444506662fdd29dd3bd3f5">&#9670;&nbsp;</a></span>BatchNormLayer() <span class="overload">[2/2]</span></h2>
-
-<div class="memitem">
-<div class="memproto">
-<div class="memtemplate">
-template&lt;typename Scalar &gt; </div>
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="classcattle_1_1_batch_norm_layer.html">cattle::BatchNormLayer</a>&lt; Scalar, 3 &gt;::<a class="el" href="classcattle_1_1_batch_norm_layer.html">BatchNormLayer</a> </td>
-          <td>(</td>
-          <td class="paramtype">const <a class="el" href="classcattle_1_1_batch_norm_layer.html">BatchNormLayer</a>&lt; Scalar, 3 &gt; &amp;&#160;</td>
-          <td class="paramname"><em>layer</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">bool&#160;</td>
-          <td class="paramname"><em>share_params</em> = <code>false</code>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">protected</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<h2 class="groupheader">Member Function Documentation</h2>
-<a id="a8bd0897b558b2e97cd79456243980afe"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a8bd0897b558b2e97cd79456243980afe">&#9670;&nbsp;</a></span>clone()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<div class="memtemplate">
-template&lt;typename Scalar &gt; </div>
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="classcattle_1_1_batch_norm_layer_3_01_scalar_00_013_01_4.html#ad3b6500256bdb4562a68a2cd5a3b56ad">Root</a>* <a class="el" href="classcattle_1_1_batch_norm_layer.html">cattle::BatchNormLayer</a>&lt; Scalar, 3 &gt;::clone </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td> const</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a id="a2b55b83e290a10ff3c9eebab94bdeddf"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a2b55b83e290a10ff3c9eebab94bdeddf">&#9670;&nbsp;</a></span>clone_with_shared_params()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<div class="memtemplate">
-template&lt;typename Scalar &gt; </div>
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="classcattle_1_1_batch_norm_layer_3_01_scalar_00_013_01_4.html#ad3b6500256bdb4562a68a2cd5a3b56ad">Root</a>* <a class="el" href="classcattle_1_1_batch_norm_layer.html">cattle::BatchNormLayer</a>&lt; Scalar, 3 &gt;::clone_with_shared_params </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td> const</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">protected</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a id="a852f358c1af41bfcdcbb718a9a933af7"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a852f358c1af41bfcdcbb718a9a933af7">&#9670;&nbsp;</a></span>pass_back()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<div class="memtemplate">
-template&lt;typename Scalar &gt; </div>
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="classcattle_1_1_layer.html#a8c0af442a18521dea2406d0878e7db61">Root::Data</a> <a class="el" href="classcattle_1_1_batch_norm_layer.html">cattle::BatchNormLayer</a>&lt; Scalar, 3 &gt;::pass_back </td>
-          <td>(</td>
-          <td class="paramtype">typename <a class="el" href="classcattle_1_1_layer.html#a8c0af442a18521dea2406d0878e7db61">Root::Data</a>&#160;</td>
-          <td class="paramname"><em>out_grads</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">protected</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a id="a8c8fa4339bf9997ce6ff9006fa19d632"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a8c8fa4339bf9997ce6ff9006fa19d632">&#9670;&nbsp;</a></span>pass_forward()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<div class="memtemplate">
-template&lt;typename Scalar &gt; </div>
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="classcattle_1_1_layer.html#a8c0af442a18521dea2406d0878e7db61">Base::Data</a> <a class="el" href="classcattle_1_1_batch_norm_layer.html">cattle::BatchNormLayer</a>&lt; Scalar, 3 &gt;::pass_forward </td>
-          <td>(</td>
-          <td class="paramtype">typename <a class="el" href="classcattle_1_1_layer.html#a8c0af442a18521dea2406d0878e7db61">Root::Data</a>&#160;</td>
-          <td class="paramname"><em>in</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">bool&#160;</td>
-          <td class="paramname"><em>training</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">protected</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<h2 class="groupheader">Member Data Documentation</h2>
-<a id="a95133ef54eef605f79df3da32328c2bb"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a95133ef54eef605f79df3da32328c2bb">&#9670;&nbsp;</a></span>extents</h2>
-
-<div class="memitem">
-<div class="memproto">
-<div class="memtemplate">
-template&lt;typename Scalar &gt; </div>
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">Base::RankwiseArray <a class="el" href="classcattle_1_1_batch_norm_layer.html">cattle::BatchNormLayer</a>&lt; Scalar, 3 &gt;::extents</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">private</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a id="a11bfab7601af6b7aeb0800fa7691ef63"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a11bfab7601af6b7aeb0800fa7691ef63">&#9670;&nbsp;</a></span>offsets</h2>
-
-<div class="memitem">
-<div class="memproto">
-<div class="memtemplate">
-template&lt;typename Scalar &gt; </div>
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">Base::RankwiseArray <a class="el" href="classcattle_1_1_batch_norm_layer.html">cattle::BatchNormLayer</a>&lt; Scalar, 3 &gt;::offsets</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">private</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-</div>
-</div>
 <hr/>The documentation for this class was generated from the following file:<ul>
-<li>src/<a class="el" href="_layer_8h_source.html">Layer.h</a></li>
+<li>include/<a class="el" href="_layer_8hpp_source.html">Layer.hpp</a></li>
 </ul>
 </div><!-- contents -->
 <!-- start footer part -->

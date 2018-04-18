@@ -5,14 +5,15 @@
  *      Author: Viktor Csomor
  */
 
-#ifndef WEIGHTINITIALIZATION_H_
-#define WEIGHTINITIALIZATION_H_
+#ifndef INCLUDE_WEIGHTINITIALIZATION_H_
+#define INCLUDE_WEIGHTINITIALIZATION_H_
 
 #include <cmath>
 #include <random>
 #include <string>
 #include <type_traits>
-#include "Eigen.h"
+
+#include "utils/Eigen.hpp"
 
 namespace cattle {
 
@@ -206,4 +207,4 @@ private:
 
 } /* namespace cattle */
 
-#endif /* WEIGHTINITIALIZATION_H_ */
+#endif /* INCLUDE_WEIGHTINITIALIZATION_H_ */

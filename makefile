@@ -5,18 +5,20 @@ CLANG_CC := clang++
 CFLAGS := -std=c++11 -fmessage-length=0 -ftemplate-backtrace-limit=0
 GCC_CFLAGS := $(CFLAGS) -fopenmp
 GCC_CUDA_CFLAGS := $(GCC_CFLAGS) -DCATTLE_USE_CUBLAS
+# Clang does not support OpenMP on Windows; no libomp or libiomp5.
 CLANG_CFLAGS := $(CFLAGS) -march=native -fopenmp=libgomp
 CLANG_CUDA_CFLAGS := $(CLANG_CFLAGS) -DCATTLE_USE_CUBLAS
 RELEASE_OPT_FLAGS := -O3 -DNDEBUG
 DEBUG_OPT_FLAGS := -O1 -Wa,-mbig-obj -g
 # For Clang on Windows, omp.h must be copied from GCC.
-INCLUDES := -Iext/Eigen/ -Isrc/ -Isrc/utils -Itest/
+INCLUDES := -Iext/Eigen/ -Iinclude/ -Itest/
 CUDA_INCLUDES := $(INCLUDES) -I"$(CUDA_INC_PATH)"
 LIBS := -lpthread -lgomp
 CUDA_LIBS := $(LIBS) -L"$(CUDA_LIB_PATH)" -lcudart -lcublas
 SOURCE_DIR := test
 SOURCES := test.cpp
 BUILD_DIR := build
+TARGET_FOLDER := bin
 TARGET_NAME := cattle_test
 TARGET := $(BUILD_DIR)/$(TARGET_NAME)
 OBJECTS := $(BUILD_DIR)/$(SOURCES:%.cpp=%.o)

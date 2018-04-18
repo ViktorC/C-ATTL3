@@ -22,7 +22,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">C-ATTL3
-   &#160;<span id="projectnumber">0.1</span>
+   &#160;<span id="projectnumber">0.5</span>
    </div>
   </td>
  </tr>
@@ -68,17 +68,14 @@ $(function() {
 <div class="header">
   <div class="summary">
 <a href="#pub-methods">Public Member Functions</a> &#124;
-<a href="#pro-types">Protected Types</a> &#124;
 <a href="#pro-methods">Protected Member Functions</a> &#124;
-<a href="#pro-static-attribs">Static Protected Attributes</a> &#124;
-<a href="#friends">Friends</a> &#124;
 <a href="classcattle_1_1_data_provider-members.html">List of all members</a>  </div>
   <div class="headertitle">
 <div class="title">cattle::DataProvider&lt; Scalar, Rank, Sequential &gt; Class Template Reference<span class="mlabels"><span class="mlabel">abstract</span></span></div>  </div>
 </div><!--header-->
 <div class="contents">
 
-<p><code>#include &lt;<a class="el" href="_data_provider_8h_source.html">DataProvider.h</a>&gt;</code></p>
+<p><code>#include &lt;<a class="el" href="_data_provider_8hpp_source.html">DataProvider.hpp</a>&gt;</code></p>
 <div class="dynheader">
 Inheritance diagram for cattle::DataProvider&lt; Scalar, Rank, Sequential &gt;:</div>
 <div class="dyncontent">
@@ -98,8 +95,6 @@ Inheritance diagram for cattle::DataProvider&lt; Scalar, Rank, Sequential &gt;:<
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:a395f1f268fe598fe253e68b259cdc064"><td class="memItemLeft" align="right" valign="top">virtual&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_data_provider.html#a395f1f268fe598fe253e68b259cdc064">~DataProvider</a> ()=default</td></tr>
-<tr class="separator:a395f1f268fe598fe253e68b259cdc064"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a8f877a9733373af4c29e86eb5235d00e"><td class="memItemLeft" align="right" valign="top">virtual const <a class="el" href="classcattle_1_1_dimensions.html">Dimensions</a>&lt; std::size_t, Rank &gt; &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_data_provider.html#a8f877a9733373af4c29e86eb5235d00e">get_obs_dims</a> () const =0</td></tr>
 <tr class="separator:a8f877a9733373af4c29e86eb5235d00e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a797875a230c677d448455d87ee00ff78"><td class="memItemLeft" align="right" valign="top">virtual const <a class="el" href="classcattle_1_1_dimensions.html">Dimensions</a>&lt; std::size_t, Rank &gt; &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_data_provider.html#a797875a230c677d448455d87ee00ff78">get_obj_dims</a> () const =0</td></tr>
@@ -111,111 +106,17 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a79add4b189a9082f82b83c0ffc0bc623"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_data_provider.html#a79add4b189a9082f82b83c0ffc0bc623">reset</a> ()=0</td></tr>
 <tr class="separator:a79add4b189a9082f82b83c0ffc0bc623"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pro-types"></a>
-Protected Types</h2></td></tr>
-<tr class="memitem:a6deebf8d0543245c80ba77693b6e9619"><td class="memItemLeft" align="right" valign="top">typedef <a class="el" href="namespacecattle.html#a8b9323ad928764340e46f0802bf27fbb">Tensor</a>&lt; Scalar, <a class="el" href="classcattle_1_1_data_provider.html#a8db59369ae8c577bad4fb33c770745fb">DATA_RANK</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_data_provider.html#a6deebf8d0543245c80ba77693b6e9619">Data</a></td></tr>
-<tr class="separator:a6deebf8d0543245c80ba77693b6e9619"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:adb5309644096f7d5ce996c4c5358b558"><td class="memItemLeft" align="right" valign="top">typedef <a class="el" href="namespacecattle.html#ae90497baf0bcd6d9b075aa3287bcd475">TensorPtr</a>&lt; Scalar, <a class="el" href="classcattle_1_1_data_provider.html#a8db59369ae8c577bad4fb33c770745fb">DATA_RANK</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_data_provider.html#adb5309644096f7d5ce996c4c5358b558">DataPtr</a></td></tr>
-<tr class="separator:adb5309644096f7d5ce996c4c5358b558"><td class="memSeparator" colspan="2">&#160;</td></tr>
-</table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pro-methods"></a>
 Protected Member Functions</h2></td></tr>
 <tr class="memitem:a85417b88f1ca8466bab448d95eed0e1c"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_data_provider.html#a85417b88f1ca8466bab448d95eed0e1c">skip</a> (std::size_t instances)=0</td></tr>
 <tr class="separator:a85417b88f1ca8466bab448d95eed0e1c"><td class="memSeparator" colspan="2">&#160;</td></tr>
-</table><table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pro-static-attribs"></a>
-Static Protected Attributes</h2></td></tr>
-<tr class="memitem:a8db59369ae8c577bad4fb33c770745fb"><td class="memItemLeft" align="right" valign="top">static constexpr std::size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_data_provider.html#a8db59369ae8c577bad4fb33c770745fb">DATA_RANK</a> = Rank + Sequential + 1</td></tr>
-<tr class="separator:a8db59369ae8c577bad4fb33c770745fb"><td class="memSeparator" colspan="2">&#160;</td></tr>
-</table><table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="friends"></a>
-Friends</h2></td></tr>
-<tr class="memitem:ad61e19d5c5f0d53063003ed71f045a5f"><td class="memItemLeft" align="right" valign="top">class&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_data_provider.html#ad61e19d5c5f0d53063003ed71f045a5f">PartitionDataProvider&lt; Scalar, Rank, Sequential &gt;</a></td></tr>
-<tr class="separator:ad61e19d5c5f0d53063003ed71f045a5f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><h3>template&lt;typename Scalar, std::size_t Rank, bool Sequential&gt;<br />
 class cattle::DataProvider&lt; Scalar, Rank, Sequential &gt;</h3>
 
 <p>A class template for fetching data from memory or disk. </p>
-</div><h2 class="groupheader">Member Typedef Documentation</h2>
-<a id="a6deebf8d0543245c80ba77693b6e9619"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a6deebf8d0543245c80ba77693b6e9619">&#9670;&nbsp;</a></span>Data</h2>
-
-<div class="memitem">
-<div class="memproto">
-<div class="memtemplate">
-template&lt;typename Scalar , std::size_t Rank, bool Sequential&gt; </div>
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">typedef <a class="el" href="namespacecattle.html#a8b9323ad928764340e46f0802bf27fbb">Tensor</a>&lt;Scalar,<a class="el" href="classcattle_1_1_data_provider.html#a8db59369ae8c577bad4fb33c770745fb">DATA_RANK</a>&gt; <a class="el" href="classcattle_1_1_data_provider.html">cattle::DataProvider</a>&lt; Scalar, Rank, Sequential &gt;::<a class="el" href="classcattle_1_1_data_provider.html#a6deebf8d0543245c80ba77693b6e9619">Data</a></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">protected</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a id="adb5309644096f7d5ce996c4c5358b558"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#adb5309644096f7d5ce996c4c5358b558">&#9670;&nbsp;</a></span>DataPtr</h2>
-
-<div class="memitem">
-<div class="memproto">
-<div class="memtemplate">
-template&lt;typename Scalar , std::size_t Rank, bool Sequential&gt; </div>
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">typedef <a class="el" href="namespacecattle.html#ae90497baf0bcd6d9b075aa3287bcd475">TensorPtr</a>&lt;Scalar,<a class="el" href="classcattle_1_1_data_provider.html#a8db59369ae8c577bad4fb33c770745fb">DATA_RANK</a>&gt; <a class="el" href="classcattle_1_1_data_provider.html">cattle::DataProvider</a>&lt; Scalar, Rank, Sequential &gt;::<a class="el" href="classcattle_1_1_data_provider.html#adb5309644096f7d5ce996c4c5358b558">DataPtr</a></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">protected</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
-<a id="a395f1f268fe598fe253e68b259cdc064"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a395f1f268fe598fe253e68b259cdc064">&#9670;&nbsp;</a></span>~DataProvider()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<div class="memtemplate">
-template&lt;typename Scalar , std::size_t Rank, bool Sequential&gt; </div>
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">virtual <a class="el" href="classcattle_1_1_data_provider.html">cattle::DataProvider</a>&lt; Scalar, Rank, Sequential &gt;::~<a class="el" href="classcattle_1_1_data_provider.html">DataProvider</a> </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">virtual</span><span class="mlabel">default</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<h2 class="groupheader">Member Function Documentation</h2>
+</div><h2 class="groupheader">Member Function Documentation</h2>
 <a id="a2545442faef51fda5466054df0ae929a"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a2545442faef51fda5466054df0ae929a">&#9670;&nbsp;</a></span>get_data()</h2>
 
@@ -414,58 +315,8 @@ template&lt;typename Scalar , std::size_t Rank, bool Sequential&gt; </div>
 
 </div>
 </div>
-<h2 class="groupheader">Friends And Related Function Documentation</h2>
-<a id="ad61e19d5c5f0d53063003ed71f045a5f"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ad61e19d5c5f0d53063003ed71f045a5f">&#9670;&nbsp;</a></span>PartitionDataProvider&lt; Scalar, Rank, Sequential &gt;</h2>
-
-<div class="memitem">
-<div class="memproto">
-<div class="memtemplate">
-template&lt;typename Scalar , std::size_t Rank, bool Sequential&gt; </div>
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">friend class <a class="el" href="classcattle_1_1_partition_data_provider.html">PartitionDataProvider</a>&lt; Scalar, Rank, Sequential &gt;</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">friend</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<h2 class="groupheader">Member Data Documentation</h2>
-<a id="a8db59369ae8c577bad4fb33c770745fb"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a8db59369ae8c577bad4fb33c770745fb">&#9670;&nbsp;</a></span>DATA_RANK</h2>
-
-<div class="memitem">
-<div class="memproto">
-<div class="memtemplate">
-template&lt;typename Scalar , std::size_t Rank, bool Sequential&gt; </div>
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">constexpr std::size_t <a class="el" href="classcattle_1_1_data_provider.html">cattle::DataProvider</a>&lt; Scalar, Rank, Sequential &gt;::DATA_RANK = Rank + Sequential + 1</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">static</span><span class="mlabel">protected</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-</div>
-</div>
 <hr/>The documentation for this class was generated from the following file:<ul>
-<li>src/<a class="el" href="_data_provider_8h_source.html">DataProvider.h</a></li>
+<li>include/<a class="el" href="_data_provider_8hpp_source.html">DataProvider.hpp</a></li>
 </ul>
 </div><!-- contents -->
 <!-- start footer part -->

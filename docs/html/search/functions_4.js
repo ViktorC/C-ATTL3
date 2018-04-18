@@ -6,7 +6,6 @@ var searchData=
   ['decidedly_5flesser',['decidedly_lesser',['../classcattle_1_1internal_1_1_numeric_utils.html#a4ccb98354f5c472bf029545c79ea2cad',1,'cattle::internal::NumericUtils']]],
   ['demote',['demote',['../classcattle_1_1_dimensions.html#a3f279dec6f26b6e1fbe9adb5c1369bab',1,'cattle::Dimensions']]],
   ['denseneuralnetwork',['DenseNeuralNetwork',['../classcattle_1_1_dense_neural_network.html#a2a9ad924f0d198ba21f5ae62fe2499df',1,'cattle::DenseNeuralNetwork']]],
-  ['dimensions',['Dimensions',['../classcattle_1_1_dimensions.html#a2bcb1da4a2e1604f8bb13a01c908065a',1,'cattle::Dimensions::Dimensions()'],['../classcattle_1_1_dimensions.html#a5e4b12c4431b0102e8f4145cd3817721',1,'cattle::Dimensions::Dimensions(const std::initializer_list&lt; IndexType &gt; &amp;values)'],['../classcattle_1_1_dimensions.html#af7079dcfba878f06047add27b4c9a6b1',1,'cattle::Dimensions::Dimensions(const std::array&lt; IndexType, Rank &gt; &amp;array)'],['../classcattle_1_1_dimensions.html#a4dc51117b2c714068892ee37f12cfc4d',1,'cattle::Dimensions::Dimensions(const DimExpression&lt; OtherDerived, IndexType, Rank &gt; &amp;dims)']]],
   ['divide_5falong_5frank',['divide_along_rank',['../classcattle_1_1_dim_expression.html#aa4651f18fd078bc3a0b60999c463261a',1,'cattle::DimExpression']]],
   ['dropoutlayer',['DropoutLayer',['../classcattle_1_1_dropout_layer.html#aaa9166a01c9e2afacf42157054f6020e',1,'cattle::DropoutLayer']]]
 ];

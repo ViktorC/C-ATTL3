@@ -1,6 +1,5 @@
 var searchData=
 [
-  ['lane',['Lane',['../classcattle_1_1_parallel_neural_network.html#a9584d93e319dd3c033a5dfd5ba0a1cb5',1,'cattle::ParallelNeuralNetwork']]],
-  ['layerptr',['LayerPtr',['../namespacecattle.html#ad9bc255ce8185babba9c66dbc39ee77f',1,'cattle']]],
-  ['losssharedptr',['LossSharedPtr',['../namespacecattle.html#a5fa4a5f7df1ad35afbadd9975ec24a12',1,'cattle']]]
+  ['matrix',['Matrix',['../namespacecattle.html#a1d78623a47279d516750a44dbad6090b',1,'cattle']]],
+  ['matrixmap',['MatrixMap',['../namespacecattle.html#afe8803bdb57fb149be7d7b7916f30ca9',1,'cattle']]]
 ];

@@ -5,8 +5,8 @@
  *      Author: Viktor Csomor
  */
 
-#ifndef OPTIMIZER_H_
-#define OPTIMIZER_H_
+#ifndef INCLUDE_OPTIMIZER_H_
+#define INCLUDE_OPTIMIZER_H_
 
 #include <algorithm>
 #include <cassert>
@@ -18,13 +18,14 @@
 #include <string>
 #include <type_traits>
 #include <vector>
-#include "DataProvider.h"
-#include "Eigen.h"
-#include "Loss.h"
-#include "NeuralNetwork.h"
-#include "NumericUtils.h"
-#include "ParameterRegularization.h"
-#include "WeightInitialization.h"
+
+#include "DataProvider.hpp"
+#include "Loss.hpp"
+#include "NeuralNetwork.hpp"
+#include "ParameterRegularization.hpp"
+#include "WeightInitialization.hpp"
+#include "utils/Eigen.hpp"
+#include "utils/NumericUtils.hpp"
 
 namespace cattle {
 
@@ -838,4 +839,4 @@ protected:
 
 } /* namespace cattle */
 
-#endif /* OPTIMIZER_H_ */
+#endif /* INCLUDE_OPTIMIZER_H_ */

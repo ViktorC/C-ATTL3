@@ -5,8 +5,8 @@
  *      Author: Viktor Csomor
  */
 
-#ifndef LOSS_H_
-#define LOSS_H_
+#ifndef INCLUDE_LOSS_H_
+#define INCLUDE_LOSS_H_
 
 #include <array>
 #include <cassert>
@@ -16,8 +16,9 @@
 #include <string>
 #include <type_traits>
 #include <utility>
-#include "Eigen.h"
-#include "NumericUtils.h"
+
+#include "utils/Eigen.hpp"
+#include "utils/NumericUtils.hpp"
 
 namespace cattle {
 
@@ -459,4 +460,4 @@ private:
 
 } /* namespace cattle */
 
-#endif /* LOSS_H_ */
+#endif /* INCLUDE_LOSS_H_ */

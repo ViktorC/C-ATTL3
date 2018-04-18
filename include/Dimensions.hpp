@@ -5,8 +5,8 @@
  *      Author: Viktor Csomor
  */
 
-#ifndef DIMENSIONS_H_
-#define DIMENSIONS_H_
+#ifndef INCLUDE_DIMENSIONS_H_
+#define INCLUDE_DIMENSIONS_H_
 
 #include <algorithm>
 #include <array>
@@ -397,4 +397,4 @@ public:
 
 } /* namespace cattle */
 
-#endif /* DIMENSIONS_H_ */
+#endif /* INCLUDE_DIMENSIONS_H_ */

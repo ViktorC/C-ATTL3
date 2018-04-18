@@ -12,16 +12,8 @@
 #include <memory>
 #include <utility>
 #include <vector>
-#include "DataProvider.h"
-#include "Dimensions.h"
-#include "Eigen.h"
-#include "Layer.h"
-#include "Loss.h"
-#include "NeuralNetwork.h"
-#include "Optimizer.h"
-#include "ParameterRegularization.h"
-#include "Preprocessor.h"
-#include "WeightInitialization.h"
+
+#include "Cattle.hpp"
 
 using namespace cattle;
 typedef double fp;

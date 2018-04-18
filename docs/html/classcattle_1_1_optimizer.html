@@ -22,7 +22,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">C-ATTL3
-   &#160;<span id="projectnumber">0.1</span>
+   &#160;<span id="projectnumber">0.5</span>
    </div>
   </td>
  </tr>
@@ -68,17 +68,15 @@ $(function() {
 <div class="header">
   <div class="summary">
 <a href="#pub-methods">Public Member Functions</a> &#124;
-<a href="#pro-types">Protected Types</a> &#124;
 <a href="#pro-methods">Protected Member Functions</a> &#124;
 <a href="#pro-static-methods">Static Protected Member Functions</a> &#124;
-<a href="#pro-attribs">Protected Attributes</a> &#124;
 <a href="classcattle_1_1_optimizer-members.html">List of all members</a>  </div>
   <div class="headertitle">
 <div class="title">cattle::Optimizer&lt; Scalar, Rank, Sequential &gt; Class Template Reference<span class="mlabels"><span class="mlabel">abstract</span></span></div>  </div>
 </div><!--header-->
 <div class="contents">
 
-<p><code>#include &lt;<a class="el" href="_layer_8h_source.html">Layer.h</a>&gt;</code></p>
+<p><code>#include &lt;<a class="el" href="_optimizer_8hpp_source.html">Optimizer.hpp</a>&gt;</code></p>
 <div class="dynheader">
 Inheritance diagram for cattle::Optimizer&lt; Scalar, Rank, Sequential &gt;:</div>
 <div class="dyncontent">
@@ -100,40 +98,27 @@ Inheritance diagram for cattle::Optimizer&lt; Scalar, Rank, Sequential &gt;:</di
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:ad26c752cffbd9e33d9d88b606c301874"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_optimizer.html#ad26c752cffbd9e33d9d88b606c301874">Optimizer</a> (<a class="el" href="namespacecattle.html#a5fa4a5f7df1ad35afbadd9975ec24a12">LossSharedPtr</a>&lt; Scalar, Rank, Sequential &gt; <a class="el" href="classcattle_1_1_optimizer.html#a3716158bae6f92c7dd917d2ad804fafa">loss</a>)</td></tr>
-<tr class="separator:ad26c752cffbd9e33d9d88b606c301874"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a125a4d35cd81c567abca5def2c92947f"><td class="memItemLeft" align="right" valign="top">virtual&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_optimizer.html#a125a4d35cd81c567abca5def2c92947f">~Optimizer</a> ()=default</td></tr>
-<tr class="separator:a125a4d35cd81c567abca5def2c92947f"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a88c61b44dbe57daea3ec400ad7c38eb6"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_optimizer.html#a88c61b44dbe57daea3ec400ad7c38eb6">verify_gradients</a> (<a class="el" href="classcattle_1_1_optimizer.html#aa52f7eca506ab86e29639e6bd753cbb3">Net</a> &amp;net, <a class="el" href="classcattle_1_1_optimizer.html#ace96fe401c80b2c1c8008d091bea3bc3">Provider</a> &amp;provider, Scalar step_size=(<a class="el" href="classcattle_1_1internal_1_1_numeric_utils.html">internal::NumericUtils</a>&lt; Scalar &gt;::EPSILON2+<a class="el" href="classcattle_1_1internal_1_1_numeric_utils.html">internal::NumericUtils</a>&lt; Scalar &gt;::EPSILON3)/2, Scalar abs_epsilon=<a class="el" href="classcattle_1_1internal_1_1_numeric_utils.html">internal::NumericUtils</a>&lt; Scalar &gt;::EPSILON2, Scalar rel_epsilon=<a class="el" href="classcattle_1_1internal_1_1_numeric_utils.html">internal::NumericUtils</a>&lt; Scalar &gt;::EPSILON3) const</td></tr>
+<tr class="memitem:a88c61b44dbe57daea3ec400ad7c38eb6"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_optimizer.html#a88c61b44dbe57daea3ec400ad7c38eb6">verify_gradients</a> (<a class="el" href="classcattle_1_1_neural_network.html">Net</a> &amp;net, <a class="el" href="classcattle_1_1_data_provider.html">Provider</a> &amp;provider, Scalar step_size=(<a class="el" href="classcattle_1_1internal_1_1_numeric_utils.html">internal::NumericUtils</a>&lt; Scalar &gt;::EPSILON2+<a class="el" href="classcattle_1_1internal_1_1_numeric_utils.html">internal::NumericUtils</a>&lt; Scalar &gt;::EPSILON3)/2, Scalar abs_epsilon=<a class="el" href="classcattle_1_1internal_1_1_numeric_utils.html">internal::NumericUtils</a>&lt; Scalar &gt;::EPSILON2, Scalar rel_epsilon=<a class="el" href="classcattle_1_1internal_1_1_numeric_utils.html">internal::NumericUtils</a>&lt; Scalar &gt;::EPSILON3) const</td></tr>
 <tr class="separator:a88c61b44dbe57daea3ec400ad7c38eb6"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:abd96aab852071300003b1b71e97207ef"><td class="memItemLeft" align="right" valign="top">Scalar&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_optimizer.html#abd96aab852071300003b1b71e97207ef">optimize</a> (<a class="el" href="classcattle_1_1_optimizer.html#aa52f7eca506ab86e29639e6bd753cbb3">Net</a> &amp;net, <a class="el" href="classcattle_1_1_optimizer.html#ace96fe401c80b2c1c8008d091bea3bc3">Provider</a> &amp;training_prov, <a class="el" href="classcattle_1_1_optimizer.html#ace96fe401c80b2c1c8008d091bea3bc3">Provider</a> &amp;test_prov, unsigned epochs, unsigned early_stop=0)</td></tr>
+<tr class="memitem:abd96aab852071300003b1b71e97207ef"><td class="memItemLeft" align="right" valign="top">Scalar&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_optimizer.html#abd96aab852071300003b1b71e97207ef">optimize</a> (<a class="el" href="classcattle_1_1_neural_network.html">Net</a> &amp;net, <a class="el" href="classcattle_1_1_data_provider.html">Provider</a> &amp;training_prov, <a class="el" href="classcattle_1_1_data_provider.html">Provider</a> &amp;test_prov, unsigned epochs, unsigned early_stop=0)</td></tr>
 <tr class="separator:abd96aab852071300003b1b71e97207ef"><td class="memSeparator" colspan="2">&#160;</td></tr>
-</table><table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pro-types"></a>
-Protected Types</h2></td></tr>
-<tr class="memitem:aa52f7eca506ab86e29639e6bd753cbb3"><td class="memItemLeft" align="right" valign="top">typedef <a class="el" href="classcattle_1_1_neural_network.html">NeuralNetwork</a>&lt; Scalar, Rank, Sequential &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_optimizer.html#aa52f7eca506ab86e29639e6bd753cbb3">Net</a></td></tr>
-<tr class="separator:aa52f7eca506ab86e29639e6bd753cbb3"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ace96fe401c80b2c1c8008d091bea3bc3"><td class="memItemLeft" align="right" valign="top">typedef <a class="el" href="classcattle_1_1_data_provider.html">DataProvider</a>&lt; Scalar, Rank, Sequential &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_optimizer.html#ace96fe401c80b2c1c8008d091bea3bc3">Provider</a></td></tr>
-<tr class="separator:ace96fe401c80b2c1c8008d091bea3bc3"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a0d75182c650ec8e7cf615aad5fef649e"><td class="memItemLeft" align="right" valign="top">typedef <a class="el" href="namespacecattle.html#a8b9323ad928764340e46f0802bf27fbb">Tensor</a>&lt; Scalar, Rank+Sequential+1 &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_optimizer.html#a0d75182c650ec8e7cf615aad5fef649e">Data</a></td></tr>
-<tr class="separator:a0d75182c650ec8e7cf615aad5fef649e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pro-methods"></a>
 Protected Member Functions</h2></td></tr>
-<tr class="memitem:a5ea3b9b9173bf065c6d3f3978b57b823"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_optimizer.html#a5ea3b9b9173bf065c6d3f3978b57b823">fit</a> (<a class="el" href="classcattle_1_1_optimizer.html#aa52f7eca506ab86e29639e6bd753cbb3">Net</a> &amp;net)=0</td></tr>
+<tr class="memitem:a5ea3b9b9173bf065c6d3f3978b57b823"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_optimizer.html#a5ea3b9b9173bf065c6d3f3978b57b823">fit</a> (<a class="el" href="classcattle_1_1_neural_network.html">Net</a> &amp;net)=0</td></tr>
 <tr class="separator:a5ea3b9b9173bf065c6d3f3978b57b823"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a06ba2c8c3bd3cc7b953e84057395bcf1"><td class="memItemLeft" align="right" valign="top">virtual Scalar&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_optimizer.html#a06ba2c8c3bd3cc7b953e84057395bcf1">train</a> (<a class="el" href="classcattle_1_1_optimizer.html#aa52f7eca506ab86e29639e6bd753cbb3">Net</a> &amp;net, <a class="el" href="classcattle_1_1_optimizer.html#ace96fe401c80b2c1c8008d091bea3bc3">Provider</a> &amp;training_prov, unsigned epoch)=0</td></tr>
+<tr class="memitem:a06ba2c8c3bd3cc7b953e84057395bcf1"><td class="memItemLeft" align="right" valign="top">virtual Scalar&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_optimizer.html#a06ba2c8c3bd3cc7b953e84057395bcf1">train</a> (<a class="el" href="classcattle_1_1_neural_network.html">Net</a> &amp;net, <a class="el" href="classcattle_1_1_data_provider.html">Provider</a> &amp;training_prov, unsigned epoch)=0</td></tr>
 <tr class="separator:a06ba2c8c3bd3cc7b953e84057395bcf1"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:abeccb14ff8083627a72efa7cff5c6c56"><td class="memItemLeft" align="right" valign="top">virtual Scalar&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_optimizer.html#abeccb14ff8083627a72efa7cff5c6c56">test</a> (<a class="el" href="classcattle_1_1_optimizer.html#aa52f7eca506ab86e29639e6bd753cbb3">Net</a> &amp;net, <a class="el" href="classcattle_1_1_optimizer.html#ace96fe401c80b2c1c8008d091bea3bc3">Provider</a> &amp;test_prov, unsigned epoch)=0</td></tr>
+<tr class="memitem:abeccb14ff8083627a72efa7cff5c6c56"><td class="memItemLeft" align="right" valign="top">virtual Scalar&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_optimizer.html#abeccb14ff8083627a72efa7cff5c6c56">test</a> (<a class="el" href="classcattle_1_1_neural_network.html">Net</a> &amp;net, <a class="el" href="classcattle_1_1_data_provider.html">Provider</a> &amp;test_prov, unsigned epoch)=0</td></tr>
 <tr class="separator:abeccb14ff8083627a72efa7cff5c6c56"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pro-static-methods"></a>
 Static Protected Member Functions</h2></td></tr>
-<tr class="memitem:a0a13bf1096cd7c78da90aeca76df5bd0"><td class="memItemLeft" align="right" valign="top">static std::vector&lt; <a class="el" href="classcattle_1_1_layer.html">Layer</a>&lt; Scalar, Rank &gt; * &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_optimizer.html#a0a13bf1096cd7c78da90aeca76df5bd0">get_layers</a> (<a class="el" href="classcattle_1_1_optimizer.html#aa52f7eca506ab86e29639e6bd753cbb3">Net</a> &amp;net)</td></tr>
+<tr class="memitem:a0a13bf1096cd7c78da90aeca76df5bd0"><td class="memItemLeft" align="right" valign="top">static std::vector&lt; <a class="el" href="classcattle_1_1_layer.html">Layer</a>&lt; Scalar, Rank &gt; * &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_optimizer.html#a0a13bf1096cd7c78da90aeca76df5bd0">get_layers</a> (<a class="el" href="classcattle_1_1_neural_network.html">Net</a> &amp;net)</td></tr>
 <tr class="separator:a0a13bf1096cd7c78da90aeca76df5bd0"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a03eff65d0152bf88d98988808090f34c"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="classcattle_1_1_optimizer.html#a0d75182c650ec8e7cf615aad5fef649e">Data</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_optimizer.html#a03eff65d0152bf88d98988808090f34c">propagate</a> (<a class="el" href="classcattle_1_1_optimizer.html#aa52f7eca506ab86e29639e6bd753cbb3">Net</a> &amp;net, <a class="el" href="classcattle_1_1_optimizer.html#a0d75182c650ec8e7cf615aad5fef649e">Data</a> in)</td></tr>
+<tr class="memitem:a03eff65d0152bf88d98988808090f34c"><td class="memItemLeft" align="right" valign="top">static Data&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_optimizer.html#a03eff65d0152bf88d98988808090f34c">propagate</a> (<a class="el" href="classcattle_1_1_neural_network.html">Net</a> &amp;net, Data in)</td></tr>
 <tr class="separator:a03eff65d0152bf88d98988808090f34c"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ae9504099cd9dbaa6f64450eb6061efe9"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_optimizer.html#ae9504099cd9dbaa6f64450eb6061efe9">backpropagate</a> (<a class="el" href="classcattle_1_1_optimizer.html#aa52f7eca506ab86e29639e6bd753cbb3">Net</a> &amp;net, <a class="el" href="classcattle_1_1_optimizer.html#a0d75182c650ec8e7cf615aad5fef649e">Data</a> out_grads)</td></tr>
+<tr class="memitem:ae9504099cd9dbaa6f64450eb6061efe9"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_optimizer.html#ae9504099cd9dbaa6f64450eb6061efe9">backpropagate</a> (<a class="el" href="classcattle_1_1_neural_network.html">Net</a> &amp;net, Data out_grads)</td></tr>
 <tr class="separator:ae9504099cd9dbaa6f64450eb6061efe9"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:abc23bf23413dfa4a8c6a8d9b222af7eb"><td class="memItemLeft" align="right" valign="top">static bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_optimizer.html#abc23bf23413dfa4a8c6a8d9b222af7eb">is_parametric</a> (<a class="el" href="classcattle_1_1_layer.html">Layer</a>&lt; Scalar, Rank &gt; &amp;layer)</td></tr>
 <tr class="separator:abc23bf23413dfa4a8c6a8d9b222af7eb"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -147,147 +132,13 @@ Static Protected Member Functions</h2></td></tr>
 <tr class="separator:ae2bfb3dc91ecf8c99bafaeba6dc97814"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a63a20018587e3a729f49050613482f38"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_optimizer.html#a63a20018587e3a729f49050613482f38">enforce_constraints</a> (<a class="el" href="classcattle_1_1_layer.html">Layer</a>&lt; Scalar, Rank &gt; &amp;layer)</td></tr>
 <tr class="separator:a63a20018587e3a729f49050613482f38"><td class="memSeparator" colspan="2">&#160;</td></tr>
-</table><table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pro-attribs"></a>
-Protected Attributes</h2></td></tr>
-<tr class="memitem:a3716158bae6f92c7dd917d2ad804fafa"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="namespacecattle.html#a5fa4a5f7df1ad35afbadd9975ec24a12">LossSharedPtr</a>&lt; Scalar, Rank, Sequential &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_optimizer.html#a3716158bae6f92c7dd917d2ad804fafa">loss</a></td></tr>
-<tr class="separator:a3716158bae6f92c7dd917d2ad804fafa"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><h3>template&lt;typename Scalar, std::size_t Rank, bool Sequential&gt;<br />
 class cattle::Optimizer&lt; Scalar, Rank, Sequential &gt;</h3>
 
 <p>An abstract class template for neural network optimizer algorithm implementations. </p>
-</div><h2 class="groupheader">Member Typedef Documentation</h2>
-<a id="a0d75182c650ec8e7cf615aad5fef649e"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a0d75182c650ec8e7cf615aad5fef649e">&#9670;&nbsp;</a></span>Data</h2>
-
-<div class="memitem">
-<div class="memproto">
-<div class="memtemplate">
-template&lt;typename Scalar , std::size_t Rank, bool Sequential&gt; </div>
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">typedef <a class="el" href="namespacecattle.html#a8b9323ad928764340e46f0802bf27fbb">Tensor</a>&lt;Scalar,Rank + Sequential + 1&gt; <a class="el" href="classcattle_1_1_optimizer.html">cattle::Optimizer</a>&lt; Scalar, Rank, Sequential &gt;::<a class="el" href="classcattle_1_1_optimizer.html#a0d75182c650ec8e7cf615aad5fef649e">Data</a></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">protected</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a id="aa52f7eca506ab86e29639e6bd753cbb3"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aa52f7eca506ab86e29639e6bd753cbb3">&#9670;&nbsp;</a></span>Net</h2>
-
-<div class="memitem">
-<div class="memproto">
-<div class="memtemplate">
-template&lt;typename Scalar , std::size_t Rank, bool Sequential&gt; </div>
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">typedef <a class="el" href="classcattle_1_1_neural_network.html">NeuralNetwork</a>&lt;Scalar,Rank,Sequential&gt; <a class="el" href="classcattle_1_1_optimizer.html">cattle::Optimizer</a>&lt; Scalar, Rank, Sequential &gt;::<a class="el" href="classcattle_1_1_optimizer.html#aa52f7eca506ab86e29639e6bd753cbb3">Net</a></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">protected</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a id="ace96fe401c80b2c1c8008d091bea3bc3"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ace96fe401c80b2c1c8008d091bea3bc3">&#9670;&nbsp;</a></span>Provider</h2>
-
-<div class="memitem">
-<div class="memproto">
-<div class="memtemplate">
-template&lt;typename Scalar , std::size_t Rank, bool Sequential&gt; </div>
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">typedef <a class="el" href="classcattle_1_1_data_provider.html">DataProvider</a>&lt;Scalar,Rank,Sequential&gt; <a class="el" href="classcattle_1_1_optimizer.html">cattle::Optimizer</a>&lt; Scalar, Rank, Sequential &gt;::<a class="el" href="classcattle_1_1_optimizer.html#ace96fe401c80b2c1c8008d091bea3bc3">Provider</a></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">protected</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
-<a id="ad26c752cffbd9e33d9d88b606c301874"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ad26c752cffbd9e33d9d88b606c301874">&#9670;&nbsp;</a></span>Optimizer()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<div class="memtemplate">
-template&lt;typename Scalar , std::size_t Rank, bool Sequential&gt; </div>
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="classcattle_1_1_optimizer.html">cattle::Optimizer</a>&lt; Scalar, Rank, Sequential &gt;::<a class="el" href="classcattle_1_1_optimizer.html">Optimizer</a> </td>
-          <td>(</td>
-          <td class="paramtype"><a class="el" href="namespacecattle.html#a5fa4a5f7df1ad35afbadd9975ec24a12">LossSharedPtr</a>&lt; Scalar, Rank, Sequential &gt;&#160;</td>
-          <td class="paramname"><em>loss</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a id="a125a4d35cd81c567abca5def2c92947f"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a125a4d35cd81c567abca5def2c92947f">&#9670;&nbsp;</a></span>~Optimizer()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<div class="memtemplate">
-template&lt;typename Scalar , std::size_t Rank, bool Sequential&gt; </div>
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">virtual <a class="el" href="classcattle_1_1_optimizer.html">cattle::Optimizer</a>&lt; Scalar, Rank, Sequential &gt;::~<a class="el" href="classcattle_1_1_optimizer.html">Optimizer</a> </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">virtual</span><span class="mlabel">default</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<h2 class="groupheader">Member Function Documentation</h2>
+</div><h2 class="groupheader">Member Function Documentation</h2>
 <a id="ae9504099cd9dbaa6f64450eb6061efe9"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#ae9504099cd9dbaa6f64450eb6061efe9">&#9670;&nbsp;</a></span>backpropagate()</h2>
 
@@ -302,13 +153,13 @@ template&lt;typename Scalar , std::size_t Rank, bool Sequential&gt; </div>
         <tr>
           <td class="memname">static void <a class="el" href="classcattle_1_1_optimizer.html">cattle::Optimizer</a>&lt; Scalar, Rank, Sequential &gt;::backpropagate </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="classcattle_1_1_optimizer.html#aa52f7eca506ab86e29639e6bd753cbb3">Net</a> &amp;&#160;</td>
+          <td class="paramtype"><a class="el" href="classcattle_1_1_neural_network.html">Net</a> &amp;&#160;</td>
           <td class="paramname"><em>net</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype"><a class="el" href="classcattle_1_1_optimizer.html#a0d75182c650ec8e7cf615aad5fef649e">Data</a>&#160;</td>
+          <td class="paramtype">Data&#160;</td>
           <td class="paramname"><em>out_grads</em>&#160;</td>
         </tr>
         <tr>
@@ -387,7 +238,7 @@ template&lt;typename Scalar , std::size_t Rank, bool Sequential&gt; </div>
         <tr>
           <td class="memname">virtual void <a class="el" href="classcattle_1_1_optimizer.html">cattle::Optimizer</a>&lt; Scalar, Rank, Sequential &gt;::fit </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="classcattle_1_1_optimizer.html#aa52f7eca506ab86e29639e6bd753cbb3">Net</a> &amp;&#160;</td>
+          <td class="paramtype"><a class="el" href="classcattle_1_1_neural_network.html">Net</a> &amp;&#160;</td>
           <td class="paramname"><em>net</em></td><td>)</td>
           <td></td>
         </tr>
@@ -424,7 +275,7 @@ template&lt;typename Scalar , std::size_t Rank, bool Sequential&gt; </div>
         <tr>
           <td class="memname">static std::vector&lt;<a class="el" href="classcattle_1_1_layer.html">Layer</a>&lt;Scalar,Rank&gt;*&gt; <a class="el" href="classcattle_1_1_optimizer.html">cattle::Optimizer</a>&lt; Scalar, Rank, Sequential &gt;::get_layers </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="classcattle_1_1_optimizer.html#aa52f7eca506ab86e29639e6bd753cbb3">Net</a> &amp;&#160;</td>
+          <td class="paramtype"><a class="el" href="classcattle_1_1_neural_network.html">Net</a> &amp;&#160;</td>
           <td class="paramname"><em>net</em></td><td>)</td>
           <td></td>
         </tr>
@@ -614,19 +465,19 @@ template&lt;typename Scalar , std::size_t Rank, bool Sequential&gt; </div>
         <tr>
           <td class="memname">Scalar <a class="el" href="classcattle_1_1_optimizer.html">cattle::Optimizer</a>&lt; Scalar, Rank, Sequential &gt;::optimize </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="classcattle_1_1_optimizer.html#aa52f7eca506ab86e29639e6bd753cbb3">Net</a> &amp;&#160;</td>
+          <td class="paramtype"><a class="el" href="classcattle_1_1_neural_network.html">Net</a> &amp;&#160;</td>
           <td class="paramname"><em>net</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype"><a class="el" href="classcattle_1_1_optimizer.html#ace96fe401c80b2c1c8008d091bea3bc3">Provider</a> &amp;&#160;</td>
+          <td class="paramtype"><a class="el" href="classcattle_1_1_data_provider.html">Provider</a> &amp;&#160;</td>
           <td class="paramname"><em>training_prov</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype"><a class="el" href="classcattle_1_1_optimizer.html#ace96fe401c80b2c1c8008d091bea3bc3">Provider</a> &amp;&#160;</td>
+          <td class="paramtype"><a class="el" href="classcattle_1_1_data_provider.html">Provider</a> &amp;&#160;</td>
           <td class="paramname"><em>test_prov</em>, </td>
         </tr>
         <tr>
@@ -680,15 +531,15 @@ template&lt;typename Scalar , std::size_t Rank, bool Sequential&gt; </div>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">static <a class="el" href="classcattle_1_1_optimizer.html#a0d75182c650ec8e7cf615aad5fef649e">Data</a> <a class="el" href="classcattle_1_1_optimizer.html">cattle::Optimizer</a>&lt; Scalar, Rank, Sequential &gt;::propagate </td>
+          <td class="memname">static Data <a class="el" href="classcattle_1_1_optimizer.html">cattle::Optimizer</a>&lt; Scalar, Rank, Sequential &gt;::propagate </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="classcattle_1_1_optimizer.html#aa52f7eca506ab86e29639e6bd753cbb3">Net</a> &amp;&#160;</td>
+          <td class="paramtype"><a class="el" href="classcattle_1_1_neural_network.html">Net</a> &amp;&#160;</td>
           <td class="paramname"><em>net</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype"><a class="el" href="classcattle_1_1_optimizer.html#a0d75182c650ec8e7cf615aad5fef649e">Data</a>&#160;</td>
+          <td class="paramtype">Data&#160;</td>
           <td class="paramname"><em>in</em>&#160;</td>
         </tr>
         <tr>
@@ -768,13 +619,13 @@ template&lt;typename Scalar , std::size_t Rank, bool Sequential&gt; </div>
         <tr>
           <td class="memname">virtual Scalar <a class="el" href="classcattle_1_1_optimizer.html">cattle::Optimizer</a>&lt; Scalar, Rank, Sequential &gt;::test </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="classcattle_1_1_optimizer.html#aa52f7eca506ab86e29639e6bd753cbb3">Net</a> &amp;&#160;</td>
+          <td class="paramtype"><a class="el" href="classcattle_1_1_neural_network.html">Net</a> &amp;&#160;</td>
           <td class="paramname"><em>net</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype"><a class="el" href="classcattle_1_1_optimizer.html#ace96fe401c80b2c1c8008d091bea3bc3">Provider</a> &amp;&#160;</td>
+          <td class="paramtype"><a class="el" href="classcattle_1_1_data_provider.html">Provider</a> &amp;&#160;</td>
           <td class="paramname"><em>test_prov</em>, </td>
         </tr>
         <tr>
@@ -824,13 +675,13 @@ template&lt;typename Scalar , std::size_t Rank, bool Sequential&gt; </div>
         <tr>
           <td class="memname">virtual Scalar <a class="el" href="classcattle_1_1_optimizer.html">cattle::Optimizer</a>&lt; Scalar, Rank, Sequential &gt;::train </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="classcattle_1_1_optimizer.html#aa52f7eca506ab86e29639e6bd753cbb3">Net</a> &amp;&#160;</td>
+          <td class="paramtype"><a class="el" href="classcattle_1_1_neural_network.html">Net</a> &amp;&#160;</td>
           <td class="paramname"><em>net</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype"><a class="el" href="classcattle_1_1_optimizer.html#ace96fe401c80b2c1c8008d091bea3bc3">Provider</a> &amp;&#160;</td>
+          <td class="paramtype"><a class="el" href="classcattle_1_1_data_provider.html">Provider</a> &amp;&#160;</td>
           <td class="paramname"><em>training_prov</em>, </td>
         </tr>
         <tr>
@@ -880,13 +731,13 @@ template&lt;typename Scalar , std::size_t Rank, bool Sequential&gt; </div>
         <tr>
           <td class="memname">bool <a class="el" href="classcattle_1_1_optimizer.html">cattle::Optimizer</a>&lt; Scalar, Rank, Sequential &gt;::verify_gradients </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="classcattle_1_1_optimizer.html#aa52f7eca506ab86e29639e6bd753cbb3">Net</a> &amp;&#160;</td>
+          <td class="paramtype"><a class="el" href="classcattle_1_1_neural_network.html">Net</a> &amp;&#160;</td>
           <td class="paramname"><em>net</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype"><a class="el" href="classcattle_1_1_optimizer.html#ace96fe401c80b2c1c8008d091bea3bc3">Provider</a> &amp;&#160;</td>
+          <td class="paramtype"><a class="el" href="classcattle_1_1_data_provider.html">Provider</a> &amp;&#160;</td>
           <td class="paramname"><em>provider</em>, </td>
         </tr>
         <tr>
@@ -934,34 +785,9 @@ template&lt;typename Scalar , std::size_t Rank, bool Sequential&gt; </div>
 
 </div>
 </div>
-<h2 class="groupheader">Member Data Documentation</h2>
-<a id="a3716158bae6f92c7dd917d2ad804fafa"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a3716158bae6f92c7dd917d2ad804fafa">&#9670;&nbsp;</a></span>loss</h2>
-
-<div class="memitem">
-<div class="memproto">
-<div class="memtemplate">
-template&lt;typename Scalar , std::size_t Rank, bool Sequential&gt; </div>
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">const <a class="el" href="namespacecattle.html#a5fa4a5f7df1ad35afbadd9975ec24a12">LossSharedPtr</a>&lt;Scalar,Rank,Sequential&gt; <a class="el" href="classcattle_1_1_optimizer.html">cattle::Optimizer</a>&lt; Scalar, Rank, Sequential &gt;::loss</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">protected</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-</div>
-</div>
 <hr/>The documentation for this class was generated from the following files:<ul>
-<li>src/<a class="el" href="_layer_8h_source.html">Layer.h</a></li>
-<li>src/<a class="el" href="_optimizer_8h_source.html">Optimizer.h</a></li>
+<li>include/<a class="el" href="_layer_8hpp_source.html">Layer.hpp</a></li>
+<li>include/<a class="el" href="_optimizer_8hpp_source.html">Optimizer.hpp</a></li>
 </ul>
 </div><!-- contents -->
 <!-- start footer part -->

@@ -22,7 +22,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">C-ATTL3
-   &#160;<span id="projectnumber">0.1</span>
+   &#160;<span id="projectnumber">0.5</span>
    </div>
   </td>
  </tr>
@@ -69,15 +69,13 @@ $(function() {
   <div class="summary">
 <a href="#pub-methods">Public Member Functions</a> &#124;
 <a href="#pro-methods">Protected Member Functions</a> &#124;
-<a href="#pri-types">Private Types</a> &#124;
-<a href="#pri-attribs">Private Attributes</a> &#124;
 <a href="classcattle_1_1_memory_data_provider-members.html">List of all members</a>  </div>
   <div class="headertitle">
 <div class="title">cattle::MemoryDataProvider&lt; Scalar, Rank, Sequential, Shuffle &gt; Class Template Reference</div>  </div>
 </div><!--header-->
 <div class="contents">
 
-<p><code>#include &lt;<a class="el" href="_data_provider_8h_source.html">DataProvider.h</a>&gt;</code></p>
+<p><code>#include &lt;<a class="el" href="_data_provider_8hpp_source.html">DataProvider.hpp</a>&gt;</code></p>
 <div class="dynheader">
 Inheritance diagram for cattle::MemoryDataProvider&lt; Scalar, Rank, Sequential, Shuffle &gt;:</div>
 <div class="dyncontent">
@@ -90,7 +88,7 @@ Inheritance diagram for cattle::MemoryDataProvider&lt; Scalar, Rank, Sequential,
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:a6376047b2d04dafb02a033275eb28fce"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_memory_data_provider.html#a6376047b2d04dafb02a033275eb28fce">MemoryDataProvider</a> (typename <a class="el" href="classcattle_1_1_data_provider.html#adb5309644096f7d5ce996c4c5358b558">Base::DataPtr</a> <a class="el" href="classcattle_1_1_memory_data_provider.html#acfd14d7134dbe46b66975aa41cc4cad1">obs</a>, typename <a class="el" href="classcattle_1_1_data_provider.html#adb5309644096f7d5ce996c4c5358b558">Base::DataPtr</a> <a class="el" href="classcattle_1_1_memory_data_provider.html#aa67ea38e2693cece1ff62105c54f00ce">obj</a>)</td></tr>
+<tr class="memitem:a6376047b2d04dafb02a033275eb28fce"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_memory_data_provider.html#a6376047b2d04dafb02a033275eb28fce">MemoryDataProvider</a> (typename Base::DataPtr obs, typename Base::DataPtr obj)</td></tr>
 <tr class="separator:a6376047b2d04dafb02a033275eb28fce"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:acca261042393126d0c6b0fb7ed1b025e"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="classcattle_1_1_dimensions.html">Dimensions</a>&lt; std::size_t, Rank &gt; &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_memory_data_provider.html#acca261042393126d0c6b0fb7ed1b025e">get_obs_dims</a> () const</td></tr>
 <tr class="separator:acca261042393126d0c6b0fb7ed1b025e"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -102,83 +100,18 @@ Public Member Functions</h2></td></tr>
 <tr class="separator:af9c8dbfe653a4c18596470d9b587a9c1"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:acd2d39fd367b01f0eb0499978eac43ac"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_memory_data_provider.html#acd2d39fd367b01f0eb0499978eac43ac">reset</a> ()</td></tr>
 <tr class="separator:acd2d39fd367b01f0eb0499978eac43ac"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="inherit_header pub_methods_classcattle_1_1_data_provider"><td colspan="2" onclick="javascript:toggleInherit('pub_methods_classcattle_1_1_data_provider')"><img src="closed.png" alt="-"/>&#160;Public Member Functions inherited from <a class="el" href="classcattle_1_1_data_provider.html">cattle::DataProvider&lt; Scalar, Rank, Sequential &gt;</a></td></tr>
-<tr class="memitem:a395f1f268fe598fe253e68b259cdc064 inherit pub_methods_classcattle_1_1_data_provider"><td class="memItemLeft" align="right" valign="top">virtual&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_data_provider.html#a395f1f268fe598fe253e68b259cdc064">~DataProvider</a> ()=default</td></tr>
-<tr class="separator:a395f1f268fe598fe253e68b259cdc064 inherit pub_methods_classcattle_1_1_data_provider"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pro-methods"></a>
 Protected Member Functions</h2></td></tr>
-<tr class="memitem:a80b122ac739ec1614856fc6d01d3876d"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_memory_data_provider.html#a80b122ac739ec1614856fc6d01d3876d">skip</a> (std::size_t <a class="el" href="classcattle_1_1_memory_data_provider.html#abb6deef0a51ec870e847768e254aaa62">instances</a>)</td></tr>
+<tr class="memitem:a80b122ac739ec1614856fc6d01d3876d"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_memory_data_provider.html#a80b122ac739ec1614856fc6d01d3876d">skip</a> (std::size_t instances)</td></tr>
 <tr class="separator:a80b122ac739ec1614856fc6d01d3876d"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a87be1abf200bade40f4c3db04275bd56"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_memory_data_provider.html#a87be1abf200bade40f4c3db04275bd56">shuffle_tensor_rows</a> ()</td></tr>
-<tr class="separator:a87be1abf200bade40f4c3db04275bd56"><td class="memSeparator" colspan="2">&#160;</td></tr>
-</table><table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pri-types"></a>
-Private Types</h2></td></tr>
-<tr class="memitem:a3ef3389732ed7a778f9cf4030345861b"><td class="memItemLeft" align="right" valign="top">typedef <a class="el" href="classcattle_1_1_data_provider.html">DataProvider</a>&lt; Scalar, Rank, Sequential &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_memory_data_provider.html#a3ef3389732ed7a778f9cf4030345861b">Base</a></td></tr>
-<tr class="separator:a3ef3389732ed7a778f9cf4030345861b"><td class="memSeparator" colspan="2">&#160;</td></tr>
-</table><table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pri-attribs"></a>
-Private Attributes</h2></td></tr>
-<tr class="memitem:acfd14d7134dbe46b66975aa41cc4cad1"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classcattle_1_1_data_provider.html#adb5309644096f7d5ce996c4c5358b558">Base::DataPtr</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_memory_data_provider.html#acfd14d7134dbe46b66975aa41cc4cad1">obs</a></td></tr>
-<tr class="separator:acfd14d7134dbe46b66975aa41cc4cad1"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aa67ea38e2693cece1ff62105c54f00ce"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classcattle_1_1_data_provider.html#adb5309644096f7d5ce996c4c5358b558">Base::DataPtr</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_memory_data_provider.html#aa67ea38e2693cece1ff62105c54f00ce">obj</a></td></tr>
-<tr class="separator:aa67ea38e2693cece1ff62105c54f00ce"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aa2a933b3c0578ef1e77411322840574f"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classcattle_1_1_dimensions.html">Dimensions</a>&lt; std::size_t, Rank &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_memory_data_provider.html#aa2a933b3c0578ef1e77411322840574f">obs_dims</a></td></tr>
-<tr class="separator:aa2a933b3c0578ef1e77411322840574f"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a21b7a49689f4146ee61316bff6929c52"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classcattle_1_1_dimensions.html">Dimensions</a>&lt; std::size_t, Rank &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_memory_data_provider.html#a21b7a49689f4146ee61316bff6929c52">obj_dims</a></td></tr>
-<tr class="separator:a21b7a49689f4146ee61316bff6929c52"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:abb6deef0a51ec870e847768e254aaa62"><td class="memItemLeft" align="right" valign="top">std::size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_memory_data_provider.html#abb6deef0a51ec870e847768e254aaa62">instances</a></td></tr>
-<tr class="separator:abb6deef0a51ec870e847768e254aaa62"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a2fffa3195ea6cd0eec815997d64f4355"><td class="memItemLeft" align="right" valign="top">std::array&lt; std::size_t, <a class="el" href="classcattle_1_1_data_provider.html#a8db59369ae8c577bad4fb33c770745fb">Base::DATA_RANK</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_memory_data_provider.html#a2fffa3195ea6cd0eec815997d64f4355">offsets</a></td></tr>
-<tr class="separator:a2fffa3195ea6cd0eec815997d64f4355"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:abc63a6d4e3acff35211ae86c3d639112"><td class="memItemLeft" align="right" valign="top">std::array&lt; std::size_t, <a class="el" href="classcattle_1_1_data_provider.html#a8db59369ae8c577bad4fb33c770745fb">Base::DATA_RANK</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_memory_data_provider.html#abc63a6d4e3acff35211ae86c3d639112">data_extents</a></td></tr>
-<tr class="separator:abc63a6d4e3acff35211ae86c3d639112"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a9e40402b9cb8d9963fdc5025cccbb710"><td class="memItemLeft" align="right" valign="top">std::array&lt; std::size_t, <a class="el" href="classcattle_1_1_data_provider.html#a8db59369ae8c577bad4fb33c770745fb">Base::DATA_RANK</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_memory_data_provider.html#a9e40402b9cb8d9963fdc5025cccbb710">obj_extents</a></td></tr>
-<tr class="separator:a9e40402b9cb8d9963fdc5025cccbb710"><td class="memSeparator" colspan="2">&#160;</td></tr>
-</table><table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="inherited"></a>
-Additional Inherited Members</h2></td></tr>
-<tr class="inherit_header pro_types_classcattle_1_1_data_provider"><td colspan="2" onclick="javascript:toggleInherit('pro_types_classcattle_1_1_data_provider')"><img src="closed.png" alt="-"/>&#160;Protected Types inherited from <a class="el" href="classcattle_1_1_data_provider.html">cattle::DataProvider&lt; Scalar, Rank, Sequential &gt;</a></td></tr>
-<tr class="memitem:a6deebf8d0543245c80ba77693b6e9619 inherit pro_types_classcattle_1_1_data_provider"><td class="memItemLeft" align="right" valign="top">typedef <a class="el" href="namespacecattle.html#a8b9323ad928764340e46f0802bf27fbb">Tensor</a>&lt; Scalar, <a class="el" href="classcattle_1_1_data_provider.html#a8db59369ae8c577bad4fb33c770745fb">DATA_RANK</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_data_provider.html#a6deebf8d0543245c80ba77693b6e9619">Data</a></td></tr>
-<tr class="separator:a6deebf8d0543245c80ba77693b6e9619 inherit pro_types_classcattle_1_1_data_provider"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:adb5309644096f7d5ce996c4c5358b558 inherit pro_types_classcattle_1_1_data_provider"><td class="memItemLeft" align="right" valign="top">typedef <a class="el" href="namespacecattle.html#ae90497baf0bcd6d9b075aa3287bcd475">TensorPtr</a>&lt; Scalar, <a class="el" href="classcattle_1_1_data_provider.html#a8db59369ae8c577bad4fb33c770745fb">DATA_RANK</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_data_provider.html#adb5309644096f7d5ce996c4c5358b558">DataPtr</a></td></tr>
-<tr class="separator:adb5309644096f7d5ce996c4c5358b558 inherit pro_types_classcattle_1_1_data_provider"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="inherit_header pro_static_attribs_classcattle_1_1_data_provider"><td colspan="2" onclick="javascript:toggleInherit('pro_static_attribs_classcattle_1_1_data_provider')"><img src="closed.png" alt="-"/>&#160;Static Protected Attributes inherited from <a class="el" href="classcattle_1_1_data_provider.html">cattle::DataProvider&lt; Scalar, Rank, Sequential &gt;</a></td></tr>
-<tr class="memitem:a8db59369ae8c577bad4fb33c770745fb inherit pro_static_attribs_classcattle_1_1_data_provider"><td class="memItemLeft" align="right" valign="top">static constexpr std::size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_data_provider.html#a8db59369ae8c577bad4fb33c770745fb">DATA_RANK</a> = Rank + Sequential + 1</td></tr>
-<tr class="separator:a8db59369ae8c577bad4fb33c770745fb inherit pro_static_attribs_classcattle_1_1_data_provider"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><h3>template&lt;typename Scalar, std::size_t Rank, bool Sequential, bool Shuffle = true&gt;<br />
 class cattle::MemoryDataProvider&lt; Scalar, Rank, Sequential, Shuffle &gt;</h3>
 
 <p>A data provider that reads from the memory. It requires the entire observation and objective data sets to be loaded into memory, but it fetches pairs faster. </p>
-</div><h2 class="groupheader">Member Typedef Documentation</h2>
-<a id="a3ef3389732ed7a778f9cf4030345861b"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a3ef3389732ed7a778f9cf4030345861b">&#9670;&nbsp;</a></span>Base</h2>
-
-<div class="memitem">
-<div class="memproto">
-<div class="memtemplate">
-template&lt;typename Scalar , std::size_t Rank, bool Sequential, bool Shuffle = true&gt; </div>
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">typedef <a class="el" href="classcattle_1_1_data_provider.html">DataProvider</a>&lt;Scalar,Rank,Sequential&gt; <a class="el" href="classcattle_1_1_memory_data_provider.html">cattle::MemoryDataProvider</a>&lt; Scalar, Rank, Sequential, Shuffle &gt;::<a class="el" href="classcattle_1_1_memory_data_provider.html#a3ef3389732ed7a778f9cf4030345861b">Base</a></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">private</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
+</div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
 <a id="a6376047b2d04dafb02a033275eb28fce"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a6376047b2d04dafb02a033275eb28fce">&#9670;&nbsp;</a></span>MemoryDataProvider()</h2>
 
@@ -193,13 +126,13 @@ template&lt;typename Scalar , std::size_t Rank, bool Sequential, bool Shuffle = 
         <tr>
           <td class="memname"><a class="el" href="classcattle_1_1_memory_data_provider.html">cattle::MemoryDataProvider</a>&lt; Scalar, Rank, Sequential, Shuffle &gt;::<a class="el" href="classcattle_1_1_memory_data_provider.html">MemoryDataProvider</a> </td>
           <td>(</td>
-          <td class="paramtype">typename <a class="el" href="classcattle_1_1_data_provider.html#adb5309644096f7d5ce996c4c5358b558">Base::DataPtr</a>&#160;</td>
+          <td class="paramtype">typename Base::DataPtr&#160;</td>
           <td class="paramname"><em>obs</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">typename <a class="el" href="classcattle_1_1_data_provider.html#adb5309644096f7d5ce996c4c5358b558">Base::DataPtr</a>&#160;</td>
+          <td class="paramtype">typename Base::DataPtr&#160;</td>
           <td class="paramname"><em>obj</em>&#160;</td>
         </tr>
         <tr>
@@ -387,33 +320,6 @@ template&lt;typename Scalar , std::size_t Rank, bool Sequential, bool Shuffle = 
 
 </div>
 </div>
-<a id="a87be1abf200bade40f4c3db04275bd56"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a87be1abf200bade40f4c3db04275bd56">&#9670;&nbsp;</a></span>shuffle_tensor_rows()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<div class="memtemplate">
-template&lt;typename Scalar , std::size_t Rank, bool Sequential, bool Shuffle = true&gt; </div>
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">void <a class="el" href="classcattle_1_1_memory_data_provider.html">cattle::MemoryDataProvider</a>&lt; Scalar, Rank, Sequential, Shuffle &gt;::shuffle_tensor_rows </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">protected</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-</div>
-</div>
 <a id="a80b122ac739ec1614856fc6d01d3876d"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a80b122ac739ec1614856fc6d01d3876d">&#9670;&nbsp;</a></span>skip()</h2>
 
@@ -451,201 +357,8 @@ template&lt;typename Scalar , std::size_t Rank, bool Sequential, bool Shuffle = 
 
 </div>
 </div>
-<h2 class="groupheader">Member Data Documentation</h2>
-<a id="abc63a6d4e3acff35211ae86c3d639112"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#abc63a6d4e3acff35211ae86c3d639112">&#9670;&nbsp;</a></span>data_extents</h2>
-
-<div class="memitem">
-<div class="memproto">
-<div class="memtemplate">
-template&lt;typename Scalar , std::size_t Rank, bool Sequential, bool Shuffle = true&gt; </div>
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">std::array&lt;std::size_t,<a class="el" href="classcattle_1_1_data_provider.html#a8db59369ae8c577bad4fb33c770745fb">Base::DATA_RANK</a>&gt; <a class="el" href="classcattle_1_1_memory_data_provider.html">cattle::MemoryDataProvider</a>&lt; Scalar, Rank, Sequential, Shuffle &gt;::data_extents</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">private</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a id="abb6deef0a51ec870e847768e254aaa62"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#abb6deef0a51ec870e847768e254aaa62">&#9670;&nbsp;</a></span>instances</h2>
-
-<div class="memitem">
-<div class="memproto">
-<div class="memtemplate">
-template&lt;typename Scalar , std::size_t Rank, bool Sequential, bool Shuffle = true&gt; </div>
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">std::size_t <a class="el" href="classcattle_1_1_memory_data_provider.html">cattle::MemoryDataProvider</a>&lt; Scalar, Rank, Sequential, Shuffle &gt;::instances</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">private</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a id="aa67ea38e2693cece1ff62105c54f00ce"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aa67ea38e2693cece1ff62105c54f00ce">&#9670;&nbsp;</a></span>obj</h2>
-
-<div class="memitem">
-<div class="memproto">
-<div class="memtemplate">
-template&lt;typename Scalar , std::size_t Rank, bool Sequential, bool Shuffle = true&gt; </div>
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="classcattle_1_1_data_provider.html#adb5309644096f7d5ce996c4c5358b558">Base::DataPtr</a> <a class="el" href="classcattle_1_1_memory_data_provider.html">cattle::MemoryDataProvider</a>&lt; Scalar, Rank, Sequential, Shuffle &gt;::obj</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">private</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a id="a21b7a49689f4146ee61316bff6929c52"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a21b7a49689f4146ee61316bff6929c52">&#9670;&nbsp;</a></span>obj_dims</h2>
-
-<div class="memitem">
-<div class="memproto">
-<div class="memtemplate">
-template&lt;typename Scalar , std::size_t Rank, bool Sequential, bool Shuffle = true&gt; </div>
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="classcattle_1_1_dimensions.html">Dimensions</a>&lt;std::size_t,Rank&gt; <a class="el" href="classcattle_1_1_memory_data_provider.html">cattle::MemoryDataProvider</a>&lt; Scalar, Rank, Sequential, Shuffle &gt;::obj_dims</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">private</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a id="a9e40402b9cb8d9963fdc5025cccbb710"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a9e40402b9cb8d9963fdc5025cccbb710">&#9670;&nbsp;</a></span>obj_extents</h2>
-
-<div class="memitem">
-<div class="memproto">
-<div class="memtemplate">
-template&lt;typename Scalar , std::size_t Rank, bool Sequential, bool Shuffle = true&gt; </div>
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">std::array&lt;std::size_t,<a class="el" href="classcattle_1_1_data_provider.html#a8db59369ae8c577bad4fb33c770745fb">Base::DATA_RANK</a>&gt; <a class="el" href="classcattle_1_1_memory_data_provider.html">cattle::MemoryDataProvider</a>&lt; Scalar, Rank, Sequential, Shuffle &gt;::obj_extents</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">private</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a id="acfd14d7134dbe46b66975aa41cc4cad1"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#acfd14d7134dbe46b66975aa41cc4cad1">&#9670;&nbsp;</a></span>obs</h2>
-
-<div class="memitem">
-<div class="memproto">
-<div class="memtemplate">
-template&lt;typename Scalar , std::size_t Rank, bool Sequential, bool Shuffle = true&gt; </div>
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="classcattle_1_1_data_provider.html#adb5309644096f7d5ce996c4c5358b558">Base::DataPtr</a> <a class="el" href="classcattle_1_1_memory_data_provider.html">cattle::MemoryDataProvider</a>&lt; Scalar, Rank, Sequential, Shuffle &gt;::obs</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">private</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a id="aa2a933b3c0578ef1e77411322840574f"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aa2a933b3c0578ef1e77411322840574f">&#9670;&nbsp;</a></span>obs_dims</h2>
-
-<div class="memitem">
-<div class="memproto">
-<div class="memtemplate">
-template&lt;typename Scalar , std::size_t Rank, bool Sequential, bool Shuffle = true&gt; </div>
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="classcattle_1_1_dimensions.html">Dimensions</a>&lt;std::size_t,Rank&gt; <a class="el" href="classcattle_1_1_memory_data_provider.html">cattle::MemoryDataProvider</a>&lt; Scalar, Rank, Sequential, Shuffle &gt;::obs_dims</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">private</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a id="a2fffa3195ea6cd0eec815997d64f4355"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a2fffa3195ea6cd0eec815997d64f4355">&#9670;&nbsp;</a></span>offsets</h2>
-
-<div class="memitem">
-<div class="memproto">
-<div class="memtemplate">
-template&lt;typename Scalar , std::size_t Rank, bool Sequential, bool Shuffle = true&gt; </div>
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">std::array&lt;std::size_t,<a class="el" href="classcattle_1_1_data_provider.html#a8db59369ae8c577bad4fb33c770745fb">Base::DATA_RANK</a>&gt; <a class="el" href="classcattle_1_1_memory_data_provider.html">cattle::MemoryDataProvider</a>&lt; Scalar, Rank, Sequential, Shuffle &gt;::offsets</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">private</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-</div>
-</div>
 <hr/>The documentation for this class was generated from the following file:<ul>
-<li>src/<a class="el" href="_data_provider_8h_source.html">DataProvider.h</a></li>
+<li>include/<a class="el" href="_data_provider_8hpp_source.html">DataProvider.hpp</a></li>
 </ul>
 </div><!-- contents -->
 <!-- start footer part -->

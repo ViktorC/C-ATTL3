@@ -5,12 +5,13 @@
  *      Author: Viktor Csomor
  */
 
-#ifndef PARAMETERREGULARIZATION_H_
-#define PARAMETERREGULARIZATION_H_
+#ifndef INCLUDE_PARAMETERREGULARIZATION_H_
+#define INCLUDE_PARAMETERREGULARIZATION_H_
 
 #include <memory>
 #include <type_traits>
-#include "Eigen.h"
+
+#include "utils/Eigen.hpp"
 
 namespace cattle {
 
@@ -127,4 +128,4 @@ private:
 
 } /* namespace cattle */
 
-#endif /* PARAMETERREGULARIZATION_H_ */
+#endif /* INCLUDE_PARAMETERREGULARIZATION_H_ */

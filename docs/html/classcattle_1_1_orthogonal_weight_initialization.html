@@ -22,7 +22,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">C-ATTL3
-   &#160;<span id="projectnumber">0.1</span>
+   &#160;<span id="projectnumber">0.5</span>
    </div>
   </td>
  </tr>
@@ -69,14 +69,13 @@ $(function() {
   <div class="summary">
 <a href="#pub-methods">Public Member Functions</a> &#124;
 <a href="#pro-methods">Protected Member Functions</a> &#124;
-<a href="#pri-attribs">Private Attributes</a> &#124;
 <a href="classcattle_1_1_orthogonal_weight_initialization-members.html">List of all members</a>  </div>
   <div class="headertitle">
 <div class="title">cattle::OrthogonalWeightInitialization&lt; Scalar &gt; Class Template Reference</div>  </div>
 </div><!--header-->
 <div class="contents">
 
-<p><code>#include &lt;<a class="el" href="_weight_initialization_8h_source.html">WeightInitialization.h</a>&gt;</code></p>
+<p><code>#include &lt;<a class="el" href="_weight_initialization_8hpp_source.html">WeightInitialization.hpp</a>&gt;</code></p>
 <div class="dynheader">
 Inheritance diagram for cattle::OrthogonalWeightInitialization&lt; Scalar &gt;:</div>
 <div class="dyncontent">
@@ -90,28 +89,15 @@ Inheritance diagram for cattle::OrthogonalWeightInitialization&lt; Scalar &gt;:<
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:a00998ff9be4fa047fb2505450af2ee4f"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_orthogonal_weight_initialization.html#a00998ff9be4fa047fb2505450af2ee4f">OrthogonalWeightInitialization</a> (Scalar <a class="el" href="classcattle_1_1_orthogonal_weight_initialization.html#a3d76302db391c53346a2a2783ba4b2db">sd</a>=1, Scalar <a class="el" href="classcattle_1_1_gaussian_weight_initialization.html#a73253d35ecefc2cfaa626e5a252ccccf">bias</a>=0)</td></tr>
+<tr class="memitem:a00998ff9be4fa047fb2505450af2ee4f"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_orthogonal_weight_initialization.html#a00998ff9be4fa047fb2505450af2ee4f">OrthogonalWeightInitialization</a> (Scalar <a class="el" href="classcattle_1_1_orthogonal_weight_initialization.html#a3d76302db391c53346a2a2783ba4b2db">sd</a>=1, Scalar bias=0)</td></tr>
 <tr class="separator:a00998ff9be4fa047fb2505450af2ee4f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ab14fdabb549f5f5ca36e2415b9823890"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_orthogonal_weight_initialization.html#ab14fdabb549f5f5ca36e2415b9823890">apply</a> (<a class="el" href="namespacecattle.html#a1d78623a47279d516750a44dbad6090b">Matrix</a>&lt; Scalar &gt; &amp;weights) const</td></tr>
 <tr class="separator:ab14fdabb549f5f5ca36e2415b9823890"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="inherit_header pub_methods_classcattle_1_1_gaussian_weight_initialization"><td colspan="2" onclick="javascript:toggleInherit('pub_methods_classcattle_1_1_gaussian_weight_initialization')"><img src="closed.png" alt="-"/>&#160;Public Member Functions inherited from <a class="el" href="classcattle_1_1_gaussian_weight_initialization.html">cattle::GaussianWeightInitialization&lt; Scalar &gt;</a></td></tr>
-<tr class="memitem:a0a439cfd38e9e414db8576f41e4e90fd inherit pub_methods_classcattle_1_1_gaussian_weight_initialization"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_gaussian_weight_initialization.html#a0a439cfd38e9e414db8576f41e4e90fd">GaussianWeightInitialization</a> (Scalar <a class="el" href="classcattle_1_1_gaussian_weight_initialization.html#a7f5ce477564bd5ff41d144c187caee92">scaling_factor</a>, Scalar <a class="el" href="classcattle_1_1_gaussian_weight_initialization.html#a73253d35ecefc2cfaa626e5a252ccccf">bias</a>)</td></tr>
-<tr class="separator:a0a439cfd38e9e414db8576f41e4e90fd inherit pub_methods_classcattle_1_1_gaussian_weight_initialization"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a49733140c287473b82193863c8bfa2e2 inherit pub_methods_classcattle_1_1_gaussian_weight_initialization"><td class="memItemLeft" align="right" valign="top">virtual&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_gaussian_weight_initialization.html#a49733140c287473b82193863c8bfa2e2">~GaussianWeightInitialization</a> ()=default</td></tr>
-<tr class="separator:a49733140c287473b82193863c8bfa2e2 inherit pub_methods_classcattle_1_1_gaussian_weight_initialization"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="inherit_header pub_methods_classcattle_1_1_weight_initialization"><td colspan="2" onclick="javascript:toggleInherit('pub_methods_classcattle_1_1_weight_initialization')"><img src="closed.png" alt="-"/>&#160;Public Member Functions inherited from <a class="el" href="classcattle_1_1_weight_initialization.html">cattle::WeightInitialization&lt; Scalar &gt;</a></td></tr>
-<tr class="memitem:a297bdc222260167543fe802ada6d5b7e inherit pub_methods_classcattle_1_1_weight_initialization"><td class="memItemLeft" align="right" valign="top">virtual&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_weight_initialization.html#a297bdc222260167543fe802ada6d5b7e">~WeightInitialization</a> ()=default</td></tr>
-<tr class="separator:a297bdc222260167543fe802ada6d5b7e inherit pub_methods_classcattle_1_1_weight_initialization"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pro-methods"></a>
 Protected Member Functions</h2></td></tr>
 <tr class="memitem:a3d76302db391c53346a2a2783ba4b2db"><td class="memItemLeft" align="right" valign="top">Scalar&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_orthogonal_weight_initialization.html#a3d76302db391c53346a2a2783ba4b2db">sd</a> (unsigned fan_ins, unsigned fan_outs) const</td></tr>
 <tr class="separator:a3d76302db391c53346a2a2783ba4b2db"><td class="memSeparator" colspan="2">&#160;</td></tr>
-</table><table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pri-attribs"></a>
-Private Attributes</h2></td></tr>
-<tr class="memitem:a5dabedbd2737a268c453edaeff0ae087"><td class="memItemLeft" align="right" valign="top">const Scalar&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_orthogonal_weight_initialization.html#a5dabedbd2737a268c453edaeff0ae087">_sd</a></td></tr>
-<tr class="separator:a5dabedbd2737a268c453edaeff0ae087"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><h3>template&lt;typename Scalar&gt;<br />
@@ -251,33 +237,8 @@ template&lt;typename Scalar &gt; </div>
 
 </div>
 </div>
-<h2 class="groupheader">Member Data Documentation</h2>
-<a id="a5dabedbd2737a268c453edaeff0ae087"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a5dabedbd2737a268c453edaeff0ae087">&#9670;&nbsp;</a></span>_sd</h2>
-
-<div class="memitem">
-<div class="memproto">
-<div class="memtemplate">
-template&lt;typename Scalar &gt; </div>
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">const Scalar <a class="el" href="classcattle_1_1_orthogonal_weight_initialization.html">cattle::OrthogonalWeightInitialization</a>&lt; Scalar &gt;::_sd</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">private</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-</div>
-</div>
 <hr/>The documentation for this class was generated from the following file:<ul>
-<li>src/<a class="el" href="_weight_initialization_8h_source.html">WeightInitialization.h</a></li>
+<li>include/<a class="el" href="_weight_initialization_8hpp_source.html">WeightInitialization.hpp</a></li>
 </ul>
 </div><!-- contents -->
 <!-- start footer part -->

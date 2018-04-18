@@ -22,7 +22,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">C-ATTL3
-   &#160;<span id="projectnumber">0.1</span>
+   &#160;<span id="projectnumber">0.5</span>
    </div>
   </td>
  </tr>
@@ -69,14 +69,13 @@ $(function() {
   <div class="summary">
 <a href="#pub-methods">Public Member Functions</a> &#124;
 <a href="#pro-methods">Protected Member Functions</a> &#124;
-<a href="#pri-types">Private Types</a> &#124;
 <a href="classcattle_1_1_nadam_optimizer-members.html">List of all members</a>  </div>
   <div class="headertitle">
 <div class="title">cattle::NadamOptimizer&lt; Scalar, Rank, Sequential &gt; Class Template Reference</div>  </div>
 </div><!--header-->
 <div class="contents">
 
-<p><code>#include &lt;<a class="el" href="_optimizer_8h_source.html">Optimizer.h</a>&gt;</code></p>
+<p><code>#include &lt;<a class="el" href="_optimizer_8hpp_source.html">Optimizer.hpp</a>&gt;</code></p>
 <div class="dynheader">
 Inheritance diagram for cattle::NadamOptimizer&lt; Scalar, Rank, Sequential &gt;:</div>
 <div class="dyncontent">
@@ -91,26 +90,15 @@ Inheritance diagram for cattle::NadamOptimizer&lt; Scalar, Rank, Sequential &gt;
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:a1c86f3ddf2cd66c023e7093dfa6b6de8"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_nadam_optimizer.html#a1c86f3ddf2cd66c023e7093dfa6b6de8">NadamOptimizer</a> (<a class="el" href="namespacecattle.html#a5fa4a5f7df1ad35afbadd9975ec24a12">LossSharedPtr</a>&lt; Scalar, Rank, Sequential &gt; <a class="el" href="classcattle_1_1_optimizer.html#a3716158bae6f92c7dd917d2ad804fafa">loss</a>, unsigned <a class="el" href="classcattle_1_1_s_g_d_optimizer.html#a55709f1159f135d405ce45a2e6539661">batch_size</a>=1, Scalar <a class="el" href="classcattle_1_1_adam_optimizer.html#acd2489fdb029b80fe6f9edbbf960a19a">learning_rate</a>=1e-3, Scalar l1_decay=1e-1, Scalar l2_decay=1e-3, Scalar epsilon=internal::NumericUtils&lt; Scalar &gt;::EPSILON2)</td></tr>
+<tr class="memitem:a1c86f3ddf2cd66c023e7093dfa6b6de8"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_nadam_optimizer.html#a1c86f3ddf2cd66c023e7093dfa6b6de8">NadamOptimizer</a> (<a class="el" href="namespacecattle.html#a5fa4a5f7df1ad35afbadd9975ec24a12">LossSharedPtr</a>&lt; Scalar, Rank, Sequential &gt; loss, unsigned batch_size=1, Scalar learning_rate=1e-3, Scalar l1_decay=1e-1, Scalar l2_decay=1e-3, Scalar epsilon=internal::NumericUtils&lt; Scalar &gt;::EPSILON2)</td></tr>
 <tr class="separator:a1c86f3ddf2cd66c023e7093dfa6b6de8"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="inherit_header pub_methods_classcattle_1_1_adam_optimizer"><td colspan="2" onclick="javascript:toggleInherit('pub_methods_classcattle_1_1_adam_optimizer')"><img src="closed.png" alt="-"/>&#160;Public Member Functions inherited from <a class="el" href="classcattle_1_1_adam_optimizer.html">cattle::AdamOptimizer&lt; Scalar, Rank, Sequential &gt;</a></td></tr>
-<tr class="memitem:acd21a516925a4de03ce63c9ac38ad735 inherit pub_methods_classcattle_1_1_adam_optimizer"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_adam_optimizer.html#acd21a516925a4de03ce63c9ac38ad735">AdamOptimizer</a> (<a class="el" href="namespacecattle.html#a5fa4a5f7df1ad35afbadd9975ec24a12">LossSharedPtr</a>&lt; Scalar, Rank, Sequential &gt; <a class="el" href="classcattle_1_1_optimizer.html#a3716158bae6f92c7dd917d2ad804fafa">loss</a>, unsigned <a class="el" href="classcattle_1_1_s_g_d_optimizer.html#a55709f1159f135d405ce45a2e6539661">batch_size</a>=1, Scalar <a class="el" href="classcattle_1_1_adam_optimizer.html#acd2489fdb029b80fe6f9edbbf960a19a">learning_rate</a>=1e-3, Scalar l1_decay=1e-1, Scalar l2_decay=1e-3, Scalar epsilon=internal::NumericUtils&lt; Scalar &gt;::EPSILON2)</td></tr>
+<tr class="memitem:acd21a516925a4de03ce63c9ac38ad735 inherit pub_methods_classcattle_1_1_adam_optimizer"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_adam_optimizer.html#acd21a516925a4de03ce63c9ac38ad735">AdamOptimizer</a> (<a class="el" href="namespacecattle.html#a5fa4a5f7df1ad35afbadd9975ec24a12">LossSharedPtr</a>&lt; Scalar, Rank, Sequential &gt; loss, unsigned batch_size=1, Scalar learning_rate=1e-3, Scalar l1_decay=1e-1, Scalar l2_decay=1e-3, Scalar epsilon=internal::NumericUtils&lt; Scalar &gt;::EPSILON2)</td></tr>
 <tr class="separator:acd21a516925a4de03ce63c9ac38ad735 inherit pub_methods_classcattle_1_1_adam_optimizer"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a73fa5b266f51c40c94d7b4659c58e838 inherit pub_methods_classcattle_1_1_adam_optimizer"><td class="memItemLeft" align="right" valign="top">virtual&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_adam_optimizer.html#a73fa5b266f51c40c94d7b4659c58e838">~AdamOptimizer</a> ()=default</td></tr>
-<tr class="separator:a73fa5b266f51c40c94d7b4659c58e838 inherit pub_methods_classcattle_1_1_adam_optimizer"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="inherit_header pub_methods_classcattle_1_1_s_g_d_optimizer"><td colspan="2" onclick="javascript:toggleInherit('pub_methods_classcattle_1_1_s_g_d_optimizer')"><img src="closed.png" alt="-"/>&#160;Public Member Functions inherited from <a class="el" href="classcattle_1_1_s_g_d_optimizer.html">cattle::SGDOptimizer&lt; Scalar, Rank, Sequential &gt;</a></td></tr>
-<tr class="memitem:ab048f35f949fc6096e6394cf9e4d0089 inherit pub_methods_classcattle_1_1_s_g_d_optimizer"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_s_g_d_optimizer.html#ab048f35f949fc6096e6394cf9e4d0089">SGDOptimizer</a> (<a class="el" href="namespacecattle.html#a5fa4a5f7df1ad35afbadd9975ec24a12">LossSharedPtr</a>&lt; Scalar, Rank, Sequential &gt; <a class="el" href="classcattle_1_1_optimizer.html#a3716158bae6f92c7dd917d2ad804fafa">loss</a>, unsigned <a class="el" href="classcattle_1_1_s_g_d_optimizer.html#a55709f1159f135d405ce45a2e6539661">batch_size</a>)</td></tr>
-<tr class="separator:ab048f35f949fc6096e6394cf9e4d0089 inherit pub_methods_classcattle_1_1_s_g_d_optimizer"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a397afe1051602f22259753b868bfd919 inherit pub_methods_classcattle_1_1_s_g_d_optimizer"><td class="memItemLeft" align="right" valign="top">virtual&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_s_g_d_optimizer.html#a397afe1051602f22259753b868bfd919">~SGDOptimizer</a> ()=default</td></tr>
-<tr class="separator:a397afe1051602f22259753b868bfd919 inherit pub_methods_classcattle_1_1_s_g_d_optimizer"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="inherit_header pub_methods_classcattle_1_1_optimizer"><td colspan="2" onclick="javascript:toggleInherit('pub_methods_classcattle_1_1_optimizer')"><img src="closed.png" alt="-"/>&#160;Public Member Functions inherited from <a class="el" href="classcattle_1_1_optimizer.html">cattle::Optimizer&lt; Scalar, Rank, Sequential &gt;</a></td></tr>
-<tr class="memitem:ad26c752cffbd9e33d9d88b606c301874 inherit pub_methods_classcattle_1_1_optimizer"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_optimizer.html#ad26c752cffbd9e33d9d88b606c301874">Optimizer</a> (<a class="el" href="namespacecattle.html#a5fa4a5f7df1ad35afbadd9975ec24a12">LossSharedPtr</a>&lt; Scalar, Rank, Sequential &gt; <a class="el" href="classcattle_1_1_optimizer.html#a3716158bae6f92c7dd917d2ad804fafa">loss</a>)</td></tr>
-<tr class="separator:ad26c752cffbd9e33d9d88b606c301874 inherit pub_methods_classcattle_1_1_optimizer"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a125a4d35cd81c567abca5def2c92947f inherit pub_methods_classcattle_1_1_optimizer"><td class="memItemLeft" align="right" valign="top">virtual&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_optimizer.html#a125a4d35cd81c567abca5def2c92947f">~Optimizer</a> ()=default</td></tr>
-<tr class="separator:a125a4d35cd81c567abca5def2c92947f inherit pub_methods_classcattle_1_1_optimizer"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a88c61b44dbe57daea3ec400ad7c38eb6 inherit pub_methods_classcattle_1_1_optimizer"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_optimizer.html#a88c61b44dbe57daea3ec400ad7c38eb6">verify_gradients</a> (<a class="el" href="classcattle_1_1_optimizer.html#aa52f7eca506ab86e29639e6bd753cbb3">Net</a> &amp;net, <a class="el" href="classcattle_1_1_optimizer.html#ace96fe401c80b2c1c8008d091bea3bc3">Provider</a> &amp;provider, Scalar step_size=(<a class="el" href="classcattle_1_1internal_1_1_numeric_utils.html">internal::NumericUtils</a>&lt; Scalar &gt;::EPSILON2+<a class="el" href="classcattle_1_1internal_1_1_numeric_utils.html">internal::NumericUtils</a>&lt; Scalar &gt;::EPSILON3)/2, Scalar abs_epsilon=<a class="el" href="classcattle_1_1internal_1_1_numeric_utils.html">internal::NumericUtils</a>&lt; Scalar &gt;::EPSILON2, Scalar rel_epsilon=<a class="el" href="classcattle_1_1internal_1_1_numeric_utils.html">internal::NumericUtils</a>&lt; Scalar &gt;::EPSILON3) const</td></tr>
+<tr class="memitem:a88c61b44dbe57daea3ec400ad7c38eb6 inherit pub_methods_classcattle_1_1_optimizer"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_optimizer.html#a88c61b44dbe57daea3ec400ad7c38eb6">verify_gradients</a> (<a class="el" href="classcattle_1_1_neural_network.html">Net</a> &amp;net, <a class="el" href="classcattle_1_1_data_provider.html">Provider</a> &amp;provider, Scalar step_size=(<a class="el" href="classcattle_1_1internal_1_1_numeric_utils.html">internal::NumericUtils</a>&lt; Scalar &gt;::EPSILON2+<a class="el" href="classcattle_1_1internal_1_1_numeric_utils.html">internal::NumericUtils</a>&lt; Scalar &gt;::EPSILON3)/2, Scalar abs_epsilon=<a class="el" href="classcattle_1_1internal_1_1_numeric_utils.html">internal::NumericUtils</a>&lt; Scalar &gt;::EPSILON2, Scalar rel_epsilon=<a class="el" href="classcattle_1_1internal_1_1_numeric_utils.html">internal::NumericUtils</a>&lt; Scalar &gt;::EPSILON3) const</td></tr>
 <tr class="separator:a88c61b44dbe57daea3ec400ad7c38eb6 inherit pub_methods_classcattle_1_1_optimizer"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:abd96aab852071300003b1b71e97207ef inherit pub_methods_classcattle_1_1_optimizer"><td class="memItemLeft" align="right" valign="top">Scalar&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_optimizer.html#abd96aab852071300003b1b71e97207ef">optimize</a> (<a class="el" href="classcattle_1_1_optimizer.html#aa52f7eca506ab86e29639e6bd753cbb3">Net</a> &amp;net, <a class="el" href="classcattle_1_1_optimizer.html#ace96fe401c80b2c1c8008d091bea3bc3">Provider</a> &amp;training_prov, <a class="el" href="classcattle_1_1_optimizer.html#ace96fe401c80b2c1c8008d091bea3bc3">Provider</a> &amp;test_prov, unsigned epochs, unsigned early_stop=0)</td></tr>
+<tr class="memitem:abd96aab852071300003b1b71e97207ef inherit pub_methods_classcattle_1_1_optimizer"><td class="memItemLeft" align="right" valign="top">Scalar&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_optimizer.html#abd96aab852071300003b1b71e97207ef">optimize</a> (<a class="el" href="classcattle_1_1_neural_network.html">Net</a> &amp;net, <a class="el" href="classcattle_1_1_data_provider.html">Provider</a> &amp;training_prov, <a class="el" href="classcattle_1_1_data_provider.html">Provider</a> &amp;test_prov, unsigned epochs, unsigned early_stop=0)</td></tr>
 <tr class="separator:abd96aab852071300003b1b71e97207ef inherit pub_methods_classcattle_1_1_optimizer"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pro-methods"></a>
@@ -121,31 +109,19 @@ Protected Member Functions</h2></td></tr>
 <tr class="memitem:a3d0ea04bf2796b9364eb9fcb42026c9f inherit pro_methods_classcattle_1_1_adam_optimizer"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_adam_optimizer.html#a3d0ea04bf2796b9364eb9fcb42026c9f">fit</a> (<a class="el" href="classcattle_1_1_neural_network.html">NeuralNetwork</a>&lt; Scalar, Rank, Sequential &gt; &amp;net)</td></tr>
 <tr class="separator:a3d0ea04bf2796b9364eb9fcb42026c9f inherit pro_methods_classcattle_1_1_adam_optimizer"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="inherit_header pro_methods_classcattle_1_1_s_g_d_optimizer"><td colspan="2" onclick="javascript:toggleInherit('pro_methods_classcattle_1_1_s_g_d_optimizer')"><img src="closed.png" alt="-"/>&#160;Protected Member Functions inherited from <a class="el" href="classcattle_1_1_s_g_d_optimizer.html">cattle::SGDOptimizer&lt; Scalar, Rank, Sequential &gt;</a></td></tr>
-<tr class="memitem:a16383bf6d1e11f38ee28cae6dccabcf7 inherit pro_methods_classcattle_1_1_s_g_d_optimizer"><td class="memItemLeft" align="right" valign="top">Scalar&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_s_g_d_optimizer.html#a16383bf6d1e11f38ee28cae6dccabcf7">train</a> (typename <a class="el" href="classcattle_1_1_optimizer.html#aa52f7eca506ab86e29639e6bd753cbb3">Base::Net</a> &amp;net, typename <a class="el" href="classcattle_1_1_optimizer.html#ace96fe401c80b2c1c8008d091bea3bc3">Base::Provider</a> &amp;training_prov, unsigned epoch)</td></tr>
+<tr class="memitem:a16383bf6d1e11f38ee28cae6dccabcf7 inherit pro_methods_classcattle_1_1_s_g_d_optimizer"><td class="memItemLeft" align="right" valign="top">Scalar&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_s_g_d_optimizer.html#a16383bf6d1e11f38ee28cae6dccabcf7">train</a> (typename <a class="el" href="classcattle_1_1_neural_network.html">Base::Net</a> &amp;net, typename <a class="el" href="classcattle_1_1_data_provider.html">Base::Provider</a> &amp;training_prov, unsigned epoch)</td></tr>
 <tr class="separator:a16383bf6d1e11f38ee28cae6dccabcf7 inherit pro_methods_classcattle_1_1_s_g_d_optimizer"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a7e93a5babf0f974ef6f0db0901f7a6fe inherit pro_methods_classcattle_1_1_s_g_d_optimizer"><td class="memItemLeft" align="right" valign="top">Scalar&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_s_g_d_optimizer.html#a7e93a5babf0f974ef6f0db0901f7a6fe">test</a> (typename <a class="el" href="classcattle_1_1_optimizer.html#aa52f7eca506ab86e29639e6bd753cbb3">Base::Net</a> &amp;net, typename <a class="el" href="classcattle_1_1_optimizer.html#ace96fe401c80b2c1c8008d091bea3bc3">Base::Provider</a> &amp;test_prov, unsigned epoch)</td></tr>
+<tr class="memitem:a7e93a5babf0f974ef6f0db0901f7a6fe inherit pro_methods_classcattle_1_1_s_g_d_optimizer"><td class="memItemLeft" align="right" valign="top">Scalar&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_s_g_d_optimizer.html#a7e93a5babf0f974ef6f0db0901f7a6fe">test</a> (typename <a class="el" href="classcattle_1_1_neural_network.html">Base::Net</a> &amp;net, typename <a class="el" href="classcattle_1_1_data_provider.html">Base::Provider</a> &amp;test_prov, unsigned epoch)</td></tr>
 <tr class="separator:a7e93a5babf0f974ef6f0db0901f7a6fe inherit pro_methods_classcattle_1_1_s_g_d_optimizer"><td class="memSeparator" colspan="2">&#160;</td></tr>
-</table><table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pri-types"></a>
-Private Types</h2></td></tr>
-<tr class="memitem:a727bafdd8cabcd29ebe62257d86b45a4"><td class="memItemLeft" align="right" valign="top">typedef <a class="el" href="classcattle_1_1_adam_optimizer.html">AdamOptimizer</a>&lt; Scalar, Rank, Sequential &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_nadam_optimizer.html#a727bafdd8cabcd29ebe62257d86b45a4">Base</a></td></tr>
-<tr class="separator:a727bafdd8cabcd29ebe62257d86b45a4"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="inherited"></a>
 Additional Inherited Members</h2></td></tr>
-<tr class="inherit_header pro_types_classcattle_1_1_optimizer"><td colspan="2" onclick="javascript:toggleInherit('pro_types_classcattle_1_1_optimizer')"><img src="closed.png" alt="-"/>&#160;Protected Types inherited from <a class="el" href="classcattle_1_1_optimizer.html">cattle::Optimizer&lt; Scalar, Rank, Sequential &gt;</a></td></tr>
-<tr class="memitem:aa52f7eca506ab86e29639e6bd753cbb3 inherit pro_types_classcattle_1_1_optimizer"><td class="memItemLeft" align="right" valign="top">typedef <a class="el" href="classcattle_1_1_neural_network.html">NeuralNetwork</a>&lt; Scalar, Rank, Sequential &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_optimizer.html#aa52f7eca506ab86e29639e6bd753cbb3">Net</a></td></tr>
-<tr class="separator:aa52f7eca506ab86e29639e6bd753cbb3 inherit pro_types_classcattle_1_1_optimizer"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ace96fe401c80b2c1c8008d091bea3bc3 inherit pro_types_classcattle_1_1_optimizer"><td class="memItemLeft" align="right" valign="top">typedef <a class="el" href="classcattle_1_1_data_provider.html">DataProvider</a>&lt; Scalar, Rank, Sequential &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_optimizer.html#ace96fe401c80b2c1c8008d091bea3bc3">Provider</a></td></tr>
-<tr class="separator:ace96fe401c80b2c1c8008d091bea3bc3 inherit pro_types_classcattle_1_1_optimizer"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a0d75182c650ec8e7cf615aad5fef649e inherit pro_types_classcattle_1_1_optimizer"><td class="memItemLeft" align="right" valign="top">typedef <a class="el" href="namespacecattle.html#a8b9323ad928764340e46f0802bf27fbb">Tensor</a>&lt; Scalar, Rank+Sequential+1 &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_optimizer.html#a0d75182c650ec8e7cf615aad5fef649e">Data</a></td></tr>
-<tr class="separator:a0d75182c650ec8e7cf615aad5fef649e inherit pro_types_classcattle_1_1_optimizer"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="inherit_header pro_static_methods_classcattle_1_1_optimizer"><td colspan="2" onclick="javascript:toggleInherit('pro_static_methods_classcattle_1_1_optimizer')"><img src="closed.png" alt="-"/>&#160;Static Protected Member Functions inherited from <a class="el" href="classcattle_1_1_optimizer.html">cattle::Optimizer&lt; Scalar, Rank, Sequential &gt;</a></td></tr>
-<tr class="memitem:a0a13bf1096cd7c78da90aeca76df5bd0 inherit pro_static_methods_classcattle_1_1_optimizer"><td class="memItemLeft" align="right" valign="top">static std::vector&lt; <a class="el" href="classcattle_1_1_layer.html">Layer</a>&lt; Scalar, Rank &gt; * &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_optimizer.html#a0a13bf1096cd7c78da90aeca76df5bd0">get_layers</a> (<a class="el" href="classcattle_1_1_optimizer.html#aa52f7eca506ab86e29639e6bd753cbb3">Net</a> &amp;net)</td></tr>
+<tr class="memitem:a0a13bf1096cd7c78da90aeca76df5bd0 inherit pro_static_methods_classcattle_1_1_optimizer"><td class="memItemLeft" align="right" valign="top">static std::vector&lt; <a class="el" href="classcattle_1_1_layer.html">Layer</a>&lt; Scalar, Rank &gt; * &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_optimizer.html#a0a13bf1096cd7c78da90aeca76df5bd0">get_layers</a> (<a class="el" href="classcattle_1_1_neural_network.html">Net</a> &amp;net)</td></tr>
 <tr class="separator:a0a13bf1096cd7c78da90aeca76df5bd0 inherit pro_static_methods_classcattle_1_1_optimizer"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a03eff65d0152bf88d98988808090f34c inherit pro_static_methods_classcattle_1_1_optimizer"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="classcattle_1_1_optimizer.html#a0d75182c650ec8e7cf615aad5fef649e">Data</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_optimizer.html#a03eff65d0152bf88d98988808090f34c">propagate</a> (<a class="el" href="classcattle_1_1_optimizer.html#aa52f7eca506ab86e29639e6bd753cbb3">Net</a> &amp;net, <a class="el" href="classcattle_1_1_optimizer.html#a0d75182c650ec8e7cf615aad5fef649e">Data</a> in)</td></tr>
+<tr class="memitem:a03eff65d0152bf88d98988808090f34c inherit pro_static_methods_classcattle_1_1_optimizer"><td class="memItemLeft" align="right" valign="top">static Data&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_optimizer.html#a03eff65d0152bf88d98988808090f34c">propagate</a> (<a class="el" href="classcattle_1_1_neural_network.html">Net</a> &amp;net, Data in)</td></tr>
 <tr class="separator:a03eff65d0152bf88d98988808090f34c inherit pro_static_methods_classcattle_1_1_optimizer"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ae9504099cd9dbaa6f64450eb6061efe9 inherit pro_static_methods_classcattle_1_1_optimizer"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_optimizer.html#ae9504099cd9dbaa6f64450eb6061efe9">backpropagate</a> (<a class="el" href="classcattle_1_1_optimizer.html#aa52f7eca506ab86e29639e6bd753cbb3">Net</a> &amp;net, <a class="el" href="classcattle_1_1_optimizer.html#a0d75182c650ec8e7cf615aad5fef649e">Data</a> out_grads)</td></tr>
+<tr class="memitem:ae9504099cd9dbaa6f64450eb6061efe9 inherit pro_static_methods_classcattle_1_1_optimizer"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_optimizer.html#ae9504099cd9dbaa6f64450eb6061efe9">backpropagate</a> (<a class="el" href="classcattle_1_1_neural_network.html">Net</a> &amp;net, Data out_grads)</td></tr>
 <tr class="separator:ae9504099cd9dbaa6f64450eb6061efe9 inherit pro_static_methods_classcattle_1_1_optimizer"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:abc23bf23413dfa4a8c6a8d9b222af7eb inherit pro_static_methods_classcattle_1_1_optimizer"><td class="memItemLeft" align="right" valign="top">static bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_optimizer.html#abc23bf23413dfa4a8c6a8d9b222af7eb">is_parametric</a> (<a class="el" href="classcattle_1_1_layer.html">Layer</a>&lt; Scalar, Rank &gt; &amp;layer)</td></tr>
 <tr class="separator:abc23bf23413dfa4a8c6a8d9b222af7eb inherit pro_static_methods_classcattle_1_1_optimizer"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -159,55 +135,13 @@ Additional Inherited Members</h2></td></tr>
 <tr class="separator:ae2bfb3dc91ecf8c99bafaeba6dc97814 inherit pro_static_methods_classcattle_1_1_optimizer"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a63a20018587e3a729f49050613482f38 inherit pro_static_methods_classcattle_1_1_optimizer"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_optimizer.html#a63a20018587e3a729f49050613482f38">enforce_constraints</a> (<a class="el" href="classcattle_1_1_layer.html">Layer</a>&lt; Scalar, Rank &gt; &amp;layer)</td></tr>
 <tr class="separator:a63a20018587e3a729f49050613482f38 inherit pro_static_methods_classcattle_1_1_optimizer"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="inherit_header pro_attribs_classcattle_1_1_adam_optimizer"><td colspan="2" onclick="javascript:toggleInherit('pro_attribs_classcattle_1_1_adam_optimizer')"><img src="closed.png" alt="-"/>&#160;Protected Attributes inherited from <a class="el" href="classcattle_1_1_adam_optimizer.html">cattle::AdamOptimizer&lt; Scalar, Rank, Sequential &gt;</a></td></tr>
-<tr class="memitem:acd2489fdb029b80fe6f9edbbf960a19a inherit pro_attribs_classcattle_1_1_adam_optimizer"><td class="memItemLeft" align="right" valign="top">const Scalar&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_adam_optimizer.html#acd2489fdb029b80fe6f9edbbf960a19a">learning_rate</a></td></tr>
-<tr class="separator:acd2489fdb029b80fe6f9edbbf960a19a inherit pro_attribs_classcattle_1_1_adam_optimizer"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aa48b62752655575f7d6665ea3cb3acad inherit pro_attribs_classcattle_1_1_adam_optimizer"><td class="memItemLeft" align="right" valign="top">const Scalar&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_adam_optimizer.html#aa48b62752655575f7d6665ea3cb3acad">l1_decay</a></td></tr>
-<tr class="separator:aa48b62752655575f7d6665ea3cb3acad inherit pro_attribs_classcattle_1_1_adam_optimizer"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a9db28d5da3625cf7ab52fdcbec0f23d8 inherit pro_attribs_classcattle_1_1_adam_optimizer"><td class="memItemLeft" align="right" valign="top">const Scalar&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_adam_optimizer.html#a9db28d5da3625cf7ab52fdcbec0f23d8">l2_decay</a></td></tr>
-<tr class="separator:a9db28d5da3625cf7ab52fdcbec0f23d8 inherit pro_attribs_classcattle_1_1_adam_optimizer"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a92fedde57701e7ad56c65699810db9a4 inherit pro_attribs_classcattle_1_1_adam_optimizer"><td class="memItemLeft" align="right" valign="top">const Scalar&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_adam_optimizer.html#a92fedde57701e7ad56c65699810db9a4">epsilon</a></td></tr>
-<tr class="separator:a92fedde57701e7ad56c65699810db9a4 inherit pro_attribs_classcattle_1_1_adam_optimizer"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a8e391a8340238522868e7a5a7d4cd83f inherit pro_attribs_classcattle_1_1_adam_optimizer"><td class="memItemLeft" align="right" valign="top">std::vector&lt; <a class="el" href="structcattle_1_1_adam_optimizer_1_1_param_grad_norms.html">ParamGradNorms</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_adam_optimizer.html#a8e391a8340238522868e7a5a7d4cd83f">pgn_vec</a></td></tr>
-<tr class="separator:a8e391a8340238522868e7a5a7d4cd83f inherit pro_attribs_classcattle_1_1_adam_optimizer"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="inherit_header pro_attribs_classcattle_1_1_s_g_d_optimizer"><td colspan="2" onclick="javascript:toggleInherit('pro_attribs_classcattle_1_1_s_g_d_optimizer')"><img src="closed.png" alt="-"/>&#160;Protected Attributes inherited from <a class="el" href="classcattle_1_1_s_g_d_optimizer.html">cattle::SGDOptimizer&lt; Scalar, Rank, Sequential &gt;</a></td></tr>
-<tr class="memitem:a55709f1159f135d405ce45a2e6539661 inherit pro_attribs_classcattle_1_1_s_g_d_optimizer"><td class="memItemLeft" align="right" valign="top">const unsigned&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_s_g_d_optimizer.html#a55709f1159f135d405ce45a2e6539661">batch_size</a></td></tr>
-<tr class="separator:a55709f1159f135d405ce45a2e6539661 inherit pro_attribs_classcattle_1_1_s_g_d_optimizer"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="inherit_header pro_attribs_classcattle_1_1_optimizer"><td colspan="2" onclick="javascript:toggleInherit('pro_attribs_classcattle_1_1_optimizer')"><img src="closed.png" alt="-"/>&#160;Protected Attributes inherited from <a class="el" href="classcattle_1_1_optimizer.html">cattle::Optimizer&lt; Scalar, Rank, Sequential &gt;</a></td></tr>
-<tr class="memitem:a3716158bae6f92c7dd917d2ad804fafa inherit pro_attribs_classcattle_1_1_optimizer"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="namespacecattle.html#a5fa4a5f7df1ad35afbadd9975ec24a12">LossSharedPtr</a>&lt; Scalar, Rank, Sequential &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_optimizer.html#a3716158bae6f92c7dd917d2ad804fafa">loss</a></td></tr>
-<tr class="separator:a3716158bae6f92c7dd917d2ad804fafa inherit pro_attribs_classcattle_1_1_optimizer"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><h3>template&lt;typename Scalar, std::size_t Rank, bool Sequential&gt;<br />
 class cattle::NadamOptimizer&lt; Scalar, Rank, Sequential &gt;</h3>
 
 <p>A class template for the Nesterov accelerated Adam (Nadam) optimization algorithm. </p>
-</div><h2 class="groupheader">Member Typedef Documentation</h2>
-<a id="a727bafdd8cabcd29ebe62257d86b45a4"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a727bafdd8cabcd29ebe62257d86b45a4">&#9670;&nbsp;</a></span>Base</h2>
-
-<div class="memitem">
-<div class="memproto">
-<div class="memtemplate">
-template&lt;typename Scalar , std::size_t Rank, bool Sequential&gt; </div>
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">typedef <a class="el" href="classcattle_1_1_adam_optimizer.html">AdamOptimizer</a>&lt;Scalar,Rank,Sequential&gt; <a class="el" href="classcattle_1_1_nadam_optimizer.html">cattle::NadamOptimizer</a>&lt; Scalar, Rank, Sequential &gt;::<a class="el" href="classcattle_1_1_s_g_d_optimizer.html#aa701d6ebef064c746540040e983b7042">Base</a></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">private</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
+</div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
 <a id="a1c86f3ddf2cd66c023e7093dfa6b6de8"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a1c86f3ddf2cd66c023e7093dfa6b6de8">&#9670;&nbsp;</a></span>NadamOptimizer()</h2>
 
@@ -338,7 +272,7 @@ template&lt;typename Scalar , std::size_t Rank, bool Sequential&gt; </div>
 </div>
 </div>
 <hr/>The documentation for this class was generated from the following file:<ul>
-<li>src/<a class="el" href="_optimizer_8h_source.html">Optimizer.h</a></li>
+<li>include/<a class="el" href="_optimizer_8hpp_source.html">Optimizer.hpp</a></li>
 </ul>
 </div><!-- contents -->
 <!-- start footer part -->

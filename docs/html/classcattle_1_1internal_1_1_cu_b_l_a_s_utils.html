@@ -22,7 +22,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">C-ATTL3
-   &#160;<span id="projectnumber">0.1</span>
+   &#160;<span id="projectnumber">0.5</span>
    </div>
   </td>
  </tr>
@@ -67,34 +67,34 @@ $(function() {
 </div><!-- top -->
 <div class="header">
   <div class="summary">
+<a href="#pub-methods">Public Member Functions</a> &#124;
 <a href="#pub-static-methods">Static Public Member Functions</a> &#124;
-<a href="#pri-methods">Private Member Functions</a> &#124;
 <a href="classcattle_1_1internal_1_1_cu_b_l_a_s_utils-members.html">List of all members</a>  </div>
   <div class="headertitle">
 <div class="title">cattle::internal::CuBLASUtils&lt; Scalar &gt; Class Template Reference</div>  </div>
 </div><!--header-->
 <div class="contents">
 
-<p><code>#include &lt;<a class="el" href="_cu_b_l_a_s_utils_8h_source.html">CuBLASUtils.h</a>&gt;</code></p>
+<p><code>#include &lt;<a class="el" href="_cu_b_l_a_s_utils_8hpp_source.html">CuBLASUtils.hpp</a>&gt;</code></p>
 <table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
+Public Member Functions</h2></td></tr>
+<tr class="memitem:a12f1c1e6ffa5eedf4d0c6c0f056097ae"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespacecattle.html#a1d78623a47279d516750a44dbad6090b">Matrix</a>&lt; Scalar &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1internal_1_1_cu_b_l_a_s_utils.html#a12f1c1e6ffa5eedf4d0c6c0f056097ae">mul</a> (<a class="el" href="namespacecattle.html#a1d78623a47279d516750a44dbad6090b">Matrix</a>&lt; Scalar &gt; &amp;a, <a class="el" href="namespacecattle.html#a1d78623a47279d516750a44dbad6090b">Matrix</a>&lt; Scalar &gt; &amp;b, bool transpose_a, bool transpose_b)</td></tr>
+<tr class="separator:a12f1c1e6ffa5eedf4d0c6c0f056097ae"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-static-methods"></a>
 Static Public Member Functions</h2></td></tr>
-<tr class="memitem:a2e8543a2b9fc94432022363593416240"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="namespacecattle.html#a1d78623a47279d516750a44dbad6090b">Matrix</a>&lt; Scalar &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1internal_1_1_cu_b_l_a_s_utils.html#a2e8543a2b9fc94432022363593416240">mul</a> (<a class="el" href="namespacecattle.html#a1d78623a47279d516750a44dbad6090b">Matrix</a>&lt; Scalar &gt; &amp;a, <a class="el" href="namespacecattle.html#a1d78623a47279d516750a44dbad6090b">Matrix</a>&lt; Scalar &gt; &amp;b, bool transpose_a, bool transpose_b)</td></tr>
-<tr class="separator:a2e8543a2b9fc94432022363593416240"><td class="memSeparator" colspan="2">&#160;</td></tr>
-</table><table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pri-methods"></a>
-Private Member Functions</h2></td></tr>
-<tr class="memitem:a27fa3f7d91d6b1be14197de24a0c079c"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1internal_1_1_cu_b_l_a_s_utils.html#a27fa3f7d91d6b1be14197de24a0c079c">CuBLASUtils</a> ()</td></tr>
-<tr class="separator:a27fa3f7d91d6b1be14197de24a0c079c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:adad9c88bf8d7fd3908368ae965f0b582"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="classcattle_1_1internal_1_1_cu_b_l_a_s_utils.html">CuBLASUtils</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1internal_1_1_cu_b_l_a_s_utils.html#adad9c88bf8d7fd3908368ae965f0b582">get_instance</a> ()</td></tr>
+<tr class="separator:adad9c88bf8d7fd3908368ae965f0b582"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><h3>template&lt;typename Scalar&gt;<br />
 class cattle::internal::CuBLASUtils&lt; Scalar &gt;</h3>
 
-<p>A utility class providing static methods for GPU accelerated linear algebra operations using cuBLAS. </p>
-</div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
-<a id="a27fa3f7d91d6b1be14197de24a0c079c"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a27fa3f7d91d6b1be14197de24a0c079c">&#9670;&nbsp;</a></span>CuBLASUtils()</h2>
+<p>A singleton utility class providing methods for GPU accelerated linear algebra operations using cuBLAS. </p>
+</div><h2 class="groupheader">Member Function Documentation</h2>
+<a id="adad9c88bf8d7fd3908368ae965f0b582"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#adad9c88bf8d7fd3908368ae965f0b582">&#9670;&nbsp;</a></span>get_instance()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -105,7 +105,7 @@ template&lt;typename Scalar &gt; </div>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="classcattle_1_1internal_1_1_cu_b_l_a_s_utils.html">cattle::internal::CuBLASUtils</a>&lt; Scalar &gt;::<a class="el" href="classcattle_1_1internal_1_1_cu_b_l_a_s_utils.html">CuBLASUtils</a> </td>
+          <td class="memname">static <a class="el" href="classcattle_1_1internal_1_1_cu_b_l_a_s_utils.html">CuBLASUtils</a>&amp; <a class="el" href="classcattle_1_1internal_1_1_cu_b_l_a_s_utils.html">cattle::internal::CuBLASUtils</a>&lt; Scalar &gt;::get_instance </td>
           <td>(</td>
           <td class="paramname"></td><td>)</td>
           <td></td>
@@ -113,16 +113,16 @@ template&lt;typename Scalar &gt; </div>
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">private</span></span>  </td>
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
+<dl class="section return"><dt>Returns</dt><dd>A reference to the only instance of the class. </dd></dl>
 
 </div>
 </div>
-<h2 class="groupheader">Member Function Documentation</h2>
-<a id="a2e8543a2b9fc94432022363593416240"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a2e8543a2b9fc94432022363593416240">&#9670;&nbsp;</a></span>mul()</h2>
+<a id="a12f1c1e6ffa5eedf4d0c6c0f056097ae"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a12f1c1e6ffa5eedf4d0c6c0f056097ae">&#9670;&nbsp;</a></span>mul()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -133,7 +133,7 @@ template&lt;typename Scalar &gt; </div>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">static <a class="el" href="namespacecattle.html#a1d78623a47279d516750a44dbad6090b">Matrix</a>&lt;Scalar&gt; <a class="el" href="classcattle_1_1internal_1_1_cu_b_l_a_s_utils.html">cattle::internal::CuBLASUtils</a>&lt; Scalar &gt;::mul </td>
+          <td class="memname"><a class="el" href="namespacecattle.html#a1d78623a47279d516750a44dbad6090b">Matrix</a>&lt;Scalar&gt; <a class="el" href="classcattle_1_1internal_1_1_cu_b_l_a_s_utils.html">cattle::internal::CuBLASUtils</a>&lt; Scalar &gt;::mul </td>
           <td>(</td>
           <td class="paramtype"><a class="el" href="namespacecattle.html#a1d78623a47279d516750a44dbad6090b">Matrix</a>&lt; Scalar &gt; &amp;&#160;</td>
           <td class="paramname"><em>a</em>, </td>
@@ -164,7 +164,7 @@ template&lt;typename Scalar &gt; </div>
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
@@ -183,7 +183,7 @@ template&lt;typename Scalar &gt; </div>
 </div>
 </div>
 <hr/>The documentation for this class was generated from the following file:<ul>
-<li>src/utils/<a class="el" href="_cu_b_l_a_s_utils_8h_source.html">CuBLASUtils.h</a></li>
+<li>include/utils/<a class="el" href="_cu_b_l_a_s_utils_8hpp_source.html">CuBLASUtils.hpp</a></li>
 </ul>
 </div><!-- contents -->
 <!-- start footer part -->

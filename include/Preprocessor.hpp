@@ -5,8 +5,8 @@
  *      Author: Viktor Csomor
  */
 
-#ifndef PREPROCESSOR_H_
-#define PREPROCESSOR_H_
+#ifndef INCLUDE_PREPROCESSOR_H_
+#define INCLUDE_PREPROCESSOR_H_
 
 #include <algorithm>
 #include <array>
@@ -16,8 +16,9 @@
 #include <string>
 #include <type_traits>
 #include <vector>
-#include "Eigen.h"
-#include "NumericUtils.h"
+
+#include "utils/Eigen.hpp"
+#include "utils/NumericUtils.hpp"
 
 namespace cattle {
 
@@ -297,4 +298,4 @@ public:
 
 } /* namespace cattle */
 
-#endif /* PREPROCESSOR_H_ */
+#endif /* INCLUDE_PREPROCESSOR_H_ */

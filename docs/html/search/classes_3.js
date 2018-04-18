@@ -12,6 +12,5 @@ var searchData=
   ['dimexpression_3c_20dimensions_3c_20std_3a_3asize_5ft_2c_20rank_20_3e_2c_20std_3a_3asize_5ft_2c_20rank_20_3e',['DimExpression&lt; Dimensions&lt; std::size_t, Rank &gt;, std::size_t, Rank &gt;',['../classcattle_1_1_dim_expression.html',1,'cattle']]],
   ['dimexpression_3c_20unarydimexpression_3c_20indextype_2c_20rank_2c_20lhsexpr_2c_20optype_20_3e_2c_20indextype_2c_20rank_20_3e',['DimExpression&lt; UnaryDimExpression&lt; IndexType, Rank, LhsExpr, OpType &gt;, IndexType, Rank &gt;',['../classcattle_1_1_dim_expression.html',1,'cattle']]],
   ['dimexpression_3c_20unaryrankwisedimexpression_3c_20indextype_2c_20rank_2c_20lhsexpr_2c_20optype_20_3e_2c_20indextype_2c_20rank_20_3e',['DimExpression&lt; UnaryRankWiseDimExpression&lt; IndexType, Rank, LhsExpr, OpType &gt;, IndexType, Rank &gt;',['../classcattle_1_1_dim_expression.html',1,'cattle']]],
-  ['divop',['DivOp',['../classcattle_1_1_div_op.html',1,'cattle']]],
   ['dropoutlayer',['DropoutLayer',['../classcattle_1_1_dropout_layer.html',1,'cattle']]]
 ];

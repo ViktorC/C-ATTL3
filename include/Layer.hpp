@@ -5,8 +5,8 @@
  *      Author: Viktor Csomor
  */
 
-#ifndef LAYER_H_
-#define LAYER_H_
+#ifndef INCLUDE_LAYER_H_
+#define INCLUDE_LAYER_H_
 
 #include <algorithm>
 #include <array>
@@ -16,14 +16,15 @@
 #include <memory>
 #include <type_traits>
 #include <utility>
-#include "Dimensions.h"
-#include "Eigen.h"
-#include "NumericUtils.h"
-#include "ParameterRegularization.h"
-#include "WeightInitialization.h"
+
+#include "Dimensions.hpp"
+#include "ParameterRegularization.hpp"
+#include "WeightInitialization.hpp"
+#include "utils/Eigen.hpp"
+#include "utils/NumericUtils.hpp"
 
 #ifdef CATTLE_USE_CUBLAS
-#include "CuBLASUtils.h"
+#include "utils/CuBLASUtils.hpp"
 #endif
 
 namespace cattle {
@@ -85,6 +86,10 @@ public:
 	 */
 	virtual const Dimensions<std::size_t,Rank>& get_output_dims() const = 0;
 	/**
+	 * It initializes the layer and its parameters.
+	 */
+	virtual void init() = 0;
+	/**
 	 * A method that returns whether the layer has parameters that can be learned.
 	 *
 	 * @return Whether the layer uses learnable parameters.
@@ -96,8 +101,8 @@ protected:
 	// Rank is increased by one to allow for batch training.
 	static constexpr std::size_t DATA_RANK = Rank + 1;
 	typedef Tensor<Scalar,DATA_RANK> Data;
-	/* Only expose methods that allow for the modification of the
-	 * layer's state to friends and sub-classes. */
+	/* Only expose methods that allow for the modification of the layer's state to friends and
+	 * sub-classes (except the initialization method). */
 	/**
 	 * It returns a clone of the layer instance using a reference to the original's parameters.
 	 *
@@ -121,10 +126,6 @@ protected:
 	 * @param input_layer Whether this layer is to be an input layer or not.
 	 */
 	virtual void set_input_layer(bool input_layer);
-	/**
-	 * It initializes the layer and its parameters.
-	 */
-	virtual void init() = 0;
 	/**
 	 * It empties the layer's caches such as those required for the derivation of the function
 	 * represented by the layer.
@@ -198,11 +199,15 @@ template<typename Scalar, std::size_t Rank>
 class KernelLayer : public Layer<Scalar,Rank> {
 public:
 	virtual ~KernelLayer() = default;
-	const Dimensions<std::size_t,Rank>& get_input_dims() const {
+	inline const Dimensions<std::size_t,Rank>& get_input_dims() const {
 		return input_dims;
 	}
-	const Dimensions<std::size_t,Rank>& get_output_dims() const {
+	inline const Dimensions<std::size_t,Rank>& get_output_dims() const {
 		return output_dims;
+	}
+	inline void init() {
+		weight_init->apply(weights_ref);
+		weights_grad.setZero(weights_grad.rows(), weights_grad.cols());
 	}
 protected:
 	inline KernelLayer(const Dimensions<std::size_t,Rank>& input_dims, Dimensions<std::size_t,Rank> output_dims,
@@ -237,10 +242,6 @@ protected:
 	}
 	inline void set_input_layer(bool input_layer) {
 		this->input_layer = input_layer;
-	}
-	inline void init() {
-		weight_init->apply(weights_ref);
-		weights_grad.setZero(weights_grad.rows(), weights_grad.cols());
 	}
 	inline Matrix<Scalar>& get_params() {
 		return weights_ref;
@@ -571,7 +572,7 @@ protected:
 	 * @param stride The convolution stride.
 	 * @return The dimension of the output tensor along the specified rank.
 	 */
-	static std::size_t calculate_output_dim(std::size_t input_dim, std::size_t receptor_size, std::size_t padding,
+	inline static std::size_t calculate_output_dim(std::size_t input_dim, std::size_t receptor_size, std::size_t padding,
 			std::size_t dilation, std::size_t stride) {
 		return (input_dim - receptor_size - (receptor_size - 1) * dilation + 2 * padding) / stride + 1;
 	}
@@ -616,6 +617,7 @@ public:
 	inline const Dimensions<std::size_t,Rank>& get_output_dims() const {
 		return dims;
 	}
+	inline void init() { }
 protected:
 	inline ActivationLayer(const Dimensions<std::size_t,Rank>& dims, std::size_t param_rows = 0,
 			std::size_t params_cols = 0) :
@@ -636,7 +638,6 @@ protected:
 	inline void set_input_layer(bool input_layer) {
 		this->input_layer = input_layer;
 	}
-	inline void init() { }
 	inline Matrix<Scalar>& get_params() {
 		return params_ref;
 	}
@@ -1141,6 +1142,10 @@ public:
 	inline Layer<Scalar,Rank>* clone() const {
 		return new PReLUActivationLayer(*this);
 	}
+	inline void init() {
+		Base::params_ref.setConstant(init_alpha);
+		Base::params_grad.setZero(1, Base::dims.get_volume());
+	}
 protected:
 	inline PReLUActivationLayer(const PReLUActivationLayer<Scalar,Rank>& layer, bool share_params = false) :
 			Base::ActivationLayer(layer, share_params),
@@ -1151,10 +1156,6 @@ protected:
 			conversion_dims(layer.conversion_dims) { }
 	inline Layer<Scalar,Rank>* clone_with_shared_params() const {
 		return new PReLUActivationLayer(*this, true);
-	}
-	inline void init() {
-		Base::params_ref.setConstant(init_alpha);
-		Base::params_grad.setZero(1, Base::dims.get_volume());
 	}
 	inline void empty_cache() {
 		in = Matrix<Scalar>(0, 0);
@@ -1225,6 +1226,7 @@ public:
 	inline const Dimensions<std::size_t,3>& get_output_dims() const {
 		return output_dims;
 	}
+	inline void init() { }
 protected:
 	typedef std::array<std::size_t,4> RankwiseArray;
 	typedef std::array<std::size_t,2> ReductionRanksArray;
@@ -1287,7 +1289,6 @@ protected:
 	inline void set_input_layer(bool input_layer) {
 		this->input_layer = input_layer;
 	}
-	inline void init() { }
 	inline Matrix<Scalar>& get_params() {
 		return params;
 	}
@@ -1364,7 +1365,7 @@ protected:
 	 * @param stride The stride at which the receptor is applied to the input tensor.
 	 * @return The depth of the output tensor.
 	 */
-	static std::size_t calculate_output_dim(std::size_t input_dim, std::size_t receptor_size, std::size_t dilation,
+	inline static std::size_t calculate_output_dim(std::size_t input_dim, std::size_t receptor_size, std::size_t dilation,
 			std::size_t stride) {
 		return (input_dim - receptor_size - (receptor_size - 1) * dilation) / stride + 1;
 	}
@@ -1587,6 +1588,18 @@ public:
 	inline const Dimensions<std::size_t,Rank>& get_output_dims() const {
 		return dims;
 	}
+	inline void init() {
+		// Gamma.
+		for (int i = 0; i < depth; ++i)
+			params_ref.row(i).setOnes();
+		// Beta.
+		for (int i = depth; i < 2 * depth; ++i)
+			params_ref.row(i).setZero();
+		params_grad.setZero(params_ref.rows(), params_ref.cols());
+		avg_means.setZero(avg_means.rows(), avg_means.cols());
+		avg_inv_sds.setZero(avg_means.rows(), avg_inv_sds.cols());
+		avgs_init = false;
+	}
 protected:
 	typedef std::array<std::size_t,Base::DATA_RANK> RankwiseArray;
 	inline BatchNormLayerBase(const Dimensions<std::size_t,Rank>& dims, std::size_t depth, ParamRegSharedPtr<Scalar> gamma_reg,
@@ -1640,18 +1653,6 @@ protected:
 	}
 	inline void set_input_layer(bool input_layer) {
 		this->input_layer = input_layer;
-	}
-	inline void init() {
-		// Gamma.
-		for (int i = 0; i < depth; ++i)
-			params_ref.row(i).setOnes();
-		// Beta.
-		for (int i = depth; i < 2 * depth; ++i)
-			params_ref.row(i).setZero();
-		params_grad.setZero(params_ref.rows(), params_ref.cols());
-		avg_means.setZero(avg_means.rows(), avg_means.cols());
-		avg_inv_sds.setZero(avg_means.rows(), avg_inv_sds.cols());
-		avgs_init = false;
 	}
 	inline void empty_cache() {
 		for (unsigned i = 0; i < cache_vec.size(); ++i) {
@@ -1929,6 +1930,7 @@ public:
 	inline const Dimensions<std::size_t,Rank>& get_output_dims() const {
 		return dims;
 	}
+	inline void init() { }
 protected:
 	inline Layer<Scalar,Rank>* clone_with_shared_params() const {
 		return clone();
@@ -1939,7 +1941,6 @@ protected:
 	inline void set_input_layer(bool input_layer) {
 		this->input_layer = input_layer;
 	}
-	inline void init() { }
 	inline void empty_cache() {
 		dropout_mask = typename Base::Data();
 	}
@@ -1992,4 +1993,4 @@ private:
 
 } /* namespace cattle */
 
-#endif /* LAYER_H_ */
+#endif /* INCLUDE_LAYER_H_ */

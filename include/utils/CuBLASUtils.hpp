@@ -10,12 +10,13 @@
 
 #include <cassert>
 #include <cstddef>
+#include <cublas_v2.h>
 #include <cuda_runtime.h>
 #include <exception>
 #include <string>
 #include <type_traits>
-#include "cublas_v2.h"
-#include "Eigen.h"
+
+#include "Eigen.hpp"
 
 namespace cattle {
 namespace internal {

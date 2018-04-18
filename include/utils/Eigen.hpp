@@ -5,12 +5,13 @@
  *      Author: Viktor Csomor
  */
 
-#ifndef UTILS_EIGEN_H_
-#define UTILS_EIGEN_H_
+#ifndef INCLUDE_UTILS_EIGEN_H_
+#define INCLUDE_UTILS_EIGEN_H_
 
 #define EIGEN_USE_THREADS
 
 #include <cstddef>
+
 #include "Eigen/Dense"
 #include "unsupported/Eigen/CXX11/Tensor"
 
@@ -104,4 +105,4 @@ inline void set_num_of_eval_threads(int num_of_threads) {
 
 }
 
-#endif /* UTILS_EIGEN_H_ */
+#endif /* INCLUDE_UTILS_EIGEN_H_ */

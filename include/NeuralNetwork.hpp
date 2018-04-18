@@ -5,8 +5,8 @@
  *      Author: Viktor Csomor
  */
 
-#ifndef NEURALNETWORK_H_
-#define NEURALNETWORK_H_
+#ifndef INCLUDE_NEURALNETWORK_H_
+#define INCLUDE_NEURALNETWORK_H_
 
 #include <algorithm>
 #include <array>
@@ -22,9 +22,10 @@
 #include <typeinfo>
 #include <utility>
 #include <vector>
-#include "Dimensions.h"
-#include "Eigen.h"
-#include "Layer.h"
+
+#include "Dimensions.hpp"
+#include "Layer.hpp"
+#include "utils/Eigen.hpp"
 
 // TODO GRU network.
 // TODO Possibility to add and remove modules (e.g. layers for simple feed-forward networks, residual modules for ResNets).
@@ -89,6 +90,14 @@ public:
 	 * variable time steps).
 	 */
 	virtual const Dims& get_output_dims() const = 0;
+	/**
+	 * @return A vector of pointers to the layers of the network. The ownership of the
+	 * layers remains with the network.
+	 */
+	virtual std::vector<Layer<Scalar,Rank>*> get_layers() = 0;
+	/**
+	 * Initializes all layers of the network.
+	 */
 	inline virtual void init() {
 		std::vector<Layer<Scalar,Rank>*> layers = get_layers();
 		for (unsigned i = 0; i < layers.size(); ++i)
@@ -146,11 +155,6 @@ protected:
 	 * Empties the caches of every layer of the network.
 	 */
 	virtual void empty_caches() = 0;
-	/**
-	 * @return A vector of pointers to the layers of the network. The ownership of the
-	 * layers remains with the network.
-	 */
-	virtual std::vector<Layer<Scalar,Rank>*> get_layers() = 0;
 	/**
 	 * It propagates the input tensor through the network and outputs its prediction.
 	 *
@@ -352,6 +356,15 @@ public:
 	inline const typename Base::Dims& get_output_dims() const {
 		return output_dims;
 	}
+	inline std::vector<Layer<Scalar,Rank>*> get_layers() {
+		std::vector<Layer<Scalar,Rank>*> layers;
+		for (unsigned i = 0; i < blocks.size(); ++i) {
+			std::vector<Layer<Scalar,Rank>*> internal_layers = blocks[i]->get_layers();
+			for (unsigned j = 0; j < internal_layers.size(); ++j)
+				layers.push_back(internal_layers[j]);
+		}
+		return layers;
+	}
 	inline friend void swap(Self& network1, Self& network2) {
 		using std::swap;
 		swap(network1.blocks, network2.blocks);
@@ -367,15 +380,6 @@ protected:
 	inline void empty_caches() {
 		for (unsigned i = 0; i < blocks.size(); ++i)
 			blocks[i]->empty_caches();
-	}
-	inline std::vector<Layer<Scalar,Rank>*> get_layers() {
-		std::vector<Layer<Scalar,Rank>*> layers;
-		for (unsigned i = 0; i < blocks.size(); ++i) {
-			std::vector<Layer<Scalar,Rank>*> internal_layers = blocks[i]->get_layers();
-			for (unsigned j = 0; j < internal_layers.size(); ++j)
-				layers.push_back(internal_layers[j]);
-		}
-		return layers;
 	}
 	inline typename Base::Data propagate(typename Base::Data input, bool training) {
 		assert(input_dims == (Dimensions<std::size_t,Base::DATA_RANK>(input.dimensions()).template demote<>()));
@@ -491,6 +495,15 @@ public:
 	inline const typename Base::Dims& get_output_dims() const {
 		return output_dims;
 	}
+	inline std::vector<Layer<Scalar,Rank>*> get_layers() {
+		std::vector<Layer<Scalar,Rank>*> layers;
+		for (unsigned i = 0; i < lanes.size(); ++i) {
+			std::vector<Layer<Scalar,Rank>*> lane_layers = lanes[i]->get_layers();
+			for (unsigned j = 0; j < lane_layers.size(); ++j)
+				layers.push_back(lane_layers[j]);
+		}
+		return layers;
+	}
 	inline friend void swap(Self& network1, Self& network2) {
 		using std::swap;
 		swap(network1.lanes, network2.lanes);
@@ -507,15 +520,6 @@ protected:
 	inline void empty_caches() {
 		for (unsigned i = 0; i < lanes.size(); ++i)
 			lanes[i]->empty_caches();
-	}
-	inline std::vector<Layer<Scalar,Rank>*> get_layers() {
-		std::vector<Layer<Scalar,Rank>*> layers;
-		for (unsigned i = 0; i < lanes.size(); ++i) {
-			std::vector<Layer<Scalar,Rank>*> lane_layers = lanes[i]->get_layers();
-			for (unsigned j = 0; j < lane_layers.size(); ++j)
-				layers.push_back(lane_layers[j]);
-		}
-		return layers;
 	}
 	inline typename Base::Data propagate(typename Base::Data input, bool training) {
 		assert(input_dims == (Dimensions<std::size_t,Base::DATA_RANK>(input.dimensions()).template demote<>()));
@@ -752,6 +756,12 @@ public:
 	inline const typename Base::Dims& get_output_dims() const {
 		return output_dims;
 	}
+	inline std::vector<Layer<Scalar,Rank>*> get_layers() {
+		std::vector<Layer<Scalar,Rank>*> layers_raw(layers.size());
+		for (unsigned i = 0; i < layers.size(); ++i)
+			layers_raw[i] = layers[i].get();
+		return layers_raw;
+	}
 	// For the copy-and-swap idiom.
 	inline friend void swap(Self& network1, Self& network2) {
 		using std::swap;
@@ -773,12 +783,6 @@ protected:
 	inline void empty_caches() {
 		for (unsigned i = 0; i < layers.size(); ++i)
 			Base::empty_cache(*layers[i]);
-	}
-	inline std::vector<Layer<Scalar,Rank>*> get_layers() {
-		std::vector<Layer<Scalar,Rank>*> layers_raw(layers.size());
-		for (unsigned i = 0; i < layers.size(); ++i)
-			layers_raw[i] = layers[i].get();
-		return layers_raw;
 	}
 	inline typename Base::Data propagate(typename Base::Data input, bool training) {
 		assert(input_dims == (Dimensions<std::size_t,Base::DATA_RANK>(input.dimensions()).template demote<>()));
@@ -853,15 +857,6 @@ public:
 	inline const typename Base::Dims& get_output_dims() const {
 		return output_dims;
 	}
-protected:
-	inline void set_foremost(bool foremost) {
-		modules[0].first.set_foremost(foremost);
-		this->foremost = foremost;
-	}
-	inline void empty_caches() {
-		for (unsigned i = 0; i < modules.size(); ++i)
-			modules[i].first.empty_caches();
-	}
 	inline std::vector<Layer<Scalar,Rank>*> get_layers() {
 		std::vector<Layer<Scalar,Rank>*> layers;
 		for (unsigned i = 0; i < modules.size(); ++i) {
@@ -870,6 +865,15 @@ protected:
 				layers.push_back(module_layers[j]);
 		}
 		return layers;
+	}
+protected:
+	inline void set_foremost(bool foremost) {
+		modules[0].first.set_foremost(foremost);
+		this->foremost = foremost;
+	}
+	inline void empty_caches() {
+		for (unsigned i = 0; i < modules.size(); ++i)
+			modules[i].first.empty_caches();
 	}
 	inline typename Base::Data propagate(typename Base::Data input, bool training) {
 		assert(input_dims == (Dimensions<std::size_t,Base::DATA_RANK>(input.dimensions()).template demote<>()));
@@ -956,15 +960,6 @@ public:
 	inline const typename Base::Dims& get_output_dims() const {
 		return output_dims;
 	}
-protected:
-	inline void set_foremost(bool foremost) {
-		modules[0].set_foremost(foremost);
-		this->foremost = foremost;
-	}
-	inline void empty_caches() {
-		for (unsigned i = 0; i < modules.size(); ++i)
-			modules[i].empty_caches();
-	}
 	inline std::vector<Layer<Scalar,Rank>*> get_layers() {
 		std::vector<Layer<Scalar,Rank>*> layers;
 		for (unsigned i = 0; i < modules.size(); ++i) {
@@ -973,6 +968,15 @@ protected:
 				layers.push_back(module_layers[j]);
 		}
 		return layers;
+	}
+protected:
+	inline void set_foremost(bool foremost) {
+		modules[0].set_foremost(foremost);
+		this->foremost = foremost;
+	}
+	inline void empty_caches() {
+		for (unsigned i = 0; i < modules.size(); ++i)
+			modules[i].empty_caches();
 	}
 	inline typename Base::Data propagate(typename Base::Data input, bool training) {
 		assert(input_dims == (Dimensions<std::size_t,Base::DATA_RANK>(input.dimensions()).template demote<>()));
@@ -1069,6 +1073,9 @@ public:
 	inline const typename Base::Dims& get_output_dims() const {
 		return output_dims;
 	}
+	inline std::vector<Layer<Scalar,Rank>*> get_layers() {
+		return net->get_layers();
+	}
 	inline friend void swap(Self& network1, Self& network2) {
 		using std::swap;
 		swap(network1.net, network2.net);
@@ -1087,9 +1094,6 @@ protected:
 	}
 	inline void empty_caches() {
 		net->empty_caches();
-	}
-	inline std::vector<Layer<Scalar,Rank>*> get_layers() {
-		return net->get_layers();
 	}
 	inline typename Base::Data propagate(typename Base::Data input, bool training) {
 		assert(input_dims == (Dimensions<std::size_t,Base::DATA_RANK>(input.dimensions()).template demote<2>()));
@@ -1217,6 +1221,16 @@ public:
 	inline const typename Base::Dims& get_output_dims() const {
 		return output_dims;
 	}
+	inline std::vector<Layer<Scalar,Rank>*> get_layers() {
+		std::vector<Layer<Scalar,Rank>*> layers;
+		std::vector<Layer<Scalar,Rank>*> net_layers = net->get_layers();
+		for (std::size_t i = 0; i < net_layers.size(); ++i)
+			layers.push_back(net_layers[i]);
+		std::vector<Layer<Scalar,Rank>*> net_rev_layers = net_rev->get_layers();
+		for (std::size_t i = 0; i < net_rev_layers.size(); ++i)
+			layers.push_back(net_rev_layers[i]);
+		return layers;
+	}
 	inline friend void swap(Self& network1, Self& network2) {
 		using std::swap;
 		swap(network1.net, network2.net);
@@ -1234,16 +1248,6 @@ protected:
 	inline void empty_caches() {
 		net->empty_caches();
 		net_rev->empty_caches();
-	}
-	inline std::vector<Layer<Scalar,Rank>*> get_layers() {
-		std::vector<Layer<Scalar,Rank>*> layers;
-		std::vector<Layer<Scalar,Rank>*> net_layers = net->get_layers();
-		for (std::size_t i = 0; i < net_layers.size(); ++i)
-			layers.push_back(net_layers[i]);
-		std::vector<Layer<Scalar,Rank>*> net_rev_layers = net_rev->get_layers();
-		for (std::size_t i = 0; i < net_rev_layers.size(); ++i)
-			layers.push_back(net_rev_layers[i]);
-		return layers;
 	}
 	inline typename Base::Data propagate(typename Base::Data input, bool training) {
 		assert(input_dims == (Dimensions<std::size_t,Base::DATA_RANK>(input.dimensions()).template demote<2>()));
@@ -1481,6 +1485,15 @@ public:
 	inline const typename Root::Dims& get_output_dims() const {
 		return output_dims;
 	}
+	inline std::vector<Layer<Scalar,Rank>*> get_layers() {
+		std::vector<Layer<Scalar,Rank>*> layers(5);
+		layers[0] = main_cell.input_kernel.get();
+		layers[1] = main_cell.state_kernel.get();
+		layers[2] = main_cell.output_kernel.get();
+		layers[3] = main_cell.state_act.get();
+		layers[4] = main_cell.output_act.get();
+		return layers;
+	}
 	// For the copy-and-swap idiom.
 	inline friend void swap(Self& network1, Self& network2) {
 		using std::swap;
@@ -1518,15 +1531,6 @@ protected:
 		output_seq_length = -1;
 		output_seq_delay = -1;
 		cells = std::vector<Cell>(0);
-	}
-	inline std::vector<Layer<Scalar,Rank>*> get_layers() {
-		std::vector<Layer<Scalar,Rank>*> layers(5);
-		layers[0] = main_cell.input_kernel.get();
-		layers[1] = main_cell.state_kernel.get();
-		layers[2] = main_cell.output_kernel.get();
-		layers[3] = main_cell.state_act.get();
-		layers[4] = main_cell.output_act.get();
-		return layers;
 	}
 	inline typename Root::Data propagate(typename Root::Data input, bool training) {
 		Dimensions<std::size_t,Root::DATA_RANK> data_dims = input.dimensions();
@@ -2032,6 +2036,23 @@ public:
 	inline const typename Root::Dims& get_output_dims() const {
 		return output_dims;
 	}
+	inline std::vector<Layer<Scalar,Rank>*> get_layers() {
+		std::vector<Layer<Scalar,Rank>*> layers(13);
+		layers[0] = main_cell.input_forget_kernel.get();
+		layers[1] = main_cell.output_forget_kernel.get();
+		layers[2] = main_cell.input_write_kernel.get();
+		layers[3] = main_cell.output_write_kernel.get();
+		layers[4] = main_cell.input_candidate_kernel.get();
+		layers[5] = main_cell.output_candidate_kernel.get();
+		layers[6] = main_cell.input_read_kernel.get();
+		layers[7] = main_cell.output_read_kernel.get();
+		layers[8] = main_cell.forget_act.get();
+		layers[9] = main_cell.write_act.get();
+		layers[10] = main_cell.candidate_act.get();
+		layers[11] = main_cell.read_act.get();
+		layers[12] = main_cell.state_act.get();
+		return layers;
+	}
 	inline friend void swap(Self& network1, Self& network2) {
 		using std::swap;
 		swap(network1.main_cell, network2.main_cell);
@@ -2091,23 +2112,6 @@ protected:
 		output_seq_length = -1;
 		output_seq_delay = -1;
 		cells = std::vector<Cell>(0);
-	}
-	inline std::vector<Layer<Scalar,Rank>*> get_layers() {
-		std::vector<Layer<Scalar,Rank>*> layers(13);
-		layers[0] = main_cell.input_forget_kernel.get();
-		layers[1] = main_cell.output_forget_kernel.get();
-		layers[2] = main_cell.input_write_kernel.get();
-		layers[3] = main_cell.output_write_kernel.get();
-		layers[4] = main_cell.input_candidate_kernel.get();
-		layers[5] = main_cell.output_candidate_kernel.get();
-		layers[6] = main_cell.input_read_kernel.get();
-		layers[7] = main_cell.output_read_kernel.get();
-		layers[8] = main_cell.forget_act.get();
-		layers[9] = main_cell.write_act.get();
-		layers[10] = main_cell.candidate_act.get();
-		layers[11] = main_cell.read_act.get();
-		layers[12] = main_cell.state_act.get();
-		return layers;
 	}
 	inline typename Root::Data propagate(typename Root::Data input, bool training) {
 		Dimensions<std::size_t,Root::DATA_RANK> data_dims = input.dimensions();
@@ -2619,4 +2623,4 @@ private:
 
 } /* namespace cattle */
 
-#endif /* NEURALNETWORK_H_ */
+#endif /* INCLUDE_NEURALNETWORK_H_ */

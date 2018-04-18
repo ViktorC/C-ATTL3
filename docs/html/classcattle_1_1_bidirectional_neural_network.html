@@ -22,7 +22,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">C-ATTL3
-   &#160;<span id="projectnumber">0.1</span>
+   &#160;<span id="projectnumber">0.5</span>
    </div>
   </td>
  </tr>
@@ -67,21 +67,15 @@ $(function() {
 </div><!-- top -->
 <div class="header">
   <div class="summary">
-<a href="#nested-classes">Classes</a> &#124;
 <a href="#pub-methods">Public Member Functions</a> &#124;
 <a href="#pro-methods">Protected Member Functions</a> &#124;
-<a href="#pri-types">Private Types</a> &#124;
-<a href="#pri-static-methods">Static Private Member Functions</a> &#124;
-<a href="#pri-attribs">Private Attributes</a> &#124;
-<a href="#pri-static-attribs">Static Private Attributes</a> &#124;
-<a href="#friends">Friends</a> &#124;
 <a href="classcattle_1_1_bidirectional_neural_network-members.html">List of all members</a>  </div>
   <div class="headertitle">
 <div class="title">cattle::BidirectionalNeuralNetwork&lt; Scalar, Rank, MergeType &gt; Class Template Reference</div>  </div>
 </div><!--header-->
 <div class="contents">
 
-<p><code>#include &lt;<a class="el" href="_neural_network_8h_source.html">NeuralNetwork.h</a>&gt;</code></p>
+<p><code>#include &lt;<a class="el" href="_neural_network_8hpp_source.html">NeuralNetwork.hpp</a>&gt;</code></p>
 <div class="dynheader">
 Inheritance diagram for cattle::BidirectionalNeuralNetwork&lt; Scalar, Rank, MergeType &gt;:</div>
 <div class="dyncontent">
@@ -92,106 +86,41 @@ Inheritance diagram for cattle::BidirectionalNeuralNetwork&lt; Scalar, Rank, Mer
 </map>
  </div></div>
 <table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="nested-classes"></a>
-Classes</h2></td></tr>
-<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structcattle_1_1_bidirectional_neural_network_1_1_backprop_args.html">BackpropArgs</a></td></tr>
-<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structcattle_1_1_bidirectional_neural_network_1_1_prop_args.html">PropArgs</a></td></tr>
-<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-</table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:a51cee6515198d8e475f9257a922bc317"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_bidirectional_neural_network.html#a51cee6515198d8e475f9257a922bc317">BidirectionalNeuralNetwork</a> (<a class="el" href="classcattle_1_1_bidirectional_neural_network.html#a6e3aa43fc14061f244bafb3d7d6fb2ca">UnidirNet</a> network, bool <a class="el" href="classcattle_1_1_bidirectional_neural_network.html#afe946b08836905dcc7b4581aab0ac2da">foremost</a>=true)</td></tr>
+<tr class="memitem:a51cee6515198d8e475f9257a922bc317"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_bidirectional_neural_network.html#a51cee6515198d8e475f9257a922bc317">BidirectionalNeuralNetwork</a> (UnidirNet network, bool foremost=true)</td></tr>
 <tr class="separator:a51cee6515198d8e475f9257a922bc317"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aca8554ffe21eedc5e7d8284049013482"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_bidirectional_neural_network.html#aca8554ffe21eedc5e7d8284049013482">BidirectionalNeuralNetwork</a> (const <a class="el" href="classcattle_1_1_bidirectional_neural_network.html#aad1ae57124cc3e0905de24bbc6dfa8c9">Self</a> &amp;network)</td></tr>
-<tr class="separator:aca8554ffe21eedc5e7d8284049013482"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a5a593526bb8f16f71991a86497e89b92"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_bidirectional_neural_network.html#a5a593526bb8f16f71991a86497e89b92">BidirectionalNeuralNetwork</a> (<a class="el" href="classcattle_1_1_bidirectional_neural_network.html#aad1ae57124cc3e0905de24bbc6dfa8c9">Self</a> &amp;&amp;network)</td></tr>
-<tr class="separator:a5a593526bb8f16f71991a86497e89b92"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a20e46d0f47f8bf392ab4a4d2b3893a02"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_bidirectional_neural_network.html#a20e46d0f47f8bf392ab4a4d2b3893a02">~BidirectionalNeuralNetwork</a> ()=default</td></tr>
-<tr class="separator:a20e46d0f47f8bf392ab4a4d2b3893a02"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ac1b2a306be8ea67316a48bb78304ec3a"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classcattle_1_1_bidirectional_neural_network.html#aad1ae57124cc3e0905de24bbc6dfa8c9">Self</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_bidirectional_neural_network.html#ac1b2a306be8ea67316a48bb78304ec3a">operator=</a> (<a class="el" href="classcattle_1_1_bidirectional_neural_network.html#aad1ae57124cc3e0905de24bbc6dfa8c9">Self</a> network)</td></tr>
-<tr class="separator:ac1b2a306be8ea67316a48bb78304ec3a"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ac3200af26b657df73ee81b230d710fa6"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classcattle_1_1_bidirectional_neural_network.html#adcf850ffbf9c085e6e41a2524823103d">Base</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_bidirectional_neural_network.html#ac3200af26b657df73ee81b230d710fa6">clone</a> () const</td></tr>
+<tr class="memitem:ac3200af26b657df73ee81b230d710fa6"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classcattle_1_1_neural_network.html">Base</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_bidirectional_neural_network.html#ac3200af26b657df73ee81b230d710fa6">clone</a> () const</td></tr>
 <tr class="separator:ac3200af26b657df73ee81b230d710fa6"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a2cd4e95bebb7272f37371f635bb09466"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_bidirectional_neural_network.html#a2cd4e95bebb7272f37371f635bb09466">is_foremost</a> () const</td></tr>
 <tr class="separator:a2cd4e95bebb7272f37371f635bb09466"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aeb9d32ff0cc9163beb470f234cc10537"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="classcattle_1_1_neural_network.html#ab3608ae118bbbacbc9161f489afcd562">Base::Dims</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_bidirectional_neural_network.html#aeb9d32ff0cc9163beb470f234cc10537">get_input_dims</a> () const</td></tr>
+<tr class="memitem:aeb9d32ff0cc9163beb470f234cc10537"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="classcattle_1_1_dimensions.html">Base::Dims</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_bidirectional_neural_network.html#aeb9d32ff0cc9163beb470f234cc10537">get_input_dims</a> () const</td></tr>
 <tr class="separator:aeb9d32ff0cc9163beb470f234cc10537"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aac567c95a4dd332dd2239c5a6714bc75"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="classcattle_1_1_neural_network.html#ab3608ae118bbbacbc9161f489afcd562">Base::Dims</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_bidirectional_neural_network.html#aac567c95a4dd332dd2239c5a6714bc75">get_output_dims</a> () const</td></tr>
+<tr class="memitem:aac567c95a4dd332dd2239c5a6714bc75"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="classcattle_1_1_dimensions.html">Base::Dims</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_bidirectional_neural_network.html#aac567c95a4dd332dd2239c5a6714bc75">get_output_dims</a> () const</td></tr>
 <tr class="separator:aac567c95a4dd332dd2239c5a6714bc75"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a052fff2227a28520de4ef74cd8f45352"><td class="memItemLeft" align="right" valign="top">std::vector&lt; <a class="el" href="classcattle_1_1_layer.html">Layer</a>&lt; Scalar, Rank &gt; * &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_bidirectional_neural_network.html#a052fff2227a28520de4ef74cd8f45352">get_layers</a> ()</td></tr>
+<tr class="separator:a052fff2227a28520de4ef74cd8f45352"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="inherit_header pub_methods_classcattle_1_1_neural_network"><td colspan="2" onclick="javascript:toggleInherit('pub_methods_classcattle_1_1_neural_network')"><img src="closed.png" alt="-"/>&#160;Public Member Functions inherited from <a class="el" href="classcattle_1_1_neural_network.html">cattle::NeuralNetwork&lt; Scalar, Rank, true &gt;</a></td></tr>
-<tr class="memitem:a334880e27677f0360c86dec07a745cbb inherit pub_methods_classcattle_1_1_neural_network"><td class="memItemLeft" align="right" valign="top">virtual&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_neural_network.html#a334880e27677f0360c86dec07a745cbb">~NeuralNetwork</a> ()=default</td></tr>
-<tr class="separator:a334880e27677f0360c86dec07a745cbb inherit pub_methods_classcattle_1_1_neural_network"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ae59c0963d75b1f2de4f18a6c8fe85fa8 inherit pub_methods_classcattle_1_1_neural_network"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_neural_network.html#ae59c0963d75b1f2de4f18a6c8fe85fa8">init</a> ()</td></tr>
 <tr class="separator:ae59c0963d75b1f2de4f18a6c8fe85fa8 inherit pub_methods_classcattle_1_1_neural_network"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ac88007e2f8fa2a208de0e51c8ac422cc inherit pub_methods_classcattle_1_1_neural_network"><td class="memItemLeft" align="right" valign="top">virtual <a class="el" href="classcattle_1_1_neural_network.html#a0235b71d6f7697e68022611147f7d30d">Data</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_neural_network.html#ac88007e2f8fa2a208de0e51c8ac422cc">infer</a> (<a class="el" href="classcattle_1_1_neural_network.html#a0235b71d6f7697e68022611147f7d30d">Data</a> input)</td></tr>
+<tr class="memitem:ac88007e2f8fa2a208de0e51c8ac422cc inherit pub_methods_classcattle_1_1_neural_network"><td class="memItemLeft" align="right" valign="top">virtual Data&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_neural_network.html#ac88007e2f8fa2a208de0e51c8ac422cc">infer</a> (Data input)</td></tr>
 <tr class="separator:ac88007e2f8fa2a208de0e51c8ac422cc inherit pub_methods_classcattle_1_1_neural_network"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ad216c4f30172a8924e959d103e38a82c inherit pub_methods_classcattle_1_1_neural_network"><td class="memItemLeft" align="right" valign="top">virtual std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_neural_network.html#ad216c4f30172a8924e959d103e38a82c">to_string</a> ()</td></tr>
 <tr class="separator:ad216c4f30172a8924e959d103e38a82c inherit pub_methods_classcattle_1_1_neural_network"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pro-methods"></a>
 Protected Member Functions</h2></td></tr>
-<tr class="memitem:a8c18a8cb33b287577ed9ce352b5acf0b"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_bidirectional_neural_network.html#a8c18a8cb33b287577ed9ce352b5acf0b">set_foremost</a> (bool <a class="el" href="classcattle_1_1_bidirectional_neural_network.html#afe946b08836905dcc7b4581aab0ac2da">foremost</a>)</td></tr>
+<tr class="memitem:a8c18a8cb33b287577ed9ce352b5acf0b"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_bidirectional_neural_network.html#a8c18a8cb33b287577ed9ce352b5acf0b">set_foremost</a> (bool foremost)</td></tr>
 <tr class="separator:a8c18a8cb33b287577ed9ce352b5acf0b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a03dd8e8bc89e04cb56887463e3fc9d5b"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_bidirectional_neural_network.html#a03dd8e8bc89e04cb56887463e3fc9d5b">empty_caches</a> ()</td></tr>
 <tr class="separator:a03dd8e8bc89e04cb56887463e3fc9d5b"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a052fff2227a28520de4ef74cd8f45352"><td class="memItemLeft" align="right" valign="top">std::vector&lt; <a class="el" href="classcattle_1_1_layer.html">Layer</a>&lt; Scalar, Rank &gt; * &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_bidirectional_neural_network.html#a052fff2227a28520de4ef74cd8f45352">get_layers</a> ()</td></tr>
-<tr class="separator:a052fff2227a28520de4ef74cd8f45352"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aeea3e43b89d4bdd0ac9b9e81c6815aa9"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classcattle_1_1_neural_network.html#a0235b71d6f7697e68022611147f7d30d">Base::Data</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_bidirectional_neural_network.html#aeea3e43b89d4bdd0ac9b9e81c6815aa9">propagate</a> (typename <a class="el" href="classcattle_1_1_neural_network.html#a0235b71d6f7697e68022611147f7d30d">Base::Data</a> input, bool training)</td></tr>
+<tr class="memitem:aeea3e43b89d4bdd0ac9b9e81c6815aa9"><td class="memItemLeft" align="right" valign="top">Base::Data&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_bidirectional_neural_network.html#aeea3e43b89d4bdd0ac9b9e81c6815aa9">propagate</a> (typename Base::Data input, bool training)</td></tr>
 <tr class="separator:aeea3e43b89d4bdd0ac9b9e81c6815aa9"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a03515350fc988ae5461b760064fc73cc"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classcattle_1_1_neural_network.html#a0235b71d6f7697e68022611147f7d30d">Base::Data</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_bidirectional_neural_network.html#a03515350fc988ae5461b760064fc73cc">backpropagate</a> (typename <a class="el" href="classcattle_1_1_neural_network.html#a0235b71d6f7697e68022611147f7d30d">Base::Data</a> out_grads)</td></tr>
+<tr class="memitem:a03515350fc988ae5461b760064fc73cc"><td class="memItemLeft" align="right" valign="top">Base::Data&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_bidirectional_neural_network.html#a03515350fc988ae5461b760064fc73cc">backpropagate</a> (typename Base::Data out_grads)</td></tr>
 <tr class="separator:a03515350fc988ae5461b760064fc73cc"><td class="memSeparator" colspan="2">&#160;</td></tr>
-</table><table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pri-types"></a>
-Private Types</h2></td></tr>
-<tr class="memitem:adcf850ffbf9c085e6e41a2524823103d"><td class="memItemLeft" align="right" valign="top">typedef <a class="el" href="classcattle_1_1_neural_network.html">NeuralNetwork</a>&lt; Scalar, Rank, true &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_bidirectional_neural_network.html#adcf850ffbf9c085e6e41a2524823103d">Base</a></td></tr>
-<tr class="separator:adcf850ffbf9c085e6e41a2524823103d"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aad1ae57124cc3e0905de24bbc6dfa8c9"><td class="memItemLeft" align="right" valign="top">typedef <a class="el" href="classcattle_1_1_bidirectional_neural_network.html">BidirectionalNeuralNetwork</a>&lt; Scalar, Rank, MergeType &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_bidirectional_neural_network.html#aad1ae57124cc3e0905de24bbc6dfa8c9">Self</a></td></tr>
-<tr class="separator:aad1ae57124cc3e0905de24bbc6dfa8c9"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a6e3aa43fc14061f244bafb3d7d6fb2ca"><td class="memItemLeft" align="right" valign="top">typedef <a class="el" href="namespacecattle.html#a011c68542051b5509475ef3f94aaa048">UnidirNeuralNetPtr</a>&lt; Scalar, Rank &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_bidirectional_neural_network.html#a6e3aa43fc14061f244bafb3d7d6fb2ca">UnidirNet</a></td></tr>
-<tr class="separator:a6e3aa43fc14061f244bafb3d7d6fb2ca"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:afdef08acf426ca059cf9e901c0947c29"><td class="memItemLeft" align="right" valign="top">typedef std::array&lt; std::size_t, <a class="el" href="classcattle_1_1_neural_network.html#a5d62d6f65e26bbd730d36ab417aacb79">Base::DATA_RANK</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_bidirectional_neural_network.html#afdef08acf426ca059cf9e901c0947c29">RankwiseArray</a></td></tr>
-<tr class="separator:afdef08acf426ca059cf9e901c0947c29"><td class="memSeparator" colspan="2">&#160;</td></tr>
-</table><table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pri-static-methods"></a>
-Static Private Member Functions</h2></td></tr>
-<tr class="memitem:a39ad32596d09d588305f9f3fcca9414a"><td class="memItemLeft" align="right" valign="top">static void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_bidirectional_neural_network.html#a39ad32596d09d588305f9f3fcca9414a">propagate</a> (void *args_ptr)</td></tr>
-<tr class="separator:a39ad32596d09d588305f9f3fcca9414a"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a642475dede3787c0d9e7879470cc6168"><td class="memItemLeft" align="right" valign="top">static void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_bidirectional_neural_network.html#a642475dede3787c0d9e7879470cc6168">backpropagate</a> (void *args_ptr)</td></tr>
-<tr class="separator:a642475dede3787c0d9e7879470cc6168"><td class="memSeparator" colspan="2">&#160;</td></tr>
-</table><table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pri-attribs"></a>
-Private Attributes</h2></td></tr>
-<tr class="memitem:a684b16e5ec38f364f7e3cb9f4f78c269"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classcattle_1_1_bidirectional_neural_network.html#a6e3aa43fc14061f244bafb3d7d6fb2ca">UnidirNet</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_bidirectional_neural_network.html#a684b16e5ec38f364f7e3cb9f4f78c269">net</a></td></tr>
-<tr class="separator:a684b16e5ec38f364f7e3cb9f4f78c269"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a5ee620f9a7bee095d762f0e6a969ece8"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classcattle_1_1_bidirectional_neural_network.html#a6e3aa43fc14061f244bafb3d7d6fb2ca">UnidirNet</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_bidirectional_neural_network.html#a5ee620f9a7bee095d762f0e6a969ece8">net_rev</a></td></tr>
-<tr class="separator:a5ee620f9a7bee095d762f0e6a969ece8"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:afe946b08836905dcc7b4581aab0ac2da"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_bidirectional_neural_network.html#afe946b08836905dcc7b4581aab0ac2da">foremost</a></td></tr>
-<tr class="separator:afe946b08836905dcc7b4581aab0ac2da"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a7a17210f3a0b5b41b1370e3f27457f8d"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classcattle_1_1_neural_network.html#ab3608ae118bbbacbc9161f489afcd562">Base::Dims</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_bidirectional_neural_network.html#a7a17210f3a0b5b41b1370e3f27457f8d">input_dims</a></td></tr>
-<tr class="separator:a7a17210f3a0b5b41b1370e3f27457f8d"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aea9c2d666ece762416bdcf727fb6f6dd"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classcattle_1_1_neural_network.html#ab3608ae118bbbacbc9161f489afcd562">Base::Dims</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_bidirectional_neural_network.html#aea9c2d666ece762416bdcf727fb6f6dd">output_dims</a></td></tr>
-<tr class="separator:aea9c2d666ece762416bdcf727fb6f6dd"><td class="memSeparator" colspan="2">&#160;</td></tr>
-</table><table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pri-static-attribs"></a>
-Static Private Attributes</h2></td></tr>
-<tr class="memitem:a0d771a4395762988a1164b2a75785306"><td class="memItemLeft" align="right" valign="top">static const std::size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_bidirectional_neural_network.html#a0d771a4395762988a1164b2a75785306">CONCAT_RANK</a> = MergeType == <a class="el" href="namespacecattle.html#adf6ad5e38e7c96e1d70ac1f180c71c42a41a1611c1ddfc609ed9ecaa408c9d884">CONCAT_HI_RANK</a> ? Rank - 1 : 0</td></tr>
-<tr class="separator:a0d771a4395762988a1164b2a75785306"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:afde4ac337bed9df8e9f43b841608d537"><td class="memItemLeft" align="right" valign="top">static const std::size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_bidirectional_neural_network.html#afde4ac337bed9df8e9f43b841608d537">CONCAT_BATCH_RANK</a> = <a class="el" href="classcattle_1_1_bidirectional_neural_network.html#a0d771a4395762988a1164b2a75785306">CONCAT_RANK</a> + 2</td></tr>
-<tr class="separator:afde4ac337bed9df8e9f43b841608d537"><td class="memSeparator" colspan="2">&#160;</td></tr>
-</table><table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="friends"></a>
-Friends</h2></td></tr>
-<tr class="memitem:a12bf02ce4346879f204aed9ccd4f9dab"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_bidirectional_neural_network.html#a12bf02ce4346879f204aed9ccd4f9dab">swap</a> (<a class="el" href="classcattle_1_1_bidirectional_neural_network.html#aad1ae57124cc3e0905de24bbc6dfa8c9">Self</a> &amp;network1, <a class="el" href="classcattle_1_1_bidirectional_neural_network.html#aad1ae57124cc3e0905de24bbc6dfa8c9">Self</a> &amp;network2)</td></tr>
-<tr class="separator:a12bf02ce4346879f204aed9ccd4f9dab"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="inherited"></a>
 Additional Inherited Members</h2></td></tr>
-<tr class="inherit_header pro_types_classcattle_1_1_neural_network"><td colspan="2" onclick="javascript:toggleInherit('pro_types_classcattle_1_1_neural_network')"><img src="closed.png" alt="-"/>&#160;Protected Types inherited from <a class="el" href="classcattle_1_1_neural_network.html">cattle::NeuralNetwork&lt; Scalar, Rank, true &gt;</a></td></tr>
-<tr class="memitem:a0235b71d6f7697e68022611147f7d30d inherit pro_types_classcattle_1_1_neural_network"><td class="memItemLeft" align="right" valign="top">typedef <a class="el" href="namespacecattle.html#a8b9323ad928764340e46f0802bf27fbb">Tensor</a>&lt; Scalar, <a class="el" href="classcattle_1_1_neural_network.html#a5d62d6f65e26bbd730d36ab417aacb79">DATA_RANK</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_neural_network.html#a0235b71d6f7697e68022611147f7d30d">Data</a></td></tr>
-<tr class="separator:a0235b71d6f7697e68022611147f7d30d inherit pro_types_classcattle_1_1_neural_network"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ab3608ae118bbbacbc9161f489afcd562 inherit pro_types_classcattle_1_1_neural_network"><td class="memItemLeft" align="right" valign="top">typedef <a class="el" href="classcattle_1_1_dimensions.html">Dimensions</a>&lt; std::size_t, Rank &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_neural_network.html#ab3608ae118bbbacbc9161f489afcd562">Dims</a></td></tr>
-<tr class="separator:ab3608ae118bbbacbc9161f489afcd562 inherit pro_types_classcattle_1_1_neural_network"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="inherit_header pro_static_methods_classcattle_1_1_neural_network"><td colspan="2" onclick="javascript:toggleInherit('pro_static_methods_classcattle_1_1_neural_network')"><img src="closed.png" alt="-"/>&#160;Static Protected Member Functions inherited from <a class="el" href="classcattle_1_1_neural_network.html">cattle::NeuralNetwork&lt; Scalar, Rank, true &gt;</a></td></tr>
 <tr class="memitem:aeb549ff03b351397f4c7bded24d55e7c inherit pro_static_methods_classcattle_1_1_neural_network"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="classcattle_1_1_layer.html">Layer</a>&lt; Scalar, Rank &gt; *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_neural_network.html#aeb549ff03b351397f4c7bded24d55e7c">clone_with_shared_params</a> (const <a class="el" href="classcattle_1_1_layer.html">Layer</a>&lt; Scalar, Rank &gt; &amp;layer)</td></tr>
 <tr class="separator:aeb549ff03b351397f4c7bded24d55e7c inherit pro_static_methods_classcattle_1_1_neural_network"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -205,115 +134,15 @@ Additional Inherited Members</h2></td></tr>
 <tr class="separator:a6ad331a525fefb2384ec045c7c7b46de inherit pro_static_methods_classcattle_1_1_neural_network"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a64b361839ba75dd77dd4f5cc02323d7d inherit pro_static_methods_classcattle_1_1_neural_network"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="namespacecattle.html#a1d78623a47279d516750a44dbad6090b">Matrix</a>&lt; Scalar &gt; &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_neural_network.html#a64b361839ba75dd77dd4f5cc02323d7d">get_params_grad</a> (<a class="el" href="classcattle_1_1_layer.html">Layer</a>&lt; Scalar, Rank &gt; &amp;layer)</td></tr>
 <tr class="separator:a64b361839ba75dd77dd4f5cc02323d7d inherit pro_static_methods_classcattle_1_1_neural_network"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="inherit_header pro_static_attribs_classcattle_1_1_neural_network"><td colspan="2" onclick="javascript:toggleInherit('pro_static_attribs_classcattle_1_1_neural_network')"><img src="closed.png" alt="-"/>&#160;Static Protected Attributes inherited from <a class="el" href="classcattle_1_1_neural_network.html">cattle::NeuralNetwork&lt; Scalar, Rank, true &gt;</a></td></tr>
-<tr class="memitem:a5d62d6f65e26bbd730d36ab417aacb79 inherit pro_static_attribs_classcattle_1_1_neural_network"><td class="memItemLeft" align="right" valign="top">static constexpr std::size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_neural_network.html#a5d62d6f65e26bbd730d36ab417aacb79">DATA_RANK</a></td></tr>
-<tr class="separator:a5d62d6f65e26bbd730d36ab417aacb79 inherit pro_static_attribs_classcattle_1_1_neural_network"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><h3>template&lt;typename Scalar, std::size_t Rank, OutputMergeType MergeType = CONCAT_LO_RANK&gt;<br />
 class cattle::BidirectionalNeuralNetwork&lt; Scalar, Rank, MergeType &gt;</h3>
 
 <p>A class template for a bidirectional neural network that takes a unidirectional recurrent network, clones it, reverses the clone's processing direction, and uses the two networks as its parallel sub-modules. The outputs of the two sub-networks can be merged by summation or concatenation either along the lowest (the 3rd after the sample and time-step ranks) or highest rank. </p>
-</div><h2 class="groupheader">Member Typedef Documentation</h2>
-<a id="adcf850ffbf9c085e6e41a2524823103d"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#adcf850ffbf9c085e6e41a2524823103d">&#9670;&nbsp;</a></span>Base</h2>
-
-<div class="memitem">
-<div class="memproto">
-<div class="memtemplate">
-template&lt;typename Scalar , std::size_t Rank, OutputMergeType MergeType = CONCAT_LO_RANK&gt; </div>
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">typedef <a class="el" href="classcattle_1_1_neural_network.html">NeuralNetwork</a>&lt;Scalar,Rank,true&gt; <a class="el" href="classcattle_1_1_bidirectional_neural_network.html">cattle::BidirectionalNeuralNetwork</a>&lt; Scalar, Rank, MergeType &gt;::<a class="el" href="classcattle_1_1_bidirectional_neural_network.html#adcf850ffbf9c085e6e41a2524823103d">Base</a></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">private</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a id="afdef08acf426ca059cf9e901c0947c29"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#afdef08acf426ca059cf9e901c0947c29">&#9670;&nbsp;</a></span>RankwiseArray</h2>
-
-<div class="memitem">
-<div class="memproto">
-<div class="memtemplate">
-template&lt;typename Scalar , std::size_t Rank, OutputMergeType MergeType = CONCAT_LO_RANK&gt; </div>
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">typedef std::array&lt;std::size_t,<a class="el" href="classcattle_1_1_neural_network.html#a5d62d6f65e26bbd730d36ab417aacb79">Base::DATA_RANK</a>&gt; <a class="el" href="classcattle_1_1_bidirectional_neural_network.html">cattle::BidirectionalNeuralNetwork</a>&lt; Scalar, Rank, MergeType &gt;::<a class="el" href="classcattle_1_1_bidirectional_neural_network.html#afdef08acf426ca059cf9e901c0947c29">RankwiseArray</a></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">private</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a id="aad1ae57124cc3e0905de24bbc6dfa8c9"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aad1ae57124cc3e0905de24bbc6dfa8c9">&#9670;&nbsp;</a></span>Self</h2>
-
-<div class="memitem">
-<div class="memproto">
-<div class="memtemplate">
-template&lt;typename Scalar , std::size_t Rank, OutputMergeType MergeType = CONCAT_LO_RANK&gt; </div>
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">typedef <a class="el" href="classcattle_1_1_bidirectional_neural_network.html">BidirectionalNeuralNetwork</a>&lt;Scalar,Rank,MergeType&gt; <a class="el" href="classcattle_1_1_bidirectional_neural_network.html">cattle::BidirectionalNeuralNetwork</a>&lt; Scalar, Rank, MergeType &gt;::<a class="el" href="classcattle_1_1_bidirectional_neural_network.html#aad1ae57124cc3e0905de24bbc6dfa8c9">Self</a></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">private</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a id="a6e3aa43fc14061f244bafb3d7d6fb2ca"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a6e3aa43fc14061f244bafb3d7d6fb2ca">&#9670;&nbsp;</a></span>UnidirNet</h2>
-
-<div class="memitem">
-<div class="memproto">
-<div class="memtemplate">
-template&lt;typename Scalar , std::size_t Rank, OutputMergeType MergeType = CONCAT_LO_RANK&gt; </div>
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">typedef <a class="el" href="namespacecattle.html#a011c68542051b5509475ef3f94aaa048">UnidirNeuralNetPtr</a>&lt;Scalar,Rank&gt; <a class="el" href="classcattle_1_1_bidirectional_neural_network.html">cattle::BidirectionalNeuralNetwork</a>&lt; Scalar, Rank, MergeType &gt;::<a class="el" href="classcattle_1_1_bidirectional_neural_network.html#a6e3aa43fc14061f244bafb3d7d6fb2ca">UnidirNet</a></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">private</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
+</div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
 <a id="a51cee6515198d8e475f9257a922bc317"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a51cee6515198d8e475f9257a922bc317">&#9670;&nbsp;</a></span>BidirectionalNeuralNetwork() <span class="overload">[1/3]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#a51cee6515198d8e475f9257a922bc317">&#9670;&nbsp;</a></span>BidirectionalNeuralNetwork()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -326,7 +155,7 @@ template&lt;typename Scalar , std::size_t Rank, OutputMergeType MergeType = CONC
         <tr>
           <td class="memname"><a class="el" href="classcattle_1_1_bidirectional_neural_network.html">cattle::BidirectionalNeuralNetwork</a>&lt; Scalar, Rank, MergeType &gt;::<a class="el" href="classcattle_1_1_bidirectional_neural_network.html">BidirectionalNeuralNetwork</a> </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="classcattle_1_1_bidirectional_neural_network.html#a6e3aa43fc14061f244bafb3d7d6fb2ca">UnidirNet</a>&#160;</td>
+          <td class="paramtype">UnidirNet&#160;</td>
           <td class="paramname"><em>network</em>, </td>
         </tr>
         <tr>
@@ -357,92 +186,9 @@ template&lt;typename Scalar , std::size_t Rank, OutputMergeType MergeType = CONC
 
 </div>
 </div>
-<a id="aca8554ffe21eedc5e7d8284049013482"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aca8554ffe21eedc5e7d8284049013482">&#9670;&nbsp;</a></span>BidirectionalNeuralNetwork() <span class="overload">[2/3]</span></h2>
-
-<div class="memitem">
-<div class="memproto">
-<div class="memtemplate">
-template&lt;typename Scalar , std::size_t Rank, OutputMergeType MergeType = CONCAT_LO_RANK&gt; </div>
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="classcattle_1_1_bidirectional_neural_network.html">cattle::BidirectionalNeuralNetwork</a>&lt; Scalar, Rank, MergeType &gt;::<a class="el" href="classcattle_1_1_bidirectional_neural_network.html">BidirectionalNeuralNetwork</a> </td>
-          <td>(</td>
-          <td class="paramtype">const <a class="el" href="classcattle_1_1_bidirectional_neural_network.html#aad1ae57124cc3e0905de24bbc6dfa8c9">Self</a> &amp;&#160;</td>
-          <td class="paramname"><em>network</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a id="a5a593526bb8f16f71991a86497e89b92"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a5a593526bb8f16f71991a86497e89b92">&#9670;&nbsp;</a></span>BidirectionalNeuralNetwork() <span class="overload">[3/3]</span></h2>
-
-<div class="memitem">
-<div class="memproto">
-<div class="memtemplate">
-template&lt;typename Scalar , std::size_t Rank, OutputMergeType MergeType = CONCAT_LO_RANK&gt; </div>
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="classcattle_1_1_bidirectional_neural_network.html">cattle::BidirectionalNeuralNetwork</a>&lt; Scalar, Rank, MergeType &gt;::<a class="el" href="classcattle_1_1_bidirectional_neural_network.html">BidirectionalNeuralNetwork</a> </td>
-          <td>(</td>
-          <td class="paramtype"><a class="el" href="classcattle_1_1_bidirectional_neural_network.html#aad1ae57124cc3e0905de24bbc6dfa8c9">Self</a> &amp;&amp;&#160;</td>
-          <td class="paramname"><em>network</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a id="a20e46d0f47f8bf392ab4a4d2b3893a02"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a20e46d0f47f8bf392ab4a4d2b3893a02">&#9670;&nbsp;</a></span>~BidirectionalNeuralNetwork()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<div class="memtemplate">
-template&lt;typename Scalar , std::size_t Rank, OutputMergeType MergeType = CONCAT_LO_RANK&gt; </div>
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="classcattle_1_1_bidirectional_neural_network.html">cattle::BidirectionalNeuralNetwork</a>&lt; Scalar, Rank, MergeType &gt;::~<a class="el" href="classcattle_1_1_bidirectional_neural_network.html">BidirectionalNeuralNetwork</a> </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">default</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-</div>
-</div>
 <h2 class="groupheader">Member Function Documentation</h2>
 <a id="a03515350fc988ae5461b760064fc73cc"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a03515350fc988ae5461b760064fc73cc">&#9670;&nbsp;</a></span>backpropagate() <span class="overload">[1/2]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#a03515350fc988ae5461b760064fc73cc">&#9670;&nbsp;</a></span>backpropagate()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -453,9 +199,9 @@ template&lt;typename Scalar , std::size_t Rank, OutputMergeType MergeType = CONC
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="classcattle_1_1_neural_network.html#a0235b71d6f7697e68022611147f7d30d">Base::Data</a> <a class="el" href="classcattle_1_1_bidirectional_neural_network.html">cattle::BidirectionalNeuralNetwork</a>&lt; Scalar, Rank, MergeType &gt;::backpropagate </td>
+          <td class="memname">Base::Data <a class="el" href="classcattle_1_1_bidirectional_neural_network.html">cattle::BidirectionalNeuralNetwork</a>&lt; Scalar, Rank, MergeType &gt;::backpropagate </td>
           <td>(</td>
-          <td class="paramtype">typename <a class="el" href="classcattle_1_1_neural_network.html#a0235b71d6f7697e68022611147f7d30d">Base::Data</a>&#160;</td>
+          <td class="paramtype">typename Base::Data&#160;</td>
           <td class="paramname"><em>out_grads</em></td><td>)</td>
           <td></td>
         </tr>
@@ -479,41 +225,6 @@ template&lt;typename Scalar , std::size_t Rank, OutputMergeType MergeType = CONC
 
 </div>
 </div>
-<a id="a642475dede3787c0d9e7879470cc6168"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a642475dede3787c0d9e7879470cc6168">&#9670;&nbsp;</a></span>backpropagate() <span class="overload">[2/2]</span></h2>
-
-<div class="memitem">
-<div class="memproto">
-<div class="memtemplate">
-template&lt;typename Scalar , std::size_t Rank, OutputMergeType MergeType = CONCAT_LO_RANK&gt; </div>
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">static void* <a class="el" href="classcattle_1_1_bidirectional_neural_network.html">cattle::BidirectionalNeuralNetwork</a>&lt; Scalar, Rank, MergeType &gt;::backpropagate </td>
-          <td>(</td>
-          <td class="paramtype">void *&#160;</td>
-          <td class="paramname"><em>args_ptr</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span><span class="mlabel">private</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-<p>The back-propagation function executed in a different thread for each lane of a parallel network.</p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">args_ptr</td><td>The back-propagation argument struct containing all necessary information. </td></tr>
-  </table>
-  </dd>
-</dl>
-
-</div>
-</div>
 <a id="ac3200af26b657df73ee81b230d710fa6"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#ac3200af26b657df73ee81b230d710fa6">&#9670;&nbsp;</a></span>clone()</h2>
 
@@ -526,7 +237,7 @@ template&lt;typename Scalar , std::size_t Rank, OutputMergeType MergeType = CONC
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="classcattle_1_1_bidirectional_neural_network.html#adcf850ffbf9c085e6e41a2524823103d">Base</a>* <a class="el" href="classcattle_1_1_bidirectional_neural_network.html">cattle::BidirectionalNeuralNetwork</a>&lt; Scalar, Rank, MergeType &gt;::clone </td>
+          <td class="memname"><a class="el" href="classcattle_1_1_neural_network.html">Base</a>* <a class="el" href="classcattle_1_1_bidirectional_neural_network.html">cattle::BidirectionalNeuralNetwork</a>&lt; Scalar, Rank, MergeType &gt;::clone </td>
           <td>(</td>
           <td class="paramname"></td><td>)</td>
           <td> const</td>
@@ -587,7 +298,7 @@ template&lt;typename Scalar , std::size_t Rank, OutputMergeType MergeType = CONC
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">const <a class="el" href="classcattle_1_1_neural_network.html#ab3608ae118bbbacbc9161f489afcd562">Base::Dims</a>&amp; <a class="el" href="classcattle_1_1_bidirectional_neural_network.html">cattle::BidirectionalNeuralNetwork</a>&lt; Scalar, Rank, MergeType &gt;::get_input_dims </td>
+          <td class="memname">const <a class="el" href="classcattle_1_1_dimensions.html">Base::Dims</a>&amp; <a class="el" href="classcattle_1_1_bidirectional_neural_network.html">cattle::BidirectionalNeuralNetwork</a>&lt; Scalar, Rank, MergeType &gt;::get_input_dims </td>
           <td>(</td>
           <td class="paramname"></td><td>)</td>
           <td> const</td>
@@ -625,7 +336,7 @@ template&lt;typename Scalar , std::size_t Rank, OutputMergeType MergeType = CONC
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">protected</span><span class="mlabel">virtual</span></span>  </td>
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">virtual</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
@@ -647,7 +358,7 @@ template&lt;typename Scalar , std::size_t Rank, OutputMergeType MergeType = CONC
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">const <a class="el" href="classcattle_1_1_neural_network.html#ab3608ae118bbbacbc9161f489afcd562">Base::Dims</a>&amp; <a class="el" href="classcattle_1_1_bidirectional_neural_network.html">cattle::BidirectionalNeuralNetwork</a>&lt; Scalar, Rank, MergeType &gt;::get_output_dims </td>
+          <td class="memname">const <a class="el" href="classcattle_1_1_dimensions.html">Base::Dims</a>&amp; <a class="el" href="classcattle_1_1_bidirectional_neural_network.html">cattle::BidirectionalNeuralNetwork</a>&lt; Scalar, Rank, MergeType &gt;::get_output_dims </td>
           <td>(</td>
           <td class="paramname"></td><td>)</td>
           <td> const</td>
@@ -695,36 +406,8 @@ template&lt;typename Scalar , std::size_t Rank, OutputMergeType MergeType = CONC
 
 </div>
 </div>
-<a id="ac1b2a306be8ea67316a48bb78304ec3a"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ac1b2a306be8ea67316a48bb78304ec3a">&#9670;&nbsp;</a></span>operator=()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<div class="memtemplate">
-template&lt;typename Scalar , std::size_t Rank, OutputMergeType MergeType = CONCAT_LO_RANK&gt; </div>
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="classcattle_1_1_bidirectional_neural_network.html#aad1ae57124cc3e0905de24bbc6dfa8c9">Self</a>&amp; <a class="el" href="classcattle_1_1_bidirectional_neural_network.html">cattle::BidirectionalNeuralNetwork</a>&lt; Scalar, Rank, MergeType &gt;::operator= </td>
-          <td>(</td>
-          <td class="paramtype"><a class="el" href="classcattle_1_1_bidirectional_neural_network.html#aad1ae57124cc3e0905de24bbc6dfa8c9">Self</a>&#160;</td>
-          <td class="paramname"><em>network</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-</div>
-</div>
 <a id="aeea3e43b89d4bdd0ac9b9e81c6815aa9"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aeea3e43b89d4bdd0ac9b9e81c6815aa9">&#9670;&nbsp;</a></span>propagate() <span class="overload">[1/2]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#aeea3e43b89d4bdd0ac9b9e81c6815aa9">&#9670;&nbsp;</a></span>propagate()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -735,9 +418,9 @@ template&lt;typename Scalar , std::size_t Rank, OutputMergeType MergeType = CONC
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="classcattle_1_1_neural_network.html#a0235b71d6f7697e68022611147f7d30d">Base::Data</a> <a class="el" href="classcattle_1_1_bidirectional_neural_network.html">cattle::BidirectionalNeuralNetwork</a>&lt; Scalar, Rank, MergeType &gt;::propagate </td>
+          <td class="memname">Base::Data <a class="el" href="classcattle_1_1_bidirectional_neural_network.html">cattle::BidirectionalNeuralNetwork</a>&lt; Scalar, Rank, MergeType &gt;::propagate </td>
           <td>(</td>
-          <td class="paramtype">typename <a class="el" href="classcattle_1_1_neural_network.html#a0235b71d6f7697e68022611147f7d30d">Base::Data</a>&#160;</td>
+          <td class="paramtype">typename Base::Data&#160;</td>
           <td class="paramname"><em>input</em>, </td>
         </tr>
         <tr>
@@ -769,41 +452,6 @@ template&lt;typename Scalar , std::size_t Rank, OutputMergeType MergeType = CONC
 <dl class="section return"><dt>Returns</dt><dd>The output tensor of the network in response to the input. </dd></dl>
 
 <p>Implements <a class="el" href="classcattle_1_1_neural_network.html#a6ade9cd95110766ff25e7b157c9fddcf">cattle::NeuralNetwork&lt; Scalar, Rank, true &gt;</a>.</p>
-
-</div>
-</div>
-<a id="a39ad32596d09d588305f9f3fcca9414a"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a39ad32596d09d588305f9f3fcca9414a">&#9670;&nbsp;</a></span>propagate() <span class="overload">[2/2]</span></h2>
-
-<div class="memitem">
-<div class="memproto">
-<div class="memtemplate">
-template&lt;typename Scalar , std::size_t Rank, OutputMergeType MergeType = CONCAT_LO_RANK&gt; </div>
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">static void* <a class="el" href="classcattle_1_1_bidirectional_neural_network.html">cattle::BidirectionalNeuralNetwork</a>&lt; Scalar, Rank, MergeType &gt;::propagate </td>
-          <td>(</td>
-          <td class="paramtype">void *&#160;</td>
-          <td class="paramname"><em>args_ptr</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span><span class="mlabel">private</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-<p>The propagation function executed in a different thread for each lane of a parallel network.</p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">args_ptr</td><td>The propagation argument struct containing all necessary information. </td></tr>
-  </table>
-  </dd>
-</dl>
 
 </div>
 </div>
@@ -844,216 +492,8 @@ template&lt;typename Scalar , std::size_t Rank, OutputMergeType MergeType = CONC
 
 </div>
 </div>
-<h2 class="groupheader">Friends And Related Function Documentation</h2>
-<a id="a12bf02ce4346879f204aed9ccd4f9dab"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a12bf02ce4346879f204aed9ccd4f9dab">&#9670;&nbsp;</a></span>swap</h2>
-
-<div class="memitem">
-<div class="memproto">
-<div class="memtemplate">
-template&lt;typename Scalar , std::size_t Rank, OutputMergeType MergeType = CONCAT_LO_RANK&gt; </div>
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">void swap </td>
-          <td>(</td>
-          <td class="paramtype"><a class="el" href="classcattle_1_1_bidirectional_neural_network.html#aad1ae57124cc3e0905de24bbc6dfa8c9">Self</a> &amp;&#160;</td>
-          <td class="paramname"><em>network1</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype"><a class="el" href="classcattle_1_1_bidirectional_neural_network.html#aad1ae57124cc3e0905de24bbc6dfa8c9">Self</a> &amp;&#160;</td>
-          <td class="paramname"><em>network2</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">friend</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<h2 class="groupheader">Member Data Documentation</h2>
-<a id="afde4ac337bed9df8e9f43b841608d537"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#afde4ac337bed9df8e9f43b841608d537">&#9670;&nbsp;</a></span>CONCAT_BATCH_RANK</h2>
-
-<div class="memitem">
-<div class="memproto">
-<div class="memtemplate">
-template&lt;typename Scalar , std::size_t Rank, OutputMergeType MergeType = CONCAT_LO_RANK&gt; </div>
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">const std::size_t <a class="el" href="classcattle_1_1_bidirectional_neural_network.html">cattle::BidirectionalNeuralNetwork</a>&lt; Scalar, Rank, MergeType &gt;::CONCAT_BATCH_RANK = <a class="el" href="classcattle_1_1_bidirectional_neural_network.html#a0d771a4395762988a1164b2a75785306">CONCAT_RANK</a> + 2</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">static</span><span class="mlabel">private</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a id="a0d771a4395762988a1164b2a75785306"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a0d771a4395762988a1164b2a75785306">&#9670;&nbsp;</a></span>CONCAT_RANK</h2>
-
-<div class="memitem">
-<div class="memproto">
-<div class="memtemplate">
-template&lt;typename Scalar , std::size_t Rank, OutputMergeType MergeType = CONCAT_LO_RANK&gt; </div>
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">const std::size_t <a class="el" href="classcattle_1_1_bidirectional_neural_network.html">cattle::BidirectionalNeuralNetwork</a>&lt; Scalar, Rank, MergeType &gt;::CONCAT_RANK = MergeType == <a class="el" href="namespacecattle.html#adf6ad5e38e7c96e1d70ac1f180c71c42a41a1611c1ddfc609ed9ecaa408c9d884">CONCAT_HI_RANK</a> ? Rank - 1 : 0</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">static</span><span class="mlabel">private</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a id="afe946b08836905dcc7b4581aab0ac2da"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#afe946b08836905dcc7b4581aab0ac2da">&#9670;&nbsp;</a></span>foremost</h2>
-
-<div class="memitem">
-<div class="memproto">
-<div class="memtemplate">
-template&lt;typename Scalar , std::size_t Rank, OutputMergeType MergeType = CONCAT_LO_RANK&gt; </div>
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">bool <a class="el" href="classcattle_1_1_bidirectional_neural_network.html">cattle::BidirectionalNeuralNetwork</a>&lt; Scalar, Rank, MergeType &gt;::foremost</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">private</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a id="a7a17210f3a0b5b41b1370e3f27457f8d"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a7a17210f3a0b5b41b1370e3f27457f8d">&#9670;&nbsp;</a></span>input_dims</h2>
-
-<div class="memitem">
-<div class="memproto">
-<div class="memtemplate">
-template&lt;typename Scalar , std::size_t Rank, OutputMergeType MergeType = CONCAT_LO_RANK&gt; </div>
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="classcattle_1_1_neural_network.html#ab3608ae118bbbacbc9161f489afcd562">Base::Dims</a> <a class="el" href="classcattle_1_1_bidirectional_neural_network.html">cattle::BidirectionalNeuralNetwork</a>&lt; Scalar, Rank, MergeType &gt;::input_dims</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">private</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a id="a684b16e5ec38f364f7e3cb9f4f78c269"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a684b16e5ec38f364f7e3cb9f4f78c269">&#9670;&nbsp;</a></span>net</h2>
-
-<div class="memitem">
-<div class="memproto">
-<div class="memtemplate">
-template&lt;typename Scalar , std::size_t Rank, OutputMergeType MergeType = CONCAT_LO_RANK&gt; </div>
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="classcattle_1_1_bidirectional_neural_network.html#a6e3aa43fc14061f244bafb3d7d6fb2ca">UnidirNet</a> <a class="el" href="classcattle_1_1_bidirectional_neural_network.html">cattle::BidirectionalNeuralNetwork</a>&lt; Scalar, Rank, MergeType &gt;::net</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">private</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a id="a5ee620f9a7bee095d762f0e6a969ece8"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a5ee620f9a7bee095d762f0e6a969ece8">&#9670;&nbsp;</a></span>net_rev</h2>
-
-<div class="memitem">
-<div class="memproto">
-<div class="memtemplate">
-template&lt;typename Scalar , std::size_t Rank, OutputMergeType MergeType = CONCAT_LO_RANK&gt; </div>
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="classcattle_1_1_bidirectional_neural_network.html#a6e3aa43fc14061f244bafb3d7d6fb2ca">UnidirNet</a> <a class="el" href="classcattle_1_1_bidirectional_neural_network.html">cattle::BidirectionalNeuralNetwork</a>&lt; Scalar, Rank, MergeType &gt;::net_rev</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">private</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a id="aea9c2d666ece762416bdcf727fb6f6dd"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aea9c2d666ece762416bdcf727fb6f6dd">&#9670;&nbsp;</a></span>output_dims</h2>
-
-<div class="memitem">
-<div class="memproto">
-<div class="memtemplate">
-template&lt;typename Scalar , std::size_t Rank, OutputMergeType MergeType = CONCAT_LO_RANK&gt; </div>
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="classcattle_1_1_neural_network.html#ab3608ae118bbbacbc9161f489afcd562">Base::Dims</a> <a class="el" href="classcattle_1_1_bidirectional_neural_network.html">cattle::BidirectionalNeuralNetwork</a>&lt; Scalar, Rank, MergeType &gt;::output_dims</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">private</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-</div>
-</div>
 <hr/>The documentation for this class was generated from the following file:<ul>
-<li>src/<a class="el" href="_neural_network_8h_source.html">NeuralNetwork.h</a></li>
+<li>include/<a class="el" href="_neural_network_8hpp_source.html">NeuralNetwork.hpp</a></li>
 </ul>
 </div><!-- contents -->
 <!-- start footer part -->

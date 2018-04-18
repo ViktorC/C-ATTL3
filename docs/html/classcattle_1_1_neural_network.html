@@ -22,7 +22,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">C-ATTL3
-   &#160;<span id="projectnumber">0.1</span>
+   &#160;<span id="projectnumber">0.5</span>
    </div>
   </td>
  </tr>
@@ -68,18 +68,15 @@ $(function() {
 <div class="header">
   <div class="summary">
 <a href="#pub-methods">Public Member Functions</a> &#124;
-<a href="#pro-types">Protected Types</a> &#124;
 <a href="#pro-methods">Protected Member Functions</a> &#124;
 <a href="#pro-static-methods">Static Protected Member Functions</a> &#124;
-<a href="#pro-static-attribs">Static Protected Attributes</a> &#124;
-<a href="#friends">Friends</a> &#124;
 <a href="classcattle_1_1_neural_network-members.html">List of all members</a>  </div>
   <div class="headertitle">
 <div class="title">cattle::NeuralNetwork&lt; Scalar, Rank, Sequential &gt; Class Template Reference<span class="mlabels"><span class="mlabel">abstract</span></span></div>  </div>
 </div><!--header-->
 <div class="contents">
 
-<p><code>#include &lt;<a class="el" href="_layer_8h_source.html">Layer.h</a>&gt;</code></p>
+<p><code>#include &lt;<a class="el" href="_neural_network_8hpp_source.html">NeuralNetwork.hpp</a>&gt;</code></p>
 <div class="dynheader">
 Inheritance diagram for cattle::NeuralNetwork&lt; Scalar, Rank, Sequential &gt;:</div>
 <div class="dyncontent">
@@ -92,29 +89,22 @@ Inheritance diagram for cattle::NeuralNetwork&lt; Scalar, Rank, Sequential &gt;:
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:a334880e27677f0360c86dec07a745cbb"><td class="memItemLeft" align="right" valign="top">virtual&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_neural_network.html#a334880e27677f0360c86dec07a745cbb">~NeuralNetwork</a> ()=default</td></tr>
-<tr class="separator:a334880e27677f0360c86dec07a745cbb"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a2abd58d4e18caa4ae95563da19c8338b"><td class="memItemLeft" align="right" valign="top">virtual <a class="el" href="classcattle_1_1_neural_network.html">NeuralNetwork</a>&lt; Scalar, Rank, Sequential &gt; *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_neural_network.html#a2abd58d4e18caa4ae95563da19c8338b">clone</a> () const =0</td></tr>
 <tr class="separator:a2abd58d4e18caa4ae95563da19c8338b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a5dadb8900281afff9167f02b2d75c86a"><td class="memItemLeft" align="right" valign="top">virtual bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_neural_network.html#a5dadb8900281afff9167f02b2d75c86a">is_foremost</a> () const =0</td></tr>
 <tr class="separator:a5dadb8900281afff9167f02b2d75c86a"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:acbea7d3cad12acbd2728e092acba4a25"><td class="memItemLeft" align="right" valign="top">virtual const <a class="el" href="classcattle_1_1_neural_network.html#ab3608ae118bbbacbc9161f489afcd562">Dims</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_neural_network.html#acbea7d3cad12acbd2728e092acba4a25">get_input_dims</a> () const =0</td></tr>
+<tr class="memitem:acbea7d3cad12acbd2728e092acba4a25"><td class="memItemLeft" align="right" valign="top">virtual const <a class="el" href="classcattle_1_1_dimensions.html">Dims</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_neural_network.html#acbea7d3cad12acbd2728e092acba4a25">get_input_dims</a> () const =0</td></tr>
 <tr class="separator:acbea7d3cad12acbd2728e092acba4a25"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:abae4c549cee2b29c2b6e072ce0314303"><td class="memItemLeft" align="right" valign="top">virtual const <a class="el" href="classcattle_1_1_neural_network.html#ab3608ae118bbbacbc9161f489afcd562">Dims</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_neural_network.html#abae4c549cee2b29c2b6e072ce0314303">get_output_dims</a> () const =0</td></tr>
+<tr class="memitem:abae4c549cee2b29c2b6e072ce0314303"><td class="memItemLeft" align="right" valign="top">virtual const <a class="el" href="classcattle_1_1_dimensions.html">Dims</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_neural_network.html#abae4c549cee2b29c2b6e072ce0314303">get_output_dims</a> () const =0</td></tr>
 <tr class="separator:abae4c549cee2b29c2b6e072ce0314303"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a297039d2fff23643c9b73da7b4bb686c"><td class="memItemLeft" align="right" valign="top">virtual std::vector&lt; <a class="el" href="classcattle_1_1_layer.html">Layer</a>&lt; Scalar, Rank &gt; * &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_neural_network.html#a297039d2fff23643c9b73da7b4bb686c">get_layers</a> ()=0</td></tr>
+<tr class="separator:a297039d2fff23643c9b73da7b4bb686c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ae59c0963d75b1f2de4f18a6c8fe85fa8"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_neural_network.html#ae59c0963d75b1f2de4f18a6c8fe85fa8">init</a> ()</td></tr>
 <tr class="separator:ae59c0963d75b1f2de4f18a6c8fe85fa8"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ac88007e2f8fa2a208de0e51c8ac422cc"><td class="memItemLeft" align="right" valign="top">virtual <a class="el" href="classcattle_1_1_neural_network.html#a0235b71d6f7697e68022611147f7d30d">Data</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_neural_network.html#ac88007e2f8fa2a208de0e51c8ac422cc">infer</a> (<a class="el" href="classcattle_1_1_neural_network.html#a0235b71d6f7697e68022611147f7d30d">Data</a> input)</td></tr>
+<tr class="memitem:ac88007e2f8fa2a208de0e51c8ac422cc"><td class="memItemLeft" align="right" valign="top">virtual Data&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_neural_network.html#ac88007e2f8fa2a208de0e51c8ac422cc">infer</a> (Data input)</td></tr>
 <tr class="separator:ac88007e2f8fa2a208de0e51c8ac422cc"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ad216c4f30172a8924e959d103e38a82c"><td class="memItemLeft" align="right" valign="top">virtual std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_neural_network.html#ad216c4f30172a8924e959d103e38a82c">to_string</a> ()</td></tr>
 <tr class="separator:ad216c4f30172a8924e959d103e38a82c"><td class="memSeparator" colspan="2">&#160;</td></tr>
-</table><table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pro-types"></a>
-Protected Types</h2></td></tr>
-<tr class="memitem:a0235b71d6f7697e68022611147f7d30d"><td class="memItemLeft" align="right" valign="top">typedef <a class="el" href="namespacecattle.html#a8b9323ad928764340e46f0802bf27fbb">Tensor</a>&lt; Scalar, <a class="el" href="classcattle_1_1_neural_network.html#a5d62d6f65e26bbd730d36ab417aacb79">DATA_RANK</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_neural_network.html#a0235b71d6f7697e68022611147f7d30d">Data</a></td></tr>
-<tr class="separator:a0235b71d6f7697e68022611147f7d30d"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ab3608ae118bbbacbc9161f489afcd562"><td class="memItemLeft" align="right" valign="top">typedef <a class="el" href="classcattle_1_1_dimensions.html">Dimensions</a>&lt; std::size_t, Rank &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_neural_network.html#ab3608ae118bbbacbc9161f489afcd562">Dims</a></td></tr>
-<tr class="separator:ab3608ae118bbbacbc9161f489afcd562"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pro-methods"></a>
 Protected Member Functions</h2></td></tr>
@@ -122,11 +112,9 @@ Protected Member Functions</h2></td></tr>
 <tr class="separator:ae417618e6c761cf7630f24dff2d3568a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a9ca6f92bd8f0f284d05ed4fef5af55ca"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_neural_network.html#a9ca6f92bd8f0f284d05ed4fef5af55ca">empty_caches</a> ()=0</td></tr>
 <tr class="separator:a9ca6f92bd8f0f284d05ed4fef5af55ca"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a297039d2fff23643c9b73da7b4bb686c"><td class="memItemLeft" align="right" valign="top">virtual std::vector&lt; <a class="el" href="classcattle_1_1_layer.html">Layer</a>&lt; Scalar, Rank &gt; * &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_neural_network.html#a297039d2fff23643c9b73da7b4bb686c">get_layers</a> ()=0</td></tr>
-<tr class="separator:a297039d2fff23643c9b73da7b4bb686c"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a6ade9cd95110766ff25e7b157c9fddcf"><td class="memItemLeft" align="right" valign="top">virtual <a class="el" href="classcattle_1_1_neural_network.html#a0235b71d6f7697e68022611147f7d30d">Data</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_neural_network.html#a6ade9cd95110766ff25e7b157c9fddcf">propagate</a> (<a class="el" href="classcattle_1_1_neural_network.html#a0235b71d6f7697e68022611147f7d30d">Data</a> input, bool training)=0</td></tr>
+<tr class="memitem:a6ade9cd95110766ff25e7b157c9fddcf"><td class="memItemLeft" align="right" valign="top">virtual Data&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_neural_network.html#a6ade9cd95110766ff25e7b157c9fddcf">propagate</a> (Data input, bool training)=0</td></tr>
 <tr class="separator:a6ade9cd95110766ff25e7b157c9fddcf"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ae4fd8a1e33b0d9cbb975a6ee5c41fa6c"><td class="memItemLeft" align="right" valign="top">virtual <a class="el" href="classcattle_1_1_neural_network.html#a0235b71d6f7697e68022611147f7d30d">Data</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_neural_network.html#ae4fd8a1e33b0d9cbb975a6ee5c41fa6c">backpropagate</a> (<a class="el" href="classcattle_1_1_neural_network.html#a0235b71d6f7697e68022611147f7d30d">Data</a> out_grads)=0</td></tr>
+<tr class="memitem:ae4fd8a1e33b0d9cbb975a6ee5c41fa6c"><td class="memItemLeft" align="right" valign="top">virtual Data&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_neural_network.html#ae4fd8a1e33b0d9cbb975a6ee5c41fa6c">backpropagate</a> (Data out_grads)=0</td></tr>
 <tr class="separator:ae4fd8a1e33b0d9cbb975a6ee5c41fa6c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pro-static-methods"></a>
@@ -143,111 +131,13 @@ Static Protected Member Functions</h2></td></tr>
 <tr class="separator:a6ad331a525fefb2384ec045c7c7b46de"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a64b361839ba75dd77dd4f5cc02323d7d"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="namespacecattle.html#a1d78623a47279d516750a44dbad6090b">Matrix</a>&lt; Scalar &gt; &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_neural_network.html#a64b361839ba75dd77dd4f5cc02323d7d">get_params_grad</a> (<a class="el" href="classcattle_1_1_layer.html">Layer</a>&lt; Scalar, Rank &gt; &amp;layer)</td></tr>
 <tr class="separator:a64b361839ba75dd77dd4f5cc02323d7d"><td class="memSeparator" colspan="2">&#160;</td></tr>
-</table><table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pro-static-attribs"></a>
-Static Protected Attributes</h2></td></tr>
-<tr class="memitem:a5d62d6f65e26bbd730d36ab417aacb79"><td class="memItemLeft" align="right" valign="top">static constexpr std::size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_neural_network.html#a5d62d6f65e26bbd730d36ab417aacb79">DATA_RANK</a> = Rank + Sequential + 1</td></tr>
-<tr class="separator:a5d62d6f65e26bbd730d36ab417aacb79"><td class="memSeparator" colspan="2">&#160;</td></tr>
-</table><table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="friends"></a>
-Friends</h2></td></tr>
-<tr class="memitem:a4febb1594d72fcd971aad93eb1d99d31"><td class="memItemLeft" align="right" valign="top">class&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_neural_network.html#a4febb1594d72fcd971aad93eb1d99d31">Optimizer&lt; Scalar, Rank, Sequential &gt;</a></td></tr>
-<tr class="separator:a4febb1594d72fcd971aad93eb1d99d31"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a897faa4eafd46b6c8c53889b5fbca1a1"><td class="memTemplParams" colspan="2">template&lt;typename _Scalar , std::size_t _Rank, bool _Sequential&gt; </td></tr>
-<tr class="memitem:a897faa4eafd46b6c8c53889b5fbca1a1"><td class="memTemplItemLeft" align="right" valign="top">class&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classcattle_1_1_neural_network.html#a897faa4eafd46b6c8c53889b5fbca1a1">CompositeNeuralNetwork</a></td></tr>
-<tr class="separator:a897faa4eafd46b6c8c53889b5fbca1a1"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a78e35da5014bc0ae5977aabe614705e2"><td class="memTemplParams" colspan="2">template&lt;typename _Scalar , std::size_t _Rank, OutputMergeType MergeType&gt; </td></tr>
-<tr class="memitem:a78e35da5014bc0ae5977aabe614705e2"><td class="memTemplItemLeft" align="right" valign="top">class&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classcattle_1_1_neural_network.html#a78e35da5014bc0ae5977aabe614705e2">ParallelNeuralNetwork</a></td></tr>
-<tr class="separator:a78e35da5014bc0ae5977aabe614705e2"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a570afd90639183b287701b355ece70bd"><td class="memTemplParams" colspan="2">template&lt;typename _Scalar , std::size_t _Rank&gt; </td></tr>
-<tr class="memitem:a570afd90639183b287701b355ece70bd"><td class="memTemplItemLeft" align="right" valign="top">class&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classcattle_1_1_neural_network.html#a570afd90639183b287701b355ece70bd">SequentialNeuralNetwork</a></td></tr>
-<tr class="separator:a570afd90639183b287701b355ece70bd"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a045b132442330930da842c56148cd09d"><td class="memItemLeft" align="right" valign="top">std::ostream &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_neural_network.html#a045b132442330930da842c56148cd09d">operator&lt;&lt;</a> (std::ostream &amp;os, <a class="el" href="classcattle_1_1_neural_network.html">NeuralNetwork</a>&lt; Scalar, Rank, Sequential &gt; &amp;nn)</td></tr>
-<tr class="separator:a045b132442330930da842c56148cd09d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><h3>template&lt;typename Scalar, std::size_t Rank, bool Sequential&gt;<br />
 class cattle::NeuralNetwork&lt; Scalar, Rank, Sequential &gt;</h3>
 
 <p>An abstract neural network class template. It allows for inference and training via back-propagation. </p>
-</div><h2 class="groupheader">Member Typedef Documentation</h2>
-<a id="a0235b71d6f7697e68022611147f7d30d"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a0235b71d6f7697e68022611147f7d30d">&#9670;&nbsp;</a></span>Data</h2>
-
-<div class="memitem">
-<div class="memproto">
-<div class="memtemplate">
-template&lt;typename Scalar, std::size_t Rank, bool Sequential&gt; </div>
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">typedef <a class="el" href="namespacecattle.html#a8b9323ad928764340e46f0802bf27fbb">Tensor</a>&lt;Scalar,<a class="el" href="classcattle_1_1_neural_network.html#a5d62d6f65e26bbd730d36ab417aacb79">DATA_RANK</a>&gt; <a class="el" href="classcattle_1_1_neural_network.html">cattle::NeuralNetwork</a>&lt; Scalar, Rank, Sequential &gt;::<a class="el" href="classcattle_1_1_neural_network.html#a0235b71d6f7697e68022611147f7d30d">Data</a></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">protected</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a id="ab3608ae118bbbacbc9161f489afcd562"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ab3608ae118bbbacbc9161f489afcd562">&#9670;&nbsp;</a></span>Dims</h2>
-
-<div class="memitem">
-<div class="memproto">
-<div class="memtemplate">
-template&lt;typename Scalar, std::size_t Rank, bool Sequential&gt; </div>
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">typedef <a class="el" href="classcattle_1_1_dimensions.html">Dimensions</a>&lt;std::size_t,Rank&gt; <a class="el" href="classcattle_1_1_neural_network.html">cattle::NeuralNetwork</a>&lt; Scalar, Rank, Sequential &gt;::<a class="el" href="classcattle_1_1_neural_network.html#ab3608ae118bbbacbc9161f489afcd562">Dims</a></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">protected</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
-<a id="a334880e27677f0360c86dec07a745cbb"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a334880e27677f0360c86dec07a745cbb">&#9670;&nbsp;</a></span>~NeuralNetwork()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<div class="memtemplate">
-template&lt;typename Scalar, std::size_t Rank, bool Sequential&gt; </div>
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">virtual <a class="el" href="classcattle_1_1_neural_network.html">cattle::NeuralNetwork</a>&lt; Scalar, Rank, Sequential &gt;::~<a class="el" href="classcattle_1_1_neural_network.html">NeuralNetwork</a> </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">virtual</span><span class="mlabel">default</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<h2 class="groupheader">Member Function Documentation</h2>
+</div><h2 class="groupheader">Member Function Documentation</h2>
 <a id="ae4fd8a1e33b0d9cbb975a6ee5c41fa6c"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#ae4fd8a1e33b0d9cbb975a6ee5c41fa6c">&#9670;&nbsp;</a></span>backpropagate()</h2>
 
@@ -260,9 +150,9 @@ template&lt;typename Scalar, std::size_t Rank, bool Sequential&gt; </div>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">virtual <a class="el" href="classcattle_1_1_neural_network.html#a0235b71d6f7697e68022611147f7d30d">Data</a> <a class="el" href="classcattle_1_1_neural_network.html">cattle::NeuralNetwork</a>&lt; Scalar, Rank, Sequential &gt;::backpropagate </td>
+          <td class="memname">virtual Data <a class="el" href="classcattle_1_1_neural_network.html">cattle::NeuralNetwork</a>&lt; Scalar, Rank, Sequential &gt;::backpropagate </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="classcattle_1_1_neural_network.html#a0235b71d6f7697e68022611147f7d30d">Data</a>&#160;</td>
+          <td class="paramtype">Data&#160;</td>
           <td class="paramname"><em>out_grads</em></td><td>)</td>
           <td></td>
         </tr>
@@ -434,7 +324,7 @@ template&lt;typename Scalar, std::size_t Rank, bool Sequential&gt; </div>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">virtual const <a class="el" href="classcattle_1_1_neural_network.html#ab3608ae118bbbacbc9161f489afcd562">Dims</a>&amp; <a class="el" href="classcattle_1_1_neural_network.html">cattle::NeuralNetwork</a>&lt; Scalar, Rank, Sequential &gt;::get_input_dims </td>
+          <td class="memname">virtual const <a class="el" href="classcattle_1_1_dimensions.html">Dims</a>&amp; <a class="el" href="classcattle_1_1_neural_network.html">cattle::NeuralNetwork</a>&lt; Scalar, Rank, Sequential &gt;::get_input_dims </td>
           <td>(</td>
           <td class="paramname"></td><td>)</td>
           <td> const</td>
@@ -472,7 +362,7 @@ template&lt;typename Scalar, std::size_t Rank, bool Sequential&gt; </div>
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">protected</span><span class="mlabel">pure virtual</span></span>  </td>
+<span class="mlabels"><span class="mlabel">pure virtual</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
@@ -494,7 +384,7 @@ template&lt;typename Scalar, std::size_t Rank, bool Sequential&gt; </div>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">virtual const <a class="el" href="classcattle_1_1_neural_network.html#ab3608ae118bbbacbc9161f489afcd562">Dims</a>&amp; <a class="el" href="classcattle_1_1_neural_network.html">cattle::NeuralNetwork</a>&lt; Scalar, Rank, Sequential &gt;::get_output_dims </td>
+          <td class="memname">virtual const <a class="el" href="classcattle_1_1_dimensions.html">Dims</a>&amp; <a class="el" href="classcattle_1_1_neural_network.html">cattle::NeuralNetwork</a>&lt; Scalar, Rank, Sequential &gt;::get_output_dims </td>
           <td>(</td>
           <td class="paramname"></td><td>)</td>
           <td> const</td>
@@ -562,9 +452,9 @@ template&lt;typename Scalar, std::size_t Rank, bool Sequential&gt; </div>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">virtual <a class="el" href="classcattle_1_1_neural_network.html#a0235b71d6f7697e68022611147f7d30d">Data</a> <a class="el" href="classcattle_1_1_neural_network.html">cattle::NeuralNetwork</a>&lt; Scalar, Rank, Sequential &gt;::infer </td>
+          <td class="memname">virtual Data <a class="el" href="classcattle_1_1_neural_network.html">cattle::NeuralNetwork</a>&lt; Scalar, Rank, Sequential &gt;::infer </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="classcattle_1_1_neural_network.html#a0235b71d6f7697e68022611147f7d30d">Data</a>&#160;</td>
+          <td class="paramtype">Data&#160;</td>
           <td class="paramname"><em>input</em></td><td>)</td>
           <td></td>
         </tr>
@@ -610,6 +500,7 @@ template&lt;typename Scalar, std::size_t Rank, bool Sequential&gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
+<p>Initializes all layers of the network. </p>
 
 </div>
 </div>
@@ -760,9 +651,9 @@ template&lt;typename Scalar, std::size_t Rank, bool Sequential&gt; </div>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">virtual <a class="el" href="classcattle_1_1_neural_network.html#a0235b71d6f7697e68022611147f7d30d">Data</a> <a class="el" href="classcattle_1_1_neural_network.html">cattle::NeuralNetwork</a>&lt; Scalar, Rank, Sequential &gt;::propagate </td>
+          <td class="memname">virtual Data <a class="el" href="classcattle_1_1_neural_network.html">cattle::NeuralNetwork</a>&lt; Scalar, Rank, Sequential &gt;::propagate </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="classcattle_1_1_neural_network.html#a0235b71d6f7697e68022611147f7d30d">Data</a>&#160;</td>
+          <td class="paramtype">Data&#160;</td>
           <td class="paramname"><em>input</em>, </td>
         </tr>
         <tr>
@@ -910,175 +801,9 @@ template&lt;typename Scalar, std::size_t Rank, bool Sequential&gt; </div>
 
 </div>
 </div>
-<h2 class="groupheader">Friends And Related Function Documentation</h2>
-<a id="a897faa4eafd46b6c8c53889b5fbca1a1"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a897faa4eafd46b6c8c53889b5fbca1a1">&#9670;&nbsp;</a></span>CompositeNeuralNetwork</h2>
-
-<div class="memitem">
-<div class="memproto">
-<div class="memtemplate">
-template&lt;typename Scalar, std::size_t Rank, bool Sequential&gt; </div>
-<div class="memtemplate">
-template&lt;typename _Scalar , std::size_t _Rank, bool _Sequential&gt; </div>
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">friend class <a class="el" href="classcattle_1_1_composite_neural_network.html">CompositeNeuralNetwork</a></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">friend</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a id="a045b132442330930da842c56148cd09d"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a045b132442330930da842c56148cd09d">&#9670;&nbsp;</a></span>operator&lt;&lt;</h2>
-
-<div class="memitem">
-<div class="memproto">
-<div class="memtemplate">
-template&lt;typename Scalar, std::size_t Rank, bool Sequential&gt; </div>
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">std::ostream&amp; operator&lt;&lt; </td>
-          <td>(</td>
-          <td class="paramtype">std::ostream &amp;&#160;</td>
-          <td class="paramname"><em>os</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype"><a class="el" href="classcattle_1_1_neural_network.html">NeuralNetwork</a>&lt; Scalar, Rank, Sequential &gt; &amp;&#160;</td>
-          <td class="paramname"><em>nn</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">friend</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a id="a4febb1594d72fcd971aad93eb1d99d31"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a4febb1594d72fcd971aad93eb1d99d31">&#9670;&nbsp;</a></span>Optimizer&lt; Scalar, Rank, Sequential &gt;</h2>
-
-<div class="memitem">
-<div class="memproto">
-<div class="memtemplate">
-template&lt;typename Scalar, std::size_t Rank, bool Sequential&gt; </div>
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">friend class <a class="el" href="classcattle_1_1_optimizer.html">Optimizer</a>&lt; Scalar, Rank, Sequential &gt;</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">friend</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a id="a78e35da5014bc0ae5977aabe614705e2"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a78e35da5014bc0ae5977aabe614705e2">&#9670;&nbsp;</a></span>ParallelNeuralNetwork</h2>
-
-<div class="memitem">
-<div class="memproto">
-<div class="memtemplate">
-template&lt;typename Scalar, std::size_t Rank, bool Sequential&gt; </div>
-<div class="memtemplate">
-template&lt;typename _Scalar , std::size_t _Rank, OutputMergeType MergeType&gt; </div>
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">friend class <a class="el" href="classcattle_1_1_parallel_neural_network.html">ParallelNeuralNetwork</a></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">friend</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a id="a570afd90639183b287701b355ece70bd"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a570afd90639183b287701b355ece70bd">&#9670;&nbsp;</a></span>SequentialNeuralNetwork</h2>
-
-<div class="memitem">
-<div class="memproto">
-<div class="memtemplate">
-template&lt;typename Scalar, std::size_t Rank, bool Sequential&gt; </div>
-<div class="memtemplate">
-template&lt;typename _Scalar , std::size_t _Rank&gt; </div>
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">friend class <a class="el" href="classcattle_1_1_sequential_neural_network.html">SequentialNeuralNetwork</a></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">friend</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<h2 class="groupheader">Member Data Documentation</h2>
-<a id="a5d62d6f65e26bbd730d36ab417aacb79"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a5d62d6f65e26bbd730d36ab417aacb79">&#9670;&nbsp;</a></span>DATA_RANK</h2>
-
-<div class="memitem">
-<div class="memproto">
-<div class="memtemplate">
-template&lt;typename Scalar, std::size_t Rank, bool Sequential&gt; </div>
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">constexpr std::size_t <a class="el" href="classcattle_1_1_neural_network.html">cattle::NeuralNetwork</a>&lt; Scalar, Rank, Sequential &gt;::DATA_RANK = Rank + Sequential + 1</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">static</span><span class="mlabel">protected</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-</div>
-</div>
 <hr/>The documentation for this class was generated from the following files:<ul>
-<li>src/<a class="el" href="_layer_8h_source.html">Layer.h</a></li>
-<li>src/<a class="el" href="_neural_network_8h_source.html">NeuralNetwork.h</a></li>
+<li>include/<a class="el" href="_layer_8hpp_source.html">Layer.hpp</a></li>
+<li>include/<a class="el" href="_neural_network_8hpp_source.html">NeuralNetwork.hpp</a></li>
 </ul>
 </div><!-- contents -->
 <!-- start footer part -->
