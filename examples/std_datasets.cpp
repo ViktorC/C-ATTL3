@@ -1,8 +1,8 @@
 /*
- * std_dataset.cpp
+ * std_datasets.cpp
  *
  *  Created on: 18 Apr 2018
- *      Author: Viktor
+ *      Author: Viktor Csomor
  */
 
 #include <chrono>
@@ -14,10 +14,10 @@
 #include "Cattle.hpp"
 
 int main() {
-//	std::string mnist_folder = "../data/mnist/";
+//	std::string mnist_folder = "data/mnist/";
 //	MNISTDataProvider<float> file_train_prov(mnist_folder + "train-images.idx3-ubyte", mnist_folder + "train-labels.idx1-ubyte");
 //	MNISTDataProvider<float> file_test_prov(mnist_folder + "t10k-images.idx3-ubyte", mnist_folder + "t10k-labels.idx1-ubyte");
-	std::string cifar_folder = "../data/cifar10/";
+	std::string cifar_folder = "data/cifar10/";
 	CIFARDataProvider<float> file_train_prov({ cifar_folder + "data_batch_1.bin", cifar_folder + "data_batch_2.bin",
 			cifar_folder + "data_batch_3.bin", cifar_folder + "data_batch_4.bin", cifar_folder + "data_batch_5.bin",
 			cifar_folder + "data_batch_6.bin", });

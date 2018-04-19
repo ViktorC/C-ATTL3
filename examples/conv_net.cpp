@@ -1,8 +1,8 @@
 /*
- * simple_feedfwd.cpp
+ * conv_net.cpp
  *
  *  Created on: 18 Apr 2018
- *      Author: Viktor
+ *      Author: Viktor Csomor
  */
 
 #include <memory>

@@ -24,6 +24,8 @@
 #include "cattle/Dimensions.hpp"
 #include "cattle/utils/Eigen.hpp"
 
+// TODO Pre-fetch batches from the files.
+
 namespace cattle {
 
 /**

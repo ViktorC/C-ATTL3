@@ -21,5 +21,6 @@ script:
   - export CXX=/usr/bin/g++-7
   - gcc -v && g++ -v
   - sudo make all
+  - sudo make check
 notifications:
   email: false
