@@ -11,9 +11,9 @@ CLANG_CUDA_CFLAGS := $(CLANG_CFLAGS) -DCATTLE_USE_CUBLAS
 RELEASE_OPT_FLAGS := -O3 -DNDEBUG
 DEBUG_OPT_FLAGS := -O1 -Wa,-mbig-obj -g
 # For Clang on Windows, omp.h must be copied from GCC.
-INCLUDES := -Iexternal/Eigen/ -Iinclude/ -Itest/
+INCLUDES := -Iexternal/Eigen/ -Iinclude/ -Itest/ -I"$(GTEST_INC_PATH)"
 CUDA_INCLUDES := -I"$(CUDA_INC_PATH)" $(INCLUDES)
-LIBS := -lpthread -lgomp
+LIBS := -lpthread -lgomp -L"$(GTEST_LIB_PATH)" -lgtest
 CUDA_LIBS := $(LIBS) -L"$(CUDA_LIB_PATH)" -lcudart -lcublas
 SOURCE_DIR := test
 SOURCES := test.cpp

@@ -239,7 +239,7 @@ typedef double fp;
 
 int main() {
 	std::cout << internal::num_of_eval_threads() << std::endl;
-	std::string mnist_folder = "C:\\Users\\Viktor\\Downloads\\mnist\\";
+	std::string mnist_folder = "../data/";
 	MNISTDataProvider<float> file_train_prov(mnist_folder + "train-images.idx3-ubyte", mnist_folder + "train-labels.idx1-ubyte");
 	MNISTDataProvider<float> file_test_prov(mnist_folder + "t10k-images.idx3-ubyte", mnist_folder + "t10k-labels.idx1-ubyte");
 	DataPair<float,3,false> train_data = file_train_prov.get_data(60000);
