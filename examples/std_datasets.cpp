@@ -11,19 +11,20 @@
 #include <utility>
 #include <vector>
 
-#include "Cattle.hpp"
+#include "cattle/Cattle.hpp"
 
 int main() {
-//	std::string mnist_folder = "data/mnist/";
-//	MNISTDataProvider<float> file_train_prov(mnist_folder + "train-images.idx3-ubyte", mnist_folder + "train-labels.idx1-ubyte");
-//	MNISTDataProvider<float> file_test_prov(mnist_folder + "t10k-images.idx3-ubyte", mnist_folder + "t10k-labels.idx1-ubyte");
+	// Create a CIFAR-10 data provider by specifying the paths to the training files.
 	std::string cifar_folder = "data/cifar10/";
 	CIFARDataProvider<float> file_train_prov({ cifar_folder + "data_batch_1.bin", cifar_folder + "data_batch_2.bin",
 			cifar_folder + "data_batch_3.bin", cifar_folder + "data_batch_4.bin", cifar_folder + "data_batch_5.bin",
 			cifar_folder + "data_batch_6.bin", });
+	// Create a data provider for the test data as well.
 	CIFARDataProvider<float> file_test_prov(cifar_folder + "test_batch.bin");
+	// Specify the weight initializations.
 	WeightInitSharedPtr<float> conv_init(new HeWeightInitialization<float>(1e-1));
 	WeightInitSharedPtr<float> dense_init(new GlorotWeightInitialization<float>(1e-1));
+	// Create the network.
 	std::vector<LayerPtr<float,3>> layers(12);
 	layers[0] = LayerPtr<float,3>(new ConvLayer<float>(file_train_prov.get_obs_dims(), 8, conv_init));
 	layers[1] = LayerPtr<float,3>(new ReLUActivationLayer<float,3>(layers[0]->get_output_dims()));
@@ -38,13 +39,17 @@ int main() {
 	layers[10] = LayerPtr<float,3>(new FCLayer<float,3>(layers[9]->get_output_dims(), 10, dense_init));
 	layers[11] = LayerPtr<float,3>(new SoftmaxActivationLayer<float,3>(layers[10]->get_output_dims()));
 	FeedforwardNeuralNetwork<float,3> nn(std::move(layers));
+	// Initialize.
 	nn.init();
+	// Specify the loss and the optimizer.
 	LossSharedPtr<float,3,false> loss(new CrossEntropyLoss<float,3,false>());
 	AdadeltaOptimizer<float,3,false> opt(loss, 200);
+	// Optimize the network and measure how long it takes.
 	std::chrono::steady_clock::time_point begin = std::chrono::steady_clock::now();
 	opt.optimize(nn, file_train_prov, file_test_prov, 10);
 	std::cout << "Training Duration: " << std::chrono::duration_cast<std::chrono::milliseconds>(
 			std::chrono::steady_clock::now() - begin).count() << std::endl;
+	// Test how many images the network classifies correctly and measure the inference duration.
 	begin = std::chrono::steady_clock::now();
 	DataPair<float,3,false> data = file_test_prov.get_data(10000);
 	Tensor<float,4> prediction = nn.infer(std::move(data.first));
