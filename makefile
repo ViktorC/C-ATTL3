@@ -30,7 +30,7 @@ $(TARGET): $(OBJECTS)
 	@cd $(GTEST_MAKE_PATH) && make gtest.a && cd $(CURDIR)
 	@mkdir -p $(TARGET_DIR)
 	# Link the gtest static library directly as it is built by default without the 'lib' prefix.
-	$(CC) $(CXXFLAGS) $(OPT_FLAGS) $(GTEST_MAKE_PATH)/gtest.a -o $@ $? $(LIBS)
+	$(CC) $(CXXFLAGS) $(OPT_FLAGS) -o $@ $? $(GTEST_MAKE_PATH)/gtest.a $(LIBS)
 .PHONY: all clean
 .DEFAULT_GOAL: all
 all:
