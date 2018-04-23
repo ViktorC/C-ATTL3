@@ -71,7 +71,6 @@ public:
 		return lambda * params.cwiseAbs().sum();
 	}
 	inline Matrix<Scalar> d_function(const Matrix<Scalar>& params) const {
-		return lambda * params.array() / params.array().abs();
 		return params.unaryExpr([this](Scalar i) { return i >= 0 ? lambda : -lambda; });
 	}
 private:

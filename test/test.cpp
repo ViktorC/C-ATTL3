@@ -7,7 +7,7 @@
 
 #include <gtest/gtest.h>
 
-#include <gradient_test.hpp>
+#include "gradient_test.hpp"
 
 int main(int argc, char** argv) {
 	::testing::InitGoogleTest(&argc, argv);

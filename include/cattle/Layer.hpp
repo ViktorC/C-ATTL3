@@ -29,6 +29,7 @@
 
 namespace cattle {
 
+// TODO Convolution and pooling for 1st and 2nd degree tensors.
 // TODO FFT and/or Winograd filtering for convolution.
 // TODO More comprehensive GPU acceleration.
 
@@ -1571,9 +1572,6 @@ private:
 	std::vector<std::vector<unsigned>> max_inds;
 };
 
-// Hide the base batch norm layer from other translation units.
-namespace {
-
 /**
  * An abstract base class template for a batch normalization layer.
  */
@@ -1761,8 +1759,6 @@ private:
 	std::vector<Cache> cache_vec;
 };
 
-}
-
 /**
  * A class template for a batch normalization layer.
  */
@@ -1785,22 +1781,23 @@ public:
 	inline BatchNormLayer(const Dimensions<std::size_t,Rank>& dims, ParamRegSharedPtr<Scalar> gamma_reg = Root::NO_PARAM_REG,
 			ParamRegSharedPtr<Scalar> beta_reg = Root::NO_PARAM_REG, Scalar gamma_max_norm_constraint = 0,
 			Scalar beta_max_norm_constraint = 0, Scalar norm_avg_decay = .1, Scalar epsilon = internal::NumericUtils<Scalar>::EPSILON3) :
-				Base::BatchNormLayerBase(dims, dims(2), gamma_reg, beta_reg, gamma_max_norm_constraint,
-						beta_max_norm_constraint, norm_avg_decay, epsilon),
-				conversion_dims(Base::dims.template promote<>()) { }
+				Base::BatchNormLayerBase(dims, 1, gamma_reg, beta_reg, gamma_max_norm_constraint, beta_max_norm_constraint,
+						norm_avg_decay, epsilon),
+				conversion_dims(dims.template promote<>()) { }
 	inline Root* clone() const {
 		return new BatchNormLayer(*this);
 	}
 protected:
 	inline BatchNormLayer(const BatchNormLayer<Scalar,Rank>& layer, bool share_params = false) :
-			Base::BatchNormLayerBase(layer, share_params) { }
+			Base::BatchNormLayerBase(layer, share_params),
+			conversion_dims(layer.conversion_dims) { }
 	inline Root* clone_with_shared_params() const {
 		return new BatchNormLayer(*this, true);
 	}
 	inline typename Root::Data pass_forward(typename Root::Data in, bool training) {
 		assert((Dimensions<std::size_t,Root::DATA_RANK>(in.dimensions()).template demote<>()) == Base::dims);
 		assert(in.dimension(0) > 0);
-		conversion_dims[0] = in.dimension();
+		conversion_dims[0] = in.dimension(0);
 		return Base::_pass_forward(std::move(in), conversion_dims, training, 0);
 	}
 	inline typename Root::Data pass_back(typename Root::Data out_grads) {
