@@ -304,12 +304,12 @@ public:
 	 * @param blocks A vector of unique pointers to neural networks.
 	 * @param foremost Whether the network is to function as a foremost network.
 	 */
-	inline CompositeNeuralNetwork(std::vector<Block> blocks, bool foremost = true) :
+	inline CompositeNeuralNetwork(std::vector<Block>&& blocks, bool foremost = true) :
 			blocks(std::move(blocks)),
 			foremost(foremost) {
 		assert(this->blocks.size() > 0 && "blocks must contain at least 1 element");
 		assert(this->blocks[0] != nullptr && "blocks contains null pointers");
-		Base& first_block = *(this->blocks[0]);
+		Base& first_block = *this->blocks[0];
 		input_dims = first_block.get_input_dims();
 		output_dims = this->blocks[this->blocks.size() - 1]->get_output_dims();
 		typename Base::Dims prev_dims = first_block.get_output_dims();
@@ -326,7 +326,7 @@ public:
 	 * @param block A unique pointer to a neural network.
 	 * @param foremost Whether the network is to function as a foremost network.
 	 */
-	inline CompositeNeuralNetwork(Block block, bool foremost = true) :
+	inline CompositeNeuralNetwork(Block&& block, bool foremost = true) :
 			CompositeNeuralNetwork(create_vector(std::move(block)), foremost) { }
 	inline CompositeNeuralNetwork(const Self& network) :
 			blocks(network.blocks.size()) {
@@ -399,7 +399,7 @@ protected:
 	 * @param net A unique pointer to the single neural network sub-module.
 	 * @return A vector of size 1 containing the unique pointer.
 	 */
-	inline static std::vector<Block> create_vector(Block net) {
+	inline static std::vector<Block> create_vector(Block&& net) {
 		std::vector<Block> vec(1);
 		vec[0] = std::move(net);
 		return vec;
@@ -432,7 +432,7 @@ public:
 	 * @param lanes A vector of unique pointers to non-sequential neural networks.
 	 * @param foremost Whether the network is to function as a foremost network.
 	 */
-	inline ParallelNeuralNetwork(std::vector<Lane> lanes, bool foremost = true) :
+	inline ParallelNeuralNetwork(std::vector<Lane>&& lanes, bool foremost = true) :
 			lanes(std::move(lanes)),
 			foremost(foremost) {
 		assert(this->lanes.size() > 0 && "lanes must contain at least 1 element");
@@ -524,14 +524,17 @@ protected:
 	inline typename Base::Data propagate(typename Base::Data input, bool training) {
 		assert(input_dims == (Dimensions<std::size_t,Base::DATA_RANK>(input.dimensions()).template demote<>()));
 		std::size_t rows = input.dimension(0);
+		int pthread_state;
 		typename Base::Data out;
 		unsigned lane_num = lanes.size();
 		unsigned helper_thread_num = lane_num - 1;
 		pthread_t threads[helper_thread_num];
 		pthread_attr_t attr;
 		if (helper_thread_num > 0) {
-			pthread_attr_init(&attr);
-			pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_JOINABLE);
+			pthread_state = pthread_attr_init(&attr);
+			assert(!pthread_state);
+			pthread_state = pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_JOINABLE);
+			assert(!pthread_state);
 		}
 		PropArgs args_arr[lane_num];
 		for (int i = helper_thread_num; i >= 0; --i) {
@@ -544,14 +547,17 @@ protected:
 			// Leave the first lane to the main thread.
 			if (i == 0)
 				propagate(&args_arr[i]);
-			else
-				assert(!pthread_create(&threads[i - 1], &attr, propagate, &args_arr[i]));
+			else {
+				pthread_state = pthread_create(&threads[i - 1], &attr, propagate, &args_arr[i]);
+				assert(!pthread_state);
+			}
 		}
 		for (unsigned i = 0; i < lane_num; ++i) {
 			if (i == 0)
 				out = std::move(args_arr[i].out);
 			else {
-				assert(!pthread_join(threads[i - 1], nullptr));
+				pthread_state = pthread_join(threads[i - 1], nullptr);
+				assert(!pthread_state);
 				if (MergeType == SUM)
 					out += args_arr[i].out;
 				else {
@@ -561,8 +567,10 @@ protected:
 				}
 			}
 		}
-		if (helper_thread_num > 0)
-			pthread_attr_destroy(&attr);
+		if (helper_thread_num > 0) {
+			pthread_state = pthread_attr_destroy(&attr);
+			assert(!pthread_state);
+		}
 		return out;
 	}
 	inline typename Base::Data backpropagate(typename Base::Data out_grads) {
@@ -576,13 +584,16 @@ protected:
 			prev_out_grads = typename Base::Data(dims);
 			prev_out_grads.setZero();
 		}
+		int pthread_state;
 		unsigned lane_num = lanes.size();
 		unsigned helper_thread_num = lane_num - 1;
 		pthread_t threads[helper_thread_num];
 		pthread_attr_t attr;
 		if (helper_thread_num > 0) {
-			pthread_attr_init(&attr);
-			pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_JOINABLE);
+			pthread_state = pthread_attr_init(&attr);
+			assert(!pthread_state);
+			pthread_state = pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_JOINABLE);
+			assert(!pthread_state);
 		}
 		BackpropArgs args_arr[lane_num];
 		int concat_rank_offset = out_grads.dimension(CONCAT_BATCH_RANK);
@@ -597,17 +608,23 @@ protected:
 			// Leave the first lane to the main thread.
 			if (i == 0)
 				backpropagate(&args_arr[i]);
-			else
-				assert(!pthread_create(&threads[i - 1], &attr, backpropagate, &args_arr[i]));
+			else {
+				pthread_state = pthread_create(&threads[i - 1], &attr, backpropagate, &args_arr[i]);
+				assert(!pthread_state);
+			}
 		}
 		for (unsigned i = 0; i < lanes.size(); ++i) {
-			if (i != 0)
-				assert(!pthread_join(threads[i - 1], nullptr));
+			if (i != 0) {
+				pthread_state = pthread_join(threads[i - 1], nullptr);
+				assert(!pthread_state);
+			}
 			if (!foremost)
 				prev_out_grads += args_arr[i].prev_out_grads;
 		}
-		if (helper_thread_num > 0)
-			pthread_attr_destroy(&attr);
+		if (helper_thread_num > 0) {
+			pthread_state = pthread_attr_destroy(&attr);
+			assert(!pthread_state);
+		}
 		return prev_out_grads;
 	}
 	/**
@@ -701,12 +718,12 @@ public:
 	 * @param foremost Whether the network directly receives its input. If it is set to false, back-propagation
 	 * returns an empty tensor.
 	 */
-	inline FeedforwardNeuralNetwork(std::vector<LayerPtr<Scalar,Rank>> layers, bool foremost = true) :
+	inline FeedforwardNeuralNetwork(std::vector<LayerPtr<Scalar,Rank>>&& layers, bool foremost = true) :
 			layers(std::move(layers)),
 			foremost(foremost) {
 		assert(this->layers.size() > 0 && "layers must contain at least 1 element");
 		assert(this->layers[0] != nullptr);
-		Layer<Scalar,Rank>& first_layer = *(this->layers[0]);
+		Layer<Scalar,Rank>& first_layer = *this->layers[0];
 		input_dims = first_layer.get_input_dims();
 		output_dims = this->layers[this->layers.size() - 1]->get_output_dims();
 		typename Base::Dims prev_dims = first_layer.get_output_dims();
@@ -721,7 +738,7 @@ public:
 	 * @param layer A unique pointer to the single layer of the network.
 	 * @param foremost Whether the network is to function as a foremost network.
 	 */
-	inline FeedforwardNeuralNetwork(LayerPtr<Scalar,Rank> layer, bool foremost = true) :
+	inline FeedforwardNeuralNetwork(LayerPtr<Scalar,Rank>&& layer, bool foremost = true) :
 			FeedforwardNeuralNetwork(create_vector(std::move(layer)), foremost) { }
 	// Copy constructor.
 	inline FeedforwardNeuralNetwork(const Self& network) :
@@ -770,7 +787,11 @@ public:
 		swap(network1.input_dims, network2.input_dims);
 		swap(network1.output_dims, network2.output_dims);
 	}
-	inline static std::vector<LayerPtr<Scalar,Rank>> create_vector(LayerPtr<Scalar,Rank> layer) {
+	/**
+	 * @param layer The layer pointer to insert into a vector.
+	 * @return A vector of size 1 containing the layer pointer.
+	 */
+	inline static std::vector<LayerPtr<Scalar,Rank>> create_vector(LayerPtr<Scalar,Rank>&& layer) {
 		std::vector<LayerPtr<Scalar,Rank>> vec(1);
 		vec[0] = std::move(layer);
 		return vec;
@@ -811,39 +832,61 @@ private:
 };
 
 /**
- * A class template for ResNets. These networks take vectors of CompositeNeuralNetwork and bool pairs
- * as their sub-modules. The second, boolean value of the pair denotes whether the sub-module is a
- * residual module or not.
+ * An alias for a unique pointer to a composite neural network.
+ */
+template<typename Scalar, std::size_t Rank, bool Sequential>
+using CompNeuralNetPtr = std::unique_ptr<CompositeNeuralNetwork<Scalar,Rank,Sequential>>;
+
+/**
+ * A class template for ResNets. These networks take vectors of CompositeNeuralNetworks as their
+ * sub-modules.
  */
 template<typename Scalar, std::size_t Rank>
 class ResidualNeuralNetwork : public NeuralNetwork<Scalar,Rank,false> {
 	typedef NeuralNetwork<Scalar,Rank,false> Base;
-	typedef CompositeNeuralNetwork<Scalar,Rank,false> Module;
+	typedef CompNeuralNetPtr<Scalar,Rank,false> Module;
+	typedef ResidualNeuralNetwork<Scalar,Rank> Self;
 public:
 	/**
-	 * @param modules A vector of CompositeNeuralNetwork and bool pairs with the boolean denoting
-	 * whether the respective network module is residual.
+	 * @param modules A vector of residual modules.
 	 * @param foremost Whether the network is to function as a foremost network.
 	 */
-	inline ResidualNeuralNetwork(std::vector<std::pair<Module,bool>> modules, bool foremost = true) :
-			modules(modules),
+	inline ResidualNeuralNetwork(std::vector<Module>&& modules, bool foremost = true) :
+			modules(std::move(modules)),
 			foremost(foremost) {
-		assert(modules.size() > 0 && "modules must contain at least 1 element");
-		Module& first_module = this->modules[0].first;
+		assert(this->modules.size() > 0 && "modules must contain at least 1 element");
+		CompositeNeuralNetwork<Scalar,Rank,false>& first_module = *this->modules[0];
 		input_dims = first_module.get_input_dims();
-		output_dims = this->modules[modules.size() - 1].first.get_output_dims();
+		output_dims = this->modules[this->modules.size() - 1]->get_output_dims();
 		first_module.set_foremost(foremost);
 		typename Base::Dims prev_dims = input_dims;
-		for (unsigned i = 0; i < modules.size(); ++i) {
-			std::pair<Module,bool>& module = this->modules[i];
-			Module& module_net = module.first;
+		for (unsigned i = 0; i < this->modules.size(); ++i) {
+			CompositeNeuralNetwork<Scalar,Rank,false>& module = *this->modules[i];
 			if (i != 0)
-				module_net.set_foremost(false);
-			assert((!module.second || module_net.get_input_dims() == module_net.get_output_dims()) &&
+				module.set_foremost(false);
+			assert(module.get_input_dims() == module.get_output_dims() &&
 					"residual module input-output dimension discrepancy");
-			assert(prev_dims == module_net.get_input_dims() && "incompatible module dimensions");
-			prev_dims = module_net.get_output_dims();
+			assert(prev_dims == module.get_input_dims() && "incompatible module dimensions");
+			prev_dims = module.get_output_dims();
 		}
+	}
+	inline ResidualNeuralNetwork(Module&& module, bool foremost) :
+				ResidualNeuralNetwork(create_vector(std::move(module), foremost)) { }
+	inline ResidualNeuralNetwork(const Self& network) :
+				modules(network.modules.size()) {
+		for (unsigned i = 0; i < modules.size(); ++i)
+			modules[i] = Module((CompositeNeuralNetwork<Scalar,Rank,false>*) network.modules[i]->clone());
+		foremost = network.foremost;
+		input_dims = network.input_dims;
+		output_dims = network.output_dims;
+	}
+	inline ResidualNeuralNetwork(Self&& network) {
+		swap(*this, network);
+	}
+	~ResidualNeuralNetwork() = default;
+	inline Self& operator=(Self network) {
+		swap(*this, network);
+		return *this;
 	}
 	inline Base* clone() const {
 		return new ResidualNeuralNetwork(*this);
@@ -860,45 +903,55 @@ public:
 	inline std::vector<Layer<Scalar,Rank>*> get_layers() {
 		std::vector<Layer<Scalar,Rank>*> layers;
 		for (unsigned i = 0; i < modules.size(); ++i) {
-			std::vector<Layer<Scalar,Rank>*> module_layers = modules[i].first.get_layers();
+			std::vector<Layer<Scalar,Rank>*> module_layers = modules[i]->get_layers();
 			for (unsigned j = 0; j < module_layers.size(); ++j)
 				layers.push_back(module_layers[j]);
 		}
 		return layers;
 	}
+	inline friend void swap(Self& network1, Self& network2) {
+		using std::swap;
+		swap(network1.modules, network2.modules);
+		swap(network1.foremost, network2.foremost);
+		swap(network1.input_dims, network2.input_dims);
+		swap(network1.output_dims, network2.output_dims);
+	}
+	/**
+	 * @param net A unique pointer to a non-sequential composite neural network.
+	 * @return A vector of size 1 containing the unique pointer.
+	 */
+	inline static std::vector<Module> create_vector(Module&& module) {
+		std::vector<Module> vec(1);
+		vec[0] = std::move(module);
+		return vec;
+	}
 protected:
 	inline void set_foremost(bool foremost) {
-		modules[0].first.set_foremost(foremost);
+		modules[0]->set_foremost(foremost);
 		this->foremost = foremost;
 	}
 	inline void empty_caches() {
 		for (unsigned i = 0; i < modules.size(); ++i)
-			modules[i].first.empty_caches();
+			modules[i]->empty_caches();
 	}
 	inline typename Base::Data propagate(typename Base::Data input, bool training) {
 		assert(input_dims == (Dimensions<std::size_t,Base::DATA_RANK>(input.dimensions()).template demote<>()));
-		for (unsigned i = 0; i < modules.size(); ++i) {
-			std::pair<Module,bool>& module = modules[i];
-			if (module.second) // If it is a residual module, propagate the sum of the input and the output.
-				input += module.first.propagate(input, training);
-			else
-				input = module.first.propagate(std::move(input), training);
-		}
+		for (unsigned i = 0; i < modules.size(); ++i)
+			input += modules[i]->propagate(input, training);
 		return input;
 	}
-	inline Tensor<Scalar,Rank + 1> backpropagate(Tensor<Scalar,Rank + 1> out_grads) {
+	inline typename Base::Data backpropagate(typename Base::Data out_grads) {
 		assert(output_dims == (Dimensions<std::size_t,Base::DATA_RANK>(out_grads.dimensions()).template demote<>()));
 		for (int i = modules.size() - 1; i >= 0; --i) {
-			std::pair<Module,bool>& module = modules[i];
-			if (module.second)
-				out_grads += module.first.backpropagate(out_grads);
+			if (foremost && i == 0)
+				return modules[i]->backpropagate(std::move(out_grads));
 			else
-				out_grads = module.first.backpropagate(std::move(out_grads));
+				out_grads += modules[i]->backpropagate(out_grads);
 		}
 		return out_grads;
 	}
 private:
-	std::vector<std::pair<Module,bool>> modules;
+	std::vector<Module> modules;
 	bool foremost;
 	typename Base::Dims input_dims;
 	typename Base::Dims output_dims;
@@ -913,7 +966,8 @@ private:
 template<typename Scalar, std::size_t Rank, DenseConcatType ConcatType = HIGHEST_RANK>
 class DenseNeuralNetwork : public NeuralNetwork<Scalar,Rank,false> {
 	typedef NeuralNetwork<Scalar,Rank,false> Base;
-	typedef CompositeNeuralNetwork<Scalar,Rank,false> Module;
+	typedef CompNeuralNetPtr<Scalar,Rank,false> Module;
+	typedef DenseNeuralNetwork<Scalar,Rank,ConcatType> Self;
 	typedef std::array<std::size_t,Base::DATA_RANK> RankwiseArray;
 	static_assert(ConcatType >= LOWEST_RANK && ConcatType <= HIGHEST_RANK, "illegal merge type value");
 	static const std::size_t CONCAT_RANK = ConcatType == HIGHEST_RANK ? Rank - 1 : 0;
@@ -923,11 +977,11 @@ public:
 	 * @param modules A vector of CompositeNeuralNetwork instances.
 	 * @param foremost Whether the network is to function as a foremost network.
 	 */
-	inline DenseNeuralNetwork(std::vector<Module> modules, bool foremost = true) :
-			modules(modules),
+	inline DenseNeuralNetwork(std::vector<Module>&& modules, bool foremost = true) :
+			modules(std::move(modules)),
 			foremost(foremost) {
 		assert(this->modules.size() > 0 && "modules must contain at least 1 element");
-		Module& first_module = this->modules[0];
+		CompositeNeuralNetwork<Scalar,Rank,false>& first_module = *this->modules[0];
 		input_dims = first_module.get_input_dims();
 		typename Base::Dims output_dims = first_module.get_output_dims();
 		output_dims(CONCAT_RANK) += input_dims(CONCAT_RANK);
@@ -939,7 +993,7 @@ public:
 				assert(input_dims(i) == output_dims(i));
 		}
 		for (unsigned i = 1; i < this->modules.size(); ++i) {
-			Module& module = this->modules[i];
+			CompositeNeuralNetwork<Scalar,Rank,false>& module = *this->modules[i];
 			const typename Base::Dims& module_input_dims = module.get_input_dims();
 			assert(module_input_dims == output_dims && "incompatible module dimensions");
 			output_dims(CONCAT_RANK) += module.get_output_dims()(CONCAT_RANK);
@@ -947,6 +1001,24 @@ public:
 		}
 		this->output_dims = output_dims;
 		first_module.set_foremost(foremost);
+	}
+	inline DenseNeuralNetwork(Module&& module, bool foremost) :
+				DenseNeuralNetwork(create_vector(std::move(module), foremost)) { }
+	inline DenseNeuralNetwork(const Self& network) :
+				modules(network.modules.size()) {
+		for (unsigned i = 0; i < modules.size(); ++i)
+			modules[i] = Module((CompositeNeuralNetwork<Scalar,Rank,false>*) network.modules[i]->clone());
+		foremost = network.foremost;
+		input_dims = network.input_dims;
+		output_dims = network.output_dims;
+	}
+	inline DenseNeuralNetwork(Self&& network) {
+		swap(*this, network);
+	}
+	~DenseNeuralNetwork() = default;
+	inline Self& operator=(Self network) {
+		swap(*this, network);
+		return *this;
 	}
 	inline Base* clone() const {
 		return new DenseNeuralNetwork(*this);
@@ -963,25 +1035,41 @@ public:
 	inline std::vector<Layer<Scalar,Rank>*> get_layers() {
 		std::vector<Layer<Scalar,Rank>*> layers;
 		for (unsigned i = 0; i < modules.size(); ++i) {
-			std::vector<Layer<Scalar,Rank>*> module_layers = modules[i].get_layers();
+			std::vector<Layer<Scalar,Rank>*> module_layers = modules[i]->get_layers();
 			for (unsigned j = 0; j < module_layers.size(); ++j)
 				layers.push_back(module_layers[j]);
 		}
 		return layers;
 	}
+	inline friend void swap(Self& network1, Self& network2) {
+		using std::swap;
+		swap(network1.modules, network2.modules);
+		swap(network1.foremost, network2.foremost);
+		swap(network1.input_dims, network2.input_dims);
+		swap(network1.output_dims, network2.output_dims);
+	}
+	/**
+	 * @param net A unique pointer to a non-sequential composite neural network.
+	 * @return A vector of size 1 containing the unique pointer.
+	 */
+	inline static std::vector<Module> create_vector(Module&& module) {
+		std::vector<Module> vec(1);
+		vec[0] = std::move(module);
+		return vec;
+	}
 protected:
 	inline void set_foremost(bool foremost) {
-		modules[0].set_foremost(foremost);
+		modules[0]->set_foremost(foremost);
 		this->foremost = foremost;
 	}
 	inline void empty_caches() {
 		for (unsigned i = 0; i < modules.size(); ++i)
-			modules[i].empty_caches();
+			modules[i]->empty_caches();
 	}
 	inline typename Base::Data propagate(typename Base::Data input, bool training) {
 		assert(input_dims == (Dimensions<std::size_t,Base::DATA_RANK>(input.dimensions()).template demote<>()));
 		for (unsigned i = 0; i < modules.size(); ++i) {
-			typename Base::Data concat = input.concatenate(modules[i].propagate(input, training), CONCAT_BATCH_RANK);
+			typename Base::Data concat = input.concatenate(modules[i]->propagate(input, training), CONCAT_BATCH_RANK);
 			input = std::move(concat);
 		}
 		return input;
@@ -993,7 +1081,7 @@ protected:
 		offsets.fill(0);
 		extents[0] = out_grads.dimension(0);
 		for (int i = modules.size() - 1; i >= 0; --i) {
-			Module& module = modules[i];
+			CompositeNeuralNetwork<Scalar,Rank,false>& module = *modules[i];
 			int layer_input_concat_rank_dim = module.get_input_dims()(CONCAT_RANK);
 			int layer_output_concat_rank_dim = module.get_output_dims()(CONCAT_RANK);
 			offsets[CONCAT_BATCH_RANK] = layer_input_concat_rank_dim;
@@ -1031,7 +1119,7 @@ public:
 	 * @param network A unique pointer to a non-sequential neural network to wrap.
 	 * @param foremost Whether the network is to function as a foremost network.
 	 */
-	inline SequentialNeuralNetwork(Net network, bool foremost = true) :
+	inline SequentialNeuralNetwork(Net&& network, bool foremost = true) :
 			net(std::move(network)),
 			foremost(foremost) {
 		assert(net);
@@ -1184,7 +1272,7 @@ public:
 	 * along with its reversed clone, will constitute the bidirectional network.
 	 * @param foremost Whether the network is to function as a foremost network.
 	 */
-	inline BidirectionalNeuralNetwork(UnidirNet network, bool foremost = true) :
+	inline BidirectionalNeuralNetwork(UnidirNet&& network, bool foremost = true) :
 				net(std::move(network)),
 				foremost(foremost) {
 		assert(this->net);
@@ -1253,16 +1341,22 @@ protected:
 		assert(input_dims == (Dimensions<std::size_t,Base::DATA_RANK>(input.dimensions()).template demote<2>()));
 		pthread_attr_t attr;
 		pthread_t helper_thread;
-		pthread_attr_init(&attr);
-		pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_JOINABLE);
+		int pthread_state;
+		pthread_state = pthread_attr_init(&attr);
+		assert(!pthread_state);
+		pthread_state = pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_JOINABLE);
+		assert(!pthread_state);
 		PropArgs args;
 		args.obj = this;
 		args.training = training;
 		args.in = &input;
-		assert(!pthread_create(&helper_thread, &attr, propagate, &args));
+		pthread_state = pthread_create(&helper_thread, &attr, propagate, &args);
+		assert(!pthread_state);
 		typename Base::Data forward_out = net->propagate(input, training);
-		assert(!pthread_join(helper_thread, nullptr));
-		pthread_attr_destroy(&attr);
+		pthread_state = pthread_join(helper_thread, nullptr);
+		assert(!pthread_state);
+		pthread_state = pthread_attr_destroy(&attr);
+		assert(!pthread_state);
 		assert(forward_out.dimension(1) == args.out.dimension(1));
 		if (MergeType != SUM)
 			return forward_out.concatenate(args.out, CONCAT_BATCH_RANK);
@@ -1274,8 +1368,11 @@ protected:
 		assert(output_dims == dims.template demote<2>());
 		pthread_attr_t attr;
 		pthread_t helper_thread;
-		pthread_attr_init(&attr);
-		pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_JOINABLE);
+		int pthread_state;
+		pthread_state = pthread_attr_init(&attr);
+		assert(!pthread_state);
+		pthread_state = pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_JOINABLE);
+		assert(!pthread_state);
 		BackpropArgs args;
 		args.obj = this;
 		typename Base::Data forward_prev_out_grads;
@@ -1287,19 +1384,24 @@ protected:
 			offsets[CONCAT_BATCH_RANK] += extents[CONCAT_BATCH_RANK];
 			typename Base::Data backward_slice = out_grads.slice(offsets, extents);
 			args.out_grads = &backward_slice;
-			assert(!pthread_create(&helper_thread, &attr, backpropagate, &args));
+			pthread_state = pthread_create(&helper_thread, &attr, backpropagate, &args);
+			assert(!pthread_state);
 			offsets[CONCAT_BATCH_RANK] -= extents[CONCAT_BATCH_RANK];
 			typename Base::Data forward_slice = out_grads.slice(offsets, extents);
 			forward_prev_out_grads = net->backpropagate(std::move(forward_slice));
 			// Make sure that backward_slice does not go out of scope before the thread terminates.
-			assert(!pthread_join(helper_thread, nullptr));
+			pthread_state = pthread_join(helper_thread, nullptr);
+			assert(!pthread_state);
 		} else {
 			args.out_grads = &out_grads;
-			assert(!pthread_create(&helper_thread, &attr, backpropagate, &args));
+			pthread_state = pthread_create(&helper_thread, &attr, backpropagate, &args);
+			assert(!pthread_state);
 			forward_prev_out_grads = net->backpropagate(out_grads);
-			assert(!pthread_join(helper_thread, nullptr));
+			pthread_state = pthread_join(helper_thread, nullptr);
+			assert(!pthread_state);
 		}
-		pthread_attr_destroy(&attr);
+		pthread_state = pthread_attr_destroy(&attr);
+		assert(!pthread_state);
 		out_grads = typename Base::Data();
 		return forward_prev_out_grads + args.prev_out_grads;
 	}
@@ -1394,9 +1496,10 @@ public:
 	 * @param reversed Whether the network is to reverse its inputs along the time-step rank.
 	 * @param foremost Whether the network is to function as a foremost network.
 	 */
-	inline RecurrentNeuralNetwork(KernelPtr<Scalar,Rank> input_kernel, KernelPtr<Scalar,Rank> state_kernel,
-			KernelPtr<Scalar,Rank> output_kernel, ActivationPtr<Scalar,Rank> state_act, ActivationPtr<Scalar,Rank> output_act,
-			OutputSeqSizeFunc output_seq_size_func, bool reversed = false, bool foremost = true) :
+	inline RecurrentNeuralNetwork(KernelPtr<Scalar,Rank>&& input_kernel, KernelPtr<Scalar,Rank>&& state_kernel,
+			KernelPtr<Scalar,Rank>&& output_kernel, ActivationPtr<Scalar,Rank>&& state_act,
+			ActivationPtr<Scalar,Rank>&& output_act, OutputSeqSizeFunc output_seq_size_func, bool reversed = false,
+			bool foremost = true) :
 				main_cell(),
 				output_seq_size_func(output_seq_size_func),
 				reversed(reversed),
@@ -1854,13 +1957,13 @@ public:
 	 * @param reversed Whether the network is to reverse its inputs along the time-step rank.
 	 * @param foremost Whether the network is to function as a foremost network.
 	 */
-	inline LSTMNeuralNetwork(KernelPtr<Scalar,Rank> input_forget_kernel, KernelPtr<Scalar,Rank> output_forget_kernel,
-			KernelPtr<Scalar,Rank> input_write_kernel, KernelPtr<Scalar,Rank> output_write_kernel,
-			KernelPtr<Scalar,Rank> input_candidate_kernel, KernelPtr<Scalar,Rank> output_candidate_kernel,
-			KernelPtr<Scalar,Rank> input_read_kernel, KernelPtr<Scalar,Rank> output_read_kernel,
-			ActivationPtr<Scalar,Rank> forget_act, ActivationPtr<Scalar,Rank> write_act,
-			ActivationPtr<Scalar,Rank> candidate_act, ActivationPtr<Scalar,Rank> state_act,
-			ActivationPtr<Scalar,Rank> read_act, OutputSeqSizeFunc output_seq_size_func,
+	inline LSTMNeuralNetwork(KernelPtr<Scalar,Rank>&& input_forget_kernel, KernelPtr<Scalar,Rank>&& output_forget_kernel,
+			KernelPtr<Scalar,Rank>&& input_write_kernel, KernelPtr<Scalar,Rank>&& output_write_kernel,
+			KernelPtr<Scalar,Rank>&& input_candidate_kernel, KernelPtr<Scalar,Rank>&& output_candidate_kernel,
+			KernelPtr<Scalar,Rank>&& input_read_kernel, KernelPtr<Scalar,Rank>&& output_read_kernel,
+			ActivationPtr<Scalar,Rank>&& forget_act, ActivationPtr<Scalar,Rank>&& write_act,
+			ActivationPtr<Scalar,Rank>&& candidate_act, ActivationPtr<Scalar,Rank>&& state_act,
+			ActivationPtr<Scalar,Rank>&& read_act, OutputSeqSizeFunc output_seq_size_func,
 			bool reversed = false, bool foremost = true) :
 				main_cell(),
 				output_seq_size_func(output_seq_size_func),
