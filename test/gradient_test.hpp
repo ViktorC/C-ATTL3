@@ -47,8 +47,8 @@ struct ScalarTraits {
 template<>
 struct ScalarTraits<float> {
 	static constexpr float step_size = 5e-4;
-	static constexpr float abs_epsilon = 5e-2;
-	static constexpr float rel_epsilon = 5e-2;
+	static constexpr float abs_epsilon = 1.5e-1;
+	static constexpr float rel_epsilon = 1e-1;
 	inline static std::string name() {
 		return "float";
 	}
@@ -115,6 +115,7 @@ inline void nonseq_network_grad_test(std::string name, NeuralNetPtr<Scalar,Rank,
 	TensorPtr<Scalar,Rank + 1> obs = random_tensor<Scalar,Rank + 1>(input_dims);
 	TensorPtr<Scalar,Rank + 1> obj = random_tensor<Scalar,Rank + 1>(output_dims);
 	MemoryDataProvider<Scalar,Rank,false> prov(std::move(obs), std::move(obj));
+	net->init();
 	auto loss = LossSharedPtr<Scalar,Rank,false>(new QuadraticLoss<Scalar,Rank,false>());
 	VanillaSGDOptimizer<Scalar,Rank,false> opt(loss, samples);
 	grad_test<Scalar,Rank,false>(name, prov, *net, opt, step_size, abs_epsilon, rel_epsilon);
@@ -146,6 +147,7 @@ inline void seq_network_grad_test(std::string name, NeuralNetPtr<Scalar,Rank,tru
 	TensorPtr<Scalar,Rank + 2> obs = random_tensor<Scalar,Rank + 2>(input_dims);
 	TensorPtr<Scalar,Rank + 2> obj = random_tensor<Scalar,Rank + 2>(output_dims);
 	MemoryDataProvider<Scalar,Rank,true> prov(std::move(obs), std::move(obj));
+	net->init();
 	auto loss = LossSharedPtr<Scalar,Rank,true>(new QuadraticLoss<Scalar,Rank,true>());
 	VanillaSGDOptimizer<Scalar,Rank,true> opt(loss, samples);
 	grad_test<Scalar,Rank,true>(name, prov, *net, opt, step_size, abs_epsilon, rel_epsilon);
@@ -176,7 +178,6 @@ inline void layer_grad_test(std::string name, LayerPtr<Scalar,Rank> layer1, Laye
 	layers[0] = std::move(layer1);
 	layers[1] = std::move(layer2);
 	NeuralNetPtr<Scalar,Rank,false> nn(new FeedforwardNeuralNetwork<Scalar,Rank>(std::move(layers)));
-	nn->init();
 	nonseq_network_grad_test<Scalar,Rank>(name, std::move(nn), samples, step_size, abs_epsilon, rel_epsilon);
 }
 
@@ -405,7 +406,7 @@ TEST(gradient_test, batch_norm_layer_grad_test) {
  */
 template<typename Scalar>
 inline void parallel_net_grad_test() {
-	auto init = WeightInitSharedPtr<Scalar>(new GlorotWeightInitialization<Scalar>(5e-3));
+	auto init = WeightInitSharedPtr<Scalar>(new GlorotWeightInitialization<Scalar>());
 	// Rank 1.
 	Dimensions<std::size_t,1> dims_1({ 32 });
 	std::vector<NeuralNetPtr<Scalar,1,false>> lanes_1;
@@ -450,19 +451,19 @@ inline void parallel_net_grad_test() {
 	nonseq_network_grad_test<Scalar,3>("parallel net", std::move(parallel_net_3));
 }
 
-//TEST(gradient_test, parallel_net_grad_test) {
-//	parallel_net_grad_test<float>();
-//	parallel_net_grad_test<double>();
-//}
+TEST(gradient_test, parallel_net_grad_test) {
+	parallel_net_grad_test<float>();
+	parallel_net_grad_test<double>();
+}
 
 /**
  * Performs gradient checks on residual neural networks.
  */
 template<typename Scalar>
 inline void residual_net_grad_test() {
-	auto init = WeightInitSharedPtr<Scalar>(new GlorotWeightInitialization<Scalar>(5e-3));
+	auto init = WeightInitSharedPtr<Scalar>(new GlorotWeightInitialization<Scalar>());
 	// Rank 1.
-	std::vector<CompNeuralNetPtr<Scalar,1,false>> modules_1;
+	std::vector<NeuralNetPtr<Scalar,1,false>> modules_1;
 	std::vector<NeuralNetPtr<Scalar,1,false>> sub_modules1_1;
 	std::vector<LayerPtr<Scalar,1>> layers1_1(2);
 	layers1_1[0] = LayerPtr<Scalar,1>(new FCLayer<Scalar,1>(Dimensions<std::size_t,1>({ 32 }), 18, init));
@@ -470,14 +471,14 @@ inline void residual_net_grad_test() {
 	sub_modules1_1.push_back(NeuralNetPtr<Scalar,1,false>(new FeedforwardNeuralNetwork<Scalar,1>(std::move(layers1_1))));
 	sub_modules1_1.push_back(NeuralNetPtr<Scalar,1,false>(new FeedforwardNeuralNetwork<Scalar,1>(LayerPtr<Scalar,1>(
 			new FCLayer<Scalar,1>(sub_modules1_1[0]->get_output_dims(), 32, init)))));
-	modules_1.push_back(CompNeuralNetPtr<Scalar,1,false>(new CompositeNeuralNetwork<Scalar,1,false>(std::move(sub_modules1_1))));
-	modules_1.push_back(CompNeuralNetPtr<Scalar,1,false>(new CompositeNeuralNetwork<Scalar,1,false>(NeuralNetPtr<Scalar,1,false>(
+	modules_1.push_back(NeuralNetPtr<Scalar,1,false>(new CompositeNeuralNetwork<Scalar,1,false>(std::move(sub_modules1_1))));
+	modules_1.push_back(NeuralNetPtr<Scalar,1,false>(new CompositeNeuralNetwork<Scalar,1,false>(NeuralNetPtr<Scalar,1,false>(
 			new FeedforwardNeuralNetwork<Scalar,1>(LayerPtr<Scalar,1>(
 			new FCLayer<Scalar,1>(modules_1[0]->get_output_dims(), 32, init)))))));
 	nonseq_network_grad_test<Scalar,1>("residual net", NeuralNetPtr<Scalar,1,false>(
 			new ResidualNeuralNetwork<Scalar,1>(std::move(modules_1))));
 	// Rank 3.
-	std::vector<CompNeuralNetPtr<Scalar,3,false>> modules_3;
+	std::vector<NeuralNetPtr<Scalar,3,false>> modules_3;
 	std::vector<NeuralNetPtr<Scalar,3,false>> sub_modules1_3;
 	std::vector<LayerPtr<Scalar,3>> layers1_3(2);
 	layers1_3[0] = LayerPtr<Scalar,3>(new ConvLayer<Scalar>(Dimensions<std::size_t,3>({ 4, 4, 3 }), 4, init));
@@ -485,18 +486,109 @@ inline void residual_net_grad_test() {
 	sub_modules1_3.push_back(NeuralNetPtr<Scalar,3,false>(new FeedforwardNeuralNetwork<Scalar,3>(std::move(layers1_3))));
 	sub_modules1_3.push_back(NeuralNetPtr<Scalar,3,false>(new FeedforwardNeuralNetwork<Scalar,3>(LayerPtr<Scalar,3>(
 			new ConvLayer<Scalar>(sub_modules1_3[0]->get_output_dims(), 3, init)))));
-	modules_3.push_back(CompNeuralNetPtr<Scalar,3,false>(new CompositeNeuralNetwork<Scalar,3,false>(std::move(sub_modules1_3))));
-	modules_3.push_back(CompNeuralNetPtr<Scalar,3,false>(new CompositeNeuralNetwork<Scalar,3,false>(NeuralNetPtr<Scalar,3,false>(
+	modules_3.push_back(NeuralNetPtr<Scalar,3,false>(new CompositeNeuralNetwork<Scalar,3,false>(std::move(sub_modules1_3))));
+	modules_3.push_back(NeuralNetPtr<Scalar,3,false>(new CompositeNeuralNetwork<Scalar,3,false>(NeuralNetPtr<Scalar,3,false>(
 			new FeedforwardNeuralNetwork<Scalar,3>(LayerPtr<Scalar,3>(
 			new ConvLayer<Scalar>(modules_3[0]->get_output_dims(), 3, init)))))));
 	nonseq_network_grad_test<Scalar,3>("residual net", NeuralNetPtr<Scalar,3,false>(
 			new ResidualNeuralNetwork<Scalar,3>(std::move(modules_3))));
 }
 
-//TEST(gradient_test, residual_net_grad_test) {
-//	residual_net_grad_test<float>();
-//	residual_net_grad_test<double>();
-//}
+TEST(gradient_test, residual_net_grad_test) {
+	residual_net_grad_test<float>();
+	residual_net_grad_test<double>();
+}
+
+/**
+ * Performs gradient checks on dense neural networks.
+ */
+template<typename Scalar>
+inline void dense_net_grad_test() {
+	auto init = WeightInitSharedPtr<Scalar>(new GlorotWeightInitialization<Scalar>());
+	// Rank 1.
+	Dimensions<std::size_t,1> dims_1({ 32 });
+	std::vector<NeuralNetPtr<Scalar,1,false>> modules_1;
+	std::vector<NeuralNetPtr<Scalar,1,false>> sub_modules1_1;
+	std::vector<LayerPtr<Scalar,1>> layers1_1(2);
+	layers1_1[0] = LayerPtr<Scalar,1>(new FCLayer<Scalar,1>(dims_1, 18, init));
+	layers1_1[1] = LayerPtr<Scalar,1>(new SigmoidActivationLayer<Scalar,1>(layers1_1[0]->get_output_dims()));
+	sub_modules1_1.push_back(NeuralNetPtr<Scalar,1,false>(new FeedforwardNeuralNetwork<Scalar,1>(std::move(layers1_1))));
+	sub_modules1_1.push_back(NeuralNetPtr<Scalar,1,false>(new FeedforwardNeuralNetwork<Scalar,1>(LayerPtr<Scalar,1>(
+			new FCLayer<Scalar,1>(sub_modules1_1[0]->get_output_dims(), 32, init)))));
+	modules_1.push_back(NeuralNetPtr<Scalar,1,false>(new CompositeNeuralNetwork<Scalar,1,false>(std::move(sub_modules1_1))));
+	modules_1.push_back(NeuralNetPtr<Scalar,1,false>(new CompositeNeuralNetwork<Scalar,1,false>(NeuralNetPtr<Scalar,1,false>(
+			new FeedforwardNeuralNetwork<Scalar,1>(LayerPtr<Scalar,1>(
+			new FCLayer<Scalar,1>(dims_1.add_along_rank(modules_1[0]->get_output_dims(), 0), 16, init)))))));
+	nonseq_network_grad_test<Scalar,1>("dense net", NeuralNetPtr<Scalar,1,false>(
+			new DenseNeuralNetwork<Scalar,1>(std::move(modules_1))));
+	// Rank 2.
+	Dimensions<std::size_t,2> dims_2({ 6, 6 });
+	std::vector<NeuralNetPtr<Scalar,2,false>> modules_2;
+	std::vector<NeuralNetPtr<Scalar,2,false>> sub_modules1_2;
+	std::vector<LayerPtr<Scalar,2>> layers1_2(2);
+	layers1_2[0] = LayerPtr<Scalar,2>(new FCLayer<Scalar,2>(dims_2, 12, init));
+	layers1_2[1] = LayerPtr<Scalar,2>(new SigmoidActivationLayer<Scalar,2>(layers1_2[0]->get_output_dims()));
+	sub_modules1_2.push_back(NeuralNetPtr<Scalar,2,false>(new FeedforwardNeuralNetwork<Scalar,2>(std::move(layers1_2))));
+	sub_modules1_2.push_back(NeuralNetPtr<Scalar,2,false>(new FeedforwardNeuralNetwork<Scalar,2>(LayerPtr<Scalar,2>(
+			new FCLayer<Scalar,2>(sub_modules1_2[0]->get_output_dims(), 6, init)))));
+	modules_2.push_back(NeuralNetPtr<Scalar,2,false>(new CompositeNeuralNetwork<Scalar,2,false>(std::move(sub_modules1_2))));
+	modules_2.push_back(NeuralNetPtr<Scalar,2,false>(new CompositeNeuralNetwork<Scalar,2,false>(NeuralNetPtr<Scalar,2,false>(
+			new FeedforwardNeuralNetwork<Scalar,2>(LayerPtr<Scalar,2>(
+			new FCLayer<Scalar,2>(dims_2.add_along_rank(modules_2[0]->get_output_dims(), 1), 6, init)))))));
+	nonseq_network_grad_test<Scalar,2>("dense net", NeuralNetPtr<Scalar,2,false>(
+			new DenseNeuralNetwork<Scalar,2,HIGHEST_RANK>(std::move(modules_2))));
+	// Rank 3.
+	Dimensions<std::size_t,3> dims_3({ 4, 4, 3 });
+	std::vector<NeuralNetPtr<Scalar,3,false>> modules_3;
+	std::vector<NeuralNetPtr<Scalar,3,false>> sub_modules1_3;
+	std::vector<LayerPtr<Scalar,3>> layers1_3(2);
+	layers1_3[0] = LayerPtr<Scalar,3>(new ConvLayer<Scalar>(dims_3, 4, init, ConvLayer<Scalar>::NO_PARAM_REG, 2, 3));
+	layers1_3[1] = LayerPtr<Scalar,3>(new SigmoidActivationLayer<Scalar,3>(layers1_3[0]->get_output_dims()));
+	sub_modules1_3.push_back(NeuralNetPtr<Scalar,3,false>(new FeedforwardNeuralNetwork<Scalar,3>(std::move(layers1_3))));
+	sub_modules1_3.push_back(NeuralNetPtr<Scalar,3,false>(new FeedforwardNeuralNetwork<Scalar,3>(LayerPtr<Scalar,3>(
+			new ConvLayer<Scalar>(sub_modules1_3[0]->get_output_dims(), 3, init)))));
+	modules_3.push_back(NeuralNetPtr<Scalar,3,false>(new CompositeNeuralNetwork<Scalar,3,false>(std::move(sub_modules1_3))));
+	modules_3.push_back(NeuralNetPtr<Scalar,3,false>(new CompositeNeuralNetwork<Scalar,3,false>(NeuralNetPtr<Scalar,3,false>(
+			new FeedforwardNeuralNetwork<Scalar,3>(LayerPtr<Scalar,3>(
+			new ConvLayer<Scalar>(dims_3.add_along_rank(modules_3[0]->get_output_dims(), 0), 3, init)))))));
+	nonseq_network_grad_test<Scalar,3>("dense net", NeuralNetPtr<Scalar,3,false>(
+			new DenseNeuralNetwork<Scalar,3,LOWEST_RANK>(std::move(modules_3))));
+}
+
+TEST(gradient_test, dense_net_grad_test) {
+	dense_net_grad_test<float>();
+	dense_net_grad_test<double>();
+}
+
+/**
+ * Performs gradient checks on sequential neural networks.
+ */
+template<typename Scalar>
+inline void sequential_net_grad_test() {
+	auto init = WeightInitSharedPtr<Scalar>(new GlorotWeightInitialization<Scalar>());
+	// Rank 1.
+	std::vector<LayerPtr<Scalar,1>> layers_1(3);
+	layers_1[0] = LayerPtr<Scalar,1>(new FCLayer<Scalar,1>(Dimensions<std::size_t,1>({ 32 }), 16, init));
+	layers_1[1] = LayerPtr<Scalar,1>(new TanhActivationLayer<Scalar,1>(layers_1[0]->get_output_dims()));
+	layers_1[2] = LayerPtr<Scalar,1>(new FCLayer<Scalar,1>(layers_1[1]->get_output_dims(), 4, init));
+	seq_network_grad_test("sequential net", NeuralNetPtr<Scalar,1,true>(
+			new SequentialNeuralNetwork<Scalar,1>(NeuralNetPtr<Scalar,1,false>(
+					new FeedforwardNeuralNetwork<Scalar,1>(std::move(layers_1))))));
+	// Rank 3.
+	std::vector<LayerPtr<Scalar,3>> layers_3(4);
+	layers_3[0] = LayerPtr<Scalar,3>(new ConvLayer<Scalar>(Dimensions<std::size_t,3>({ 4, 4, 2 }), 4, init));
+	layers_3[1] = LayerPtr<Scalar,3>(new ReLUActivationLayer<Scalar,3>(layers_3[0]->get_output_dims()));
+	layers_3[2] = LayerPtr<Scalar,3>(new MaxPoolingLayer<Scalar>(layers_3[1]->get_output_dims()));
+	layers_3[3] = LayerPtr<Scalar,3>(new FCLayer<Scalar,3>(layers_3[2]->get_output_dims(), 1, init));
+	seq_network_grad_test("sequential net", NeuralNetPtr<Scalar,3,true>(
+			new SequentialNeuralNetwork<Scalar,3>(NeuralNetPtr<Scalar,3,false>(
+					new FeedforwardNeuralNetwork<Scalar,3>(std::move(layers_3))))));
+}
+
+TEST(gradient_test, sequential_net_grad_test) {
+	sequential_net_grad_test<float>();
+	sequential_net_grad_test<double>();
+}
 
 } /* namespace test */
 

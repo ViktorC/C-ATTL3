@@ -42,6 +42,12 @@ template<typename Scalar, std::size_t Rank, bool Sequential> class Optimizer;
 enum OutputMergeType { CONCAT_LO_RANK, CONCAT_HI_RANK, SUM };
 
 /**
+ * An enumeration type for the different ways the input of a layer in a dense network may be concatenated
+ * to its output.
+ */
+enum DenseConcatType { LOWEST_RANK, HIGHEST_RANK };
+
+/**
  * An abstract neural network class template. It allows for inference and training via
  * back-propagation.
  */
@@ -54,6 +60,10 @@ class NeuralNetwork {
 	friend class CompositeNeuralNetwork;
 	template<typename _Scalar, std::size_t _Rank, OutputMergeType MergeType>
 	friend class ParallelNeuralNetwork;
+	template<typename _Scalar, std::size_t _Rank>
+	friend class ResidualNeuralNetwork;
+	template<typename _Scalar, std::size_t _Rank, DenseConcatType ConcatType>
+	friend class DenseNeuralNetwork;
 	template<typename _Scalar, std::size_t _Rank>
 	friend class SequentialNeuralNetwork;
 protected:
@@ -274,10 +284,136 @@ protected:
 };
 
 /**
- * An enumeration type for the different ways the input of a layer in a dense network may be concatenated
- * to its output.
+ * An alias for a unique pointer to a layer of arbitrary rank and scalar type.
  */
-enum DenseConcatType { LOWEST_RANK, HIGHEST_RANK };
+template<typename Scalar, std::size_t Rank>
+using LayerPtr = std::unique_ptr<Layer<Scalar,Rank>>;
+
+/**
+ * A class template representing a simple feed-forward neural network.
+ */
+template<typename Scalar, std::size_t Rank>
+class FeedforwardNeuralNetwork : public NeuralNetwork<Scalar,Rank,false> {
+	typedef NeuralNetwork<Scalar,Rank,false> Base;
+	typedef FeedforwardNeuralNetwork<Scalar,Rank> Self;
+public:
+	/**
+	 * @param layers A vector of unique smart pointers to the layers that constitute the neural network.
+	 * @param foremost Whether the network directly receives its input. If it is set to false, back-propagation
+	 * returns an empty tensor.
+	 */
+	inline FeedforwardNeuralNetwork(std::vector<LayerPtr<Scalar,Rank>>&& layers, bool foremost = true) :
+			layers(std::move(layers)),
+			foremost(foremost) {
+		assert(this->layers.size() > 0 && "layers must contain at least 1 element");
+		assert(this->layers[0] != nullptr);
+		Layer<Scalar,Rank>& first_layer = *this->layers[0];
+		input_dims = first_layer.get_input_dims();
+		output_dims = this->layers[this->layers.size() - 1]->get_output_dims();
+		typename Base::Dims prev_dims = first_layer.get_output_dims();
+		for (unsigned i = 1; i < this->layers.size(); ++i) {
+			assert(this->layers[i] != nullptr && "layers contains null pointers");
+			assert(prev_dims == this->layers[i]->get_input_dims() && "incompatible layer dimensions");
+			prev_dims = this->layers[i]->get_output_dims();
+		}
+		Base::set_input_layer(first_layer, foremost);
+	}
+	/**
+	 * @param layer A unique pointer to the single layer of the network.
+	 * @param foremost Whether the network is to function as a foremost network.
+	 */
+	inline FeedforwardNeuralNetwork(LayerPtr<Scalar,Rank>&& layer, bool foremost = true) :
+			FeedforwardNeuralNetwork(create_vector(std::move(layer)), foremost) { }
+	// Copy constructor.
+	inline FeedforwardNeuralNetwork(const Self& network) :
+			layers(network.layers.size()) {
+		for (unsigned i = 0; i < layers.size(); ++i)
+			layers[i] = LayerPtr<Scalar,Rank>(network.layers[i]->clone());
+		foremost = network.foremost;
+		input_dims = network.input_dims;
+		output_dims = network.output_dims;
+	}
+	// Move constructor.
+	inline FeedforwardNeuralNetwork(Self&& network) {
+		swap(*this, network);
+	}
+	// The smart pointers take care of deleting the layers.
+	~FeedforwardNeuralNetwork() = default;
+	/* The assignment uses the move or copy constructor to pass the parameter
+	 * based on whether it is an rvalue or an lvalue. */
+	inline Self& operator=(Self network) {
+		swap(*this, network);
+		return *this;
+	}
+	inline Base* clone() const {
+		return new FeedforwardNeuralNetwork(*this);
+	}
+	inline bool is_foremost() const {
+		return foremost;
+	}
+	inline const typename Base::Dims& get_input_dims() const {
+		return input_dims;
+	}
+	inline const typename Base::Dims& get_output_dims() const {
+		return output_dims;
+	}
+	inline std::vector<Layer<Scalar,Rank>*> get_layers() {
+		std::vector<Layer<Scalar,Rank>*> layers_raw(layers.size());
+		for (unsigned i = 0; i < layers.size(); ++i)
+			layers_raw[i] = layers[i].get();
+		return layers_raw;
+	}
+	// For the copy-and-swap idiom.
+	inline friend void swap(Self& network1, Self& network2) {
+		using std::swap;
+		swap(network1.layers, network2.layers);
+		swap(network1.foremost, network2.foremost);
+		swap(network1.input_dims, network2.input_dims);
+		swap(network1.output_dims, network2.output_dims);
+	}
+	/**
+	 * @param layer The layer pointer to insert into a vector.
+	 * @return A vector of size 1 containing the layer pointer.
+	 */
+	inline static std::vector<LayerPtr<Scalar,Rank>> create_vector(LayerPtr<Scalar,Rank>&& layer) {
+		std::vector<LayerPtr<Scalar,Rank>> vec(1);
+		vec[0] = std::move(layer);
+		return vec;
+	}
+protected:
+	inline void set_foremost(bool foremost) {
+		Base::set_input_layer(*layers[0], foremost);
+		this->foremost = foremost;
+	}
+	inline void empty_caches() {
+		for (unsigned i = 0; i < layers.size(); ++i)
+			Base::empty_cache(*layers[i]);
+	}
+	inline typename Base::Data propagate(typename Base::Data input, bool training) {
+		assert(input_dims == (Dimensions<std::size_t,Base::DATA_RANK>(input.dimensions()).template demote<>()));
+		for (unsigned i = 0; i < layers.size(); ++i) {
+			Layer<Scalar,Rank>& layer = *layers[i];
+			input = Base::pass_forward(layer, std::move(input), training);
+			if (!training)
+				Base::empty_cache(layer);
+		}
+		return input;
+	}
+	inline typename Base::Data backpropagate(typename Base::Data out_grads) {
+		assert(output_dims == (Dimensions<std::size_t,Base::DATA_RANK>(out_grads.dimensions()).template demote<>()));
+		for (int i = layers.size() - 1; i >= 0; --i) {
+			Layer<Scalar,Rank>& layer = *layers[i];
+			out_grads = Base::pass_back(layer, std::move(out_grads));
+			Base::empty_cache(layer);
+		}
+		return out_grads;
+	}
+private:
+	std::vector<LayerPtr<Scalar,Rank>> layers;
+	bool foremost;
+	typename Base::Dims input_dims;
+	typename Base::Dims output_dims;
+};
 
 /**
  * An alias for a unique pointer to a neural network of arbitrary scalar type, rank,
@@ -292,10 +428,6 @@ using NeuralNetPtr = std::unique_ptr<NeuralNetwork<Scalar,Rank,Sequential>>;
  */
 template<typename Scalar, std::size_t Rank, bool Sequential>
 class CompositeNeuralNetwork : public NeuralNetwork<Scalar,Rank,Sequential> {
-	template<typename _Scalar, std::size_t _Rank>
-	friend class ResidualNeuralNetwork;
-	template<typename _Scalar, std::size_t _Rank, DenseConcatType ConcatType>
-	friend class DenseNeuralNetwork;
 	typedef NeuralNetwork<Scalar,Rank,Sequential> Base;
 	typedef CompositeNeuralNetwork<Scalar,Rank,Sequential> Self;
 	typedef NeuralNetPtr<Scalar,Rank,Sequential> Block;
@@ -700,151 +832,13 @@ private:
 };
 
 /**
- * An alias for a unique pointer to a layer of arbitrary rank and scalar type.
- */
-template<typename Scalar, std::size_t Rank>
-using LayerPtr = std::unique_ptr<Layer<Scalar,Rank>>;
-
-/**
- * A class template representing a simple feed-forward neural network.
- */
-template<typename Scalar, std::size_t Rank>
-class FeedforwardNeuralNetwork : public NeuralNetwork<Scalar,Rank,false> {
-	typedef NeuralNetwork<Scalar,Rank,false> Base;
-	typedef FeedforwardNeuralNetwork<Scalar,Rank> Self;
-public:
-	/**
-	 * @param layers A vector of unique smart pointers to the layers that constitute the neural network.
-	 * @param foremost Whether the network directly receives its input. If it is set to false, back-propagation
-	 * returns an empty tensor.
-	 */
-	inline FeedforwardNeuralNetwork(std::vector<LayerPtr<Scalar,Rank>>&& layers, bool foremost = true) :
-			layers(std::move(layers)),
-			foremost(foremost) {
-		assert(this->layers.size() > 0 && "layers must contain at least 1 element");
-		assert(this->layers[0] != nullptr);
-		Layer<Scalar,Rank>& first_layer = *this->layers[0];
-		input_dims = first_layer.get_input_dims();
-		output_dims = this->layers[this->layers.size() - 1]->get_output_dims();
-		typename Base::Dims prev_dims = first_layer.get_output_dims();
-		for (unsigned i = 1; i < this->layers.size(); ++i) {
-			assert(this->layers[i] != nullptr && "layers contains null pointers");
-			assert(prev_dims == this->layers[i]->get_input_dims() && "incompatible layer dimensions");
-			prev_dims = this->layers[i]->get_output_dims();
-		}
-		Base::set_input_layer(first_layer, foremost);
-	}
-	/**
-	 * @param layer A unique pointer to the single layer of the network.
-	 * @param foremost Whether the network is to function as a foremost network.
-	 */
-	inline FeedforwardNeuralNetwork(LayerPtr<Scalar,Rank>&& layer, bool foremost = true) :
-			FeedforwardNeuralNetwork(create_vector(std::move(layer)), foremost) { }
-	// Copy constructor.
-	inline FeedforwardNeuralNetwork(const Self& network) :
-			layers(network.layers.size()) {
-		for (unsigned i = 0; i < layers.size(); ++i)
-			layers[i] = LayerPtr<Scalar,Rank>(network.layers[i]->clone());
-		foremost = network.foremost;
-		input_dims = network.input_dims;
-		output_dims = network.output_dims;
-	}
-	// Move constructor.
-	inline FeedforwardNeuralNetwork(Self&& network) {
-		swap(*this, network);
-	}
-	// The smart pointers take care of deleting the layers.
-	~FeedforwardNeuralNetwork() = default;
-	/* The assignment uses the move or copy constructor to pass the parameter
-	 * based on whether it is an rvalue or an lvalue. */
-	inline Self& operator=(Self network) {
-		swap(*this, network);
-		return *this;
-	}
-	inline Base* clone() const {
-		return new FeedforwardNeuralNetwork(*this);
-	}
-	inline bool is_foremost() const {
-		return foremost;
-	}
-	inline const typename Base::Dims& get_input_dims() const {
-		return input_dims;
-	}
-	inline const typename Base::Dims& get_output_dims() const {
-		return output_dims;
-	}
-	inline std::vector<Layer<Scalar,Rank>*> get_layers() {
-		std::vector<Layer<Scalar,Rank>*> layers_raw(layers.size());
-		for (unsigned i = 0; i < layers.size(); ++i)
-			layers_raw[i] = layers[i].get();
-		return layers_raw;
-	}
-	// For the copy-and-swap idiom.
-	inline friend void swap(Self& network1, Self& network2) {
-		using std::swap;
-		swap(network1.layers, network2.layers);
-		swap(network1.foremost, network2.foremost);
-		swap(network1.input_dims, network2.input_dims);
-		swap(network1.output_dims, network2.output_dims);
-	}
-	/**
-	 * @param layer The layer pointer to insert into a vector.
-	 * @return A vector of size 1 containing the layer pointer.
-	 */
-	inline static std::vector<LayerPtr<Scalar,Rank>> create_vector(LayerPtr<Scalar,Rank>&& layer) {
-		std::vector<LayerPtr<Scalar,Rank>> vec(1);
-		vec[0] = std::move(layer);
-		return vec;
-	}
-protected:
-	inline void set_foremost(bool foremost) {
-		Base::set_input_layer(*layers[0], foremost);
-		this->foremost = foremost;
-	}
-	inline void empty_caches() {
-		for (unsigned i = 0; i < layers.size(); ++i)
-			Base::empty_cache(*layers[i]);
-	}
-	inline typename Base::Data propagate(typename Base::Data input, bool training) {
-		assert(input_dims == (Dimensions<std::size_t,Base::DATA_RANK>(input.dimensions()).template demote<>()));
-		for (unsigned i = 0; i < layers.size(); ++i) {
-			Layer<Scalar,Rank>& layer = *layers[i];
-			input = Base::pass_forward(layer, std::move(input), training);
-			if (!training)
-				Base::empty_cache(layer);
-		}
-		return input;
-	}
-	inline typename Base::Data backpropagate(typename Base::Data out_grads) {
-		assert(output_dims == (Dimensions<std::size_t,Base::DATA_RANK>(out_grads.dimensions()).template demote<>()));
-		for (int i = layers.size() - 1; i >= 0; --i) {
-			Layer<Scalar,Rank>& layer = *layers[i];
-			out_grads = Base::pass_back(layer, std::move(out_grads));
-			Base::empty_cache(layer);
-		}
-		return out_grads;
-	}
-private:
-	std::vector<LayerPtr<Scalar,Rank>> layers;
-	bool foremost;
-	typename Base::Dims input_dims;
-	typename Base::Dims output_dims;
-};
-
-/**
- * An alias for a unique pointer to a composite neural network.
- */
-template<typename Scalar, std::size_t Rank, bool Sequential>
-using CompNeuralNetPtr = std::unique_ptr<CompositeNeuralNetwork<Scalar,Rank,Sequential>>;
-
-/**
  * A class template for ResNets. These networks take vectors of CompositeNeuralNetworks as their
  * sub-modules.
  */
 template<typename Scalar, std::size_t Rank>
 class ResidualNeuralNetwork : public NeuralNetwork<Scalar,Rank,false> {
 	typedef NeuralNetwork<Scalar,Rank,false> Base;
-	typedef CompNeuralNetPtr<Scalar,Rank,false> Module;
+	typedef NeuralNetPtr<Scalar,Rank,false> Module;
 	typedef ResidualNeuralNetwork<Scalar,Rank> Self;
 public:
 	/**
@@ -855,13 +849,13 @@ public:
 			modules(std::move(modules)),
 			foremost(foremost) {
 		assert(this->modules.size() > 0 && "modules must contain at least 1 element");
-		CompositeNeuralNetwork<Scalar,Rank,false>& first_module = *this->modules[0];
+		Base& first_module = *this->modules[0];
 		input_dims = first_module.get_input_dims();
 		output_dims = this->modules[this->modules.size() - 1]->get_output_dims();
 		first_module.set_foremost(foremost);
 		typename Base::Dims prev_dims = input_dims;
 		for (unsigned i = 0; i < this->modules.size(); ++i) {
-			CompositeNeuralNetwork<Scalar,Rank,false>& module = *this->modules[i];
+			Base& module = *this->modules[i];
 			if (i != 0)
 				module.set_foremost(false);
 			assert(module.get_input_dims() == module.get_output_dims() &&
@@ -870,12 +864,16 @@ public:
 			prev_dims = module.get_output_dims();
 		}
 	}
-	inline ResidualNeuralNetwork(Module&& module, bool foremost) :
+	/**
+	 * @param module A single residual module.
+	 * @param foremost Whether the network is to function as a foremost network.
+	 */
+	inline ResidualNeuralNetwork(Module&& module, bool foremost = true) :
 				ResidualNeuralNetwork(create_vector(std::move(module), foremost)) { }
 	inline ResidualNeuralNetwork(const Self& network) :
 				modules(network.modules.size()) {
 		for (unsigned i = 0; i < modules.size(); ++i)
-			modules[i] = Module((CompositeNeuralNetwork<Scalar,Rank,false>*) network.modules[i]->clone());
+			modules[i] = Module((Base*) network.modules[i]->clone());
 		foremost = network.foremost;
 		input_dims = network.input_dims;
 		output_dims = network.output_dims;
@@ -966,7 +964,7 @@ private:
 template<typename Scalar, std::size_t Rank, DenseConcatType ConcatType = HIGHEST_RANK>
 class DenseNeuralNetwork : public NeuralNetwork<Scalar,Rank,false> {
 	typedef NeuralNetwork<Scalar,Rank,false> Base;
-	typedef CompNeuralNetPtr<Scalar,Rank,false> Module;
+	typedef NeuralNetPtr<Scalar,Rank,false> Module;
 	typedef DenseNeuralNetwork<Scalar,Rank,ConcatType> Self;
 	typedef std::array<std::size_t,Base::DATA_RANK> RankwiseArray;
 	static_assert(ConcatType >= LOWEST_RANK && ConcatType <= HIGHEST_RANK, "illegal merge type value");
@@ -974,14 +972,14 @@ class DenseNeuralNetwork : public NeuralNetwork<Scalar,Rank,false> {
 	static const std::size_t CONCAT_BATCH_RANK = CONCAT_RANK + 1;
 public:
 	/**
-	 * @param modules A vector of CompositeNeuralNetwork instances.
+	 * @param modules A vector of dense modules.
 	 * @param foremost Whether the network is to function as a foremost network.
 	 */
 	inline DenseNeuralNetwork(std::vector<Module>&& modules, bool foremost = true) :
 			modules(std::move(modules)),
 			foremost(foremost) {
 		assert(this->modules.size() > 0 && "modules must contain at least 1 element");
-		CompositeNeuralNetwork<Scalar,Rank,false>& first_module = *this->modules[0];
+		Base& first_module = *this->modules[0];
 		input_dims = first_module.get_input_dims();
 		typename Base::Dims output_dims = first_module.get_output_dims();
 		output_dims(CONCAT_RANK) += input_dims(CONCAT_RANK);
@@ -993,7 +991,7 @@ public:
 				assert(input_dims(i) == output_dims(i));
 		}
 		for (unsigned i = 1; i < this->modules.size(); ++i) {
-			CompositeNeuralNetwork<Scalar,Rank,false>& module = *this->modules[i];
+			Base& module = *this->modules[i];
 			const typename Base::Dims& module_input_dims = module.get_input_dims();
 			assert(module_input_dims == output_dims && "incompatible module dimensions");
 			output_dims(CONCAT_RANK) += module.get_output_dims()(CONCAT_RANK);
@@ -1002,12 +1000,16 @@ public:
 		this->output_dims = output_dims;
 		first_module.set_foremost(foremost);
 	}
-	inline DenseNeuralNetwork(Module&& module, bool foremost) :
+	/**
+	 * @param modules A single dense module.
+	 * @param foremost Whether the network is to function as a foremost network.
+	 */
+	inline DenseNeuralNetwork(Module&& module, bool foremost = true) :
 				DenseNeuralNetwork(create_vector(std::move(module), foremost)) { }
 	inline DenseNeuralNetwork(const Self& network) :
 				modules(network.modules.size()) {
 		for (unsigned i = 0; i < modules.size(); ++i)
-			modules[i] = Module((CompositeNeuralNetwork<Scalar,Rank,false>*) network.modules[i]->clone());
+			modules[i] = Module((Base*) network.modules[i]->clone());
 		foremost = network.foremost;
 		input_dims = network.input_dims;
 		output_dims = network.output_dims;
@@ -1081,7 +1083,7 @@ protected:
 		offsets.fill(0);
 		extents[0] = out_grads.dimension(0);
 		for (int i = modules.size() - 1; i >= 0; --i) {
-			CompositeNeuralNetwork<Scalar,Rank,false>& module = *modules[i];
+			Base& module = *modules[i];
 			int layer_input_concat_rank_dim = module.get_input_dims()(CONCAT_RANK);
 			int layer_output_concat_rank_dim = module.get_output_dims()(CONCAT_RANK);
 			offsets[CONCAT_BATCH_RANK] = layer_input_concat_rank_dim;
