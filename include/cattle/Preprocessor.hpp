@@ -23,6 +23,7 @@
 namespace cattle {
 
 // TODO Preprocessors for sequential data.
+// TODO LDA.
 
 /**
  * An abstract class template for data preprocessors.

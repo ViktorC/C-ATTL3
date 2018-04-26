@@ -25,17 +25,15 @@ namespace cattle {
  */
 namespace test {
 
-using namespace internal;
-
 /**
  * A trait struct for the name of a scalar type and the default numeric constants used for gradient
  * verification depending on the scalar type.
  */
 template<typename Scalar>
 struct ScalarTraits {
-	static constexpr Scalar step_size = 1e-4;
-	static constexpr Scalar abs_epsilon = NumericUtils<Scalar>::EPSILON2;
-	static constexpr Scalar rel_epsilon = NumericUtils<Scalar>::EPSILON3;
+	static constexpr Scalar step_size = 1e-5;
+	static constexpr Scalar abs_epsilon = 1e-2;
+	static constexpr Scalar rel_epsilon = 1e-2;
 	inline static std::string name() {
 		return "double";
 	}
@@ -46,7 +44,7 @@ struct ScalarTraits {
  */
 template<>
 struct ScalarTraits<float> {
-	static constexpr float step_size = 5e-4;
+	static constexpr float step_size = 1e-4;
 	static constexpr float abs_epsilon = 1.5e-1;
 	static constexpr float rel_epsilon = 1e-1;
 	inline static std::string name() {
@@ -124,9 +122,9 @@ inline void nonseq_network_grad_test(std::string name, NeuralNetPtr<Scalar,Rank,
 /**
  * @param name The name of the gradient test.
  * @param net The neural network to perform the gradient check on.
- * @param samples The number of samples to use.
  * @param input_seq_length The length of the input sequence.
  * @param output_seq_length The length of the output sequence.
+ * @param samples The number of samples to use.
  * @param step_size The step size for numerical differentiation.
  * @param abs_epsilon The maximum acceptable absolute difference between the analytic and
  * numerical gradients.
@@ -135,7 +133,7 @@ inline void nonseq_network_grad_test(std::string name, NeuralNetPtr<Scalar,Rank,
  */
 template<typename Scalar, std::size_t Rank>
 inline void seq_network_grad_test(std::string name, NeuralNetPtr<Scalar,Rank,true> net,
-		std::size_t samples = 5, std::size_t input_seq_length = 5, std::size_t output_seq_length = 5,
+		std::size_t input_seq_length = 5, std::size_t output_seq_length = 5, std::size_t samples = 5,
 		Scalar step_size = ScalarTraits<Scalar>::step_size, Scalar abs_epsilon = ScalarTraits<Scalar>::abs_epsilon,
 		Scalar rel_epsilon = ScalarTraits<Scalar>::rel_epsilon) {
 	std::array<std::size_t,Rank + 2> input_dims = net->get_input_dims().template promote<2>();
@@ -588,6 +586,58 @@ inline void sequential_net_grad_test() {
 TEST(gradient_test, sequential_net_grad_test) {
 	sequential_net_grad_test<float>();
 	sequential_net_grad_test<double>();
+}
+
+/**
+ * Performs gradient checks on recurrent neural networks.
+ */
+template<typename Scalar>
+inline void recurrent_net_grad_test() {
+	auto init = WeightInitSharedPtr<Scalar>(new GlorotWeightInitialization<Scalar>());
+	auto reg = ParamRegSharedPtr<Scalar>(new L2ParameterRegularization<Scalar>());
+	// Rank 1.
+	KernelPtr<Scalar,1> input_kernel1_1(new FCLayer<Scalar,1>(Dimensions<std::size_t,1>({ 12 }), 12, init, reg));
+	KernelPtr<Scalar,1> state_kernel1_1(new FCLayer<Scalar,1>(input_kernel1_1->get_output_dims(), 12, init, reg));
+	KernelPtr<Scalar,1> output_kernel1_1(new FCLayer<Scalar,1>(state_kernel1_1->get_output_dims(), 4, init, reg));
+	ActivationPtr<Scalar,1> state_act1_1(new SigmoidActivationLayer<Scalar,1>(state_kernel1_1->get_output_dims()));
+	ActivationPtr<Scalar,1> output_act1_1(new IdentityActivationLayer<Scalar,1>(output_kernel1_1->get_output_dims()));
+	KernelPtr<Scalar,1> input_kernel2_1((FCLayer<Scalar,1>*) input_kernel1_1->clone());
+	KernelPtr<Scalar,1> state_kernel2_1((FCLayer<Scalar,1>*) input_kernel2_1->clone());
+	KernelPtr<Scalar,1> output_kernel2_1((FCLayer<Scalar,1>*) output_kernel1_1->clone());
+	ActivationPtr<Scalar,1> state_act2_1((SigmoidActivationLayer<Scalar,1>*) state_act1_1->clone());
+	ActivationPtr<Scalar,1> output_act2_1((IdentityActivationLayer<Scalar,1>*) output_act1_1->clone());
+	seq_network_grad_test("recurrent net", NeuralNetPtr<Scalar,1,true>(
+			new RecurrentNeuralNetwork<Scalar,1>(std::move(input_kernel1_1), std::move(state_kernel1_1),
+					std::move(output_kernel1_1), std::move(state_act1_1), std::move(output_act1_1),
+					[](int input_seq_length) { return std::make_pair(input_seq_length, 0); })), 3, 3);
+	seq_network_grad_test("recurrent net with multiplicative integration", NeuralNetPtr<Scalar,1,true>(
+			new RecurrentNeuralNetwork<Scalar,1,true>(std::move(input_kernel2_1), std::move(state_kernel2_1),
+					std::move(output_kernel2_1), std::move(state_act2_1), std::move(output_act2_1),
+					[](int input_seq_length) { return std::make_pair(1, input_seq_length - 1); })), 5, 1);
+	// Rank 3.
+	KernelPtr<Scalar,3> input_kernel1_3(new ConvLayer<Scalar>(Dimensions<std::size_t,3>({ 4, 4, 2 }), 5, init, reg));
+	KernelPtr<Scalar,3> state_kernel1_3(new ConvLayer<Scalar>(input_kernel1_3->get_output_dims(), 5, init, reg));
+	KernelPtr<Scalar,3> output_kernel1_3(new FCLayer<Scalar,3>(state_kernel1_3->get_output_dims(), 2, init, reg));
+	ActivationPtr<Scalar,3> state_act1_3(new SigmoidActivationLayer<Scalar,3>(state_kernel1_3->get_output_dims()));
+	ActivationPtr<Scalar,3> output_act1_3(new IdentityActivationLayer<Scalar,3>(output_kernel1_3->get_output_dims()));
+	KernelPtr<Scalar,3> input_kernel2_3((ConvLayer<Scalar>*) input_kernel1_3->clone());
+	KernelPtr<Scalar,3> state_kernel2_3((ConvLayer<Scalar>*) state_kernel1_3->clone());
+	KernelPtr<Scalar,3> output_kernel2_3((FCLayer<Scalar,3>*) output_kernel1_3->clone());
+	ActivationPtr<Scalar,3> state_act2_3((SigmoidActivationLayer<Scalar,3>*) state_act1_3->clone());
+	ActivationPtr<Scalar,3> output_act2_3((IdentityActivationLayer<Scalar,3>*) output_act1_3->clone());
+	seq_network_grad_test("recurrent net", NeuralNetPtr<Scalar,3,true>(
+			new RecurrentNeuralNetwork<Scalar,3>(std::move(input_kernel1_3), std::move(state_kernel1_3),
+					std::move(output_kernel1_3), std::move(state_act1_3), std::move(output_act1_3),
+					[](int input_seq_length) { return std::make_pair(3, input_seq_length - 3); })), 5, 3);
+	seq_network_grad_test("recurrent net with multiplicative integration", NeuralNetPtr<Scalar,3,true>(
+			new RecurrentNeuralNetwork<Scalar,3,true>(std::move(input_kernel2_3), std::move(state_kernel2_3),
+					std::move(output_kernel2_3), std::move(state_act2_3), std::move(output_act2_3),
+					[](int input_seq_length) { return std::make_pair(2, input_seq_length); })), 3, 2);
+}
+
+TEST(gradient_test, recurrent_net_grad_test) {
+	recurrent_net_grad_test<float>();
+	recurrent_net_grad_test<double>();
 }
 
 } /* namespace test */

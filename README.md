@@ -183,4 +183,21 @@ The final code snippet demonstrates the usage of the trained neural network for 
 More examples of neural network constructs can be found [here](https://github.com/ViktorC/C-ATTL3/tree/master/examples).
 
 ## TODO
-Planned features include FFT and Winograd filter accelerated convolution, more comprehensive GPU support, proper automated testing using CMake, network serialization and de-serialization, evolutionary and second order optimization algorithms, GRU neural net, CTC loss, and more extensive documentation including practical examples.
+The list below contains the planned features of the library.
+- [ ] Test automation using Google Test
+- [ ] CMake build
+- [ ] Convolution and pooling for 1st and 2nd degree features
+- [ ] Temporal (convolutional) networks
+- [ ] More comprehensive GPU support via cuDNN utilization
+- [ ] Data pre-fetching for file based providers
+- [ ] Network serialization and de-serialization
+- [ ] Adding and removing modules from networks
+- [ ] Hessian-free optimizer with conjugate gradient descent
+- [ ] L-BFGS optimizer
+- [ ] Particle swarm optimizer
+- [ ] GA optimizer
+- [ ] PBIL optimizer
+- [ ] FFT and/or Winograd filtering for CPU convolution
+- [ ] LDA preprocessor
+- [ ] GRU network
+- [ ] CTC loss

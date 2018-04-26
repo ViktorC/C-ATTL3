@@ -1494,7 +1494,9 @@ public:
 	 * @param output_act The activation function applied to the linearly transformed hidden state
 	 * of the network at each time step with an output.
 	 * @param output_seq_size_func A function parameterized by the input sequence length that
-	 * determines the output sequence delay and length
+	 * determines the output sequence delay and length. The output of the function is a pair of unsigned
+	 * integers where the first element is the sequence length and the second element is the sequence
+	 * delay.
 	 * @param reversed Whether the network is to reverse its inputs along the time-step rank.
 	 * @param foremost Whether the network is to function as a foremost network.
 	 */
@@ -1858,11 +1860,12 @@ protected:
 					input_offsets[1] -= 1;
 				}
 				Root::empty_cache(*cell.input_kernel);
-			}
-			// Compute the the state kernel's gradient.
-			if (MulInt) {
-				state_grads = Root::pass_back(*cell.state_kernel, cell.input_kernel_cache * state_grads);
-				cell.input_kernel_cache = null_tensor;
+				// Compute the the state kernel's gradient.
+				if (MulInt) {
+					state_grads = Root::pass_back(*cell.state_kernel, cell.input_kernel_cache * state_grads);
+					cell.input_kernel_cache = null_tensor;
+				} else
+					state_grads = Root::pass_back(*cell.state_kernel, std::move(state_grads));
 			} else
 				state_grads = Root::pass_back(*cell.state_kernel, std::move(state_grads));
 			Root::empty_cache(*cell.state_kernel);
@@ -1955,7 +1958,9 @@ public:
 	 * @param read_act The activation layer of the read filter. Usually a sigmoid activation
 	 * function.
 	 * @param output_seq_size_func A function parameterized by the input sequence length that
-	 * determines the output sequence delay and length.
+	 * determines the output sequence delay and length. The output of the function is a pair of unsigned
+	 * integers where the first element is the sequence length and the second element is the sequence
+	 * delay.
 	 * @param reversed Whether the network is to reverse its inputs along the time-step rank.
 	 * @param foremost Whether the network is to function as a foremost network.
 	 */

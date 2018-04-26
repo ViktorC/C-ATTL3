@@ -31,7 +31,6 @@ namespace cattle {
 
 // TODO Hessian-free w/ Conjugate Gradient
 // TODO L-BFGS
-// TODO Supervised Descent Method
 // TODO Particle Swarm
 // TODO GA
 // TODO PBIL
