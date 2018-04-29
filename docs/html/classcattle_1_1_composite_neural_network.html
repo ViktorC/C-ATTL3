@@ -89,10 +89,10 @@ Inheritance diagram for cattle::CompositeNeuralNetwork&lt; Scalar, Rank, Sequent
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:a3ae6e3354901cee872115844e522c3d0"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_composite_neural_network.html#a3ae6e3354901cee872115844e522c3d0">CompositeNeuralNetwork</a> (std::vector&lt; Block &gt; blocks, bool foremost=true)</td></tr>
-<tr class="separator:a3ae6e3354901cee872115844e522c3d0"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a7ca1b8918ea91d4f875651b873adbae2"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_composite_neural_network.html#a7ca1b8918ea91d4f875651b873adbae2">CompositeNeuralNetwork</a> (Block block, bool foremost=true)</td></tr>
-<tr class="separator:a7ca1b8918ea91d4f875651b873adbae2"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a930caccf8f173ba8da403de75b2aed5f"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_composite_neural_network.html#a930caccf8f173ba8da403de75b2aed5f">CompositeNeuralNetwork</a> (std::vector&lt; Block &gt; &amp;&amp;blocks, bool foremost=true)</td></tr>
+<tr class="separator:a930caccf8f173ba8da403de75b2aed5f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af74c1ccc9c5362f93605cc2d17f1f10c"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_composite_neural_network.html#af74c1ccc9c5362f93605cc2d17f1f10c">CompositeNeuralNetwork</a> (Block &amp;&amp;block, bool foremost=true)</td></tr>
+<tr class="separator:af74c1ccc9c5362f93605cc2d17f1f10c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aafad384eb6ed387193bb87878df2a50c"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classcattle_1_1_neural_network.html">Base</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_composite_neural_network.html#aafad384eb6ed387193bb87878df2a50c">clone</a> () const</td></tr>
 <tr class="separator:aafad384eb6ed387193bb87878df2a50c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a4ff84e347287f20ad69741fc35eeee41"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_composite_neural_network.html#a4ff84e347287f20ad69741fc35eeee41">is_foremost</a> () const</td></tr>
@@ -124,8 +124,8 @@ Protected Member Functions</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pro-static-methods"></a>
 Static Protected Member Functions</h2></td></tr>
-<tr class="memitem:a86859dd6228977300d54a5d6bb57a0c8"><td class="memItemLeft" align="right" valign="top">static std::vector&lt; Block &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_composite_neural_network.html#a86859dd6228977300d54a5d6bb57a0c8">create_vector</a> (Block net)</td></tr>
-<tr class="separator:a86859dd6228977300d54a5d6bb57a0c8"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2e170f58538d6ce48e289507b4244ac2"><td class="memItemLeft" align="right" valign="top">static std::vector&lt; Block &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_composite_neural_network.html#a2e170f58538d6ce48e289507b4244ac2">create_vector</a> (Block &amp;&amp;net)</td></tr>
+<tr class="separator:a2e170f58538d6ce48e289507b4244ac2"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="inherit_header pro_static_methods_classcattle_1_1_neural_network"><td colspan="2" onclick="javascript:toggleInherit('pro_static_methods_classcattle_1_1_neural_network')"><img src="closed.png" alt="-"/>&#160;Static Protected Member Functions inherited from <a class="el" href="classcattle_1_1_neural_network.html">cattle::NeuralNetwork&lt; Scalar, Rank, Sequential &gt;</a></td></tr>
 <tr class="memitem:aeb549ff03b351397f4c7bded24d55e7c inherit pro_static_methods_classcattle_1_1_neural_network"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="classcattle_1_1_layer.html">Layer</a>&lt; Scalar, Rank &gt; *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_neural_network.html#aeb549ff03b351397f4c7bded24d55e7c">clone_with_shared_params</a> (const <a class="el" href="classcattle_1_1_layer.html">Layer</a>&lt; Scalar, Rank &gt; &amp;layer)</td></tr>
 <tr class="separator:aeb549ff03b351397f4c7bded24d55e7c inherit pro_static_methods_classcattle_1_1_neural_network"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -146,8 +146,8 @@ class cattle::CompositeNeuralNetwork&lt; Scalar, Rank, Sequential &gt;</h3>
 
 <p>A class template for a composite neural network that consists of a set of serially stacked neural network sub-modules. </p>
 </div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
-<a id="a3ae6e3354901cee872115844e522c3d0"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a3ae6e3354901cee872115844e522c3d0">&#9670;&nbsp;</a></span>CompositeNeuralNetwork() <span class="overload">[1/2]</span></h2>
+<a id="a930caccf8f173ba8da403de75b2aed5f"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a930caccf8f173ba8da403de75b2aed5f">&#9670;&nbsp;</a></span>CompositeNeuralNetwork() <span class="overload">[1/2]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -160,7 +160,7 @@ template&lt;typename Scalar , std::size_t Rank, bool Sequential&gt; </div>
         <tr>
           <td class="memname"><a class="el" href="classcattle_1_1_composite_neural_network.html">cattle::CompositeNeuralNetwork</a>&lt; Scalar, Rank, Sequential &gt;::<a class="el" href="classcattle_1_1_composite_neural_network.html">CompositeNeuralNetwork</a> </td>
           <td>(</td>
-          <td class="paramtype">std::vector&lt; Block &gt;&#160;</td>
+          <td class="paramtype">std::vector&lt; Block &gt; &amp;&amp;&#160;</td>
           <td class="paramname"><em>blocks</em>, </td>
         </tr>
         <tr>
@@ -191,8 +191,8 @@ template&lt;typename Scalar , std::size_t Rank, bool Sequential&gt; </div>
 
 </div>
 </div>
-<a id="a7ca1b8918ea91d4f875651b873adbae2"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a7ca1b8918ea91d4f875651b873adbae2">&#9670;&nbsp;</a></span>CompositeNeuralNetwork() <span class="overload">[2/2]</span></h2>
+<a id="af74c1ccc9c5362f93605cc2d17f1f10c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af74c1ccc9c5362f93605cc2d17f1f10c">&#9670;&nbsp;</a></span>CompositeNeuralNetwork() <span class="overload">[2/2]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -205,7 +205,7 @@ template&lt;typename Scalar , std::size_t Rank, bool Sequential&gt; </div>
         <tr>
           <td class="memname"><a class="el" href="classcattle_1_1_composite_neural_network.html">cattle::CompositeNeuralNetwork</a>&lt; Scalar, Rank, Sequential &gt;::<a class="el" href="classcattle_1_1_composite_neural_network.html">CompositeNeuralNetwork</a> </td>
           <td>(</td>
-          <td class="paramtype">Block&#160;</td>
+          <td class="paramtype">Block &amp;&amp;&#160;</td>
           <td class="paramname"><em>block</em>, </td>
         </tr>
         <tr>
@@ -306,8 +306,8 @@ template&lt;typename Scalar , std::size_t Rank, bool Sequential&gt; </div>
 
 </div>
 </div>
-<a id="a86859dd6228977300d54a5d6bb57a0c8"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a86859dd6228977300d54a5d6bb57a0c8">&#9670;&nbsp;</a></span>create_vector()</h2>
+<a id="a2e170f58538d6ce48e289507b4244ac2"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a2e170f58538d6ce48e289507b4244ac2">&#9670;&nbsp;</a></span>create_vector()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -320,7 +320,7 @@ template&lt;typename Scalar , std::size_t Rank, bool Sequential&gt; </div>
         <tr>
           <td class="memname">static std::vector&lt;Block&gt; <a class="el" href="classcattle_1_1_composite_neural_network.html">cattle::CompositeNeuralNetwork</a>&lt; Scalar, Rank, Sequential &gt;::create_vector </td>
           <td>(</td>
-          <td class="paramtype">Block&#160;</td>
+          <td class="paramtype">Block &amp;&amp;&#160;</td>
           <td class="paramname"><em>net</em></td><td>)</td>
           <td></td>
         </tr>

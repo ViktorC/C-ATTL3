@@ -5,7 +5,7 @@ var searchData=
   ['decidedly_5fgreater',['decidedly_greater',['../classcattle_1_1internal_1_1_numeric_utils.html#ae73d7c1b4caf84f0227e7b04c4d7512b',1,'cattle::internal::NumericUtils']]],
   ['decidedly_5flesser',['decidedly_lesser',['../classcattle_1_1internal_1_1_numeric_utils.html#a4ccb98354f5c472bf029545c79ea2cad',1,'cattle::internal::NumericUtils']]],
   ['demote',['demote',['../classcattle_1_1_dimensions.html#a3f279dec6f26b6e1fbe9adb5c1369bab',1,'cattle::Dimensions']]],
-  ['denseneuralnetwork',['DenseNeuralNetwork',['../classcattle_1_1_dense_neural_network.html#a2a9ad924f0d198ba21f5ae62fe2499df',1,'cattle::DenseNeuralNetwork']]],
+  ['denseneuralnetwork',['DenseNeuralNetwork',['../classcattle_1_1_dense_neural_network.html#ae1f29fc3b643d61d125fc082eed9ec89',1,'cattle::DenseNeuralNetwork::DenseNeuralNetwork(std::vector&lt; Module &gt; &amp;&amp;modules, bool foremost=true)'],['../classcattle_1_1_dense_neural_network.html#a714633b6ad63253ca1baf7d1716d414a',1,'cattle::DenseNeuralNetwork::DenseNeuralNetwork(Module &amp;&amp;module, bool foremost=true)']]],
   ['divide_5falong_5frank',['divide_along_rank',['../classcattle_1_1_dim_expression.html#aa4651f18fd078bc3a0b60999c463261a',1,'cattle::DimExpression']]],
   ['dropoutlayer',['DropoutLayer',['../classcattle_1_1_dropout_layer.html#aaa9166a01c9e2afacf42157054f6020e',1,'cattle::DropoutLayer']]]
 ];

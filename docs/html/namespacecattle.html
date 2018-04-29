@@ -95,6 +95,8 @@ Classes</h2></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_batch_norm_layer_3_01_scalar_00_013_01_4.html">BatchNormLayer&lt; Scalar, 3 &gt;</a></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_batch_norm_layer_base.html">BatchNormLayerBase</a></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_bidirectional_neural_network.html">BidirectionalNeuralNetwork</a></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_binary_dim_expression.html">BinaryDimExpression</a></td></tr>
@@ -199,6 +201,8 @@ Classes</h2></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_p_c_a_preprocessor_3_01_scalar_00_013_00_01_standardize_00_01_whiten_01_4.html">PCAPreprocessor&lt; Scalar, 3, Standardize, Whiten &gt;</a></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_p_c_a_preprocessor_base.html">PCAPreprocessorBase</a></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_pooling_layer.html">PoolingLayer</a></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_p_re_l_u_activation_layer.html">PReLUActivationLayer</a></td></tr>
@@ -266,12 +270,12 @@ Typedefs</h2></td></tr>
 <tr class="memitem:a083ab63c64a5c935b2d2cd3f03c4e27a"><td class="memTemplParams" colspan="2">template&lt;typename Scalar &gt; </td></tr>
 <tr class="memitem:a083ab63c64a5c935b2d2cd3f03c4e27a"><td class="memTemplItemLeft" align="right" valign="top">using&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespacecattle.html#a083ab63c64a5c935b2d2cd3f03c4e27a">ParamRegSharedPtr</a> = std::shared_ptr&lt; <a class="el" href="classcattle_1_1_paramater_regularization.html">ParamaterRegularization</a>&lt; Scalar &gt; &gt;</td></tr>
 <tr class="separator:a083ab63c64a5c935b2d2cd3f03c4e27a"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a4d754351864153898cdbd3918dc1525b"><td class="memTemplParams" colspan="2">template&lt;typename Scalar , std::size_t Rank, bool Sequential&gt; </td></tr>
-<tr class="memitem:a4d754351864153898cdbd3918dc1525b"><td class="memTemplItemLeft" align="right" valign="top">using&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespacecattle.html#a4d754351864153898cdbd3918dc1525b">NeuralNetPtr</a> = std::unique_ptr&lt; <a class="el" href="classcattle_1_1_neural_network.html">NeuralNetwork</a>&lt; Scalar, Rank, Sequential &gt; &gt;</td></tr>
-<tr class="separator:a4d754351864153898cdbd3918dc1525b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ad9bc255ce8185babba9c66dbc39ee77f"><td class="memTemplParams" colspan="2">template&lt;typename Scalar , std::size_t Rank&gt; </td></tr>
 <tr class="memitem:ad9bc255ce8185babba9c66dbc39ee77f"><td class="memTemplItemLeft" align="right" valign="top">using&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespacecattle.html#ad9bc255ce8185babba9c66dbc39ee77f">LayerPtr</a> = std::unique_ptr&lt; <a class="el" href="classcattle_1_1_layer.html">Layer</a>&lt; Scalar, Rank &gt; &gt;</td></tr>
 <tr class="separator:ad9bc255ce8185babba9c66dbc39ee77f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4d754351864153898cdbd3918dc1525b"><td class="memTemplParams" colspan="2">template&lt;typename Scalar , std::size_t Rank, bool Sequential&gt; </td></tr>
+<tr class="memitem:a4d754351864153898cdbd3918dc1525b"><td class="memTemplItemLeft" align="right" valign="top">using&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespacecattle.html#a4d754351864153898cdbd3918dc1525b">NeuralNetPtr</a> = std::unique_ptr&lt; <a class="el" href="classcattle_1_1_neural_network.html">NeuralNetwork</a>&lt; Scalar, Rank, Sequential &gt; &gt;</td></tr>
+<tr class="separator:a4d754351864153898cdbd3918dc1525b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a011c68542051b5509475ef3f94aaa048"><td class="memTemplParams" colspan="2">template&lt;typename Scalar , std::size_t Rank&gt; </td></tr>
 <tr class="memitem:a011c68542051b5509475ef3f94aaa048"><td class="memTemplItemLeft" align="right" valign="top">using&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespacecattle.html#a011c68542051b5509475ef3f94aaa048">UnidirNeuralNetPtr</a> = std::unique_ptr&lt; <a class="el" href="classcattle_1_1_unidirectional_neural_network.html">UnidirectionalNeuralNetwork</a>&lt; Scalar, Rank &gt; &gt;</td></tr>
 <tr class="separator:a011c68542051b5509475ef3f94aaa048"><td class="memSeparator" colspan="2">&#160;</td></tr>

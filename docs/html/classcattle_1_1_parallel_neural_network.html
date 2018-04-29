@@ -89,8 +89,8 @@ Inheritance diagram for cattle::ParallelNeuralNetwork&lt; Scalar, Rank, MergeTyp
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:a191f27701351d938d8f6a8e284817e28"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_parallel_neural_network.html#a191f27701351d938d8f6a8e284817e28">ParallelNeuralNetwork</a> (std::vector&lt; Lane &gt; lanes, bool foremost=true)</td></tr>
-<tr class="separator:a191f27701351d938d8f6a8e284817e28"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a13e1a4201d072bca0476a2280b0eb40f"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_parallel_neural_network.html#a13e1a4201d072bca0476a2280b0eb40f">ParallelNeuralNetwork</a> (std::vector&lt; Lane &gt; &amp;&amp;lanes, bool foremost=true)</td></tr>
+<tr class="separator:a13e1a4201d072bca0476a2280b0eb40f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a31b122373065a443474ce5a5c2dd7188"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_parallel_neural_network.html#a31b122373065a443474ce5a5c2dd7188">ParallelNeuralNetwork</a> (<a class="el" href="classcattle_1_1_neural_network.html">Base</a> &amp;&amp;lane, bool foremost=true)</td></tr>
 <tr class="separator:a31b122373065a443474ce5a5c2dd7188"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a5bd9cce2f1fbbd2dd87fd6ffcb2b1a52"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_parallel_neural_network.html#a5bd9cce2f1fbbd2dd87fd6ffcb2b1a52">is_foremost</a> () const</td></tr>
@@ -146,8 +146,8 @@ class cattle::ParallelNeuralNetwork&lt; Scalar, Rank, MergeType &gt;</h3>
 
 <p>A class template for a parallel neural network that consists of one or more lanes of non-sequential neural networks with the same input dimensions. Inputs and gradients are propagated through the lanes simultaneously using multithreading. The outputs of the lanes are merged by concatenation (either along the lowest or hightest rank) or summation. </p>
 </div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
-<a id="a191f27701351d938d8f6a8e284817e28"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a191f27701351d938d8f6a8e284817e28">&#9670;&nbsp;</a></span>ParallelNeuralNetwork() <span class="overload">[1/2]</span></h2>
+<a id="a13e1a4201d072bca0476a2280b0eb40f"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a13e1a4201d072bca0476a2280b0eb40f">&#9670;&nbsp;</a></span>ParallelNeuralNetwork() <span class="overload">[1/2]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -160,7 +160,7 @@ template&lt;typename Scalar , std::size_t Rank, OutputMergeType MergeType = CONC
         <tr>
           <td class="memname"><a class="el" href="classcattle_1_1_parallel_neural_network.html">cattle::ParallelNeuralNetwork</a>&lt; Scalar, Rank, MergeType &gt;::<a class="el" href="classcattle_1_1_parallel_neural_network.html">ParallelNeuralNetwork</a> </td>
           <td>(</td>
-          <td class="paramtype">std::vector&lt; Lane &gt;&#160;</td>
+          <td class="paramtype">std::vector&lt; Lane &gt; &amp;&amp;&#160;</td>
           <td class="paramname"><em>lanes</em>, </td>
         </tr>
         <tr>

@@ -89,8 +89,8 @@ Inheritance diagram for cattle::RecurrentNeuralNetwork&lt; Scalar, Rank, MulInt,
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:ad788443003ca3d8300198398627e812e"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_recurrent_neural_network.html#ad788443003ca3d8300198398627e812e">RecurrentNeuralNetwork</a> (<a class="el" href="namespacecattle.html#a540d630253530c3530f6af1c31b82c44">KernelPtr</a>&lt; Scalar, Rank &gt; input_kernel, <a class="el" href="namespacecattle.html#a540d630253530c3530f6af1c31b82c44">KernelPtr</a>&lt; Scalar, Rank &gt; state_kernel, <a class="el" href="namespacecattle.html#a540d630253530c3530f6af1c31b82c44">KernelPtr</a>&lt; Scalar, Rank &gt; output_kernel, <a class="el" href="namespacecattle.html#a33c43d0983f054e904daa2806ce17231">ActivationPtr</a>&lt; Scalar, Rank &gt; state_act, <a class="el" href="namespacecattle.html#a33c43d0983f054e904daa2806ce17231">ActivationPtr</a>&lt; Scalar, Rank &gt; output_act, OutputSeqSizeFunc output_seq_size_func, bool reversed=false, bool foremost=true)</td></tr>
-<tr class="separator:ad788443003ca3d8300198398627e812e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a26e14f3d74f03aad0650338ddafc2532"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_recurrent_neural_network.html#a26e14f3d74f03aad0650338ddafc2532">RecurrentNeuralNetwork</a> (<a class="el" href="namespacecattle.html#a540d630253530c3530f6af1c31b82c44">KernelPtr</a>&lt; Scalar, Rank &gt; &amp;&amp;input_kernel, <a class="el" href="namespacecattle.html#a540d630253530c3530f6af1c31b82c44">KernelPtr</a>&lt; Scalar, Rank &gt; &amp;&amp;state_kernel, <a class="el" href="namespacecattle.html#a540d630253530c3530f6af1c31b82c44">KernelPtr</a>&lt; Scalar, Rank &gt; &amp;&amp;output_kernel, <a class="el" href="namespacecattle.html#a33c43d0983f054e904daa2806ce17231">ActivationPtr</a>&lt; Scalar, Rank &gt; &amp;&amp;state_act, <a class="el" href="namespacecattle.html#a33c43d0983f054e904daa2806ce17231">ActivationPtr</a>&lt; Scalar, Rank &gt; &amp;&amp;output_act, OutputSeqSizeFunc output_seq_size_func, bool reversed=false, bool foremost=true)</td></tr>
+<tr class="separator:a26e14f3d74f03aad0650338ddafc2532"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a24cdf0e19a4704b59d22d23ec371e6c3"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classcattle_1_1_neural_network.html">Root</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_recurrent_neural_network.html#a24cdf0e19a4704b59d22d23ec371e6c3">clone</a> () const</td></tr>
 <tr class="separator:a24cdf0e19a4704b59d22d23ec371e6c3"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a1d2d1d83cd4b9acdc364fb8684d7443a"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_recurrent_neural_network.html#a1d2d1d83cd4b9acdc364fb8684d7443a">is_reversed</a> () const</td></tr>
@@ -146,8 +146,8 @@ class cattle::RecurrentNeuralNetwork&lt; Scalar, Rank, MulInt, Stateful &gt;</h3
 
 <p>A class template for a simple recurrent neural network (RNN). The network can use multiplicative integration to combine its linearly transformed input and its linearly transformed previous hidden state. A stateful network retains its hidden state across sequences as long as the batch size is constant. </p>
 </div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
-<a id="ad788443003ca3d8300198398627e812e"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ad788443003ca3d8300198398627e812e">&#9670;&nbsp;</a></span>RecurrentNeuralNetwork()</h2>
+<a id="a26e14f3d74f03aad0650338ddafc2532"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a26e14f3d74f03aad0650338ddafc2532">&#9670;&nbsp;</a></span>RecurrentNeuralNetwork()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -160,31 +160,31 @@ template&lt;typename Scalar , std::size_t Rank, bool MulInt = false, bool Statef
         <tr>
           <td class="memname"><a class="el" href="classcattle_1_1_recurrent_neural_network.html">cattle::RecurrentNeuralNetwork</a>&lt; Scalar, Rank, MulInt, Stateful &gt;::<a class="el" href="classcattle_1_1_recurrent_neural_network.html">RecurrentNeuralNetwork</a> </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="namespacecattle.html#a540d630253530c3530f6af1c31b82c44">KernelPtr</a>&lt; Scalar, Rank &gt;&#160;</td>
+          <td class="paramtype"><a class="el" href="namespacecattle.html#a540d630253530c3530f6af1c31b82c44">KernelPtr</a>&lt; Scalar, Rank &gt; &amp;&amp;&#160;</td>
           <td class="paramname"><em>input_kernel</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype"><a class="el" href="namespacecattle.html#a540d630253530c3530f6af1c31b82c44">KernelPtr</a>&lt; Scalar, Rank &gt;&#160;</td>
+          <td class="paramtype"><a class="el" href="namespacecattle.html#a540d630253530c3530f6af1c31b82c44">KernelPtr</a>&lt; Scalar, Rank &gt; &amp;&amp;&#160;</td>
           <td class="paramname"><em>state_kernel</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype"><a class="el" href="namespacecattle.html#a540d630253530c3530f6af1c31b82c44">KernelPtr</a>&lt; Scalar, Rank &gt;&#160;</td>
+          <td class="paramtype"><a class="el" href="namespacecattle.html#a540d630253530c3530f6af1c31b82c44">KernelPtr</a>&lt; Scalar, Rank &gt; &amp;&amp;&#160;</td>
           <td class="paramname"><em>output_kernel</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype"><a class="el" href="namespacecattle.html#a33c43d0983f054e904daa2806ce17231">ActivationPtr</a>&lt; Scalar, Rank &gt;&#160;</td>
+          <td class="paramtype"><a class="el" href="namespacecattle.html#a33c43d0983f054e904daa2806ce17231">ActivationPtr</a>&lt; Scalar, Rank &gt; &amp;&amp;&#160;</td>
           <td class="paramname"><em>state_act</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype"><a class="el" href="namespacecattle.html#a33c43d0983f054e904daa2806ce17231">ActivationPtr</a>&lt; Scalar, Rank &gt;&#160;</td>
+          <td class="paramtype"><a class="el" href="namespacecattle.html#a33c43d0983f054e904daa2806ce17231">ActivationPtr</a>&lt; Scalar, Rank &gt; &amp;&amp;&#160;</td>
           <td class="paramname"><em>output_act</em>, </td>
         </tr>
         <tr>
@@ -224,7 +224,7 @@ template&lt;typename Scalar , std::size_t Rank, bool MulInt = false, bool Statef
     <tr><td class="paramname">output_kernel</td><td>The linear layer applied to the hidden state of the network at each time step with an output. </td></tr>
     <tr><td class="paramname">state_act</td><td>The activation function applied to the hidden state at each time step. </td></tr>
     <tr><td class="paramname">output_act</td><td>The activation function applied to the linearly transformed hidden state of the network at each time step with an output. </td></tr>
-    <tr><td class="paramname">output_seq_size_func</td><td>A function parameterized by the input sequence length that determines the output sequence delay and length </td></tr>
+    <tr><td class="paramname">output_seq_size_func</td><td>A function parameterized by the input sequence length that determines the output sequence delay and length. The output of the function is a pair of unsigned integers where the first element is the sequence length and the second element is the sequence delay. </td></tr>
     <tr><td class="paramname">reversed</td><td>Whether the network is to reverse its inputs along the time-step rank. </td></tr>
     <tr><td class="paramname">foremost</td><td>Whether the network is to function as a foremost network. </td></tr>
   </table>

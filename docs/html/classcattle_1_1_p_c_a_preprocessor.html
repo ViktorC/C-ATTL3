@@ -75,13 +75,30 @@ $(function() {
 <div class="contents">
 
 <p><code>#include &lt;<a class="el" href="_preprocessor_8hpp_source.html">Preprocessor.hpp</a>&gt;</code></p>
-
-<p>Inherits cattle::PCAPreprocessorBase&lt; Scalar, Rank, Standardize, Whiten &gt;.</p>
+<div class="dynheader">
+Inheritance diagram for cattle::PCAPreprocessor&lt; Scalar, Rank, Standardize, Whiten &gt;:</div>
+<div class="dyncontent">
+ <div class="center">
+  <img src="classcattle_1_1_p_c_a_preprocessor.png" usemap="#cattle::PCAPreprocessor_3C_20Scalar_2C_20Rank_2C_20Standardize_2C_20Whiten_20_3E_map" alt=""/>
+  <map id="cattle::PCAPreprocessor_3C_20Scalar_2C_20Rank_2C_20Standardize_2C_20Whiten_20_3E_map" name="cattle::PCAPreprocessor_3C_20Scalar_2C_20Rank_2C_20Standardize_2C_20Whiten_20_3E_map">
+<area href="classcattle_1_1_p_c_a_preprocessor_base.html" alt="cattle::PCAPreprocessorBase&lt; Scalar, Rank, Standardize, Whiten &gt;" shape="rect" coords="0,112,400,136"/>
+<area href="classcattle_1_1_normalization_preprocessor.html" alt="cattle::NormalizationPreprocessor&lt; Scalar, Rank, Standardize &gt;" shape="rect" coords="0,56,400,80"/>
+<area href="classcattle_1_1_preprocessor.html" alt="cattle::Preprocessor&lt; Scalar, Rank, false &gt;" shape="rect" coords="0,0,400,24"/>
+</map>
+ </div></div>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
 <tr class="memitem:a7fa7315cc4823bd4703bf2ff45f68c09"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_p_c_a_preprocessor.html#a7fa7315cc4823bd4703bf2ff45f68c09">PCAPreprocessor</a> (Scalar min_rel_var_to_retain=1, Scalar epsilon=<a class="el" href="classcattle_1_1internal_1_1_numeric_utils.html">internal::NumericUtils</a>&lt; Scalar &gt;::EPSILON2)</td></tr>
 <tr class="separator:a7fa7315cc4823bd4703bf2ff45f68c09"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="inherit_header pub_methods_classcattle_1_1_normalization_preprocessor"><td colspan="2" onclick="javascript:toggleInherit('pub_methods_classcattle_1_1_normalization_preprocessor')"><img src="closed.png" alt="-"/>&#160;Public Member Functions inherited from <a class="el" href="classcattle_1_1_normalization_preprocessor.html">cattle::NormalizationPreprocessor&lt; Scalar, Rank, Standardize &gt;</a></td></tr>
+<tr class="memitem:a1987f52abf107c7435181946179ac385 inherit pub_methods_classcattle_1_1_normalization_preprocessor"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_normalization_preprocessor.html#a1987f52abf107c7435181946179ac385">NormalizationPreprocessor</a> (Scalar epsilon=<a class="el" href="classcattle_1_1internal_1_1_numeric_utils.html">internal::NumericUtils</a>&lt; Scalar &gt;::EPSILON2)</td></tr>
+<tr class="separator:a1987f52abf107c7435181946179ac385 inherit pub_methods_classcattle_1_1_normalization_preprocessor"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="inherit_header pub_methods_classcattle_1_1_preprocessor"><td colspan="2" onclick="javascript:toggleInherit('pub_methods_classcattle_1_1_preprocessor')"><img src="closed.png" alt="-"/>&#160;Public Member Functions inherited from <a class="el" href="classcattle_1_1_preprocessor.html">cattle::Preprocessor&lt; Scalar, Rank, false &gt;</a></td></tr>
+<tr class="memitem:a939ef7f0d6351ad52ce53fb1431df5db inherit pub_methods_classcattle_1_1_preprocessor"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_preprocessor.html#a939ef7f0d6351ad52ce53fb1431df5db">fit</a> (const <a class="el" href="namespacecattle.html#a8b9323ad928764340e46f0802bf27fbb">Tensor</a>&lt; Scalar, Rank+Sequential+1 &gt; &amp;data)=0</td></tr>
+<tr class="separator:a939ef7f0d6351ad52ce53fb1431df5db inherit pub_methods_classcattle_1_1_preprocessor"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aeca48abc85d4c23ef888d296ff5e0914 inherit pub_methods_classcattle_1_1_preprocessor"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_preprocessor.html#aeca48abc85d4c23ef888d296ff5e0914">transform</a> (<a class="el" href="namespacecattle.html#a8b9323ad928764340e46f0802bf27fbb">Tensor</a>&lt; Scalar, Rank+Sequential+1 &gt; &amp;data) const=0</td></tr>
+<tr class="separator:aeca48abc85d4c23ef888d296ff5e0914 inherit pub_methods_classcattle_1_1_preprocessor"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><h3>template&lt;typename Scalar, std::size_t Rank, bool Standardize = false, bool Whiten = false&gt;<br />

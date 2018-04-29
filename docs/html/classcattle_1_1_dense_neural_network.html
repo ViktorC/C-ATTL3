@@ -68,6 +68,7 @@ $(function() {
 <div class="header">
   <div class="summary">
 <a href="#pub-methods">Public Member Functions</a> &#124;
+<a href="#pub-static-methods">Static Public Member Functions</a> &#124;
 <a href="#pro-methods">Protected Member Functions</a> &#124;
 <a href="classcattle_1_1_dense_neural_network-members.html">List of all members</a>  </div>
   <div class="headertitle">
@@ -88,8 +89,10 @@ Inheritance diagram for cattle::DenseNeuralNetwork&lt; Scalar, Rank, ConcatType 
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:a2a9ad924f0d198ba21f5ae62fe2499df"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_dense_neural_network.html#a2a9ad924f0d198ba21f5ae62fe2499df">DenseNeuralNetwork</a> (std::vector&lt; <a class="el" href="classcattle_1_1_composite_neural_network.html">Module</a> &gt; modules, bool foremost=true)</td></tr>
-<tr class="separator:a2a9ad924f0d198ba21f5ae62fe2499df"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae1f29fc3b643d61d125fc082eed9ec89"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_dense_neural_network.html#ae1f29fc3b643d61d125fc082eed9ec89">DenseNeuralNetwork</a> (std::vector&lt; Module &gt; &amp;&amp;modules, bool foremost=true)</td></tr>
+<tr class="separator:ae1f29fc3b643d61d125fc082eed9ec89"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a714633b6ad63253ca1baf7d1716d414a"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_dense_neural_network.html#a714633b6ad63253ca1baf7d1716d414a">DenseNeuralNetwork</a> (Module &amp;&amp;module, bool foremost=true)</td></tr>
+<tr class="separator:a714633b6ad63253ca1baf7d1716d414a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a42a9bae4ecdbd18ba5dabe3f73eacc57"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classcattle_1_1_neural_network.html">Base</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_dense_neural_network.html#a42a9bae4ecdbd18ba5dabe3f73eacc57">clone</a> () const</td></tr>
 <tr class="separator:a42a9bae4ecdbd18ba5dabe3f73eacc57"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a33fefd1e2488d31481a3c9671afa1864"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_dense_neural_network.html#a33fefd1e2488d31481a3c9671afa1864">is_foremost</a> () const</td></tr>
@@ -107,6 +110,11 @@ Public Member Functions</h2></td></tr>
 <tr class="separator:ac88007e2f8fa2a208de0e51c8ac422cc inherit pub_methods_classcattle_1_1_neural_network"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ad216c4f30172a8924e959d103e38a82c inherit pub_methods_classcattle_1_1_neural_network"><td class="memItemLeft" align="right" valign="top">virtual std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_neural_network.html#ad216c4f30172a8924e959d103e38a82c">to_string</a> ()</td></tr>
 <tr class="separator:ad216c4f30172a8924e959d103e38a82c inherit pub_methods_classcattle_1_1_neural_network"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-static-methods"></a>
+Static Public Member Functions</h2></td></tr>
+<tr class="memitem:aa53c7088c6b234d6281550acfffcfa2c"><td class="memItemLeft" align="right" valign="top">static std::vector&lt; Module &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_dense_neural_network.html#aa53c7088c6b234d6281550acfffcfa2c">create_vector</a> (Module &amp;&amp;module)</td></tr>
+<tr class="separator:aa53c7088c6b234d6281550acfffcfa2c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pro-methods"></a>
 Protected Member Functions</h2></td></tr>
@@ -141,8 +149,8 @@ class cattle::DenseNeuralNetwork&lt; Scalar, Rank, ConcatType &gt;</h3>
 
 <p>A class template for DenseNet architectures. These networks consist of sub-modules that are all 'connected' to each other as in the input of each module is concatenated to its output and then propagated to the next module as its input. The input is concatenated to the output either along its lowest or highest rank. </p>
 </div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
-<a id="a2a9ad924f0d198ba21f5ae62fe2499df"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a2a9ad924f0d198ba21f5ae62fe2499df">&#9670;&nbsp;</a></span>DenseNeuralNetwork()</h2>
+<a id="ae1f29fc3b643d61d125fc082eed9ec89"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae1f29fc3b643d61d125fc082eed9ec89">&#9670;&nbsp;</a></span>DenseNeuralNetwork() <span class="overload">[1/2]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -155,7 +163,7 @@ template&lt;typename Scalar , std::size_t Rank, DenseConcatType ConcatType = HIG
         <tr>
           <td class="memname"><a class="el" href="classcattle_1_1_dense_neural_network.html">cattle::DenseNeuralNetwork</a>&lt; Scalar, Rank, ConcatType &gt;::<a class="el" href="classcattle_1_1_dense_neural_network.html">DenseNeuralNetwork</a> </td>
           <td>(</td>
-          <td class="paramtype">std::vector&lt; <a class="el" href="classcattle_1_1_composite_neural_network.html">Module</a> &gt;&#160;</td>
+          <td class="paramtype">std::vector&lt; Module &gt; &amp;&amp;&#160;</td>
           <td class="paramname"><em>modules</em>, </td>
         </tr>
         <tr>
@@ -178,7 +186,52 @@ template&lt;typename Scalar , std::size_t Rank, DenseConcatType ConcatType = HIG
 </div><div class="memdoc">
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">modules</td><td>A vector of <a class="el" href="classcattle_1_1_composite_neural_network.html">CompositeNeuralNetwork</a> instances. </td></tr>
+    <tr><td class="paramname">modules</td><td>A vector of dense modules. </td></tr>
+    <tr><td class="paramname">foremost</td><td>Whether the network is to function as a foremost network. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="a714633b6ad63253ca1baf7d1716d414a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a714633b6ad63253ca1baf7d1716d414a">&#9670;&nbsp;</a></span>DenseNeuralNetwork() <span class="overload">[2/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename Scalar , std::size_t Rank, DenseConcatType ConcatType = HIGHEST_RANK&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classcattle_1_1_dense_neural_network.html">cattle::DenseNeuralNetwork</a>&lt; Scalar, Rank, ConcatType &gt;::<a class="el" href="classcattle_1_1_dense_neural_network.html">DenseNeuralNetwork</a> </td>
+          <td>(</td>
+          <td class="paramtype">Module &amp;&amp;&#160;</td>
+          <td class="paramname"><em>module</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">bool&#160;</td>
+          <td class="paramname"><em>foremost</em> = <code>true</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">module</td><td>A single dense module. </td></tr>
     <tr><td class="paramname">foremost</td><td>Whether the network is to function as a foremost network. </td></tr>
   </table>
   </dd>
@@ -253,6 +306,41 @@ template&lt;typename Scalar , std::size_t Rank, DenseConcatType ConcatType = HIG
 <dl class="section return"><dt>Returns</dt><dd>A pointer to a copy of the instance. The instance does not take ownership of the returned pointer (i.e. the caller is responsible for deleting it). </dd></dl>
 
 <p>Implements <a class="el" href="classcattle_1_1_neural_network.html#a2abd58d4e18caa4ae95563da19c8338b">cattle::NeuralNetwork&lt; Scalar, Rank, false &gt;</a>.</p>
+
+</div>
+</div>
+<a id="aa53c7088c6b234d6281550acfffcfa2c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa53c7088c6b234d6281550acfffcfa2c">&#9670;&nbsp;</a></span>create_vector()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename Scalar , std::size_t Rank, DenseConcatType ConcatType = HIGHEST_RANK&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static std::vector&lt;Module&gt; <a class="el" href="classcattle_1_1_dense_neural_network.html">cattle::DenseNeuralNetwork</a>&lt; Scalar, Rank, ConcatType &gt;::create_vector </td>
+          <td>(</td>
+          <td class="paramtype">Module &amp;&amp;&#160;</td>
+          <td class="paramname"><em>module</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">module</td><td>A unique pointer to a non-sequential composite neural network. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>A vector of size 1 containing the unique pointer. </dd></dl>
 
 </div>
 </div>

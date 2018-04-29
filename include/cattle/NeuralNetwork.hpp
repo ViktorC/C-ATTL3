@@ -915,7 +915,7 @@ public:
 		swap(network1.output_dims, network2.output_dims);
 	}
 	/**
-	 * @param net A unique pointer to a non-sequential composite neural network.
+	 * @param module A unique pointer to a non-sequential composite neural network.
 	 * @return A vector of size 1 containing the unique pointer.
 	 */
 	inline static std::vector<Module> create_vector(Module&& module) {
@@ -1001,7 +1001,7 @@ public:
 		first_module.set_foremost(foremost);
 	}
 	/**
-	 * @param modules A single dense module.
+	 * @param module A single dense module.
 	 * @param foremost Whether the network is to function as a foremost network.
 	 */
 	inline DenseNeuralNetwork(Module&& module, bool foremost = true) :
@@ -1051,7 +1051,7 @@ public:
 		swap(network1.output_dims, network2.output_dims);
 	}
 	/**
-	 * @param net A unique pointer to a non-sequential composite neural network.
+	 * @param module A unique pointer to a non-sequential composite neural network.
 	 * @return A vector of size 1 containing the unique pointer.
 	 */
 	inline static std::vector<Module> create_vector(Module&& module) {

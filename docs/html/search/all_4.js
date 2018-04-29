@@ -8,7 +8,7 @@ var searchData=
   ['decidedly_5flesser',['decidedly_lesser',['../classcattle_1_1internal_1_1_numeric_utils.html#a4ccb98354f5c472bf029545c79ea2cad',1,'cattle::internal::NumericUtils']]],
   ['demote',['demote',['../classcattle_1_1_dimensions.html#a3f279dec6f26b6e1fbe9adb5c1369bab',1,'cattle::Dimensions']]],
   ['denseconcattype',['DenseConcatType',['../namespacecattle.html#a962c4b25a74fac744864b9fa4fca4a0b',1,'cattle']]],
-  ['denseneuralnetwork',['DenseNeuralNetwork',['../classcattle_1_1_dense_neural_network.html',1,'cattle::DenseNeuralNetwork&lt; Scalar, Rank, ConcatType &gt;'],['../classcattle_1_1_dense_neural_network.html#a2a9ad924f0d198ba21f5ae62fe2499df',1,'cattle::DenseNeuralNetwork::DenseNeuralNetwork()']]],
+  ['denseneuralnetwork',['DenseNeuralNetwork',['../classcattle_1_1_dense_neural_network.html',1,'cattle::DenseNeuralNetwork&lt; Scalar, Rank, ConcatType &gt;'],['../classcattle_1_1_dense_neural_network.html#ae1f29fc3b643d61d125fc082eed9ec89',1,'cattle::DenseNeuralNetwork::DenseNeuralNetwork(std::vector&lt; Module &gt; &amp;&amp;modules, bool foremost=true)'],['../classcattle_1_1_dense_neural_network.html#a714633b6ad63253ca1baf7d1716d414a',1,'cattle::DenseNeuralNetwork::DenseNeuralNetwork(Module &amp;&amp;module, bool foremost=true)']]],
   ['dimensions',['Dimensions',['../classcattle_1_1_dimensions.html',1,'cattle']]],
   ['dimensions_3c_20std_3a_3asize_5ft_2c_203_20_3e',['Dimensions&lt; std::size_t, 3 &gt;',['../classcattle_1_1_dimensions.html',1,'cattle']]],
   ['dimensions_3c_20std_3a_3asize_5ft_2c_20rank_20_3e',['Dimensions&lt; std::size_t, Rank &gt;',['../classcattle_1_1_dimensions.html',1,'cattle']]],

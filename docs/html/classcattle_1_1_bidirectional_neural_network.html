@@ -88,8 +88,8 @@ Inheritance diagram for cattle::BidirectionalNeuralNetwork&lt; Scalar, Rank, Mer
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:a51cee6515198d8e475f9257a922bc317"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_bidirectional_neural_network.html#a51cee6515198d8e475f9257a922bc317">BidirectionalNeuralNetwork</a> (UnidirNet network, bool foremost=true)</td></tr>
-<tr class="separator:a51cee6515198d8e475f9257a922bc317"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3ec916796edf657aa7280330c827e1e9"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_bidirectional_neural_network.html#a3ec916796edf657aa7280330c827e1e9">BidirectionalNeuralNetwork</a> (UnidirNet &amp;&amp;network, bool foremost=true)</td></tr>
+<tr class="separator:a3ec916796edf657aa7280330c827e1e9"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ac3200af26b657df73ee81b230d710fa6"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classcattle_1_1_neural_network.html">Base</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_bidirectional_neural_network.html#ac3200af26b657df73ee81b230d710fa6">clone</a> () const</td></tr>
 <tr class="separator:ac3200af26b657df73ee81b230d710fa6"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a2cd4e95bebb7272f37371f635bb09466"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_bidirectional_neural_network.html#a2cd4e95bebb7272f37371f635bb09466">is_foremost</a> () const</td></tr>
@@ -141,8 +141,8 @@ class cattle::BidirectionalNeuralNetwork&lt; Scalar, Rank, MergeType &gt;</h3>
 
 <p>A class template for a bidirectional neural network that takes a unidirectional recurrent network, clones it, reverses the clone's processing direction, and uses the two networks as its parallel sub-modules. The outputs of the two sub-networks can be merged by summation or concatenation either along the lowest (the 3rd after the sample and time-step ranks) or highest rank. </p>
 </div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
-<a id="a51cee6515198d8e475f9257a922bc317"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a51cee6515198d8e475f9257a922bc317">&#9670;&nbsp;</a></span>BidirectionalNeuralNetwork()</h2>
+<a id="a3ec916796edf657aa7280330c827e1e9"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a3ec916796edf657aa7280330c827e1e9">&#9670;&nbsp;</a></span>BidirectionalNeuralNetwork()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -155,7 +155,7 @@ template&lt;typename Scalar , std::size_t Rank, OutputMergeType MergeType = CONC
         <tr>
           <td class="memname"><a class="el" href="classcattle_1_1_bidirectional_neural_network.html">cattle::BidirectionalNeuralNetwork</a>&lt; Scalar, Rank, MergeType &gt;::<a class="el" href="classcattle_1_1_bidirectional_neural_network.html">BidirectionalNeuralNetwork</a> </td>
           <td>(</td>
-          <td class="paramtype">UnidirNet&#160;</td>
+          <td class="paramtype">UnidirNet &amp;&amp;&#160;</td>
           <td class="paramname"><em>network</em>, </td>
         </tr>
         <tr>
