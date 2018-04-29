@@ -1,4 +1,4 @@
-MAKE := make -f makefile
+MAKE := make -f Makefile
 GCC_CXX := g++
 CLANG_CXX := clang++
 CXXFLAGS := -std=c++11 -fmessage-length=0 -ftemplate-backtrace-limit=0
