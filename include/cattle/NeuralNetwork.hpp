@@ -326,12 +326,12 @@ public:
 			FeedforwardNeuralNetwork(create_vector(std::move(layer)), foremost) { }
 	// Copy constructor.
 	inline FeedforwardNeuralNetwork(const Self& network) :
-			layers(network.layers.size()) {
+			layers(network.layers.size()),
+			foremost(network.foremost),
+			input_dims(network.input_dims),
+			output_dims(network.output_dims) {
 		for (unsigned i = 0; i < layers.size(); ++i)
 			layers[i] = LayerPtr<Scalar,Rank>(network.layers[i]->clone());
-		foremost = network.foremost;
-		input_dims = network.input_dims;
-		output_dims = network.output_dims;
 	}
 	// Move constructor.
 	inline FeedforwardNeuralNetwork(Self&& network) {
@@ -461,12 +461,12 @@ public:
 	inline CompositeNeuralNetwork(Block&& block, bool foremost = true) :
 			CompositeNeuralNetwork(create_vector(std::move(block)), foremost) { }
 	inline CompositeNeuralNetwork(const Self& network) :
-			blocks(network.blocks.size()) {
+			blocks(network.blocks.size()),
+			foremost(network.foremost),
+			input_dims(network.input_dims),
+			output_dims(network.output_dims) {
 		for (unsigned i = 0; i < blocks.size(); ++i)
 			blocks[i] = Block(network.blocks[i]->clone());
-		foremost = network.foremost;
-		input_dims = network.input_dims;
-		output_dims = network.output_dims;
 	}
 	inline CompositeNeuralNetwork(Self&& network) {
 		swap(*this, network);
@@ -557,8 +557,8 @@ class ParallelNeuralNetwork : public NeuralNetwork<Scalar,Rank,false> {
 	typedef NeuralNetPtr<Scalar,Rank,false> Lane;
 	typedef std::array<std::size_t,Base::DATA_RANK> RankwiseArray;
 	static_assert(MergeType >= CONCAT_LO_RANK && MergeType <= SUM, "illegal merge type value");
-	static const std::size_t CONCAT_RANK = MergeType == CONCAT_HI_RANK ? Rank - 1 : 0;
-	static const std::size_t CONCAT_BATCH_RANK = CONCAT_RANK + 1;
+	static constexpr std::size_t CONCAT_RANK = MergeType == CONCAT_HI_RANK ? Rank - 1 : 0;
+	static constexpr std::size_t CONCAT_BATCH_RANK = CONCAT_RANK + 1;
 public:
 	/**
 	 * @param lanes A vector of unique pointers to non-sequential neural networks.
@@ -579,13 +579,13 @@ public:
 			const typename Base::Dims& lane_output_dims = lane.get_output_dims();
 			if (MergeType != SUM) {
 				if (MergeType == CONCAT_HI_RANK) {
-					for (std::size_t i = 0; i < CONCAT_RANK; ++i)
+					for (std::size_t i = 0; i < +CONCAT_RANK; ++i)
 						assert(output_dims(i) == lane_output_dims(i));
 				} else {
-					for (std::size_t i = Rank - 1; i > CONCAT_RANK; --i)
+					for (std::size_t i = Rank - 1; i > +CONCAT_RANK; --i)
 						assert(output_dims(i) == lane_output_dims(i));
 				}
-				output_dims(CONCAT_RANK) += lane_output_dims(CONCAT_RANK);
+				output_dims(+CONCAT_RANK) += lane_output_dims(+CONCAT_RANK);
 			} else
 				assert(output_dims == lane_output_dims);
 		}
@@ -694,7 +694,7 @@ protected:
 					out += args_arr[i].out;
 				else {
 					// Must be evaluated first due to the dimension difference.
-					typename Base::Data concat = out.concatenate(std::move(args_arr[i].out), CONCAT_BATCH_RANK);
+					typename Base::Data concat = out.concatenate(std::move(args_arr[i].out), +CONCAT_BATCH_RANK);
 					out = std::move(concat);
 				}
 			}
@@ -728,9 +728,9 @@ protected:
 			assert(!pthread_state);
 		}
 		BackpropArgs args_arr[lane_num];
-		int concat_rank_offset = out_grads.dimension(CONCAT_BATCH_RANK);
+		int concat_rank_offset = out_grads.dimension(+CONCAT_BATCH_RANK);
 		for (int i = helper_thread_num; i >= 0; --i) {
-			concat_rank_offset -= lanes[i]->get_output_dims()(CONCAT_RANK);
+			concat_rank_offset -= lanes[i]->get_output_dims()(+CONCAT_RANK);
 			BackpropArgs args;
 			args.obj = this;
 			args.lane_id = i;
@@ -821,7 +821,7 @@ private:
 			RankwiseArray offsets;
 			RankwiseArray extents = lane.get_output_dims().template promote<>();
 			offsets.fill(0);
-			offsets[CONCAT_BATCH_RANK] = args.concat_rank_offset;
+			offsets[+CONCAT_BATCH_RANK] = args.concat_rank_offset;
 			extents[0] = args.out_grads->dimension(0);
 			typename Base::Data out_grads_slice = args.out_grads->slice(offsets, extents);
 			args.prev_out_grads = lane.backpropagate(std::move(out_grads_slice));
@@ -869,14 +869,14 @@ public:
 	 * @param foremost Whether the network is to function as a foremost network.
 	 */
 	inline ResidualNeuralNetwork(Module&& module, bool foremost = true) :
-				ResidualNeuralNetwork(create_vector(std::move(module), foremost)) { }
+			ResidualNeuralNetwork(create_vector(std::move(module), foremost)) { }
 	inline ResidualNeuralNetwork(const Self& network) :
-				modules(network.modules.size()) {
+			modules(network.modules.size()),
+			foremost(network.foremost),
+			input_dims(network.input_dims),
+			output_dims(network.output_dims) {
 		for (unsigned i = 0; i < modules.size(); ++i)
 			modules[i] = Module((Base*) network.modules[i]->clone());
-		foremost = network.foremost;
-		input_dims = network.input_dims;
-		output_dims = network.output_dims;
 	}
 	inline ResidualNeuralNetwork(Self&& network) {
 		swap(*this, network);
@@ -968,8 +968,8 @@ class DenseNeuralNetwork : public NeuralNetwork<Scalar,Rank,false> {
 	typedef DenseNeuralNetwork<Scalar,Rank,ConcatType> Self;
 	typedef std::array<std::size_t,Base::DATA_RANK> RankwiseArray;
 	static_assert(ConcatType >= LOWEST_RANK && ConcatType <= HIGHEST_RANK, "illegal merge type value");
-	static const std::size_t CONCAT_RANK = ConcatType == HIGHEST_RANK ? Rank - 1 : 0;
-	static const std::size_t CONCAT_BATCH_RANK = CONCAT_RANK + 1;
+	static constexpr std::size_t CONCAT_RANK = ConcatType == HIGHEST_RANK ? Rank - 1 : 0;
+	static constexpr std::size_t CONCAT_BATCH_RANK = CONCAT_RANK + 1;
 public:
 	/**
 	 * @param modules A vector of dense modules.
@@ -982,19 +982,19 @@ public:
 		Base& first_module = *this->modules[0];
 		input_dims = first_module.get_input_dims();
 		typename Base::Dims output_dims = first_module.get_output_dims();
-		output_dims(CONCAT_RANK) += input_dims(CONCAT_RANK);
+		output_dims(+CONCAT_RANK) += input_dims(+CONCAT_RANK);
 		if (ConcatType == LOWEST_RANK) {
-			for (std::size_t i = Rank - 1; i > CONCAT_RANK; --i)
+			for (std::size_t i = Rank - 1; i > +CONCAT_RANK; --i)
 				assert(input_dims(i) == output_dims(i));
 		} else {
-			for (std::size_t i = 0; i < CONCAT_RANK; ++i)
+			for (std::size_t i = 0; i < +CONCAT_RANK; ++i)
 				assert(input_dims(i) == output_dims(i));
 		}
 		for (unsigned i = 1; i < this->modules.size(); ++i) {
 			Base& module = *this->modules[i];
 			const typename Base::Dims& module_input_dims = module.get_input_dims();
 			assert(module_input_dims == output_dims && "incompatible module dimensions");
-			output_dims(CONCAT_RANK) += module.get_output_dims()(CONCAT_RANK);
+			output_dims(+CONCAT_RANK) += module.get_output_dims()(+CONCAT_RANK);
 			module.set_foremost(false);
 		}
 		this->output_dims = output_dims;
@@ -1005,14 +1005,14 @@ public:
 	 * @param foremost Whether the network is to function as a foremost network.
 	 */
 	inline DenseNeuralNetwork(Module&& module, bool foremost = true) :
-				DenseNeuralNetwork(create_vector(std::move(module), foremost)) { }
+			DenseNeuralNetwork(create_vector(std::move(module), foremost)) { }
 	inline DenseNeuralNetwork(const Self& network) :
-				modules(network.modules.size()) {
+			modules(network.modules.size()),
+			foremost(network.foremost),
+			input_dims(network.input_dims),
+			output_dims(network.output_dims) {
 		for (unsigned i = 0; i < modules.size(); ++i)
 			modules[i] = Module((Base*) network.modules[i]->clone());
-		foremost = network.foremost;
-		input_dims = network.input_dims;
-		output_dims = network.output_dims;
 	}
 	inline DenseNeuralNetwork(Self&& network) {
 		swap(*this, network);
@@ -1071,7 +1071,7 @@ protected:
 	inline typename Base::Data propagate(typename Base::Data input, bool training) {
 		assert(input_dims == (Dimensions<std::size_t,Base::DATA_RANK>(input.dimensions()).template demote<>()));
 		for (unsigned i = 0; i < modules.size(); ++i) {
-			typename Base::Data concat = input.concatenate(modules[i]->propagate(input, training), CONCAT_BATCH_RANK);
+			typename Base::Data concat = input.concatenate(modules[i]->propagate(input, training), +CONCAT_BATCH_RANK);
 			input = std::move(concat);
 		}
 		return input;
@@ -1084,13 +1084,13 @@ protected:
 		extents[0] = out_grads.dimension(0);
 		for (int i = modules.size() - 1; i >= 0; --i) {
 			Base& module = *modules[i];
-			int layer_input_concat_rank_dim = module.get_input_dims()(CONCAT_RANK);
-			int layer_output_concat_rank_dim = module.get_output_dims()(CONCAT_RANK);
-			offsets[CONCAT_BATCH_RANK] = layer_input_concat_rank_dim;
-			extents[CONCAT_BATCH_RANK] = layer_output_concat_rank_dim;
+			int layer_input_concat_rank_dim = module.get_input_dims()(+CONCAT_RANK);
+			int layer_output_concat_rank_dim = module.get_output_dims()(+CONCAT_RANK);
+			offsets[+CONCAT_BATCH_RANK] = layer_input_concat_rank_dim;
+			extents[+CONCAT_BATCH_RANK] = layer_output_concat_rank_dim;
 			typename Base::Data out_grads_i = out_grads.slice(offsets, extents);
-			offsets[CONCAT_BATCH_RANK] = 0;
-			extents[CONCAT_BATCH_RANK] = layer_input_concat_rank_dim;
+			offsets[+CONCAT_BATCH_RANK] = 0;
+			extents[+CONCAT_BATCH_RANK] = layer_input_concat_rank_dim;
 			if (foremost && i == 0)
 				module.backpropagate(std::move(out_grads_i));
 			else
@@ -1133,16 +1133,15 @@ public:
 		split_output_dims = output_dims.template promote<2>();
 		set_foremost(foremost);
 	}
-	inline SequentialNeuralNetwork(const Self& network) {
-		net = Net(network.net->clone());
-		foremost = network.foremost;
-		input_dims = network.input_dims;
-		joint_input_dims = network.joint_input_dims;
-		joint_output_dims = network.joint_output_dims;
-		split_input_dims = network.split_input_dims;
-		split_output_dims = network.split_output_dims;
-		output_dims = network.output_dims;
-	}
+	inline SequentialNeuralNetwork(const Self& network) :
+			net(Net(network.net->clone())),
+			foremost(network.foremost),
+			input_dims(network.input_dims),
+			joint_input_dims(network.joint_input_dims),
+			joint_output_dims(network.joint_output_dims),
+			split_input_dims(network.split_input_dims),
+			split_output_dims(network.split_output_dims),
+			output_dims(network.output_dims) { }
 	inline SequentialNeuralNetwork(Self&& network) {
 		swap(*this, network);
 	}
@@ -1266,8 +1265,8 @@ class BidirectionalNeuralNetwork : public NeuralNetwork<Scalar,Rank,true> {
 	typedef UnidirNeuralNetPtr<Scalar,Rank> UnidirNet;
 	typedef std::array<std::size_t,Base::DATA_RANK> RankwiseArray;
 	static_assert(MergeType >= CONCAT_LO_RANK && MergeType <= SUM, "illegal merge type value");
-	static const std::size_t CONCAT_RANK = MergeType == CONCAT_HI_RANK ? Rank - 1 : 0;
-	static const std::size_t CONCAT_BATCH_RANK = CONCAT_RANK + 2;
+	static constexpr std::size_t CONCAT_RANK = MergeType == CONCAT_HI_RANK ? Rank - 1 : 0;
+	static constexpr std::size_t CONCAT_BATCH_RANK = CONCAT_RANK + 2;
 public:
 	/**
 	 * @param network A unique pointer to a unidirectional recurrent neural network that,
@@ -1283,7 +1282,7 @@ public:
 		input_dims = this->net->get_input_dims();
 		output_dims = this->net->get_output_dims();
 		if (MergeType != SUM)
-			output_dims(CONCAT_RANK) *= 2;
+			output_dims(+CONCAT_RANK) *= 2;
 	}
 	inline BidirectionalNeuralNetwork(const Self& network) :
 			net(UnidirNet((UnidirectionalNeuralNetwork<Scalar,Rank>*) network.net->clone())),
@@ -1361,7 +1360,7 @@ protected:
 		assert(!pthread_state);
 		assert(forward_out.dimension(1) == args.out.dimension(1));
 		if (MergeType != SUM)
-			return forward_out.concatenate(args.out, CONCAT_BATCH_RANK);
+			return forward_out.concatenate(args.out, +CONCAT_BATCH_RANK);
 		else
 			return forward_out + args.out;
 	}
@@ -1382,13 +1381,13 @@ protected:
 			RankwiseArray offsets;
 			RankwiseArray extents = dims;
 			offsets.fill(0);
-			extents[CONCAT_BATCH_RANK] /= 2;
-			offsets[CONCAT_BATCH_RANK] += extents[CONCAT_BATCH_RANK];
+			extents[+CONCAT_BATCH_RANK] /= 2;
+			offsets[+CONCAT_BATCH_RANK] += extents[+CONCAT_BATCH_RANK];
 			typename Base::Data backward_slice = out_grads.slice(offsets, extents);
 			args.out_grads = &backward_slice;
 			pthread_state = pthread_create(&helper_thread, &attr, backpropagate, &args);
 			assert(!pthread_state);
-			offsets[CONCAT_BATCH_RANK] -= extents[CONCAT_BATCH_RANK];
+			offsets[+CONCAT_BATCH_RANK] -= extents[+CONCAT_BATCH_RANK];
 			typename Base::Data forward_slice = out_grads.slice(offsets, extents);
 			forward_prev_out_grads = net->backpropagate(std::move(forward_slice));
 			// Make sure that backward_slice does not go out of scope before the thread terminates.
