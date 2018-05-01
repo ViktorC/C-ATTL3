@@ -179,7 +179,8 @@ protected:
 	}
 	inline typename Root::Data _d_function(typename Root::Data out, typename Root::Data obj,
 			const typename Base::RankwiseArray& grad_dims) const {
-		return out.exp() / out - obj;
+		typename Root::Data diff = out - obj;
+		return diff.unaryExpr([this](Scalar i) { return (Scalar) (i >= 0 ? 1 : -1); });
 	}
 };
 

@@ -12,8 +12,8 @@
 
 #include <cstddef>
 
-#include "../../../external/Eigen/Eigen/Dense"
-#include "../../../external/Eigen/unsupported/Eigen/CXX11/Tensor"
+#include "Eigen/Dense"
+#include "unsupported/Eigen/CXX11/Tensor"
 
 /**
  * The namespace containing all classes and typedefs of the C-ATTL3 library.

@@ -66,6 +66,8 @@ public:
 	 *
 	 * @param net A reference to the network on which the gradient check is to be performed.
 	 * @param provider A reference to the data provider to use for the gradient check.
+	 * @param verbose Whether the analytic and numerical derivatives of the variables should be printed to the
+	 * standard out stream.
 	 * @param step_size The step size for numerical differentiation.
 	 * @param abs_epsilon The maximum acceptable absolute difference between the numerical and analytic
 	 * gradients.
@@ -73,8 +75,9 @@ public:
 	 * the numerical and analytic gradients.
 	 * @return Whether the gradient check has been passed or failed.
 	 */
-	inline bool verify_gradients(Net& net, Provider& provider, Scalar step_size = (internal::NumericUtils<Scalar>::EPSILON2 +
-			internal::NumericUtils<Scalar>::EPSILON3) / 2, Scalar abs_epsilon = internal::NumericUtils<Scalar>::EPSILON2,
+	inline bool verify_gradients(Net& net, Provider& provider, bool verbose = true,
+			Scalar step_size = (internal::NumericUtils<Scalar>::EPSILON2 + internal::NumericUtils<Scalar>::EPSILON3) / 2,
+			Scalar abs_epsilon = internal::NumericUtils<Scalar>::EPSILON2,
 			Scalar rel_epsilon = internal::NumericUtils<Scalar>::EPSILON3) const {
 		assert(net.get_input_dims() == provider.get_obs_dims());
 		assert(net.get_output_dims() == provider.get_obj_dims());
@@ -91,8 +94,8 @@ public:
 		for (std::size_t i = 0; i < layers.size(); ++i) {
 			Layer<Scalar,Rank>& layer = *layers[i];
 			if (layer.is_parametric()) {
-				std::cout << "Layer " << std::setw(3) << std::to_string(i + 1) <<
-						std::string(28, '-') << std::endl;
+				if (verbose)
+					std::cout << "Layer " << std::setw(3) << std::to_string(i + 1) << std::string(28, '-') << std::endl;
 				/* Add the derivative of the regularization function w.r.t. to the parameters of the layer to the
 				 * parameters' gradient. */
 				layer.regularize();
@@ -100,9 +103,11 @@ public:
 				const Matrix<Scalar>& params_grad = layer.get_params_grad();
 				for (int j = 0; j < params.rows(); ++j) {
 					for (int k = 0; k < params.cols(); ++k) {
-						std::cout << "\tParam[" << i << "," << j << "," << k << "]:" << std::endl;
+						if (verbose)
+							std::cout << "\tParam[" << i << "," << j << "," << k << "]:" << std::endl;
 						Scalar ana_grad = params_grad(j,k);
-						std::cout << "\t\tAnalytic gradient = " << ana_grad << std::endl;
+						if (verbose)
+							std::cout << "\t\tAnalytic gradient = " << ana_grad << std::endl;
 						Scalar param = params(j,k);
 						params(j,k) = param + step_size;
 						/* Compute the numerical gradients in training mode to ensure that the means and standard
@@ -118,12 +123,15 @@ public:
 						params(j,k) = param;
 						// Include the regularization penalty as well.
 						Scalar num_grad = (loss_inc + reg_pen_inc - (loss_dec + reg_pen_dec)) / (2 * step_size);
-						std::cout << "\t\tNumerical gradient = " << num_grad;
+						if (verbose)
+							std::cout << "\t\tNumerical gradient = " << num_grad;
 						if (!internal::NumericUtils<Scalar>::almost_equal(ana_grad, num_grad, abs_epsilon, rel_epsilon)) {
-							std::cout << " *****FAIL*****";
+							if (verbose)
+								std::cout << " *****FAIL*****";
 							failure = true;
 						}
-						std::cout << std::endl;
+						if (verbose)
+							std::cout << std::endl;
 					}
 				}
 			}
@@ -143,9 +151,12 @@ public:
 	 * @param early_stop An unsigned integer denoting the number of consecutive loss increases
 	 * after which the optimization process is to be terminated prematurely. If it is 0, the
 	 * process is never terminated prematurely.
+	 * @param verbose Whether the training, test, and regularization losses for each epoch should
+	 * be printed to the standard out stream.
 	 * @return The test loss of the last epoch.
 	 */
-	inline Scalar optimize(Net& net, Provider& training_prov, Provider& test_prov, unsigned epochs, unsigned early_stop = 0) {
+	inline Scalar optimize(Net& net, Provider& training_prov, Provider& test_prov, unsigned epochs, unsigned early_stop = 0,
+			bool verbose = true) {
 		assert(net.get_input_dims() == training_prov.get_obs_dims());
 		assert(net.get_output_dims() == training_prov.get_obj_dims());
 		assert(training_prov.get_obs_dims() == test_prov.get_obs_dims());
@@ -157,25 +168,30 @@ public:
 		unsigned cons_loss_inc = 0;
 		// Start the optimization iterations.
 		for (unsigned i = 0; i <= epochs; ++i) {
-			std::cout << "Epoch " << std::setw(3) << i << std::string(28, '-') << std::endl;
+			if (verbose)
+				std::cout << "Epoch " << std::setw(3) << i << std::string(28, '-') << std::endl;
 			// Train.
 			if (i != 0) {
 				training_prov.reset();
-				std::cout << "\ttraining loss: " << std::to_string(train(net, training_prov, i)) << std::endl;
+				if (verbose)
+					std::cout << "\ttraining loss: " << std::to_string(train(net, training_prov, i, verbose)) << std::endl;
 			}
 			// Validate.
-//			test_prov.reset();
-//			Scalar test_loss = test(net, test_prov, i);
-//			std::cout << "\ttest loss: " << std::to_string(test_loss);
-//			if (test_loss >= prev_test_loss) {
-//				cons_loss_inc++;
-//				std::cout << " *****INCREASED LOSS*****";
-//				if (early_stop > 0 && cons_loss_inc >= early_stop)
-//					return prev_test_loss;
-//			} else
-//				cons_loss_inc = 0;
-//			std::cout << std::endl << std::endl;
-//			prev_test_loss = test_loss;
+			test_prov.reset();
+			Scalar test_loss = test(net, test_prov, i, verbose);
+			if (verbose)
+				std::cout << "\ttest loss: " << std::to_string(test_loss);
+			if (test_loss >= prev_test_loss) {
+				cons_loss_inc++;
+				if (verbose)
+					std::cout << " *****INCREASED LOSS*****";
+				if (early_stop > 0 && cons_loss_inc >= early_stop)
+					return prev_test_loss;
+			} else
+				cons_loss_inc = 0;
+			if (verbose)
+				std::cout << std::endl << std::endl;
+			prev_test_loss = test_loss;
 		}
 		// Reset the providers.
 		training_prov.reset();
@@ -199,9 +215,11 @@ protected:
 	 * @param net A reference to the neural network to optimize.
 	 * @param training_prov A reference to the training data provider.
 	 * @param epoch The index of the current epoch. starting from 1.
+	 * @param verbose Whether the optimization is performed in verbose mode; i.e. whether
+	 * information should be printed to the standard out stream.
 	 * @return The training loss of the epoch.
 	 */
-	virtual Scalar train(Net& net, Provider& training_prov, unsigned epoch) = 0;
+	virtual Scalar train(Net& net, Provider& training_prov, unsigned epoch, bool verbose) = 0;
 	/**
 	 * It tests the specified neural network for a single epoch on the test data
 	 * provided by the specified data provider.
@@ -209,9 +227,11 @@ protected:
 	 * @param net A reference to the neural network to test.
 	 * @param test_prov A reference to the test data provider.
 	 * @param epoch The index of the epoch starting from 0.
+	 * @param verbose Whether the optimization is performed in verbose mode; i.e. whether
+	 * information should be printed to the standard out stream.
 	 * @return The test loss of the epoch.
 	 */
-	virtual Scalar test(Net& net, Provider& test_prov, unsigned epoch) = 0;
+	virtual Scalar test(Net& net, Provider& test_prov, unsigned epoch, bool verbose) = 0;
 	/**
 	 * A method to expose protected methods of the NeuralNetwork class to subclasses of
 	 * Optimizer that are not friend classes of NeuralNetwork.
@@ -359,7 +379,7 @@ public:
 	}
 	virtual ~SGDOptimizer() = default;
 protected:
-	inline Scalar train(typename Base::Net& net, typename Base::Provider& training_prov, unsigned epoch) {
+	inline Scalar train(typename Base::Net& net, typename Base::Provider& training_prov, unsigned epoch, bool verbose) {
 		Scalar training_loss = 0;
 		Scalar instances = 0;
 		std::vector<Layer<Scalar,Rank>*> layers = Base::get_layers(net);
@@ -387,7 +407,7 @@ protected:
 		}
 		return training_loss / instances;
 	}
-	inline Scalar test(typename Base::Net& net, typename Base::Provider& test_prov, unsigned epoch) {
+	inline Scalar test(typename Base::Net& net, typename Base::Provider& test_prov, unsigned epoch, bool verbose) {
 		Scalar obj_loss = 0;
 		Scalar instances = 0;
 		std::vector<Layer<Scalar,Rank>*> layers = Base::get_layers(net);
@@ -401,8 +421,10 @@ protected:
 		Scalar reg_loss = 0;
 		for (unsigned j = 0; j < layers.size(); ++j)
 			reg_loss += Base::get_regularization_penalty(*layers[j]);
-		std::cout << "\tobj loss: " << std::to_string(mean_obj_loss) << std::endl;
-		std::cout << "\treg loss: " << std::to_string(reg_loss) << std::endl;
+		if (verbose) {
+			std::cout << "\tobj loss: " << std::to_string(mean_obj_loss) << std::endl;
+			std::cout << "\treg loss: " << std::to_string(reg_loss) << std::endl;
+		}
 		return mean_obj_loss + reg_loss;
 	}
 	/**

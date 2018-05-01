@@ -13,6 +13,7 @@
 #include <gtest/gtest.h>
 #include <memory>
 #include <string>
+#include <type_traits>
 #include <utility>
 #include <vector>
 
@@ -24,6 +25,11 @@ namespace cattle {
  * A namespace for C-ATTL3's test functions.
  */
 namespace test {
+
+/**
+ * Determines the verbosity of the gradient tests.
+ */
+extern bool verbose;
 
 /**
  * A trait struct for the name of a scalar type and the default numeric constants used for gradient
@@ -53,18 +59,6 @@ struct ScalarTraits<float> {
 };
 
 /**
- * @param dims The dimensions of the random tensor to create.
- * @return A tensor of the specified dimensions filled with random values in the range of
- * -1 to 1.
- */
-template<typename Scalar, std::size_t Rank>
-inline TensorPtr<Scalar,Rank> random_tensor(const std::array<std::size_t,Rank>& dims) {
-	TensorPtr<Scalar,Rank> tensor_ptr(new Tensor<Scalar,Rank>(dims));
-	tensor_ptr->setRandom();
-	return tensor_ptr;
-}
-
-/**
  * @param name The name of the gradient test.
  * @param prov The data provider to use for gradient checking.
  * @param net The neural network whose differentiation is to be checked.
@@ -78,17 +72,32 @@ inline TensorPtr<Scalar,Rank> random_tensor(const std::array<std::size_t,Rank>& 
 template<typename Scalar, std::size_t Rank, bool Sequential>
 inline void grad_test(std::string name, DataProvider<Scalar,Rank,Sequential>& prov,
 		NeuralNetwork<Scalar,Rank,Sequential>& net, Optimizer<Scalar,Rank,Sequential>& opt,
-		Scalar step_size, Scalar abs_epsilon, Scalar rel_epsilon) {
+		Scalar step_size = ScalarTraits<Scalar>::step_size, Scalar abs_epsilon = ScalarTraits<Scalar>::abs_epsilon,
+		Scalar rel_epsilon = ScalarTraits<Scalar>::rel_epsilon) {
 	std::transform(name.begin(), name.end(), name.begin(), ::toupper);
-	std::string header = "*   GRADIENT CHECK: " + name + "; SCALAR TYPE: " +
+	std::string header = "|   GRADIENT CHECK: " + name + "; SCALAR TYPE: " +
 			ScalarTraits<Scalar>::name() + "; RANK: " + std::to_string(Rank) +
-			"; SEQ: " + std::to_string(Sequential) + "   *";
+			"; SEQ: " + std::to_string(Sequential) + "   |";
 	std::size_t header_length = header.length();
-	std::string header_border = std::string(header_length, '*');
-	std::string header_padding = "*" + std::string(header_length - 2, ' ') + "*";
-	std::cout << std::endl << header_border << std::endl << header_padding << std::endl <<
-			header << std::endl << header_padding << std::endl << header_border << std::endl;
-	EXPECT_TRUE(opt.verify_gradients(net, prov, step_size, abs_epsilon, rel_epsilon));
+	int padding_content_length = header_length - 2;
+	std::string header_border = " " + std::string(padding_content_length, '-') + " ";
+	std::string upper_header_padding = "/" + std::string(padding_content_length, ' ') + "\\";
+	std::string lower_header_padding = "\\" + std::string(padding_content_length, ' ') + "/";
+	std::cout << std::endl << header_border << std::endl << upper_header_padding << std::endl <<
+			header << std::endl << lower_header_padding << std::endl << header_border << std::endl;
+	EXPECT_TRUE(opt.verify_gradients(net, prov, verbose, step_size, abs_epsilon, rel_epsilon));
+}
+
+/**
+ * @param dims The dimensions of the random tensor to create.
+ * @return A tensor of the specified dimensions filled with random values in the range of
+ * -1 to 1.
+ */
+template<typename Scalar, std::size_t Rank>
+inline TensorPtr<Scalar,Rank> random_tensor(const std::array<std::size_t,Rank>& dims) {
+	TensorPtr<Scalar,Rank> tensor_ptr(new Tensor<Scalar,Rank>(dims));
+	tensor_ptr->setRandom();
+	return tensor_ptr;
 }
 
 /**
@@ -173,6 +182,24 @@ inline void layer_grad_test(std::string name, LayerPtr<Scalar,Rank> layer1, Laye
 	layers[1] = std::move(layer2);
 	NeuralNetPtr<Scalar,Rank,false> nn(new FeedforwardNeuralNetwork<Scalar,Rank>(std::move(layers)));
 	nonseq_network_grad_test<Scalar,Rank>(name, std::move(nn), samples, step_size, abs_epsilon, rel_epsilon);
+}
+
+template<typename Scalar, std::size_t Rank>
+inline NeuralNetPtr<Scalar,Rank,false> reg_neural_net(const typename std::enable_if<Rank != 3,
+		Dimensions<std::size_t,Rank>>::type& input_dims) {
+	std::vector<LayerPtr<Scalar,Rank>> layers(1);
+	layers[0] = LayerPtr<Scalar,Rank>(new FCLayer<Scalar,Rank>(input_dims, 4,
+			WeightInitSharedPtr<Scalar>(new GlorotWeightInitialization<Scalar>())));
+	return NeuralNetPtr<Scalar,Rank,false>(new FeedforwardNeuralNetwork<Scalar,Rank>(std::move(layers)));
+}
+
+template<typename Scalar, std::size_t Rank>
+inline NeuralNetPtr<Scalar,Rank,false> reg_neural_net(const typename std::enable_if<Rank == 3,
+		Dimensions<std::size_t,Rank>>::type& input_dims) {
+	std::vector<LayerPtr<Scalar,Rank>> layers(1);
+	layers[0] = LayerPtr<Scalar,Rank>(new ConvLayer<Scalar>(input_dims, input_dims(2),
+			WeightInitSharedPtr<Scalar>(new GlorotWeightInitialization<Scalar>())));
+	return NeuralNetPtr<Scalar,Rank,false>(new FeedforwardNeuralNetwork<Scalar,3>(std::move(layers)));
 }
 
 /************************
@@ -800,6 +827,49 @@ TEST(GradientTest, BidirectionalNet) {
 /***********************
  * LOSS GRADIENT TESTS *
  ***********************/
+
+template<typename Scalar, std::size_t Rank>
+inline void absolute_loss_grad_test(const Dimensions<std::size_t,Rank>& dims) {
+	const std::size_t samples = 5;
+	const std::size_t time_steps = 3;
+	// Non-sequential.
+	auto net = reg_neural_net<Scalar,Rank>(dims);
+	net->init();
+	Dimensions<std::size_t,Rank + 1> batch_dims = dims.template promote<>();
+	batch_dims(0) = samples;
+	Dimensions<std::size_t,Rank + 1> batch_out_dims = net->get_output_dims().template promote<>();
+	batch_dims(1) = samples;
+	MemoryDataProvider<Scalar,Rank,false> prov(random_tensor<Scalar,Rank + 1>(batch_dims),
+			random_tensor<Scalar,Rank + 1>(batch_out_dims));
+	LossSharedPtr<Scalar,Rank,false> loss(new AbsoluteLoss<Scalar,Rank,false>());
+	VanillaSGDOptimizer<Scalar,Rank,false> opt(loss, samples);
+	grad_test<Scalar,Rank,false>("absolute loss", prov, *net, opt);
+	// Sequential.
+	SequentialNeuralNetwork<Scalar,Rank> seq_net(std::move(net));
+	Dimensions<std::size_t,Rank + 2> seq_batch_dims = dims.template promote<2>();
+	seq_batch_dims(0) = samples;
+	seq_batch_dims(1) = time_steps;
+	Dimensions<std::size_t,Rank + 2> seq_batch_out_dims = seq_net.get_output_dims().template promote<2>();
+	seq_batch_out_dims(0) = samples;
+	seq_batch_out_dims(1) = time_steps;
+	MemoryDataProvider<Scalar,Rank,true> seq_prov(random_tensor<Scalar,Rank + 2>(seq_batch_dims),
+			random_tensor<Scalar,Rank + 2>(seq_batch_out_dims));
+	LossSharedPtr<Scalar,Rank,true> seq_loss(new AbsoluteLoss<Scalar,Rank,true>());
+	VanillaSGDOptimizer<Scalar,Rank,true> seq_opt(seq_loss, samples);
+	grad_test<Scalar,Rank,true>("absolute loss", seq_prov, seq_net, seq_opt);
+}
+
+template<typename Scalar>
+inline void absolute_loss_grad_test() {
+	absolute_loss_grad_test<Scalar,1>(Dimensions<std::size_t,1>({ 24 }));
+	absolute_loss_grad_test<Scalar,2>(Dimensions<std::size_t,2>({ 6, 6 }));
+	absolute_loss_grad_test<Scalar,3>(Dimensions<std::size_t,3>({ 4, 4, 2 }));
+}
+
+//TEST(GradientTest, AbsoluteLoss) {
+//	absolute_loss_grad_test<float>();
+//	absolute_loss_grad_test<double>();
+//}
 
 } /* namespace test */
 
