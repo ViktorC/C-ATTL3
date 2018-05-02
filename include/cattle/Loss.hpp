@@ -218,11 +218,11 @@ protected:
 		std::size_t cols = out.size() / rows;
 		MatrixMap<Scalar> out_mat(out.data(), rows, cols);
 		MatrixMap<Scalar> obj_mat(obj.data(), rows, cols);
-		ColVector<Scalar> loss(out_mat.rows());
-		for (int i = 0; i < obj_mat.rows(); ++i) {
+		ColVector<Scalar> loss(rows);
+		for (int i = 0; i < rows; ++i) {
 			unsigned ones = 0;
 			int correct_class_ind = -1;
-			for (int j = 0; j < obj_mat.cols(); ++j) {
+			for (int j = 0; j < cols; ++j) {
 				Scalar obj_ij = obj_mat(i,j);
 				assert((internal::NumericUtils<Scalar>::almost_equal(obj_ij, (Scalar) 0) ||
 						internal::NumericUtils<Scalar>::almost_equal(obj_ij, (Scalar) 1)));
@@ -234,10 +234,10 @@ protected:
 			assert(ones == 1);
 			Scalar loss_i = 0;
 			Scalar correct_class_score = out_mat(i,correct_class_ind);
-			for (int j = 0; j < obj_mat.cols(); ++j) {
+			for (int j = 0; j < cols; ++j) {
 				if (j == correct_class_ind)
 					continue;
-				Scalar loss_ij = std::max(.0, out_mat(i,j) - correct_class_score + 1);
+				Scalar loss_ij = std::max((Scalar) 0, (Scalar) (out_mat(i,j) - correct_class_score + 1));
 				loss_i += Squared ? loss_ij * loss_ij : loss_ij;
 			}
 			loss(i) = loss_i;
@@ -250,11 +250,11 @@ protected:
 		std::size_t cols = out.size() / rows;
 		MatrixMap<Scalar> out_mat(out.data(), rows, cols);
 		MatrixMap<Scalar> obj_mat(obj.data(), rows, cols);
-		Matrix<Scalar> out_grads(out_mat.rows(), out_mat.cols());
-		for (int i = 0; i < out_mat.rows(); ++i) {
+		Matrix<Scalar> out_grads(rows, cols);
+		for (int i = 0; i < rows; ++i) {
 			unsigned ones = 0;
 			int correct_class_ind = -1;
-			for (int j = 0; j < out_mat.cols(); ++j) {
+			for (int j = 0; j < cols; ++j) {
 				Scalar obj_ij = obj_mat(i,j);
 				assert((internal::NumericUtils<Scalar>::almost_equal(obj_ij, (Scalar) 0) ||
 						internal::NumericUtils<Scalar>::almost_equal(obj_ij, (Scalar) 1)));
@@ -266,13 +266,13 @@ protected:
 			assert(ones == 1);
 			Scalar total_out_grad = 0;
 			Scalar correct_class_score = out_mat(i,correct_class_ind);
-			for (int j = 0; j < out_mat.cols(); ++j) {
+			for (int j = 0; j < cols; ++j) {
 				if (j == correct_class_ind)
 					continue;
 				Scalar out_ij = out_mat(i,j);
 				Scalar margin = out_ij - correct_class_score + 1;
 				if (internal::NumericUtils<Scalar>::decidedly_greater(margin, (Scalar) 0)) {
-					Scalar out_grad = Squared ? 2 * (out_ij - correct_class_score) : 1;
+					Scalar out_grad = Squared ? 2 * margin : 1;
 					total_out_grad += out_grad;
 					out_grads(i,j) = out_grad;
 				} else
@@ -362,10 +362,10 @@ protected:
 		std::size_t cols = out.size() / rows;
 		MatrixMap<Scalar> out_mat(out.data(), rows, cols);
 		MatrixMap<Scalar> obj_mat(obj.data(), rows, cols);
-		ColVector<Scalar> loss(out_mat.rows());
-		for (int i = 0; i < obj_mat.rows(); ++i) {
+		ColVector<Scalar> loss(rows);
+		for (int i = 0; i < rows; ++i) {
 			Scalar loss_i = 0;
-			for (int j = 0; j < obj_mat.cols(); ++j) {
+			for (int j = 0; j < cols; ++j) {
 				Scalar obj_ij = obj_mat(i,j);
 				assert((internal::NumericUtils<Scalar>::almost_equal(obj_ij, (Scalar) -1) ||
 						internal::NumericUtils<Scalar>::almost_equal(obj_ij, (Scalar) 1)));
@@ -382,18 +382,18 @@ protected:
 		std::size_t cols = out.size() / rows;
 		MatrixMap<Scalar> out_mat(out.data(), rows, cols);
 		MatrixMap<Scalar> obj_mat(obj.data(), rows, cols);
-		Matrix<Scalar> out_grads(out_mat.rows(), out_mat.cols());
-		for (int i = 0; i < out_mat.rows(); ++i) {
-			for (int j = 0; j < out_mat.cols(); ++j) {
-				Scalar obj_ij = obj_mat(i,j);
-				assert((internal::NumericUtils<Scalar>::almost_equal(obj_ij, (Scalar) -1) ||
-						internal::NumericUtils<Scalar>::almost_equal(obj_ij, (Scalar) 1)));
-				Scalar out_ij = out_mat(i,j);
-				Scalar margin = 1 - obj_ij * out_ij;
+		Matrix<Scalar> out_grads(rows, cols);
+		for (int i = 0; i < cols; ++i) {
+			for (int j = 0; j < rows; ++j) {
+				Scalar obj_ji = obj_mat(j,i);
+				assert((internal::NumericUtils<Scalar>::almost_equal(obj_ji, (Scalar) -1) ||
+						internal::NumericUtils<Scalar>::almost_equal(obj_ji, (Scalar) 1)));
+				Scalar out_ji = out_mat(j,i);
+				Scalar margin = 1 - obj_ji * out_ji;
 				if (internal::NumericUtils<Scalar>::decidedly_greater(margin, (Scalar) 0))
-					out_grads(i,j) = Squared ? 2 * out_ij - 2 * obj_ij : -obj_ij;
+					out_grads(j,i) = Squared ? 2 * out_ji - 2 * obj_ji : -obj_ji;
 				else
-					out_grads(i,j) = 0;
+					out_grads(j,i) = 0;
 			}
 		}
 		return TensorMap<Scalar,Root::DATA_RANK>(out_grads.data(), grad_dims);
@@ -421,15 +421,15 @@ protected:
 		std::size_t cols = out.size() / rows;
 		MatrixMap<Scalar> out_mat(out.data(), rows, cols);
 		MatrixMap<Scalar> obj_mat(obj.data(), rows, cols);
-		ColVector<Scalar> loss(out_mat.rows());
-		for (int i = 0; i < out_mat.rows(); ++i) {
+		ColVector<Scalar> loss(rows);
+		for (int i = 0; i < rows; ++i) {
 			Scalar loss_i = 0;
-			for (int j = 0; j < out_mat.cols(); ++j) {
+			for (int j = 0; j < cols; ++j) {
 				Scalar obj_ij = obj_mat(i,j);
 				assert(internal::NumericUtils<Scalar>::almost_equal(obj_ij, (Scalar) 0) ||
 						internal::NumericUtils<Scalar>::almost_equal(obj_ij, (Scalar) 1));
 				Scalar out_ij = out_mat(i,j);
-				loss_i += (obj_ij * log(out_ij) + (1 - obj_ij) * log(1 - out_ij));
+				loss_i += obj_ij * log(out_ij) + (1 - obj_ij) * log(1 - out_ij);
 			}
 			loss(i) = loss_i;
 		}
@@ -441,16 +441,17 @@ protected:
 		std::size_t cols = out.size() / rows;
 		MatrixMap<Scalar> out_mat(out.data(), rows, cols);
 		MatrixMap<Scalar> obj_mat(obj.data(), rows, cols);
-		Matrix<Scalar> out_grads(rows, out_mat.cols());
-		for (int i = 0; i < rows; ++i) {
-			for (int j = 0; j < out_grads.cols(); ++j) {
-				Scalar obj_ij = obj_mat(i,j);
-				assert(internal::NumericUtils<Scalar>::almost_equal(obj_ij, (Scalar) 0) ||
-						internal::NumericUtils<Scalar>::almost_equal(obj_ij, (Scalar) 1));
-				Scalar denominator = out_mat(i,j) - (Scalar) (internal::NumericUtils<Scalar>::almost_equal(obj_ij, (Scalar) 0));
-				if (denominator == 0)
-					denominator += (rand() % 2 == 0 ? epsilon : -epsilon);
-				out_grads(i,j) = 1 / (denominator * rows);
+		Matrix<Scalar> out_grads(rows, cols);
+		for (int i = 0; i < cols; ++i) {
+			for (int j = 0; j < rows; ++j) {
+				Scalar obj_ji = obj_mat(j,i);
+				assert(internal::NumericUtils<Scalar>::almost_equal(obj_ji, (Scalar) 0) ||
+						internal::NumericUtils<Scalar>::almost_equal(obj_ji, (Scalar) 1));
+				Scalar out_ji = out_mat(j,i);
+				Scalar denominator = out_ji * (1 - out_ji);
+				if (out_ji == 0)
+					out_ji += epsilon;
+				out_grads(j,i) = (obj_ji - out_ji) / denominator;
 			}
 		}
 		return TensorMap<Scalar,Root::DATA_RANK>(out_grads.data(), grad_dims);

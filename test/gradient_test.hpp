@@ -9,9 +9,11 @@
 #define GRADIENT_TEST_HPP_
 
 #include <algorithm>
+#include <array>
 #include <cstddef>
 #include <gtest/gtest.h>
 #include <memory>
+#include <random>
 #include <string>
 #include <type_traits>
 #include <utility>
@@ -59,6 +61,149 @@ struct ScalarTraits<float> {
 };
 
 /**
+ * @param dims The dimensions of the prospective tensor.
+ * @return The number of samples.
+ */
+template<typename Scalar, std::size_t Rank, bool Sequential>
+inline std::size_t get_rows(const typename std::enable_if<!Sequential,
+		std::array<std::size_t,Rank>>::type& dims) {
+	return dims[0];
+}
+
+/**
+ * @param dims The dimensions of the prospective tensor.
+ * @return The number of samples multiplied by the number of time steps.
+ */
+template<typename Scalar, std::size_t Rank, bool Sequential>
+inline std::size_t get_rows(const typename std::enable_if<Sequential,
+		std::array<std::size_t,Rank>>::type& dims) {
+	return dims[0] * dims[1];
+}
+
+/**
+ * @param dims The dimensions of the random tensor to create.
+ * @return A tensor of the specified dimensions filled with random values in the range of
+ * -1 to 1.
+ */
+template<typename Scalar, std::size_t Rank>
+inline TensorPtr<Scalar,Rank> random_tensor(const std::array<std::size_t,Rank>& dims) {
+	TensorPtr<Scalar,Rank> tensor_ptr(new Tensor<Scalar,Rank>(dims));
+	tensor_ptr->setRandom();
+	return tensor_ptr;
+}
+
+/**
+ * @param dims The dimensions of the random tensor to create.
+ * @param non_label The value of the non-label elements of the objective tensor (0 for cross
+ * entropy, -1 for hinge loss).
+ * @return A one-hot tensor of the specified dimensions in which only one element per sample
+ * and time step is 1 while all others equal non_label.
+ */
+template<typename Scalar, std::size_t Rank, bool Sequential>
+inline TensorPtr<Scalar,Rank> random_one_hot_tensor(const std::array<std::size_t,Rank>& dims,
+		Scalar non_label = 0) {
+	TensorPtr<Scalar,Rank> tensor_ptr(new Tensor<Scalar,Rank>(dims));
+	tensor_ptr->setConstant(non_label);
+	int rows = get_rows<Scalar,Rank,Sequential>(dims);
+	MatrixMap<Scalar> mat_map(tensor_ptr->data(), rows, tensor_ptr->size() / rows);
+	std::random_device rd;
+	std::mt19937 rng(rd());
+	std::uniform_int_distribution<int> dist(0, mat_map.cols() - 1);
+	for (int i = 0; i < mat_map.rows(); ++i)
+		mat_map(i,dist(rng)) = 1;
+	return tensor_ptr;
+}
+
+/**
+ * @param dims The dimensions of the random tensor to create.
+ * @param non_label The value of the non-label elements of the objective tensor (0 for cross
+ * entropy, -1 for hinge loss).
+ * @return A multi-label objective tensor whose elements equal either 1 or non_label.
+ */
+template<typename Scalar, std::size_t Rank>
+inline TensorPtr<Scalar,Rank> random_multi_hot_tensor(const std::array<std::size_t,Rank>& dims,
+		Scalar non_label = 0) {
+	auto tensor_ptr = random_tensor<Scalar,Rank>(dims);
+	Tensor<bool,Rank> if_tensor = (*tensor_ptr) > tensor_ptr->constant((Scalar) 0);
+	Tensor<Scalar,Rank> then_tensor = tensor_ptr->constant((Scalar) 1);
+	Tensor<Scalar,Rank> else_tensor = tensor_ptr->constant(non_label);
+	*tensor_ptr = if_tensor.select(then_tensor, else_tensor);
+	return tensor_ptr;
+}
+
+/**
+ * @param input_dims The input dimensions of the layer.
+ * @return A fully connected kernel layer.
+ */
+template<typename Scalar, std::size_t Rank>
+inline KernelPtr<Scalar,Rank> kernel_layer(const typename std::enable_if<Rank != 3,
+		Dimensions<std::size_t,Rank>>::type& input_dims) {
+	return KernelPtr<Scalar,Rank>(new FCLayer<Scalar,Rank>(input_dims, 4,
+			WeightInitSharedPtr<Scalar>(new GlorotWeightInitialization<Scalar>())));
+}
+
+/**
+ * @param input_dims The input dimensions of the layer.
+ * @return A convolutional kernel layer.
+ */
+template<typename Scalar, std::size_t Rank>
+inline KernelPtr<Scalar,Rank> kernel_layer(const typename std::enable_if<Rank == 3,
+		Dimensions<std::size_t,Rank>>::type& input_dims) {
+	return KernelPtr<Scalar,Rank>(new ConvLayer<Scalar>(input_dims, input_dims(2),
+			WeightInitSharedPtr<Scalar>(new GlorotWeightInitialization<Scalar>())));
+}
+
+/**
+ * @param input_dims The input dimensions of the neural network.
+ * @return A simple feed-forward neural network with unrestricted output values.
+ */
+template<typename Scalar, std::size_t Rank>
+inline NeuralNetPtr<Scalar,Rank,false> reg_neural_net(const Dimensions<std::size_t,Rank>& input_dims) {
+	std::vector<LayerPtr<Scalar,Rank>> layers(1);
+	layers[0] = kernel_layer<Scalar,Rank>(input_dims);
+	return NeuralNetPtr<Scalar,Rank,false>(new FeedforwardNeuralNetwork<Scalar,Rank>(std::move(layers)));
+}
+
+/**
+ * @param input_dims The input dimensions of the neural network.
+ * @return A simple feed-forward neural network with a sigmoid activation function and hence output values
+ * between 0 and 1.
+ */
+template<typename Scalar, std::size_t Rank>
+inline NeuralNetPtr<Scalar,Rank,false> sigmoid_neural_net(const Dimensions<std::size_t,Rank>& input_dims) {
+	std::vector<LayerPtr<Scalar,Rank>> layers(2);
+	layers[0] = kernel_layer<Scalar,Rank>(input_dims);
+	layers[1] = LayerPtr<Scalar,Rank>(new SigmoidActivationLayer<Scalar,Rank>(layers[0]->get_output_dims()));
+	return NeuralNetPtr<Scalar,Rank,false>(new FeedforwardNeuralNetwork<Scalar,Rank>(std::move(layers)));
+}
+
+/**
+ * @param input_dims The input dimensions of the neural network.
+ * @return A simple feed-forward neural network with a tanh activation function and hence output values
+ * between -1 and 1.
+ */
+template<typename Scalar, std::size_t Rank>
+inline NeuralNetPtr<Scalar,Rank,false> tanh_neural_net(const Dimensions<std::size_t,Rank>& input_dims) {
+	std::vector<LayerPtr<Scalar,Rank>> layers(2);
+	layers[0] = kernel_layer<Scalar,Rank>(input_dims);
+	layers[1] = LayerPtr<Scalar,Rank>(new TanhActivationLayer<Scalar,Rank>(layers[0]->get_output_dims()));
+	return NeuralNetPtr<Scalar,Rank,false>(new FeedforwardNeuralNetwork<Scalar,Rank>(std::move(layers)));
+}
+
+/**
+ * @param input_dims The input dimensions of the neural network.
+ * @return A simple feed-forward neural network with a softmax activation function and hence output values
+ * between 0 and 1.
+ */
+template<typename Scalar, std::size_t Rank>
+inline NeuralNetPtr<Scalar,Rank,false> softmax_neural_net(const Dimensions<std::size_t,Rank>& input_dims) {
+	std::vector<LayerPtr<Scalar,Rank>> layers(2);
+	layers[0] = kernel_layer<Scalar,Rank>(input_dims);
+	layers[1] = LayerPtr<Scalar,Rank>(new SoftmaxActivationLayer<Scalar,Rank>(layers[0]->get_output_dims()));
+	return NeuralNetPtr<Scalar,Rank,false>(new FeedforwardNeuralNetwork<Scalar,Rank>(std::move(layers)));
+}
+
+/**
  * @param name The name of the gradient test.
  * @param prov The data provider to use for gradient checking.
  * @param net The neural network whose differentiation is to be checked.
@@ -86,18 +231,6 @@ inline void grad_test(std::string name, DataProvider<Scalar,Rank,Sequential>& pr
 	std::cout << std::endl << header_border << std::endl << upper_header_padding << std::endl <<
 			header << std::endl << lower_header_padding << std::endl << header_border << std::endl;
 	EXPECT_TRUE(opt.verify_gradients(net, prov, verbose, step_size, abs_epsilon, rel_epsilon));
-}
-
-/**
- * @param dims The dimensions of the random tensor to create.
- * @return A tensor of the specified dimensions filled with random values in the range of
- * -1 to 1.
- */
-template<typename Scalar, std::size_t Rank>
-inline TensorPtr<Scalar,Rank> random_tensor(const std::array<std::size_t,Rank>& dims) {
-	TensorPtr<Scalar,Rank> tensor_ptr(new Tensor<Scalar,Rank>(dims));
-	tensor_ptr->setRandom();
-	return tensor_ptr;
 }
 
 /**
@@ -184,24 +317,6 @@ inline void layer_grad_test(std::string name, LayerPtr<Scalar,Rank> layer1, Laye
 	nonseq_network_grad_test<Scalar,Rank>(name, std::move(nn), samples, step_size, abs_epsilon, rel_epsilon);
 }
 
-template<typename Scalar, std::size_t Rank>
-inline NeuralNetPtr<Scalar,Rank,false> reg_neural_net(const typename std::enable_if<Rank != 3,
-		Dimensions<std::size_t,Rank>>::type& input_dims) {
-	std::vector<LayerPtr<Scalar,Rank>> layers(1);
-	layers[0] = LayerPtr<Scalar,Rank>(new FCLayer<Scalar,Rank>(input_dims, 4,
-			WeightInitSharedPtr<Scalar>(new GlorotWeightInitialization<Scalar>())));
-	return NeuralNetPtr<Scalar,Rank,false>(new FeedforwardNeuralNetwork<Scalar,Rank>(std::move(layers)));
-}
-
-template<typename Scalar, std::size_t Rank>
-inline NeuralNetPtr<Scalar,Rank,false> reg_neural_net(const typename std::enable_if<Rank == 3,
-		Dimensions<std::size_t,Rank>>::type& input_dims) {
-	std::vector<LayerPtr<Scalar,Rank>> layers(1);
-	layers[0] = LayerPtr<Scalar,Rank>(new ConvLayer<Scalar>(input_dims, input_dims(2),
-			WeightInitSharedPtr<Scalar>(new GlorotWeightInitialization<Scalar>())));
-	return NeuralNetPtr<Scalar,Rank,false>(new FeedforwardNeuralNetwork<Scalar,3>(std::move(layers)));
-}
-
 /************************
  * LAYER GRADIENT TESTS *
  ************************/
@@ -256,7 +371,8 @@ TEST(GradientTest, ConvLayer) {
  * @param dims The dimensions of the layers' input tensors.
  */
 template<typename Scalar, std::size_t Rank>
-inline void activation_layer_grad_test(const Dimensions<std::size_t,Rank>& dims) {
+inline void activation_layer_grad_test(const typename std::enable_if<Rank != 3,
+		Dimensions<std::size_t,Rank>>::type& dims) {
 	auto init = WeightInitSharedPtr<Scalar>(new GlorotWeightInitialization<Scalar>());
 	LayerPtr<Scalar,Rank> layer1_1(new FCLayer<Scalar,Rank>(dims, 12, init));
 	Dimensions<std::size_t,Rank> dims_1 = layer1_1->get_output_dims();
@@ -305,12 +421,11 @@ inline void activation_layer_grad_test(const Dimensions<std::size_t,Rank>& dims)
 }
 
 /**
- * Template specialization.
- *
- * @param dims The dimensions of the layers' input tensors.
+ *@param dims The dimensions of the layers' input tensors.
  */
-template<typename Scalar>
-inline void activation_layer_grad_test(const Dimensions<std::size_t,3>& dims) {
+template<typename Scalar, std::size_t Rank>
+inline void activation_layer_grad_test(const typename std::enable_if<Rank == 3,
+		Dimensions<std::size_t,Rank>>::type& dims) {
 	auto init = WeightInitSharedPtr<Scalar>(new HeWeightInitialization<Scalar>());
 	LayerPtr<Scalar,3> layer1_1(new ConvLayer<Scalar>(dims, 2, init));
 	Dimensions<std::size_t,3> dims_1 = layer1_1->get_output_dims();
@@ -828,17 +943,21 @@ TEST(GradientTest, BidirectionalNet) {
  * LOSS GRADIENT TESTS *
  ***********************/
 
+/**
+ * @param dims The dimensions of the input data.
+ * @param samples The number of samples in the batch.
+ * @param time_steps The number of time steps for sequential loss gradient testing.
+ */
 template<typename Scalar, std::size_t Rank>
-inline void absolute_loss_grad_test(const Dimensions<std::size_t,Rank>& dims) {
-	const std::size_t samples = 5;
-	const std::size_t time_steps = 3;
+inline void absolute_loss_grad_test(const Dimensions<std::size_t,Rank>& dims, std::size_t samples = 5,
+		std::size_t time_steps = 3) {
 	// Non-sequential.
 	auto net = reg_neural_net<Scalar,Rank>(dims);
 	net->init();
 	Dimensions<std::size_t,Rank + 1> batch_dims = dims.template promote<>();
 	batch_dims(0) = samples;
 	Dimensions<std::size_t,Rank + 1> batch_out_dims = net->get_output_dims().template promote<>();
-	batch_dims(1) = samples;
+	batch_out_dims(0) = samples;
 	MemoryDataProvider<Scalar,Rank,false> prov(random_tensor<Scalar,Rank + 1>(batch_dims),
 			random_tensor<Scalar,Rank + 1>(batch_out_dims));
 	LossSharedPtr<Scalar,Rank,false> loss(new AbsoluteLoss<Scalar,Rank,false>());
@@ -859,6 +978,9 @@ inline void absolute_loss_grad_test(const Dimensions<std::size_t,Rank>& dims) {
 	grad_test<Scalar,Rank,true>("absolute loss", seq_prov, seq_net, seq_opt);
 }
 
+/**
+ * Performs gradient checks on the absolute loss function.
+ */
 template<typename Scalar>
 inline void absolute_loss_grad_test() {
 	absolute_loss_grad_test<Scalar,1>(Dimensions<std::size_t,1>({ 24 }));
@@ -866,10 +988,274 @@ inline void absolute_loss_grad_test() {
 	absolute_loss_grad_test<Scalar,3>(Dimensions<std::size_t,3>({ 4, 4, 2 }));
 }
 
-//TEST(GradientTest, AbsoluteLoss) {
-//	absolute_loss_grad_test<float>();
-//	absolute_loss_grad_test<double>();
-//}
+TEST(GradientTest, AbsoluteLoss) {
+	absolute_loss_grad_test<float>();
+	absolute_loss_grad_test<double>();
+}
+
+/**
+ * @param dims The dimensions of the input data.
+ * @param samples The number of samples in the batch.
+ * @param time_steps The number of time steps for sequential loss gradient testing.
+ */
+template<typename Scalar, std::size_t Rank, bool Squared>
+inline void hinge_loss_grad_test(const Dimensions<std::size_t,Rank>& dims, std::size_t samples = 5,
+		std::size_t time_steps = 3) {
+	// Non-sequential.
+	auto net = tanh_neural_net<Scalar,Rank>(dims);
+	net->init();
+	Dimensions<std::size_t,Rank + 1> batch_dims = dims.template promote<>();
+	batch_dims(0) = samples;
+	Dimensions<std::size_t,Rank + 1> batch_out_dims = net->get_output_dims().template promote<>();
+	batch_out_dims(0) = samples;
+	MemoryDataProvider<Scalar,Rank,false> prov(random_tensor<Scalar,Rank + 1>(batch_dims),
+			random_one_hot_tensor<Scalar,Rank + 1,false>(batch_out_dims));
+	LossSharedPtr<Scalar,Rank,false> loss(new HingeLoss<Scalar,Rank,false,Squared>());
+	VanillaSGDOptimizer<Scalar,Rank,false> opt(loss, samples);
+	std::string name = std::string(Squared ? "squared " : "") + std::string("hinge loss");
+	grad_test<Scalar,Rank,false>(name, prov, *net, opt);
+	// Sequential.
+	SequentialNeuralNetwork<Scalar,Rank> seq_net(std::move(net));
+	Dimensions<std::size_t,Rank + 2> seq_batch_dims = dims.template promote<2>();
+	seq_batch_dims(0) = samples;
+	seq_batch_dims(1) = time_steps;
+	Dimensions<std::size_t,Rank + 2> seq_batch_out_dims = seq_net.get_output_dims().template promote<2>();
+	seq_batch_out_dims(0) = samples;
+	seq_batch_out_dims(1) = time_steps;
+	MemoryDataProvider<Scalar,Rank,true> seq_prov(random_tensor<Scalar,Rank + 2>(seq_batch_dims),
+			random_one_hot_tensor<Scalar,Rank + 2,true>(seq_batch_out_dims));
+	LossSharedPtr<Scalar,Rank,true> seq_loss(new HingeLoss<Scalar,Rank,true,Squared>());
+	VanillaSGDOptimizer<Scalar,Rank,true> seq_opt(seq_loss, samples);
+	grad_test<Scalar,Rank,true>(name, seq_prov, seq_net, seq_opt);
+}
+
+/**
+ * Performs gradient checks on the hinge loss function.
+ */
+template<typename Scalar>
+inline void hinge_loss_grad_test() {
+	Dimensions<std::size_t,1> dims_1({ 24 });
+	hinge_loss_grad_test<Scalar,1,false>(dims_1);
+	hinge_loss_grad_test<Scalar,1,true>(dims_1);
+	Dimensions<std::size_t,2> dims_2({ 6, 6 });
+	hinge_loss_grad_test<Scalar,2,false>(dims_2);
+	hinge_loss_grad_test<Scalar,2,true>(dims_2);
+	Dimensions<std::size_t,3> dims_3({ 4, 4, 2 });
+	hinge_loss_grad_test<Scalar,3,false>(dims_3);
+	hinge_loss_grad_test<Scalar,3,true>(dims_3);
+}
+
+TEST(GradientTest, HingeLoss) {
+	hinge_loss_grad_test<float>();
+	hinge_loss_grad_test<double>();
+}
+
+/**
+ * @param dims The dimensions of the input data.
+ * @param samples The number of samples in the batch.
+ * @param time_steps The number of time steps for sequential loss gradient testing.
+ */
+template<typename Scalar, std::size_t Rank>
+inline void cross_entropy_loss_grad_test(const Dimensions<std::size_t,Rank>& dims, std::size_t samples = 5,
+		std::size_t time_steps = 3) {
+	// Non-sequential.
+	auto net = softmax_neural_net<Scalar,Rank>(dims);
+	net->init();
+	Dimensions<std::size_t,Rank + 1> batch_dims = dims.template promote<>();
+	batch_dims(0) = samples;
+	Dimensions<std::size_t,Rank + 1> batch_out_dims = net->get_output_dims().template promote<>();
+	batch_out_dims(0) = samples;
+	MemoryDataProvider<Scalar,Rank,false> prov(random_tensor<Scalar,Rank + 1>(batch_dims),
+			random_one_hot_tensor<Scalar,Rank + 1,false>(batch_out_dims));
+	LossSharedPtr<Scalar,Rank,false> loss(new CrossEntropyLoss<Scalar,Rank,false>());
+	VanillaSGDOptimizer<Scalar,Rank,false> opt(loss, samples);
+	grad_test<Scalar,Rank,false>("cross entropy loss", prov, *net, opt);
+	// Sequential.
+	SequentialNeuralNetwork<Scalar,Rank> seq_net(std::move(net));
+	Dimensions<std::size_t,Rank + 2> seq_batch_dims = dims.template promote<2>();
+	seq_batch_dims(0) = samples;
+	seq_batch_dims(1) = time_steps;
+	Dimensions<std::size_t,Rank + 2> seq_batch_out_dims = seq_net.get_output_dims().template promote<2>();
+	seq_batch_out_dims(0) = samples;
+	seq_batch_out_dims(1) = time_steps;
+	MemoryDataProvider<Scalar,Rank,true> seq_prov(random_tensor<Scalar,Rank + 2>(seq_batch_dims),
+			random_one_hot_tensor<Scalar,Rank + 2,true>(seq_batch_out_dims));
+	LossSharedPtr<Scalar,Rank,true> seq_loss(new CrossEntropyLoss<Scalar,Rank,true>());
+	VanillaSGDOptimizer<Scalar,Rank,true> seq_opt(seq_loss, samples);
+	grad_test<Scalar,Rank,true>("cross entropy loss", seq_prov, seq_net, seq_opt);
+}
+
+/**
+ * Performs gradient checks on the cross entropy loss function.
+ */
+template<typename Scalar>
+inline void cross_entropy_loss_grad_test() {
+	cross_entropy_loss_grad_test<Scalar,1>(Dimensions<std::size_t,1>({ 24 }));
+	cross_entropy_loss_grad_test<Scalar,2>(Dimensions<std::size_t,2>({ 6, 6 }));
+	cross_entropy_loss_grad_test<Scalar,3>(Dimensions<std::size_t,3>({ 4, 4, 2 }));
+}
+
+TEST(GradientTest, CrossEntropyLoss) {
+	cross_entropy_loss_grad_test<float>();
+	cross_entropy_loss_grad_test<double>();
+}
+
+/**
+ * @param dims The dimensions of the input data.
+ * @param samples The number of samples in the batch.
+ * @param time_steps The number of time steps for sequential loss gradient testing.
+ */
+template<typename Scalar, std::size_t Rank>
+inline void softmax_cross_entropy_loss_grad_test(const Dimensions<std::size_t,Rank>& dims, std::size_t samples = 5,
+		std::size_t time_steps = 3) {
+	// Non-sequential.
+	auto net = reg_neural_net<Scalar,Rank>(dims);
+	net->init();
+	Dimensions<std::size_t,Rank + 1> batch_dims = dims.template promote<>();
+	batch_dims(0) = samples;
+	Dimensions<std::size_t,Rank + 1> batch_out_dims = net->get_output_dims().template promote<>();
+	batch_out_dims(0) = samples;
+	MemoryDataProvider<Scalar,Rank,false> prov(random_tensor<Scalar,Rank + 1>(batch_dims),
+			random_one_hot_tensor<Scalar,Rank + 1,false>(batch_out_dims));
+	LossSharedPtr<Scalar,Rank,false> loss(new SoftmaxCrossEntropyLoss<Scalar,Rank,false>());
+	VanillaSGDOptimizer<Scalar,Rank,false> opt(loss, samples);
+	grad_test<Scalar,Rank,false>("softmax cross entropy loss", prov, *net, opt);
+	// Sequential.
+	SequentialNeuralNetwork<Scalar,Rank> seq_net(std::move(net));
+	Dimensions<std::size_t,Rank + 2> seq_batch_dims = dims.template promote<2>();
+	seq_batch_dims(0) = samples;
+	seq_batch_dims(1) = time_steps;
+	Dimensions<std::size_t,Rank + 2> seq_batch_out_dims = seq_net.get_output_dims().template promote<2>();
+	seq_batch_out_dims(0) = samples;
+	seq_batch_out_dims(1) = time_steps;
+	MemoryDataProvider<Scalar,Rank,true> seq_prov(random_tensor<Scalar,Rank + 2>(seq_batch_dims),
+			random_one_hot_tensor<Scalar,Rank + 2,true>(seq_batch_out_dims));
+	LossSharedPtr<Scalar,Rank,true> seq_loss(new SoftmaxCrossEntropyLoss<Scalar,Rank,true>());
+	VanillaSGDOptimizer<Scalar,Rank,true> seq_opt(seq_loss, samples);
+	grad_test<Scalar,Rank,true>("softmax cross entropy loss", seq_prov, seq_net, seq_opt);
+}
+
+/**
+ * Performs gradient checks on the softmax-cross-entropy loss function.
+ */
+template<typename Scalar>
+inline void softmax_cross_entropy_loss_grad_test() {
+	softmax_cross_entropy_loss_grad_test<Scalar,1>(Dimensions<std::size_t,1>({ 24 }));
+	softmax_cross_entropy_loss_grad_test<Scalar,2>(Dimensions<std::size_t,2>({ 6, 6 }));
+	softmax_cross_entropy_loss_grad_test<Scalar,3>(Dimensions<std::size_t,3>({ 4, 4, 2 }));
+}
+
+TEST(GradientTest, SoftmaxCrossEntropyLoss) {
+	softmax_cross_entropy_loss_grad_test<float>();
+	softmax_cross_entropy_loss_grad_test<double>();
+}
+
+/**
+ * @param dims The dimensions of the input data.
+ * @param samples The number of samples in the batch.
+ * @param time_steps The number of time steps for sequential loss gradient testing.
+ */
+template<typename Scalar, std::size_t Rank, bool Squared>
+inline void multi_label_hinge_loss_grad_test(const Dimensions<std::size_t,Rank>& dims, std::size_t samples = 5,
+		std::size_t time_steps = 3) {
+	// Non-sequential.
+	auto net = tanh_neural_net<Scalar,Rank>(dims);
+	net->init();
+	Dimensions<std::size_t,Rank + 1> batch_dims = dims.template promote<>();
+	batch_dims(0) = samples;
+	Dimensions<std::size_t,Rank + 1> batch_out_dims = net->get_output_dims().template promote<>();
+	batch_out_dims(0) = samples;
+	MemoryDataProvider<Scalar,Rank,false> prov(random_tensor<Scalar,Rank + 1>(batch_dims),
+			random_multi_hot_tensor<Scalar,Rank + 1>(batch_out_dims, -1));
+	LossSharedPtr<Scalar,Rank,false> loss(new MultiLabelHingeLoss<Scalar,Rank,false,Squared>());
+	VanillaSGDOptimizer<Scalar,Rank,false> opt(loss, samples);
+	std::string name = std::string(Squared ? "squared " : "") + std::string("multi-label hinge loss");
+	grad_test<Scalar,Rank,false>(name, prov, *net, opt);
+	// Sequential.
+	SequentialNeuralNetwork<Scalar,Rank> seq_net(std::move(net));
+	Dimensions<std::size_t,Rank + 2> seq_batch_dims = dims.template promote<2>();
+	seq_batch_dims(0) = samples;
+	seq_batch_dims(1) = time_steps;
+	Dimensions<std::size_t,Rank + 2> seq_batch_out_dims = seq_net.get_output_dims().template promote<2>();
+	seq_batch_out_dims(0) = samples;
+	seq_batch_out_dims(1) = time_steps;
+	MemoryDataProvider<Scalar,Rank,true> seq_prov(random_tensor<Scalar,Rank + 2>(seq_batch_dims),
+			random_multi_hot_tensor<Scalar,Rank + 2>(seq_batch_out_dims, -1));
+	LossSharedPtr<Scalar,Rank,true> seq_loss(new MultiLabelHingeLoss<Scalar,Rank,true,Squared>());
+	VanillaSGDOptimizer<Scalar,Rank,true> seq_opt(seq_loss, samples);
+	grad_test<Scalar,Rank,true>(name, seq_prov, seq_net, seq_opt);
+}
+
+/**
+ * Performs gradient checks on the multi-label hinge loss function.
+ */
+template<typename Scalar>
+inline void multi_label_hinge_loss_grad_test() {
+	Dimensions<std::size_t,1> dims_1({ 24 });
+	multi_label_hinge_loss_grad_test<Scalar,1,false>(dims_1);
+	multi_label_hinge_loss_grad_test<Scalar,1,true>(dims_1);
+	Dimensions<std::size_t,2> dims_2({ 6, 6 });
+	multi_label_hinge_loss_grad_test<Scalar,2,false>(dims_2);
+	multi_label_hinge_loss_grad_test<Scalar,2,true>(dims_2);
+	Dimensions<std::size_t,3> dims_3({ 4, 4, 2 });
+	multi_label_hinge_loss_grad_test<Scalar,3,false>(dims_3);
+	multi_label_hinge_loss_grad_test<Scalar,3,true>(dims_3);
+}
+
+TEST(GradientTest, MultiLabelHingeLoss) {
+	multi_label_hinge_loss_grad_test<float>();
+	multi_label_hinge_loss_grad_test<double>();
+}
+
+/**
+ * @param dims The dimensions of the input data.
+ * @param samples The number of samples in the batch.
+ * @param time_steps The number of time steps for sequential loss gradient testing.
+ */
+template<typename Scalar, std::size_t Rank>
+inline void multi_label_log_loss_grad_test(const Dimensions<std::size_t,Rank>& dims, std::size_t samples = 5,
+		std::size_t time_steps = 3) {
+	// Non-sequential.
+	auto net = sigmoid_neural_net<Scalar,Rank>(dims);
+	net->init();
+	Dimensions<std::size_t,Rank + 1> batch_dims = dims.template promote<>();
+	batch_dims(0) = samples;
+	Dimensions<std::size_t,Rank + 1> batch_out_dims = net->get_output_dims().template promote<>();
+	batch_out_dims(0) = samples;
+	MemoryDataProvider<Scalar,Rank,false> prov(random_tensor<Scalar,Rank + 1>(batch_dims),
+			random_multi_hot_tensor<Scalar,Rank + 1>(batch_out_dims));
+	LossSharedPtr<Scalar,Rank,false> loss(new MultiLabelLogLoss<Scalar,Rank,false>());
+	VanillaSGDOptimizer<Scalar,Rank,false> opt(loss, samples);
+	grad_test<Scalar,Rank,false>("multi-label log loss", prov, *net, opt);
+	// Sequential.
+	SequentialNeuralNetwork<Scalar,Rank> seq_net(std::move(net));
+	Dimensions<std::size_t,Rank + 2> seq_batch_dims = dims.template promote<2>();
+	seq_batch_dims(0) = samples;
+	seq_batch_dims(1) = time_steps;
+	Dimensions<std::size_t,Rank + 2> seq_batch_out_dims = seq_net.get_output_dims().template promote<2>();
+	seq_batch_out_dims(0) = samples;
+	seq_batch_out_dims(1) = time_steps;
+	MemoryDataProvider<Scalar,Rank,true> seq_prov(random_tensor<Scalar,Rank + 2>(seq_batch_dims),
+			random_multi_hot_tensor<Scalar,Rank + 2>(seq_batch_out_dims));
+	LossSharedPtr<Scalar,Rank,true> seq_loss(new MultiLabelLogLoss<Scalar,Rank,true>());
+	VanillaSGDOptimizer<Scalar,Rank,true> seq_opt(seq_loss, samples);
+	grad_test<Scalar,Rank,true>("multi-label log loss", seq_prov, seq_net, seq_opt);
+}
+
+/**
+ * Performs gradient checks on the multi-label log loss function.
+ */
+template<typename Scalar>
+inline void multi_label_log_loss_grad_test() {
+	multi_label_log_loss_grad_test<Scalar,1>(Dimensions<std::size_t,1>({ 24 }));
+	multi_label_log_loss_grad_test<Scalar,2>(Dimensions<std::size_t,2>({ 6, 6 }));
+	multi_label_log_loss_grad_test<Scalar,3>(Dimensions<std::size_t,3>({ 4, 4, 2 }));
+}
+
+TEST(GradientTest, MultiLabelLogLoss) {
+	multi_label_log_loss_grad_test<float>();
+	multi_label_log_loss_grad_test<double>();
+}
 
 } /* namespace test */
 
