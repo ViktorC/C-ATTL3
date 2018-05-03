@@ -5,8 +5,8 @@
  *      Author: Viktor Csomor
  */
 
-#ifndef INCLUDE_UTILS_EIGEN_H_
-#define INCLUDE_UTILS_EIGEN_H_
+#ifndef CATTLE_UTILS_EIGEN_H_
+#define CATTLE_UTILS_EIGEN_H_
 
 #define EIGEN_USE_THREADS
 
@@ -105,4 +105,4 @@ inline void set_num_of_eval_threads(int num_of_threads) {
 
 }
 
-#endif /* INCLUDE_UTILS_EIGEN_H_ */
+#endif /* CATTLE_UTILS_EIGEN_H_ */

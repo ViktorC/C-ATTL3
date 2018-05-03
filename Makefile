@@ -10,9 +10,9 @@ CLANG_CXXFLAGS := $(CXXFLAGS) -march=native
 CLANG_CUDA_CXXFLAGS := $(CLANG_CXXFLAGS) -DCATTLE_USE_CUBLAS
 RELEASE_OPT_FLAGS := -O3 -DNDEBUG
 DEBUG_OPT_FLAGS := -O1 -Wa,-mbig-obj -g
-GTEST_DIR := lib/googletest
+GTEST_DIR := test/gtest
 # For Clang on Windows, omp.h must be copied from GCC.
-INCLUDES := -Iexternal/Eigen/ -Iinclude/ -I$(GTEST_DIR)/include/ -Itest/
+INCLUDES := -IC-ATTL3 -IEigen -I$(GTEST_DIR)/include -Itest/
 CUDA_INCLUDES := -I"$(CUDA_INC_PATH)" $(INCLUDES)
 LIBS := -lpthread -lgomp
 CUDA_LIBS := $(LIBS) -L"$(CUDA_LIB_PATH)" -lcudart -lcublas

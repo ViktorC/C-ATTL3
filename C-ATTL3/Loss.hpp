@@ -1,12 +1,12 @@
 /*
- * Cost.h
+ * Loss.h
  *
  *  Created on: 4 Dec 2017
  *      Author: Viktor Csomor
  */
 
-#ifndef INCLUDE_LOSS_H_
-#define INCLUDE_LOSS_H_
+#ifndef CATTLE_LOSS_H_
+#define CATTLE_LOSS_H_
 
 #include <array>
 #include <cassert>
@@ -17,8 +17,8 @@
 #include <type_traits>
 #include <utility>
 
-#include "cattle/utils/Eigen.hpp"
-#include "cattle/utils/NumericUtils.hpp"
+#include "utils/Eigen.hpp"
+#include "utils/NumericUtils.hpp"
 
 namespace cattle {
 
@@ -462,4 +462,4 @@ private:
 
 } /* namespace cattle */
 
-#endif /* INCLUDE_LOSS_H_ */
+#endif /* CATTLE_LOSS_H_ */

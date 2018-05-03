@@ -5,8 +5,8 @@
  *      Author: Viktor Csomor
  */
 
-#ifndef INCLUDE_UTILS_NUMERICUTILS_H_
-#define INCLUDE_UTILS_NUMERICUTILS_H_
+#ifndef CATTLE_UTILS_NUMERICUTILS_H_
+#define CATTLE_UTILS_NUMERICUTILS_H_
 
 #include <algorithm>
 #include <limits>
@@ -120,4 +120,4 @@ public:
 }
 }
 
-#endif /* INCLUDE_UTILS_NUMERICUTILS_H_ */
+#endif /* CATTLE_UTILS_NUMERICUTILS_H_ */

@@ -5,8 +5,8 @@
  *      Author: Viktor Csomor
  */
 
-#ifndef INCLUDE_DATAPROVIDER_H_
-#define INCLUDE_DATAPROVIDER_H_
+#ifndef CATTLE_DATAPROVIDER_H_
+#define CATTLE_DATAPROVIDER_H_
 
 #include <algorithm>
 #include <array>
@@ -21,8 +21,8 @@
 #include <utility>
 #include <vector>
 
-#include "cattle/Dimensions.hpp"
-#include "cattle/utils/Eigen.hpp"
+#include "Dimensions.hpp"
+#include "utils/Eigen.hpp"
 
 // TODO Pre-fetch batches from the files.
 
@@ -632,4 +632,4 @@ private:
 
 } /* namespace cattle */
 
-#endif /* INCLUDE_DATAPROVIDER_H_ */
+#endif /* CATTLE_DATAPROVIDER_H_ */

@@ -5,8 +5,8 @@
  *      Author: Viktor Csomor
  */
 
-#ifndef INCLUDE_LAYER_H_
-#define INCLUDE_LAYER_H_
+#ifndef CATTLE_LAYER_H_
+#define CATTLE_LAYER_H_
 
 #include <algorithm>
 #include <array>
@@ -17,14 +17,14 @@
 #include <type_traits>
 #include <utility>
 
-#include "cattle/Dimensions.hpp"
-#include "cattle/ParameterRegularization.hpp"
-#include "cattle/utils/Eigen.hpp"
-#include "cattle/utils/NumericUtils.hpp"
-#include "cattle/WeightInitialization.hpp"
+#include "Dimensions.hpp"
+#include "ParameterRegularization.hpp"
+#include "utils/Eigen.hpp"
+#include "utils/NumericUtils.hpp"
+#include "WeightInitialization.hpp"
 
 #ifdef CATTLE_USE_CUBLAS
-#include "cattle/utils/CuBLASUtils.hpp"
+#include "utils/CuBLASUtils.hpp"
 #endif
 
 namespace cattle {
@@ -1990,4 +1990,4 @@ private:
 
 } /* namespace cattle */
 
-#endif /* INCLUDE_LAYER_H_ */
+#endif /* CATTLE_LAYER_H_ */

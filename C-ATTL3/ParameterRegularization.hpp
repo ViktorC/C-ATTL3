@@ -1,17 +1,17 @@
 /*
- * Regularization.h
+ * ParameterRegularization.h
  *
  *  Created on: 4 Dec 2017
  *      Author: Viktor Csomor
  */
 
-#ifndef INCLUDE_PARAMETERREGULARIZATION_H_
-#define INCLUDE_PARAMETERREGULARIZATION_H_
+#ifndef CATTLE_PARAMETERREGULARIZATION_H_
+#define CATTLE_PARAMETERREGULARIZATION_H_
 
 #include <memory>
 #include <type_traits>
 
-#include "cattle/utils/Eigen.hpp"
+#include "utils/Eigen.hpp"
 
 namespace cattle {
 
@@ -127,4 +127,4 @@ private:
 
 } /* namespace cattle */
 
-#endif /* INCLUDE_PARAMETERREGULARIZATION_H_ */
+#endif /* CATTLE_PARAMETERREGULARIZATION_H_ */

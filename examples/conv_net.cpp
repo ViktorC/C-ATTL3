@@ -9,7 +9,7 @@
 #include <utility>
 #include <vector>
 
-#include "cattle/Cattle.hpp"
+#include "Cattle.hpp"
 
 int main() {
 	// Create random observation and objective tensors for training.

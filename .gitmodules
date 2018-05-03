@@ -1,3 +1,3 @@
-[submodule "external/Eigen"]
-	path = external/Eigen
-	url = git@github.com:ViktorC/eigen-git-mirror
+[submodule "Eigen"]
+	path = Eigen
+	url = https://github.com/ViktorC/Eigen-for-C-ATTL3

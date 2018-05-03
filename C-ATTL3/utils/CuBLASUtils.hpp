@@ -5,8 +5,8 @@
  *      Author: Viktor Csomor
  */
 
-#ifndef UTILS_GPU_CUBLASUTILS_H_
-#define UTILS_GPU_CUBLASUTILS_H_
+#ifndef CATTLE_UTILS_CUBLASUTILS_H_
+#define CATTLE_UTILS_CUBLASUTILS_H_
 
 #include <cassert>
 #include <cstddef>
@@ -16,7 +16,7 @@
 #include <string>
 #include <type_traits>
 
-#include "cattle/utils/Eigen.hpp"
+#include "Eigen.hpp"
 
 namespace cattle {
 namespace internal {
@@ -176,4 +176,4 @@ private:
 }
 } /* namespace cattle */
 
-#endif /* UTILS_GPU_CUBLASUTILS_H_ */
+#endif /* CATTLE_UTILS_CUBLASUTILS_H_ */

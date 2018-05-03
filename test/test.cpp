@@ -6,8 +6,8 @@
  */
 
 #include <cstring>
-#include <gtest/gtest.h>
 
+#include "gtest/gtest.h"
 #include "gradient_test.hpp"
 
 bool cattle::test::verbose;

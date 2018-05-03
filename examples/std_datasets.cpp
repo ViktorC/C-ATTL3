@@ -11,7 +11,7 @@
 #include <utility>
 #include <vector>
 
-#include "cattle/Cattle.hpp"
+#include "Cattle.hpp"
 
 int main() {
 	// Create a CIFAR-10 data provider by specifying the paths to the training files.

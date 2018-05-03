@@ -1,19 +1,19 @@
 /*
- * Initialization.h
+ * WeightInitialization.h
  *
  *  Created on: 13.12.2017
  *      Author: Viktor Csomor
  */
 
-#ifndef INCLUDE_WEIGHTINITIALIZATION_H_
-#define INCLUDE_WEIGHTINITIALIZATION_H_
+#ifndef CATTLE_WEIGHTINITIALIZATION_H_
+#define CATTLE_WEIGHTINITIALIZATION_H_
 
 #include <cmath>
 #include <random>
 #include <string>
 #include <type_traits>
 
-#include "cattle/utils/Eigen.hpp"
+#include "utils/Eigen.hpp"
 
 namespace cattle {
 
@@ -207,4 +207,4 @@ private:
 
 } /* namespace cattle */
 
-#endif /* INCLUDE_WEIGHTINITIALIZATION_H_ */
+#endif /* CATTLE_WEIGHTINITIALIZATION_H_ */
