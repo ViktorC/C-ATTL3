@@ -39,7 +39,7 @@ template<typename Scalar, std::size_t Rank, bool Sequential> class Optimizer;
  * An enumeration type for the different ways the outputs of sub-modules of neural networks
  * may be merged.
  */
-enum OutputMergeType { CONCAT_LO_RANK, CONCAT_HI_RANK, SUM };
+enum OutputMergeType { CONCAT_LO_RANK, CONCAT_HI_RANK, SUM, MUL };
 
 /**
  * An enumeration type for the different ways the input of a layer in a dense network may be concatenated
@@ -421,17 +421,17 @@ private:
 
 /**
  * A class template for composite neural networks consisting of one or more neural
- * networks.
+ * network modules.
  */
-template<typename Scalar, std::size_t Rank, bool Sequential>
+template<typename Scalar, std::size_t Rank, bool Sequential, typename Module>
 class CompositeNeuralNetwork : public NeuralNetwork<Scalar,Rank,Sequential> {
 public:
 	/**
-	 * @return A vector of neural network pointers pointing to the sub-modules of the
-	 * composite network instance. The ownership of the modules is not transferred
-	 * to the caller of the method.
+	 * @return A vector of pointers pointing to the sub-modules of the composite
+	 * network instance. The ownership of the modules is not transferred to the
+	 * caller of the method.
 	 */
-	virtual std::vector<NeuralNetwork<Scalar,Rank,Sequential>*> get_modules() = 0;
+	virtual std::vector<Module*> get_modules() = 0;
 };
 
 /**
@@ -446,7 +446,8 @@ using NeuralNetPtr = std::unique_ptr<NeuralNetwork<Scalar,Rank,Sequential>>;
  * serially stacked neural network sub-modules.
  */
 template<typename Scalar, std::size_t Rank, bool Sequential>
-class StackedNeuralNetwork : public CompositeNeuralNetwork<Scalar,Rank,Sequential> {
+class StackedNeuralNetwork :
+		public CompositeNeuralNetwork<Scalar,Rank,Sequential,NeuralNetwork<Scalar,Rank,Sequential>> {
 	typedef NeuralNetwork<Scalar,Rank,Sequential> Base;
 	typedef StackedNeuralNetwork<Scalar,Rank,Sequential> Self;
 	typedef NeuralNetPtr<Scalar,Rank,Sequential> Block;
@@ -573,15 +574,16 @@ private:
  * lanes of non-sequential neural networks with the same input dimensions. Inputs
  * and gradients are propagated through the lanes simultaneously using multithreading.
  * The outputs of the lanes are merged by concatenation (either along the lowest
- * or hightest rank) or summation.
+ * or hightest rank), summation, or multiplication.
  */
 template<typename Scalar, std::size_t Rank, OutputMergeType MergeType = CONCAT_HI_RANK>
-class ParallelNeuralNetwork : public CompositeNeuralNetwork<Scalar,Rank,false> {
+class ParallelNeuralNetwork :
+		public CompositeNeuralNetwork<Scalar,Rank,false,NeuralNetwork<Scalar,Rank,false>> {
 	typedef NeuralNetwork<Scalar,Rank,false> Base;
 	typedef ParallelNeuralNetwork<Scalar,Rank,MergeType> Self;
 	typedef NeuralNetPtr<Scalar,Rank,false> Lane;
 	typedef std::array<std::size_t,Base::DATA_RANK> RankwiseArray;
-	static_assert(MergeType >= CONCAT_LO_RANK && MergeType <= SUM, "illegal merge type value");
+	static_assert(MergeType >= CONCAT_LO_RANK && MergeType <= MUL, "illegal merge type value");
 	static constexpr std::size_t CONCAT_RANK = MergeType == CONCAT_HI_RANK ? Rank - 1 : 0;
 	static constexpr std::size_t CONCAT_BATCH_RANK = CONCAT_RANK + 1;
 public:
@@ -591,7 +593,8 @@ public:
 	 */
 	inline ParallelNeuralNetwork(std::vector<Lane>&& lanes, bool foremost = true) :
 			lanes(std::move(lanes)),
-			foremost(foremost) {
+			foremost(foremost),
+			outputs(this->lanes.size()) {
 		assert(this->lanes.size() > 0 && "lanes must contain at least 1 element");
 		assert(this->lanes[0] != nullptr && "lanes contains null pointers");
 		Base& first_lane = *this->lanes[0];
@@ -602,7 +605,7 @@ public:
 			Base& lane = *this->lanes[i];
 			assert(input_dims == lane.get_input_dims());
 			const typename Base::Dims& lane_output_dims = lane.get_output_dims();
-			if (MergeType != SUM) {
+			if (MergeType == CONCAT_HI_RANK || MergeType == CONCAT_LO_RANK) {
 				if (MergeType == CONCAT_HI_RANK) {
 					for (std::size_t i = 0; i < +CONCAT_RANK; ++i)
 						assert(output_dims(i) == lane_output_dims(i));
@@ -628,7 +631,8 @@ public:
 			lanes(network.lanes.size()),
 			foremost(network.foremost),
 			input_dims(network.input_dims),
-			output_dims(network.output_dims) {
+			output_dims(network.output_dims),
+			outputs(network.outputs) {
 		for (unsigned i = 0; i < lanes.size(); ++i)
 			lanes[i] = Lane(network.lanes[i]->clone());
 	}
@@ -673,6 +677,7 @@ public:
 		swap(network1.foremost, network2.foremost);
 		swap(network1.input_dims, network2.input_dims);
 		swap(network1.output_dims, network2.output_dims);
+		swap(network1.outputs, network2.outputs);
 	}
 protected:
 	inline void set_foremost(bool foremost) {
@@ -681,8 +686,10 @@ protected:
 		this->foremost = foremost;
 	}
 	inline void empty_caches() {
-		for (unsigned i = 0; i < lanes.size(); ++i)
+		for (unsigned i = 0; i < lanes.size(); ++i) {
 			lanes[i]->empty_caches();
+			outputs[i] = typename Base::Data();
+		}
 	}
 	inline typename Base::Data propagate(typename Base::Data input, bool training) {
 		assert(input_dims == (Dimensions<std::size_t,Base::DATA_RANK>(input.dimensions()).template demote<>()));
@@ -716,14 +723,19 @@ protected:
 			}
 		}
 		for (unsigned i = 0; i < lane_num; ++i) {
-			if (i == 0)
+			if (i == 0) {
 				out = std::move(args_arr[i].out);
-			else {
+				if (MergeType == MUL)
+					outputs[i] = out;
+			} else {
 				pthread_state = pthread_join(threads[i - 1], nullptr);
 				assert(!pthread_state);
 				if (MergeType == SUM)
 					out += args_arr[i].out;
-				else {
+				else if (MergeType == MUL) {
+					outputs[i] = std::move(args_arr[i].out);
+					out *= outputs[i];
+				} else {
 					// Must be evaluated first due to the dimension difference.
 					typename Base::Data concat = out.concatenate(std::move(args_arr[i].out), +CONCAT_BATCH_RANK);
 					out = std::move(concat);
@@ -776,7 +788,7 @@ protected:
 				assert(!pthread_state);
 			}
 		}
-		for (unsigned i = 0; i < lanes.size(); ++i) {
+		for (std::size_t i = 0; i < lanes.size(); ++i) {
 			if (i != 0) {
 				pthread_state = pthread_join(threads[i - 1], nullptr);
 				assert(!pthread_state);
@@ -806,6 +818,7 @@ private:
 	bool foremost;
 	typename Base::Dims input_dims;
 	typename Base::Dims output_dims;
+	std::vector<typename Base::Data> outputs;
 	/**
 	 * A struct containing the data required for propagation.
 	 */
@@ -848,7 +861,16 @@ private:
 	inline static void* backpropagate(void* args_ptr) {
 		BackpropArgs& args = *((BackpropArgs*) args_ptr);
 		Base& lane = *args.obj->lanes[args.lane_id];
-		if (MergeType != SUM) {
+		if (MergeType == SUM)
+			args.prev_out_grads = lane.backpropagate(*args.out_grads);
+		else if (MergeType == MUL) {
+			typename Base::Data out_grads = *args.out_grads;
+			for (std::size_t i = 0; i < args.obj->lanes.size(); ++i) {
+				if (i != (std::size_t) args.lane_id)
+					out_grads *= args.obj->outputs[i];
+			}
+			args.prev_out_grads = lane.backpropagate(std::move(out_grads));
+		} else {
 			RankwiseArray offsets;
 			RankwiseArray extents = lane.get_output_dims().template promote<>();
 			offsets.fill(0);
@@ -856,8 +878,7 @@ private:
 			extents[0] = args.out_grads->dimension(0);
 			typename Base::Data out_grads_slice = args.out_grads->slice(offsets, extents);
 			args.prev_out_grads = lane.backpropagate(std::move(out_grads_slice));
-		} else
-			args.prev_out_grads = lane.backpropagate(*args.out_grads);
+		}
 		return nullptr;
 	}
 };
@@ -867,7 +888,8 @@ private:
  * sub-modules.
  */
 template<typename Scalar, std::size_t Rank>
-class ResidualNeuralNetwork : public CompositeNeuralNetwork<Scalar,Rank,false> {
+class ResidualNeuralNetwork :
+		public CompositeNeuralNetwork<Scalar,Rank,false,NeuralNetwork<Scalar,Rank,false>> {
 	typedef NeuralNetwork<Scalar,Rank,false> Base;
 	typedef NeuralNetPtr<Scalar,Rank,false> Module;
 	typedef ResidualNeuralNetwork<Scalar,Rank> Self;
@@ -999,7 +1021,8 @@ private:
  * its lowest or highest rank.
  */
 template<typename Scalar, std::size_t Rank, DenseConcatType ConcatType = HIGHEST_RANK>
-class DenseNeuralNetwork : public NeuralNetwork<Scalar,Rank,false> {
+class DenseNeuralNetwork :
+		public CompositeNeuralNetwork<Scalar,Rank,false,NeuralNetwork<Scalar,Rank,false>> {
 	typedef NeuralNetwork<Scalar,Rank,false> Base;
 	typedef NeuralNetPtr<Scalar,Rank,false> Module;
 	typedef DenseNeuralNetwork<Scalar,Rank,ConcatType> Self;
@@ -1158,7 +1181,8 @@ protected:
  * again once the internal, non-sequential network is done processing them.
  */
 template<typename Scalar, std::size_t Rank>
-class SequentialNeuralNetwork : public NeuralNetwork<Scalar,Rank,true> {
+class SequentialNeuralNetwork :
+		public CompositeNeuralNetwork<Scalar,Rank,true,NeuralNetwork<Scalar,Rank,false>> {
 	typedef NeuralNetwork<Scalar,Rank,true> Base;
 	typedef SequentialNeuralNetwork<Scalar,Rank> Self;
 	typedef NeuralNetPtr<Scalar,Rank,false> Net;
@@ -1211,6 +1235,11 @@ public:
 	}
 	inline std::vector<Layer<Scalar,Rank>*> get_layers() {
 		return net->get_layers();
+	}
+	inline std::vector<NeuralNetwork<Scalar,Rank,false>*> get_modules() {
+		std::vector<NeuralNetwork<Scalar,Rank,false>*> modules;
+		modules.push_back(net.get());
+		return modules;
 	}
 	inline friend void swap(Self& network1, Self& network2) {
 		using std::swap;
@@ -2581,7 +2610,7 @@ using UnidirNeuralNetPtr = std::unique_ptr<UnidirectionalNeuralNetwork<Scalar,Ra
  * highest rank.
  */
 template<typename Scalar, std::size_t Rank, OutputMergeType MergeType = CONCAT_LO_RANK>
-class BidirectionalNeuralNetwork : public CompositeNeuralNetwork<Scalar,Rank,true> {
+class BidirectionalNeuralNetwork : public CompositeNeuralNetwork<Scalar,Rank,true,UnidirectionalNeuralNetwork<Scalar,Rank>> {
 	typedef NeuralNetwork<Scalar,Rank,true> Base;
 	typedef BidirectionalNeuralNetwork<Scalar,Rank,MergeType> Self;
 	typedef UnidirNeuralNetPtr<Scalar,Rank> UnidirNet;
@@ -2642,8 +2671,8 @@ public:
 			layers.push_back(net_rev_layers[i]);
 		return layers;
 	}
-	inline std::vector<Base*> get_modules() {
-		std::vector<Base*> modules;
+	inline std::vector<UnidirectionalNeuralNetwork<Scalar,Rank>*> get_modules() {
+		std::vector<UnidirectionalNeuralNetwork<Scalar,Rank>*> modules;
 		modules.push_back(net.get());
 		modules.push_back(net_rev.get());
 		return modules;

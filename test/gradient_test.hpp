@@ -548,25 +548,42 @@ TEST(GradientTest, BatchNormLayer) {
 template<typename Scalar>
 inline void parallel_net_grad_test() {
 	auto init = WeightInitSharedPtr<Scalar>(new GlorotWeightInitialization<Scalar>());
-	// Rank 1.
+	// Rank 1 with summation.
 	Dimensions<std::size_t,1> dims_1({ 32u });
-	std::vector<NeuralNetPtr<Scalar,1,false>> lanes_1;
-	std::vector<LayerPtr<Scalar,1>> lane1_1_layers(1);
-	lane1_1_layers[0] = LayerPtr<Scalar,1>(new FCLayer<Scalar,1>(dims_1, 6, init));
-	lanes_1.push_back(NeuralNetPtr<Scalar,1,false>(new FeedforwardNeuralNetwork<Scalar,1>(std::move(lane1_1_layers))));
-	std::vector<LayerPtr<Scalar,1>> lane2_1_layers(3);
-	lane2_1_layers[0] = LayerPtr<Scalar,1>(new FCLayer<Scalar,1>(dims_1, 12, init));
-	lane2_1_layers[1] = LayerPtr<Scalar,1>(new SigmoidActivationLayer<Scalar,1>(lane2_1_layers[0]->get_output_dims()));
-	lane2_1_layers[2] = LayerPtr<Scalar,1>(new FCLayer<Scalar,1>(lane2_1_layers[1]->get_output_dims(), 6, init));
-	lanes_1.push_back(NeuralNetPtr<Scalar,1,false>(new FeedforwardNeuralNetwork<Scalar,1>(std::move(lane2_1_layers))));
-	std::vector<LayerPtr<Scalar,1>> lane3_1_layers(2);
-	lane3_1_layers[0] = LayerPtr<Scalar,1>(new FCLayer<Scalar,1>(dims_1, 4, init));
-	lane3_1_layers[1] = LayerPtr<Scalar,1>(new FCLayer<Scalar,1>(lane3_1_layers[0]->get_output_dims(), 6, init));
-	lanes_1.push_back(NeuralNetPtr<Scalar,1,false>(new FeedforwardNeuralNetwork<Scalar,1>(std::move(lane3_1_layers))));
-	NeuralNetPtr<Scalar,1,false> parallel_net_1(new ParallelNeuralNetwork<Scalar,1,SUM>(std::move(lanes_1)));
-	ASSERT_TRUE((parallel_net_1->get_output_dims() == Dimensions<std::size_t,1>({ 6 })));
-	nonseq_network_grad_test<Scalar,1>("parallel net", std::move(parallel_net_1));
-	// Rank 2.
+	std::vector<NeuralNetPtr<Scalar,1,false>> lanes1_1;
+	std::vector<LayerPtr<Scalar,1>> lane1_1_1_layers(1);
+	lane1_1_1_layers[0] = LayerPtr<Scalar,1>(new FCLayer<Scalar,1>(dims_1, 6, init));
+	lanes1_1.push_back(NeuralNetPtr<Scalar,1,false>(new FeedforwardNeuralNetwork<Scalar,1>(std::move(lane1_1_1_layers))));
+	std::vector<LayerPtr<Scalar,1>> lane2_1_1_layers(3);
+	lane2_1_1_layers[0] = LayerPtr<Scalar,1>(new FCLayer<Scalar,1>(dims_1, 12, init));
+	lane2_1_1_layers[1] = LayerPtr<Scalar,1>(new SigmoidActivationLayer<Scalar,1>(lane2_1_1_layers[0]->get_output_dims()));
+	lane2_1_1_layers[2] = LayerPtr<Scalar,1>(new FCLayer<Scalar,1>(lane2_1_1_layers[1]->get_output_dims(), 6, init));
+	lanes1_1.push_back(NeuralNetPtr<Scalar,1,false>(new FeedforwardNeuralNetwork<Scalar,1>(std::move(lane2_1_1_layers))));
+	std::vector<LayerPtr<Scalar,1>> lane3_1_1_layers(2);
+	lane3_1_1_layers[0] = LayerPtr<Scalar,1>(new FCLayer<Scalar,1>(dims_1, 4, init));
+	lane3_1_1_layers[1] = LayerPtr<Scalar,1>(new FCLayer<Scalar,1>(lane3_1_1_layers[0]->get_output_dims(), 6, init));
+	lanes1_1.push_back(NeuralNetPtr<Scalar,1,false>(new FeedforwardNeuralNetwork<Scalar,1>(std::move(lane3_1_1_layers))));
+	NeuralNetPtr<Scalar,1,false> parallel_net1_1(new ParallelNeuralNetwork<Scalar,1,SUM>(std::move(lanes1_1)));
+	ASSERT_TRUE((parallel_net1_1->get_output_dims() == Dimensions<std::size_t,1>({ 6 })));
+	nonseq_network_grad_test<Scalar,1>("parallel net with summation", std::move(parallel_net1_1));
+	// Rank 1 with multiplication.
+	std::vector<NeuralNetPtr<Scalar,1,false>> lanes2_1;
+	std::vector<LayerPtr<Scalar,1>> lane1_2_1_layers(1);
+	lane1_2_1_layers[0] = LayerPtr<Scalar,1>(new FCLayer<Scalar,1>(dims_1, 6, init));
+	lanes2_1.push_back(NeuralNetPtr<Scalar,1,false>(new FeedforwardNeuralNetwork<Scalar,1>(std::move(lane1_2_1_layers))));
+	std::vector<LayerPtr<Scalar,1>> lane2_2_1_layers(3);
+	lane2_2_1_layers[0] = LayerPtr<Scalar,1>(new FCLayer<Scalar,1>(dims_1, 12, init));
+	lane2_2_1_layers[1] = LayerPtr<Scalar,1>(new SigmoidActivationLayer<Scalar,1>(lane2_2_1_layers[0]->get_output_dims()));
+	lane2_2_1_layers[2] = LayerPtr<Scalar,1>(new FCLayer<Scalar,1>(lane2_2_1_layers[1]->get_output_dims(), 6, init));
+	lanes2_1.push_back(NeuralNetPtr<Scalar,1,false>(new FeedforwardNeuralNetwork<Scalar,1>(std::move(lane2_2_1_layers))));
+	std::vector<LayerPtr<Scalar,1>> lane3_2_1_layers(2);
+	lane3_2_1_layers[0] = LayerPtr<Scalar,1>(new FCLayer<Scalar,1>(dims_1, 4, init));
+	lane3_2_1_layers[1] = LayerPtr<Scalar,1>(new FCLayer<Scalar,1>(lane3_2_1_layers[0]->get_output_dims(), 6, init));
+	lanes2_1.push_back(NeuralNetPtr<Scalar,1,false>(new FeedforwardNeuralNetwork<Scalar,1>(std::move(lane3_2_1_layers))));
+	NeuralNetPtr<Scalar,1,false> parallel_net2_1(new ParallelNeuralNetwork<Scalar,1,MUL>(std::move(lanes2_1)));
+	ASSERT_TRUE((parallel_net2_1->get_output_dims() == Dimensions<std::size_t,1>({ 6 })));
+	nonseq_network_grad_test<Scalar,1>("parallel net with multiplication", std::move(parallel_net2_1));
+	// Rank 2 with lowest rank concatenation.
 	Dimensions<std::size_t,2> dims_2({ 6u, 6u });
 	std::vector<NeuralNetPtr<Scalar,2,false>> lanes_2;
 	std::vector<LayerPtr<Scalar,2>> lane1_2_layers(1);
@@ -577,8 +594,8 @@ inline void parallel_net_grad_test() {
 	lanes_2.push_back(NeuralNetPtr<Scalar,2,false>(new FeedforwardNeuralNetwork<Scalar,2>(std::move(lane2_2_layers))));
 	NeuralNetPtr<Scalar,2,false> parallel_net_2(new ParallelNeuralNetwork<Scalar,2,CONCAT_LO_RANK>(std::move(lanes_2)));
 	ASSERT_TRUE((parallel_net_2->get_output_dims() == Dimensions<std::size_t,2>({ 18, 1 })));
-	nonseq_network_grad_test<Scalar,2>("parallel net", std::move(parallel_net_2));
-	// Rank 3.
+	nonseq_network_grad_test<Scalar,2>("parallel net with lowest rank concatenation", std::move(parallel_net_2));
+	// Rank 3 with highest rank concatenation.
 	Dimensions<std::size_t,3> dims_3({ 4u, 4u, 3u });
 	std::vector<NeuralNetPtr<Scalar,3,false>> lanes_3;
 	std::vector<LayerPtr<Scalar,3>> lane1_3_layers(1);
@@ -589,7 +606,7 @@ inline void parallel_net_grad_test() {
 	lanes_3.push_back(NeuralNetPtr<Scalar,3,false>(new FeedforwardNeuralNetwork<Scalar,3>(std::move(lane2_3_layers))));
 	NeuralNetPtr<Scalar,3,false> parallel_net_3(new ParallelNeuralNetwork<Scalar,3>(std::move(lanes_3)));
 	ASSERT_TRUE((parallel_net_3->get_output_dims() == Dimensions<std::size_t,3>({ 4, 4, 6 })));
-	nonseq_network_grad_test<Scalar,3>("parallel net", std::move(parallel_net_3));
+	nonseq_network_grad_test<Scalar,3>("parallel net with highest rank concatenation", std::move(parallel_net_3));
 }
 
 TEST(GradientTest, ParallelNet) {

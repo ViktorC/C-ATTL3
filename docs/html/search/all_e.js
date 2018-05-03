@@ -5,6 +5,7 @@ var searchData=
   ['neuralnetptr',['NeuralNetPtr',['../namespacecattle.html#a4d754351864153898cdbd3918dc1525b',1,'cattle']]],
   ['neuralnetwork',['NeuralNetwork',['../classcattle_1_1_neural_network.html',1,'cattle']]],
   ['neuralnetwork_3c_20scalar_2c_20rank_2c_20false_20_3e',['NeuralNetwork&lt; Scalar, Rank, false &gt;',['../classcattle_1_1_neural_network.html',1,'cattle']]],
+  ['neuralnetwork_3c_20scalar_2c_20rank_2c_20false_2c_20neuralnetwork_3c_20scalar_2c_20rank_2c_20false_20_3e_20_3e',['NeuralNetwork&lt; Scalar, Rank, false, NeuralNetwork&lt; Scalar, Rank, false &gt; &gt;',['../classcattle_1_1_neural_network.html',1,'cattle']]],
   ['neuralnetwork_3c_20scalar_2c_20rank_2c_20true_20_3e',['NeuralNetwork&lt; Scalar, Rank, true &gt;',['../classcattle_1_1_neural_network.html',1,'cattle']]],
   ['noparameterregularization',['NoParameterRegularization',['../classcattle_1_1_no_parameter_regularization.html',1,'cattle']]],
   ['normalizationpreprocessor',['NormalizationPreprocessor',['../classcattle_1_1_normalization_preprocessor.html',1,'cattle::NormalizationPreprocessor&lt; Scalar, Rank, Standardize &gt;'],['../classcattle_1_1_normalization_preprocessor.html#a1987f52abf107c7435181946179ac385',1,'cattle::NormalizationPreprocessor::NormalizationPreprocessor()'],['../classcattle_1_1_normalization_preprocessor_3_01_scalar_00_013_00_01_standardize_01_4.html#a240e252e0ff20b0435300fb859f742e2',1,'cattle::NormalizationPreprocessor&lt; Scalar, 3, Standardize &gt;::NormalizationPreprocessor()']]],

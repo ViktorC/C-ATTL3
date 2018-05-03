@@ -82,7 +82,8 @@ Inheritance diagram for cattle::BidirectionalNeuralNetwork&lt; Scalar, Rank, Mer
  <div class="center">
   <img src="classcattle_1_1_bidirectional_neural_network.png" usemap="#cattle::BidirectionalNeuralNetwork_3C_20Scalar_2C_20Rank_2C_20MergeType_20_3E_map" alt=""/>
   <map id="cattle::BidirectionalNeuralNetwork_3C_20Scalar_2C_20Rank_2C_20MergeType_20_3E_map" name="cattle::BidirectionalNeuralNetwork_3C_20Scalar_2C_20Rank_2C_20MergeType_20_3E_map">
-<area href="classcattle_1_1_neural_network.html" alt="cattle::NeuralNetwork&lt; Scalar, Rank, true &gt;" shape="rect" coords="0,0,374,24"/>
+<area href="classcattle_1_1_composite_neural_network.html" alt="cattle::CompositeNeuralNetwork&lt; Scalar, Rank, true, UnidirectionalNeuralNetwork&lt; Scalar, Rank &gt; &gt;" shape="rect" coords="0,56,587,80"/>
+<area href="classcattle_1_1_neural_network.html" alt="cattle::NeuralNetwork&lt; Scalar, Rank, Sequential &gt;" shape="rect" coords="0,0,587,24"/>
 </map>
  </div></div>
 <table class="memberdecls">
@@ -100,7 +101,9 @@ Public Member Functions</h2></td></tr>
 <tr class="separator:aac567c95a4dd332dd2239c5a6714bc75"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a052fff2227a28520de4ef74cd8f45352"><td class="memItemLeft" align="right" valign="top">std::vector&lt; <a class="el" href="classcattle_1_1_layer.html">Layer</a>&lt; Scalar, Rank &gt; * &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_bidirectional_neural_network.html#a052fff2227a28520de4ef74cd8f45352">get_layers</a> ()</td></tr>
 <tr class="separator:a052fff2227a28520de4ef74cd8f45352"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="inherit_header pub_methods_classcattle_1_1_neural_network"><td colspan="2" onclick="javascript:toggleInherit('pub_methods_classcattle_1_1_neural_network')"><img src="closed.png" alt="-"/>&#160;Public Member Functions inherited from <a class="el" href="classcattle_1_1_neural_network.html">cattle::NeuralNetwork&lt; Scalar, Rank, true &gt;</a></td></tr>
+<tr class="memitem:ae9249dbef2dc0bf7955af7a2bd2bc794"><td class="memItemLeft" align="right" valign="top">std::vector&lt; <a class="el" href="classcattle_1_1_unidirectional_neural_network.html">UnidirectionalNeuralNetwork</a>&lt; Scalar, Rank &gt; * &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_bidirectional_neural_network.html#ae9249dbef2dc0bf7955af7a2bd2bc794">get_modules</a> ()</td></tr>
+<tr class="separator:ae9249dbef2dc0bf7955af7a2bd2bc794"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="inherit_header pub_methods_classcattle_1_1_neural_network"><td colspan="2" onclick="javascript:toggleInherit('pub_methods_classcattle_1_1_neural_network')"><img src="closed.png" alt="-"/>&#160;Public Member Functions inherited from <a class="el" href="classcattle_1_1_neural_network.html">cattle::NeuralNetwork&lt; Scalar, Rank, Sequential &gt;</a></td></tr>
 <tr class="memitem:ae59c0963d75b1f2de4f18a6c8fe85fa8 inherit pub_methods_classcattle_1_1_neural_network"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_neural_network.html#ae59c0963d75b1f2de4f18a6c8fe85fa8">init</a> ()</td></tr>
 <tr class="separator:ae59c0963d75b1f2de4f18a6c8fe85fa8 inherit pub_methods_classcattle_1_1_neural_network"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ac88007e2f8fa2a208de0e51c8ac422cc inherit pub_methods_classcattle_1_1_neural_network"><td class="memItemLeft" align="right" valign="top">virtual Data&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_neural_network.html#ac88007e2f8fa2a208de0e51c8ac422cc">infer</a> (Data input)</td></tr>
@@ -121,7 +124,7 @@ Protected Member Functions</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="inherited"></a>
 Additional Inherited Members</h2></td></tr>
-<tr class="inherit_header pro_static_methods_classcattle_1_1_neural_network"><td colspan="2" onclick="javascript:toggleInherit('pro_static_methods_classcattle_1_1_neural_network')"><img src="closed.png" alt="-"/>&#160;Static Protected Member Functions inherited from <a class="el" href="classcattle_1_1_neural_network.html">cattle::NeuralNetwork&lt; Scalar, Rank, true &gt;</a></td></tr>
+<tr class="inherit_header pro_static_methods_classcattle_1_1_neural_network"><td colspan="2" onclick="javascript:toggleInherit('pro_static_methods_classcattle_1_1_neural_network')"><img src="closed.png" alt="-"/>&#160;Static Protected Member Functions inherited from <a class="el" href="classcattle_1_1_neural_network.html">cattle::NeuralNetwork&lt; Scalar, Rank, Sequential &gt;</a></td></tr>
 <tr class="memitem:aeb549ff03b351397f4c7bded24d55e7c inherit pro_static_methods_classcattle_1_1_neural_network"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="classcattle_1_1_layer.html">Layer</a>&lt; Scalar, Rank &gt; *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_neural_network.html#aeb549ff03b351397f4c7bded24d55e7c">clone_with_shared_params</a> (const <a class="el" href="classcattle_1_1_layer.html">Layer</a>&lt; Scalar, Rank &gt; &amp;layer)</td></tr>
 <tr class="separator:aeb549ff03b351397f4c7bded24d55e7c inherit pro_static_methods_classcattle_1_1_neural_network"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a6cdd26677f188f7c499f520a01082b60 inherit pro_static_methods_classcattle_1_1_neural_network"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_neural_network.html#a6cdd26677f188f7c499f520a01082b60">set_input_layer</a> (<a class="el" href="classcattle_1_1_layer.html">Layer</a>&lt; Scalar, Rank &gt; &amp;layer, bool on)</td></tr>
@@ -221,7 +224,7 @@ template&lt;typename Scalar , std::size_t Rank, OutputMergeType MergeType = CONC
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>The derivative of the loss function w.r.t. the input of the network or a null tensor if the network is a foremost network. </dd></dl>
 
-<p>Implements <a class="el" href="classcattle_1_1_neural_network.html#ae4fd8a1e33b0d9cbb975a6ee5c41fa6c">cattle::NeuralNetwork&lt; Scalar, Rank, true &gt;</a>.</p>
+<p>Implements <a class="el" href="classcattle_1_1_neural_network.html#ae4fd8a1e33b0d9cbb975a6ee5c41fa6c">cattle::NeuralNetwork&lt; Scalar, Rank, Sequential &gt;</a>.</p>
 
 </div>
 </div>
@@ -252,7 +255,7 @@ template&lt;typename Scalar , std::size_t Rank, OutputMergeType MergeType = CONC
 <p>A constant method implementing the clone pattern.</p>
 <dl class="section return"><dt>Returns</dt><dd>A pointer to a copy of the instance. The instance does not take ownership of the returned pointer (i.e. the caller is responsible for deleting it). </dd></dl>
 
-<p>Implements <a class="el" href="classcattle_1_1_neural_network.html#a2abd58d4e18caa4ae95563da19c8338b">cattle::NeuralNetwork&lt; Scalar, Rank, true &gt;</a>.</p>
+<p>Implements <a class="el" href="classcattle_1_1_neural_network.html#a2abd58d4e18caa4ae95563da19c8338b">cattle::NeuralNetwork&lt; Scalar, Rank, Sequential &gt;</a>.</p>
 
 </div>
 </div>
@@ -282,7 +285,7 @@ template&lt;typename Scalar , std::size_t Rank, OutputMergeType MergeType = CONC
 </div><div class="memdoc">
 <p>Empties the caches of every layer of the network. </p>
 
-<p>Implements <a class="el" href="classcattle_1_1_neural_network.html#a9ca6f92bd8f0f284d05ed4fef5af55ca">cattle::NeuralNetwork&lt; Scalar, Rank, true &gt;</a>.</p>
+<p>Implements <a class="el" href="classcattle_1_1_neural_network.html#a9ca6f92bd8f0f284d05ed4fef5af55ca">cattle::NeuralNetwork&lt; Scalar, Rank, Sequential &gt;</a>.</p>
 
 </div>
 </div>
@@ -312,7 +315,7 @@ template&lt;typename Scalar , std::size_t Rank, OutputMergeType MergeType = CONC
 </div><div class="memdoc">
 <dl class="section return"><dt>Returns</dt><dd>A constant reference to the member variable denoting the dimensions of the tensors accepted by the network as its input along (except for the first rank which denotes the variable sample size and in case of sequential networks the second rank which denotes the variable time steps). </dd></dl>
 
-<p>Implements <a class="el" href="classcattle_1_1_neural_network.html#acbea7d3cad12acbd2728e092acba4a25">cattle::NeuralNetwork&lt; Scalar, Rank, true &gt;</a>.</p>
+<p>Implements <a class="el" href="classcattle_1_1_neural_network.html#acbea7d3cad12acbd2728e092acba4a25">cattle::NeuralNetwork&lt; Scalar, Rank, Sequential &gt;</a>.</p>
 
 </div>
 </div>
@@ -342,7 +345,37 @@ template&lt;typename Scalar , std::size_t Rank, OutputMergeType MergeType = CONC
 </div><div class="memdoc">
 <dl class="section return"><dt>Returns</dt><dd>A vector of pointers to the layers of the network. The ownership of the layers remains with the network. </dd></dl>
 
-<p>Implements <a class="el" href="classcattle_1_1_neural_network.html#a297039d2fff23643c9b73da7b4bb686c">cattle::NeuralNetwork&lt; Scalar, Rank, true &gt;</a>.</p>
+<p>Implements <a class="el" href="classcattle_1_1_neural_network.html#a297039d2fff23643c9b73da7b4bb686c">cattle::NeuralNetwork&lt; Scalar, Rank, Sequential &gt;</a>.</p>
+
+</div>
+</div>
+<a id="ae9249dbef2dc0bf7955af7a2bd2bc794"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae9249dbef2dc0bf7955af7a2bd2bc794">&#9670;&nbsp;</a></span>get_modules()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename Scalar , std::size_t Rank, OutputMergeType MergeType = CONCAT_LO_RANK&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::vector&lt;<a class="el" href="classcattle_1_1_unidirectional_neural_network.html">UnidirectionalNeuralNetwork</a>&lt;Scalar,Rank&gt;*&gt; <a class="el" href="classcattle_1_1_bidirectional_neural_network.html">cattle::BidirectionalNeuralNetwork</a>&lt; Scalar, Rank, MergeType &gt;::get_modules </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<dl class="section return"><dt>Returns</dt><dd>A vector of pointers pointing to the sub-modules of the composite network instance. The ownership of the modules is not transferred to the caller of the method. </dd></dl>
+
+<p>Implements <a class="el" href="classcattle_1_1_composite_neural_network.html#ab7f9075535798ac5b144364c390bcc66">cattle::CompositeNeuralNetwork&lt; Scalar, Rank, true, UnidirectionalNeuralNetwork&lt; Scalar, Rank &gt; &gt;</a>.</p>
 
 </div>
 </div>
@@ -372,7 +405,7 @@ template&lt;typename Scalar , std::size_t Rank, OutputMergeType MergeType = CONC
 </div><div class="memdoc">
 <dl class="section return"><dt>Returns</dt><dd>A constant reference to the member variable denoting the dimensions of the tensors output by the network (except for the first rank which denotes the variable sample size and in case of sequential networks the second rank which denotes the variable time steps). </dd></dl>
 
-<p>Implements <a class="el" href="classcattle_1_1_neural_network.html#abae4c549cee2b29c2b6e072ce0314303">cattle::NeuralNetwork&lt; Scalar, Rank, true &gt;</a>.</p>
+<p>Implements <a class="el" href="classcattle_1_1_neural_network.html#abae4c549cee2b29c2b6e072ce0314303">cattle::NeuralNetwork&lt; Scalar, Rank, Sequential &gt;</a>.</p>
 
 </div>
 </div>
@@ -402,7 +435,7 @@ template&lt;typename Scalar , std::size_t Rank, OutputMergeType MergeType = CONC
 </div><div class="memdoc">
 <dl class="section return"><dt>Returns</dt><dd>Whether the instance is a foremost network. If the instance is not a stand-alone network and it is not the first module of a complex network, it is not a foremost network. Foremost networks do not need to back-propagate the gradients all the way given that no other network is expected to depend on them. </dd></dl>
 
-<p>Implements <a class="el" href="classcattle_1_1_neural_network.html#a5dadb8900281afff9167f02b2d75c86a">cattle::NeuralNetwork&lt; Scalar, Rank, true &gt;</a>.</p>
+<p>Implements <a class="el" href="classcattle_1_1_neural_network.html#a5dadb8900281afff9167f02b2d75c86a">cattle::NeuralNetwork&lt; Scalar, Rank, Sequential &gt;</a>.</p>
 
 </div>
 </div>
@@ -451,7 +484,7 @@ template&lt;typename Scalar , std::size_t Rank, OutputMergeType MergeType = CONC
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>The output tensor of the network in response to the input. </dd></dl>
 
-<p>Implements <a class="el" href="classcattle_1_1_neural_network.html#a6ade9cd95110766ff25e7b157c9fddcf">cattle::NeuralNetwork&lt; Scalar, Rank, true &gt;</a>.</p>
+<p>Implements <a class="el" href="classcattle_1_1_neural_network.html#a6ade9cd95110766ff25e7b157c9fddcf">cattle::NeuralNetwork&lt; Scalar, Rank, Sequential &gt;</a>.</p>
 
 </div>
 </div>
@@ -488,12 +521,12 @@ template&lt;typename Scalar , std::size_t Rank, OutputMergeType MergeType = CONC
   </dd>
 </dl>
 
-<p>Implements <a class="el" href="classcattle_1_1_neural_network.html#ae417618e6c761cf7630f24dff2d3568a">cattle::NeuralNetwork&lt; Scalar, Rank, true &gt;</a>.</p>
+<p>Implements <a class="el" href="classcattle_1_1_neural_network.html#ae417618e6c761cf7630f24dff2d3568a">cattle::NeuralNetwork&lt; Scalar, Rank, Sequential &gt;</a>.</p>
 
 </div>
 </div>
 <hr/>The documentation for this class was generated from the following file:<ul>
-<li>include/cattle/<a class="el" href="_neural_network_8hpp_source.html">NeuralNetwork.hpp</a></li>
+<li>C:/Users/A6714/git/C-ATTL3/C-ATTL3/<a class="el" href="_neural_network_8hpp_source.html">NeuralNetwork.hpp</a></li>
 </ul>
 </div><!-- contents -->
 <!-- start footer part -->
