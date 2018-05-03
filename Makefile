@@ -4,10 +4,10 @@ CLANG_CXX := clang++
 CXXFLAGS := -std=c++11 -fmessage-length=0 -ftemplate-backtrace-limit=0
 # AVX instructions are problematic with GCC 64 bit on Windows due to its lack of support for 32 byte stack alignment.
 GCC_CXXFLAGS := $(CXXFLAGS) -Wno-ignored-attributes -fopenmp
-GCC_CUDA_CXXFLAGS := $(GCC_CXXFLAGS) -DCATTLE_USE_CUBLAS
+GCC_CUDA_CXXFLAGS := $(GCC_CXXFLAGS) -DCATTL3_USE_CUBLAS
 # Clang does not actually utilize OpenMP on Windows; no libomp or libiomp5.
 CLANG_CXXFLAGS := $(CXXFLAGS) -march=native
-CLANG_CUDA_CXXFLAGS := $(CLANG_CXXFLAGS) -DCATTLE_USE_CUBLAS
+CLANG_CUDA_CXXFLAGS := $(CLANG_CXXFLAGS) -DCATTL3_USE_CUBLAS
 RELEASE_OPT_FLAGS := -O3 -DNDEBUG
 DEBUG_OPT_FLAGS := -O1 -Wa,-mbig-obj -g
 GTEST_DIR := test/gtest

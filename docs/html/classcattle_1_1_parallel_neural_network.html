@@ -98,9 +98,9 @@ Public Member Functions</h2></td></tr>
 <tr class="separator:a5bd9cce2f1fbbd2dd87fd6ffcb2b1a52"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a8a0293c70c8583ca3446f9ef7998852f"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classcattle_1_1_neural_network.html">Base</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_parallel_neural_network.html#a8a0293c70c8583ca3446f9ef7998852f">clone</a> () const</td></tr>
 <tr class="separator:a8a0293c70c8583ca3446f9ef7998852f"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a5b60c593e8982b4b7e0d4d24b1aee236"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="classcattle_1_1_dimensions.html">Base::Dims</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_parallel_neural_network.html#a5b60c593e8982b4b7e0d4d24b1aee236">get_input_dims</a> () const</td></tr>
+<tr class="memitem:a5b60c593e8982b4b7e0d4d24b1aee236"><td class="memItemLeft" align="right" valign="top">const Base::Dims &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_parallel_neural_network.html#a5b60c593e8982b4b7e0d4d24b1aee236">get_input_dims</a> () const</td></tr>
 <tr class="separator:a5b60c593e8982b4b7e0d4d24b1aee236"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a10e0039aa177ae89c690d962a871fa93"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="classcattle_1_1_dimensions.html">Base::Dims</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_parallel_neural_network.html#a10e0039aa177ae89c690d962a871fa93">get_output_dims</a> () const</td></tr>
+<tr class="memitem:a10e0039aa177ae89c690d962a871fa93"><td class="memItemLeft" align="right" valign="top">const Base::Dims &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_parallel_neural_network.html#a10e0039aa177ae89c690d962a871fa93">get_output_dims</a> () const</td></tr>
 <tr class="separator:a10e0039aa177ae89c690d962a871fa93"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a5a9722d13ece51610438246ae9ead068"><td class="memItemLeft" align="right" valign="top">std::vector&lt; <a class="el" href="classcattle_1_1_layer.html">Layer</a>&lt; Scalar, Rank &gt; * &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_parallel_neural_network.html#a5a9722d13ece51610438246ae9ead068">get_layers</a> ()</td></tr>
 <tr class="separator:a5a9722d13ece51610438246ae9ead068"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -147,7 +147,7 @@ Static Protected Member Functions</h2></td></tr>
 <div class="textblock"><h3>template&lt;typename Scalar, std::size_t Rank, OutputMergeType MergeType = CONCAT_HI_RANK&gt;<br />
 class cattle::ParallelNeuralNetwork&lt; Scalar, Rank, MergeType &gt;</h3>
 
-<p>A class template for a parallel neural network that consists of one or more lanes of non-sequential neural networks with the same input dimensions. Inputs and gradients are propagated through the lanes simultaneously using multithreading. The outputs of the lanes are merged by concatenation (either along the lowest or hightest rank) or summation. </p>
+<p>A class template for a parallel neural network that consists of one or more lanes of non-sequential neural networks with the same input dimensions. Inputs and gradients are propagated through the lanes simultaneously using multithreading. The outputs of the lanes are merged by concatenation (either along the lowest or hightest rank), summation, or multiplication. </p>
 </div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
 <a id="a13e1a4201d072bca0476a2280b0eb40f"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a13e1a4201d072bca0476a2280b0eb40f">&#9670;&nbsp;</a></span>ParallelNeuralNetwork() <span class="overload">[1/2]</span></h2>
@@ -387,7 +387,7 @@ template&lt;typename Scalar , std::size_t Rank, OutputMergeType MergeType = CONC
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">const <a class="el" href="classcattle_1_1_dimensions.html">Base::Dims</a>&amp; <a class="el" href="classcattle_1_1_parallel_neural_network.html">cattle::ParallelNeuralNetwork</a>&lt; Scalar, Rank, MergeType &gt;::get_input_dims </td>
+          <td class="memname">const Base::Dims&amp; <a class="el" href="classcattle_1_1_parallel_neural_network.html">cattle::ParallelNeuralNetwork</a>&lt; Scalar, Rank, MergeType &gt;::get_input_dims </td>
           <td>(</td>
           <td class="paramname"></td><td>)</td>
           <td> const</td>
@@ -477,7 +477,7 @@ template&lt;typename Scalar , std::size_t Rank, OutputMergeType MergeType = CONC
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">const <a class="el" href="classcattle_1_1_dimensions.html">Base::Dims</a>&amp; <a class="el" href="classcattle_1_1_parallel_neural_network.html">cattle::ParallelNeuralNetwork</a>&lt; Scalar, Rank, MergeType &gt;::get_output_dims </td>
+          <td class="memname">const Base::Dims&amp; <a class="el" href="classcattle_1_1_parallel_neural_network.html">cattle::ParallelNeuralNetwork</a>&lt; Scalar, Rank, MergeType &gt;::get_output_dims </td>
           <td>(</td>
           <td class="paramname"></td><td>)</td>
           <td> const</td>
@@ -612,7 +612,7 @@ template&lt;typename Scalar , std::size_t Rank, OutputMergeType MergeType = CONC
 </div>
 </div>
 <hr/>The documentation for this class was generated from the following file:<ul>
-<li>C:/Users/A6714/git/C-ATTL3/C-ATTL3/<a class="el" href="_neural_network_8hpp_source.html">NeuralNetwork.hpp</a></li>
+<li>C:/Users/Viktor/git/C-ATTL3/C-ATTL3/<a class="el" href="_neural_network_8hpp_source.html">NeuralNetwork.hpp</a></li>
 </ul>
 </div><!-- contents -->
 <!-- start footer part -->

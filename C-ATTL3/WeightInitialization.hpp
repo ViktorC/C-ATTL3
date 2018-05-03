@@ -5,8 +5,8 @@
  *      Author: Viktor Csomor
  */
 
-#ifndef CATTLE_WEIGHTINITIALIZATION_H_
-#define CATTLE_WEIGHTINITIALIZATION_H_
+#ifndef CATTL3_WEIGHTINITIALIZATION_H_
+#define CATTL3_WEIGHTINITIALIZATION_H_
 
 #include <cmath>
 #include <random>
@@ -207,4 +207,4 @@ private:
 
 } /* namespace cattle */
 
-#endif /* CATTLE_WEIGHTINITIALIZATION_H_ */
+#endif /* CATTL3_WEIGHTINITIALIZATION_H_ */

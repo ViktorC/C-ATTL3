@@ -5,8 +5,8 @@
  *      Author: Viktor Csomor
  */
 
-#ifndef CATTLE_LOSS_H_
-#define CATTLE_LOSS_H_
+#ifndef CATTL3_LOSS_H_
+#define CATTL3_LOSS_H_
 
 #include <array>
 #include <cassert>
@@ -462,4 +462,4 @@ private:
 
 } /* namespace cattle */
 
-#endif /* CATTLE_LOSS_H_ */
+#endif /* CATTL3_LOSS_H_ */

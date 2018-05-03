@@ -5,8 +5,8 @@
  *      Author: Viktor Csomor
  */
 
-#ifndef CATTLE_DATAPROVIDER_H_
-#define CATTLE_DATAPROVIDER_H_
+#ifndef CATTL3_DATAPROVIDER_H_
+#define CATTL3_DATAPROVIDER_H_
 
 #include <algorithm>
 #include <array>
@@ -632,4 +632,4 @@ private:
 
 } /* namespace cattle */
 
-#endif /* CATTLE_DATAPROVIDER_H_ */
+#endif /* CATTL3_DATAPROVIDER_H_ */

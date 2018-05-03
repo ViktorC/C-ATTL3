@@ -4,7 +4,6 @@ var searchData=
   ['nesterovmomentumacceleratedsgdoptimizer',['NesterovMomentumAcceleratedSGDOptimizer',['../classcattle_1_1_nesterov_momentum_accelerated_s_g_d_optimizer.html',1,'cattle']]],
   ['neuralnetwork',['NeuralNetwork',['../classcattle_1_1_neural_network.html',1,'cattle']]],
   ['neuralnetwork_3c_20scalar_2c_20rank_2c_20false_20_3e',['NeuralNetwork&lt; Scalar, Rank, false &gt;',['../classcattle_1_1_neural_network.html',1,'cattle']]],
-  ['neuralnetwork_3c_20scalar_2c_20rank_2c_20false_2c_20neuralnetwork_3c_20scalar_2c_20rank_2c_20false_20_3e_20_3e',['NeuralNetwork&lt; Scalar, Rank, false, NeuralNetwork&lt; Scalar, Rank, false &gt; &gt;',['../classcattle_1_1_neural_network.html',1,'cattle']]],
   ['neuralnetwork_3c_20scalar_2c_20rank_2c_20true_20_3e',['NeuralNetwork&lt; Scalar, Rank, true &gt;',['../classcattle_1_1_neural_network.html',1,'cattle']]],
   ['noparameterregularization',['NoParameterRegularization',['../classcattle_1_1_no_parameter_regularization.html',1,'cattle']]],
   ['normalizationpreprocessor',['NormalizationPreprocessor',['../classcattle_1_1_normalization_preprocessor.html',1,'cattle']]],

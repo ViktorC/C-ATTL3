@@ -5,8 +5,8 @@
  *      Author: Viktor Csomor
  */
 
-#ifndef CATTLE_UTILS_CUBLASUTILS_H_
-#define CATTLE_UTILS_CUBLASUTILS_H_
+#ifndef CATTL3_UTILS_CUBLASUTILS_H_
+#define CATTL3_UTILS_CUBLASUTILS_H_
 
 #include <cassert>
 #include <cstddef>
@@ -176,4 +176,4 @@ private:
 }
 } /* namespace cattle */
 
-#endif /* CATTLE_UTILS_CUBLASUTILS_H_ */
+#endif /* CATTL3_UTILS_CUBLASUTILS_H_ */

@@ -5,8 +5,8 @@
  *      Author: Viktor Csomor
  */
 
-#ifndef CATTLE_OPTIMIZER_H_
-#define CATTLE_OPTIMIZER_H_
+#ifndef CATTL3_OPTIMIZER_H_
+#define CATTL3_OPTIMIZER_H_
 
 #include <algorithm>
 #include <cassert>
@@ -860,4 +860,4 @@ protected:
 
 } /* namespace cattle */
 
-#endif /* CATTLE_OPTIMIZER_H_ */
+#endif /* CATTL3_OPTIMIZER_H_ */

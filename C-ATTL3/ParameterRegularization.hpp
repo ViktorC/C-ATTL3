@@ -5,8 +5,8 @@
  *      Author: Viktor Csomor
  */
 
-#ifndef CATTLE_PARAMETERREGULARIZATION_H_
-#define CATTLE_PARAMETERREGULARIZATION_H_
+#ifndef CATTL3_PARAMETERREGULARIZATION_H_
+#define CATTL3_PARAMETERREGULARIZATION_H_
 
 #include <memory>
 #include <type_traits>
@@ -127,4 +127,4 @@ private:
 
 } /* namespace cattle */
 
-#endif /* CATTLE_PARAMETERREGULARIZATION_H_ */
+#endif /* CATTL3_PARAMETERREGULARIZATION_H_ */

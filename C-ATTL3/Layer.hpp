@@ -5,8 +5,8 @@
  *      Author: Viktor Csomor
  */
 
-#ifndef CATTLE_LAYER_H_
-#define CATTLE_LAYER_H_
+#ifndef CATTL3_LAYER_H_
+#define CATTL3_LAYER_H_
 
 #include <algorithm>
 #include <array>
@@ -23,7 +23,7 @@
 #include "utils/NumericUtils.hpp"
 #include "WeightInitialization.hpp"
 
-#ifdef CATTLE_USE_CUBLAS
+#ifdef CATTL3_USE_CUBLAS
 #include "utils/CuBLASUtils.hpp"
 #endif
 
@@ -325,7 +325,7 @@ protected:
 		biased_in = Matrix<Scalar>(in.dimension(0), input_size + 1);
 		biased_in.leftCols(input_size) = MatrixMap<Scalar>(in.data(), in.dimension(0), input_size);
 		biased_in.col(input_size).setOnes();
-#ifndef CATTLE_USE_CUBLAS
+#ifndef CATTL3_USE_CUBLAS
 		Matrix<Scalar> out = biased_in * Base::weights_ref;
 #else
 		Matrix<Scalar> out = internal::CuBLASUtils<Scalar>::get_instance().mul(biased_in, Base::weights_ref, false, false);
@@ -337,7 +337,7 @@ protected:
 		assert((Dimensions<std::size_t,Root::DATA_RANK>(out_grads.dimensions()).template demote<>()) == Base::output_dims);
 		assert(out_grads.dimension(0) > 0 && biased_in.rows() == out_grads.dimension(0));
 		// Compute the gradient of the outputs with respect to the weights.
-#ifndef CATTLE_USE_CUBLAS
+#ifndef CATTL3_USE_CUBLAS
 		MatrixMap<Scalar> out_grads_mat(out_grads.data(), out_grads.dimension(0), Base::output_dims.get_volume());
 		Base::weights_grad = biased_in.transpose() * out_grads_mat;
 		if (Base::is_input_layer())
@@ -501,7 +501,7 @@ protected:
 		assert(patch_ind == total_patches);
 		// Bias trick.
 		biased_in.col(receptor_vol).setOnes();
-#ifndef CATTLE_USE_CUBLAS
+#ifndef CATTL3_USE_CUBLAS
 		Matrix<Scalar> out = biased_in * Base::weights_ref;
 #else
 		Matrix<Scalar> out = internal::CuBLASUtils<Scalar>::get_instance().mul(biased_in,
@@ -517,7 +517,7 @@ protected:
 		std::size_t rows = out_grads.dimension(0);
 		std::size_t patches = Base::output_dims(0) * Base::output_dims(1);
 		std::size_t receptor_vol = Base::weights_ref.rows() - 1;
-#ifndef CATTLE_USE_CUBLAS
+#ifndef CATTL3_USE_CUBLAS
 		MatrixMap<Scalar> out_grads_mat(out_grads.data(), rows * Base::output_dims(0) * Base::output_dims(1), filters);
 		Base::weights_grad = biased_in.transpose() * out_grads_mat;
 		if (Base::is_input_layer())
@@ -1990,4 +1990,4 @@ private:
 
 } /* namespace cattle */
 
-#endif /* CATTLE_LAYER_H_ */
+#endif /* CATTL3_LAYER_H_ */

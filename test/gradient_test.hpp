@@ -909,7 +909,7 @@ inline void bidirectional_net_grad_test() {
 	KernelPtr<Scalar,3> output_kernel1(new FCLayer<Scalar,3>(input_kernel1->get_output_dims(), 2, init, reg));
 	ActivationPtr<Scalar,3> state_act1(new SigmoidActivationLayer<Scalar,3>(input_kernel1->get_output_dims()));
 	ActivationPtr<Scalar,3> output_act1(new IdentityActivationLayer<Scalar,3>(output_kernel1->get_output_dims()));
-	seq_network_grad_test("bidirectional recurrent net", NeuralNetPtr<Scalar,3,true>(
+	seq_network_grad_test("bidirectional recurrent net with highest rank concatenation", NeuralNetPtr<Scalar,3,true>(
 			new BidirectionalNeuralNetwork<Scalar,3,CONCAT_HI_RANK>(UnidirNeuralNetPtr<Scalar,3>(
 					new RecurrentNeuralNetwork<Scalar,3,true>(std::move(input_kernel1), std::move(state_kernel1),
 							std::move(output_kernel1), std::move(state_act1), std::move(output_act1),
@@ -930,7 +930,7 @@ inline void bidirectional_net_grad_test() {
 	ActivationPtr<Scalar,2> candidate_act2(new SoftplusActivationLayer<Scalar,2>(output_dims));
 	ActivationPtr<Scalar,2> state_act2(new SoftplusActivationLayer<Scalar,2>(output_dims));
 	ActivationPtr<Scalar,2> read_act2(new SigmoidActivationLayer<Scalar,2>(output_dims));
-	seq_network_grad_test("bidirectional lstm net", NeuralNetPtr<Scalar,2,true>(
+	seq_network_grad_test("bidirectional lstm net with lowest rank concatenation", NeuralNetPtr<Scalar,2,true>(
 			new BidirectionalNeuralNetwork<Scalar,2,CONCAT_LO_RANK>(UnidirNeuralNetPtr<Scalar,2>(
 					new LSTMNeuralNetwork<Scalar,2,true>(std::move(forget_input_kernel2),
 							std::move(forget_output_kernel2), std::move(write_input_kernel2),
@@ -945,11 +945,22 @@ inline void bidirectional_net_grad_test() {
 	KernelPtr<Scalar,1> output_kernel3(new FCLayer<Scalar,1>(input_kernel3->get_output_dims(), 1, init, reg));
 	ActivationPtr<Scalar,1> state_act3(new SigmoidActivationLayer<Scalar,1>(input_kernel3->get_output_dims()));
 	ActivationPtr<Scalar,1> output_act3(new SigmoidActivationLayer<Scalar,1>(output_kernel3->get_output_dims()));
-	seq_network_grad_test("bidirectional recurrent net", NeuralNetPtr<Scalar,1,true>(
+	seq_network_grad_test("bidirectional recurrent net with summation", NeuralNetPtr<Scalar,1,true>(
 			new BidirectionalNeuralNetwork<Scalar,1,SUM>(UnidirNeuralNetPtr<Scalar,1>(
 					new RecurrentNeuralNetwork<Scalar,1>(std::move(input_kernel3), std::move(state_kernel3),
 							std::move(output_kernel3), std::move(state_act3), std::move(output_act3),
 							[](int input_seq_length) { return std::make_pair(5, 2); })))), 7, 5);
+	// 3rd degree RNN with multiplication.
+	KernelPtr<Scalar,3> input_kernel4(new ConvLayer<Scalar>(Dimensions<std::size_t,3>({ 4u, 4u, 2u }), 5, init, reg));
+	KernelPtr<Scalar,3> state_kernel4(new ConvLayer<Scalar>(input_kernel4->get_output_dims(), 5, init, reg));
+	KernelPtr<Scalar,3> output_kernel4(new FCLayer<Scalar,3>(input_kernel4->get_output_dims(), 2, init, reg));
+	ActivationPtr<Scalar,3> state_act4(new SigmoidActivationLayer<Scalar,3>(input_kernel4->get_output_dims()));
+	ActivationPtr<Scalar,3> output_act4(new IdentityActivationLayer<Scalar,3>(output_kernel4->get_output_dims()));
+	seq_network_grad_test("bidirectional recurrent net with multiplication", NeuralNetPtr<Scalar,3,true>(
+			new BidirectionalNeuralNetwork<Scalar,3,MUL>(UnidirNeuralNetPtr<Scalar,3>(
+					new RecurrentNeuralNetwork<Scalar,3,true>(std::move(input_kernel4), std::move(state_kernel4),
+							std::move(output_kernel4), std::move(state_act4), std::move(output_act4),
+							[](int input_seq_length) { return std::make_pair(3, 2); })))), 7, 3);
 }
 
 TEST(GradientTest, BidirectionalNet) {

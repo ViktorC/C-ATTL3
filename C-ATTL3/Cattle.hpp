@@ -5,8 +5,8 @@
  *      Author: Viktor Csomor
  */
 
-#ifndef CATTLE_CATTLE_H_
-#define CATTLE_CATTLE_H_
+#ifndef CATTL3_CATTLE_H_
+#define CATTL3_CATTLE_H_
 
 #include "DataProvider.hpp"
 #include "Dimensions.hpp"
@@ -18,4 +18,4 @@
 #include "Preprocessor.hpp"
 #include "WeightInitialization.hpp"
 
-#endif /* CATTLE_CATTLE_H_ */
+#endif /* CATTL3_CATTLE_H_ */

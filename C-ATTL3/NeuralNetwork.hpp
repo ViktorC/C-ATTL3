@@ -5,8 +5,8 @@
  *      Author: Viktor Csomor
  */
 
-#ifndef CATTLE_NEURALNETWORK_H_
-#define CATTLE_NEURALNETWORK_H_
+#ifndef CATTL3_NEURALNETWORK_H_
+#define CATTL3_NEURALNETWORK_H_
 
 #include <algorithm>
 #include <array>
@@ -27,9 +27,8 @@
 #include "Layer.hpp"
 #include "utils/Eigen.hpp"
 
-// TODO GRU network.
-// TODO Possibility to add and remove modules (e.g. layers for simple feed-forward networks, residual modules for ResNets).
 // TODO Serialization.
+// TODO GRU network.
 
 namespace cattle {
 
@@ -2610,12 +2609,13 @@ using UnidirNeuralNetPtr = std::unique_ptr<UnidirectionalNeuralNetwork<Scalar,Ra
  * highest rank.
  */
 template<typename Scalar, std::size_t Rank, OutputMergeType MergeType = CONCAT_LO_RANK>
-class BidirectionalNeuralNetwork : public CompositeNeuralNetwork<Scalar,Rank,true,UnidirectionalNeuralNetwork<Scalar,Rank>> {
+class BidirectionalNeuralNetwork :
+		public CompositeNeuralNetwork<Scalar,Rank,true,UnidirectionalNeuralNetwork<Scalar,Rank>> {
 	typedef NeuralNetwork<Scalar,Rank,true> Base;
 	typedef BidirectionalNeuralNetwork<Scalar,Rank,MergeType> Self;
 	typedef UnidirNeuralNetPtr<Scalar,Rank> UnidirNet;
 	typedef std::array<std::size_t,Base::DATA_RANK> RankwiseArray;
-	static_assert(MergeType >= CONCAT_LO_RANK && MergeType <= SUM, "illegal merge type value");
+	static_assert(MergeType >= CONCAT_LO_RANK && MergeType <= MUL, "illegal merge type value");
 	static constexpr std::size_t CONCAT_RANK = MergeType == CONCAT_HI_RANK ? Rank - 1 : 0;
 	static constexpr std::size_t CONCAT_BATCH_RANK = CONCAT_RANK + 2;
 public:
@@ -2640,7 +2640,9 @@ public:
 			net_rev(UnidirNet((UnidirectionalNeuralNetwork<Scalar,Rank>*) network.net_rev->clone())),
 			foremost(network.foremost),
 			input_dims(network.input_dims),
-			output_dims(network.output_dims) { }
+			output_dims(network.output_dims),
+			output(network.output),
+			output_rev(network.output_rev) { }
 	inline BidirectionalNeuralNetwork(Self&& network) {
 		swap(*this, network);
 	}
@@ -2684,6 +2686,8 @@ public:
 		swap(network1.foremost, network2.foremost);
 		swap(network1.input_dims, network2.input_dims);
 		swap(network1.output_dims, network2.output_dims);
+		swap(network1.output, network2.output);
+		swap(network1.output_rev, network2.output_rev);
 	}
 protected:
 	inline void set_foremost(bool foremost) {
@@ -2694,6 +2698,8 @@ protected:
 	inline void empty_caches() {
 		net->empty_caches();
 		net_rev->empty_caches();
+		output = typename Base::Data();
+		output_rev = typename Base::Data();
 	}
 	inline typename Base::Data propagate(typename Base::Data input, bool training) {
 		assert(input_dims == (Dimensions<std::size_t,Base::DATA_RANK>(input.dimensions()).template demote<2>()));
@@ -2716,10 +2722,14 @@ protected:
 		pthread_state = pthread_attr_destroy(&attr);
 		assert(!pthread_state);
 		assert(forward_out.dimension(1) == args.out.dimension(1));
-		if (MergeType != SUM)
-			return forward_out.concatenate(args.out, +CONCAT_BATCH_RANK);
-		else
+		if (MergeType == SUM)
 			return forward_out + args.out;
+		else if (MergeType == MUL) {
+			output = std::move(forward_out);
+			output_rev = std::move(args.out);
+			return output * output_rev;
+		} else
+			return forward_out.concatenate(args.out, +CONCAT_BATCH_RANK);
 	}
 	inline typename Base::Data backpropagate(typename Base::Data out_grads) {
 		Dimensions<std::size_t,Base::DATA_RANK> dims(out_grads.dimensions());
@@ -2734,7 +2744,24 @@ protected:
 		BackpropArgs args;
 		args.obj = this;
 		typename Base::Data forward_prev_out_grads;
-		if (MergeType != SUM) {
+		if (MergeType == SUM) {
+			args.out_grads = &out_grads;
+			pthread_state = pthread_create(&helper_thread, &attr, backpropagate, &args);
+			assert(!pthread_state);
+			forward_prev_out_grads = net->backpropagate(out_grads);
+			pthread_state = pthread_join(helper_thread, nullptr);
+			assert(!pthread_state);
+			out_grads = typename Base::Data();
+		} else if (MergeType == MUL) {
+			typename Base::Data out_grads_rev = output * out_grads;
+			args.out_grads = &out_grads_rev;
+			pthread_state = pthread_create(&helper_thread, &attr, backpropagate, &args);
+			assert(!pthread_state);
+			out_grads *= output_rev;
+			forward_prev_out_grads = net->backpropagate(std::move(out_grads));
+			pthread_state = pthread_join(helper_thread, nullptr);
+			assert(!pthread_state);
+		} else {
 			RankwiseArray offsets;
 			RankwiseArray extents = dims;
 			offsets.fill(0);
@@ -2746,21 +2773,14 @@ protected:
 			assert(!pthread_state);
 			offsets[+CONCAT_BATCH_RANK] -= extents[+CONCAT_BATCH_RANK];
 			typename Base::Data forward_slice = out_grads.slice(offsets, extents);
+			out_grads = typename Base::Data();
 			forward_prev_out_grads = net->backpropagate(std::move(forward_slice));
 			// Make sure that backward_slice does not go out of scope before the thread terminates.
-			pthread_state = pthread_join(helper_thread, nullptr);
-			assert(!pthread_state);
-		} else {
-			args.out_grads = &out_grads;
-			pthread_state = pthread_create(&helper_thread, &attr, backpropagate, &args);
-			assert(!pthread_state);
-			forward_prev_out_grads = net->backpropagate(out_grads);
 			pthread_state = pthread_join(helper_thread, nullptr);
 			assert(!pthread_state);
 		}
 		pthread_state = pthread_attr_destroy(&attr);
 		assert(!pthread_state);
-		out_grads = typename Base::Data();
 		return forward_prev_out_grads + args.prev_out_grads;
 	}
 private:
@@ -2769,6 +2789,8 @@ private:
 	bool foremost;
 	typename Base::Dims input_dims;
 	typename Base::Dims output_dims;
+	typename Base::Data output;
+	typename Base::Data output_rev;
 	/**
 	 * A struct containing the data required for propagation.
 	 */
@@ -2814,4 +2836,4 @@ private:
 
 } /* namespace cattle */
 
-#endif /* CATTLE_NEURALNETWORK_H_ */
+#endif /* CATTL3_NEURALNETWORK_H_ */

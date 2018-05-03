@@ -5,8 +5,8 @@
  *      Author: Viktor Csomor
  */
 
-#ifndef CATTLE_PREPROCESSOR_H_
-#define CATTLE_PREPROCESSOR_H_
+#ifndef CATTL3_PREPROCESSOR_H_
+#define CATTL3_PREPROCESSOR_H_
 
 #include <algorithm>
 #include <array>
@@ -294,4 +294,4 @@ public:
 
 } /* namespace cattle */
 
-#endif /* CATTLE_PREPROCESSOR_H_ */
+#endif /* CATTL3_PREPROCESSOR_H_ */
