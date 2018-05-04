@@ -127,27 +127,10 @@ public:
 	 */
 	inline virtual std::string to_string() {
 		std::stringstream strm;
-		strm << "Neural Net " << this << std::endl;
+		strm << "Neural Net <" << typeid(*this).name() << this << ">" << std::endl;
 		std::vector<Layer<Scalar,Rank>*> layers = get_layers();
-		for (unsigned i = 0; i < layers.size(); ++i) {
-			Layer<Scalar,Rank>* layer = layers[i];
-			strm << "\tLayer " << std::setw(3) << std::to_string(i + 1) << std::string(28, '-') << std::endl;
-			strm << "\t\tinput dims: " << layer->get_input_dims().to_string() << std::endl;
-			strm << "\t\toutput dims: " << layer->get_output_dims().to_string() << std::endl;
-			if (layer->is_parametric()) {
-				strm << "\t\tparams:" << std::endl;
-				Matrix<Scalar>& params = layer->get_params();
-				for (int j = 0; j < params.rows(); ++j) {
-					strm << "\t\t[ ";
-					for (int k = 0; k < params.cols(); ++k) {
-						strm << std::setw(11) << std::setprecision(4) << params(j,k);
-						if (k != params.cols() - 1)
-							strm << ", ";
-					}
-					strm << " ]" << std::endl;
-				}
-			}
-		}
+		for (unsigned i = 0; i < layers.size(); ++i)
+			strm << "Layer " << std::setw(3) << std::to_string(i) << " " << *layers[i];
 		return strm.str();
 	}
 	friend std::ostream& operator<<(std::ostream& os, NeuralNetwork<Scalar,Rank,Sequential>& nn) {
@@ -2625,14 +2608,14 @@ public:
 	 * @param foremost Whether the network is to function as a foremost network.
 	 */
 	inline BidirectionalNeuralNetwork(UnidirNet&& network, bool foremost = true) :
-				net(std::move(network)),
-				foremost(foremost) {
+			net(std::move(network)),
+			foremost(foremost) {
 		assert(this->net);
 		net_rev = UnidirNet((UnidirectionalNeuralNetwork<Scalar,Rank>*) this->net->clone());
 		net_rev->reverse();
 		input_dims = this->net->get_input_dims();
 		output_dims = this->net->get_output_dims();
-		if (MergeType != SUM)
+		if (MergeType == CONCAT_LO_RANK || MergeType == CONCAT_HI_RANK)
 			output_dims(+CONCAT_RANK) *= 2;
 	}
 	inline BidirectionalNeuralNetwork(const Self& network) :

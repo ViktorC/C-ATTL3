@@ -13,7 +13,9 @@
 #include <cassert>
 #include <cmath>
 #include <cstddef>
+#include <iomanip>
 #include <memory>
+#include <sstream>
 #include <type_traits>
 #include <utility>
 
@@ -97,6 +99,36 @@ public:
 	 */
 	inline bool is_parametric() {
 		return get_params().rows() > 0 && get_params().cols() > 0;
+	}
+	/**
+	 * @return A string representation of the layer.
+	 */
+	inline virtual std::string to_string() {
+		static const int header_length = 128;
+		std::stringstream strm;
+		std::stringstream id_num_strm;
+		id_num_strm << this;
+		std::string id = "<" + std::string(typeid(*this).name()) + id_num_strm.str() + ">";
+		strm << id << std::string(std::max(0, (int) (header_length - id.length())), '-') << std::endl;
+		strm << "\tinput dims: " << get_input_dims().to_string() << std::endl;
+		strm << "\toutput dims: " << get_output_dims().to_string() << std::endl;
+		if (is_parametric()) {
+			strm << "\tparams:" << std::endl;
+			Matrix<Scalar>& params = get_params();
+			for (int j = 0; j < params.rows(); ++j) {
+				strm << "\t[ ";
+				for (int k = 0; k < params.cols(); ++k) {
+					strm << std::setw(11) << std::setprecision(4) << params(j,k);
+					if (k != params.cols() - 1)
+						strm << ", ";
+				}
+				strm << " ]" << std::endl;
+			}
+		}
+		return strm.str();
+	}
+	friend std::ostream& operator<<(std::ostream& os, Layer<Scalar,Rank>& layer) {
+		return os << layer.to_string() << std::flush;
 	}
 protected:
 	// Rank is increased by one to allow for batch training.

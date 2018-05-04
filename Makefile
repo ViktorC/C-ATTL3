@@ -1,6 +1,7 @@
 MAKE := make -f Makefile
 GCC_CXX := g++
 CLANG_CXX := clang++
+COV := gcov
 CXXFLAGS := -std=c++11 -fmessage-length=0 -ftemplate-backtrace-limit=0
 # AVX instructions are problematic with GCC 64 bit on Windows due to its lack of support for 32 byte stack alignment.
 GCC_CXXFLAGS := $(CXXFLAGS) -Wno-ignored-attributes -fopenmp
@@ -9,13 +10,15 @@ GCC_CUDA_CXXFLAGS := $(GCC_CXXFLAGS) -DCATTL3_USE_CUBLAS
 CLANG_CXXFLAGS := $(CXXFLAGS) -march=native
 CLANG_CUDA_CXXFLAGS := $(CLANG_CXXFLAGS) -DCATTL3_USE_CUBLAS
 RELEASE_OPT_FLAGS := -O3 -DNDEBUG
-DEBUG_OPT_FLAGS := -O1 -Wa,-mbig-obj -g
+# Support gcov/lcov.
+DEBUG_OPT_FLAGS := -O1 -Wa,-mbig-obj -g -fprofile-arcs -ftest-coverage
 GTEST_DIR := test/gtest
 # For Clang on Windows, omp.h must be copied from GCC.
 INCLUDES := -IC-ATTL3 -IEigen -I$(GTEST_DIR)/include -Itest/
 CUDA_INCLUDES := -I"$(CUDA_INC_PATH)" $(INCLUDES)
 LIBS := -lpthread -lgomp
 CUDA_LIBS := $(LIBS) -L"$(CUDA_LIB_PATH)" -lcudart -lcublas
+HEADER_DIR := C-ATTL3
 SOURCE_DIR := test
 SOURCES := test.cpp
 BUILD_DIR := build
@@ -85,8 +88,10 @@ clang_cuda_debug:
 		LIBS='$(CUDA_LIBS)'
 check:
 	@bin/cattle_test.exe
+coverage:
+	$(COV) -o $(BUILD_DIR) $(BUILD_DIR)/test.cpp
 clean:
-	$(RM) $(OBJECTS) $(TARGET)
+	$(RM) -r $(BUILD_DIR) $(TARGET_DIR)
 		@cd $(GTEST_MAKE_PATH) && make clean && cd $(CURDIR)
 .depend:
 	$(CC) -MM $(CFLAGS) $(SOURCES) > $@
