@@ -11,7 +11,7 @@ CLANG_CXXFLAGS := $(CXXFLAGS) -march=native
 CLANG_CUDA_CXXFLAGS := $(CLANG_CXXFLAGS) -DCATTL3_USE_CUBLAS
 RELEASE_OPT_FLAGS := -O3 -DNDEBUG
 # Without level 1 optimization, the file is too big.
-DEBUG_OPT_FLAGS := -O1 -Wa,-mbig-obj -g
+DEBUG_OPT_FLAGS := -O1 -g
 # Support gcov/lcov.
 COVERAGE_OPT_FLAGS := $(DEBUG_OPT_FLAGS) -fprofile-arcs -ftest-coverage
 GTEST_DIR := test/gtest
@@ -20,9 +20,9 @@ INCLUDES := -IC-ATTL3 -IEigen -I$(GTEST_DIR)/include -Itest/
 CUDA_INCLUDES := -I"$(CUDA_INC_PATH)" $(INCLUDES)
 LIBS := -lpthread -lgomp
 CUDA_LIBS := $(LIBS) -L"$(CUDA_LIB_PATH)" -lcudart -lcublas
-HEADERS := Dimensions.hpp Layer.hpp Loss.hpp NeuralNetwork.hpp \
-	Optimizer.hpp ParameterRegularization.hpp Preprocessor.hpp \
-	WeightInitialization.hpp
+HEADERS := DataProvider.hpp Dimensions.hpp Layer.hpp Loss.hpp \
+	NeuralNetwork.hpp Optimizer.hpp ParameterRegularization.hpp \
+	Preprocessor.hpp WeightInitialization.hpp
 SOURCE_DIR := test
 SOURCES := test.cpp
 BUILD_DIR := build
