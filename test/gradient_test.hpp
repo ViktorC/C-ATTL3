@@ -11,6 +11,7 @@
 #include <algorithm>
 #include <array>
 #include <cstddef>
+#include <gtest/gtest.h>
 #include <memory>
 #include <random>
 #include <string>
@@ -18,7 +19,6 @@
 #include <utility>
 #include <vector>
 
-#include "gtest/gtest.h"
 #include "Cattle.hpp"
 
 

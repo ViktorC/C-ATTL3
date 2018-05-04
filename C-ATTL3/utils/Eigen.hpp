@@ -11,9 +11,8 @@
 #define EIGEN_USE_THREADS
 
 #include <cstddef>
-
-#include "Eigen/Dense"
-#include "unsupported/Eigen/CXX11/Tensor"
+#include <Eigen/Dense>
+#include <unsupported/Eigen/CXX11/Tensor>
 
 /**
  * The namespace containing all classes and typedefs of the C-ATTL3 library.

@@ -9,24 +9,21 @@ addons:
     packages:
       - gcc-7-multilib
       - g++-7-multilib
-      - lcov
 git:
   submodules: false
 before_install:
   - sed -i 's/git@github.com:/https:\/\/github.com\//' .gitmodules
   - git submodule update --init --recursive
-install:
+script:
   - sudo ln -s /usr/bin/gcc-7 /usr/local/bin/gcc
   - sudo ln -s /usr/bin/g++-7 /usr/local/bin/g++
   - export CC=/usr/bin/gcc-7
   - export CXX=/usr/bin/g++-7
   - gcc -v && g++ -v
-  - sudo pip install codecov
-script:
-  - sudo make debug
+  - sudo make coverage
   - sudo make check
-#  - sudo make coverage
-#after_success:
-#  - codecov -t c888b396-4d46-46b9-a347-8752728e27cd
+  - sudo make report
+after_success:
+  - bash <(curl -s https://codecov.io/bash) || echo "Codecov did not collect coverage reports"
 notifications:
   email: false

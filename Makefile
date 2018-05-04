@@ -10,18 +10,23 @@ GCC_CUDA_CXXFLAGS := $(GCC_CXXFLAGS) -DCATTL3_USE_CUBLAS
 CLANG_CXXFLAGS := $(CXXFLAGS) -march=native
 CLANG_CUDA_CXXFLAGS := $(CLANG_CXXFLAGS) -DCATTL3_USE_CUBLAS
 RELEASE_OPT_FLAGS := -O3 -DNDEBUG
+# Without level 1 optimization, the file is too big.
+DEBUG_OPT_FLAGS := -O1 -Wa,-mbig-obj -g
 # Support gcov/lcov.
-DEBUG_OPT_FLAGS := -O1 -Wa,-mbig-obj -g -fprofile-arcs -ftest-coverage
+COVERAGE_OPT_FLAGS := $(DEBUG_OPT_FLAGS) -fprofile-arcs -ftest-coverage
 GTEST_DIR := test/gtest
 # For Clang on Windows, omp.h must be copied from GCC.
 INCLUDES := -IC-ATTL3 -IEigen -I$(GTEST_DIR)/include -Itest/
 CUDA_INCLUDES := -I"$(CUDA_INC_PATH)" $(INCLUDES)
 LIBS := -lpthread -lgomp
 CUDA_LIBS := $(LIBS) -L"$(CUDA_LIB_PATH)" -lcudart -lcublas
-HEADER_DIR := C-ATTL3
+HEADERS := Dimensions.hpp Layer.hpp Loss.hpp NeuralNetwork.hpp \
+	Optimizer.hpp ParameterRegularization.hpp Preprocessor.hpp \
+	WeightInitialization.hpp
 SOURCE_DIR := test
 SOURCES := test.cpp
 BUILD_DIR := build
+COV_DIR := $(BUILD_DIR)/cov
 TARGET_DIR := bin
 TARGET_NAME := cattle_test.exe
 GTEST_MAKE_PATH := $(GTEST_DIR)/make
@@ -48,6 +53,11 @@ debug:
 		CXX='$(GCC_CXX)' \
 		CXXFLAGS='$(GCC_CXXFLAGS)' \
 		OPT_FLAGS='$(DEBUG_OPT_FLAGS)'
+coverage:
+	$(MAKE) $(TARGET) \
+		CXX='$(GCC_CXX)' \
+		CXXFLAGS='$(GCC_CXXFLAGS)' \
+		OPT_FLAGS='$(COVERAGE_OPT_FLAGS)'
 clang_all:
 	$(MAKE) $(TARGET) \
 		CXX='$(CLANG_CXX)' \
@@ -58,6 +68,11 @@ clang_debug:
 		CXX='$(CLANG_CXX)' \
 		CXXFLAGS='$(CLANG_CXXFLAGS)' \
 		OPT_FLAGS='$(DEBUG_OPT_FLAGS)'
+clang_coverage:
+	$(MAKE) $(TARGET) \
+		CXX='$(CLANG_CXX)' \
+		CXXFLAGS='$(CLANG_CXXFLAGS)' \
+		OPT_FLAGS='$(COVERAGE_OPT_FLAGS)'
 cuda_all:
 	$(MAKE) $(TARGET) \
 		CXX='$(GCC_CXX)' \
@@ -88,10 +103,13 @@ clang_cuda_debug:
 		LIBS='$(CUDA_LIBS)'
 check:
 	@bin/cattle_test.exe
-coverage:
-	$(COV) -o $(BUILD_DIR) $(BUILD_DIR)/test.cpp
+report:
+	$(COV) -o $(BUILD_DIR) -r $(SOURCES)
+		@rm -rf $(COV_DIR)
+		@mkdir $(COV_DIR) && (mv -f -t $(COV_DIR) $(HEADERS:%=%.gcov) || true)
+		@rm -f *.gcov
 clean:
-	$(RM) -r $(BUILD_DIR) $(TARGET_DIR)
+	@rm -rf $(BUILD_DIR) $(TARGET_DIR)
 		@cd $(GTEST_MAKE_PATH) && make clean && cd $(CURDIR)
 .depend:
 	$(CC) -MM $(CFLAGS) $(SOURCES) > $@
