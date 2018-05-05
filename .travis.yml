@@ -1,29 +1,37 @@
 dist: trusty
 sudo: required
 language: cpp
-compiler: gcc
-addons:
-  apt:
-    sources:
-      - ubuntu-toolchain-r-test
-    packages:
-      - gcc-7-multilib
-      - g++-7-multilib
+matrix:
+  include:
+    - os: linux
+      addons:
+        apt:
+          sources:
+            - llvm-toolchain-trusty-5.0
+          packages:
+            - clang-5.0
+      env:
+        - MATRIX_EVAL="COMPILER_NAME=clang++ && CC=clang-5.0 && CXX=clang++-5.0"
+    - os: linux
+      addons:
+        apt:
+          sources:
+            - ubuntu-toolchain-r-test
+          packages:
+            - g++-7
+      env:
+        - MATRIX_EVAL="COMPILER_NAME=g++ && CC=gcc-7 && CXX=g++-7"
 git:
   submodules: false
 before_install:
   - sed -i 's/git@github.com:/https:\/\/github.com\//' .gitmodules
   - git submodule update --init --recursive
+  - eval "${MATRIX_EVAL}"
+  - if [ $COMPILER_NAME -eq "g++" ]; then g++ -v; elif [ $COMPILER_NAME -eq "clang++" ]; then clang++ -v; fi
+before_script:
+  - export CLANG_TRIES=5
+  - export GCC_TRIES=5
 script:
-  - sudo ln -s /usr/bin/gcc-7 /usr/local/bin/gcc
-  - sudo ln -s /usr/bin/g++-7 /usr/local/bin/g++
-  - export CC=/usr/bin/gcc-7
-  - export CXX=/usr/bin/g++-7
-  - gcc -v && g++ -v
-  - sudo make coverage
-  - sudo make check
-  - sudo make report
-after_success:
-  - bash <(curl -s https://codecov.io/bash) || echo "Codecov did not collect coverage reports"
+  - sudo ./build.sh
 notifications:
   email: false
