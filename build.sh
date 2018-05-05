@@ -25,7 +25,6 @@ if [ "$COMPILER_NAME" = "g++" ]; then
     echo "GNU Coverage report failed" >&2
     exit "$rc"
   fi
-  bash <(curl -s https://codecov.io/bash) || echo "Codecov did not collect coverage reports"
 elif [ "$COMPILER_NAME" = "clang++" ]; then
   make clang_all
   rc=$?
