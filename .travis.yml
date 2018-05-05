@@ -18,19 +18,23 @@ matrix:
           sources:
             - ubuntu-toolchain-r-test
           packages:
-            - g++-7
+            - gcc-7-multilib
+            - g++-7-multilib
       env:
-        - MATRIX_EVAL="COMPILER_NAME=g++ && CC=gcc-7 && CXX=g++-7"
+        - MATRIX_EVAL="COMPILER_NAME=g++ && CC=/usr/bin/gcc-7 && CXX=/usr/bin/g++-7"
 git:
   submodules: false
 before_install:
   - sed -i 's/git@github.com:/https:\/\/github.com\//' .gitmodules
   - git submodule update --init --recursive
-  - eval "${MATRIX_EVAL}"
-  - if [ "$COMPILER_NAME" = "g++" ]; then g++ -v; elif [ "$COMPILER_NAME" = "clang++" ]; then clang++ -v; fi
 before_script:
-  - export CLANG_TRIES=5
-  - export GCC_TRIES=5
+  - eval "${MATRIX_EVAL}"
+  - if [ "$COMPILER_NAME" = "g++" ]; then
+      sudo ln -s /usr/bin/gcc-7 /usr/local/bin/gcc && sudo ln -s /usr/bin/g++-7 /usr/local/bin/g++ && g++ -v;
+    elif [ "$COMPILER_NAME" = "clang++" ]; then
+      clang++ -v;
+    fi
+  - export TRIES=5;
 script:
   - sudo ./build.sh
 notifications:

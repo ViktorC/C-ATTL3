@@ -7,7 +7,7 @@ if [ "$COMPILER_NAME" = "g++" ]; then
     echo "GCC build failed" >&2
     exit "$rc"
   fi
-  for run in {1.."$GCC_TRIES"}
+  for run in {1.."$TRIES"}
   do
     make check
     rc=$?
@@ -33,7 +33,7 @@ elif [ "$COMPILER_NAME" = "clang++" ]; then
     echo "Clang build failed" >&2
     exit "$rc"
   fi
-  for run in {1.."$CLANG_TRIES"}
+  for run in {1.."$TRIES"}
   do
     make check
     rc=$?
