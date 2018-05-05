@@ -11,7 +11,7 @@ matrix:
           packages:
             - clang-5.0
       env:
-        - MATRIX_EVAL="COMPILER_NAME=clang++ && CC=clang-5.0 && CXX=clang++-5.0"
+        - MATRIX_EVAL="export COMPILER_NAME=clang++ && export CC=clang-5.0 && export CXX=clang++-5.0"
     - os: linux
       addons:
         apt:
@@ -20,15 +20,15 @@ matrix:
           packages:
             - g++-7
       env:
-        - MATRIX_EVAL="COMPILER_NAME=g++ && CC=gcc-7 && CXX=g++-7"
+        - MATRIX_EVAL="export COMPILER_NAME=g++ && export CC=gcc-7 && export CXX=g++-7"
 git:
   submodules: false
 before_install:
   - sed -i 's/git@github.com:/https:\/\/github.com\//' .gitmodules
   - git submodule update --init --recursive
-before_script:
   - eval "${MATRIX_EVAL}"
   - if [ "$COMPILER_NAME" = "g++" ]; then g++ -v; elif [ "$COMPILER_NAME" = "clang++" ]; then clang++ -v; fi
+before_script:
   - export TRIES=5;
 script:
   - chmod +x build.sh
