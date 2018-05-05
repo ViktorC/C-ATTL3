@@ -1,5 +1,5 @@
 dist: trusty
-sudo: false
+sudo: required
 language: generic
 matrix:
   include:
@@ -20,9 +20,9 @@ matrix:
           sources:
             - ubuntu-toolchain-r-test
           packages:
-            - g++-7
+            - g++-7-multilib
       env:
-        - MATRIX_EVAL="export COMPILER_NAME=g++ && export CXX=g++-7"
+        - MATRIX_EVAL="export COMPILER_NAME=g++ && export CXX=/usr/bin/g++-7"
 git:
   submodules: false
 before_install:
@@ -30,7 +30,7 @@ before_install:
   - git submodule update --init --recursive
   - eval "${MATRIX_EVAL}"
   - if [ "$COMPILER_NAME" = "g++" ]; then
-      sudo g++ -v;
+      sudo ln -s /usr/bin/g++-7 /usr/local/bin/g++ && g++ -v;
     elif [ "$COMPILER_NAME" = "clang++" ]; then
       clang++ -v;
     fi
