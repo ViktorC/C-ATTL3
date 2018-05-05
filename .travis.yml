@@ -26,9 +26,9 @@ git:
 before_install:
   - sed -i 's/git@github.com:/https:\/\/github.com\//' .gitmodules
   - git submodule update --init --recursive
+before_script:
   - eval "${MATRIX_EVAL}"
   - if [ "$COMPILER_NAME" = "g++" ]; then g++ -v; elif [ "$COMPILER_NAME" = "clang++" ]; then clang++ -v; fi
-before_script:
   - export TRIES=5;
 script:
   - chmod +x build.sh

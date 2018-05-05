@@ -1,6 +1,5 @@
 #!/bin/sh
 
-echo "$COMPILER_NAME"
 if [ "$COMPILER_NAME" = "g++" ]; then
   make coverage
   rc=$?
