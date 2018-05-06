@@ -1,4 +1,11 @@
-# C-ATTL3 [![Build Status](https://travis-ci.org/ViktorC/C-ATTL3.svg?branch=master)](https://travis-ci.org/ViktorC/C-ATTL3) [![Codecov](https://img.shields.io/codecov/c/github/ViktorC/C-ATTL3.svg)](https://codecov.io/gh/ViktorC/C-ATTL3)
+# C-ATTL3 [![Codecov](https://img.shields.io/codecov/c/github/ViktorC/C-ATTL3.svg)](https://codecov.io/gh/ViktorC/C-ATTL3)
+| Clang++ 5.0 | G++ 7 |
+|---|---|
+| [![Build1][1]][3] | [![Build2][2]][3] |
+
+[1]: https://travis-matrix-badges.herokuapp.com/repos/ViktorC/C-ATTL3/branches/master/1
+[2]: https://travis-matrix-badges.herokuapp.com/repos/ViktorC/C-ATTL3/branches/master/2
+[3]: https://travis-ci.org/ViktorC/C-ATTL3
 A header-only neural network template library written in C++11. C-ATTL3 uses [Eigen](http://eigen.tuxfamily.org), the popular linear algebra library. If GPU acceleration is enabled, it also utilizes NVIDIA's CUDA toolkit and specifically the [cuBLAS](https://developer.nvidia.com/cublas) library. C-ATTL3 allows for the easy construction and training of both feed-forward and recurrent neural networks ranging from simple MLPs and RNNs to state-of-the-art InceptionNets, ResNets, DenseNets,  and convolutional LSTMs. The library can handle data of different ranks and different floating point scalar types such as `float` and `double`. The Doxygen documentation of the library can be found [here](https://viktorc.github.io/C-ATTL3/html/).
 
 ## Components
