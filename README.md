@@ -192,7 +192,7 @@ More examples of neural network constructs can be found [here](https://github.co
 The list below contains the planned features of the library.
 - [ ] Test automation using Google Test
 - [ ] CMake build
-- [ ] Deconvolutional layer
+- [x] Deconvolutional layer
 - [ ] Temporal (convolutional) networks
 - [ ] Convolution and pooling for 1st and 2nd degree features
 - [ ] More comprehensive GPU support via cuDNN utilization

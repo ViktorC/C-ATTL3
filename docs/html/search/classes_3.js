@@ -1,6 +1,7 @@
 var searchData=
 [
   ['dataprovider',['DataProvider',['../classcattle_1_1_data_provider.html',1,'cattle']]],
+  ['deconvolutionallayer',['DeconvolutionalLayer',['../classcattle_1_1_deconvolutional_layer.html',1,'cattle']]],
   ['denseneuralnetwork',['DenseNeuralNetwork',['../classcattle_1_1_dense_neural_network.html',1,'cattle']]],
   ['dimensions',['Dimensions',['../classcattle_1_1_dimensions.html',1,'cattle']]],
   ['dimensions_3c_20std_3a_3asize_5ft_2c_203_20_3e',['Dimensions&lt; std::size_t, 3 &gt;',['../classcattle_1_1_dimensions.html',1,'cattle']]],

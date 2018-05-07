@@ -342,36 +342,36 @@ protected:
 			Base::KernelLayer(layer, share_params),
 			out_conversion_dims(layer.out_conversion_dims),
 			prev_out_conversion_dims(layer.prev_out_conversion_dims),
-			biased_in(layer.biased_in) { }
+			biased_in_mat(layer.biased_in_mat) { }
 	inline Layer<Scalar,Rank>* clone_with_shared_params() const {
 		return new FullyConnectedLayer(*this, true);
 	}
 	inline void empty_cache() {
-		biased_in = Matrix<Scalar>(0, 0);
+		biased_in_mat = Matrix<Scalar>(0, 0);
 	}
 	inline typename Root::Data pass_forward(typename Root::Data in, bool training) {
 		assert((Dimensions<std::size_t,Root::DATA_RANK>(in.dimensions()).template demote<>()) == Base::input_dims);
 		assert(in.dimension(0) > 0);
 		unsigned input_size = Base::input_dims.get_volume();
 		// Add a 1-column to the input for the bias trick.
-		biased_in = Matrix<Scalar>(in.dimension(0), input_size + 1);
-		biased_in.leftCols(input_size) = MatrixMap<Scalar>(in.data(), in.dimension(0), input_size);
-		biased_in.col(input_size).setOnes();
+		biased_in_mat = Matrix<Scalar>(in.dimension(0), input_size + 1);
+		biased_in_mat.leftCols(input_size) = MatrixMap<Scalar>(in.data(), in.dimension(0), input_size);
+		biased_in_mat.col(input_size).setOnes();
 #ifndef CATTL3_USE_CUBLAS
-		Matrix<Scalar> out = biased_in * Base::weights_ref;
+		Matrix<Scalar> out = biased_in_mat * Base::weights_ref;
 #else
-		Matrix<Scalar> out = internal::CuBLASUtils<Scalar>::get_instance().mul(biased_in, Base::weights_ref, false, false);
+		Matrix<Scalar> out = internal::CuBLASUtils<Scalar>::get_instance().mul(biased_in_conv_mat, Base::weights_ref, false, false);
 #endif
 		out_conversion_dims[0] = out.rows();
 		return TensorMap<Scalar,Root::DATA_RANK>(out.data(), out_conversion_dims);
 	}
 	inline typename Root::Data pass_back(typename Root::Data out_grads) {
 		assert((Dimensions<std::size_t,Root::DATA_RANK>(out_grads.dimensions()).template demote<>()) == Base::output_dims);
-		assert(out_grads.dimension(0) > 0 && biased_in.rows() == out_grads.dimension(0));
+		assert(out_grads.dimension(0) > 0 && biased_in_mat.rows() == out_grads.dimension(0));
 		// Compute the gradient of the outputs with respect to the weights.
 #ifndef CATTL3_USE_CUBLAS
 		MatrixMap<Scalar> out_grads_mat(out_grads.data(), out_grads.dimension(0), Base::output_dims.get_volume());
-		Base::weights_grad = biased_in.transpose() * out_grads_mat;
+		Base::weights_grad = biased_in_mat.transpose() * out_grads_mat;
 		if (Base::is_input_layer())
 			return typename Root::Data();
 		/* Remove the bias row from the weight matrix, transpose it, and compute the derivative w.r.t. the
@@ -380,7 +380,7 @@ protected:
 #else
 		Matrix<Scalar> out_grads_mat = MatrixMap<Scalar>(out_grads.data(), out_grads.dimension(0),
 				Base::output_dims.get_volume());
-		Base::weights_grad = internal::CuBLASUtils<Scalar>::get_instance().mul(biased_in, out_grads_mat, true, false);
+		Base::weights_grad = internal::CuBLASUtils<Scalar>::get_instance().mul(biased_in_mat, out_grads_mat, true, false);
 		if (Base::is_input_layer())
 			return typename Root::Data();
 		Matrix<Scalar> weights_without_bias = Base::weights_ref.topRows(Base::input_dims.get_volume());
@@ -394,7 +394,7 @@ private:
 	RankwiseArray out_conversion_dims;
 	RankwiseArray prev_out_conversion_dims;
 	// Staged computation caches
-	Matrix<Scalar> biased_in;
+	Matrix<Scalar> biased_in_mat;
 };
 
 /**
@@ -494,12 +494,13 @@ protected:
 			dil_strides(layer.dil_strides),
 			no_padding_offsets(layer.no_padding_offsets),
 			no_padding_extents(layer.no_padding_extents),
-			paddings(layer.paddings) { }
+			paddings(layer.paddings),
+			biased_in_conv_mat(layer.biased_in_conv_mat) { }
 	inline Root* clone_with_shared_params() const {
 		return new ConvolutionalLayer(*this, true);
 	}
 	inline void empty_cache() {
-		biased_in = Matrix<Scalar>(0, 0);
+		biased_in_conv_mat = Matrix<Scalar>(0, 0);
 	}
 	inline typename Root::Data pass_forward(typename Root::Data in, bool training) {
 		assert((Dimensions<std::size_t,4>(in.dimensions()).template demote<>()) == Base::input_dims);
@@ -515,7 +516,7 @@ protected:
 		 * by a contiguous block of these rows. There is one block for each receptor location. */
 		std::size_t patch_ind = 0;
 		patch_extents[0] = rows;
-		biased_in = Matrix<Scalar>(total_patches, receptor_vol + 1);
+		biased_in_conv_mat = Matrix<Scalar>(total_patches, receptor_vol + 1);
 		for (std::size_t i = 0; i <= padded_width - dil_receptor_width; i += horizontal_stride) {
 			patch_offsets[2] = i;
 			for (std::size_t j = 0; j <= padded_height - dil_receptor_height; j += vertical_stride) {
@@ -526,17 +527,17 @@ protected:
 					patch = in.slice(patch_offsets, patch_extents).stride(dil_strides);
 				else
 					patch = in.slice(patch_offsets, patch_extents);
-				biased_in.block(patch_ind, 0, rows, receptor_vol) = MatrixMap<Scalar>(patch.data(), rows, receptor_vol);
+				biased_in_conv_mat.block(patch_ind, 0, rows, receptor_vol) = MatrixMap<Scalar>(patch.data(), rows, receptor_vol);
 				patch_ind += rows;
 			}
 		}
 		assert(patch_ind == total_patches);
 		// Bias trick.
-		biased_in.col(receptor_vol).setOnes();
+		biased_in_conv_mat.col(receptor_vol).setOnes();
 #ifndef CATTL3_USE_CUBLAS
-		Matrix<Scalar> out = biased_in * Base::weights_ref;
+		Matrix<Scalar> out = biased_in_conv_mat * Base::weights_ref;
 #else
-		Matrix<Scalar> out = internal::CuBLASUtils<Scalar>::get_instance().mul(biased_in,
+		Matrix<Scalar> out = internal::CuBLASUtils<Scalar>::get_instance().mul(biased_in_conv_mat,
 				Base::weights_ref, false, false);
 #endif
 		out_conversion_dims[0] = rows;
@@ -544,27 +545,27 @@ protected:
 	}
 	inline typename Root::Data pass_back(typename Root::Data out_grads) {
 		assert((Dimensions<std::size_t,4>(out_grads.dimensions()).template demote<>()) == Base::output_dims);
-		assert(out_grads.dimension(0) > 0 && biased_in.rows() / (Base::output_dims(0) *
+		assert(out_grads.dimension(0) > 0 && biased_in_conv_mat.rows() / (Base::output_dims(0) *
 				Base::output_dims(1)) == out_grads.dimension(0));
 		std::size_t rows = out_grads.dimension(0);
 		std::size_t total_patches = rows * Base::output_dims(0) * Base::output_dims(1);
 		std::size_t receptor_vol = Base::weights_ref.rows() - 1;
 #ifndef CATTL3_USE_CUBLAS
 		MatrixMap<Scalar> out_grads_mat(out_grads.data(), total_patches, filters);
-		Base::weights_grad = biased_in.transpose() * out_grads_mat;
+		Base::weights_grad = biased_in_conv_mat.transpose() * out_grads_mat;
 		if (Base::is_input_layer())
 			return typename Root::Data();
 		/* Remove the bias row from the weight matrix, transpose it, and compute the gradient of the
 		 * previous layer's output. */
-		Matrix<Scalar> prev_out_grads_mat = out_grads_mat * Base::weights_ref.topRows(receptor_vol).transpose();
+		Matrix<Scalar> prev_out_grads_conv_mat = out_grads_mat * Base::weights_ref.topRows(receptor_vol).transpose();
 #else
 		Matrix<Scalar> out_grads_mat = MatrixMap<Scalar>(out_grads.data(),
 				rows * Base::output_dims(0) * Base::output_dims(1), filters);
-		Base::weights_grad = internal::CuBLASUtils<Scalar>::get_instance().mul(biased_in, out_grads_mat, true, false);
+		Base::weights_grad = internal::CuBLASUtils<Scalar>::get_instance().mul(biased_in_conv_mat, out_grads_mat, true, false);
 		if (Base::is_input_layer())
 			return typename Root::Data();
 		Matrix<Scalar> weights_without_bias = Base::weights_ref.topRows(receptor_vol);
-		Matrix<Scalar> prev_out_grads_mat = internal::CuBLASUtils<Scalar>::get_instance().mul(out_grads_mat,
+		Matrix<Scalar> prev_out_grads_conv_mat = internal::CuBLASUtils<Scalar>::get_instance().mul(out_grads_mat,
 				weights_without_bias, false, true);
 #endif
 		/* Given the gradient of the stretched out receptor patches, perform a 'backwards' convolution
@@ -578,16 +579,18 @@ protected:
 			for (std::size_t j = 0; j <= padded_height - dil_receptor_height; j += vertical_stride) {
 				patch_offsets[1] = j;
 				// Accumulate the gradients where the receptor-patch-tensors overlap.
-				Matrix<Scalar> prev_out_grads_block = prev_out_grads_mat.block(patch_ind, 0, rows, receptor_vol);
-				TensorMap<Scalar,4> prev_out_grads_block_map(prev_out_grads_block.data(), patch_extents);
+				Matrix<Scalar> prev_out_grads_conv_mat_block = prev_out_grads_conv_mat.block(patch_ind, 0,
+						rows, receptor_vol);
+				TensorMap<Scalar,4> prev_out_grads_patch(prev_out_grads_conv_mat_block.data(), rows,
+						receptor_height, receptor_width, Base::input_dims(2));
 				if (vertical_dilation > 0 || horizontal_dilation > 0)
-					prev_out_grads.slice(patch_offsets, patch_extents).stride(dil_strides) += prev_out_grads_block_map;
+					prev_out_grads.slice(patch_offsets, patch_extents).stride(dil_strides) += prev_out_grads_patch;
 				else
-					prev_out_grads.slice(patch_offsets, patch_extents) += prev_out_grads_block_map;
+					prev_out_grads.slice(patch_offsets, patch_extents) += prev_out_grads_patch;
 				patch_ind += rows;
 			}
 		}
-		assert(patch_ind == prev_out_grads_mat.rows());
+		assert(patch_ind == prev_out_grads_conv_mat.rows());
 		if (vertical_padding > 0 || horizontal_padding > 0) {
 			// Cut off the padding.
 			no_padding_extents[0] = rows;
@@ -633,7 +636,7 @@ private:
 	RankwiseArray no_padding_extents;
 	PaddingsArray paddings;
 	// Staged computation caches
-	Matrix<Scalar> biased_in;
+	Matrix<Scalar> biased_in_conv_mat;
 };
 
 /**
@@ -689,9 +692,9 @@ public:
 				padded_width(Base::output_dims(1) + 2 * horizontal_padding),
 				dil_receptor_height(receptor_height + (receptor_height - 1) * vertical_dilation),
 				dil_receptor_width(receptor_width + (receptor_width - 1) * horizontal_dilation),
-				out_conversion_dims({ 0u, input_dims(0), input_dims(1), input_dims(2) }),
+				prev_out_conversion_dims({ 0u, input_dims(0), input_dims(1), input_dims(2) }),
 				patch_offsets({ 0u, 0u, 0u, 0u }),
-				patch_extents({ 0u, dil_receptor_height, dil_receptor_width, input_dims(2) }),
+				patch_extents({ 0u, dil_receptor_height, dil_receptor_width, filters }),
 				dil_strides({ 1u, vertical_dilation + 1u, horizontal_dilation + 1u, 1u }),
 				no_padding_offsets({ 0u, vertical_padding, horizontal_padding, 0u }),
 				no_padding_extents({ 0u, Base::output_dims(0), Base::output_dims(1), Base::output_dims(2) }),
@@ -708,7 +711,7 @@ public:
 		return new DeconvolutionalLayer(*this);
 	}
 protected:
-	inline DeconvolutionalLayer(const DeconvLayer<Scalar>& layer, bool share_params = false) :
+	inline DeconvolutionalLayer(const DeconvolutionalLayer<Scalar>& layer, bool share_params = false) :
 			Base::KernelLayer(layer, share_params),
 			filters(layer.filters),
 			receptor_height(layer.receptor_height),
@@ -723,18 +726,19 @@ protected:
 			padded_width(layer.padded_width),
 			dil_receptor_height(layer.dil_receptor_height),
 			dil_receptor_width(layer.dil_receptor_width),
-			out_conversion_dims(layer.out_conversion_dims),
+			prev_out_conversion_dims(layer.prev_out_conversion_dims),
 			patch_offsets(layer.patch_offsets),
 			patch_extents(layer.patch_extents),
 			dil_strides(layer.dil_strides),
 			no_padding_offsets(layer.no_padding_offsets),
 			no_padding_extents(layer.no_padding_extents),
-			paddings(layer.paddings) { }
+			paddings(layer.paddings),
+			biased_in_mat(layer.biased_in_mat) { }
 	inline Root* clone_with_shared_params() const {
 		return new DeconvolutionalLayer(*this, true);
 	}
 	inline void empty_cache() {
-		biased_in = Matrix<Scalar>(0, 0);
+		biased_in_mat = Matrix<Scalar>(0, 0);
 	}
 	inline typename Root::Data pass_forward(typename Root::Data in, bool training) {
 		assert((Dimensions<std::size_t,4>(in.dimensions()).template demote<>()) == Base::input_dims);
@@ -743,13 +747,13 @@ protected:
 		std::size_t depth = Base::input_dims(2);
 		std::size_t receptor_vol = Base::weights_ref.cols();
 		std::size_t total_patches = rows * Base::input_dims(0) * Base::input_dims(1);
-		biased_in = Matrix<Scalar>(total_patches, depth + 1);
-		biased_in.block(0, 0, total_patches, depth) = MatrixMap<Scalar>(in.data(), total_patches, depth);
-		biased_in.col(depth).setOnes();
+		biased_in_mat = Matrix<Scalar>(total_patches, depth + 1);
+		biased_in_mat.block(0, 0, total_patches, depth) = MatrixMap<Scalar>(in.data(), total_patches, depth);
+		biased_in_mat.col(depth).setOnes();
 #ifndef CATTL3_USE_CUBLAS
-		Matrix<Scalar> out_mat = biased_in * Base::weights_ref;
+		Matrix<Scalar> out_conv_mat = biased_in_mat * Base::weights_ref;
 #else
-		Matrix<Scalar> out_mat = internal::CuBLASUtils<Scalar>::get_instance().mul(biased_in,
+		Matrix<Scalar> out_conv_mat = internal::CuBLASUtils<Scalar>::get_instance().mul(biased_in_mat,
 				Base::weights_ref, false, false);
 #endif
 		/* Given the values of the stretched out receptor patches, accumulate them in the output tensor. */
@@ -762,12 +766,13 @@ protected:
 			for (std::size_t j = 0; j <= padded_height - dil_receptor_height; j += vertical_stride) {
 				patch_offsets[1] = j;
 				// Accumulate the gradients where the receptor-patch-tensors overlap.
-				Matrix<Scalar> out_mat_block = biased_in.block(patch_ind, 0, rows, receptor_vol);
-				TensorMap<Scalar,4> out_block(out_mat_block.data(), patch_extents);
+				Matrix<Scalar> out_conv_mat_block = out_conv_mat.block(patch_ind, 0, rows, receptor_vol);
+				TensorMap<Scalar,4> out_patch(out_conv_mat_block.data(), rows, receptor_height,
+						receptor_width, Base::output_dims(2));
 				if (vertical_dilation > 0 || horizontal_dilation > 0)
-					out.slice(patch_offsets, patch_extents).stride(dil_strides) += out_block;
+					out.slice(patch_offsets, patch_extents).stride(dil_strides) += out_patch;
 				else
-					out.slice(patch_offsets, patch_extents) += out_block;
+					out.slice(patch_offsets, patch_extents) += out_patch;
 				patch_ind += rows;
 			}
 		}
@@ -781,7 +786,7 @@ protected:
 	}
 	inline typename Root::Data pass_back(typename Root::Data out_grads) {
 		assert((Dimensions<std::size_t,4>(out_grads.dimensions()).template demote<>()) == Base::output_dims);
-		assert(out_grads.dimension(0) > 0 && biased_in.rows() / (Base::input_dims(0) *
+		assert(out_grads.dimension(0) > 0 && biased_in_mat.rows() / (Base::input_dims(0) *
 				Base::input_dims(1)) == out_grads.dimension(0));
 		// Spatial padding.
 		if (vertical_padding > 0 || horizontal_padding > 0)
@@ -792,7 +797,7 @@ protected:
 		std::size_t total_patches = rows * Base::input_dims(0) * Base::input_dims(1);
 		std::size_t patch_ind = 0;
 		patch_extents[0] = rows;
-		Matrix<Scalar> out_grads_mat(total_patches, receptor_vol);
+		Matrix<Scalar> out_grads_conv_mat(total_patches, receptor_vol);
 		for (std::size_t i = 0; i <= padded_width - dil_receptor_width; i += horizontal_stride) {
 			patch_offsets[2] = i;
 			for (std::size_t j = 0; j <= padded_height - dil_receptor_height; j += vertical_stride) {
@@ -803,27 +808,28 @@ protected:
 					patch = out_grads.slice(patch_offsets, patch_extents).stride(dil_strides);
 				else
 					patch = out_grads.slice(patch_offsets, patch_extents);
-				out_grads_mat.block(patch_ind, 0, rows, receptor_vol) = MatrixMap<Scalar>(patch.data(), rows, receptor_vol);
+				out_grads_conv_mat.block(patch_ind, 0, rows, receptor_vol) = MatrixMap<Scalar>(patch.data(),
+						rows, receptor_vol);
 				patch_ind += rows;
 			}
 		}
 		assert(patch_ind == total_patches);
 #ifndef CATTL3_USE_CUBLAS
-		Base::weights_grad = biased_in.transpose() * out_grads_mat;
+		Base::weights_grad = biased_in_mat.transpose() * out_grads_conv_mat;
 		if (Base::is_input_layer())
 			return typename Root::Data();
-		Matrix<Scalar> prev_out_grads = out_grads_mat * Base::weights_ref.rows(depth).transpose();
+		Matrix<Scalar> prev_out_grads = out_grads_conv_mat * Base::weights_ref.topRows(depth).transpose();
 #else
-		Base::weights_grad = internal::CuBLASUtils<Scalar>::get_instance().mul(biased_in,
-				out_grads_mat, true, false);
+		Base::weights_grad = internal::CuBLASUtils<Scalar>::get_instance().mul(biased_in_mat,
+				out_grads_conv_mat, true, false);
 		if (Base::is_input_layer())
 			return typename Root::Data();
 		Matrix<Scalar> weights_without_bias = Base::weights_ref.rows(depth);
-		Matrix<Scalar> prev_out_grads = internal::CuBLASUtils<Scalar>::get_instance().mul(out_grads_mat,
+		Matrix<Scalar> prev_out_grads = internal::CuBLASUtils<Scalar>::get_instance().mul(out_grads_conv_mat,
 				weights_without_bias, false, true);
 #endif
-		out_conversion_dims[0] = rows;
-		return TensorMap<Scalar,4>(prev_out_grads.data(), out_conversion_dims);
+		prev_out_conversion_dims[0] = rows;
+		return TensorMap<Scalar,4>(prev_out_grads.data(), prev_out_conversion_dims);
 	}
 	/**
 	 * It computes the dimension of the output tensor along a rank.
@@ -837,7 +843,7 @@ protected:
 	 */
 	inline static std::size_t calculate_output_dim(std::size_t input_dim, std::size_t receptor_size, std::size_t padding,
 			std::size_t dilation, std::size_t stride) {
-		return (stride + 1) * input_dim + receptor_size + (receptor_size - 1) * dilation - 2 * padding;
+		return (input_dim - 1) * stride + receptor_size + (receptor_size - 1) * dilation - 2 * padding;
 	}
 private:
 	// The defining attributes of the convolutional layer.
@@ -855,7 +861,7 @@ private:
 	const std::size_t padded_width;
 	const std::size_t dil_receptor_height;
 	const std::size_t dil_receptor_width;
-	RankwiseArray out_conversion_dims;
+	RankwiseArray prev_out_conversion_dims;
 	RankwiseArray patch_offsets;
 	RankwiseArray patch_extents;
 	RankwiseArray dil_strides;
@@ -863,7 +869,7 @@ private:
 	RankwiseArray no_padding_extents;
 	PaddingsArray paddings;
 	// Staged computation caches
-	Matrix<Scalar> biased_in;
+	Matrix<Scalar> biased_in_mat;
 };
 
 /**

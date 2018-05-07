@@ -186,6 +186,24 @@ TEST(GradientTest, ConvolutionalLayer) {
 }
 
 /**
+ * Performs gradient checks on transposed convolutional layers.
+ */
+template<typename Scalar>
+inline void deconv_layer_grad_test() {
+	auto init = WeightInitSharedPtr<Scalar>(new HeWeightInitialization<Scalar>());
+	auto reg = ParamRegSharedPtr<Scalar>(new L2ParameterRegularization<Scalar>());
+	LayerPtr<Scalar,3> layer1(new DeconvolutionalLayer<Scalar>(Dimensions<std::size_t,3>({ 2u, 3u, 2u }), 5, init,
+			DeconvolutionalLayer<Scalar>::NO_PARAM_REG, 5, 3, 1, 0, 1, 2, 0, 1));
+	LayerPtr<Scalar,3> layer2(new DeconvolutionalLayer<Scalar>(layer1->get_output_dims(), 1, init, reg, 1, 1));
+	layer_grad_test<Scalar,3>("deconvolutional layer ", std::move(layer1), std::move(layer2));
+}
+
+TEST(GradientTest, DeconvolutionalLayer) {
+	deconv_layer_grad_test<float>();
+	deconv_layer_grad_test<double>();
+}
+
+/**
  * @param dims The dimensions of the layers' input tensors.
  */
 template<typename Scalar, std::size_t Rank>

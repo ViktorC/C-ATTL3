@@ -98,8 +98,8 @@ Inheritance diagram for cattle::Optimizer&lt; Scalar, Rank, Sequential &gt;:</di
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:a860472e42511249caa95f9c75f97a957"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_optimizer.html#a860472e42511249caa95f9c75f97a957">verify_gradients</a> (<a class="el" href="classcattle_1_1_neural_network.html">Net</a> &amp;net, <a class="el" href="classcattle_1_1_data_provider.html">Provider</a> &amp;provider, bool verbose=true, Scalar step_size=(<a class="el" href="classcattle_1_1internal_1_1_numeric_utils.html">internal::NumericUtils</a>&lt; Scalar &gt;::EPSILON2+<a class="el" href="classcattle_1_1internal_1_1_numeric_utils.html">internal::NumericUtils</a>&lt; Scalar &gt;::EPSILON3)/2, Scalar abs_epsilon=<a class="el" href="classcattle_1_1internal_1_1_numeric_utils.html">internal::NumericUtils</a>&lt; Scalar &gt;::EPSILON2, Scalar rel_epsilon=<a class="el" href="classcattle_1_1internal_1_1_numeric_utils.html">internal::NumericUtils</a>&lt; Scalar &gt;::EPSILON3) const</td></tr>
-<tr class="separator:a860472e42511249caa95f9c75f97a957"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae0abffe6692149793d0595f303b3e629"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_optimizer.html#ae0abffe6692149793d0595f303b3e629">verify_gradients</a> (<a class="el" href="classcattle_1_1_neural_network.html">Net</a> &amp;net, <a class="el" href="classcattle_1_1_data_provider.html">Provider</a> &amp;provider, bool verbose=true, Scalar step_size=<a class="el" href="classcattle_1_1internal_1_1_numeric_utils.html">internal::NumericUtils</a>&lt; Scalar &gt;::EPSILON3/2, Scalar abs_epsilon=<a class="el" href="classcattle_1_1internal_1_1_numeric_utils.html">internal::NumericUtils</a>&lt; Scalar &gt;::EPSILON2, Scalar rel_epsilon=<a class="el" href="classcattle_1_1internal_1_1_numeric_utils.html">internal::NumericUtils</a>&lt; Scalar &gt;::EPSILON3) const</td></tr>
+<tr class="separator:ae0abffe6692149793d0595f303b3e629"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ac25499c3dfbb1995dcbe747868a26c8c"><td class="memItemLeft" align="right" valign="top">Scalar&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_optimizer.html#ac25499c3dfbb1995dcbe747868a26c8c">optimize</a> (<a class="el" href="classcattle_1_1_neural_network.html">Net</a> &amp;net, <a class="el" href="classcattle_1_1_data_provider.html">Provider</a> &amp;training_prov, <a class="el" href="classcattle_1_1_data_provider.html">Provider</a> &amp;test_prov, unsigned epochs, unsigned early_stop=0, bool verbose=true)</td></tr>
 <tr class="separator:ac25499c3dfbb1995dcbe747868a26c8c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
@@ -738,8 +738,8 @@ template&lt;typename Scalar , std::size_t Rank, bool Sequential&gt; </div>
 
 </div>
 </div>
-<a id="a860472e42511249caa95f9c75f97a957"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a860472e42511249caa95f9c75f97a957">&#9670;&nbsp;</a></span>verify_gradients()</h2>
+<a id="ae0abffe6692149793d0595f303b3e629"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae0abffe6692149793d0595f303b3e629">&#9670;&nbsp;</a></span>verify_gradients()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -771,7 +771,7 @@ template&lt;typename Scalar , std::size_t Rank, bool Sequential&gt; </div>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">Scalar&#160;</td>
-          <td class="paramname"><em>step_size</em> = <code>(<a class="el" href="classcattle_1_1internal_1_1_numeric_utils.html">internal::NumericUtils</a>&lt;Scalar&gt;::EPSILON2&#160;+&#160;<a class="el" href="classcattle_1_1internal_1_1_numeric_utils.html">internal::NumericUtils</a>&lt;Scalar&gt;::EPSILON3)&#160;/&#160;2</code>, </td>
+          <td class="paramname"><em>step_size</em> = <code><a class="el" href="classcattle_1_1internal_1_1_numeric_utils.html">internal::NumericUtils</a>&lt;Scalar&gt;::EPSILON3&#160;/&#160;2</code>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>

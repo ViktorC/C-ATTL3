@@ -69,7 +69,8 @@ $(function() {
 : <a class="el" href="classcattle_1_1_momentum_accelerated_s_g_d_optimizer.html#a83c7e177b2e02790e308610900323f49">cattle::MomentumAcceleratedSGDOptimizer&lt; Scalar, Rank, Sequential &gt;</a>
 </li>
 <li>calculate_output_dim()
-: <a class="el" href="classcattle_1_1_conv_layer.html#a4e6fd8183f28e5d87c1255303c9d066d">cattle::ConvLayer&lt; Scalar &gt;</a>
+: <a class="el" href="classcattle_1_1_convolutional_layer.html#a0a9a27596f917688bf58d429379d1b82">cattle::ConvolutionalLayer&lt; Scalar &gt;</a>
+, <a class="el" href="classcattle_1_1_deconvolutional_layer.html#a58ac3d9ca2d3012ad5b501c573aea95d">cattle::DeconvolutionalLayer&lt; Scalar &gt;</a>
 , <a class="el" href="classcattle_1_1_pooling_layer.html#ab46620c48c2cf3459f38d0ff69dd4f78">cattle::PoolingLayer&lt; Scalar &gt;</a>
 </li>
 <li>CIFARDataProvider()
@@ -80,12 +81,13 @@ $(function() {
 , <a class="el" href="classcattle_1_1_batch_norm_layer_3_01_scalar_00_013_01_4.html#a8bd0897b558b2e97cd79456243980afe">cattle::BatchNormLayer&lt; Scalar, 3 &gt;</a>
 , <a class="el" href="classcattle_1_1_bidirectional_neural_network.html#ac3200af26b657df73ee81b230d710fa6">cattle::BidirectionalNeuralNetwork&lt; Scalar, Rank, MergeType &gt;</a>
 , <a class="el" href="classcattle_1_1_binary_step_activation_layer.html#a7be1597139f721c9b5f259adadc30a8a">cattle::BinaryStepActivationLayer&lt; Scalar, Rank &gt;</a>
-, <a class="el" href="classcattle_1_1_conv_layer.html#ad31fbc13d9998c5e2a821a1674ffd180">cattle::ConvLayer&lt; Scalar &gt;</a>
+, <a class="el" href="classcattle_1_1_convolutional_layer.html#a4115f1ba694afeae3eefae64bec1db0b">cattle::ConvolutionalLayer&lt; Scalar &gt;</a>
+, <a class="el" href="classcattle_1_1_deconvolutional_layer.html#ace4da9a90c982963e9fa5f39b892831f">cattle::DeconvolutionalLayer&lt; Scalar &gt;</a>
 , <a class="el" href="classcattle_1_1_dense_neural_network.html#a42a9bae4ecdbd18ba5dabe3f73eacc57">cattle::DenseNeuralNetwork&lt; Scalar, Rank, ConcatType &gt;</a>
 , <a class="el" href="classcattle_1_1_dropout_layer.html#a0206c8917c45b9ac3f4388fa29ab9a26">cattle::DropoutLayer&lt; Scalar, Rank &gt;</a>
 , <a class="el" href="classcattle_1_1_e_l_u_activation_layer.html#aa8542434a8430319aaa149363151e777">cattle::ELUActivationLayer&lt; Scalar, Rank &gt;</a>
-, <a class="el" href="classcattle_1_1_f_c_layer.html#a435f08bb452df2f8b226145e59419826">cattle::FCLayer&lt; Scalar, Rank &gt;</a>
 , <a class="el" href="classcattle_1_1_feedforward_neural_network.html#ab0366180102ce798b97bf28634523a3c">cattle::FeedforwardNeuralNetwork&lt; Scalar, Rank &gt;</a>
+, <a class="el" href="classcattle_1_1_fully_connected_layer.html#ac5b7630deaa00b9942967366dd3a487e">cattle::FullyConnectedLayer&lt; Scalar, Rank &gt;</a>
 , <a class="el" href="classcattle_1_1_identity_activation_layer.html#a90c6d2eca9a8d5913d5186b96df2f82e">cattle::IdentityActivationLayer&lt; Scalar, Rank &gt;</a>
 , <a class="el" href="classcattle_1_1_layer.html#a46db46c62f3d46c6bbef5a482d7fcb00">cattle::Layer&lt; Scalar, Rank &gt;</a>
 , <a class="el" href="classcattle_1_1_leaky_re_l_u_activation_layer.html#a82d876e1484fd0e695ad72eb20ccadc4">cattle::LeakyReLUActivationLayer&lt; Scalar, Rank &gt;</a>
@@ -111,10 +113,11 @@ $(function() {
 : <a class="el" href="classcattle_1_1_batch_norm_layer.html#a135142858f8e3433f7eeb67cde734e25">cattle::BatchNormLayer&lt; Scalar, Rank &gt;</a>
 , <a class="el" href="classcattle_1_1_batch_norm_layer_3_01_scalar_00_013_01_4.html#a2b55b83e290a10ff3c9eebab94bdeddf">cattle::BatchNormLayer&lt; Scalar, 3 &gt;</a>
 , <a class="el" href="classcattle_1_1_binary_step_activation_layer.html#a38a01324d530d519f18880c3c15e76bb">cattle::BinaryStepActivationLayer&lt; Scalar, Rank &gt;</a>
-, <a class="el" href="classcattle_1_1_conv_layer.html#af4602567739c9372d64348855db65f91">cattle::ConvLayer&lt; Scalar &gt;</a>
+, <a class="el" href="classcattle_1_1_convolutional_layer.html#aa5b37aa9b0d4dd3326e66fa8543bf563">cattle::ConvolutionalLayer&lt; Scalar &gt;</a>
+, <a class="el" href="classcattle_1_1_deconvolutional_layer.html#a15dcb9c9a27c85eedaecb623d018f197">cattle::DeconvolutionalLayer&lt; Scalar &gt;</a>
 , <a class="el" href="classcattle_1_1_dropout_layer.html#a3863e8605c165c1a5646575bbbb71f2b">cattle::DropoutLayer&lt; Scalar, Rank &gt;</a>
 , <a class="el" href="classcattle_1_1_e_l_u_activation_layer.html#a0112398ad1f9598cba107a8e57e1a661">cattle::ELUActivationLayer&lt; Scalar, Rank &gt;</a>
-, <a class="el" href="classcattle_1_1_f_c_layer.html#a46941c7a004feb2ba44a73171aa13b88">cattle::FCLayer&lt; Scalar, Rank &gt;</a>
+, <a class="el" href="classcattle_1_1_fully_connected_layer.html#a8b52c187f4990bfa517a44b721126fee">cattle::FullyConnectedLayer&lt; Scalar, Rank &gt;</a>
 , <a class="el" href="classcattle_1_1_identity_activation_layer.html#a53cc3b4ce652766d228206427176ea8f">cattle::IdentityActivationLayer&lt; Scalar, Rank &gt;</a>
 , <a class="el" href="classcattle_1_1_layer.html#a725b8784f71f40c162f25a8820c97473">cattle::Layer&lt; Scalar, Rank &gt;</a>
 , <a class="el" href="classcattle_1_1_leaky_re_l_u_activation_layer.html#a6a755544043f1af43f20c96f1b660a8e">cattle::LeakyReLUActivationLayer&lt; Scalar, Rank &gt;</a>
@@ -130,8 +133,8 @@ $(function() {
 , <a class="el" href="classcattle_1_1_sum_pooling_layer.html#a6208db954d6a983240a43c7e7cd016b3">cattle::SumPoolingLayer&lt; Scalar &gt;</a>
 , <a class="el" href="classcattle_1_1_tanh_activation_layer.html#a6407cb2d664a3a2f0a2b52c46a92513f">cattle::TanhActivationLayer&lt; Scalar, Rank &gt;</a>
 </li>
-<li>ConvLayer()
-: <a class="el" href="classcattle_1_1_conv_layer.html#a397e97999bfb0db9389fa3bf616ccd0a">cattle::ConvLayer&lt; Scalar &gt;</a>
+<li>ConvolutionalLayer()
+: <a class="el" href="classcattle_1_1_convolutional_layer.html#a3ddd471c3c275233c4239d92d1cbbd01">cattle::ConvolutionalLayer&lt; Scalar &gt;</a>
 </li>
 <li>create_vector()
 : <a class="el" href="classcattle_1_1_dense_neural_network.html#aa53c7088c6b234d6281550acfffcfa2c">cattle::DenseNeuralNetwork&lt; Scalar, Rank, ConcatType &gt;</a>

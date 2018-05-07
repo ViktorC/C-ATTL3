@@ -10,7 +10,7 @@ GCC_CUDA_CXXFLAGS := $(GCC_CXXFLAGS) -DCATTL3_USE_CUBLAS
 CLANG_CXXFLAGS := $(CXXFLAGS) -march=native
 CLANG_CUDA_CXXFLAGS := $(CLANG_CXXFLAGS) -DCATTL3_USE_CUBLAS
 RELEASE_OPT_FLAGS := -O3 -DNDEBUG
-# Without level 1 optimization, the file is too big.
+# Without level 1 optimization, the object file is too big.
 DEBUG_OPT_FLAGS := -O1 -g
 # Support gcov/lcov.
 COVERAGE_OPT_FLAGS := $(DEBUG_OPT_FLAGS) -fprofile-arcs -ftest-coverage
