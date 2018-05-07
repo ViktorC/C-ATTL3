@@ -13,7 +13,7 @@ if [ "$rc" -ne 0 ]; then
   echo "Build failed" >&2
   exit "$rc"
 fi
-for run in {1..5}
+for run in {1..3}
 do
   make check
   rc=$?

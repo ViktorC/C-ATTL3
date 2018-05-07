@@ -76,7 +76,7 @@ public:
 	 * @return Whether the gradient check has been passed or failed.
 	 */
 	inline bool verify_gradients(Net& net, Provider& provider, bool verbose = true,
-			Scalar step_size = (internal::NumericUtils<Scalar>::EPSILON2 + internal::NumericUtils<Scalar>::EPSILON3) / 2,
+			Scalar step_size = internal::NumericUtils<Scalar>::EPSILON3 / 2,
 			Scalar abs_epsilon = internal::NumericUtils<Scalar>::EPSILON2,
 			Scalar rel_epsilon = internal::NumericUtils<Scalar>::EPSILON3) const {
 		assert(net.get_input_dims() == provider.get_obs_dims());
@@ -161,7 +161,6 @@ public:
 		assert(net.get_output_dims() == training_prov.get_obj_dims());
 		assert(training_prov.get_obs_dims() == test_prov.get_obs_dims());
 		assert(training_prov.get_obj_dims() == test_prov.get_obj_dims());
-		assert(epochs > 0);
 		// Fit the optimizer parameters to the network.
 		fit(net);
 		Scalar prev_test_loss = internal::NumericUtils<Scalar>::MAX;
