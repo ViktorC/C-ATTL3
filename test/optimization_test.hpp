@@ -51,11 +51,11 @@ template<typename Scalar>
 inline NeuralNetPtr<Scalar,3,false> fc_net(const Dimensions<std::size_t,3>& input_dims) {
 	WeightInitSharedPtr<Scalar> init(new GlorotWeightInitialization<Scalar>(1e-1));
 	std::vector<LayerPtr<Scalar,3>> layers(5);
-	layers[0] = LayerPtr<Scalar,3>(new FCLayer<Scalar,3>(input_dims, 200, init));
+	layers[0] = LayerPtr<Scalar,3>(new FullyConnectedLayer<Scalar,3>(input_dims, 200, init));
 	layers[1] = LayerPtr<Scalar,3>(new ReLUActivationLayer<Scalar,3>(layers[0]->get_output_dims()));
-	layers[2] = LayerPtr<Scalar,3>(new FCLayer<Scalar,3>(layers[1]->get_output_dims(), 100, init));
+	layers[2] = LayerPtr<Scalar,3>(new FullyConnectedLayer<Scalar,3>(layers[1]->get_output_dims(), 100, init));
 	layers[3] = LayerPtr<Scalar,3>(new ReLUActivationLayer<Scalar,3>(layers[2]->get_output_dims()));
-	layers[4] = LayerPtr<Scalar,3>(new FCLayer<Scalar,3>(layers[3]->get_output_dims(), 10, init));
+	layers[4] = LayerPtr<Scalar,3>(new FullyConnectedLayer<Scalar,3>(layers[3]->get_output_dims(), 10, init));
 	return NeuralNetPtr<Scalar,3,false>(new FeedforwardNeuralNetwork<Scalar,3>(std::move(layers)));
 }
 
@@ -69,17 +69,17 @@ inline NeuralNetPtr<Scalar,3,false> conv_net(const Dimensions<std::size_t,3>& in
 	WeightInitSharedPtr<Scalar> conv_init(new HeWeightInitialization<Scalar>(1e-1));
 	WeightInitSharedPtr<Scalar> dense_init(new GlorotWeightInitialization<Scalar>(1e-1));
 	std::vector<LayerPtr<Scalar,3>> layers(11);
-	layers[0] = LayerPtr<Scalar,3>(new ConvLayer<Scalar>(input_dims, 4, conv_init));
+	layers[0] = LayerPtr<Scalar,3>(new ConvolutionalLayer<Scalar>(input_dims, 4, conv_init));
 	layers[1] = LayerPtr<Scalar,3>(new ReLUActivationLayer<Scalar,3>(layers[0]->get_output_dims()));
 	layers[2] = LayerPtr<Scalar,3>(new MaxPoolingLayer<Scalar>(layers[1]->get_output_dims()));
-	layers[3] = LayerPtr<Scalar,3>(new ConvLayer<Scalar>(layers[2]->get_output_dims(), 2, conv_init));
+	layers[3] = LayerPtr<Scalar,3>(new ConvolutionalLayer<Scalar>(layers[2]->get_output_dims(), 2, conv_init));
 	layers[4] = LayerPtr<Scalar,3>(new ReLUActivationLayer<Scalar,3>(layers[3]->get_output_dims()));
 	layers[5] = LayerPtr<Scalar,3>(new MaxPoolingLayer<Scalar>(layers[4]->get_output_dims()));
 	layers[6] = LayerPtr<Scalar,3>(new DropoutLayer<Scalar,3>(layers[5]->get_output_dims(), .25));
-	layers[7] = LayerPtr<Scalar,3>(new FCLayer<Scalar,3>(layers[6]->get_output_dims(), 50, dense_init));
+	layers[7] = LayerPtr<Scalar,3>(new FullyConnectedLayer<Scalar,3>(layers[6]->get_output_dims(), 50, dense_init));
 	layers[8] = LayerPtr<Scalar,3>(new ReLUActivationLayer<Scalar,3>(layers[7]->get_output_dims()));
 	layers[9] = LayerPtr<Scalar,3>(new DropoutLayer<Scalar,3>(layers[8]->get_output_dims(), .5));
-	layers[10] = LayerPtr<Scalar,3>(new FCLayer<Scalar,3>(layers[9]->get_output_dims(), 10, dense_init));
+	layers[10] = LayerPtr<Scalar,3>(new FullyConnectedLayer<Scalar,3>(layers[9]->get_output_dims(), 10, dense_init));
 	return NeuralNetPtr<Scalar,3,false>(new FeedforwardNeuralNetwork<Scalar,3>(std::move(layers)));
 }
 

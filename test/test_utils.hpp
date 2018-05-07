@@ -165,7 +165,7 @@ inline std::pair<DataProviderPtr<Scalar,3,false>,DataProviderPtr<Scalar,3,false>
 template<typename Scalar, std::size_t Rank>
 inline KernelPtr<Scalar,Rank> kernel_layer(const typename std::enable_if<Rank != 3,
 		Dimensions<std::size_t,Rank>>::type& input_dims) {
-	return KernelPtr<Scalar,Rank>(new FCLayer<Scalar,Rank>(input_dims, 4,
+	return KernelPtr<Scalar,Rank>(new FullyConnectedLayer<Scalar,Rank>(input_dims, 4,
 			WeightInitSharedPtr<Scalar>(new GlorotWeightInitialization<Scalar>())));
 }
 
@@ -176,7 +176,7 @@ inline KernelPtr<Scalar,Rank> kernel_layer(const typename std::enable_if<Rank !=
 template<typename Scalar, std::size_t Rank>
 inline KernelPtr<Scalar,Rank> kernel_layer(const typename std::enable_if<Rank == 3,
 		Dimensions<std::size_t,Rank>>::type& input_dims) {
-	return KernelPtr<Scalar,Rank>(new ConvLayer<Scalar>(input_dims, input_dims(2),
+	return KernelPtr<Scalar,Rank>(new ConvolutionalLayer<Scalar>(input_dims, input_dims(2),
 			WeightInitSharedPtr<Scalar>(new GlorotWeightInitialization<Scalar>())));
 }
 

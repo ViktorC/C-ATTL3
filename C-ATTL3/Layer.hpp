@@ -314,7 +314,7 @@ private:
  * A class template representing a fully connected layer.
  */
 template<typename Scalar, std::size_t Rank>
-class FCLayer : public KernelLayer<Scalar,Rank> {
+class FullyConnectedLayer : public KernelLayer<Scalar,Rank> {
 	typedef Layer<Scalar,Rank> Root;
 	typedef KernelLayer<Scalar,Rank> Base;
 	typedef std::array<std::size_t,Root::DATA_RANK> RankwiseArray;
@@ -328,23 +328,23 @@ public:
 	 * @param max_norm_constraint An optional max-norm constraint. If it is 0 or less, no
 	 * constraint is applied.
 	 */
-	inline FCLayer(const Dimensions<std::size_t,Rank>& input_dims, std::size_t output_size, WeightInitSharedPtr<Scalar> weight_init,
+	inline FullyConnectedLayer(const Dimensions<std::size_t,Rank>& input_dims, std::size_t output_size, WeightInitSharedPtr<Scalar> weight_init,
 			ParamRegSharedPtr<Scalar> weight_reg = Root::NO_PARAM_REG, Scalar max_norm_constraint = 0) :
 				Base::KernelLayer(input_dims, Dimensions<std::size_t,Rank>({ output_size }), weight_init, weight_reg,
 						input_dims.get_volume() + 1, output_size, max_norm_constraint),
 				out_conversion_dims(Base::output_dims.template promote<>()),
 				prev_out_conversion_dims(Base::input_dims.template promote<>()) { }
 	inline Root* clone() const {
-		return new FCLayer(*this);
+		return new FullyConnectedLayer(*this);
 	}
 protected:
-	inline FCLayer(const FCLayer<Scalar,Rank>& layer, bool share_params = false) :
+	inline FullyConnectedLayer(const FullyConnectedLayer<Scalar,Rank>& layer, bool share_params = false) :
 			Base::KernelLayer(layer, share_params),
 			out_conversion_dims(layer.out_conversion_dims),
 			prev_out_conversion_dims(layer.prev_out_conversion_dims),
 			biased_in(layer.biased_in) { }
 	inline Layer<Scalar,Rank>* clone_with_shared_params() const {
-		return new FCLayer(*this, true);
+		return new FullyConnectedLayer(*this, true);
 	}
 	inline void empty_cache() {
 		biased_in = Matrix<Scalar>(0, 0);
@@ -401,7 +401,7 @@ private:
  * A class template for convolutional layers.
  */
 template<typename Scalar>
-class ConvLayer : public KernelLayer<Scalar,3> {
+class ConvolutionalLayer : public KernelLayer<Scalar,3> {
 	typedef Layer<Scalar,3> Root;
 	typedef KernelLayer<Scalar,3> Base;
 	typedef std::array<std::size_t,4> RankwiseArray;
@@ -429,7 +429,7 @@ public:
 	 * @param max_norm_constraint An optional max-norm constraint. If it is 0 or less, no
 	 * constraint is applied.
 	 */
-	inline ConvLayer(const Dimensions<std::size_t,3>& input_dims, std::size_t filters, WeightInitSharedPtr<Scalar> weight_init,
+	inline ConvolutionalLayer(const Dimensions<std::size_t,3>& input_dims, std::size_t filters, WeightInitSharedPtr<Scalar> weight_init,
 			ParamRegSharedPtr<Scalar> weight_reg = Root::NO_PARAM_REG, std::size_t receptor_height = 3, std::size_t receptor_width = 3,
 			std::size_t vertical_padding = 1, std::size_t horizontal_padding = 1, std::size_t vertical_stride = 1,
 			std::size_t horizontal_stride = 1, std::size_t vertical_dilation = 0, std::size_t horizontal_dilation = 0,
@@ -470,10 +470,10 @@ public:
 				input_dims(2) + 2 * horizontal_padding >= dil_receptor_width);
 	}
 	inline Root* clone() const {
-		return new ConvLayer(*this);
+		return new ConvolutionalLayer(*this);
 	}
 protected:
-	inline ConvLayer(const ConvLayer<Scalar>& layer, bool share_params = false) :
+	inline ConvolutionalLayer(const ConvolutionalLayer<Scalar>& layer, bool share_params = false) :
 			Base::KernelLayer(layer, share_params),
 			filters(layer.filters),
 			receptor_height(layer.receptor_height),
@@ -496,7 +496,7 @@ protected:
 			no_padding_extents(layer.no_padding_extents),
 			paddings(layer.paddings) { }
 	inline Root* clone_with_shared_params() const {
-		return new ConvLayer(*this, true);
+		return new ConvolutionalLayer(*this, true);
 	}
 	inline void empty_cache() {
 		biased_in = Matrix<Scalar>(0, 0);
@@ -547,10 +547,10 @@ protected:
 		assert(out_grads.dimension(0) > 0 && biased_in.rows() / (Base::output_dims(0) *
 				Base::output_dims(1)) == out_grads.dimension(0));
 		std::size_t rows = out_grads.dimension(0);
-		std::size_t patches = Base::output_dims(0) * Base::output_dims(1);
+		std::size_t total_patches = rows * Base::output_dims(0) * Base::output_dims(1);
 		std::size_t receptor_vol = Base::weights_ref.rows() - 1;
 #ifndef CATTL3_USE_CUBLAS
-		MatrixMap<Scalar> out_grads_mat(out_grads.data(), rows * Base::output_dims(0) * Base::output_dims(1), filters);
+		MatrixMap<Scalar> out_grads_mat(out_grads.data(), total_patches, filters);
 		Base::weights_grad = biased_in.transpose() * out_grads_mat;
 		if (Base::is_input_layer())
 			return typename Root::Data();
@@ -640,7 +640,7 @@ private:
  * A class template for transposed convolutional layers.
  */
 template<typename Scalar>
-class DeconvLayer : public KernelLayer<Scalar,3> {
+class DeconvolutionalLayer : public KernelLayer<Scalar,3> {
 	typedef Layer<Scalar,3> Root;
 	typedef KernelLayer<Scalar,3> Base;
 	typedef std::array<std::size_t,4> RankwiseArray;
@@ -655,31 +655,27 @@ public:
 	 * @param weight_reg The regularization function to apply to the layer's parameters.
 	 * @param receptor_height The height of the base of the receptor cuboid.
 	 * @param receptor_width The width of the base of the receptor cuboid.
-	 * @param vertical_padding The extent of padding to apply to the input tensor along its height (both
-	 * at the top and at the bottom).
-	 * @param horizontal_padding The extent of padding to apply to the input tensor along its width (both
-	 * at the left and at the right).
+	 * @param vertical_padding The extent of vertical padding to use for the transposed convolution.
+	 * @param horizontal_padding The extent of horizontal padding to use for the transposed convolution.
 	 * @param vertical_stride The vertical convolution stride i.e. the number of elements by which the
-	 * receptor is to be shifted along the height of the input tensor.
+	 * receptor is to be shifted along the height of the output tensor.
 	 * @param horizontal_stride The horizonzal convolution stride i.e. the number of elements by which the
-	 * receptor is to be shifted along the width of the input tensor.
+	 * receptor is to be shifted along the width of the output tensor.
 	 * @param vertical_dilation The extent of the vertical padding between voxels of the receptor.
 	 * @param horizontal_dilation The extent of the horizontal padding between voxels of the receptor.
 	 * @param max_norm_constraint An optional max-norm constraint. If it is 0 or less, no
 	 * constraint is applied.
 	 */
-	inline DeconvLayer(const Dimensions<std::size_t,3>& input_dims, std::size_t filters, WeightInitSharedPtr<Scalar> weight_init,
+	inline DeconvolutionalLayer(const Dimensions<std::size_t,3>& input_dims, std::size_t filters, WeightInitSharedPtr<Scalar> weight_init,
 			ParamRegSharedPtr<Scalar> weight_reg = Root::NO_PARAM_REG, std::size_t receptor_height = 3, std::size_t receptor_width = 3,
 			std::size_t vertical_padding = 1, std::size_t horizontal_padding = 1, std::size_t vertical_stride = 1,
 			std::size_t horizontal_stride = 1, std::size_t vertical_dilation = 0, std::size_t horizontal_dilation = 0,
 			Scalar max_norm_constraint = 0) :
-				/* For every filter, there is a column in the weight matrix with the same number of
-				 * elements as the area of the receptive field (F * F * D) + 1 for the bias row. */
 				Base::KernelLayer(input_dims, Dimensions<std::size_t,3>({
 						calculate_output_dim(input_dims(0), receptor_height, vertical_padding, vertical_dilation, vertical_stride),
 						calculate_output_dim(input_dims(1), receptor_width, horizontal_padding, horizontal_dilation, horizontal_stride),
-						filters }), weight_init, weight_reg, receptor_height * receptor_width * input_dims(2) + 1,
-						filters, max_norm_constraint),
+						filters }), weight_init, weight_reg, input_dims(2) + 1, receptor_height * receptor_width * filters,
+						max_norm_constraint),
 				filters(filters),
 				receptor_height(receptor_height),
 				receptor_width(receptor_width),
@@ -689,30 +685,30 @@ public:
 				horizontal_stride(horizontal_stride),
 				vertical_dilation(vertical_dilation),
 				horizontal_dilation(horizontal_dilation),
-				padded_height(input_dims(0) + 2 * vertical_padding),
-				padded_width(input_dims(1) + 2 * horizontal_padding),
+				padded_height(Base::output_dims(0) + 2 * vertical_padding),
+				padded_width(Base::output_dims(1) + 2 * horizontal_padding),
 				dil_receptor_height(receptor_height + (receptor_height - 1) * vertical_dilation),
 				dil_receptor_width(receptor_width + (receptor_width - 1) * horizontal_dilation),
-				out_conversion_dims({ 0u, Base::output_dims(0), Base::output_dims(1), Base::output_dims(2) }),
+				out_conversion_dims({ 0u, input_dims(0), input_dims(1), input_dims(2) }),
 				patch_offsets({ 0u, 0u, 0u, 0u }),
 				patch_extents({ 0u, dil_receptor_height, dil_receptor_width, input_dims(2) }),
 				dil_strides({ 1u, vertical_dilation + 1u, horizontal_dilation + 1u, 1u }),
 				no_padding_offsets({ 0u, vertical_padding, horizontal_padding, 0u }),
-				no_padding_extents({ 0u, input_dims(0), input_dims(1), input_dims(2) }),
+				no_padding_extents({ 0u, Base::output_dims(0), Base::output_dims(1), Base::output_dims(2) }),
 				paddings({ std::make_pair(0, 0), std::make_pair(vertical_padding, vertical_padding),
 						std::make_pair(horizontal_padding, horizontal_padding), std::make_pair(0, 0) }) {
 		assert(filters > 0);
 		assert(receptor_height > 0);
 		assert(receptor_width > 0);
 		assert(vertical_stride > 0 && horizontal_stride > 0);
-		assert(input_dims(1) + 2 * vertical_padding >= dil_receptor_height &&
-				input_dims(2) + 2 * horizontal_padding >= dil_receptor_width);
+		assert(Base::output_dims(1) + 2 * vertical_padding >= dil_receptor_height &&
+				Base::output_dims(2) + 2 * horizontal_padding >= dil_receptor_width);
 	}
 	inline Root* clone() const {
-		return new ConvLayer(*this);
+		return new DeconvolutionalLayer(*this);
 	}
 protected:
-	inline DeconvLayer(const DeconvLayer<Scalar>& layer, bool share_params = false) :
+	inline DeconvolutionalLayer(const DeconvLayer<Scalar>& layer, bool share_params = false) :
 			Base::KernelLayer(layer, share_params),
 			filters(layer.filters),
 			receptor_height(layer.receptor_height),
@@ -735,7 +731,7 @@ protected:
 			no_padding_extents(layer.no_padding_extents),
 			paddings(layer.paddings) { }
 	inline Root* clone_with_shared_params() const {
-		return new ConvLayer(*this, true);
+		return new DeconvolutionalLayer(*this, true);
 	}
 	inline void empty_cache() {
 		biased_in = Matrix<Scalar>(0, 0);
@@ -743,73 +739,22 @@ protected:
 	inline typename Root::Data pass_forward(typename Root::Data in, bool training) {
 		assert((Dimensions<std::size_t,4>(in.dimensions()).template demote<>()) == Base::input_dims);
 		assert(in.dimension(0) > 0);
-		// Spatial padding.
-		if (vertical_padding > 0 || horizontal_padding > 0)
-			in = typename Root::Data(in.pad(paddings));
 		std::size_t rows = in.dimension(0);
-		std::size_t total_patches = rows * Base::output_dims(0) * Base::output_dims(1);
-		std::size_t receptor_vol = Base::weights_ref.rows() - 1;
-		/* Flatten the receptor cuboids into row vectors and concatenate them. Each row stands for one stretched
-		 * out receptor of one sample. The same receptor location along all samples of the batch is represented
-		 * by a contiguous block of these rows. There is one block for each receptor location. */
-		std::size_t patch_ind = 0;
-		patch_extents[0] = rows;
-		biased_in = Matrix<Scalar>(total_patches, receptor_vol + 1);
-		for (std::size_t i = 0; i <= padded_width - dil_receptor_width; i += horizontal_stride) {
-			patch_offsets[2] = i;
-			for (std::size_t j = 0; j <= padded_height - dil_receptor_height; j += vertical_stride) {
-				patch_offsets[1] = j;
-				typename Root::Data patch;
-				// If the patch is dilated, skip the 'internal padding' when flattening it into a matrix.
-				if (vertical_dilation > 0 || horizontal_dilation > 0)
-					patch = in.slice(patch_offsets, patch_extents).stride(dil_strides);
-				else
-					patch = in.slice(patch_offsets, patch_extents);
-				biased_in.block(patch_ind, 0, rows, receptor_vol) = MatrixMap<Scalar>(patch.data(), rows, receptor_vol);
-				patch_ind += rows;
-			}
-		}
-		assert(patch_ind == total_patches);
-		// Bias trick.
-		biased_in.col(receptor_vol).setOnes();
+		std::size_t depth = Base::input_dims(2);
+		std::size_t receptor_vol = Base::weights_ref.cols();
+		std::size_t total_patches = rows * Base::input_dims(0) * Base::input_dims(1);
+		biased_in = Matrix<Scalar>(total_patches, depth + 1);
+		biased_in.block(0, 0, total_patches, depth) = MatrixMap<Scalar>(in.data(), total_patches, depth);
+		biased_in.col(depth).setOnes();
 #ifndef CATTL3_USE_CUBLAS
-		Matrix<Scalar> out = biased_in * Base::weights_ref;
+		Matrix<Scalar> out_mat = biased_in * Base::weights_ref;
 #else
-		Matrix<Scalar> out = internal::CuBLASUtils<Scalar>::get_instance().mul(biased_in,
+		Matrix<Scalar> out_mat = internal::CuBLASUtils<Scalar>::get_instance().mul(biased_in,
 				Base::weights_ref, false, false);
 #endif
-		out_conversion_dims[0] = rows;
-		return TensorMap<Scalar,4>(out.data(), out_conversion_dims);
-	}
-	inline typename Root::Data pass_back(typename Root::Data out_grads) {
-		assert((Dimensions<std::size_t,4>(out_grads.dimensions()).template demote<>()) == Base::output_dims);
-		assert(out_grads.dimension(0) > 0 && biased_in.rows() / (Base::output_dims(0) *
-				Base::output_dims(1)) == out_grads.dimension(0));
-		std::size_t rows = out_grads.dimension(0);
-		std::size_t patches = Base::output_dims(0) * Base::output_dims(1);
-		std::size_t receptor_vol = Base::weights_ref.rows() - 1;
-#ifndef CATTL3_USE_CUBLAS
-		MatrixMap<Scalar> out_grads_mat(out_grads.data(), rows * Base::output_dims(0) * Base::output_dims(1), filters);
-		Base::weights_grad = biased_in.transpose() * out_grads_mat;
-		if (Base::is_input_layer())
-			return typename Root::Data();
-		/* Remove the bias row from the weight matrix, transpose it, and compute the gradient of the
-		 * previous layer's output. */
-		Matrix<Scalar> prev_out_grads_mat = out_grads_mat * Base::weights_ref.topRows(receptor_vol).transpose();
-#else
-		Matrix<Scalar> out_grads_mat = MatrixMap<Scalar>(out_grads.data(),
-				rows * Base::output_dims(0) * Base::output_dims(1), filters);
-		Base::weights_grad = internal::CuBLASUtils<Scalar>::get_instance().mul(biased_in, out_grads_mat, true, false);
-		if (Base::is_input_layer())
-			return typename Root::Data();
-		Matrix<Scalar> weights_without_bias = Base::weights_ref.topRows(receptor_vol);
-		Matrix<Scalar> prev_out_grads_mat = internal::CuBLASUtils<Scalar>::get_instance().mul(out_grads_mat,
-				weights_without_bias, false, true);
-#endif
-		/* Given the gradient of the stretched out receptor patches, perform a 'backwards' convolution
-		 * to get the derivative w.r.t. the individual input nodes. */
-		typename Root::Data prev_out_grads(rows, padded_height, padded_width, Base::input_dims(2));
-		prev_out_grads.setZero();
+		/* Given the values of the stretched out receptor patches, accumulate them in the output tensor. */
+		typename Root::Data out(rows, padded_height, padded_width, Base::output_dims(2));
+		out.setZero();
 		std::size_t patch_ind = 0;
 		patch_extents[0] = rows;
 		for (std::size_t i = 0; i <= padded_width - dil_receptor_width; i += horizontal_stride) {
@@ -817,22 +762,68 @@ protected:
 			for (std::size_t j = 0; j <= padded_height - dil_receptor_height; j += vertical_stride) {
 				patch_offsets[1] = j;
 				// Accumulate the gradients where the receptor-patch-tensors overlap.
-				Matrix<Scalar> prev_out_grads_block = prev_out_grads_mat.block(patch_ind, 0, rows, receptor_vol);
-				TensorMap<Scalar,4> prev_out_grads_block_map(prev_out_grads_block.data(), patch_extents);
+				Matrix<Scalar> out_mat_block = biased_in.block(patch_ind, 0, rows, receptor_vol);
+				TensorMap<Scalar,4> out_block(out_mat_block.data(), patch_extents);
 				if (vertical_dilation > 0 || horizontal_dilation > 0)
-					prev_out_grads.slice(patch_offsets, patch_extents).stride(dil_strides) += prev_out_grads_block_map;
+					out.slice(patch_offsets, patch_extents).stride(dil_strides) += out_block;
 				else
-					prev_out_grads.slice(patch_offsets, patch_extents) += prev_out_grads_block_map;
+					out.slice(patch_offsets, patch_extents) += out_block;
 				patch_ind += rows;
 			}
 		}
-		assert(patch_ind == prev_out_grads_mat.rows());
+		assert(patch_ind == total_patches);
 		if (vertical_padding > 0 || horizontal_padding > 0) {
 			// Cut off the padding.
 			no_padding_extents[0] = rows;
-			return prev_out_grads.slice(no_padding_offsets, no_padding_extents);
+			return out.slice(no_padding_offsets, no_padding_extents);
 		} else
-			return prev_out_grads;
+			return out;
+	}
+	inline typename Root::Data pass_back(typename Root::Data out_grads) {
+		assert((Dimensions<std::size_t,4>(out_grads.dimensions()).template demote<>()) == Base::output_dims);
+		assert(out_grads.dimension(0) > 0 && biased_in.rows() / (Base::input_dims(0) *
+				Base::input_dims(1)) == out_grads.dimension(0));
+		// Spatial padding.
+		if (vertical_padding > 0 || horizontal_padding > 0)
+			out_grads = typename Root::Data(out_grads.pad(paddings));
+		std::size_t rows = out_grads.dimension(0);
+		std::size_t depth = Base::input_dims(2);
+		std::size_t receptor_vol = Base::weights_ref.cols();
+		std::size_t total_patches = rows * Base::input_dims(0) * Base::input_dims(1);
+		std::size_t patch_ind = 0;
+		patch_extents[0] = rows;
+		Matrix<Scalar> out_grads_mat(total_patches, receptor_vol);
+		for (std::size_t i = 0; i <= padded_width - dil_receptor_width; i += horizontal_stride) {
+			patch_offsets[2] = i;
+			for (std::size_t j = 0; j <= padded_height - dil_receptor_height; j += vertical_stride) {
+				patch_offsets[1] = j;
+				typename Root::Data patch;
+				// If the patch is dilated, skip the 'internal padding' when flattening it into a matrix.
+				if (vertical_dilation > 0 || horizontal_dilation > 0)
+					patch = out_grads.slice(patch_offsets, patch_extents).stride(dil_strides);
+				else
+					patch = out_grads.slice(patch_offsets, patch_extents);
+				out_grads_mat.block(patch_ind, 0, rows, receptor_vol) = MatrixMap<Scalar>(patch.data(), rows, receptor_vol);
+				patch_ind += rows;
+			}
+		}
+		assert(patch_ind == total_patches);
+#ifndef CATTL3_USE_CUBLAS
+		Base::weights_grad = biased_in.transpose() * out_grads_mat;
+		if (Base::is_input_layer())
+			return typename Root::Data();
+		Matrix<Scalar> prev_out_grads = out_grads_mat * Base::weights_ref.rows(depth).transpose();
+#else
+		Base::weights_grad = internal::CuBLASUtils<Scalar>::get_instance().mul(biased_in,
+				out_grads_mat, true, false);
+		if (Base::is_input_layer())
+			return typename Root::Data();
+		Matrix<Scalar> weights_without_bias = Base::weights_ref.rows(depth);
+		Matrix<Scalar> prev_out_grads = internal::CuBLASUtils<Scalar>::get_instance().mul(out_grads_mat,
+				weights_without_bias, false, true);
+#endif
+		out_conversion_dims[0] = rows;
+		return TensorMap<Scalar,4>(prev_out_grads.data(), out_conversion_dims);
 	}
 	/**
 	 * It computes the dimension of the output tensor along a rank.
@@ -846,7 +837,7 @@ protected:
 	 */
 	inline static std::size_t calculate_output_dim(std::size_t input_dim, std::size_t receptor_size, std::size_t padding,
 			std::size_t dilation, std::size_t stride) {
-		return (input_dim - receptor_size - (receptor_size - 1) * dilation + 2 * padding) / stride + 1;
+		return (stride + 1) * input_dim + receptor_size + (receptor_size - 1) * dilation - 2 * padding;
 	}
 private:
 	// The defining attributes of the convolutional layer.

@@ -34,15 +34,15 @@ int main() {
 	auto reg = std::make_shared<L2ParameterRegularization<double>>();
 	// Create the convolutional network.
 	std::vector<LayerPtr<double,3>> layers(9);
-	layers[0] = LayerPtr<double,3>(new ConvLayer<double>(training_prov.get_obs_dims(), 10, init, reg, 5, 2));
+	layers[0] = LayerPtr<double,3>(new ConvolutionalLayer<double>(training_prov.get_obs_dims(), 10, init, reg, 5, 2));
 	layers[1] = LayerPtr<double,3>(new ReLUActivationLayer<double,3>(layers[0]->get_output_dims()));
 	layers[2] = LayerPtr<double,3>(new MaxPoolingLayer<double>(layers[1]->get_output_dims()));
-	layers[3] = LayerPtr<double,3>(new ConvLayer<double>(layers[2]->get_output_dims(), 20, init, reg));
+	layers[3] = LayerPtr<double,3>(new ConvolutionalLayer<double>(layers[2]->get_output_dims(), 20, init, reg));
 	layers[4] = LayerPtr<double,3>(new ReLUActivationLayer<double,3>(layers[3]->get_output_dims()));
 	layers[5] = LayerPtr<double,3>(new MaxPoolingLayer<double>(layers[4]->get_output_dims()));
-	layers[6] = LayerPtr<double,3>(new FCLayer<double,3>(layers[5]->get_output_dims(), 500, init, reg));
+	layers[6] = LayerPtr<double,3>(new FullyConnectedLayer<double,3>(layers[5]->get_output_dims(), 500, init, reg));
 	layers[7] = LayerPtr<double,3>(new ReLUActivationLayer<double,3>(layers[6]->get_output_dims()));
-	layers[8] = LayerPtr<double,3>(new FCLayer<double,3>(layers[7]->get_output_dims(), 1, init, reg));
+	layers[8] = LayerPtr<double,3>(new FullyConnectedLayer<double,3>(layers[7]->get_output_dims(), 1, init, reg));
 	FeedforwardNeuralNetwork<double,3> nn(std::move(layers));
 	// Initialize the network.
 	nn.init();

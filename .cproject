@@ -631,6 +631,7 @@
 		</configuration>
 		<configuration configurationName="Check"/>
 		<configuration configurationName="GCC Debug"/>
+		<configuration configurationName="GCC Coverage"/>
 		<configuration configurationName="Coverage">
 			<resource resourceType="PROJECT" workspacePath="/C-ATTL3"/>
 		</configuration>
@@ -639,6 +640,7 @@
 		</configuration>
 		<configuration configurationName="GCC CUDA Release"/>
 		<configuration configurationName="Clang CUDA Debug"/>
+		<configuration configurationName="Clang Coverage"/>
 		<configuration configurationName="Clang Debug"/>
 		<configuration configurationName="Clang CUDA Release">
 			<resource resourceType="PROJECT" workspacePath="/C-ATTL3"/>

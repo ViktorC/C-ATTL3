@@ -12,8 +12,9 @@ The following sub-sections describe the main components of the C-ATTL3 deep lear
 The lowest level building blocks of neural networks in C-ATTL3 are the layers. The library provides a wide selection of them that can be used for the construction of neural network modules. The available layer types are the following:
 * [Layer](https://viktorc.github.io/C-ATTL3/html/classcattle_1_1_layer.html) [A]
   * [KernelLayer](https://viktorc.github.io/C-ATTL3/html/classcattle_1_1_kernel_layer.html) [A]
-    * [FCLayer](https://viktorc.github.io/C-ATTL3/html/classcattle_1_1_f_c_layer.html)
-    * [ConvLayer](https://viktorc.github.io/C-ATTL3/html/classcattle_1_1_conv_layer.html) (3)
+    * [FullyConnectedLayer](https://viktorc.github.io/C-ATTL3/html/classcattle_1_1_fully_connected_layer.html)
+    * [ConvolutionalLayer](https://viktorc.github.io/C-ATTL3/html/classcattle_1_1_convolutional_layer.html) (3)
+    * [DeconvolutionalLayer](https://viktorc.github.io/C-ATTL3/html/classcattle_1_1_deconvolutional_layer.html) (3)
   * [ActivationLayer](https://viktorc.github.io/C-ATTL3/html/classcattle_1_1_activation_layer.html) [A]
     * [IdentityActivationLayer](https://viktorc.github.io/C-ATTL3/html/classcattle_1_1_identity_activation_layer.html)
     * [ScalingActivationLayer](https://viktorc.github.io/C-ATTL3/html/classcattle_1_1_scaling_activation_layer.html)
@@ -152,15 +153,15 @@ The test data provider is created similarly. However, it is important not to re-
 auto init = std::make_shared<HeWeightInitialization<double>>();
 auto reg = std::make_shared<L2ParameterRegularization<double>>();
 std::vector<LayerPtr<double,3>> layers(9);
-layers[0] = LayerPtr<double,3>(new ConvLayer<double>(training_prov.get_obs_dims(), 10, init, reg, 5, 5, 2, 2));
+layers[0] = LayerPtr<double,3>(new ConvolutionalLayer<double>(training_prov.get_obs_dims(), 10, init, reg, 5, 5, 2, 2));
 layers[1] = LayerPtr<double,3>(new ReLUActivationLayer<double,3>(layers[0]->get_output_dims()));
 layers[2] = LayerPtr<double,3>(new MaxPoolingLayer<double>(layers[1]->get_output_dims()));
-layers[3] = LayerPtr<double,3>(new ConvLayer<double>(layers[2]->get_output_dims(), 20, init, reg));
+layers[3] = LayerPtr<double,3>(new ConvolutionalLayer<double>(layers[2]->get_output_dims(), 20, init, reg));
 layers[4] = LayerPtr<double,3>(new ReLUActivationLayer<double,3>(layers[3]->get_output_dims()));
 layers[5] = LayerPtr<double,3>(new MaxPoolingLayer<double>(layers[4]->get_output_dims()));
-layers[6] = LayerPtr<double,3>(new FCLayer<double,3>(layers[5]->get_output_dims(), 500, init, reg));
+layers[6] = LayerPtr<double,3>(new FullyConnectedLayer<double,3>(layers[5]->get_output_dims(), 500, init, reg));
 layers[7] = LayerPtr<double,3>(new ReLUActivationLayer<double,3>(layers[6]->get_output_dims()));
-layers[8] = LayerPtr<double,3>(new FCLayer<double,3>(layers[7]->get_output_dims(), 1, init, reg));
+layers[8] = LayerPtr<double,3>(new FullyConnectedLayer<double,3>(layers[7]->get_output_dims(), 1, init, reg));
 FeedforwardNeuralNetwork<double,3> nn(std::move(layers));
 ```
 The next step is the construction of the neural network. The above snippet demonstrates that of a simple convolutional neural network. The neural network implementation used is `FeedforwardNeuralNetwork` which takes a vector of unique layer pointers. Each layer in the vector must have the same input dimensions as the output dimensions of the preceding layer. Notice how the dimensions of the outputs of the layers do not need to be calculated manually; they can be simply retrieved using the `get_output_dims` members of the previous layers. It should also be noted that all neural networks require their layers to be of the same nominal rank and scalar type as the network itself. The example network consists of convolutional, max pooling, rectified linear unit, and fully connected layers. Convolutional and fully connected layers require weight initialization; due to its well-known compatibility with ReLU activations, He weight initialization is a good choice in our situation. As the `WeightInitialization` class specifies a stateless interface, multiple layers can use the same implementation instance (this is the reason they take a shared pointer). The same can be said about the`ParameterRegularization` abstract type. All layers with learnable parameters, including the fully connected and convolutional ones above, support optional parameter regularization. In our example, the choice fell upon the popular L2 regularization penalty function for all parameteric layers. Similarly to the unique tensor pointer arguments of the data providers, the vector of unique layer pointers required by the network's constructor must be moved as well, as unique smart pointers cannot be copied.

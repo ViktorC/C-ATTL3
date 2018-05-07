@@ -149,20 +149,20 @@ inline void fc_layer_grad_test() {
 	auto reg1 = ParamRegSharedPtr<Scalar>(new L1ParameterRegularization<Scalar>());
 	auto reg2 = ParamRegSharedPtr<Scalar>(new L2ParameterRegularization<Scalar>());
 	auto reg3 = ParamRegSharedPtr<Scalar>(new ElasticNetParameterRegularization<Scalar>());
-	LayerPtr<Scalar,1> layer1_1(new FCLayer<Scalar,1>(Dimensions<std::size_t,1>({ 32u }), 16, init1));
-	LayerPtr<Scalar,1> layer1_2(new FCLayer<Scalar,1>(layer1_1->get_output_dims(), 1, init1, reg3));
+	LayerPtr<Scalar,1> layer1_1(new FullyConnectedLayer<Scalar,1>(Dimensions<std::size_t,1>({ 32u }), 16, init1));
+	LayerPtr<Scalar,1> layer1_2(new FullyConnectedLayer<Scalar,1>(layer1_1->get_output_dims(), 1, init1, reg3));
 	layer_grad_test<Scalar,1>("fc layer", std::move(layer1_1), std::move(layer1_2), 5, ScalarTraits<Scalar>::step_size,
 			ScalarTraits<float>::abs_epsilon, ScalarTraits<float>::rel_epsilon);
-	LayerPtr<Scalar,2> layer2_1(new FCLayer<Scalar,2>(Dimensions<std::size_t,2>({ 6u, 6u }), 16, init2));
-	LayerPtr<Scalar,2> layer2_2(new FCLayer<Scalar,2>(layer2_1->get_output_dims(), 2, init2, reg1));
+	LayerPtr<Scalar,2> layer2_1(new FullyConnectedLayer<Scalar,2>(Dimensions<std::size_t,2>({ 6u, 6u }), 16, init2));
+	LayerPtr<Scalar,2> layer2_2(new FullyConnectedLayer<Scalar,2>(layer2_1->get_output_dims(), 2, init2, reg1));
 	layer_grad_test<Scalar,2>("fc layer", std::move(layer2_1), std::move(layer2_2), 5, ScalarTraits<Scalar>::step_size,
 			ScalarTraits<float>::abs_epsilon, ScalarTraits<float>::rel_epsilon);
-	LayerPtr<Scalar,3> layer3_1(new FCLayer<Scalar,3>(Dimensions<std::size_t,3>({ 4u, 4u, 2u }), 16, init1, reg2));
-	LayerPtr<Scalar,3> layer3_2(new FCLayer<Scalar,3>(layer3_1->get_output_dims(), 4, init1, reg2));
+	LayerPtr<Scalar,3> layer3_1(new FullyConnectedLayer<Scalar,3>(Dimensions<std::size_t,3>({ 4u, 4u, 2u }), 16, init1, reg2));
+	LayerPtr<Scalar,3> layer3_2(new FullyConnectedLayer<Scalar,3>(layer3_1->get_output_dims(), 4, init1, reg2));
 	layer_grad_test<Scalar,3>("fc layer", std::move(layer3_1), std::move(layer3_2));
 }
 
-TEST(GradientTest, FCLayer) {
+TEST(GradientTest, FullyConnectedLayer) {
 	fc_layer_grad_test<float>();
 	fc_layer_grad_test<double>();
 }
@@ -174,13 +174,13 @@ template<typename Scalar>
 inline void conv_layer_grad_test() {
 	auto init = WeightInitSharedPtr<Scalar>(new HeWeightInitialization<Scalar>());
 	auto reg = ParamRegSharedPtr<Scalar>(new L2ParameterRegularization<Scalar>());
-	LayerPtr<Scalar,3> layer1(new ConvLayer<Scalar>(Dimensions<std::size_t,3>({ 8u, 8u, 2u }), 5, init,
-			ConvLayer<Scalar>::NO_PARAM_REG, 3, 2, 1, 2, 1, 2, 1, 0));
-	LayerPtr<Scalar,3> layer2(new ConvLayer<Scalar>(layer1->get_output_dims(), 1, init, reg, 1, 1));
+	LayerPtr<Scalar,3> layer1(new ConvolutionalLayer<Scalar>(Dimensions<std::size_t,3>({ 8u, 8u, 2u }), 5, init,
+			ConvolutionalLayer<Scalar>::NO_PARAM_REG, 3, 2, 1, 2, 1, 2, 1, 0));
+	LayerPtr<Scalar,3> layer2(new ConvolutionalLayer<Scalar>(layer1->get_output_dims(), 1, init, reg, 1, 1));
 	layer_grad_test<Scalar,3>("convolutional layer ", std::move(layer1), std::move(layer2));
 }
 
-TEST(GradientTest, ConvLayer) {
+TEST(GradientTest, ConvolutionalLayer) {
 	conv_layer_grad_test<float>();
 	conv_layer_grad_test<double>();
 }
@@ -192,43 +192,43 @@ template<typename Scalar, std::size_t Rank>
 inline void activation_layer_grad_test(const typename std::enable_if<Rank != 3,
 		Dimensions<std::size_t,Rank>>::type& dims) {
 	auto init = WeightInitSharedPtr<Scalar>(new GlorotWeightInitialization<Scalar>());
-	LayerPtr<Scalar,Rank> layer1_1(new FCLayer<Scalar,Rank>(dims, 12, init));
+	LayerPtr<Scalar,Rank> layer1_1(new FullyConnectedLayer<Scalar,Rank>(dims, 12, init));
 	Dimensions<std::size_t,Rank> dims_1 = layer1_1->get_output_dims();
 	layer_grad_test<Scalar,Rank>("identity activation layer", std::move(layer1_1),
 			LayerPtr<Scalar,Rank>(new IdentityActivationLayer<Scalar,Rank>(dims_1)));
-	LayerPtr<Scalar,Rank> layer1_2(new FCLayer<Scalar,Rank>(dims, 8, init));
+	LayerPtr<Scalar,Rank> layer1_2(new FullyConnectedLayer<Scalar,Rank>(dims, 8, init));
 	Dimensions<std::size_t,Rank> dims_2 = layer1_2->get_output_dims();
 	layer_grad_test<Scalar,Rank>("scaling activation layer", std::move(layer1_2),
 			LayerPtr<Scalar,Rank>(new ScalingActivationLayer<Scalar,Rank>(dims_2, 1.5)));
-	LayerPtr<Scalar,Rank> layer1_3(new FCLayer<Scalar,Rank>(dims, 12, init));
+	LayerPtr<Scalar,Rank> layer1_3(new FullyConnectedLayer<Scalar,Rank>(dims, 12, init));
 	Dimensions<std::size_t,Rank> dims_3 = layer1_3->get_output_dims();
 	layer_grad_test<Scalar,Rank>("binary step activation layer", std::move(layer1_3),
 			LayerPtr<Scalar,Rank>(new BinaryStepActivationLayer<Scalar,Rank>(dims_3)));
-	LayerPtr<Scalar,Rank> layer1_4(new FCLayer<Scalar,Rank>(dims, 16, init));
+	LayerPtr<Scalar,Rank> layer1_4(new FullyConnectedLayer<Scalar,Rank>(dims, 16, init));
 	Dimensions<std::size_t,Rank> dims_4 = layer1_4->get_output_dims();
 	layer_grad_test<Scalar,Rank>("sigmoid activation layer rank", std::move(layer1_4),
 			LayerPtr<Scalar,Rank>(new SigmoidActivationLayer<Scalar,Rank>(dims_4)));
-	LayerPtr<Scalar,Rank> layer1_5(new FCLayer<Scalar,Rank>(dims, 12, init));
+	LayerPtr<Scalar,Rank> layer1_5(new FullyConnectedLayer<Scalar,Rank>(dims, 12, init));
 	Dimensions<std::size_t,Rank> dims_5 = layer1_5->get_output_dims();
 	layer_grad_test<Scalar,Rank>("tanh activation layer rank", std::move(layer1_5),
 			LayerPtr<Scalar,Rank>(new TanhActivationLayer<Scalar,Rank>(dims_5)));
-	LayerPtr<Scalar,Rank> layer1_6(new FCLayer<Scalar,Rank>(dims, 9, init));
+	LayerPtr<Scalar,Rank> layer1_6(new FullyConnectedLayer<Scalar,Rank>(dims, 9, init));
 	Dimensions<std::size_t,Rank> dims_6 = layer1_6->get_output_dims();
 	layer_grad_test<Scalar,Rank>("softplus activation layer rank", std::move(layer1_6),
 			LayerPtr<Scalar,Rank>(new SoftplusActivationLayer<Scalar,Rank>(dims_6)));
-	LayerPtr<Scalar,Rank> layer1_7(new FCLayer<Scalar,Rank>(dims, 12, init));
+	LayerPtr<Scalar,Rank> layer1_7(new FullyConnectedLayer<Scalar,Rank>(dims, 12, init));
 	Dimensions<std::size_t,Rank> dims_7 = layer1_7->get_output_dims();
 	layer_grad_test<Scalar,Rank>("softmax activation layer rank", std::move(layer1_7),
 			LayerPtr<Scalar,Rank>(new SoftmaxActivationLayer<Scalar,Rank>(dims_7)));
-	LayerPtr<Scalar,Rank> layer1_8(new FCLayer<Scalar,Rank>(dims, 10, init));
+	LayerPtr<Scalar,Rank> layer1_8(new FullyConnectedLayer<Scalar,Rank>(dims, 10, init));
 	Dimensions<std::size_t,Rank> dims_8 = layer1_8->get_output_dims();
 	layer_grad_test<Scalar,Rank>("relu activation layer rank", std::move(layer1_8),
 			LayerPtr<Scalar,Rank>(new ReLUActivationLayer<Scalar,Rank>(dims_8)));
-	LayerPtr<Scalar,Rank> layer1_9(new FCLayer<Scalar,Rank>(dims, 12, init));
+	LayerPtr<Scalar,Rank> layer1_9(new FullyConnectedLayer<Scalar,Rank>(dims, 12, init));
 	Dimensions<std::size_t,Rank> dims_9 = layer1_9->get_output_dims();
 	layer_grad_test<Scalar,Rank>("leaky relu activation layer rank", std::move(layer1_9),
 			LayerPtr<Scalar,Rank>(new LeakyReLUActivationLayer<Scalar,Rank>(dims_9, 2e-1)));
-	LayerPtr<Scalar,Rank> layer1_10(new FCLayer<Scalar,Rank>(dims, 11, init));
+	LayerPtr<Scalar,Rank> layer1_10(new FullyConnectedLayer<Scalar,Rank>(dims, 11, init));
 	Dimensions<std::size_t,Rank> dims_10 = layer1_10->get_output_dims();
 	layer_grad_test<Scalar,Rank>("elu activation layer rank", std::move(layer1_10),
 			LayerPtr<Scalar,Rank>(new ELUActivationLayer<Scalar,Rank>(dims_10, 2e-1)));
@@ -245,43 +245,43 @@ template<typename Scalar, std::size_t Rank>
 inline void activation_layer_grad_test(const typename std::enable_if<Rank == 3,
 		Dimensions<std::size_t,Rank>>::type& dims) {
 	auto init = WeightInitSharedPtr<Scalar>(new HeWeightInitialization<Scalar>());
-	LayerPtr<Scalar,3> layer1_1(new ConvLayer<Scalar>(dims, 2, init));
+	LayerPtr<Scalar,3> layer1_1(new ConvolutionalLayer<Scalar>(dims, 2, init));
 	Dimensions<std::size_t,3> dims_1 = layer1_1->get_output_dims();
 	layer_grad_test<Scalar,3>("identity activation layer", std::move(layer1_1),
 			LayerPtr<Scalar,3>(new IdentityActivationLayer<Scalar,3>(dims_1)));
-	LayerPtr<Scalar,3> layer1_2(new ConvLayer<Scalar>(dims, 2, init));
+	LayerPtr<Scalar,3> layer1_2(new ConvolutionalLayer<Scalar>(dims, 2, init));
 	Dimensions<std::size_t,3> dims_2 = layer1_2->get_output_dims();
 	layer_grad_test<Scalar,3>("scaling activation layer", std::move(layer1_2),
 			LayerPtr<Scalar,3>(new ScalingActivationLayer<Scalar,3>(dims_2, 1.5)));
-	LayerPtr<Scalar,3> layer1_3(new ConvLayer<Scalar>(dims, 2, init));
+	LayerPtr<Scalar,3> layer1_3(new ConvolutionalLayer<Scalar>(dims, 2, init));
 	Dimensions<std::size_t,3> dims_3 = layer1_3->get_output_dims();
 	layer_grad_test<Scalar,3>("binary step activation layer", std::move(layer1_3),
 			LayerPtr<Scalar,3>(new BinaryStepActivationLayer<Scalar,3>(dims_3)));
-	LayerPtr<Scalar,3> layer1_4(new ConvLayer<Scalar>(dims, 2, init));
+	LayerPtr<Scalar,3> layer1_4(new ConvolutionalLayer<Scalar>(dims, 2, init));
 	Dimensions<std::size_t,3> dims_4 = layer1_4->get_output_dims();
 	layer_grad_test<Scalar,3>("sigmoid activation layer", std::move(layer1_4),
 			LayerPtr<Scalar,3>(new SigmoidActivationLayer<Scalar,3>(dims_4)));
-	LayerPtr<Scalar,3> layer1_5(new ConvLayer<Scalar>(dims, 2, init));
+	LayerPtr<Scalar,3> layer1_5(new ConvolutionalLayer<Scalar>(dims, 2, init));
 	Dimensions<std::size_t,3> dims_5 = layer1_5->get_output_dims();
 	layer_grad_test<Scalar,3>("tanh activation layer", std::move(layer1_5),
 			LayerPtr<Scalar,3>(new TanhActivationLayer<Scalar,3>(dims_5)));
-	LayerPtr<Scalar,3> layer1_6(new ConvLayer<Scalar>(dims, 2, init));
+	LayerPtr<Scalar,3> layer1_6(new ConvolutionalLayer<Scalar>(dims, 2, init));
 	Dimensions<std::size_t,3> dims_6 = layer1_6->get_output_dims();
 	layer_grad_test<Scalar,3>("softplus activation layer", std::move(layer1_6),
 			LayerPtr<Scalar,3>(new SoftplusActivationLayer<Scalar,3>(dims_6)));
-	LayerPtr<Scalar,3> layer1_7(new ConvLayer<Scalar>(dims, 2, init));
+	LayerPtr<Scalar,3> layer1_7(new ConvolutionalLayer<Scalar>(dims, 2, init));
 	Dimensions<std::size_t,3> dims_7 = layer1_7->get_output_dims();
 	layer_grad_test<Scalar,3>("softmax activation layer", std::move(layer1_7),
 			LayerPtr<Scalar,3>(new SoftmaxActivationLayer<Scalar,3>(dims_7)));
-	LayerPtr<Scalar,3> layer1_8(new ConvLayer<Scalar>(dims, 2, init));
+	LayerPtr<Scalar,3> layer1_8(new ConvolutionalLayer<Scalar>(dims, 2, init));
 	Dimensions<std::size_t,3> dims_8 = layer1_8->get_output_dims();
 	layer_grad_test<Scalar,3>("relu activation layer", std::move(layer1_8),
 			LayerPtr<Scalar,3>(new ReLUActivationLayer<Scalar,3>(dims_8)));
-	LayerPtr<Scalar,3> layer1_9(new ConvLayer<Scalar>(dims, 2, init));
+	LayerPtr<Scalar,3> layer1_9(new ConvolutionalLayer<Scalar>(dims, 2, init));
 	Dimensions<std::size_t,3> dims_9 = layer1_9->get_output_dims();
 	layer_grad_test<Scalar,3>("leaky relu activation layer", std::move(layer1_9),
 			LayerPtr<Scalar,3>(new LeakyReLUActivationLayer<Scalar,3>(dims_9, 2e-1)));
-	LayerPtr<Scalar,3> layer1_10(new ConvLayer<Scalar>(dims, 2, init));
+	LayerPtr<Scalar,3> layer1_10(new ConvolutionalLayer<Scalar>(dims, 2, init));
 	Dimensions<std::size_t,3> dims_10 = layer1_10->get_output_dims();
 	layer_grad_test<Scalar,3>("elu activation layer", std::move(layer1_10),
 			LayerPtr<Scalar,3>(new ELUActivationLayer<Scalar,3>(dims_10, 2e-1)));
@@ -314,13 +314,13 @@ template<typename Scalar>
 inline void pooling_layer_grad_test() {
 	Dimensions<std::size_t,3> dims({ 16u, 16u, 2u });
 	auto init = WeightInitSharedPtr<Scalar>(new HeWeightInitialization<Scalar>());
-	LayerPtr<Scalar,3> sum_layer1(new ConvLayer<Scalar>(dims, 2, init));
+	LayerPtr<Scalar,3> sum_layer1(new ConvolutionalLayer<Scalar>(dims, 2, init));
 	LayerPtr<Scalar,3> sum_layer2(new SumPoolingLayer<Scalar>(sum_layer1->get_output_dims(), 3, 1, 1, 2, 0, 1));
 	layer_grad_test<Scalar,3>("sum pooling layer", std::move(sum_layer1), std::move(sum_layer2));
-	LayerPtr<Scalar,3> mean_layer1(new ConvLayer<Scalar>(dims, 2, init));
+	LayerPtr<Scalar,3> mean_layer1(new ConvolutionalLayer<Scalar>(dims, 2, init));
 	LayerPtr<Scalar,3> mean_layer2(new MeanPoolingLayer<Scalar>(mean_layer1->get_output_dims(), 3, 1, 1, 2, 0, 1));
 	layer_grad_test<Scalar,3>("mean pooling layer", std::move(mean_layer1), std::move(mean_layer2));
-	LayerPtr<Scalar,3> max_layer1(new ConvLayer<Scalar>(dims, 2, init));
+	LayerPtr<Scalar,3> max_layer1(new ConvolutionalLayer<Scalar>(dims, 2, init));
 	LayerPtr<Scalar,3> max_layer2(new MaxPoolingLayer<Scalar>(max_layer1->get_output_dims(), 3, 1, 1, 2, 0, 1));
 	layer_grad_test<Scalar,3>("max pooling layer", std::move(max_layer1), std::move(max_layer2));
 }
@@ -338,14 +338,14 @@ inline void batch_norm_layer_grad_test() {
 	auto init = WeightInitSharedPtr<Scalar>(new HeWeightInitialization<Scalar>());
 	auto reg1 = ParamRegSharedPtr<Scalar>(new L1ParameterRegularization<Scalar>());
 	auto reg2 = ParamRegSharedPtr<Scalar>(new L2ParameterRegularization<Scalar>());
-	LayerPtr<Scalar,1> layer1_1(new FCLayer<Scalar,1>(Dimensions<std::size_t,1>({ 32u }), 16, init));
+	LayerPtr<Scalar,1> layer1_1(new FullyConnectedLayer<Scalar,1>(Dimensions<std::size_t,1>({ 32u }), 16, init));
 	LayerPtr<Scalar,1> layer1_2(new BatchNormLayer<Scalar,1>(layer1_1->get_output_dims(), reg2, reg1));
 	layer_grad_test<Scalar,1>("batch norm layer", std::move(layer1_1), std::move(layer1_2), 5,
 			ScalarTraits<Scalar>::step_size, ScalarTraits<float>::abs_epsilon, ScalarTraits<float>::rel_epsilon);
 	LayerPtr<Scalar,2> layer2_1(new BatchNormLayer<Scalar,2>(Dimensions<std::size_t,2>({ 6u, 6u })));
 	LayerPtr<Scalar,2> layer2_2(new IdentityActivationLayer<Scalar,2>(layer2_1->get_output_dims()));
 	layer_grad_test<Scalar,2>("batch norm layer", std::move(layer2_1), std::move(layer2_2));
-	LayerPtr<Scalar,3> layer3_1(new ConvLayer<Scalar>(Dimensions<std::size_t,3>({ 4u, 4u, 2u }), 2, init));
+	LayerPtr<Scalar,3> layer3_1(new ConvolutionalLayer<Scalar>(Dimensions<std::size_t,3>({ 4u, 4u, 2u }), 2, init));
 	LayerPtr<Scalar,3> layer3_2(new BatchNormLayer<Scalar,3>(layer3_1->get_output_dims(), reg2, reg2));
 	layer_grad_test<Scalar,3>("batch norm layer", std::move(layer3_1), std::move(layer3_2));
 }
@@ -369,16 +369,16 @@ inline void parallel_net_grad_test() {
 	Dimensions<std::size_t,1> dims_1({ 32u });
 	std::vector<NeuralNetPtr<Scalar,1,false>> lanes1_1;
 	std::vector<LayerPtr<Scalar,1>> lane1_1_1_layers(1);
-	lane1_1_1_layers[0] = LayerPtr<Scalar,1>(new FCLayer<Scalar,1>(dims_1, 6, init));
+	lane1_1_1_layers[0] = LayerPtr<Scalar,1>(new FullyConnectedLayer<Scalar,1>(dims_1, 6, init));
 	lanes1_1.push_back(NeuralNetPtr<Scalar,1,false>(new FeedforwardNeuralNetwork<Scalar,1>(std::move(lane1_1_1_layers))));
 	std::vector<LayerPtr<Scalar,1>> lane2_1_1_layers(3);
-	lane2_1_1_layers[0] = LayerPtr<Scalar,1>(new FCLayer<Scalar,1>(dims_1, 12, init));
+	lane2_1_1_layers[0] = LayerPtr<Scalar,1>(new FullyConnectedLayer<Scalar,1>(dims_1, 12, init));
 	lane2_1_1_layers[1] = LayerPtr<Scalar,1>(new SigmoidActivationLayer<Scalar,1>(lane2_1_1_layers[0]->get_output_dims()));
-	lane2_1_1_layers[2] = LayerPtr<Scalar,1>(new FCLayer<Scalar,1>(lane2_1_1_layers[1]->get_output_dims(), 6, init));
+	lane2_1_1_layers[2] = LayerPtr<Scalar,1>(new FullyConnectedLayer<Scalar,1>(lane2_1_1_layers[1]->get_output_dims(), 6, init));
 	lanes1_1.push_back(NeuralNetPtr<Scalar,1,false>(new FeedforwardNeuralNetwork<Scalar,1>(std::move(lane2_1_1_layers))));
 	std::vector<LayerPtr<Scalar,1>> lane3_1_1_layers(2);
-	lane3_1_1_layers[0] = LayerPtr<Scalar,1>(new FCLayer<Scalar,1>(dims_1, 4, init));
-	lane3_1_1_layers[1] = LayerPtr<Scalar,1>(new FCLayer<Scalar,1>(lane3_1_1_layers[0]->get_output_dims(), 6, init));
+	lane3_1_1_layers[0] = LayerPtr<Scalar,1>(new FullyConnectedLayer<Scalar,1>(dims_1, 4, init));
+	lane3_1_1_layers[1] = LayerPtr<Scalar,1>(new FullyConnectedLayer<Scalar,1>(lane3_1_1_layers[0]->get_output_dims(), 6, init));
 	lanes1_1.push_back(NeuralNetPtr<Scalar,1,false>(new FeedforwardNeuralNetwork<Scalar,1>(std::move(lane3_1_1_layers))));
 	NeuralNetPtr<Scalar,1,false> parallel_net1_1(new ParallelNeuralNetwork<Scalar,1,SUM>(std::move(lanes1_1)));
 	ASSERT_TRUE((parallel_net1_1->get_output_dims() == Dimensions<std::size_t,1>({ 6 })));
@@ -386,16 +386,16 @@ inline void parallel_net_grad_test() {
 	// Rank 1 with multiplication.
 	std::vector<NeuralNetPtr<Scalar,1,false>> lanes2_1;
 	std::vector<LayerPtr<Scalar,1>> lane1_2_1_layers(1);
-	lane1_2_1_layers[0] = LayerPtr<Scalar,1>(new FCLayer<Scalar,1>(dims_1, 6, init));
+	lane1_2_1_layers[0] = LayerPtr<Scalar,1>(new FullyConnectedLayer<Scalar,1>(dims_1, 6, init));
 	lanes2_1.push_back(NeuralNetPtr<Scalar,1,false>(new FeedforwardNeuralNetwork<Scalar,1>(std::move(lane1_2_1_layers))));
 	std::vector<LayerPtr<Scalar,1>> lane2_2_1_layers(3);
-	lane2_2_1_layers[0] = LayerPtr<Scalar,1>(new FCLayer<Scalar,1>(dims_1, 12, init));
+	lane2_2_1_layers[0] = LayerPtr<Scalar,1>(new FullyConnectedLayer<Scalar,1>(dims_1, 12, init));
 	lane2_2_1_layers[1] = LayerPtr<Scalar,1>(new SigmoidActivationLayer<Scalar,1>(lane2_2_1_layers[0]->get_output_dims()));
-	lane2_2_1_layers[2] = LayerPtr<Scalar,1>(new FCLayer<Scalar,1>(lane2_2_1_layers[1]->get_output_dims(), 6, init));
+	lane2_2_1_layers[2] = LayerPtr<Scalar,1>(new FullyConnectedLayer<Scalar,1>(lane2_2_1_layers[1]->get_output_dims(), 6, init));
 	lanes2_1.push_back(NeuralNetPtr<Scalar,1,false>(new FeedforwardNeuralNetwork<Scalar,1>(std::move(lane2_2_1_layers))));
 	std::vector<LayerPtr<Scalar,1>> lane3_2_1_layers(2);
-	lane3_2_1_layers[0] = LayerPtr<Scalar,1>(new FCLayer<Scalar,1>(dims_1, 4, init));
-	lane3_2_1_layers[1] = LayerPtr<Scalar,1>(new FCLayer<Scalar,1>(lane3_2_1_layers[0]->get_output_dims(), 6, init));
+	lane3_2_1_layers[0] = LayerPtr<Scalar,1>(new FullyConnectedLayer<Scalar,1>(dims_1, 4, init));
+	lane3_2_1_layers[1] = LayerPtr<Scalar,1>(new FullyConnectedLayer<Scalar,1>(lane3_2_1_layers[0]->get_output_dims(), 6, init));
 	lanes2_1.push_back(NeuralNetPtr<Scalar,1,false>(new FeedforwardNeuralNetwork<Scalar,1>(std::move(lane3_2_1_layers))));
 	NeuralNetPtr<Scalar,1,false> parallel_net2_1(new ParallelNeuralNetwork<Scalar,1,MUL>(std::move(lanes2_1)));
 	ASSERT_TRUE((parallel_net2_1->get_output_dims() == Dimensions<std::size_t,1>({ 6 })));
@@ -404,10 +404,10 @@ inline void parallel_net_grad_test() {
 	Dimensions<std::size_t,2> dims_2({ 6u, 6u });
 	std::vector<NeuralNetPtr<Scalar,2,false>> lanes_2;
 	std::vector<LayerPtr<Scalar,2>> lane1_2_layers(1);
-	lane1_2_layers[0] = LayerPtr<Scalar,2>(new FCLayer<Scalar,2>(dims_2, 6, init));
+	lane1_2_layers[0] = LayerPtr<Scalar,2>(new FullyConnectedLayer<Scalar,2>(dims_2, 6, init));
 	lanes_2.push_back(NeuralNetPtr<Scalar,2,false>(new FeedforwardNeuralNetwork<Scalar,2>(std::move(lane1_2_layers))));
 	std::vector<LayerPtr<Scalar,2>> lane2_2_layers(1);
-	lane2_2_layers[0] = LayerPtr<Scalar,2>(new FCLayer<Scalar,2>(dims_2, 12, init));
+	lane2_2_layers[0] = LayerPtr<Scalar,2>(new FullyConnectedLayer<Scalar,2>(dims_2, 12, init));
 	lanes_2.push_back(NeuralNetPtr<Scalar,2,false>(new FeedforwardNeuralNetwork<Scalar,2>(std::move(lane2_2_layers))));
 	NeuralNetPtr<Scalar,2,false> parallel_net_2(new ParallelNeuralNetwork<Scalar,2,CONCAT_LO_RANK>(std::move(lanes_2)));
 	ASSERT_TRUE((parallel_net_2->get_output_dims() == Dimensions<std::size_t,2>({ 18, 1 })));
@@ -416,10 +416,10 @@ inline void parallel_net_grad_test() {
 	Dimensions<std::size_t,3> dims_3({ 4u, 4u, 3u });
 	std::vector<NeuralNetPtr<Scalar,3,false>> lanes_3;
 	std::vector<LayerPtr<Scalar,3>> lane1_3_layers(1);
-	lane1_3_layers[0] = LayerPtr<Scalar,3>(new ConvLayer<Scalar>(dims_3, 4, init));
+	lane1_3_layers[0] = LayerPtr<Scalar,3>(new ConvolutionalLayer<Scalar>(dims_3, 4, init));
 	lanes_3.push_back(NeuralNetPtr<Scalar,3,false>(new FeedforwardNeuralNetwork<Scalar,3>(std::move(lane1_3_layers))));
 	std::vector<LayerPtr<Scalar,3>> lane2_3_layers(1);
-	lane2_3_layers[0] = LayerPtr<Scalar,3>(new ConvLayer<Scalar>(dims_3, 2, init));
+	lane2_3_layers[0] = LayerPtr<Scalar,3>(new ConvolutionalLayer<Scalar>(dims_3, 2, init));
 	lanes_3.push_back(NeuralNetPtr<Scalar,3,false>(new FeedforwardNeuralNetwork<Scalar,3>(std::move(lane2_3_layers))));
 	NeuralNetPtr<Scalar,3,false> parallel_net_3(new ParallelNeuralNetwork<Scalar,3>(std::move(lanes_3)));
 	ASSERT_TRUE((parallel_net_3->get_output_dims() == Dimensions<std::size_t,3>({ 4, 4, 6 })));
@@ -441,30 +441,30 @@ inline void residual_net_grad_test() {
 	std::vector<NeuralNetPtr<Scalar,1,false>> modules_1;
 	std::vector<NeuralNetPtr<Scalar,1,false>> sub_modules1_1;
 	std::vector<LayerPtr<Scalar,1>> layers1_1(2);
-	layers1_1[0] = LayerPtr<Scalar,1>(new FCLayer<Scalar,1>(Dimensions<std::size_t,1>({ 32u }), 18, init));
+	layers1_1[0] = LayerPtr<Scalar,1>(new FullyConnectedLayer<Scalar,1>(Dimensions<std::size_t,1>({ 32u }), 18, init));
 	layers1_1[1] = LayerPtr<Scalar,1>(new SigmoidActivationLayer<Scalar,1>(layers1_1[0]->get_output_dims()));
 	sub_modules1_1.push_back(NeuralNetPtr<Scalar,1,false>(new FeedforwardNeuralNetwork<Scalar,1>(std::move(layers1_1))));
 	sub_modules1_1.push_back(NeuralNetPtr<Scalar,1,false>(new FeedforwardNeuralNetwork<Scalar,1>(LayerPtr<Scalar,1>(
-			new FCLayer<Scalar,1>(sub_modules1_1[0]->get_output_dims(), 32, init)))));
+			new FullyConnectedLayer<Scalar,1>(sub_modules1_1[0]->get_output_dims(), 32, init)))));
 	modules_1.push_back(NeuralNetPtr<Scalar,1,false>(new StackedNeuralNetwork<Scalar,1,false>(std::move(sub_modules1_1))));
 	modules_1.push_back(NeuralNetPtr<Scalar,1,false>(new StackedNeuralNetwork<Scalar,1,false>(NeuralNetPtr<Scalar,1,false>(
 			new FeedforwardNeuralNetwork<Scalar,1>(LayerPtr<Scalar,1>(
-			new FCLayer<Scalar,1>(modules_1[0]->get_output_dims(), 32, init)))))));
+			new FullyConnectedLayer<Scalar,1>(modules_1[0]->get_output_dims(), 32, init)))))));
 	nonseq_network_grad_test<Scalar,1>("residual net", NeuralNetPtr<Scalar,1,false>(
 			new ResidualNeuralNetwork<Scalar,1>(std::move(modules_1))));
 	// Rank 3.
 	std::vector<NeuralNetPtr<Scalar,3,false>> modules_3;
 	std::vector<NeuralNetPtr<Scalar,3,false>> sub_modules1_3;
 	std::vector<LayerPtr<Scalar,3>> layers1_3(2);
-	layers1_3[0] = LayerPtr<Scalar,3>(new ConvLayer<Scalar>(Dimensions<std::size_t,3>({ 4u, 4u, 3u }), 4, init));
+	layers1_3[0] = LayerPtr<Scalar,3>(new ConvolutionalLayer<Scalar>(Dimensions<std::size_t,3>({ 4u, 4u, 3u }), 4, init));
 	layers1_3[1] = LayerPtr<Scalar,3>(new SigmoidActivationLayer<Scalar,3>(layers1_3[0]->get_output_dims()));
 	sub_modules1_3.push_back(NeuralNetPtr<Scalar,3,false>(new FeedforwardNeuralNetwork<Scalar,3>(std::move(layers1_3))));
 	sub_modules1_3.push_back(NeuralNetPtr<Scalar,3,false>(new FeedforwardNeuralNetwork<Scalar,3>(LayerPtr<Scalar,3>(
-			new ConvLayer<Scalar>(sub_modules1_3[0]->get_output_dims(), 3, init)))));
+			new ConvolutionalLayer<Scalar>(sub_modules1_3[0]->get_output_dims(), 3, init)))));
 	modules_3.push_back(NeuralNetPtr<Scalar,3,false>(new StackedNeuralNetwork<Scalar,3,false>(std::move(sub_modules1_3))));
 	modules_3.push_back(NeuralNetPtr<Scalar,3,false>(new StackedNeuralNetwork<Scalar,3,false>(NeuralNetPtr<Scalar,3,false>(
 			new FeedforwardNeuralNetwork<Scalar,3>(LayerPtr<Scalar,3>(
-			new ConvLayer<Scalar>(modules_3[0]->get_output_dims(), 3, init)))))));
+			new ConvolutionalLayer<Scalar>(modules_3[0]->get_output_dims(), 3, init)))))));
 	nonseq_network_grad_test<Scalar,3>("residual net", NeuralNetPtr<Scalar,3,false>(
 			new ResidualNeuralNetwork<Scalar,3>(std::move(modules_3))));
 }
@@ -485,15 +485,15 @@ inline void dense_net_grad_test() {
 	std::vector<NeuralNetPtr<Scalar,1,false>> modules_1;
 	std::vector<NeuralNetPtr<Scalar,1,false>> sub_modules1_1;
 	std::vector<LayerPtr<Scalar,1>> layers1_1(2);
-	layers1_1[0] = LayerPtr<Scalar,1>(new FCLayer<Scalar,1>(dims_1, 18, init));
+	layers1_1[0] = LayerPtr<Scalar,1>(new FullyConnectedLayer<Scalar,1>(dims_1, 18, init));
 	layers1_1[1] = LayerPtr<Scalar,1>(new SigmoidActivationLayer<Scalar,1>(layers1_1[0]->get_output_dims()));
 	sub_modules1_1.push_back(NeuralNetPtr<Scalar,1,false>(new FeedforwardNeuralNetwork<Scalar,1>(std::move(layers1_1))));
 	sub_modules1_1.push_back(NeuralNetPtr<Scalar,1,false>(new FeedforwardNeuralNetwork<Scalar,1>(LayerPtr<Scalar,1>(
-			new FCLayer<Scalar,1>(sub_modules1_1[0]->get_output_dims(), 32, init)))));
+			new FullyConnectedLayer<Scalar,1>(sub_modules1_1[0]->get_output_dims(), 32, init)))));
 	modules_1.push_back(NeuralNetPtr<Scalar,1,false>(new StackedNeuralNetwork<Scalar,1,false>(std::move(sub_modules1_1))));
 	modules_1.push_back(NeuralNetPtr<Scalar,1,false>(new StackedNeuralNetwork<Scalar,1,false>(NeuralNetPtr<Scalar,1,false>(
 			new FeedforwardNeuralNetwork<Scalar,1>(LayerPtr<Scalar,1>(
-			new FCLayer<Scalar,1>(dims_1.add_along_rank(modules_1[0]->get_output_dims(), 0), 16, init)))))));
+			new FullyConnectedLayer<Scalar,1>(dims_1.add_along_rank(modules_1[0]->get_output_dims(), 0), 16, init)))))));
 	nonseq_network_grad_test<Scalar,1>("dense net", NeuralNetPtr<Scalar,1,false>(
 			new DenseNeuralNetwork<Scalar,1>(std::move(modules_1))));
 	// Rank 2.
@@ -501,15 +501,15 @@ inline void dense_net_grad_test() {
 	std::vector<NeuralNetPtr<Scalar,2,false>> modules_2;
 	std::vector<NeuralNetPtr<Scalar,2,false>> sub_modules1_2;
 	std::vector<LayerPtr<Scalar,2>> layers1_2(2);
-	layers1_2[0] = LayerPtr<Scalar,2>(new FCLayer<Scalar,2>(dims_2, 12, init));
+	layers1_2[0] = LayerPtr<Scalar,2>(new FullyConnectedLayer<Scalar,2>(dims_2, 12, init));
 	layers1_2[1] = LayerPtr<Scalar,2>(new SigmoidActivationLayer<Scalar,2>(layers1_2[0]->get_output_dims()));
 	sub_modules1_2.push_back(NeuralNetPtr<Scalar,2,false>(new FeedforwardNeuralNetwork<Scalar,2>(std::move(layers1_2))));
 	sub_modules1_2.push_back(NeuralNetPtr<Scalar,2,false>(new FeedforwardNeuralNetwork<Scalar,2>(LayerPtr<Scalar,2>(
-			new FCLayer<Scalar,2>(sub_modules1_2[0]->get_output_dims(), 6, init)))));
+			new FullyConnectedLayer<Scalar,2>(sub_modules1_2[0]->get_output_dims(), 6, init)))));
 	modules_2.push_back(NeuralNetPtr<Scalar,2,false>(new StackedNeuralNetwork<Scalar,2,false>(std::move(sub_modules1_2))));
 	modules_2.push_back(NeuralNetPtr<Scalar,2,false>(new StackedNeuralNetwork<Scalar,2,false>(NeuralNetPtr<Scalar,2,false>(
 			new FeedforwardNeuralNetwork<Scalar,2>(LayerPtr<Scalar,2>(
-			new FCLayer<Scalar,2>(dims_2.add_along_rank(modules_2[0]->get_output_dims(), 1), 6, init)))))));
+			new FullyConnectedLayer<Scalar,2>(dims_2.add_along_rank(modules_2[0]->get_output_dims(), 1), 6, init)))))));
 	nonseq_network_grad_test<Scalar,2>("dense net", NeuralNetPtr<Scalar,2,false>(
 			new DenseNeuralNetwork<Scalar,2,HIGHEST_RANK>(std::move(modules_2))));
 	// Rank 3.
@@ -517,15 +517,15 @@ inline void dense_net_grad_test() {
 	std::vector<NeuralNetPtr<Scalar,3,false>> modules_3;
 	std::vector<NeuralNetPtr<Scalar,3,false>> sub_modules1_3;
 	std::vector<LayerPtr<Scalar,3>> layers1_3(2);
-	layers1_3[0] = LayerPtr<Scalar,3>(new ConvLayer<Scalar>(dims_3, 4, init, ConvLayer<Scalar>::NO_PARAM_REG, 2, 3));
+	layers1_3[0] = LayerPtr<Scalar,3>(new ConvolutionalLayer<Scalar>(dims_3, 4, init, ConvolutionalLayer<Scalar>::NO_PARAM_REG, 2, 3));
 	layers1_3[1] = LayerPtr<Scalar,3>(new SigmoidActivationLayer<Scalar,3>(layers1_3[0]->get_output_dims()));
 	sub_modules1_3.push_back(NeuralNetPtr<Scalar,3,false>(new FeedforwardNeuralNetwork<Scalar,3>(std::move(layers1_3))));
 	sub_modules1_3.push_back(NeuralNetPtr<Scalar,3,false>(new FeedforwardNeuralNetwork<Scalar,3>(LayerPtr<Scalar,3>(
-			new ConvLayer<Scalar>(sub_modules1_3[0]->get_output_dims(), 3, init)))));
+			new ConvolutionalLayer<Scalar>(sub_modules1_3[0]->get_output_dims(), 3, init)))));
 	modules_3.push_back(NeuralNetPtr<Scalar,3,false>(new StackedNeuralNetwork<Scalar,3,false>(std::move(sub_modules1_3))));
 	modules_3.push_back(NeuralNetPtr<Scalar,3,false>(new StackedNeuralNetwork<Scalar,3,false>(NeuralNetPtr<Scalar,3,false>(
 			new FeedforwardNeuralNetwork<Scalar,3>(LayerPtr<Scalar,3>(
-			new ConvLayer<Scalar>(dims_3.add_along_rank(modules_3[0]->get_output_dims(), 0), 3, init)))))));
+			new ConvolutionalLayer<Scalar>(dims_3.add_along_rank(modules_3[0]->get_output_dims(), 0), 3, init)))))));
 	nonseq_network_grad_test<Scalar,3>("dense net", NeuralNetPtr<Scalar,3,false>(
 			new DenseNeuralNetwork<Scalar,3,LOWEST_RANK>(std::move(modules_3))));
 }
@@ -543,18 +543,18 @@ inline void sequential_net_grad_test() {
 	auto init = WeightInitSharedPtr<Scalar>(new GlorotWeightInitialization<Scalar>());
 	// Rank 1.
 	std::vector<LayerPtr<Scalar,1>> layers_1(3);
-	layers_1[0] = LayerPtr<Scalar,1>(new FCLayer<Scalar,1>(Dimensions<std::size_t,1>({ 32u }), 16, init));
+	layers_1[0] = LayerPtr<Scalar,1>(new FullyConnectedLayer<Scalar,1>(Dimensions<std::size_t,1>({ 32u }), 16, init));
 	layers_1[1] = LayerPtr<Scalar,1>(new TanhActivationLayer<Scalar,1>(layers_1[0]->get_output_dims()));
-	layers_1[2] = LayerPtr<Scalar,1>(new FCLayer<Scalar,1>(layers_1[1]->get_output_dims(), 4, init));
+	layers_1[2] = LayerPtr<Scalar,1>(new FullyConnectedLayer<Scalar,1>(layers_1[1]->get_output_dims(), 4, init));
 	seq_network_grad_test("sequential net", NeuralNetPtr<Scalar,1,true>(
 			new SequentialNeuralNetwork<Scalar,1>(NeuralNetPtr<Scalar,1,false>(
 					new FeedforwardNeuralNetwork<Scalar,1>(std::move(layers_1))))));
 	// Rank 3.
 	std::vector<LayerPtr<Scalar,3>> layers_3(4);
-	layers_3[0] = LayerPtr<Scalar,3>(new ConvLayer<Scalar>(Dimensions<std::size_t,3>({ 4u, 4u, 2u }), 4, init));
+	layers_3[0] = LayerPtr<Scalar,3>(new ConvolutionalLayer<Scalar>(Dimensions<std::size_t,3>({ 4u, 4u, 2u }), 4, init));
 	layers_3[1] = LayerPtr<Scalar,3>(new ReLUActivationLayer<Scalar,3>(layers_3[0]->get_output_dims()));
 	layers_3[2] = LayerPtr<Scalar,3>(new MaxPoolingLayer<Scalar>(layers_3[1]->get_output_dims()));
-	layers_3[3] = LayerPtr<Scalar,3>(new FCLayer<Scalar,3>(layers_3[2]->get_output_dims(), 1, init));
+	layers_3[3] = LayerPtr<Scalar,3>(new FullyConnectedLayer<Scalar,3>(layers_3[2]->get_output_dims(), 1, init));
 	seq_network_grad_test("sequential net", NeuralNetPtr<Scalar,3,true>(
 			new SequentialNeuralNetwork<Scalar,3>(NeuralNetPtr<Scalar,3,false>(
 					new FeedforwardNeuralNetwork<Scalar,3>(std::move(layers_3))))));
@@ -573,14 +573,14 @@ inline void recurrent_net_grad_test() {
 	auto init = WeightInitSharedPtr<Scalar>(new OrthogonalWeightInitialization<Scalar>());
 	auto reg = ParamRegSharedPtr<Scalar>(new L2ParameterRegularization<Scalar>());
 	// Rank 1.
-	KernelPtr<Scalar,1> input_kernel1_1(new FCLayer<Scalar,1>(Dimensions<std::size_t,1>({ 12u }), 12, init, reg));
-	KernelPtr<Scalar,1> state_kernel1_1(new FCLayer<Scalar,1>(input_kernel1_1->get_output_dims(), 12, init, reg));
-	KernelPtr<Scalar,1> output_kernel1_1(new FCLayer<Scalar,1>(state_kernel1_1->get_output_dims(), 4, init, reg));
+	KernelPtr<Scalar,1> input_kernel1_1(new FullyConnectedLayer<Scalar,1>(Dimensions<std::size_t,1>({ 12u }), 12, init, reg));
+	KernelPtr<Scalar,1> state_kernel1_1(new FullyConnectedLayer<Scalar,1>(input_kernel1_1->get_output_dims(), 12, init, reg));
+	KernelPtr<Scalar,1> output_kernel1_1(new FullyConnectedLayer<Scalar,1>(state_kernel1_1->get_output_dims(), 4, init, reg));
 	ActivationPtr<Scalar,1> state_act1_1(new SigmoidActivationLayer<Scalar,1>(state_kernel1_1->get_output_dims()));
 	ActivationPtr<Scalar,1> output_act1_1(new IdentityActivationLayer<Scalar,1>(output_kernel1_1->get_output_dims()));
-	KernelPtr<Scalar,1> input_kernel2_1((FCLayer<Scalar,1>*) input_kernel1_1->clone());
-	KernelPtr<Scalar,1> state_kernel2_1((FCLayer<Scalar,1>*) input_kernel2_1->clone());
-	KernelPtr<Scalar,1> output_kernel2_1((FCLayer<Scalar,1>*) output_kernel1_1->clone());
+	KernelPtr<Scalar,1> input_kernel2_1((FullyConnectedLayer<Scalar,1>*) input_kernel1_1->clone());
+	KernelPtr<Scalar,1> state_kernel2_1((FullyConnectedLayer<Scalar,1>*) input_kernel2_1->clone());
+	KernelPtr<Scalar,1> output_kernel2_1((FullyConnectedLayer<Scalar,1>*) output_kernel1_1->clone());
 	ActivationPtr<Scalar,1> state_act2_1((SigmoidActivationLayer<Scalar,1>*) state_act1_1->clone());
 	ActivationPtr<Scalar,1> output_act2_1((IdentityActivationLayer<Scalar,1>*) output_act1_1->clone());
 	seq_network_grad_test("recurrent net", NeuralNetPtr<Scalar,1,true>(
@@ -592,14 +592,14 @@ inline void recurrent_net_grad_test() {
 					std::move(output_kernel2_1), std::move(state_act2_1), std::move(output_act2_1),
 					[](int input_seq_length) { return std::make_pair(1, input_seq_length - 1); })), 5, 1);
 	// Rank 3.
-	KernelPtr<Scalar,3> input_kernel1_3(new ConvLayer<Scalar>(Dimensions<std::size_t,3>({ 4u, 4u, 2u }), 5, init, reg));
-	KernelPtr<Scalar,3> state_kernel1_3(new ConvLayer<Scalar>(input_kernel1_3->get_output_dims(), 5, init, reg));
-	KernelPtr<Scalar,3> output_kernel1_3(new FCLayer<Scalar,3>(state_kernel1_3->get_output_dims(), 2, init, reg));
+	KernelPtr<Scalar,3> input_kernel1_3(new ConvolutionalLayer<Scalar>(Dimensions<std::size_t,3>({ 4u, 4u, 2u }), 5, init, reg));
+	KernelPtr<Scalar,3> state_kernel1_3(new ConvolutionalLayer<Scalar>(input_kernel1_3->get_output_dims(), 5, init, reg));
+	KernelPtr<Scalar,3> output_kernel1_3(new FullyConnectedLayer<Scalar,3>(state_kernel1_3->get_output_dims(), 2, init, reg));
 	ActivationPtr<Scalar,3> state_act1_3(new SoftplusActivationLayer<Scalar,3>(state_kernel1_3->get_output_dims()));
 	ActivationPtr<Scalar,3> output_act1_3(new IdentityActivationLayer<Scalar,3>(output_kernel1_3->get_output_dims()));
-	KernelPtr<Scalar,3> input_kernel2_3((ConvLayer<Scalar>*) input_kernel1_3->clone());
-	KernelPtr<Scalar,3> state_kernel2_3((ConvLayer<Scalar>*) state_kernel1_3->clone());
-	KernelPtr<Scalar,3> output_kernel2_3((FCLayer<Scalar,3>*) output_kernel1_3->clone());
+	KernelPtr<Scalar,3> input_kernel2_3((ConvolutionalLayer<Scalar>*) input_kernel1_3->clone());
+	KernelPtr<Scalar,3> state_kernel2_3((ConvolutionalLayer<Scalar>*) state_kernel1_3->clone());
+	KernelPtr<Scalar,3> output_kernel2_3((FullyConnectedLayer<Scalar,3>*) output_kernel1_3->clone());
 	ActivationPtr<Scalar,3> state_act2_3((SoftplusActivationLayer<Scalar,3>*) state_act1_3->clone());
 	ActivationPtr<Scalar,3> output_act2_3((IdentityActivationLayer<Scalar,3>*) output_act1_3->clone());
 	seq_network_grad_test("recurrent net", NeuralNetPtr<Scalar,3,true>(
@@ -627,27 +627,27 @@ inline void lstm_net_grad_test() {
 	// Rank 1.
 	Dimensions<std::size_t,1> input_dims_1({ 32u });
 	Dimensions<std::size_t,1> output_dims_1({ 5u });
-	KernelPtr<Scalar,1> forget_input_kernel1_1(new FCLayer<Scalar,1>(input_dims_1, 5, init, reg));
-	KernelPtr<Scalar,1> forget_output_kernel1_1(new FCLayer<Scalar,1>(output_dims_1, 5, init, reg));
-	KernelPtr<Scalar,1> write_input_kernel1_1(new FCLayer<Scalar,1>(input_dims_1, 5, init, reg));
-	KernelPtr<Scalar,1> write_output_kernel1_1(new FCLayer<Scalar,1>(output_dims_1, 5, init, reg));
-	KernelPtr<Scalar,1> candidate_input_kernel1_1(new FCLayer<Scalar,1>(input_dims_1, 5, init, reg));
-	KernelPtr<Scalar,1> candidate_output_kernel1_1(new FCLayer<Scalar,1>(output_dims_1, 5, init, reg));
-	KernelPtr<Scalar,1> read_input_kernel1_1(new FCLayer<Scalar,1>(input_dims_1, 5, init, reg));
-	KernelPtr<Scalar,1> read_output_kernel1_1(new FCLayer<Scalar,1>(output_dims_1, 5, init, reg));
+	KernelPtr<Scalar,1> forget_input_kernel1_1(new FullyConnectedLayer<Scalar,1>(input_dims_1, 5, init, reg));
+	KernelPtr<Scalar,1> forget_output_kernel1_1(new FullyConnectedLayer<Scalar,1>(output_dims_1, 5, init, reg));
+	KernelPtr<Scalar,1> write_input_kernel1_1(new FullyConnectedLayer<Scalar,1>(input_dims_1, 5, init, reg));
+	KernelPtr<Scalar,1> write_output_kernel1_1(new FullyConnectedLayer<Scalar,1>(output_dims_1, 5, init, reg));
+	KernelPtr<Scalar,1> candidate_input_kernel1_1(new FullyConnectedLayer<Scalar,1>(input_dims_1, 5, init, reg));
+	KernelPtr<Scalar,1> candidate_output_kernel1_1(new FullyConnectedLayer<Scalar,1>(output_dims_1, 5, init, reg));
+	KernelPtr<Scalar,1> read_input_kernel1_1(new FullyConnectedLayer<Scalar,1>(input_dims_1, 5, init, reg));
+	KernelPtr<Scalar,1> read_output_kernel1_1(new FullyConnectedLayer<Scalar,1>(output_dims_1, 5, init, reg));
 	ActivationPtr<Scalar,1> forget_act1_1(new SigmoidActivationLayer<Scalar,1>(output_dims_1));
 	ActivationPtr<Scalar,1> write_act1_1(new SigmoidActivationLayer<Scalar,1>(output_dims_1));
 	ActivationPtr<Scalar,1> candidate_act1_1(new TanhActivationLayer<Scalar,1>(output_dims_1));
 	ActivationPtr<Scalar,1> state_act1_1(new TanhActivationLayer<Scalar,1>(output_dims_1));
 	ActivationPtr<Scalar,1> read_act1_1(new SigmoidActivationLayer<Scalar,1>(output_dims_1));
-	KernelPtr<Scalar,1> forget_input_kernel2_1((FCLayer<Scalar,1>*) forget_input_kernel1_1->clone());
-	KernelPtr<Scalar,1> forget_output_kernel2_1((FCLayer<Scalar,1>*) forget_output_kernel1_1->clone());
-	KernelPtr<Scalar,1> write_input_kernel2_1((FCLayer<Scalar,1>*) write_input_kernel1_1->clone());
-	KernelPtr<Scalar,1> write_output_kernel2_1((FCLayer<Scalar,1>*) write_output_kernel1_1->clone());
-	KernelPtr<Scalar,1> candidate_input_kernel2_1((FCLayer<Scalar,1>*) candidate_input_kernel1_1->clone());
-	KernelPtr<Scalar,1> candidate_output_kernel2_1((FCLayer<Scalar,1>*) candidate_output_kernel1_1->clone());
-	KernelPtr<Scalar,1> read_input_kernel2_1((FCLayer<Scalar,1>*) read_input_kernel1_1->clone());
-	KernelPtr<Scalar,1> read_output_kernel2_1((FCLayer<Scalar,1>*) read_output_kernel1_1->clone());
+	KernelPtr<Scalar,1> forget_input_kernel2_1((FullyConnectedLayer<Scalar,1>*) forget_input_kernel1_1->clone());
+	KernelPtr<Scalar,1> forget_output_kernel2_1((FullyConnectedLayer<Scalar,1>*) forget_output_kernel1_1->clone());
+	KernelPtr<Scalar,1> write_input_kernel2_1((FullyConnectedLayer<Scalar,1>*) write_input_kernel1_1->clone());
+	KernelPtr<Scalar,1> write_output_kernel2_1((FullyConnectedLayer<Scalar,1>*) write_output_kernel1_1->clone());
+	KernelPtr<Scalar,1> candidate_input_kernel2_1((FullyConnectedLayer<Scalar,1>*) candidate_input_kernel1_1->clone());
+	KernelPtr<Scalar,1> candidate_output_kernel2_1((FullyConnectedLayer<Scalar,1>*) candidate_output_kernel1_1->clone());
+	KernelPtr<Scalar,1> read_input_kernel2_1((FullyConnectedLayer<Scalar,1>*) read_input_kernel1_1->clone());
+	KernelPtr<Scalar,1> read_output_kernel2_1((FullyConnectedLayer<Scalar,1>*) read_output_kernel1_1->clone());
 	ActivationPtr<Scalar,1> forget_act2_1((SigmoidActivationLayer<Scalar,1>*) forget_act1_1->clone());
 	ActivationPtr<Scalar,1> write_act2_1((SigmoidActivationLayer<Scalar,1>*) write_act1_1->clone());
 	ActivationPtr<Scalar,1> candidate_act2_1((TanhActivationLayer<Scalar,1>*) candidate_act1_1->clone());
@@ -668,27 +668,27 @@ inline void lstm_net_grad_test() {
 	// Rank 3.
 	Dimensions<std::size_t,3> input_dims_3({ 5u, 3u, 3u });
 	Dimensions<std::size_t,3> output_dims_3({ 3u, 3u, 3u });
-	KernelPtr<Scalar,3> forget_input_kernel1_3(new ConvLayer<Scalar>(input_dims_3, 3, init, reg, 3, 3, 0, 1));
-	KernelPtr<Scalar,3> forget_output_kernel1_3(new ConvLayer<Scalar>(output_dims_3, 3, init, reg));
-	KernelPtr<Scalar,3> write_input_kernel1_3(new ConvLayer<Scalar>(input_dims_3, 3, init, reg, 3, 3, 0, 1));
-	KernelPtr<Scalar,3> write_output_kernel1_3(new ConvLayer<Scalar>(output_dims_3, 3, init, reg));
-	KernelPtr<Scalar,3> candidate_input_kernel1_3(new ConvLayer<Scalar>(input_dims_3, 3, init, reg, 3, 3, 0, 1));
-	KernelPtr<Scalar,3> candidate_output_kernel1_3(new ConvLayer<Scalar>(output_dims_3, 3, init, reg));
-	KernelPtr<Scalar,3> read_input_kernel1_3(new ConvLayer<Scalar>(input_dims_3, 3, init, reg, 3, 3, 0, 1));
-	KernelPtr<Scalar,3> read_output_kernel1_3(new ConvLayer<Scalar>(output_dims_3, 3, init, reg));
+	KernelPtr<Scalar,3> forget_input_kernel1_3(new ConvolutionalLayer<Scalar>(input_dims_3, 3, init, reg, 3, 3, 0, 1));
+	KernelPtr<Scalar,3> forget_output_kernel1_3(new ConvolutionalLayer<Scalar>(output_dims_3, 3, init, reg));
+	KernelPtr<Scalar,3> write_input_kernel1_3(new ConvolutionalLayer<Scalar>(input_dims_3, 3, init, reg, 3, 3, 0, 1));
+	KernelPtr<Scalar,3> write_output_kernel1_3(new ConvolutionalLayer<Scalar>(output_dims_3, 3, init, reg));
+	KernelPtr<Scalar,3> candidate_input_kernel1_3(new ConvolutionalLayer<Scalar>(input_dims_3, 3, init, reg, 3, 3, 0, 1));
+	KernelPtr<Scalar,3> candidate_output_kernel1_3(new ConvolutionalLayer<Scalar>(output_dims_3, 3, init, reg));
+	KernelPtr<Scalar,3> read_input_kernel1_3(new ConvolutionalLayer<Scalar>(input_dims_3, 3, init, reg, 3, 3, 0, 1));
+	KernelPtr<Scalar,3> read_output_kernel1_3(new ConvolutionalLayer<Scalar>(output_dims_3, 3, init, reg));
 	ActivationPtr<Scalar,3> forget_act1_3(new SigmoidActivationLayer<Scalar,3>(output_dims_3));
 	ActivationPtr<Scalar,3> write_act1_3(new SigmoidActivationLayer<Scalar,3>(output_dims_3));
 	ActivationPtr<Scalar,3> candidate_act1_3(new TanhActivationLayer<Scalar,3>(output_dims_3));
 	ActivationPtr<Scalar,3> state_act1_3(new TanhActivationLayer<Scalar,3>(output_dims_3));
 	ActivationPtr<Scalar,3> read_act1_3(new SigmoidActivationLayer<Scalar,3>(output_dims_3));
-	KernelPtr<Scalar,3> forget_input_kernel2_3((ConvLayer<Scalar>*) forget_input_kernel1_3->clone());
-	KernelPtr<Scalar,3> forget_output_kernel2_3((ConvLayer<Scalar>*) forget_output_kernel1_3->clone());
-	KernelPtr<Scalar,3> write_input_kernel2_3((ConvLayer<Scalar>*) write_input_kernel1_3->clone());
-	KernelPtr<Scalar,3> write_output_kernel2_3((ConvLayer<Scalar>*) write_output_kernel1_3->clone());
-	KernelPtr<Scalar,3> candidate_input_kernel2_3((ConvLayer<Scalar>*) candidate_input_kernel1_3->clone());
-	KernelPtr<Scalar,3> candidate_output_kernel2_3((ConvLayer<Scalar>*) candidate_output_kernel1_3->clone());
-	KernelPtr<Scalar,3> read_input_kernel2_3((ConvLayer<Scalar>*) read_input_kernel1_3->clone());
-	KernelPtr<Scalar,3> read_output_kernel2_3((ConvLayer<Scalar>*) read_output_kernel1_3->clone());
+	KernelPtr<Scalar,3> forget_input_kernel2_3((ConvolutionalLayer<Scalar>*) forget_input_kernel1_3->clone());
+	KernelPtr<Scalar,3> forget_output_kernel2_3((ConvolutionalLayer<Scalar>*) forget_output_kernel1_3->clone());
+	KernelPtr<Scalar,3> write_input_kernel2_3((ConvolutionalLayer<Scalar>*) write_input_kernel1_3->clone());
+	KernelPtr<Scalar,3> write_output_kernel2_3((ConvolutionalLayer<Scalar>*) write_output_kernel1_3->clone());
+	KernelPtr<Scalar,3> candidate_input_kernel2_3((ConvolutionalLayer<Scalar>*) candidate_input_kernel1_3->clone());
+	KernelPtr<Scalar,3> candidate_output_kernel2_3((ConvolutionalLayer<Scalar>*) candidate_output_kernel1_3->clone());
+	KernelPtr<Scalar,3> read_input_kernel2_3((ConvolutionalLayer<Scalar>*) read_input_kernel1_3->clone());
+	KernelPtr<Scalar,3> read_output_kernel2_3((ConvolutionalLayer<Scalar>*) read_output_kernel1_3->clone());
 	ActivationPtr<Scalar,3> forget_act2_3((SigmoidActivationLayer<Scalar,3>*) forget_act1_3->clone());
 	ActivationPtr<Scalar,3> write_act2_3((SigmoidActivationLayer<Scalar,3>*) write_act1_3->clone());
 	ActivationPtr<Scalar,3> candidate_act2_3((TanhActivationLayer<Scalar,3>*) candidate_act1_3->clone());
@@ -721,9 +721,9 @@ inline void bidirectional_net_grad_test() {
 	auto init = WeightInitSharedPtr<Scalar>(new OrthogonalWeightInitialization<Scalar>());
 	auto reg = ParamRegSharedPtr<Scalar>(new L2ParameterRegularization<Scalar>());
 	// 3rd degree RNN with highest rank concatenation.
-	KernelPtr<Scalar,3> input_kernel1(new ConvLayer<Scalar>(Dimensions<std::size_t,3>({ 4u, 4u, 2u }), 5, init, reg));
-	KernelPtr<Scalar,3> state_kernel1(new ConvLayer<Scalar>(input_kernel1->get_output_dims(), 5, init, reg));
-	KernelPtr<Scalar,3> output_kernel1(new FCLayer<Scalar,3>(input_kernel1->get_output_dims(), 2, init, reg));
+	KernelPtr<Scalar,3> input_kernel1(new ConvolutionalLayer<Scalar>(Dimensions<std::size_t,3>({ 4u, 4u, 2u }), 5, init, reg));
+	KernelPtr<Scalar,3> state_kernel1(new ConvolutionalLayer<Scalar>(input_kernel1->get_output_dims(), 5, init, reg));
+	KernelPtr<Scalar,3> output_kernel1(new FullyConnectedLayer<Scalar,3>(input_kernel1->get_output_dims(), 2, init, reg));
 	ActivationPtr<Scalar,3> state_act1(new SigmoidActivationLayer<Scalar,3>(input_kernel1->get_output_dims()));
 	ActivationPtr<Scalar,3> output_act1(new IdentityActivationLayer<Scalar,3>(output_kernel1->get_output_dims()));
 	seq_network_grad_test("bidirectional recurrent net with highest rank concatenation", NeuralNetPtr<Scalar,3,true>(
@@ -734,14 +734,14 @@ inline void bidirectional_net_grad_test() {
 	// 2nd degree LSTM with lowest rank concatenation.
 	Dimensions<std::size_t,2> input_dims({ 6u, 6u });
 	Dimensions<std::size_t,2> output_dims({ 6u, 1u });
-	KernelPtr<Scalar,2> forget_input_kernel2(new FCLayer<Scalar,2>(input_dims, 6, init, reg));
-	KernelPtr<Scalar,2> forget_output_kernel2(new FCLayer<Scalar,2>(output_dims, 6, init, reg));
-	KernelPtr<Scalar,2> write_input_kernel2(new FCLayer<Scalar,2>(input_dims, 6, init, reg));
-	KernelPtr<Scalar,2> write_output_kernel2(new FCLayer<Scalar,2>(output_dims, 6, init, reg));
-	KernelPtr<Scalar,2> candidate_input_kernel2(new FCLayer<Scalar,2>(input_dims, 6, init, reg));
-	KernelPtr<Scalar,2> candidate_output_kernel2(new FCLayer<Scalar,2>(output_dims, 6, init, reg));
-	KernelPtr<Scalar,2> read_input_kernel2(new FCLayer<Scalar,2>(input_dims, 6, init, reg));
-	KernelPtr<Scalar,2> read_output_kernel2(new FCLayer<Scalar,2>(output_dims, 6, init, reg));
+	KernelPtr<Scalar,2> forget_input_kernel2(new FullyConnectedLayer<Scalar,2>(input_dims, 6, init, reg));
+	KernelPtr<Scalar,2> forget_output_kernel2(new FullyConnectedLayer<Scalar,2>(output_dims, 6, init, reg));
+	KernelPtr<Scalar,2> write_input_kernel2(new FullyConnectedLayer<Scalar,2>(input_dims, 6, init, reg));
+	KernelPtr<Scalar,2> write_output_kernel2(new FullyConnectedLayer<Scalar,2>(output_dims, 6, init, reg));
+	KernelPtr<Scalar,2> candidate_input_kernel2(new FullyConnectedLayer<Scalar,2>(input_dims, 6, init, reg));
+	KernelPtr<Scalar,2> candidate_output_kernel2(new FullyConnectedLayer<Scalar,2>(output_dims, 6, init, reg));
+	KernelPtr<Scalar,2> read_input_kernel2(new FullyConnectedLayer<Scalar,2>(input_dims, 6, init, reg));
+	KernelPtr<Scalar,2> read_output_kernel2(new FullyConnectedLayer<Scalar,2>(output_dims, 6, init, reg));
 	ActivationPtr<Scalar,2> forget_act2(new SigmoidActivationLayer<Scalar,2>(output_dims));
 	ActivationPtr<Scalar,2> write_act2(new SigmoidActivationLayer<Scalar,2>(output_dims));
 	ActivationPtr<Scalar,2> candidate_act2(new SoftplusActivationLayer<Scalar,2>(output_dims));
@@ -757,9 +757,9 @@ inline void bidirectional_net_grad_test() {
 							std::move(candidate_act2), std::move(state_act2), std::move(read_act2),
 							[](int input_seq_length) { return std::make_pair(1, 2); })))), 5, 1);
 	// 1st degree RNN with summation.
-	KernelPtr<Scalar,1> input_kernel3(new FCLayer<Scalar,1>(Dimensions<std::size_t,1>({ 24u }), 8, init, reg));
-	KernelPtr<Scalar,1> state_kernel3(new FCLayer<Scalar,1>(input_kernel3->get_output_dims(), 8, init, reg));
-	KernelPtr<Scalar,1> output_kernel3(new FCLayer<Scalar,1>(input_kernel3->get_output_dims(), 1, init, reg));
+	KernelPtr<Scalar,1> input_kernel3(new FullyConnectedLayer<Scalar,1>(Dimensions<std::size_t,1>({ 24u }), 8, init, reg));
+	KernelPtr<Scalar,1> state_kernel3(new FullyConnectedLayer<Scalar,1>(input_kernel3->get_output_dims(), 8, init, reg));
+	KernelPtr<Scalar,1> output_kernel3(new FullyConnectedLayer<Scalar,1>(input_kernel3->get_output_dims(), 1, init, reg));
 	ActivationPtr<Scalar,1> state_act3(new SigmoidActivationLayer<Scalar,1>(input_kernel3->get_output_dims()));
 	ActivationPtr<Scalar,1> output_act3(new SigmoidActivationLayer<Scalar,1>(output_kernel3->get_output_dims()));
 	seq_network_grad_test("bidirectional recurrent net with summation", NeuralNetPtr<Scalar,1,true>(
@@ -768,9 +768,9 @@ inline void bidirectional_net_grad_test() {
 							std::move(output_kernel3), std::move(state_act3), std::move(output_act3),
 							[](int input_seq_length) { return std::make_pair(5, 2); })))), 7, 5);
 	// 3rd degree RNN with multiplication.
-	KernelPtr<Scalar,3> input_kernel4(new ConvLayer<Scalar>(Dimensions<std::size_t,3>({ 4u, 4u, 2u }), 5, init, reg));
-	KernelPtr<Scalar,3> state_kernel4(new ConvLayer<Scalar>(input_kernel4->get_output_dims(), 5, init, reg));
-	KernelPtr<Scalar,3> output_kernel4(new FCLayer<Scalar,3>(input_kernel4->get_output_dims(), 2, init, reg));
+	KernelPtr<Scalar,3> input_kernel4(new ConvolutionalLayer<Scalar>(Dimensions<std::size_t,3>({ 4u, 4u, 2u }), 5, init, reg));
+	KernelPtr<Scalar,3> state_kernel4(new ConvolutionalLayer<Scalar>(input_kernel4->get_output_dims(), 5, init, reg));
+	KernelPtr<Scalar,3> output_kernel4(new FullyConnectedLayer<Scalar,3>(input_kernel4->get_output_dims(), 2, init, reg));
 	ActivationPtr<Scalar,3> state_act4(new SigmoidActivationLayer<Scalar,3>(input_kernel4->get_output_dims()));
 	ActivationPtr<Scalar,3> output_act4(new IdentityActivationLayer<Scalar,3>(output_kernel4->get_output_dims()));
 	seq_network_grad_test("bidirectional recurrent net with multiplication", NeuralNetPtr<Scalar,3,true>(
