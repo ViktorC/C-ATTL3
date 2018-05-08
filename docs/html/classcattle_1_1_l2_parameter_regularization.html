@@ -74,6 +74,9 @@ $(function() {
 </div><!--header-->
 <div class="contents">
 
+<p>A class template for an L2 (second-norm) regularization penalty.  
+ <a href="classcattle_1_1_l2_parameter_regularization.html#details">More...</a></p>
+
 <p><code>#include &lt;<a class="el" href="_parameter_regularization_8hpp_source.html">ParameterRegularization.hpp</a>&gt;</code></p>
 <div class="dynheader">
 Inheritance diagram for cattle::L2ParameterRegularization&lt; Scalar &gt;:</div>
@@ -81,7 +84,7 @@ Inheritance diagram for cattle::L2ParameterRegularization&lt; Scalar &gt;:</div>
  <div class="center">
   <img src="classcattle_1_1_l2_parameter_regularization.png" usemap="#cattle::L2ParameterRegularization_3C_20Scalar_20_3E_map" alt=""/>
   <map id="cattle::L2ParameterRegularization_3C_20Scalar_20_3E_map" name="cattle::L2ParameterRegularization_3C_20Scalar_20_3E_map">
-<area href="classcattle_1_1_paramater_regularization.html" alt="cattle::ParamaterRegularization&lt; Scalar &gt;" shape="rect" coords="0,0,261,24"/>
+<area href="classcattle_1_1_paramater_regularization.html" title="An abstract template class for different regularization penalties for neural network layer parameters..." alt="cattle::ParamaterRegularization&lt; Scalar &gt;" shape="rect" coords="0,0,261,24"/>
 </map>
  </div></div>
 <table class="memberdecls">
@@ -90,8 +93,10 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:afb769ad4643029a9d81d8d9c26cc1459"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_l2_parameter_regularization.html#afb769ad4643029a9d81d8d9c26cc1459">L2ParameterRegularization</a> (Scalar lambda=1e-2)</td></tr>
 <tr class="separator:afb769ad4643029a9d81d8d9c26cc1459"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a4e571ce75540f764ade19b13b5088a33"><td class="memItemLeft" align="right" valign="top">Scalar&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_l2_parameter_regularization.html#a4e571ce75540f764ade19b13b5088a33">function</a> (const <a class="el" href="namespacecattle.html#a1d78623a47279d516750a44dbad6090b">Matrix</a>&lt; Scalar &gt; &amp;params) const</td></tr>
+<tr class="memdesc:a4e571ce75540f764ade19b13b5088a33"><td class="mdescLeft">&#160;</td><td class="mdescRight">It computes the regularization penalty for the given parameter values.  <a href="#a4e571ce75540f764ade19b13b5088a33">More...</a><br /></td></tr>
 <tr class="separator:a4e571ce75540f764ade19b13b5088a33"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a60d9aa98aa6a26633fca9354a57fe733"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespacecattle.html#a1d78623a47279d516750a44dbad6090b">Matrix</a>&lt; Scalar &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_l2_parameter_regularization.html#a60d9aa98aa6a26633fca9354a57fe733">d_function</a> (const <a class="el" href="namespacecattle.html#a1d78623a47279d516750a44dbad6090b">Matrix</a>&lt; Scalar &gt; &amp;params) const</td></tr>
+<tr class="memdesc:a60d9aa98aa6a26633fca9354a57fe733"><td class="mdescLeft">&#160;</td><td class="mdescRight">It differentiates the regularization function and returns its derivative w.r.t.  <a href="#a60d9aa98aa6a26633fca9354a57fe733">More...</a><br /></td></tr>
 <tr class="separator:a60d9aa98aa6a26633fca9354a57fe733"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
@@ -160,7 +165,9 @@ template&lt;typename Scalar &gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
-<p>It differentiates the regularization function and returns its derivative w.r.t. the parameters.</p>
+
+<p>It differentiates the regularization function and returns its derivative w.r.t. </p>
+<p>the parameters.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">params</td><td>A constant reference to the parameter matrix. </td></tr>
@@ -198,7 +205,8 @@ template&lt;typename Scalar &gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
-<p>It computes the regularization penalty for the given parameter values.</p>
+
+<p>It computes the regularization penalty for the given parameter values. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">params</td><td>A constant reference to the parameter matrix. </td></tr>
@@ -212,7 +220,7 @@ template&lt;typename Scalar &gt; </div>
 </div>
 </div>
 <hr/>The documentation for this class was generated from the following file:<ul>
-<li>C:/Users/Viktor/git/C-ATTL3/C-ATTL3/<a class="el" href="_parameter_regularization_8hpp_source.html">ParameterRegularization.hpp</a></li>
+<li>C:/Users/A6714/git/C-ATTL3/C-ATTL3/<a class="el" href="_parameter_regularization_8hpp_source.html">ParameterRegularization.hpp</a></li>
 </ul>
 </div><!-- contents -->
 <!-- start footer part -->

@@ -3,7 +3,7 @@
 |---|---|
 | [![Clang](https://travis-matrix-badges.herokuapp.com/repos/ViktorC/C-ATTL3/branches/master/1)](https://travis-ci.org/ViktorC/C-ATTL3) | [![GCC](https://travis-matrix-badges.herokuapp.com/repos/ViktorC/C-ATTL3/branches/master/2)](https://travis-ci.org/ViktorC/C-ATTL3) |
 
-A header-only neural network template library written in C++11. C-ATTL3 uses [Eigen](http://eigen.tuxfamily.org), the popular linear algebra library. If GPU acceleration is enabled, it also utilizes NVIDIA's CUDA toolkit and specifically the [cuBLAS](https://developer.nvidia.com/cublas) library. C-ATTL3 allows for the easy construction and training of both feed-forward and recurrent neural networks ranging from simple MLPs and RNNs to state-of-the-art InceptionNets, ResNets, DenseNets,  and convolutional LSTMs. The library can handle data of different ranks and different floating point scalar types such as `float` and `double`. The Doxygen documentation of the library can be found [here](https://viktorc.github.io/C-ATTL3/html/).
+A header-only neural network template library written in C++11. C-ATTL3 uses [Eigen](http://eigen.tuxfamily.org), the popular linear algebra library. If GPU acceleration is enabled, it also utilizes NVIDIA's CUDA toolkit and specifically the [cuBLAS](https://developer.nvidia.com/cublas) library. C-ATTL3 allows for the easy construction and training of both feed-forward and recurrent neural networks ranging from simple MLPs and RNNs to state-of-the-art InceptionNets, ResNets, DenseNets,  and convolutional LSTMs. The library can handle data of different ranks and different floating point scalar types such as `float` and `double`. The Doxygen documentation of the library can be found [here](https://viktorc.github.io/C-ATTL3/html/annotated.html).
 
 ## Components
 The following sub-sections describe the main components of the C-ATTL3 deep learning library. Knowledge of these components and their relations is required for the effective usage of the library.
@@ -12,12 +12,12 @@ The following sub-sections describe the main components of the C-ATTL3 deep lear
 The lowest level building blocks of neural networks in C-ATTL3 are the layers. The library provides a wide selection of them that can be used for the construction of neural network modules. The available layer types are the following:
 * [Layer](https://viktorc.github.io/C-ATTL3/html/classcattle_1_1_layer.html) [A]
   * [KernelLayer](https://viktorc.github.io/C-ATTL3/html/classcattle_1_1_kernel_layer.html) [A]
-    * [FullyConnectedLayer](https://viktorc.github.io/C-ATTL3/html/classcattle_1_1_fully_connected_layer.html)
-    * [ConvolutionalLayer](https://viktorc.github.io/C-ATTL3/html/classcattle_1_1_convolutional_layer.html) (3)
-    * [DeconvolutionalLayer](https://viktorc.github.io/C-ATTL3/html/classcattle_1_1_deconvolutional_layer.html) (3)
+    * [DenseLayer](https://viktorc.github.io/C-ATTL3/html/classcattle_1_1_dense_layer.html)
+    * [ConvolutionLayer](https://viktorc.github.io/C-ATTL3/html/classcattle_1_1_convolution_layer.html) (3)
+    * [DeconvolutionLayer](https://viktorc.github.io/C-ATTL3/html/classcattle_1_1_deconvolution_layer.html) (3)
   * [ActivationLayer](https://viktorc.github.io/C-ATTL3/html/classcattle_1_1_activation_layer.html) [A]
     * [IdentityActivationLayer](https://viktorc.github.io/C-ATTL3/html/classcattle_1_1_identity_activation_layer.html)
-    * [ScalingActivationLayer](https://viktorc.github.io/C-ATTL3/html/classcattle_1_1_scaling_activation_layer.html)
+    * [ScaledActivationLayer](https://viktorc.github.io/C-ATTL3/html/classcattle_1_1_scaled_activation_layer.html)
     * [BinaryStepActivationLayer](https://viktorc.github.io/C-ATTL3/html/classcattle_1_1_binary_step_activation_layer.html)
     * [SigmoidActivationLayer](https://viktorc.github.io/C-ATTL3/html/classcattle_1_1_sigmoid_activation_layer.html)
     * [TanhActivationLayer](https://viktorc.github.io/C-ATTL3/html/classcattle_1_1_tanh_activation_layer.html)
@@ -27,12 +27,14 @@ The lowest level building blocks of neural networks in C-ATTL3 are the layers. T
     * [LeakyReLUActivationLayer](https://viktorc.github.io/C-ATTL3/html/classcattle_1_1_leaky_re_l_u_activation_layer.html)
     * [ELUActivationLayer](https://viktorc.github.io/C-ATTL3/html/classcattle_1_1_e_l_u_activation_layer.html)
     * [PReLUActivationLayer](https://viktorc.github.io/C-ATTL3/html/classcattle_1_1_p_re_l_u_activation_layer.html)
-  * [PoolingLayer](https://viktorc.github.io/C-ATTL3/html/classcattle_1_1_pooling_layer.html) [A] (3)
-    * [SumPoolingLayer](https://viktorc.github.io/C-ATTL3/html/classcattle_1_1_sum_pooling_layer.html) (3)
-    * [MaxPoolingLayer](https://viktorc.github.io/C-ATTL3/html/classcattle_1_1_max_pooling_layer.html) (3)
-    * [MeanPoolingLayer](https://viktorc.github.io/C-ATTL3/html/classcattle_1_1_mean_pooling_layer.html) (3)
-  * [BatchNormLayer](https://viktorc.github.io/C-ATTL3/html/classcattle_1_1_batch_norm_layer.html)
+  * [PoolLayer](https://viktorc.github.io/C-ATTL3/html/classcattle_1_1_pooling_layer.html) [A] (3)
+    * [SumPoolLayer](https://viktorc.github.io/C-ATTL3/html/classcattle_1_1_sum_pool_layer.html) (3)
+    * [MaxPoolLayer](https://viktorc.github.io/C-ATTL3/html/classcattle_1_1_max_pool_layer.html) (3)
+    * [MeanPoolLayer](https://viktorc.github.io/C-ATTL3/html/classcattle_1_1_mean_pool_layer.html) (3)
+  * [BroadcastLayer](https://viktorc.github.io/C-ATTL3/html/classcattle_1_1_broadcast_layer.html)
+  * [BatchNormalizationLayer](https://viktorc.github.io/C-ATTL3/html/classcattle_1_1_batch_normalization_layer.html)
   * [DropoutLayer](https://viktorc.github.io/C-ATTL3/html/classcattle_1_1_dropout_layer.html)
+  * [ReshapeLayer](https://viktorc.github.io/C-ATTL3/html/classcattle_1_1_reshape_layer.html)
 
 Most layers can handle data of rank 1 to 3 with the exception of convolutional and pooling layers which only accept rank 3 data. The actual rank of the input and output of the layers is one greater than the nominal rank of the layers to allow for batch learning. In the case of a layer with a nominal rank of 3, the input tensor is expected to be a rank-4 tensor with its ranks representing the sample number, height, width, and depth/channel (N,H,W,C) respectively. The nominal dimensionalities of the accepted input tensors of the different layers are specified using instances of the [Dimensions](https://viktorc.github.io/C-ATTL3/html/classcattle_1_1_dimensions.html) class which relies on expression templates and compile time polymorphism to enable the fast and easy computation of the input dimensions of intermediary layers in complex neural networks. Besides the input dimensions, the one parameter required by all, most layers rely on multiple other hyper-parameters as well (e.g. max-norm constraint, dilation, receptor field size, etc.). These parameters may need to be fine-tuned manually or via random search (or in some other way) to optimize the behaviour of the networks.
 
@@ -92,8 +94,10 @@ The library also provides optimizers that can be used to train the networks via 
       * [AdaMaxOptimizer](https://viktorc.github.io/C-ATTL3/html/classcattle_1_1_ada_max_optimizer.html)
       * [NadamOptimizer](https://viktorc.github.io/C-ATTL3/html/classcattle_1_1_nadam_optimizer.html)
 
+These optimizers all aim to minimize a loss function with respect to the learnable parameters of the layers making up a neural network. The direction and magnitude of the updates depend on the update schemes of the optimizers and on the derivatives of the loss function with respect to the parameters as computed during back-propagation. Some of the optimizers maintain moving averages over the gradients to simulate momentum and reduce the chances of getting stuck in local minima, some use annealing to reduce the magnitude of updates over 'time' so that they can settle on a minimum instead of dancing around it, some use individual parameter-specific learning rates, and others use combinations of these techniques.
+
 #### Loss
-Similarly to the layers, these optimizers rely on several hyper-parameters as well. Besides the hyper-parameters, optimizers also rely on 'practically' differentiable loss functions to minimize. The library provides the following out of the box loss functions:
+Similarly to the layers, optimizers rely on several hyper-parameters as well. Besides the hyper-parameters, optimizers also rely on 'practically' differentiable loss functions to minimize. The library provides the following out of the box loss functions:
 * [Loss](https://viktorc.github.io/C-ATTL3/html/classcattle_1_1_loss.html) [A]
   * [UniversalLoss](https://viktorc.github.io/C-ATTL3/html/classcattle_1_1_universal_loss.html) [A]
     * [AbsoluteLoss](https://viktorc.github.io/C-ATTL3/html/classcattle_1_1_absolute_loss.html)
@@ -153,15 +157,15 @@ The test data provider is created similarly. However, it is important not to re-
 auto init = std::make_shared<HeWeightInitialization<double>>();
 auto reg = std::make_shared<L2ParameterRegularization<double>>();
 std::vector<LayerPtr<double,3>> layers(9);
-layers[0] = LayerPtr<double,3>(new ConvolutionalLayer<double>(training_prov.get_obs_dims(), 10, init, reg, 5, 5, 2, 2));
+layers[0] = LayerPtr<double,3>(new ConvolutionLayer<double>(training_prov.get_obs_dims(), 10, init, reg, 5, 5, 2, 2));
 layers[1] = LayerPtr<double,3>(new ReLUActivationLayer<double,3>(layers[0]->get_output_dims()));
-layers[2] = LayerPtr<double,3>(new MaxPoolingLayer<double>(layers[1]->get_output_dims()));
-layers[3] = LayerPtr<double,3>(new ConvolutionalLayer<double>(layers[2]->get_output_dims(), 20, init, reg));
+layers[2] = LayerPtr<double,3>(new MaxPoolLayer<double>(layers[1]->get_output_dims()));
+layers[3] = LayerPtr<double,3>(new ConvolutionLayer<double>(layers[2]->get_output_dims(), 20, init, reg));
 layers[4] = LayerPtr<double,3>(new ReLUActivationLayer<double,3>(layers[3]->get_output_dims()));
-layers[5] = LayerPtr<double,3>(new MaxPoolingLayer<double>(layers[4]->get_output_dims()));
-layers[6] = LayerPtr<double,3>(new FullyConnectedLayer<double,3>(layers[5]->get_output_dims(), 500, init, reg));
+layers[5] = LayerPtr<double,3>(new MaxPoolLayer<double>(layers[4]->get_output_dims()));
+layers[6] = LayerPtr<double,3>(new DenseLayer<double,3>(layers[5]->get_output_dims(), 500, init, reg));
 layers[7] = LayerPtr<double,3>(new ReLUActivationLayer<double,3>(layers[6]->get_output_dims()));
-layers[8] = LayerPtr<double,3>(new FullyConnectedLayer<double,3>(layers[7]->get_output_dims(), 1, init, reg));
+layers[8] = LayerPtr<double,3>(new DenseLayer<double,3>(layers[7]->get_output_dims(), 1, init, reg));
 FeedforwardNeuralNetwork<double,3> nn(std::move(layers));
 ```
 The next step is the construction of the neural network. The above snippet demonstrates that of a simple convolutional neural network. The neural network implementation used is `FeedforwardNeuralNetwork` which takes a vector of unique layer pointers. Each layer in the vector must have the same input dimensions as the output dimensions of the preceding layer. Notice how the dimensions of the outputs of the layers do not need to be calculated manually; they can be simply retrieved using the `get_output_dims` members of the previous layers. It should also be noted that all neural networks require their layers to be of the same nominal rank and scalar type as the network itself. The example network consists of convolutional, max pooling, rectified linear unit, and fully connected layers. Convolutional and fully connected layers require weight initialization; due to its well-known compatibility with ReLU activations, He weight initialization is a good choice in our situation. As the `WeightInitialization` class specifies a stateless interface, multiple layers can use the same implementation instance (this is the reason they take a shared pointer). The same can be said about the`ParameterRegularization` abstract type. All layers with learnable parameters, including the fully connected and convolutional ones above, support optional parameter regularization. In our example, the choice fell upon the popular L2 regularization penalty function for all parameteric layers. Similarly to the unique tensor pointer arguments of the data providers, the vector of unique layer pointers required by the network's constructor must be moved as well, as unique smart pointers cannot be copied.
@@ -193,11 +197,13 @@ The list below contains the planned features of the library.
 - [ ] Test automation using Google Test
 - [ ] CMake build
 - [x] Deconvolutional layer
+- [x] Broadcast and reshaping layers
 - [ ] Temporal (convolutional) networks
-- [ ] Convolution and pooling for 1st and 2nd degree features
+- [ ] Convolution, deconvolution and pooling for 1st and 2nd degree features
 - [ ] More comprehensive GPU support via cuDNN utilization
 - [ ] Data pre-fetching for file based providers
 - [ ] Network serialization and de-serialization
+- [ ] AMSGrad optimizer
 - [ ] Hessian-free optimizer with conjugate gradient descent
 - [ ] L-BFGS optimizer
 - [ ] Particle swarm optimizer

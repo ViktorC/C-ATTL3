@@ -75,6 +75,9 @@ $(function() {
 </div><!--header-->
 <div class="contents">
 
+<p>A partial template specialization for multi-channel input tensors.  
+ <a href="classcattle_1_1_batch_norm_layer_3_01_scalar_00_013_01_4.html#details">More...</a></p>
+
 <p><code>#include &lt;<a class="el" href="_layer_8hpp_source.html">Layer.hpp</a>&gt;</code></p>
 <div class="dynheader">
 Inheritance diagram for cattle::BatchNormLayer&lt; Scalar, 3 &gt;:</div>
@@ -83,7 +86,7 @@ Inheritance diagram for cattle::BatchNormLayer&lt; Scalar, 3 &gt;:</div>
   <img src="classcattle_1_1_batch_norm_layer_3_01_scalar_00_013_01_4.png" usemap="#cattle::BatchNormLayer_3C_20Scalar_2C_203_20_3E_map" alt=""/>
   <map id="cattle::BatchNormLayer_3C_20Scalar_2C_203_20_3E_map" name="cattle::BatchNormLayer_3C_20Scalar_2C_203_20_3E_map">
 <area href="classcattle_1_1_batch_norm_layer_base.html" alt="cattle::BatchNormLayerBase&lt; Scalar, 3 &gt;" shape="rect" coords="0,56,248,80"/>
-<area href="classcattle_1_1_layer.html" alt="cattle::Layer&lt; Scalar, Rank &gt;" shape="rect" coords="0,0,248,24"/>
+<area href="classcattle_1_1_layer.html" title="An abstract class template representing layers in a neural network. " alt="cattle::Layer&lt; Scalar, Rank &gt;" shape="rect" coords="0,0,248,24"/>
 </map>
  </div></div>
 <table class="memberdecls">
@@ -92,9 +95,11 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a4d49cccfbf49f095bf1b0d8fd0ad49bf"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_batch_norm_layer_3_01_scalar_00_013_01_4.html#a4d49cccfbf49f095bf1b0d8fd0ad49bf">BatchNormLayer</a> (<a class="el" href="classcattle_1_1_dimensions.html">Dimensions</a>&lt; std::size_t, 3 &gt; dims, <a class="el" href="namespacecattle.html#a083ab63c64a5c935b2d2cd3f03c4e27a">ParamRegSharedPtr</a>&lt; Scalar &gt; gamma_reg=Root::NO_PARAM_REG, <a class="el" href="namespacecattle.html#a083ab63c64a5c935b2d2cd3f03c4e27a">ParamRegSharedPtr</a>&lt; Scalar &gt; beta_reg=Root::NO_PARAM_REG, Scalar gamma_max_norm_constraint=0, Scalar beta_max_norm_constraint=0, Scalar norm_avg_decay=.1, Scalar epsilon=<a class="el" href="classcattle_1_1internal_1_1_numeric_utils.html">internal::NumericUtils</a>&lt; Scalar &gt;::EPSILON3)</td></tr>
 <tr class="separator:a4d49cccfbf49f095bf1b0d8fd0ad49bf"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a8bd0897b558b2e97cd79456243980afe"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classcattle_1_1_layer.html">Root</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_batch_norm_layer_3_01_scalar_00_013_01_4.html#a8bd0897b558b2e97cd79456243980afe">clone</a> () const</td></tr>
+<tr class="memdesc:a8bd0897b558b2e97cd79456243980afe"><td class="mdescLeft">&#160;</td><td class="mdescRight">A constant method implementing the clone pattern.  <a href="#a8bd0897b558b2e97cd79456243980afe">More...</a><br /></td></tr>
 <tr class="separator:a8bd0897b558b2e97cd79456243980afe"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="inherit_header pub_methods_classcattle_1_1_layer"><td colspan="2" onclick="javascript:toggleInherit('pub_methods_classcattle_1_1_layer')"><img src="closed.png" alt="-"/>&#160;Public Member Functions inherited from <a class="el" href="classcattle_1_1_layer.html">cattle::Layer&lt; Scalar, Rank &gt;</a></td></tr>
 <tr class="memitem:a92963ac4a339d9174a3aef3dbf3c271f inherit pub_methods_classcattle_1_1_layer"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_layer.html#a92963ac4a339d9174a3aef3dbf3c271f">is_parametric</a> ()</td></tr>
+<tr class="memdesc:a92963ac4a339d9174a3aef3dbf3c271f inherit pub_methods_classcattle_1_1_layer"><td class="mdescLeft">&#160;</td><td class="mdescRight">A method that returns whether the layer has parameters that can be learned.  <a href="classcattle_1_1_layer.html#a92963ac4a339d9174a3aef3dbf3c271f">More...</a><br /></td></tr>
 <tr class="separator:a92963ac4a339d9174a3aef3dbf3c271f inherit pub_methods_classcattle_1_1_layer"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ab7c19156cc41357b221b0b57633eaaca inherit pub_methods_classcattle_1_1_layer"><td class="memItemLeft" align="right" valign="top">virtual std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_layer.html#ab7c19156cc41357b221b0b57633eaaca">to_string</a> ()</td></tr>
 <tr class="separator:ab7c19156cc41357b221b0b57633eaaca inherit pub_methods_classcattle_1_1_layer"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -102,10 +107,13 @@ Public Member Functions</h2></td></tr>
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pro-methods"></a>
 Protected Member Functions</h2></td></tr>
 <tr class="memitem:a2b55b83e290a10ff3c9eebab94bdeddf"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classcattle_1_1_layer.html">Root</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_batch_norm_layer_3_01_scalar_00_013_01_4.html#a2b55b83e290a10ff3c9eebab94bdeddf">clone_with_shared_params</a> () const</td></tr>
+<tr class="memdesc:a2b55b83e290a10ff3c9eebab94bdeddf"><td class="mdescLeft">&#160;</td><td class="mdescRight">It returns a clone of the layer instance using a reference to the original's parameters.  <a href="#a2b55b83e290a10ff3c9eebab94bdeddf">More...</a><br /></td></tr>
 <tr class="separator:a2b55b83e290a10ff3c9eebab94bdeddf"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a8c8fa4339bf9997ce6ff9006fa19d632"><td class="memItemLeft" align="right" valign="top">Base::Data&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_batch_norm_layer_3_01_scalar_00_013_01_4.html#a8c8fa4339bf9997ce6ff9006fa19d632">pass_forward</a> (typename Root::Data in, bool training)</td></tr>
+<tr class="memdesc:a8c8fa4339bf9997ce6ff9006fa19d632"><td class="mdescLeft">&#160;</td><td class="mdescRight">It has the function represented by the layer applied to the input tensor.  <a href="#a8c8fa4339bf9997ce6ff9006fa19d632">More...</a><br /></td></tr>
 <tr class="separator:a8c8fa4339bf9997ce6ff9006fa19d632"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a852f358c1af41bfcdcbb718a9a933af7"><td class="memItemLeft" align="right" valign="top">Root::Data&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_batch_norm_layer_3_01_scalar_00_013_01_4.html#a852f358c1af41bfcdcbb718a9a933af7">pass_back</a> (typename Root::Data out_grads)</td></tr>
+<tr class="memdesc:a852f358c1af41bfcdcbb718a9a933af7"><td class="mdescLeft">&#160;</td><td class="mdescRight">It back-propagates the derivative of the error function w.r.t.  <a href="#a852f358c1af41bfcdcbb718a9a933af7">More...</a><br /></td></tr>
 <tr class="separator:a852f358c1af41bfcdcbb718a9a933af7"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
@@ -219,7 +227,8 @@ template&lt;typename Scalar &gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
-<p>A constant method implementing the clone pattern.</p>
+
+<p>A constant method implementing the clone pattern. </p>
 <dl class="section return"><dt>Returns</dt><dd>A pointer to a copy of the instance. The instance does not take ownership of the returned pointer (i.e. the caller is responsible for deleting it). </dd></dl>
 
 <p>Implements <a class="el" href="classcattle_1_1_layer.html#a46db46c62f3d46c6bbef5a482d7fcb00">cattle::Layer&lt; Scalar, Rank &gt;</a>.</p>
@@ -250,7 +259,8 @@ template&lt;typename Scalar &gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
-<p>It returns a clone of the layer instance using a reference to the original's parameters.</p>
+
+<p>It returns a clone of the layer instance using a reference to the original's parameters. </p>
 <dl class="section return"><dt>Returns</dt><dd>A clone of the original layer instance sharing the same parameters with the original. </dd></dl>
 
 <p>Implements <a class="el" href="classcattle_1_1_layer.html#a725b8784f71f40c162f25a8820c97473">cattle::Layer&lt; Scalar, Rank &gt;</a>.</p>
@@ -282,7 +292,9 @@ template&lt;typename Scalar &gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
-<p>It back-propagates the derivative of the error function w.r.t. the output of the layer updating the gradient of its learnable parameters along the way if there are any. If there are, it also calculates the derivative of the regularization penalty w.r.t. to the layer's parameters and adds it to their gradient.</p>
+
+<p>It back-propagates the derivative of the error function w.r.t. </p>
+<p>the output of the layer updating the gradient of its learnable parameters along the way if there are any. If there are, it also calculates the derivative of the regularization penalty w.r.t. to the layer's parameters and adds it to their gradient.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">out_grads</td><td>The derivative of the loss function w.r.t. the output of the layer </td></tr>
@@ -330,7 +342,8 @@ template&lt;typename Scalar &gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
-<p>It has the function represented by the layer applied to the input tensor.</p>
+
+<p>It has the function represented by the layer applied to the input tensor. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">in</td><td>A tensor representing a batch of observations. The observations are of the rank specified by the layer's template parameter and the input tensors rank is one greater. </td></tr>
@@ -345,7 +358,7 @@ template&lt;typename Scalar &gt; </div>
 </div>
 </div>
 <hr/>The documentation for this class was generated from the following file:<ul>
-<li>C:/Users/Viktor/git/C-ATTL3/C-ATTL3/<a class="el" href="_layer_8hpp_source.html">Layer.hpp</a></li>
+<li>C:/Users/A6714/git/C-ATTL3/C-ATTL3/<a class="el" href="_layer_8hpp_source.html">Layer.hpp</a></li>
 </ul>
 </div><!-- contents -->
 <!-- start footer part -->

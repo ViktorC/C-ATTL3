@@ -8,5 +8,6 @@ var searchData=
   ['bidirectionalneuralnetwork',['BidirectionalNeuralNetwork',['../classcattle_1_1_bidirectional_neural_network.html',1,'cattle::BidirectionalNeuralNetwork&lt; Scalar, Rank, MergeType &gt;'],['../classcattle_1_1_bidirectional_neural_network.html#a3ec916796edf657aa7280330c827e1e9',1,'cattle::BidirectionalNeuralNetwork::BidirectionalNeuralNetwork()']]],
   ['binarydimexpression',['BinaryDimExpression',['../classcattle_1_1_binary_dim_expression.html',1,'cattle']]],
   ['binaryrankwisedimexpression',['BinaryRankWiseDimExpression',['../classcattle_1_1_binary_rank_wise_dim_expression.html',1,'cattle']]],
-  ['binarystepactivationlayer',['BinaryStepActivationLayer',['../classcattle_1_1_binary_step_activation_layer.html',1,'cattle::BinaryStepActivationLayer&lt; Scalar, Rank &gt;'],['../classcattle_1_1_binary_step_activation_layer.html#af7dcd32d6982b8405bae6f25a2859e62',1,'cattle::BinaryStepActivationLayer::BinaryStepActivationLayer()']]]
+  ['binarystepactivationlayer',['BinaryStepActivationLayer',['../classcattle_1_1_binary_step_activation_layer.html',1,'cattle::BinaryStepActivationLayer&lt; Scalar, Rank &gt;'],['../classcattle_1_1_binary_step_activation_layer.html#af7dcd32d6982b8405bae6f25a2859e62',1,'cattle::BinaryStepActivationLayer::BinaryStepActivationLayer()']]],
+  ['broadcastlayer',['BroadcastLayer',['../classcattle_1_1_broadcast_layer.html',1,'cattle::BroadcastLayer&lt; Scalar, Rank &gt;'],['../classcattle_1_1_broadcast_layer.html#a18b7c3f932b25b84f2bbfc80cdb6c011',1,'cattle::BroadcastLayer::BroadcastLayer()']]]
 ];

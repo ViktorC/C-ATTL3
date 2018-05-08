@@ -75,6 +75,9 @@ $(function() {
 </div><!--header-->
 <div class="contents">
 
+<p>Partial template specialization for sequential data.  
+ <a href="classcattle_1_1_universal_loss_3_01_scalar_00_01_rank_00_01true_01_4.html#details">More...</a></p>
+
 <p><code>#include &lt;<a class="el" href="_loss_8hpp_source.html">Loss.hpp</a>&gt;</code></p>
 <div class="dynheader">
 Inheritance diagram for cattle::UniversalLoss&lt; Scalar, Rank, true &gt;:</div>
@@ -89,22 +92,27 @@ Inheritance diagram for cattle::UniversalLoss&lt; Scalar, Rank, true &gt;:</div>
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
 <tr class="memitem:aba848190d00966a7e7f9bcee2dd0acd0"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespacecattle.html#a6763ba5ba9b418d5da581630de564cf9">ColVector</a>&lt; Scalar &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_universal_loss_3_01_scalar_00_01_rank_00_01true_01_4.html#aba848190d00966a7e7f9bcee2dd0acd0">function</a> (typename Base::Data out, typename Base::Data obj) const</td></tr>
+<tr class="memdesc:aba848190d00966a7e7f9bcee2dd0acd0"><td class="mdescLeft">&#160;</td><td class="mdescRight">It calculates the error on each sample given the output and the objective tensors.  <a href="#aba848190d00966a7e7f9bcee2dd0acd0">More...</a><br /></td></tr>
 <tr class="separator:aba848190d00966a7e7f9bcee2dd0acd0"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a55d3046825929436790b354404e103d1"><td class="memItemLeft" align="right" valign="top">Base::Data&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_universal_loss_3_01_scalar_00_01_rank_00_01true_01_4.html#a55d3046825929436790b354404e103d1">d_function</a> (const typename Base::Data out, const typename Base::Data obj) const</td></tr>
+<tr class="memdesc:a55d3046825929436790b354404e103d1"><td class="mdescLeft">&#160;</td><td class="mdescRight">It calculates the derivative of the loss function w.r.t.  <a href="#a55d3046825929436790b354404e103d1">More...</a><br /></td></tr>
 <tr class="separator:a55d3046825929436790b354404e103d1"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pro-methods"></a>
 Protected Member Functions</h2></td></tr>
 <tr class="memitem:a10bf147108deff6a1b9f749b5dd7bd05"><td class="memItemLeft" align="right" valign="top">virtual <a class="el" href="namespacecattle.html#a6763ba5ba9b418d5da581630de564cf9">ColVector</a>&lt; Scalar &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_universal_loss_3_01_scalar_00_01_rank_00_01true_01_4.html#a10bf147108deff6a1b9f749b5dd7bd05">_function</a> (typename Base::Data out, typename Base::Data obj) const =0</td></tr>
+<tr class="memdesc:a10bf147108deff6a1b9f749b5dd7bd05"><td class="mdescLeft">&#160;</td><td class="mdescRight">It computes the loss of a single time step in a batch.  <a href="#a10bf147108deff6a1b9f749b5dd7bd05">More...</a><br /></td></tr>
 <tr class="separator:a10bf147108deff6a1b9f749b5dd7bd05"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a9798706682b90f022ecde4ea2448efb6"><td class="memItemLeft" align="right" valign="top">virtual Base::Data&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_universal_loss_3_01_scalar_00_01_rank_00_01true_01_4.html#a9798706682b90f022ecde4ea2448efb6">_d_function</a> (typename Base::Data out, typename Base::Data obj, const RankwiseArray &amp;grad_dims) const =0</td></tr>
+<tr class="memdesc:a9798706682b90f022ecde4ea2448efb6"><td class="mdescLeft">&#160;</td><td class="mdescRight">It computes the gradient of a single time step of the output sequence batch.  <a href="#a9798706682b90f022ecde4ea2448efb6">More...</a><br /></td></tr>
 <tr class="separator:a9798706682b90f022ecde4ea2448efb6"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><h3>template&lt;typename Scalar, std::size_t Rank&gt;<br />
 class cattle::UniversalLoss&lt; Scalar, Rank, true &gt;</h3>
 
-<p>Partial template specialization for sequential data. Implementations of this class should be stateless. </p>
+<p>Partial template specialization for sequential data. </p>
+<p>Implementations of this class should be stateless. </p>
 </div><h2 class="groupheader">Member Function Documentation</h2>
 <a id="a9798706682b90f022ecde4ea2448efb6"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a9798706682b90f022ecde4ea2448efb6">&#9670;&nbsp;</a></span>_d_function()</h2>
@@ -147,7 +155,8 @@ template&lt;typename Scalar , std::size_t Rank&gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
-<p>It computes the gradient of a single time step of the output sequence batch.</p>
+
+<p>It computes the gradient of a single time step of the output sequence batch. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">out</td><td>The output tensor. </td></tr>
@@ -195,7 +204,9 @@ template&lt;typename Scalar , std::size_t Rank&gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
-<p>It computes the loss of a single time step in a batch. The total loss of the batch is the sum of the losses of all its time steps.</p>
+
+<p>It computes the loss of a single time step in a batch. </p>
+<p>The total loss of the batch is the sum of the losses of all its time steps.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">out</td><td>The output tensor. </td></tr>
@@ -242,7 +253,9 @@ template&lt;typename Scalar , std::size_t Rank&gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
-<p>It calculates the derivative of the loss function w.r.t. the output.</p>
+
+<p>It calculates the derivative of the loss function w.r.t. </p>
+<p>the output.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">out</td><td>The output tensor. </td></tr>
@@ -291,7 +304,8 @@ template&lt;typename Scalar , std::size_t Rank&gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
-<p>It calculates the error on each sample given the output and the objective tensors.</p>
+
+<p>It calculates the error on each sample given the output and the objective tensors. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">out</td><td>The output tensor. </td></tr>
@@ -306,7 +320,7 @@ template&lt;typename Scalar , std::size_t Rank&gt; </div>
 </div>
 </div>
 <hr/>The documentation for this class was generated from the following file:<ul>
-<li>C:/Users/Viktor/git/C-ATTL3/C-ATTL3/<a class="el" href="_loss_8hpp_source.html">Loss.hpp</a></li>
+<li>C:/Users/A6714/git/C-ATTL3/C-ATTL3/<a class="el" href="_loss_8hpp_source.html">Loss.hpp</a></li>
 </ul>
 </div><!-- contents -->
 <!-- start footer part -->

@@ -75,6 +75,9 @@ $(function() {
 </div><!--header-->
 <div class="contents">
 
+<p>An abstract class template for loss functions for both sequential and non-sequential data.  
+ <a href="classcattle_1_1_universal_loss.html#details">More...</a></p>
+
 <p><code>#include &lt;<a class="el" href="_loss_8hpp_source.html">Loss.hpp</a>&gt;</code></p>
 <div class="dynheader">
 Inheritance diagram for cattle::UniversalLoss&lt; Scalar, Rank, Sequential &gt;:</div>
@@ -82,36 +85,41 @@ Inheritance diagram for cattle::UniversalLoss&lt; Scalar, Rank, Sequential &gt;:
  <div class="center">
   <img src="classcattle_1_1_universal_loss.png" usemap="#cattle::UniversalLoss_3C_20Scalar_2C_20Rank_2C_20Sequential_20_3E_map" alt=""/>
   <map id="cattle::UniversalLoss_3C_20Scalar_2C_20Rank_2C_20Sequential_20_3E_map" name="cattle::UniversalLoss_3C_20Scalar_2C_20Rank_2C_20Sequential_20_3E_map">
-<area href="classcattle_1_1_loss.html" alt="cattle::Loss&lt; Scalar, Rank, Sequential &gt;" shape="rect" coords="1188,0,1574,24"/>
-<area href="classcattle_1_1_absolute_loss.html" alt="cattle::AbsoluteLoss&lt; Scalar, Rank, Sequential &gt;" shape="rect" coords="0,112,386,136"/>
-<area href="classcattle_1_1_cross_entropy_loss.html" alt="cattle::CrossEntropyLoss&lt; Scalar, Rank, Sequential &gt;" shape="rect" coords="396,112,782,136"/>
-<area href="classcattle_1_1_hinge_loss.html" alt="cattle::HingeLoss&lt; Scalar, Rank, Sequential, Squared &gt;" shape="rect" coords="792,112,1178,136"/>
-<area href="classcattle_1_1_multi_label_hinge_loss.html" alt="cattle::MultiLabelHingeLoss&lt; Scalar, Rank, Sequential, Squared &gt;" shape="rect" coords="1188,112,1574,136"/>
-<area href="classcattle_1_1_multi_label_log_loss.html" alt="cattle::MultiLabelLogLoss&lt; Scalar, Rank, Sequential &gt;" shape="rect" coords="1584,112,1970,136"/>
-<area href="classcattle_1_1_quadratic_loss.html" alt="cattle::QuadraticLoss&lt; Scalar, Rank, Sequential &gt;" shape="rect" coords="1980,112,2366,136"/>
-<area href="classcattle_1_1_softmax_cross_entropy_loss.html" alt="cattle::SoftmaxCrossEntropyLoss&lt; Scalar, Rank, Sequential &gt;" shape="rect" coords="2376,112,2762,136"/>
+<area href="classcattle_1_1_loss.html" title="An abstract class template for loss functions. " alt="cattle::Loss&lt; Scalar, Rank, Sequential &gt;" shape="rect" coords="1188,0,1574,24"/>
+<area href="classcattle_1_1_absolute_loss.html" title="A template class representing the absolute error (L1) loss function. " alt="cattle::AbsoluteLoss&lt; Scalar, Rank, Sequential &gt;" shape="rect" coords="0,112,386,136"/>
+<area href="classcattle_1_1_cross_entropy_loss.html" title="A template class representing the cross entropy loss function. " alt="cattle::CrossEntropyLoss&lt; Scalar, Rank, Sequential &gt;" shape="rect" coords="396,112,782,136"/>
+<area href="classcattle_1_1_hinge_loss.html" title="A template class representing the hinge loss function. " alt="cattle::HingeLoss&lt; Scalar, Rank, Sequential, Squared &gt;" shape="rect" coords="792,112,1178,136"/>
+<area href="classcattle_1_1_multi_label_hinge_loss.html" title="A class template representing the hinge loss function for multi-label objectives. ..." alt="cattle::MultiLabelHingeLoss&lt; Scalar, Rank, Sequential, Squared &gt;" shape="rect" coords="1188,112,1574,136"/>
+<area href="classcattle_1_1_multi_label_log_loss.html" title="A class template representing the logarithmic loss function for multi-label objectives. " alt="cattle::MultiLabelLogLoss&lt; Scalar, Rank, Sequential &gt;" shape="rect" coords="1584,112,1970,136"/>
+<area href="classcattle_1_1_quadratic_loss.html" title="A template class representing the squared error (L2) loss function. " alt="cattle::QuadraticLoss&lt; Scalar, Rank, Sequential &gt;" shape="rect" coords="1980,112,2366,136"/>
+<area href="classcattle_1_1_softmax_cross_entropy_loss.html" title="A loss function template that applies the softmax function to its input before calculating the cross ..." alt="cattle::SoftmaxCrossEntropyLoss&lt; Scalar, Rank, Sequential &gt;" shape="rect" coords="2376,112,2762,136"/>
 </map>
  </div></div>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
 <tr class="memitem:ad85ee3a2f542b04271afbbe07ff15329"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespacecattle.html#a6763ba5ba9b418d5da581630de564cf9">ColVector</a>&lt; Scalar &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_universal_loss.html#ad85ee3a2f542b04271afbbe07ff15329">function</a> (typename Base::Data out, typename Base::Data obj) const</td></tr>
+<tr class="memdesc:ad85ee3a2f542b04271afbbe07ff15329"><td class="mdescLeft">&#160;</td><td class="mdescRight">It calculates the error on each sample given the output and the objective tensors.  <a href="#ad85ee3a2f542b04271afbbe07ff15329">More...</a><br /></td></tr>
 <tr class="separator:ad85ee3a2f542b04271afbbe07ff15329"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:afba23a7f00f3067e2bd38a33d63b2ad8"><td class="memItemLeft" align="right" valign="top">Base::Data&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_universal_loss.html#afba23a7f00f3067e2bd38a33d63b2ad8">d_function</a> (typename Base::Data out, typename Base::Data obj) const</td></tr>
+<tr class="memdesc:afba23a7f00f3067e2bd38a33d63b2ad8"><td class="mdescLeft">&#160;</td><td class="mdescRight">It calculates the derivative of the loss function w.r.t.  <a href="#afba23a7f00f3067e2bd38a33d63b2ad8">More...</a><br /></td></tr>
 <tr class="separator:afba23a7f00f3067e2bd38a33d63b2ad8"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pro-methods"></a>
 Protected Member Functions</h2></td></tr>
 <tr class="memitem:aa6146b521539cb31b284cec4a765af45"><td class="memItemLeft" align="right" valign="top">virtual <a class="el" href="namespacecattle.html#a6763ba5ba9b418d5da581630de564cf9">ColVector</a>&lt; Scalar &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_universal_loss.html#aa6146b521539cb31b284cec4a765af45">_function</a> (typename Base::Data out, typename Base::Data obj) const =0</td></tr>
+<tr class="memdesc:aa6146b521539cb31b284cec4a765af45"><td class="mdescLeft">&#160;</td><td class="mdescRight">It computes the loss of a batch of non-sequential data.  <a href="#aa6146b521539cb31b284cec4a765af45">More...</a><br /></td></tr>
 <tr class="separator:aa6146b521539cb31b284cec4a765af45"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a9b651862f5631030c75eb69ade7a8e17"><td class="memItemLeft" align="right" valign="top">virtual Base::Data&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_universal_loss.html#a9b651862f5631030c75eb69ade7a8e17">_d_function</a> (typename Base::Data out, typename Base::Data obj, const RankwiseArray &amp;grad_dims) const =0</td></tr>
+<tr class="memdesc:a9b651862f5631030c75eb69ade7a8e17"><td class="mdescLeft">&#160;</td><td class="mdescRight">It computes the gradient of the output batch.  <a href="#a9b651862f5631030c75eb69ade7a8e17">More...</a><br /></td></tr>
 <tr class="separator:a9b651862f5631030c75eb69ade7a8e17"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><h3>template&lt;typename Scalar, std::size_t Rank, bool Sequential&gt;<br />
 class cattle::UniversalLoss&lt; Scalar, Rank, Sequential &gt;</h3>
 
-<p>An abstract class template for loss functions for both sequential and non-sequential data. Implementations of this class should be stateless. </p>
+<p>An abstract class template for loss functions for both sequential and non-sequential data. </p>
+<p>Implementations of this class should be stateless. </p>
 </div><h2 class="groupheader">Member Function Documentation</h2>
 <a id="a9b651862f5631030c75eb69ade7a8e17"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a9b651862f5631030c75eb69ade7a8e17">&#9670;&nbsp;</a></span>_d_function()</h2>
@@ -154,7 +162,8 @@ template&lt;typename Scalar , std::size_t Rank, bool Sequential&gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
-<p>It computes the gradient of the output batch.</p>
+
+<p>It computes the gradient of the output batch. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">out</td><td>The output tensor. </td></tr>
@@ -202,7 +211,8 @@ template&lt;typename Scalar , std::size_t Rank, bool Sequential&gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
-<p>It computes the loss of a batch of non-sequential data.</p>
+
+<p>It computes the loss of a batch of non-sequential data. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">out</td><td>The output tensor. </td></tr>
@@ -251,7 +261,9 @@ template&lt;typename Scalar , std::size_t Rank, bool Sequential&gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
-<p>It calculates the derivative of the loss function w.r.t. the output.</p>
+
+<p>It calculates the derivative of the loss function w.r.t. </p>
+<p>the output.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">out</td><td>The output tensor. </td></tr>
@@ -300,7 +312,8 @@ template&lt;typename Scalar , std::size_t Rank, bool Sequential&gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
-<p>It calculates the error on each sample given the output and the objective tensors.</p>
+
+<p>It calculates the error on each sample given the output and the objective tensors. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">out</td><td>The output tensor. </td></tr>
@@ -315,7 +328,7 @@ template&lt;typename Scalar , std::size_t Rank, bool Sequential&gt; </div>
 </div>
 </div>
 <hr/>The documentation for this class was generated from the following file:<ul>
-<li>C:/Users/Viktor/git/C-ATTL3/C-ATTL3/<a class="el" href="_loss_8hpp_source.html">Loss.hpp</a></li>
+<li>C:/Users/A6714/git/C-ATTL3/C-ATTL3/<a class="el" href="_loss_8hpp_source.html">Loss.hpp</a></li>
 </ul>
 </div><!-- contents -->
 <!-- start footer part -->

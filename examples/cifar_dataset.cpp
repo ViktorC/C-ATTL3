@@ -26,17 +26,17 @@ int main() {
 	WeightInitSharedPtr<float> dense_init(new GlorotWeightInitialization<float>(1e-1));
 	// Create the network.
 	std::vector<LayerPtr<float,3>> layers(12);
-	layers[0] = LayerPtr<float,3>(new ConvolutionalLayer<float>(file_train_prov.get_obs_dims(), 8, conv_init));
+	layers[0] = LayerPtr<float,3>(new ConvolutionLayer<float>(file_train_prov.get_obs_dims(), 8, conv_init));
 	layers[1] = LayerPtr<float,3>(new ReLUActivationLayer<float,3>(layers[0]->get_output_dims()));
-	layers[2] = LayerPtr<float,3>(new MaxPoolingLayer<float>(layers[1]->get_output_dims()));
-	layers[3] = LayerPtr<float,3>(new ConvolutionalLayer<float>(layers[2]->get_output_dims(), 8, conv_init));
+	layers[2] = LayerPtr<float,3>(new MaxPoolLayer<float>(layers[1]->get_output_dims()));
+	layers[3] = LayerPtr<float,3>(new ConvolutionLayer<float>(layers[2]->get_output_dims(), 8, conv_init));
 	layers[4] = LayerPtr<float,3>(new ReLUActivationLayer<float,3>(layers[3]->get_output_dims()));
-	layers[5] = LayerPtr<float,3>(new MaxPoolingLayer<float>(layers[4]->get_output_dims()));
+	layers[5] = LayerPtr<float,3>(new MaxPoolLayer<float>(layers[4]->get_output_dims()));
 	layers[6] = LayerPtr<float,3>(new DropoutLayer<float,3>(layers[5]->get_output_dims(), .25));
-	layers[7] = LayerPtr<float,3>(new FullyConnectedLayer<float,3>(layers[6]->get_output_dims(), 50, dense_init));
+	layers[7] = LayerPtr<float,3>(new DenseLayer<float,3>(layers[6]->get_output_dims(), 50, dense_init));
 	layers[8] = LayerPtr<float,3>(new ReLUActivationLayer<float,3>(layers[7]->get_output_dims()));
 	layers[9] = LayerPtr<float,3>(new DropoutLayer<float,3>(layers[8]->get_output_dims(), .5));
-	layers[10] = LayerPtr<float,3>(new FullyConnectedLayer<float,3>(layers[9]->get_output_dims(), 10, dense_init));
+	layers[10] = LayerPtr<float,3>(new DenseLayer<float,3>(layers[9]->get_output_dims(), 10, dense_init));
 	layers[11] = LayerPtr<float,3>(new SoftmaxActivationLayer<float,3>(layers[10]->get_output_dims()));
 	FeedforwardNeuralNetwork<float,3> nn(std::move(layers));
 	// Initialize.

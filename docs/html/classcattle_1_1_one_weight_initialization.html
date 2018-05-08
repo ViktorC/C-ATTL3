@@ -74,6 +74,9 @@ $(function() {
 </div><!--header-->
 <div class="contents">
 
+<p>A class template for a weight initialization that sets all values to 1.  
+ <a href="classcattle_1_1_one_weight_initialization.html#details">More...</a></p>
+
 <p><code>#include &lt;<a class="el" href="_weight_initialization_8hpp_source.html">WeightInitialization.hpp</a>&gt;</code></p>
 <div class="dynheader">
 Inheritance diagram for cattle::OneWeightInitialization&lt; Scalar &gt;:</div>
@@ -81,7 +84,7 @@ Inheritance diagram for cattle::OneWeightInitialization&lt; Scalar &gt;:</div>
  <div class="center">
   <img src="classcattle_1_1_one_weight_initialization.png" usemap="#cattle::OneWeightInitialization_3C_20Scalar_20_3E_map" alt=""/>
   <map id="cattle::OneWeightInitialization_3C_20Scalar_20_3E_map" name="cattle::OneWeightInitialization_3C_20Scalar_20_3E_map">
-<area href="classcattle_1_1_weight_initialization.html" alt="cattle::WeightInitialization&lt; Scalar &gt;" shape="rect" coords="0,0,236,24"/>
+<area href="classcattle_1_1_weight_initialization.html" title="An abstract class template for different weight initialization methods for kernel layers..." alt="cattle::WeightInitialization&lt; Scalar &gt;" shape="rect" coords="0,0,236,24"/>
 </map>
  </div></div>
 <table class="memberdecls">
@@ -90,6 +93,7 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:ab37a5bfc05e360771243195dcc7586a2"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_one_weight_initialization.html#ab37a5bfc05e360771243195dcc7586a2">OneWeightInitialization</a> (Scalar bias=0)</td></tr>
 <tr class="separator:ab37a5bfc05e360771243195dcc7586a2"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:adb729e06ba75b0b4a5b7ab533bcf41d7"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_one_weight_initialization.html#adb729e06ba75b0b4a5b7ab533bcf41d7">apply</a> (<a class="el" href="namespacecattle.html#a1d78623a47279d516750a44dbad6090b">Matrix</a>&lt; Scalar &gt; &amp;weights) const</td></tr>
+<tr class="memdesc:adb729e06ba75b0b4a5b7ab533bcf41d7"><td class="mdescLeft">&#160;</td><td class="mdescRight">It initializes the values of the kernel.  <a href="#adb729e06ba75b0b4a5b7ab533bcf41d7">More...</a><br /></td></tr>
 <tr class="separator:adb729e06ba75b0b4a5b7ab533bcf41d7"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
@@ -158,7 +162,9 @@ template&lt;typename Scalar &gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
-<p>It initializes the values of the kernel. It is assumed that the last row of the kernel is the bias row and is thus treated differently.</p>
+
+<p>It initializes the values of the kernel. </p>
+<p>It is assumed that the last row of the kernel is the bias row and is thus treated differently.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">weights</td><td>A reference to the weight matrix. </td></tr>
@@ -171,7 +177,7 @@ template&lt;typename Scalar &gt; </div>
 </div>
 </div>
 <hr/>The documentation for this class was generated from the following file:<ul>
-<li>C:/Users/Viktor/git/C-ATTL3/C-ATTL3/<a class="el" href="_weight_initialization_8hpp_source.html">WeightInitialization.hpp</a></li>
+<li>C:/Users/A6714/git/C-ATTL3/C-ATTL3/<a class="el" href="_weight_initialization_8hpp_source.html">WeightInitialization.hpp</a></li>
 </ul>
 </div><!-- contents -->
 <!-- start footer part -->

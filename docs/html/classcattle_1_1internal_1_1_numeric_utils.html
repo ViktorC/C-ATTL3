@@ -74,19 +74,27 @@ $(function() {
 </div><!--header-->
 <div class="contents">
 
+<p>A utility class template containing static methods and variables to help with numerical issues.  
+ <a href="classcattle_1_1internal_1_1_numeric_utils.html#details">More...</a></p>
+
 <p><code>#include &lt;<a class="el" href="_numeric_utils_8hpp_source.html">NumericUtils.hpp</a>&gt;</code></p>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-static-methods"></a>
 Static Public Member Functions</h2></td></tr>
 <tr class="memitem:ae8fb7411c4b05e73ccfd01e0bc3b802f"><td class="memItemLeft" align="right" valign="top">static bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1internal_1_1_numeric_utils.html#ae8fb7411c4b05e73ccfd01e0bc3b802f">almost_equal</a> (Scalar n1, Scalar n2, Scalar abs_epsilon=EPSILON1, Scalar rel_epsilon=EPSILON1)</td></tr>
+<tr class="memdesc:ae8fb7411c4b05e73ccfd01e0bc3b802f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns whether the two numerals are close enough to be considered equal.  <a href="#ae8fb7411c4b05e73ccfd01e0bc3b802f">More...</a><br /></td></tr>
 <tr class="separator:ae8fb7411c4b05e73ccfd01e0bc3b802f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ae73d7c1b4caf84f0227e7b04c4d7512b"><td class="memItemLeft" align="right" valign="top">static bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1internal_1_1_numeric_utils.html#ae73d7c1b4caf84f0227e7b04c4d7512b">decidedly_greater</a> (Scalar n1, Scalar n2, Scalar abs_epsilon=EPSILON1, Scalar rel_epsilon=EPSILON1)</td></tr>
+<tr class="memdesc:ae73d7c1b4caf84f0227e7b04c4d7512b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns whether a numeral is greater than another one by a margin great enough for them not to be considered almost equal.  <a href="#ae73d7c1b4caf84f0227e7b04c4d7512b">More...</a><br /></td></tr>
 <tr class="separator:ae73d7c1b4caf84f0227e7b04c4d7512b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a7bf17f4eb3f18305abbf5620f9f72bbe"><td class="memItemLeft" align="right" valign="top">static bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1internal_1_1_numeric_utils.html#a7bf17f4eb3f18305abbf5620f9f72bbe">greater_or_almost_equal</a> (Scalar n1, Scalar n2, Scalar abs_epsilon=EPSILON1, Scalar rel_epsilon=EPSILON1)</td></tr>
+<tr class="memdesc:a7bf17f4eb3f18305abbf5620f9f72bbe"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns whether a numeral is not lesser than another one by a margin great enough for them not to be considered almost equal.  <a href="#a7bf17f4eb3f18305abbf5620f9f72bbe">More...</a><br /></td></tr>
 <tr class="separator:a7bf17f4eb3f18305abbf5620f9f72bbe"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a4ccb98354f5c472bf029545c79ea2cad"><td class="memItemLeft" align="right" valign="top">static bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1internal_1_1_numeric_utils.html#a4ccb98354f5c472bf029545c79ea2cad">decidedly_lesser</a> (Scalar n1, Scalar n2, Scalar abs_epsilon=EPSILON1, Scalar rel_epsilon=EPSILON1)</td></tr>
+<tr class="memdesc:a4ccb98354f5c472bf029545c79ea2cad"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns whether a numeral is lesser than another one by a margin great enough for them not to be considered almost equal.  <a href="#a4ccb98354f5c472bf029545c79ea2cad">More...</a><br /></td></tr>
 <tr class="separator:a4ccb98354f5c472bf029545c79ea2cad"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ad59854aa76dfb17620820beb5cc63235"><td class="memItemLeft" align="right" valign="top">static bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1internal_1_1_numeric_utils.html#ad59854aa76dfb17620820beb5cc63235">lesser_or_almost_equal</a> (Scalar n1, Scalar n2, Scalar abs_epsilon=EPSILON1, Scalar rel_epsilon=EPSILON1)</td></tr>
+<tr class="memdesc:ad59854aa76dfb17620820beb5cc63235"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns whether a numeral is not greater than another one by a margin great enough for them not to be considered almost equal.  <a href="#ad59854aa76dfb17620820beb5cc63235">More...</a><br /></td></tr>
 <tr class="separator:ad59854aa76dfb17620820beb5cc63235"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
@@ -142,7 +150,8 @@ template&lt;typename Scalar &gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
-<p>Returns whether the two numerals are close enough to be considered equal.</p>
+
+<p>Returns whether the two numerals are close enough to be considered equal. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">n1</td><td>The first numeral. </td></tr>
@@ -203,7 +212,8 @@ template&lt;typename Scalar &gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
-<p>Returns whether a numeral is greater than another one by a margin great enough for them not to be considered almost equal.</p>
+
+<p>Returns whether a numeral is greater than another one by a margin great enough for them not to be considered almost equal. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">n1</td><td>The first numeral. </td></tr>
@@ -264,7 +274,8 @@ template&lt;typename Scalar &gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
-<p>Returns whether a numeral is lesser than another one by a margin great enough for them not to be considered almost equal.</p>
+
+<p>Returns whether a numeral is lesser than another one by a margin great enough for them not to be considered almost equal. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">n1</td><td>The first numeral. </td></tr>
@@ -325,7 +336,8 @@ template&lt;typename Scalar &gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
-<p>Returns whether a numeral is not lesser than another one by a margin great enough for them not to be considered almost equal.</p>
+
+<p>Returns whether a numeral is not lesser than another one by a margin great enough for them not to be considered almost equal. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">n1</td><td>The first numeral. </td></tr>
@@ -386,7 +398,8 @@ template&lt;typename Scalar &gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
-<p>Returns whether a numeral is not greater than another one by a margin great enough for them not to be considered almost equal.</p>
+
+<p>Returns whether a numeral is not greater than another one by a margin great enough for them not to be considered almost equal. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">n1</td><td>The first numeral. </td></tr>
@@ -401,7 +414,7 @@ template&lt;typename Scalar &gt; </div>
 </div>
 </div>
 <hr/>The documentation for this class was generated from the following file:<ul>
-<li>C:/Users/Viktor/git/C-ATTL3/C-ATTL3/utils/<a class="el" href="_numeric_utils_8hpp_source.html">NumericUtils.hpp</a></li>
+<li>C:/Users/A6714/git/C-ATTL3/C-ATTL3/utils/<a class="el" href="_numeric_utils_8hpp_source.html">NumericUtils.hpp</a></li>
 </ul>
 </div><!-- contents -->
 <!-- start footer part -->

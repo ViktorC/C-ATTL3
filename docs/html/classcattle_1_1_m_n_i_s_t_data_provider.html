@@ -75,6 +75,9 @@ $(function() {
 </div><!--header-->
 <div class="contents">
 
+<p>A data provider template for the MNIST data set.  
+ <a href="classcattle_1_1_m_n_i_s_t_data_provider.html#details">More...</a></p>
+
 <p><code>#include &lt;<a class="el" href="_data_provider_8hpp_source.html">DataProvider.hpp</a>&gt;</code></p>
 <div class="dynheader">
 Inheritance diagram for cattle::MNISTDataProvider&lt; Scalar &gt;:</div>
@@ -83,7 +86,7 @@ Inheritance diagram for cattle::MNISTDataProvider&lt; Scalar &gt;:</div>
   <img src="classcattle_1_1_m_n_i_s_t_data_provider.png" usemap="#cattle::MNISTDataProvider_3C_20Scalar_20_3E_map" alt=""/>
   <map id="cattle::MNISTDataProvider_3C_20Scalar_20_3E_map" name="cattle::MNISTDataProvider_3C_20Scalar_20_3E_map">
 <area href="classcattle_1_1_split_file_data_provider.html" alt="cattle::SplitFileDataProvider&lt; Scalar, 3, false, true, true &gt;" shape="rect" coords="0,56,343,80"/>
-<area href="classcattle_1_1_data_provider.html" alt="cattle::DataProvider&lt; Scalar, Rank, Sequential &gt;" shape="rect" coords="0,0,343,24"/>
+<area href="classcattle_1_1_data_provider.html" title="A class template for fetching data from memory or disk. " alt="cattle::DataProvider&lt; Scalar, Rank, Sequential &gt;" shape="rect" coords="0,0,343,24"/>
 </map>
  </div></div>
 <table class="memberdecls">
@@ -92,17 +95,22 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a6ea7c7026514c600ed595c6f7fdb5696"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_m_n_i_s_t_data_provider.html#a6ea7c7026514c600ed595c6f7fdb5696">MNISTDataProvider</a> (std::string obs_path, std::string labels_path)</td></tr>
 <tr class="separator:a6ea7c7026514c600ed595c6f7fdb5696"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a372ff8d80ed8d3a50e6fa2dccf866592"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="classcattle_1_1_dimensions.html">Dimensions</a>&lt; std::size_t, 3 &gt; &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_m_n_i_s_t_data_provider.html#a372ff8d80ed8d3a50e6fa2dccf866592">get_obs_dims</a> () const</td></tr>
+<tr class="memdesc:a372ff8d80ed8d3a50e6fa2dccf866592"><td class="mdescLeft">&#160;</td><td class="mdescRight">A simple constant getter method for the dimensions of the observations.  <a href="#a372ff8d80ed8d3a50e6fa2dccf866592">More...</a><br /></td></tr>
 <tr class="separator:a372ff8d80ed8d3a50e6fa2dccf866592"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a979b4d19ecb48e3ea5be7887819b4658"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="classcattle_1_1_dimensions.html">Dimensions</a>&lt; std::size_t, 3 &gt; &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_m_n_i_s_t_data_provider.html#a979b4d19ecb48e3ea5be7887819b4658">get_obj_dims</a> () const</td></tr>
+<tr class="memdesc:a979b4d19ecb48e3ea5be7887819b4658"><td class="mdescLeft">&#160;</td><td class="mdescRight">A simple constant getter method for the dimensions of the objectives.  <a href="#a979b4d19ecb48e3ea5be7887819b4658">More...</a><br /></td></tr>
 <tr class="separator:a979b4d19ecb48e3ea5be7887819b4658"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pro-methods"></a>
 Protected Member Functions</h2></td></tr>
 <tr class="memitem:ae41c52d34d99be6bbb990f6971ead881"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_m_n_i_s_t_data_provider.html#ae41c52d34d99be6bbb990f6971ead881">_set_to_beg</a> (std::ifstream &amp;obs_input_stream, std::ifstream &amp;obj_input_stream)</td></tr>
+<tr class="memdesc:ae41c52d34d99be6bbb990f6971ead881"><td class="mdescLeft">&#160;</td><td class="mdescRight">It sets the positions of the file streams to the beginning of the observation data set and the objective data set respectively.  <a href="#ae41c52d34d99be6bbb990f6971ead881">More...</a><br /></td></tr>
 <tr class="separator:ae41c52d34d99be6bbb990f6971ead881"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a063971b7d467464589d449bca9ba7d1d"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespacecattle.html#aaf234deaf1504300126fed57912a132e">DataPair</a>&lt; Scalar, 3, false &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_m_n_i_s_t_data_provider.html#a063971b7d467464589d449bca9ba7d1d">_get_data</a> (std::ifstream &amp;obs_input_stream, std::ifstream &amp;obj_input_stream, std::size_t batch_size)</td></tr>
+<tr class="memdesc:a063971b7d467464589d449bca9ba7d1d"><td class="mdescLeft">&#160;</td><td class="mdescRight">It reads at most the specified number of observations from the observation-file and at most the specified number of objectives from the objective-file.  <a href="#a063971b7d467464589d449bca9ba7d1d">More...</a><br /></td></tr>
 <tr class="separator:a063971b7d467464589d449bca9ba7d1d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a0f43935423fff83bb8c88a027ee6283f"><td class="memItemLeft" align="right" valign="top">std::size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_m_n_i_s_t_data_provider.html#a0f43935423fff83bb8c88a027ee6283f">_skip</a> (std::ifstream &amp;obs_input_stream, std::ifstream &amp;obj_input_stream, std::size_t instances)</td></tr>
+<tr class="memdesc:a0f43935423fff83bb8c88a027ee6283f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Skips at most the specified number of instances in the data streams.  <a href="#a0f43935423fff83bb8c88a027ee6283f">More...</a><br /></td></tr>
 <tr class="separator:a0f43935423fff83bb8c88a027ee6283f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
@@ -198,7 +206,9 @@ template&lt;typename Scalar &gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
-<p>It reads at most the specified number of observations from the observation-file and at most the specified number of objectives from the objective-file. The file streams can be expected not to have any of their fail flags set initially and to have at least 1 more character left to read in each.</p>
+
+<p>It reads at most the specified number of observations from the observation-file and at most the specified number of objectives from the objective-file. </p>
+<p>The file streams can be expected not to have any of their fail flags set initially and to have at least 1 more character left to read in each.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">obs_input_stream</td><td>A reference to the file stream to a file containing observations. </td></tr>
@@ -248,7 +258,8 @@ template&lt;typename Scalar &gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
-<p>It sets the positions of the file streams to the beginning of the observation data set and the objective data set respectively.</p>
+
+<p>It sets the positions of the file streams to the beginning of the observation data set and the objective data set respectively. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">obs_input_stream</td><td>A reference to the file stream to a file containing observations. </td></tr>
@@ -302,7 +313,9 @@ template&lt;typename Scalar &gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
-<p>Skips at most the specified number of instances in the data streams. The file streams can be expected not to have any of their fail flags set initially.</p>
+
+<p>Skips at most the specified number of instances in the data streams. </p>
+<p>The file streams can be expected not to have any of their fail flags set initially.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">obs_input_stream</td><td>A reference to the file stream to a file containing observations. </td></tr>
@@ -341,7 +354,8 @@ template&lt;typename Scalar &gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
-<p>A simple constant getter method for the dimensions of the objectives.</p>
+
+<p>A simple constant getter method for the dimensions of the objectives. </p>
 <dl class="section return"><dt>Returns</dt><dd>A constant reference to the dimensions of the objectives. </dd></dl>
 
 <p>Implements <a class="el" href="classcattle_1_1_data_provider.html#a797875a230c677d448455d87ee00ff78">cattle::DataProvider&lt; Scalar, Rank, Sequential &gt;</a>.</p>
@@ -372,7 +386,8 @@ template&lt;typename Scalar &gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
-<p>A simple constant getter method for the dimensions of the observations.</p>
+
+<p>A simple constant getter method for the dimensions of the observations. </p>
 <dl class="section return"><dt>Returns</dt><dd>A constant reference to the dimensions of the observations. </dd></dl>
 
 <p>Implements <a class="el" href="classcattle_1_1_data_provider.html#a8f877a9733373af4c29e86eb5235d00e">cattle::DataProvider&lt; Scalar, Rank, Sequential &gt;</a>.</p>
@@ -380,7 +395,7 @@ template&lt;typename Scalar &gt; </div>
 </div>
 </div>
 <hr/>The documentation for this class was generated from the following file:<ul>
-<li>C:/Users/Viktor/git/C-ATTL3/C-ATTL3/<a class="el" href="_data_provider_8hpp_source.html">DataProvider.hpp</a></li>
+<li>C:/Users/A6714/git/C-ATTL3/C-ATTL3/<a class="el" href="_data_provider_8hpp_source.html">DataProvider.hpp</a></li>
 </ul>
 </div><!-- contents -->
 <!-- start footer part -->

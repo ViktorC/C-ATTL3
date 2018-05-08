@@ -74,17 +74,24 @@ $(function() {
 </div><!--header-->
 <div class="contents">
 
+<p>NOTE: Expression templates are rather unwarranted for this class as its objects are unlikely to be used in complex expressions.  
+ <a href="classcattle_1_1_dim_expression.html#details">More...</a></p>
+
 <p><code>#include &lt;<a class="el" href="_dimensions_8hpp_source.html">Dimensions.hpp</a>&gt;</code></p>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
 <tr class="memitem:a04c4cf3f267946addfe24852e78e4818"><td class="memItemLeft" align="right" valign="top">IndexType&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_dim_expression.html#a04c4cf3f267946addfe24852e78e4818">operator()</a> (std::size_t i) const</td></tr>
+<tr class="memdesc:a04c4cf3f267946addfe24852e78e4818"><td class="mdescLeft">&#160;</td><td class="mdescRight">Evaluates the expression along the given rank.  <a href="#a04c4cf3f267946addfe24852e78e4818">More...</a><br /></td></tr>
 <tr class="separator:a04c4cf3f267946addfe24852e78e4818"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:adae8f2ea4e6a29d65b85ea0aa2d48bd1"><td class="memItemLeft" align="right" valign="top">IndexType&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_dim_expression.html#adae8f2ea4e6a29d65b85ea0aa2d48bd1">get_volume</a> () const</td></tr>
+<tr class="memdesc:adae8f2ea4e6a29d65b85ea0aa2d48bd1"><td class="mdescLeft">&#160;</td><td class="mdescRight">A constant method the returns the volume of the expression.  <a href="#adae8f2ea4e6a29d65b85ea0aa2d48bd1">More...</a><br /></td></tr>
 <tr class="separator:adae8f2ea4e6a29d65b85ea0aa2d48bd1"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a80900ec3799e55374ee393327ead0279"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classcattle_1_1_dimensions.html">Dimensions</a>&lt; IndexType, Rank &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_dim_expression.html#a80900ec3799e55374ee393327ead0279">eval</a> ()</td></tr>
+<tr class="memdesc:a80900ec3799e55374ee393327ead0279"><td class="mdescLeft">&#160;</td><td class="mdescRight">A method for forcing the evaluation of the expression.  <a href="#a80900ec3799e55374ee393327ead0279">More...</a><br /></td></tr>
 <tr class="separator:a80900ec3799e55374ee393327ead0279"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ae51ed9575f019bc86402615cf08e97d8"><td class="memItemLeft" align="right" valign="top">std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_dim_expression.html#ae51ed9575f019bc86402615cf08e97d8">to_string</a> () const</td></tr>
+<tr class="memdesc:ae51ed9575f019bc86402615cf08e97d8"><td class="mdescLeft">&#160;</td><td class="mdescRight">It evaluates the expression and returns a string containing the results.  <a href="#ae51ed9575f019bc86402615cf08e97d8">More...</a><br /></td></tr>
 <tr class="separator:ae51ed9575f019bc86402615cf08e97d8"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ad14faa346e24c377c8a3306f587e8e50"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classcattle_1_1_unary_rank_wise_dim_expression.html">UnaryRankWiseDimExpression</a>&lt; IndexType, Rank, <a class="el" href="classcattle_1_1_dim_expression.html">Self</a>, SumOp&lt; IndexType &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_dim_expression.html#ad14faa346e24c377c8a3306f587e8e50">add_along_rank</a> (const IndexType &amp;n, std::size_t rank) const</td></tr>
 <tr class="separator:ad14faa346e24c377c8a3306f587e8e50"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -105,8 +112,9 @@ Public Member Functions</h2></td></tr>
 <div class="textblock"><h3>template&lt;typename Derived, typename IndexType, std::size_t Rank&gt;<br />
 class cattle::DimExpression&lt; Derived, IndexType, Rank &gt;</h3>
 
-<p>NOTE: Expression templates are rather unwarranted for this class as its objects are unlikely to be used in complex expressions. They have only been implemented for the sake of practical learning.</p>
-<p>The base class of all dimension expressions. </p>
+<p>NOTE: Expression templates are rather unwarranted for this class as its objects are unlikely to be used in complex expressions. </p>
+<p>The base class of all dimension expressions.</p>
+<p>They have only been implemented for the sake of practical learning. </p>
 </div><h2 class="groupheader">Member Function Documentation</h2>
 <a id="ad14faa346e24c377c8a3306f587e8e50"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#ad14faa346e24c377c8a3306f587e8e50">&#9670;&nbsp;</a></span>add_along_rank() <span class="overload">[1/2]</span></h2>
@@ -272,8 +280,9 @@ template&lt;typename Derived, typename IndexType, std::size_t Rank&gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
-<p>A method for forcing the evaluation of the expression.</p>
-<dl class="section return"><dt>Returns</dt><dd>A <a class="el" href="classcattle_1_1_dimensions.html">Dimensions</a> instance containing the results of the evaluated expression. </dd></dl>
+
+<p>A method for forcing the evaluation of the expression. </p>
+<dl class="section return"><dt>Returns</dt><dd>A <a class="el" href="classcattle_1_1_dimensions.html" title="A class representing dimensions along one or more ranks. ">Dimensions</a> instance containing the results of the evaluated expression. </dd></dl>
 
 </div>
 </div>
@@ -301,7 +310,8 @@ template&lt;typename Derived, typename IndexType, std::size_t Rank&gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
-<p>A constant method the returns the volume of the expression.</p>
+
+<p>A constant method the returns the volume of the expression. </p>
 <dl class="section return"><dt>Returns</dt><dd>The product of the dimensions of each rank of the instance. </dd></dl>
 
 </div>
@@ -377,7 +387,8 @@ template&lt;typename Derived, typename IndexType, std::size_t Rank&gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
-<p>Evaluates the expression along the given rank.</p>
+
+<p>Evaluates the expression along the given rank. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">i</td><td>The index of the single rank along which the expression is to be evaluated. </td></tr>
@@ -506,13 +517,14 @@ template&lt;typename Derived, typename IndexType, std::size_t Rank&gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
-<p>It evaluates the expression and returns a string containing the results.</p>
+
+<p>It evaluates the expression and returns a string containing the results. </p>
 <dl class="section return"><dt>Returns</dt><dd>A string representation of the evaluated expression. </dd></dl>
 
 </div>
 </div>
 <hr/>The documentation for this class was generated from the following file:<ul>
-<li>C:/Users/Viktor/git/C-ATTL3/C-ATTL3/<a class="el" href="_dimensions_8hpp_source.html">Dimensions.hpp</a></li>
+<li>C:/Users/A6714/git/C-ATTL3/C-ATTL3/<a class="el" href="_dimensions_8hpp_source.html">Dimensions.hpp</a></li>
 </ul>
 </div><!-- contents -->
 <!-- start footer part -->

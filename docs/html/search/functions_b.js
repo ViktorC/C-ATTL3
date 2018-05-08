@@ -1,7 +1,7 @@
 var searchData=
 [
-  ['maxpoolinglayer',['MaxPoolingLayer',['../classcattle_1_1_max_pooling_layer.html#a0ce1b07c138db410f34556916c4d795f',1,'cattle::MaxPoolingLayer']]],
-  ['meanpoolinglayer',['MeanPoolingLayer',['../classcattle_1_1_mean_pooling_layer.html#aff56d9af97a32f924f13179a2e5753fe',1,'cattle::MeanPoolingLayer']]],
+  ['maxpoollayer',['MaxPoolLayer',['../classcattle_1_1_max_pool_layer.html#aa19fec34b1dfba2a046b0a69d0b67ff1',1,'cattle::MaxPoolLayer']]],
+  ['meanpoollayer',['MeanPoolLayer',['../classcattle_1_1_mean_pool_layer.html#a2c99b1879d42922d754ec47d3d7a3ab8',1,'cattle::MeanPoolLayer']]],
   ['memorydataprovider',['MemoryDataProvider',['../classcattle_1_1_memory_data_provider.html#a6376047b2d04dafb02a033275eb28fce',1,'cattle::MemoryDataProvider']]],
   ['mnistdataprovider',['MNISTDataProvider',['../classcattle_1_1_m_n_i_s_t_data_provider.html#a6ea7c7026514c600ed595c6f7fdb5696',1,'cattle::MNISTDataProvider']]],
   ['momentumacceleratedsgdoptimizer',['MomentumAcceleratedSGDOptimizer',['../classcattle_1_1_momentum_accelerated_s_g_d_optimizer.html#a671155f63736374132686b4efd948592',1,'cattle::MomentumAcceleratedSGDOptimizer']]],

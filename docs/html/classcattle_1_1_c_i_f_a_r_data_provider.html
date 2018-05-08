@@ -75,6 +75,9 @@ $(function() {
 </div><!--header-->
 <div class="contents">
 
+<p>A data provider template for the CIFAR-10 and CIFAR-100 data sets.  
+ <a href="classcattle_1_1_c_i_f_a_r_data_provider.html#details">More...</a></p>
+
 <p><code>#include &lt;<a class="el" href="_data_provider_8hpp_source.html">DataProvider.hpp</a>&gt;</code></p>
 <div class="dynheader">
 Inheritance diagram for cattle::CIFARDataProvider&lt; Scalar, CIFARType &gt;:</div>
@@ -83,7 +86,7 @@ Inheritance diagram for cattle::CIFARDataProvider&lt; Scalar, CIFARType &gt;:</d
   <img src="classcattle_1_1_c_i_f_a_r_data_provider.png" usemap="#cattle::CIFARDataProvider_3C_20Scalar_2C_20CIFARType_20_3E_map" alt=""/>
   <map id="cattle::CIFARDataProvider_3C_20Scalar_2C_20CIFARType_20_3E_map" name="cattle::CIFARDataProvider_3C_20Scalar_2C_20CIFARType_20_3E_map">
 <area href="classcattle_1_1_joint_file_data_provider.html" alt="cattle::JointFileDataProvider&lt; Scalar, 3, false, true &gt;" shape="rect" coords="0,56,315,80"/>
-<area href="classcattle_1_1_data_provider.html" alt="cattle::DataProvider&lt; Scalar, Rank, Sequential &gt;" shape="rect" coords="0,0,315,24"/>
+<area href="classcattle_1_1_data_provider.html" title="A class template for fetching data from memory or disk. " alt="cattle::DataProvider&lt; Scalar, Rank, Sequential &gt;" shape="rect" coords="0,0,315,24"/>
 </map>
  </div></div>
 <table class="memberdecls">
@@ -94,18 +97,23 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:acad45a9be6ec504c355d8b82e0b4d20f"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_c_i_f_a_r_data_provider.html#acad45a9be6ec504c355d8b82e0b4d20f">CIFARDataProvider</a> (std::string file_path)</td></tr>
 <tr class="separator:acad45a9be6ec504c355d8b82e0b4d20f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ab8c86d2e8a78146b84e070b879c9ab85"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="classcattle_1_1_dimensions.html">Dimensions</a>&lt; std::size_t, 3 &gt; &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_c_i_f_a_r_data_provider.html#ab8c86d2e8a78146b84e070b879c9ab85">get_obs_dims</a> () const</td></tr>
+<tr class="memdesc:ab8c86d2e8a78146b84e070b879c9ab85"><td class="mdescLeft">&#160;</td><td class="mdescRight">A simple constant getter method for the dimensions of the observations.  <a href="#ab8c86d2e8a78146b84e070b879c9ab85">More...</a><br /></td></tr>
 <tr class="separator:ab8c86d2e8a78146b84e070b879c9ab85"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:af60eefbce63dbbfb982807c160768f61"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="classcattle_1_1_dimensions.html">Dimensions</a>&lt; std::size_t, 3 &gt; &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_c_i_f_a_r_data_provider.html#af60eefbce63dbbfb982807c160768f61">get_obj_dims</a> () const</td></tr>
+<tr class="memdesc:af60eefbce63dbbfb982807c160768f61"><td class="mdescLeft">&#160;</td><td class="mdescRight">A simple constant getter method for the dimensions of the objectives.  <a href="#af60eefbce63dbbfb982807c160768f61">More...</a><br /></td></tr>
 <tr class="separator:af60eefbce63dbbfb982807c160768f61"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pro-methods"></a>
 Protected Member Functions</h2></td></tr>
 <tr class="memitem:a8c5b73c553f06a7dbfeff57d87e9d5d9"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespacecattle.html#aaf234deaf1504300126fed57912a132e">DataPair</a>&lt; Scalar, 3, false &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_c_i_f_a_r_data_provider.html#a8c5b73c553f06a7dbfeff57d87e9d5d9">_get_data</a> (std::ifstream &amp;data_stream, std::size_t batch_size)</td></tr>
+<tr class="memdesc:a8c5b73c553f06a7dbfeff57d87e9d5d9"><td class="mdescLeft">&#160;</td><td class="mdescRight">It reads at most the specified number of observation-objective pairs from the provided file stream.  <a href="#a8c5b73c553f06a7dbfeff57d87e9d5d9">More...</a><br /></td></tr>
 <tr class="separator:a8c5b73c553f06a7dbfeff57d87e9d5d9"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a739f67300be83feea721a755d8d6e091"><td class="memItemLeft" align="right" valign="top">std::size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_c_i_f_a_r_data_provider.html#a739f67300be83feea721a755d8d6e091">_skip</a> (std::ifstream &amp;data_stream, std::size_t instances)</td></tr>
+<tr class="memdesc:a739f67300be83feea721a755d8d6e091"><td class="mdescLeft">&#160;</td><td class="mdescRight">Skips at most the specified number of instances in the data stream.  <a href="#a739f67300be83feea721a755d8d6e091">More...</a><br /></td></tr>
 <tr class="separator:a739f67300be83feea721a755d8d6e091"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="inherit_header pro_methods_classcattle_1_1_joint_file_data_provider"><td colspan="2" onclick="javascript:toggleInherit('pro_methods_classcattle_1_1_joint_file_data_provider')"><img src="closed.png" alt="-"/>&#160;Protected Member Functions inherited from <a class="el" href="classcattle_1_1_joint_file_data_provider.html">cattle::JointFileDataProvider&lt; Scalar, 3, false, true &gt;</a></td></tr>
 <tr class="memitem:a1a52a24f7f4fd4dcb9dbcb2965d7b748 inherit pro_methods_classcattle_1_1_joint_file_data_provider"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_joint_file_data_provider.html#a1a52a24f7f4fd4dcb9dbcb2965d7b748">_set_to_beg</a> (std::ifstream &amp;data_stream)</td></tr>
+<tr class="memdesc:a1a52a24f7f4fd4dcb9dbcb2965d7b748 inherit pro_methods_classcattle_1_1_joint_file_data_provider"><td class="mdescLeft">&#160;</td><td class="mdescRight">It sets the position of the file stream to the beginning of the data set.  <a href="classcattle_1_1_joint_file_data_provider.html#a1a52a24f7f4fd4dcb9dbcb2965d7b748">More...</a><br /></td></tr>
 <tr class="separator:a1a52a24f7f4fd4dcb9dbcb2965d7b748 inherit pro_methods_classcattle_1_1_joint_file_data_provider"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
@@ -218,7 +226,9 @@ template&lt;typename Scalar , CIFARType CIFARType = CIFAR_10&gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
-<p>It reads at most the specified number of observation-objective pairs from the provided file stream. The file stream can be expected not to have any of its fail flags set initially and to have at least 1 more character left to read.</p>
+
+<p>It reads at most the specified number of observation-objective pairs from the provided file stream. </p>
+<p>The file stream can be expected not to have any of its fail flags set initially and to have at least 1 more character left to read.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">data_stream</td><td>A reference to the file stream of the data set. </td></tr>
@@ -267,7 +277,9 @@ template&lt;typename Scalar , CIFARType CIFARType = CIFAR_10&gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
-<p>Skips at most the specified number of instances in the data stream. The file stream can be expected not to have any of its fail flags set initially.</p>
+
+<p>Skips at most the specified number of instances in the data stream. </p>
+<p>The file stream can be expected not to have any of its fail flags set initially.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">data_stream</td><td>A reference to the file stream of the data set. </td></tr>
@@ -305,7 +317,8 @@ template&lt;typename Scalar , CIFARType CIFARType = CIFAR_10&gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
-<p>A simple constant getter method for the dimensions of the objectives.</p>
+
+<p>A simple constant getter method for the dimensions of the objectives. </p>
 <dl class="section return"><dt>Returns</dt><dd>A constant reference to the dimensions of the objectives. </dd></dl>
 
 <p>Implements <a class="el" href="classcattle_1_1_data_provider.html#a797875a230c677d448455d87ee00ff78">cattle::DataProvider&lt; Scalar, Rank, Sequential &gt;</a>.</p>
@@ -336,7 +349,8 @@ template&lt;typename Scalar , CIFARType CIFARType = CIFAR_10&gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
-<p>A simple constant getter method for the dimensions of the observations.</p>
+
+<p>A simple constant getter method for the dimensions of the observations. </p>
 <dl class="section return"><dt>Returns</dt><dd>A constant reference to the dimensions of the observations. </dd></dl>
 
 <p>Implements <a class="el" href="classcattle_1_1_data_provider.html#a8f877a9733373af4c29e86eb5235d00e">cattle::DataProvider&lt; Scalar, Rank, Sequential &gt;</a>.</p>
@@ -344,7 +358,7 @@ template&lt;typename Scalar , CIFARType CIFARType = CIFAR_10&gt; </div>
 </div>
 </div>
 <hr/>The documentation for this class was generated from the following file:<ul>
-<li>C:/Users/Viktor/git/C-ATTL3/C-ATTL3/<a class="el" href="_data_provider_8hpp_source.html">DataProvider.hpp</a></li>
+<li>C:/Users/A6714/git/C-ATTL3/C-ATTL3/<a class="el" href="_data_provider_8hpp_source.html">DataProvider.hpp</a></li>
 </ul>
 </div><!-- contents -->
 <!-- start footer part -->

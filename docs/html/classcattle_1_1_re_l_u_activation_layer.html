@@ -75,6 +75,9 @@ $(function() {
 </div><!--header-->
 <div class="contents">
 
+<p>A class template representing a rectified linear unit (ReLU) activation function.  
+ <a href="classcattle_1_1_re_l_u_activation_layer.html#details">More...</a></p>
+
 <p><code>#include &lt;<a class="el" href="_layer_8hpp_source.html">Layer.hpp</a>&gt;</code></p>
 <div class="dynheader">
 Inheritance diagram for cattle::ReLUActivationLayer&lt; Scalar, Rank &gt;:</div>
@@ -82,8 +85,8 @@ Inheritance diagram for cattle::ReLUActivationLayer&lt; Scalar, Rank &gt;:</div>
  <div class="center">
   <img src="classcattle_1_1_re_l_u_activation_layer.png" usemap="#cattle::ReLUActivationLayer_3C_20Scalar_2C_20Rank_20_3E_map" alt=""/>
   <map id="cattle::ReLUActivationLayer_3C_20Scalar_2C_20Rank_20_3E_map" name="cattle::ReLUActivationLayer_3C_20Scalar_2C_20Rank_20_3E_map">
-<area href="classcattle_1_1_activation_layer.html" alt="cattle::ActivationLayer&lt; Scalar, Rank &gt;" shape="rect" coords="0,56,265,80"/>
-<area href="classcattle_1_1_layer.html" alt="cattle::Layer&lt; Scalar, Rank &gt;" shape="rect" coords="0,0,265,24"/>
+<area href="classcattle_1_1_activation_layer.html" title="An abstract class template that represents an activation function layer. " alt="cattle::ActivationLayer&lt; Scalar, Rank &gt;" shape="rect" coords="0,56,265,80"/>
+<area href="classcattle_1_1_layer.html" title="An abstract class template representing layers in a neural network. " alt="cattle::Layer&lt; Scalar, Rank &gt;" shape="rect" coords="0,0,265,24"/>
 </map>
  </div></div>
 <table class="memberdecls">
@@ -92,16 +95,22 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a413bba29e917c3de534cf9fcf7f85d11"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_re_l_u_activation_layer.html#a413bba29e917c3de534cf9fcf7f85d11">ReLUActivationLayer</a> (const <a class="el" href="classcattle_1_1_dimensions.html">Dimensions</a>&lt; std::size_t, Rank &gt; &amp;dims)</td></tr>
 <tr class="separator:a413bba29e917c3de534cf9fcf7f85d11"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a9f15affc9a835583ed6745496b1dd0c7"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classcattle_1_1_layer.html">Layer</a>&lt; Scalar, Rank &gt; *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_re_l_u_activation_layer.html#a9f15affc9a835583ed6745496b1dd0c7">clone</a> () const</td></tr>
+<tr class="memdesc:a9f15affc9a835583ed6745496b1dd0c7"><td class="mdescLeft">&#160;</td><td class="mdescRight">A constant method implementing the clone pattern.  <a href="#a9f15affc9a835583ed6745496b1dd0c7">More...</a><br /></td></tr>
 <tr class="separator:a9f15affc9a835583ed6745496b1dd0c7"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="inherit_header pub_methods_classcattle_1_1_activation_layer"><td colspan="2" onclick="javascript:toggleInherit('pub_methods_classcattle_1_1_activation_layer')"><img src="closed.png" alt="-"/>&#160;Public Member Functions inherited from <a class="el" href="classcattle_1_1_activation_layer.html">cattle::ActivationLayer&lt; Scalar, Rank &gt;</a></td></tr>
 <tr class="memitem:a4550c77e6341cd77a62a751eb129e44e inherit pub_methods_classcattle_1_1_activation_layer"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="classcattle_1_1_dimensions.html">Dimensions</a>&lt; std::size_t, Rank &gt; &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_activation_layer.html#a4550c77e6341cd77a62a751eb129e44e">get_input_dims</a> () const</td></tr>
+<tr class="memdesc:a4550c77e6341cd77a62a751eb129e44e inherit pub_methods_classcattle_1_1_activation_layer"><td class="mdescLeft">&#160;</td><td class="mdescRight">A simple constant getter method for the input dimensionality of the layer.  <a href="classcattle_1_1_activation_layer.html#a4550c77e6341cd77a62a751eb129e44e">More...</a><br /></td></tr>
 <tr class="separator:a4550c77e6341cd77a62a751eb129e44e inherit pub_methods_classcattle_1_1_activation_layer"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a30f2215af291a00e008fa09de8a32cf7 inherit pub_methods_classcattle_1_1_activation_layer"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="classcattle_1_1_dimensions.html">Dimensions</a>&lt; std::size_t, Rank &gt; &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_activation_layer.html#a30f2215af291a00e008fa09de8a32cf7">get_output_dims</a> () const</td></tr>
+<tr class="memdesc:a30f2215af291a00e008fa09de8a32cf7 inherit pub_methods_classcattle_1_1_activation_layer"><td class="mdescLeft">&#160;</td><td class="mdescRight">A simple constant getter method for the output dimensionality of the layer.  <a href="classcattle_1_1_activation_layer.html#a30f2215af291a00e008fa09de8a32cf7">More...</a><br /></td></tr>
 <tr class="separator:a30f2215af291a00e008fa09de8a32cf7 inherit pub_methods_classcattle_1_1_activation_layer"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a03f8dc5fe0d781b983e4494ab8413f5f inherit pub_methods_classcattle_1_1_activation_layer"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_activation_layer.html#a03f8dc5fe0d781b983e4494ab8413f5f">init</a> ()</td></tr>
+<tr class="memitem:a03f8dc5fe0d781b983e4494ab8413f5f inherit pub_methods_classcattle_1_1_activation_layer"><td class="memItemLeft" align="right" valign="top"><a id="a03f8dc5fe0d781b983e4494ab8413f5f"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_activation_layer.html#a03f8dc5fe0d781b983e4494ab8413f5f">init</a> ()</td></tr>
+<tr class="memdesc:a03f8dc5fe0d781b983e4494ab8413f5f inherit pub_methods_classcattle_1_1_activation_layer"><td class="mdescLeft">&#160;</td><td class="mdescRight">It initializes the layer and its parameters. <br /></td></tr>
 <tr class="separator:a03f8dc5fe0d781b983e4494ab8413f5f inherit pub_methods_classcattle_1_1_activation_layer"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="inherit_header pub_methods_classcattle_1_1_layer"><td colspan="2" onclick="javascript:toggleInherit('pub_methods_classcattle_1_1_layer')"><img src="closed.png" alt="-"/>&#160;Public Member Functions inherited from <a class="el" href="classcattle_1_1_layer.html">cattle::Layer&lt; Scalar, Rank &gt;</a></td></tr>
 <tr class="memitem:a92963ac4a339d9174a3aef3dbf3c271f inherit pub_methods_classcattle_1_1_layer"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_layer.html#a92963ac4a339d9174a3aef3dbf3c271f">is_parametric</a> ()</td></tr>
+<tr class="memdesc:a92963ac4a339d9174a3aef3dbf3c271f inherit pub_methods_classcattle_1_1_layer"><td class="mdescLeft">&#160;</td><td class="mdescRight">A method that returns whether the layer has parameters that can be learned.  <a href="classcattle_1_1_layer.html#a92963ac4a339d9174a3aef3dbf3c271f">More...</a><br /></td></tr>
 <tr class="separator:a92963ac4a339d9174a3aef3dbf3c271f inherit pub_methods_classcattle_1_1_layer"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ab7c19156cc41357b221b0b57633eaaca inherit pub_methods_classcattle_1_1_layer"><td class="memItemLeft" align="right" valign="top">virtual std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_layer.html#ab7c19156cc41357b221b0b57633eaaca">to_string</a> ()</td></tr>
 <tr class="separator:ab7c19156cc41357b221b0b57633eaaca inherit pub_methods_classcattle_1_1_layer"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -109,34 +118,48 @@ Public Member Functions</h2></td></tr>
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pro-methods"></a>
 Protected Member Functions</h2></td></tr>
 <tr class="memitem:a1643e945cda81d83b13b69fc798147a3"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classcattle_1_1_layer.html">Layer</a>&lt; Scalar, Rank &gt; *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_re_l_u_activation_layer.html#a1643e945cda81d83b13b69fc798147a3">clone_with_shared_params</a> () const</td></tr>
+<tr class="memdesc:a1643e945cda81d83b13b69fc798147a3"><td class="mdescLeft">&#160;</td><td class="mdescRight">It returns a clone of the layer instance using a reference to the original's parameters.  <a href="#a1643e945cda81d83b13b69fc798147a3">More...</a><br /></td></tr>
 <tr class="separator:a1643e945cda81d83b13b69fc798147a3"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ad9fecbc7c7a552e89eae61034ad89cf9"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_re_l_u_activation_layer.html#ad9fecbc7c7a552e89eae61034ad89cf9">empty_cache</a> ()</td></tr>
+<tr class="memitem:ad9fecbc7c7a552e89eae61034ad89cf9"><td class="memItemLeft" align="right" valign="top"><a id="ad9fecbc7c7a552e89eae61034ad89cf9"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_re_l_u_activation_layer.html#ad9fecbc7c7a552e89eae61034ad89cf9">empty_cache</a> ()</td></tr>
+<tr class="memdesc:ad9fecbc7c7a552e89eae61034ad89cf9"><td class="mdescLeft">&#160;</td><td class="mdescRight">It empties the layer's caches such as those required for the derivation of the function represented by the layer. <br /></td></tr>
 <tr class="separator:ad9fecbc7c7a552e89eae61034ad89cf9"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ae53d86eece7966ace131af941bb6e095"><td class="memItemLeft" align="right" valign="top">Root::Data&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_re_l_u_activation_layer.html#ae53d86eece7966ace131af941bb6e095">pass_forward</a> (typename Root::Data in, bool training)</td></tr>
+<tr class="memdesc:ae53d86eece7966ace131af941bb6e095"><td class="mdescLeft">&#160;</td><td class="mdescRight">It has the function represented by the layer applied to the input tensor.  <a href="#ae53d86eece7966ace131af941bb6e095">More...</a><br /></td></tr>
 <tr class="separator:ae53d86eece7966ace131af941bb6e095"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aa497fd14a3b3cab2495a6fecfdeaf116"><td class="memItemLeft" align="right" valign="top">Root::Data&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_re_l_u_activation_layer.html#aa497fd14a3b3cab2495a6fecfdeaf116">pass_back</a> (typename Root::Data out_grads)</td></tr>
+<tr class="memdesc:aa497fd14a3b3cab2495a6fecfdeaf116"><td class="mdescLeft">&#160;</td><td class="mdescRight">It back-propagates the derivative of the error function w.r.t.  <a href="#aa497fd14a3b3cab2495a6fecfdeaf116">More...</a><br /></td></tr>
 <tr class="separator:aa497fd14a3b3cab2495a6fecfdeaf116"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="inherit_header pro_methods_classcattle_1_1_activation_layer"><td colspan="2" onclick="javascript:toggleInherit('pro_methods_classcattle_1_1_activation_layer')"><img src="closed.png" alt="-"/>&#160;Protected Member Functions inherited from <a class="el" href="classcattle_1_1_activation_layer.html">cattle::ActivationLayer&lt; Scalar, Rank &gt;</a></td></tr>
 <tr class="memitem:a3733446d064f63f86f8a48bd30c0dbcb inherit pro_methods_classcattle_1_1_activation_layer"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_activation_layer.html#a3733446d064f63f86f8a48bd30c0dbcb">is_input_layer</a> () const</td></tr>
+<tr class="memdesc:a3733446d064f63f86f8a48bd30c0dbcb inherit pro_methods_classcattle_1_1_activation_layer"><td class="mdescLeft">&#160;</td><td class="mdescRight">A constant method that returns whether this layer functions as an input layer.  <a href="classcattle_1_1_activation_layer.html#a3733446d064f63f86f8a48bd30c0dbcb">More...</a><br /></td></tr>
 <tr class="separator:a3733446d064f63f86f8a48bd30c0dbcb inherit pro_methods_classcattle_1_1_activation_layer"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a34972577a520dc5e4d34d40c448f127b inherit pro_methods_classcattle_1_1_activation_layer"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_activation_layer.html#a34972577a520dc5e4d34d40c448f127b">set_input_layer</a> (bool input_layer)</td></tr>
+<tr class="memdesc:a34972577a520dc5e4d34d40c448f127b inherit pro_methods_classcattle_1_1_activation_layer"><td class="mdescLeft">&#160;</td><td class="mdescRight">Sets this instance's input layer status to the given value.  <a href="classcattle_1_1_activation_layer.html#a34972577a520dc5e4d34d40c448f127b">More...</a><br /></td></tr>
 <tr class="separator:a34972577a520dc5e4d34d40c448f127b inherit pro_methods_classcattle_1_1_activation_layer"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ab97e38ad519af40007f659120f3f7fe1 inherit pro_methods_classcattle_1_1_activation_layer"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespacecattle.html#a1d78623a47279d516750a44dbad6090b">Matrix</a>&lt; Scalar &gt; &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_activation_layer.html#ab97e38ad519af40007f659120f3f7fe1">get_params</a> ()</td></tr>
+<tr class="memdesc:ab97e38ad519af40007f659120f3f7fe1 inherit pro_methods_classcattle_1_1_activation_layer"><td class="mdescLeft">&#160;</td><td class="mdescRight">It returns a reference to the learnable parameters of the layer.  <a href="classcattle_1_1_activation_layer.html#ab97e38ad519af40007f659120f3f7fe1">More...</a><br /></td></tr>
 <tr class="separator:ab97e38ad519af40007f659120f3f7fe1 inherit pro_methods_classcattle_1_1_activation_layer"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:af9822a94073cb72e2db4de62c2126d54 inherit pro_methods_classcattle_1_1_activation_layer"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespacecattle.html#a1d78623a47279d516750a44dbad6090b">Matrix</a>&lt; Scalar &gt; &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_activation_layer.html#af9822a94073cb72e2db4de62c2126d54">get_params_grad</a> ()</td></tr>
+<tr class="memdesc:af9822a94073cb72e2db4de62c2126d54 inherit pro_methods_classcattle_1_1_activation_layer"><td class="mdescLeft">&#160;</td><td class="mdescRight">It returns a reference to the gradient of the learnable parameters of the layer.  <a href="classcattle_1_1_activation_layer.html#af9822a94073cb72e2db4de62c2126d54">More...</a><br /></td></tr>
 <tr class="separator:af9822a94073cb72e2db4de62c2126d54 inherit pro_methods_classcattle_1_1_activation_layer"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aff288c69e4af006db23d2e998d84e847 inherit pro_methods_classcattle_1_1_activation_layer"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_activation_layer.html#aff288c69e4af006db23d2e998d84e847">regularize</a> ()</td></tr>
+<tr class="memdesc:aff288c69e4af006db23d2e998d84e847 inherit pro_methods_classcattle_1_1_activation_layer"><td class="mdescLeft">&#160;</td><td class="mdescRight">It computes the derivative of the regularization function w.r.t.  <a href="classcattle_1_1_activation_layer.html#aff288c69e4af006db23d2e998d84e847">More...</a><br /></td></tr>
 <tr class="separator:aff288c69e4af006db23d2e998d84e847 inherit pro_methods_classcattle_1_1_activation_layer"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:abea6c88bbdb5cb6c77a69e2219e291b3 inherit pro_methods_classcattle_1_1_activation_layer"><td class="memItemLeft" align="right" valign="top">Scalar&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_activation_layer.html#abea6c88bbdb5cb6c77a69e2219e291b3">get_regularization_penalty</a> ()</td></tr>
+<tr class="memdesc:abea6c88bbdb5cb6c77a69e2219e291b3 inherit pro_methods_classcattle_1_1_activation_layer"><td class="mdescLeft">&#160;</td><td class="mdescRight">It calculates the regularization penalty of the layer's parameters.  <a href="classcattle_1_1_activation_layer.html#abea6c88bbdb5cb6c77a69e2219e291b3">More...</a><br /></td></tr>
 <tr class="separator:abea6c88bbdb5cb6c77a69e2219e291b3 inherit pro_methods_classcattle_1_1_activation_layer"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a2722517029fa18cb0ee1b9038a643da9 inherit pro_methods_classcattle_1_1_activation_layer"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_activation_layer.html#a2722517029fa18cb0ee1b9038a643da9">enforce_constraints</a> ()</td></tr>
+<tr class="memitem:a2722517029fa18cb0ee1b9038a643da9 inherit pro_methods_classcattle_1_1_activation_layer"><td class="memItemLeft" align="right" valign="top"><a id="a2722517029fa18cb0ee1b9038a643da9"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_activation_layer.html#a2722517029fa18cb0ee1b9038a643da9">enforce_constraints</a> ()</td></tr>
+<tr class="memdesc:a2722517029fa18cb0ee1b9038a643da9 inherit pro_methods_classcattle_1_1_activation_layer"><td class="mdescLeft">&#160;</td><td class="mdescRight">It applies constraints such as max-norm to the parameters of the layer (if applicable). <br /></td></tr>
 <tr class="separator:a2722517029fa18cb0ee1b9038a643da9 inherit pro_methods_classcattle_1_1_activation_layer"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><h3>template&lt;typename Scalar, std::size_t Rank&gt;<br />
 class cattle::ReLUActivationLayer&lt; Scalar, Rank &gt;</h3>
 
-<p>A class template representing a rectified linear unit (ReLU) activation function. ReLU layers set all negative elements of the input to 0. This function is not theoretically differentiable. </p>
+<p>A class template representing a rectified linear unit (ReLU) activation function. </p>
+<p>ReLU layers set all negative elements of the input to 0. This function is not theoretically differentiable. </p>
 </div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
 <a id="a413bba29e917c3de534cf9fcf7f85d11"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a413bba29e917c3de534cf9fcf7f85d11">&#9670;&nbsp;</a></span>ReLUActivationLayer()</h2>
@@ -197,7 +220,8 @@ template&lt;typename Scalar , std::size_t Rank&gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
-<p>A constant method implementing the clone pattern.</p>
+
+<p>A constant method implementing the clone pattern. </p>
 <dl class="section return"><dt>Returns</dt><dd>A pointer to a copy of the instance. The instance does not take ownership of the returned pointer (i.e. the caller is responsible for deleting it). </dd></dl>
 
 <p>Implements <a class="el" href="classcattle_1_1_layer.html#a46db46c62f3d46c6bbef5a482d7fcb00">cattle::Layer&lt; Scalar, Rank &gt;</a>.</p>
@@ -228,40 +252,11 @@ template&lt;typename Scalar , std::size_t Rank&gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
-<p>It returns a clone of the layer instance using a reference to the original's parameters.</p>
+
+<p>It returns a clone of the layer instance using a reference to the original's parameters. </p>
 <dl class="section return"><dt>Returns</dt><dd>A clone of the original layer instance sharing the same parameters with the original. </dd></dl>
 
 <p>Implements <a class="el" href="classcattle_1_1_layer.html#a725b8784f71f40c162f25a8820c97473">cattle::Layer&lt; Scalar, Rank &gt;</a>.</p>
-
-</div>
-</div>
-<a id="ad9fecbc7c7a552e89eae61034ad89cf9"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ad9fecbc7c7a552e89eae61034ad89cf9">&#9670;&nbsp;</a></span>empty_cache()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<div class="memtemplate">
-template&lt;typename Scalar , std::size_t Rank&gt; </div>
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">void <a class="el" href="classcattle_1_1_re_l_u_activation_layer.html">cattle::ReLUActivationLayer</a>&lt; Scalar, Rank &gt;::empty_cache </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">protected</span><span class="mlabel">virtual</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-<p>It empties the layer's caches such as those required for the derivation of the function represented by the layer. </p>
-
-<p>Reimplemented from <a class="el" href="classcattle_1_1_activation_layer.html#a3ea3acc95aef44eac905481020f3f946">cattle::ActivationLayer&lt; Scalar, Rank &gt;</a>.</p>
 
 </div>
 </div>
@@ -290,7 +285,9 @@ template&lt;typename Scalar , std::size_t Rank&gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
-<p>It back-propagates the derivative of the error function w.r.t. the output of the layer updating the gradient of its learnable parameters along the way if there are any. If there are, it also calculates the derivative of the regularization penalty w.r.t. to the layer's parameters and adds it to their gradient.</p>
+
+<p>It back-propagates the derivative of the error function w.r.t. </p>
+<p>the output of the layer updating the gradient of its learnable parameters along the way if there are any. If there are, it also calculates the derivative of the regularization penalty w.r.t. to the layer's parameters and adds it to their gradient.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">out_grads</td><td>The derivative of the loss function w.r.t. the output of the layer </td></tr>
@@ -338,7 +335,8 @@ template&lt;typename Scalar , std::size_t Rank&gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
-<p>It has the function represented by the layer applied to the input tensor.</p>
+
+<p>It has the function represented by the layer applied to the input tensor. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">in</td><td>A tensor representing a batch of observations. The observations are of the rank specified by the layer's template parameter and the input tensors rank is one greater. </td></tr>
@@ -353,7 +351,7 @@ template&lt;typename Scalar , std::size_t Rank&gt; </div>
 </div>
 </div>
 <hr/>The documentation for this class was generated from the following file:<ul>
-<li>C:/Users/Viktor/git/C-ATTL3/C-ATTL3/<a class="el" href="_layer_8hpp_source.html">Layer.hpp</a></li>
+<li>C:/Users/A6714/git/C-ATTL3/C-ATTL3/<a class="el" href="_layer_8hpp_source.html">Layer.hpp</a></li>
 </ul>
 </div><!-- contents -->
 <!-- start footer part -->

@@ -314,7 +314,7 @@ private:
  * A class template representing a fully connected layer.
  */
 template<typename Scalar, std::size_t Rank>
-class FullyConnectedLayer : public KernelLayer<Scalar,Rank> {
+class DenseLayer : public KernelLayer<Scalar,Rank> {
 	typedef Layer<Scalar,Rank> Root;
 	typedef KernelLayer<Scalar,Rank> Base;
 	typedef std::array<std::size_t,Root::DATA_RANK> RankwiseArray;
@@ -328,23 +328,23 @@ public:
 	 * @param max_norm_constraint An optional max-norm constraint. If it is 0 or less, no
 	 * constraint is applied.
 	 */
-	inline FullyConnectedLayer(const Dimensions<std::size_t,Rank>& input_dims, std::size_t output_size, WeightInitSharedPtr<Scalar> weight_init,
+	inline DenseLayer(const Dimensions<std::size_t,Rank>& input_dims, std::size_t output_size, WeightInitSharedPtr<Scalar> weight_init,
 			ParamRegSharedPtr<Scalar> weight_reg = Root::NO_PARAM_REG, Scalar max_norm_constraint = 0) :
 				Base::KernelLayer(input_dims, Dimensions<std::size_t,Rank>({ output_size }), weight_init, weight_reg,
 						input_dims.get_volume() + 1, output_size, max_norm_constraint),
 				out_conversion_dims(Base::output_dims.template promote<>()),
 				prev_out_conversion_dims(Base::input_dims.template promote<>()) { }
 	inline Root* clone() const {
-		return new FullyConnectedLayer(*this);
+		return new DenseLayer(*this);
 	}
 protected:
-	inline FullyConnectedLayer(const FullyConnectedLayer<Scalar,Rank>& layer, bool share_params = false) :
+	inline DenseLayer(const DenseLayer<Scalar,Rank>& layer, bool share_params = false) :
 			Base::KernelLayer(layer, share_params),
 			out_conversion_dims(layer.out_conversion_dims),
 			prev_out_conversion_dims(layer.prev_out_conversion_dims),
 			biased_in_mat(layer.biased_in_mat) { }
 	inline Layer<Scalar,Rank>* clone_with_shared_params() const {
-		return new FullyConnectedLayer(*this, true);
+		return new DenseLayer(*this, true);
 	}
 	inline void empty_cache() {
 		biased_in_mat = Matrix<Scalar>(0, 0);
@@ -398,10 +398,10 @@ private:
 };
 
 /**
- * A class template for convolutional layers.
+ * A class template for a 2D convolutional layer.
  */
 template<typename Scalar>
-class ConvolutionalLayer : public KernelLayer<Scalar,3> {
+class ConvolutionLayer : public KernelLayer<Scalar,3> {
 	typedef Layer<Scalar,3> Root;
 	typedef KernelLayer<Scalar,3> Base;
 	typedef std::array<std::size_t,4> RankwiseArray;
@@ -429,7 +429,7 @@ public:
 	 * @param max_norm_constraint An optional max-norm constraint. If it is 0 or less, no
 	 * constraint is applied.
 	 */
-	inline ConvolutionalLayer(const Dimensions<std::size_t,3>& input_dims, std::size_t filters, WeightInitSharedPtr<Scalar> weight_init,
+	inline ConvolutionLayer(const Dimensions<std::size_t,3>& input_dims, std::size_t filters, WeightInitSharedPtr<Scalar> weight_init,
 			ParamRegSharedPtr<Scalar> weight_reg = Root::NO_PARAM_REG, std::size_t receptor_height = 3, std::size_t receptor_width = 3,
 			std::size_t vertical_padding = 1, std::size_t horizontal_padding = 1, std::size_t vertical_stride = 1,
 			std::size_t horizontal_stride = 1, std::size_t vertical_dilation = 0, std::size_t horizontal_dilation = 0,
@@ -470,10 +470,10 @@ public:
 				input_dims(2) + 2 * horizontal_padding >= dil_receptor_width);
 	}
 	inline Root* clone() const {
-		return new ConvolutionalLayer(*this);
+		return new ConvolutionLayer(*this);
 	}
 protected:
-	inline ConvolutionalLayer(const ConvolutionalLayer<Scalar>& layer, bool share_params = false) :
+	inline ConvolutionLayer(const ConvolutionLayer<Scalar>& layer, bool share_params = false) :
 			Base::KernelLayer(layer, share_params),
 			filters(layer.filters),
 			receptor_height(layer.receptor_height),
@@ -497,7 +497,7 @@ protected:
 			paddings(layer.paddings),
 			biased_in_conv_mat(layer.biased_in_conv_mat) { }
 	inline Root* clone_with_shared_params() const {
-		return new ConvolutionalLayer(*this, true);
+		return new ConvolutionLayer(*this, true);
 	}
 	inline void empty_cache() {
 		biased_in_conv_mat = Matrix<Scalar>(0, 0);
@@ -640,10 +640,10 @@ private:
 };
 
 /**
- * A class template for transposed convolutional layers.
+ * A class template for a transposed 2D convolutional layer.
  */
 template<typename Scalar>
-class DeconvolutionalLayer : public KernelLayer<Scalar,3> {
+class DeconvolutionLayer : public KernelLayer<Scalar,3> {
 	typedef Layer<Scalar,3> Root;
 	typedef KernelLayer<Scalar,3> Base;
 	typedef std::array<std::size_t,4> RankwiseArray;
@@ -669,7 +669,7 @@ public:
 	 * @param max_norm_constraint An optional max-norm constraint. If it is 0 or less, no
 	 * constraint is applied.
 	 */
-	inline DeconvolutionalLayer(const Dimensions<std::size_t,3>& input_dims, std::size_t filters, WeightInitSharedPtr<Scalar> weight_init,
+	inline DeconvolutionLayer(const Dimensions<std::size_t,3>& input_dims, std::size_t filters, WeightInitSharedPtr<Scalar> weight_init,
 			ParamRegSharedPtr<Scalar> weight_reg = Root::NO_PARAM_REG, std::size_t receptor_height = 3, std::size_t receptor_width = 3,
 			std::size_t vertical_padding = 1, std::size_t horizontal_padding = 1, std::size_t vertical_stride = 1,
 			std::size_t horizontal_stride = 1, std::size_t vertical_dilation = 0, std::size_t horizontal_dilation = 0,
@@ -708,10 +708,10 @@ public:
 				Base::output_dims(2) + 2 * horizontal_padding >= dil_receptor_width);
 	}
 	inline Root* clone() const {
-		return new DeconvolutionalLayer(*this);
+		return new DeconvolutionLayer(*this);
 	}
 protected:
-	inline DeconvolutionalLayer(const DeconvolutionalLayer<Scalar>& layer, bool share_params = false) :
+	inline DeconvolutionLayer(const DeconvolutionLayer<Scalar>& layer, bool share_params = false) :
 			Base::KernelLayer(layer, share_params),
 			filters(layer.filters),
 			receptor_height(layer.receptor_height),
@@ -735,7 +735,7 @@ protected:
 			paddings(layer.paddings),
 			biased_in_mat(layer.biased_in_mat) { }
 	inline Root* clone_with_shared_params() const {
-		return new DeconvolutionalLayer(*this, true);
+		return new DeconvolutionLayer(*this, true);
 	}
 	inline void empty_cache() {
 		biased_in_mat = Matrix<Scalar>(0, 0);
@@ -967,7 +967,7 @@ private:
  * A class template that represents a linearly scaling activation layer.
  */
 template<typename Scalar, std::size_t Rank>
-class ScalingActivationLayer : public ActivationLayer<Scalar,Rank> {
+class ScaledActivationLayer : public ActivationLayer<Scalar,Rank> {
 	typedef Layer<Scalar,Rank> Root;
 	typedef ActivationLayer<Scalar,Rank> Base;
 public:
@@ -975,11 +975,11 @@ public:
 	 * @param dims The dimensionality of the input tensor.
 	 * @param scale The factor by which the input is to be scaled.
 	 */
-	inline ScalingActivationLayer(const Dimensions<std::size_t,Rank>& dims, Scalar scale) :
+	inline ScaledActivationLayer(const Dimensions<std::size_t,Rank>& dims, Scalar scale) :
 			ActivationLayer<Scalar,Rank>::ActivationLayer(dims),
 			scale(scale) { }
 	inline Layer<Scalar,Rank>* clone() const {
-		return new ScalingActivationLayer(*this);
+		return new ScaledActivationLayer(*this);
 	}
 protected:
 	inline Layer<Scalar,Rank>* clone_with_shared_params() const {
@@ -1486,7 +1486,7 @@ private:
  * An abstract class template representing a pooling layer for batches of rank 3 data.
  */
 template<typename Scalar>
-class PoolingLayer : public Layer<Scalar,3> {
+class PoolLayer : public Layer<Scalar,3> {
 	typedef Layer<Scalar,3> Base;
 public:
 	inline const Dimensions<std::size_t,3>& get_input_dims() const {
@@ -1500,7 +1500,7 @@ protected:
 	typedef std::array<std::size_t,4> RankwiseArray;
 	typedef std::array<std::size_t,2> ReductionRanksArray;
 	typedef Tensor<Scalar,2> ReducedData;
-	inline PoolingLayer(const Dimensions<std::size_t,3>& input_dims, std::size_t receptor_height, std::size_t receptor_width,
+	inline PoolLayer(const Dimensions<std::size_t,3>& input_dims, std::size_t receptor_height, std::size_t receptor_width,
 			std::size_t vertical_stride, std::size_t horizontal_stride, std::size_t vertical_dilation,
 			std::size_t horizontal_dilation) :
 				input_dims(input_dims),
@@ -1670,9 +1670,9 @@ private:
  * sums.
  */
 template<typename Scalar>
-class SumPoolingLayer : public PoolingLayer<Scalar> {
+class SumPoolLayer : public PoolLayer<Scalar> {
 	typedef Layer<Scalar,3> Root;
-	typedef PoolingLayer<Scalar> Base;
+	typedef PoolLayer<Scalar> Base;
 public:
 	/**
 	 * @param input_dims The dimensionality of the input tensor.
@@ -1685,13 +1685,13 @@ public:
 	 * @param vertical_dilation The extent of the vertical dilation to apply to the receptor field.
 	 * @param horizontal_dilation The extent of the horizontal dilation to apply to the receptor field.
 	 */
-	inline SumPoolingLayer(const Dimensions<std::size_t,3>& input_dims, std::size_t receptor_height = 2,
+	inline SumPoolLayer(const Dimensions<std::size_t,3>& input_dims, std::size_t receptor_height = 2,
 			std::size_t receptor_width = 2, std::size_t vertical_stride = 2, std::size_t horizontal_stride = 2,
 			std::size_t vertical_dilation = 0, std::size_t horizontal_dilation = 0) :
-				Base::PoolingLayer(input_dims, receptor_height, receptor_width, vertical_stride,
+				Base::PoolLayer(input_dims, receptor_height, receptor_width, vertical_stride,
 						horizontal_stride, vertical_dilation, horizontal_dilation) { }
 	inline Root* clone() const {
-		return new SumPoolingLayer(*this);
+		return new SumPoolLayer(*this);
 	}
 protected:
 	inline Root* clone_with_shared_params() const {
@@ -1713,9 +1713,9 @@ protected:
  * means.
  */
 template<typename Scalar>
-class MeanPoolingLayer : public PoolingLayer<Scalar> {
+class MeanPoolLayer : public PoolLayer<Scalar> {
 	typedef Layer<Scalar,3> Root;
-	typedef PoolingLayer<Scalar> Base;
+	typedef PoolLayer<Scalar> Base;
 public:
 	/**
 	 * @param input_dims The dimensionality of the input tensor.
@@ -1728,14 +1728,14 @@ public:
 	 * @param vertical_dilation The extent of the vertical dilation to apply to the receptor field.
 	 * @param horizontal_dilation The extent of the horizontal dilation to apply to the receptor field.
 	 */
-	inline MeanPoolingLayer(const Dimensions<std::size_t,3>& input_dims, std::size_t receptor_height = 2,
+	inline MeanPoolLayer(const Dimensions<std::size_t,3>& input_dims, std::size_t receptor_height = 2,
 			std::size_t receptor_width = 2, std::size_t vertical_stride = 2, std::size_t horizontal_stride = 2,
 			std::size_t vertical_dilation = 0, std::size_t horizontal_dilation = 0) :
-				Base::PoolingLayer(input_dims, receptor_height, receptor_width, vertical_stride,
+				Base::PoolLayer(input_dims, receptor_height, receptor_width, vertical_stride,
 						horizontal_stride, vertical_dilation, horizontal_dilation),
 				receptor_area(receptor_height * receptor_width) { }
 	inline Root* clone() const {
-		return new MeanPoolingLayer(*this);
+		return new MeanPoolLayer(*this);
 	}
 protected:
 	inline Root* clone_with_shared_params() const {
@@ -1759,9 +1759,9 @@ private:
  * maximums.
  */
 template<typename Scalar>
-class MaxPoolingLayer : public PoolingLayer<Scalar> {
+class MaxPoolLayer : public PoolLayer<Scalar> {
 	typedef Layer<Scalar,3> Root;
-	typedef PoolingLayer<Scalar> Base;
+	typedef PoolLayer<Scalar> Base;
 public:
 	/**
 	 * @param input_dims The dimensionality of the input tensor.
@@ -1774,13 +1774,13 @@ public:
 	 * @param vertical_dilation The extent of the vertical dilation to apply to the receptor field.
 	 * @param horizontal_dilation The extent of the horizontal dilation to apply to the receptor field.
 	 */
-	inline MaxPoolingLayer(const Dimensions<std::size_t,3>& input_dims, std::size_t receptor_height = 2,
+	inline MaxPoolLayer(const Dimensions<std::size_t,3>& input_dims, std::size_t receptor_height = 2,
 			std::size_t receptor_width = 2, std::size_t vertical_stride = 2, std::size_t horizontal_stride = 2,
 			std::size_t vertical_dilation = 0, std::size_t horizontal_dilation = 0) :
-				Base::PoolingLayer(input_dims, receptor_height, receptor_width, vertical_stride,
+				Base::PoolLayer(input_dims, receptor_height, receptor_width, vertical_stride,
 						horizontal_stride, vertical_dilation, horizontal_dilation) { }
 	inline Root* clone() const {
-		return new MaxPoolingLayer(*this);
+		return new MaxPoolLayer(*this);
 	}
 protected:
 	inline Root* clone_with_shared_params() const {
@@ -1838,6 +1838,103 @@ protected:
 private:
 	// Cache
 	std::vector<std::vector<unsigned>> max_inds;
+};
+
+/**
+ * A class template representing a broadcasting layer that repeats the contents of its input tensors
+ * along its ranks.
+ */
+template<typename Scalar, std::size_t Rank>
+class BroadcastLayer : public Layer<Scalar,Rank> {
+	typedef Layer<Scalar,Rank> Base;
+	typedef std::array<std::size_t,Rank + 1> RankwiseArray;
+public:
+	/**
+	 * @param input_dims The nominal input dimensions of the layer.
+	 * @param broadcast The number of times the input tensor's contents are
+	 * repeated along each rank. All elements should be greater than 0.
+	 */
+	inline BroadcastLayer(const Dimensions<std::size_t,Rank>& input_dims,
+			const Dimensions<std::size_t,Rank>& broadcast) :
+				input_dims(input_dims),
+				output_dims(input_dims * broadcast),
+				broadcast(broadcast.template promote<>()),
+				params(0, 0),
+				params_grad(0, 0) {
+		slice_offsets.fill(0);
+		for (std::size_t i = 0; i < Rank; ++i)
+			assert(broadcast(i) > 0);
+	}
+	inline Base* clone() const {
+		return new BroadcastLayer(*this);
+	}
+	inline const Dimensions<std::size_t,Rank>& get_input_dims() const {
+		return input_dims;
+	}
+	inline const Dimensions<std::size_t,Rank>& get_output_dims() const {
+		return output_dims;
+	}
+	inline void init() { }
+protected:
+	inline Base* clone_with_shared_params() const {
+		return clone();
+	}
+	inline bool is_input_layer() const {
+		return input_layer;
+	}
+	inline void set_input_layer(bool input_layer) {
+		this->input_layer = input_layer;
+	}
+	inline void empty_cache() { }
+	inline Matrix<Scalar>& get_params() {
+		return params;
+	}
+	inline Matrix<Scalar>& get_params_grad() {
+		return params_grad;
+	}
+	inline void regularize() { }
+	inline Scalar get_regularization_penalty() {
+		return 0;
+	}
+	inline void enforce_constraints() { }
+	inline typename Base::Data pass_forward(typename Base::Data in, bool training) {
+		assert((Dimensions<std::size_t,Base::DATA_RANK>(in.dimensions()).template demote<>()) == input_dims);
+		assert(in.dimension(0) > 0);
+		rows = in.dimension(0);
+		return in.broadcast(broadcast);
+	}
+	inline typename Base::Data pass_back(typename Base::Data out_grads) {
+		assert((Dimensions<std::size_t,Base::DATA_RANK>(out_grads.dimensions()).template demote<>()) == output_dims);
+		assert(out_grads.dimension(0) > 0 && rows == out_grads.dimension(0));
+		typename Base::Data prev_out_grads = std::move(out_grads);
+		slice_offsets.fill(0);
+		slice_extents = output_dims.template promote<>();
+		slice_extents[0] = rows;
+		for (std::size_t i = 0; i < Rank; ++i) {
+			if (broadcast[i + 1] <= 1)
+				continue;
+			slice_extents[i + 1] = input_dims(i);
+			typename Base::Data work_tensor(slice_extents);
+			work_tensor.setZero();
+			for (std::size_t j = 0; j < broadcast[i + 1]; ++j) {
+				work_tensor += prev_out_grads.slice(slice_offsets, slice_extents);
+				slice_offsets[i + 1] += input_dims(i);
+			}
+			slice_offsets[i + 1] = 0;
+			prev_out_grads = std::move(work_tensor);
+		}
+		return prev_out_grads;
+	}
+private:
+	const Dimensions<std::size_t,Rank> input_dims;
+	const Dimensions<std::size_t,Rank> output_dims;
+	RankwiseArray broadcast;
+	RankwiseArray slice_offsets;
+	RankwiseArray slice_extents;
+	std::size_t rows;
+	bool input_layer;
+	Matrix<Scalar> params;
+	Matrix<Scalar> params_grad;
 };
 
 /**
@@ -2254,6 +2351,84 @@ private:
 	Matrix<Scalar> params_grad;
 	// Staged computation cache.
 	typename Base::Data dropout_mask;
+};
+
+/**
+ * A class template representing a reshaping layer that outputs a reshaped copy of the input
+ * tensor with the same volume. The data backing the tensor is not shifted in any way.
+ */
+template<typename Scalar, std::size_t Rank>
+class ReshapeLayer : public Layer<Scalar,Rank> {
+	typedef Layer<Scalar,Rank> Base;
+	typedef std::array<std::size_t,Rank + 1> RankwiseArray;
+public:
+	/**
+	 * @param input_dims The nominal input dimensions of the layer.
+	 * @param output_dims The dimensions of the reshaped tensor. The output tensor must have
+	 * the same volume as the input tensor.
+	 */
+	inline ReshapeLayer(const Dimensions<std::size_t,Rank>& input_dims,
+			const Dimensions<std::size_t,Rank>& output_dims) :
+				input_dims(input_dims),
+				output_dims(output_dims),
+				input_conversion_dims(output_dims.template promote<>()),
+				output_conversion_dims(input_dims.template promote<>()),
+				params(0, 0),
+				params_grad(0, 0) {
+		assert(input_dims.get_volume() == output_dims.get_volume());
+	}
+	inline Base* clone() const {
+		return new ReshapeLayer(*this);
+	}
+	inline const Dimensions<std::size_t,Rank>& get_input_dims() const {
+		return input_dims;
+	}
+	inline const Dimensions<std::size_t,Rank>& get_output_dims() const {
+		return output_dims;
+	}
+	inline void init() { }
+protected:
+	inline Base* clone_with_shared_params() const {
+		return clone();
+	}
+	inline bool is_input_layer() const {
+		return input_layer;
+	}
+	inline void set_input_layer(bool input_layer) {
+		this->input_layer = input_layer;
+	}
+	inline void empty_cache() { }
+	inline Matrix<Scalar>& get_params() {
+		return params;
+	}
+	inline Matrix<Scalar>& get_params_grad() {
+		return params_grad;
+	}
+	inline void regularize() { }
+	inline Scalar get_regularization_penalty() {
+		return 0;
+	}
+	inline void enforce_constraints() { }
+	inline typename Base::Data pass_forward(typename Base::Data in, bool training) {
+		assert((Dimensions<std::size_t,Base::DATA_RANK>(in.dimensions()).template demote<>()) == input_dims);
+		assert(in.dimension(0) > 0);
+		input_conversion_dims[0] = in.dimension(0);
+		return in.reshape(input_conversion_dims);
+	}
+	inline typename Base::Data pass_back(typename Base::Data out_grads) {
+		assert((Dimensions<std::size_t,Base::DATA_RANK>(out_grads.dimensions()).template demote<>()) == output_dims);
+		assert(out_grads.dimension(0) > 0 && input_conversion_dims[0] == out_grads.dimension(0));
+		output_conversion_dims[0] = input_conversion_dims[0];
+		return out_grads.reshape(output_conversion_dims);
+	}
+private:
+	const Dimensions<std::size_t,Rank> input_dims;
+	const Dimensions<std::size_t,Rank> output_dims;
+	RankwiseArray input_conversion_dims;
+	RankwiseArray output_conversion_dims;
+	bool input_layer;
+	Matrix<Scalar> params;
+	Matrix<Scalar> params_grad;
 };
 
 } /* namespace cattle */

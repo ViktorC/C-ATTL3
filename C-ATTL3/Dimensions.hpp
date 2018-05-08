@@ -351,6 +351,11 @@ public:
 	operator-(const Other<OtherDerived>& dims) const {
 		return BinaryDimExpression<IndexType,Rank,Self,Other<OtherDerived>,SubOp<IndexType>>(*this, dims);
 	}
+	template<typename OtherDerived>
+	inline BinaryDimExpression<IndexType,Rank,Self,Other<OtherDerived>,MulOp<IndexType>>
+	operator*(const Other<OtherDerived>& dims) const {
+		return BinaryDimExpression<IndexType,Rank,Self,Other<OtherDerived>,MulOp<IndexType>>(*this, dims);
+	}
 	inline UnaryDimExpression<IndexType,Rank,Self,SumOp<IndexType>>
 	operator+(const IndexType& n) const {
 		return UnaryDimExpression<IndexType,Rank,Self,SumOp<IndexType>>(*this, n);

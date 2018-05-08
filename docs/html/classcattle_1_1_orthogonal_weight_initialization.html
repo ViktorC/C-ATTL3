@@ -75,6 +75,9 @@ $(function() {
 </div><!--header-->
 <div class="contents">
 
+<p>A class template representing the orthogonal weight initialization method.  
+ <a href="classcattle_1_1_orthogonal_weight_initialization.html#details">More...</a></p>
+
 <p><code>#include &lt;<a class="el" href="_weight_initialization_8hpp_source.html">WeightInitialization.hpp</a>&gt;</code></p>
 <div class="dynheader">
 Inheritance diagram for cattle::OrthogonalWeightInitialization&lt; Scalar &gt;:</div>
@@ -82,8 +85,8 @@ Inheritance diagram for cattle::OrthogonalWeightInitialization&lt; Scalar &gt;:<
  <div class="center">
   <img src="classcattle_1_1_orthogonal_weight_initialization.png" usemap="#cattle::OrthogonalWeightInitialization_3C_20Scalar_20_3E_map" alt=""/>
   <map id="cattle::OrthogonalWeightInitialization_3C_20Scalar_20_3E_map" name="cattle::OrthogonalWeightInitialization_3C_20Scalar_20_3E_map">
-<area href="classcattle_1_1_gaussian_weight_initialization.html" alt="cattle::GaussianWeightInitialization&lt; Scalar &gt;" shape="rect" coords="0,56,275,80"/>
-<area href="classcattle_1_1_weight_initialization.html" alt="cattle::WeightInitialization&lt; Scalar &gt;" shape="rect" coords="0,0,275,24"/>
+<area href="classcattle_1_1_gaussian_weight_initialization.html" title="An abstract class template representing a random weight initialization method that samples from a Gau..." alt="cattle::GaussianWeightInitialization&lt; Scalar &gt;" shape="rect" coords="0,56,275,80"/>
+<area href="classcattle_1_1_weight_initialization.html" title="An abstract class template for different weight initialization methods for kernel layers..." alt="cattle::WeightInitialization&lt; Scalar &gt;" shape="rect" coords="0,0,275,24"/>
 </map>
  </div></div>
 <table class="memberdecls">
@@ -92,11 +95,13 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a00998ff9be4fa047fb2505450af2ee4f"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_orthogonal_weight_initialization.html#a00998ff9be4fa047fb2505450af2ee4f">OrthogonalWeightInitialization</a> (Scalar <a class="el" href="classcattle_1_1_orthogonal_weight_initialization.html#a3d76302db391c53346a2a2783ba4b2db">sd</a>=1, Scalar bias=0)</td></tr>
 <tr class="separator:a00998ff9be4fa047fb2505450af2ee4f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ab14fdabb549f5f5ca36e2415b9823890"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_orthogonal_weight_initialization.html#ab14fdabb549f5f5ca36e2415b9823890">apply</a> (<a class="el" href="namespacecattle.html#a1d78623a47279d516750a44dbad6090b">Matrix</a>&lt; Scalar &gt; &amp;weights) const</td></tr>
+<tr class="memdesc:ab14fdabb549f5f5ca36e2415b9823890"><td class="mdescLeft">&#160;</td><td class="mdescRight">It initializes the values of the kernel.  <a href="#ab14fdabb549f5f5ca36e2415b9823890">More...</a><br /></td></tr>
 <tr class="separator:ab14fdabb549f5f5ca36e2415b9823890"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pro-methods"></a>
 Protected Member Functions</h2></td></tr>
 <tr class="memitem:a3d76302db391c53346a2a2783ba4b2db"><td class="memItemLeft" align="right" valign="top">Scalar&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_orthogonal_weight_initialization.html#a3d76302db391c53346a2a2783ba4b2db">sd</a> (unsigned fan_ins, unsigned fan_outs) const</td></tr>
+<tr class="memdesc:a3d76302db391c53346a2a2783ba4b2db"><td class="mdescLeft">&#160;</td><td class="mdescRight">It computes the standard deviation of the distribution to sample from.  <a href="#a3d76302db391c53346a2a2783ba4b2db">More...</a><br /></td></tr>
 <tr class="separator:a3d76302db391c53346a2a2783ba4b2db"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
@@ -176,7 +181,9 @@ template&lt;typename Scalar &gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
-<p>It initializes the values of the kernel. It is assumed that the last row of the kernel is the bias row and is thus treated differently.</p>
+
+<p>It initializes the values of the kernel. </p>
+<p>It is assumed that the last row of the kernel is the bias row and is thus treated differently.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">weights</td><td>A reference to the weight matrix. </td></tr>
@@ -223,7 +230,8 @@ template&lt;typename Scalar &gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
-<p>It computes the standard deviation of the distribution to sample from.</p>
+
+<p>It computes the standard deviation of the distribution to sample from. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">fan_ins</td><td>The input size of the kernel (the number of rows in the weight matrix excluding the bias row). </td></tr>
@@ -238,7 +246,7 @@ template&lt;typename Scalar &gt; </div>
 </div>
 </div>
 <hr/>The documentation for this class was generated from the following file:<ul>
-<li>C:/Users/Viktor/git/C-ATTL3/C-ATTL3/<a class="el" href="_weight_initialization_8hpp_source.html">WeightInitialization.hpp</a></li>
+<li>C:/Users/A6714/git/C-ATTL3/C-ATTL3/<a class="el" href="_weight_initialization_8hpp_source.html">WeightInitialization.hpp</a></li>
 </ul>
 </div><!-- contents -->
 <!-- start footer part -->

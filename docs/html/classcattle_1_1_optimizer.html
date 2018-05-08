@@ -76,6 +76,9 @@ $(function() {
 </div><!--header-->
 <div class="contents">
 
+<p>An abstract class template for neural network optimizer algorithm implementations.  
+ <a href="classcattle_1_1_optimizer.html#details">More...</a></p>
+
 <p><code>#include &lt;<a class="el" href="_optimizer_8hpp_source.html">Optimizer.hpp</a>&gt;</code></p>
 <div class="dynheader">
 Inheritance diagram for cattle::Optimizer&lt; Scalar, Rank, Sequential &gt;:</div>
@@ -83,54 +86,68 @@ Inheritance diagram for cattle::Optimizer&lt; Scalar, Rank, Sequential &gt;:</di
  <div class="center">
   <img src="classcattle_1_1_optimizer.png" usemap="#cattle::Optimizer_3C_20Scalar_2C_20Rank_2C_20Sequential_20_3E_map" alt=""/>
   <map id="cattle::Optimizer_3C_20Scalar_2C_20Rank_2C_20Sequential_20_3E_map" name="cattle::Optimizer_3C_20Scalar_2C_20Rank_2C_20Sequential_20_3E_map">
-<area href="classcattle_1_1_s_g_d_optimizer.html" alt="cattle::SGDOptimizer&lt; Scalar, Rank, Sequential &gt;" shape="rect" coords="1205,56,1677,80"/>
-<area href="classcattle_1_1_adadelta_optimizer.html" alt="cattle::AdadeltaOptimizer&lt; Scalar, Rank, Sequential &gt;" shape="rect" coords="0,112,472,136"/>
-<area href="classcattle_1_1_adagrad_optimizer.html" alt="cattle::AdagradOptimizer&lt; Scalar, Rank, Sequential &gt;" shape="rect" coords="482,112,954,136"/>
-<area href="classcattle_1_1_adam_optimizer.html" alt="cattle::AdamOptimizer&lt; Scalar, Rank, Sequential &gt;" shape="rect" coords="1205,112,1677,136"/>
-<area href="classcattle_1_1_momentum_accelerated_s_g_d_optimizer.html" alt="cattle::MomentumAcceleratedSGDOptimizer&lt; Scalar, Rank, Sequential &gt;" shape="rect" coords="1928,112,2400,136"/>
-<area href="classcattle_1_1_vanilla_s_g_d_optimizer.html" alt="cattle::VanillaSGDOptimizer&lt; Scalar, Rank, Sequential &gt;" shape="rect" coords="2410,112,2882,136"/>
-<area href="classcattle_1_1_r_m_s_prop_optimizer.html" alt="cattle::RMSPropOptimizer&lt; Scalar, Rank, Sequential &gt;" shape="rect" coords="482,168,954,192"/>
-<area href="classcattle_1_1_ada_max_optimizer.html" alt="cattle::AdaMaxOptimizer&lt; Scalar, Rank, Sequential &gt;" shape="rect" coords="964,168,1436,192"/>
-<area href="classcattle_1_1_nadam_optimizer.html" alt="cattle::NadamOptimizer&lt; Scalar, Rank, Sequential &gt;" shape="rect" coords="1446,168,1918,192"/>
-<area href="classcattle_1_1_nesterov_momentum_accelerated_s_g_d_optimizer.html" alt="cattle::NesterovMomentumAcceleratedSGDOptimizer&lt; Scalar, Rank, Sequential &gt;" shape="rect" coords="1928,168,2400,192"/>
+<area href="classcattle_1_1_s_g_d_optimizer.html" title="An abstract class template for stochastic gradient descent (SGD) optimizers. " alt="cattle::SGDOptimizer&lt; Scalar, Rank, Sequential &gt;" shape="rect" coords="1205,56,1677,80"/>
+<area href="classcattle_1_1_adadelta_optimizer.html" title="A class template for the Adadelta optimization algorithm. " alt="cattle::AdadeltaOptimizer&lt; Scalar, Rank, Sequential &gt;" shape="rect" coords="0,112,472,136"/>
+<area href="classcattle_1_1_adagrad_optimizer.html" title="A class template for the Adagrad optimization algorithm. " alt="cattle::AdagradOptimizer&lt; Scalar, Rank, Sequential &gt;" shape="rect" coords="482,112,954,136"/>
+<area href="classcattle_1_1_adam_optimizer.html" title="A class template for the Adam optimization algorithm. " alt="cattle::AdamOptimizer&lt; Scalar, Rank, Sequential &gt;" shape="rect" coords="1205,112,1677,136"/>
+<area href="classcattle_1_1_momentum_accelerated_s_g_d_optimizer.html" title="A class template for a momentum accelerated SGD optimizer. " alt="cattle::MomentumAcceleratedSGDOptimizer&lt; Scalar, Rank, Sequential &gt;" shape="rect" coords="1928,112,2400,136"/>
+<area href="classcattle_1_1_vanilla_s_g_d_optimizer.html" title="A class template for a vanilla SGD optimizer. " alt="cattle::VanillaSGDOptimizer&lt; Scalar, Rank, Sequential &gt;" shape="rect" coords="2410,112,2882,136"/>
+<area href="classcattle_1_1_r_m_s_prop_optimizer.html" title="A class template for the RMSProp optimizer. " alt="cattle::RMSPropOptimizer&lt; Scalar, Rank, Sequential &gt;" shape="rect" coords="482,168,954,192"/>
+<area href="classcattle_1_1_ada_max_optimizer.html" title="A class template for the AdaMax optimization algorithm. " alt="cattle::AdaMaxOptimizer&lt; Scalar, Rank, Sequential &gt;" shape="rect" coords="964,168,1436,192"/>
+<area href="classcattle_1_1_nadam_optimizer.html" title="A class template for the Nesterov accelerated Adam (Nadam) optimization algorithm. " alt="cattle::NadamOptimizer&lt; Scalar, Rank, Sequential &gt;" shape="rect" coords="1446,168,1918,192"/>
+<area href="classcattle_1_1_nesterov_momentum_accelerated_s_g_d_optimizer.html" title="A class template for Nesterov momentum accelerated SGD optimizers. " alt="cattle::NesterovMomentumAcceleratedSGDOptimizer&lt; Scalar, Rank, Sequential &gt;" shape="rect" coords="1928,168,2400,192"/>
 </map>
  </div></div>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
 <tr class="memitem:ae0abffe6692149793d0595f303b3e629"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_optimizer.html#ae0abffe6692149793d0595f303b3e629">verify_gradients</a> (<a class="el" href="classcattle_1_1_neural_network.html">Net</a> &amp;net, <a class="el" href="classcattle_1_1_data_provider.html">Provider</a> &amp;provider, bool verbose=true, Scalar step_size=<a class="el" href="classcattle_1_1internal_1_1_numeric_utils.html">internal::NumericUtils</a>&lt; Scalar &gt;::EPSILON3/2, Scalar abs_epsilon=<a class="el" href="classcattle_1_1internal_1_1_numeric_utils.html">internal::NumericUtils</a>&lt; Scalar &gt;::EPSILON2, Scalar rel_epsilon=<a class="el" href="classcattle_1_1internal_1_1_numeric_utils.html">internal::NumericUtils</a>&lt; Scalar &gt;::EPSILON3) const</td></tr>
+<tr class="memdesc:ae0abffe6692149793d0595f303b3e629"><td class="mdescLeft">&#160;</td><td class="mdescRight">It performs a gradient check to verify the correctness of the neural network and layer implementations.  <a href="#ae0abffe6692149793d0595f303b3e629">More...</a><br /></td></tr>
 <tr class="separator:ae0abffe6692149793d0595f303b3e629"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ac25499c3dfbb1995dcbe747868a26c8c"><td class="memItemLeft" align="right" valign="top">Scalar&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_optimizer.html#ac25499c3dfbb1995dcbe747868a26c8c">optimize</a> (<a class="el" href="classcattle_1_1_neural_network.html">Net</a> &amp;net, <a class="el" href="classcattle_1_1_data_provider.html">Provider</a> &amp;training_prov, <a class="el" href="classcattle_1_1_data_provider.html">Provider</a> &amp;test_prov, unsigned epochs, unsigned early_stop=0, bool verbose=true)</td></tr>
+<tr class="memdesc:ac25499c3dfbb1995dcbe747868a26c8c"><td class="mdescLeft">&#160;</td><td class="mdescRight">It optimizes the specified neural network using the given data providers according to the optimizers loss function.  <a href="#ac25499c3dfbb1995dcbe747868a26c8c">More...</a><br /></td></tr>
 <tr class="separator:ac25499c3dfbb1995dcbe747868a26c8c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pro-methods"></a>
 Protected Member Functions</h2></td></tr>
 <tr class="memitem:a5ea3b9b9173bf065c6d3f3978b57b823"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_optimizer.html#a5ea3b9b9173bf065c6d3f3978b57b823">fit</a> (<a class="el" href="classcattle_1_1_neural_network.html">Net</a> &amp;net)=0</td></tr>
+<tr class="memdesc:a5ea3b9b9173bf065c6d3f3978b57b823"><td class="mdescLeft">&#160;</td><td class="mdescRight">It fits the optimizer to the neural network.  <a href="#a5ea3b9b9173bf065c6d3f3978b57b823">More...</a><br /></td></tr>
 <tr class="separator:a5ea3b9b9173bf065c6d3f3978b57b823"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a35b171a49a6cfc74b563983c8409d5c0"><td class="memItemLeft" align="right" valign="top">virtual Scalar&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_optimizer.html#a35b171a49a6cfc74b563983c8409d5c0">train</a> (<a class="el" href="classcattle_1_1_neural_network.html">Net</a> &amp;net, <a class="el" href="classcattle_1_1_data_provider.html">Provider</a> &amp;training_prov, unsigned epoch, bool verbose)=0</td></tr>
+<tr class="memdesc:a35b171a49a6cfc74b563983c8409d5c0"><td class="mdescLeft">&#160;</td><td class="mdescRight">It trains the specified neural network for a single epoch on data provided by the specified data provider.  <a href="#a35b171a49a6cfc74b563983c8409d5c0">More...</a><br /></td></tr>
 <tr class="separator:a35b171a49a6cfc74b563983c8409d5c0"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a726fb2f87d27a6fddfc6c5f972352252"><td class="memItemLeft" align="right" valign="top">virtual Scalar&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_optimizer.html#a726fb2f87d27a6fddfc6c5f972352252">test</a> (<a class="el" href="classcattle_1_1_neural_network.html">Net</a> &amp;net, <a class="el" href="classcattle_1_1_data_provider.html">Provider</a> &amp;test_prov, unsigned epoch, bool verbose)=0</td></tr>
+<tr class="memdesc:a726fb2f87d27a6fddfc6c5f972352252"><td class="mdescLeft">&#160;</td><td class="mdescRight">It tests the specified neural network for a single epoch on the test data provided by the specified data provider.  <a href="#a726fb2f87d27a6fddfc6c5f972352252">More...</a><br /></td></tr>
 <tr class="separator:a726fb2f87d27a6fddfc6c5f972352252"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pro-static-methods"></a>
 Static Protected Member Functions</h2></td></tr>
 <tr class="memitem:a0a13bf1096cd7c78da90aeca76df5bd0"><td class="memItemLeft" align="right" valign="top">static std::vector&lt; <a class="el" href="classcattle_1_1_layer.html">Layer</a>&lt; Scalar, Rank &gt; * &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_optimizer.html#a0a13bf1096cd7c78da90aeca76df5bd0">get_layers</a> (<a class="el" href="classcattle_1_1_neural_network.html">Net</a> &amp;net)</td></tr>
+<tr class="memdesc:a0a13bf1096cd7c78da90aeca76df5bd0"><td class="mdescLeft">&#160;</td><td class="mdescRight">A method to expose protected methods of the <a class="el" href="classcattle_1_1_neural_network.html" title="An abstract neural network class template. ">NeuralNetwork</a> class to subclasses of <a class="el" href="classcattle_1_1_optimizer.html" title="An abstract class template for neural network optimizer algorithm implementations. ">Optimizer</a> that are not friend classes of <a class="el" href="classcattle_1_1_neural_network.html" title="An abstract neural network class template. ">NeuralNetwork</a>.  <a href="#a0a13bf1096cd7c78da90aeca76df5bd0">More...</a><br /></td></tr>
 <tr class="separator:a0a13bf1096cd7c78da90aeca76df5bd0"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a03eff65d0152bf88d98988808090f34c"><td class="memItemLeft" align="right" valign="top">static Data&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_optimizer.html#a03eff65d0152bf88d98988808090f34c">propagate</a> (<a class="el" href="classcattle_1_1_neural_network.html">Net</a> &amp;net, Data in)</td></tr>
+<tr class="memdesc:a03eff65d0152bf88d98988808090f34c"><td class="mdescLeft">&#160;</td><td class="mdescRight">A method to expose protected methods of the <a class="el" href="classcattle_1_1_neural_network.html" title="An abstract neural network class template. ">NeuralNetwork</a> class to subclasses of <a class="el" href="classcattle_1_1_optimizer.html" title="An abstract class template for neural network optimizer algorithm implementations. ">Optimizer</a> that are not friend classes of <a class="el" href="classcattle_1_1_neural_network.html" title="An abstract neural network class template. ">NeuralNetwork</a>.  <a href="#a03eff65d0152bf88d98988808090f34c">More...</a><br /></td></tr>
 <tr class="separator:a03eff65d0152bf88d98988808090f34c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ae9504099cd9dbaa6f64450eb6061efe9"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_optimizer.html#ae9504099cd9dbaa6f64450eb6061efe9">backpropagate</a> (<a class="el" href="classcattle_1_1_neural_network.html">Net</a> &amp;net, Data out_grads)</td></tr>
+<tr class="memdesc:ae9504099cd9dbaa6f64450eb6061efe9"><td class="mdescLeft">&#160;</td><td class="mdescRight">A method to expose protected methods of the <a class="el" href="classcattle_1_1_neural_network.html" title="An abstract neural network class template. ">NeuralNetwork</a> class to subclasses of <a class="el" href="classcattle_1_1_optimizer.html" title="An abstract class template for neural network optimizer algorithm implementations. ">Optimizer</a> that are not friend classes of <a class="el" href="classcattle_1_1_neural_network.html" title="An abstract neural network class template. ">NeuralNetwork</a>.  <a href="#ae9504099cd9dbaa6f64450eb6061efe9">More...</a><br /></td></tr>
 <tr class="separator:ae9504099cd9dbaa6f64450eb6061efe9"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:abc23bf23413dfa4a8c6a8d9b222af7eb"><td class="memItemLeft" align="right" valign="top">static bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_optimizer.html#abc23bf23413dfa4a8c6a8d9b222af7eb">is_parametric</a> (<a class="el" href="classcattle_1_1_layer.html">Layer</a>&lt; Scalar, Rank &gt; &amp;layer)</td></tr>
+<tr class="memdesc:abc23bf23413dfa4a8c6a8d9b222af7eb"><td class="mdescLeft">&#160;</td><td class="mdescRight">A method to expose protected methods of the <a class="el" href="classcattle_1_1_layer.html" title="An abstract class template representing layers in a neural network. ">Layer</a> class to subclasses of <a class="el" href="classcattle_1_1_optimizer.html" title="An abstract class template for neural network optimizer algorithm implementations. ">Optimizer</a> that are not friend classes of <a class="el" href="classcattle_1_1_layer.html" title="An abstract class template representing layers in a neural network. ">Layer</a>.  <a href="#abc23bf23413dfa4a8c6a8d9b222af7eb">More...</a><br /></td></tr>
 <tr class="separator:abc23bf23413dfa4a8c6a8d9b222af7eb"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a03a788c5ce15f611d5c6007d43550ef5"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="namespacecattle.html#a1d78623a47279d516750a44dbad6090b">Matrix</a>&lt; Scalar &gt; &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_optimizer.html#a03a788c5ce15f611d5c6007d43550ef5">get_params</a> (<a class="el" href="classcattle_1_1_layer.html">Layer</a>&lt; Scalar, Rank &gt; &amp;layer)</td></tr>
+<tr class="memdesc:a03a788c5ce15f611d5c6007d43550ef5"><td class="mdescLeft">&#160;</td><td class="mdescRight">A method to expose protected methods of the <a class="el" href="classcattle_1_1_layer.html" title="An abstract class template representing layers in a neural network. ">Layer</a> class to subclasses of <a class="el" href="classcattle_1_1_optimizer.html" title="An abstract class template for neural network optimizer algorithm implementations. ">Optimizer</a> that are not friend classes of <a class="el" href="classcattle_1_1_layer.html" title="An abstract class template representing layers in a neural network. ">Layer</a>.  <a href="#a03a788c5ce15f611d5c6007d43550ef5">More...</a><br /></td></tr>
 <tr class="separator:a03a788c5ce15f611d5c6007d43550ef5"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a4697c3e95df8ae818471c5734b6f5ef6"><td class="memItemLeft" align="right" valign="top">static const <a class="el" href="namespacecattle.html#a1d78623a47279d516750a44dbad6090b">Matrix</a>&lt; Scalar &gt; &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_optimizer.html#a4697c3e95df8ae818471c5734b6f5ef6">get_params_grad</a> (<a class="el" href="classcattle_1_1_layer.html">Layer</a>&lt; Scalar, Rank &gt; &amp;layer)</td></tr>
+<tr class="memdesc:a4697c3e95df8ae818471c5734b6f5ef6"><td class="mdescLeft">&#160;</td><td class="mdescRight">A method to expose protected methods of the <a class="el" href="classcattle_1_1_layer.html" title="An abstract class template representing layers in a neural network. ">Layer</a> class to subclasses of <a class="el" href="classcattle_1_1_optimizer.html" title="An abstract class template for neural network optimizer algorithm implementations. ">Optimizer</a> that are not friend classes of <a class="el" href="classcattle_1_1_layer.html" title="An abstract class template representing layers in a neural network. ">Layer</a>.  <a href="#a4697c3e95df8ae818471c5734b6f5ef6">More...</a><br /></td></tr>
 <tr class="separator:a4697c3e95df8ae818471c5734b6f5ef6"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a4fb7888b5e5f4bb64378a789d00e5139"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_optimizer.html#a4fb7888b5e5f4bb64378a789d00e5139">regularize</a> (<a class="el" href="classcattle_1_1_layer.html">Layer</a>&lt; Scalar, Rank &gt; &amp;layer)</td></tr>
+<tr class="memdesc:a4fb7888b5e5f4bb64378a789d00e5139"><td class="mdescLeft">&#160;</td><td class="mdescRight">A method to expose protected methods of the <a class="el" href="classcattle_1_1_layer.html" title="An abstract class template representing layers in a neural network. ">Layer</a> class to subclasses of <a class="el" href="classcattle_1_1_optimizer.html" title="An abstract class template for neural network optimizer algorithm implementations. ">Optimizer</a> that are not friend classes of <a class="el" href="classcattle_1_1_layer.html" title="An abstract class template representing layers in a neural network. ">Layer</a>.  <a href="#a4fb7888b5e5f4bb64378a789d00e5139">More...</a><br /></td></tr>
 <tr class="separator:a4fb7888b5e5f4bb64378a789d00e5139"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ae2bfb3dc91ecf8c99bafaeba6dc97814"><td class="memItemLeft" align="right" valign="top">static Scalar&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_optimizer.html#ae2bfb3dc91ecf8c99bafaeba6dc97814">get_regularization_penalty</a> (<a class="el" href="classcattle_1_1_layer.html">Layer</a>&lt; Scalar, Rank &gt; &amp;layer)</td></tr>
+<tr class="memdesc:ae2bfb3dc91ecf8c99bafaeba6dc97814"><td class="mdescLeft">&#160;</td><td class="mdescRight">A method to expose protected methods of the <a class="el" href="classcattle_1_1_layer.html" title="An abstract class template representing layers in a neural network. ">Layer</a> class to subclasses of <a class="el" href="classcattle_1_1_optimizer.html" title="An abstract class template for neural network optimizer algorithm implementations. ">Optimizer</a> that are not friend classes of <a class="el" href="classcattle_1_1_layer.html" title="An abstract class template representing layers in a neural network. ">Layer</a>.  <a href="#ae2bfb3dc91ecf8c99bafaeba6dc97814">More...</a><br /></td></tr>
 <tr class="separator:ae2bfb3dc91ecf8c99bafaeba6dc97814"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a63a20018587e3a729f49050613482f38"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_optimizer.html#a63a20018587e3a729f49050613482f38">enforce_constraints</a> (<a class="el" href="classcattle_1_1_layer.html">Layer</a>&lt; Scalar, Rank &gt; &amp;layer)</td></tr>
+<tr class="memdesc:a63a20018587e3a729f49050613482f38"><td class="mdescLeft">&#160;</td><td class="mdescRight">A method to expose protected methods of the <a class="el" href="classcattle_1_1_layer.html" title="An abstract class template representing layers in a neural network. ">Layer</a> class to subclasses of <a class="el" href="classcattle_1_1_optimizer.html" title="An abstract class template for neural network optimizer algorithm implementations. ">Optimizer</a> that are not friend classes of <a class="el" href="classcattle_1_1_layer.html" title="An abstract class template representing layers in a neural network. ">Layer</a>.  <a href="#a63a20018587e3a729f49050613482f38">More...</a><br /></td></tr>
 <tr class="separator:a63a20018587e3a729f49050613482f38"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
@@ -174,8 +191,9 @@ template&lt;typename Scalar , std::size_t Rank, bool Sequential&gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
-<p>A method to expose protected methods of the <a class="el" href="classcattle_1_1_neural_network.html">NeuralNetwork</a> class to subclasses of <a class="el" href="classcattle_1_1_optimizer.html">Optimizer</a> that are not friend classes of <a class="el" href="classcattle_1_1_neural_network.html">NeuralNetwork</a>.</p>
-<dl class="section see"><dt>See also</dt><dd><a class="el" href="classcattle_1_1_neural_network.html#ae4fd8a1e33b0d9cbb975a6ee5c41fa6c">NeuralNetwork::backpropagate</a>(<a class="el" href="namespacecattle.html#a8b9323ad928764340e46f0802bf27fbb">Tensor</a>&lt;Scalar,Rank + Sequential + 1&gt;)</dd></dl>
+
+<p>A method to expose protected methods of the <a class="el" href="classcattle_1_1_neural_network.html" title="An abstract neural network class template. ">NeuralNetwork</a> class to subclasses of <a class="el" href="classcattle_1_1_optimizer.html" title="An abstract class template for neural network optimizer algorithm implementations. ">Optimizer</a> that are not friend classes of <a class="el" href="classcattle_1_1_neural_network.html" title="An abstract neural network class template. ">NeuralNetwork</a>. </p>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="classcattle_1_1_neural_network.html#ae4fd8a1e33b0d9cbb975a6ee5c41fa6c" title="It back-propagates the derivative of the loss function w.r.t. ">NeuralNetwork::backpropagate</a>(<a class="el" href="namespacecattle.html#a8b9323ad928764340e46f0802bf27fbb" title="An alias for a tensor of arbitrary rank and scalar type with dynamic dimensionality. ">Tensor</a>&lt;Scalar,Rank + Sequential + 1&gt;)</dd></dl>
 <p>It back-propagates the gradients through the specified network.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
@@ -212,8 +230,9 @@ template&lt;typename Scalar , std::size_t Rank, bool Sequential&gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
-<p>A method to expose protected methods of the <a class="el" href="classcattle_1_1_layer.html">Layer</a> class to subclasses of <a class="el" href="classcattle_1_1_optimizer.html">Optimizer</a> that are not friend classes of <a class="el" href="classcattle_1_1_layer.html">Layer</a>.</p>
-<dl class="section see"><dt>See also</dt><dd><a class="el" href="classcattle_1_1_layer.html#ac74dd19ed2f3a253cfbb1d1785f56197">Layer::enforce_constraints()</a></dd></dl>
+
+<p>A method to expose protected methods of the <a class="el" href="classcattle_1_1_layer.html" title="An abstract class template representing layers in a neural network. ">Layer</a> class to subclasses of <a class="el" href="classcattle_1_1_optimizer.html" title="An abstract class template for neural network optimizer algorithm implementations. ">Optimizer</a> that are not friend classes of <a class="el" href="classcattle_1_1_layer.html" title="An abstract class template representing layers in a neural network. ">Layer</a>. </p>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="classcattle_1_1_layer.html#ac74dd19ed2f3a253cfbb1d1785f56197" title="It applies constraints such as max-norm to the parameters of the layer (if applicable). ">Layer::enforce_constraints()</a></dd></dl>
 <p>It enforces constraints on the parameters of the specified layer if applicable.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
@@ -249,7 +268,9 @@ template&lt;typename Scalar , std::size_t Rank, bool Sequential&gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
-<p>It fits the optimizer to the neural network. It allows optimizers with individual learning rates for each parameter to set up their necessary internal data structures.</p>
+
+<p>It fits the optimizer to the neural network. </p>
+<p>It allows optimizers with individual learning rates for each parameter to set up their necessary internal data structures.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">net</td><td>A reference to the neural network that is to be optimized. </td></tr>
@@ -286,7 +307,8 @@ template&lt;typename Scalar , std::size_t Rank, bool Sequential&gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
-<p>A method to expose protected methods of the <a class="el" href="classcattle_1_1_neural_network.html">NeuralNetwork</a> class to subclasses of <a class="el" href="classcattle_1_1_optimizer.html">Optimizer</a> that are not friend classes of <a class="el" href="classcattle_1_1_neural_network.html">NeuralNetwork</a>.</p>
+
+<p>A method to expose protected methods of the <a class="el" href="classcattle_1_1_neural_network.html" title="An abstract neural network class template. ">NeuralNetwork</a> class to subclasses of <a class="el" href="classcattle_1_1_optimizer.html" title="An abstract class template for neural network optimizer algorithm implementations. ">Optimizer</a> that are not friend classes of <a class="el" href="classcattle_1_1_neural_network.html" title="An abstract neural network class template. ">NeuralNetwork</a>. </p>
 <dl class="section see"><dt>See also</dt><dd><a class="el" href="classcattle_1_1_neural_network.html#a297039d2fff23643c9b73da7b4bb686c">NeuralNetwork::get_layers()</a></dd></dl>
 <p>It returns a vector of pointers to the layers of the specified network.</p>
 <dl class="params"><dt>Parameters</dt><dd>
@@ -324,8 +346,9 @@ template&lt;typename Scalar , std::size_t Rank, bool Sequential&gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
-<p>A method to expose protected methods of the <a class="el" href="classcattle_1_1_layer.html">Layer</a> class to subclasses of <a class="el" href="classcattle_1_1_optimizer.html">Optimizer</a> that are not friend classes of <a class="el" href="classcattle_1_1_layer.html">Layer</a>.</p>
-<dl class="section see"><dt>See also</dt><dd><a class="el" href="classcattle_1_1_layer.html#abd799a16024c5aee49dbc0a5fe2f3183">Layer::get_params()</a></dd></dl>
+
+<p>A method to expose protected methods of the <a class="el" href="classcattle_1_1_layer.html" title="An abstract class template representing layers in a neural network. ">Layer</a> class to subclasses of <a class="el" href="classcattle_1_1_optimizer.html" title="An abstract class template for neural network optimizer algorithm implementations. ">Optimizer</a> that are not friend classes of <a class="el" href="classcattle_1_1_layer.html" title="An abstract class template representing layers in a neural network. ">Layer</a>. </p>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="classcattle_1_1_layer.html#abd799a16024c5aee49dbc0a5fe2f3183" title="It returns a reference to the learnable parameters of the layer. ">Layer::get_params()</a></dd></dl>
 <p>It returns a non-constant reference to the parameter matrix of the specified layer.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
@@ -362,8 +385,9 @@ template&lt;typename Scalar , std::size_t Rank, bool Sequential&gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
-<p>A method to expose protected methods of the <a class="el" href="classcattle_1_1_layer.html">Layer</a> class to subclasses of <a class="el" href="classcattle_1_1_optimizer.html">Optimizer</a> that are not friend classes of <a class="el" href="classcattle_1_1_layer.html">Layer</a>.</p>
-<dl class="section see"><dt>See also</dt><dd><a class="el" href="classcattle_1_1_layer.html#a6e2e726f9677758ea61c6916a5c88b92">Layer::get_params_grad()</a></dd></dl>
+
+<p>A method to expose protected methods of the <a class="el" href="classcattle_1_1_layer.html" title="An abstract class template representing layers in a neural network. ">Layer</a> class to subclasses of <a class="el" href="classcattle_1_1_optimizer.html" title="An abstract class template for neural network optimizer algorithm implementations. ">Optimizer</a> that are not friend classes of <a class="el" href="classcattle_1_1_layer.html" title="An abstract class template representing layers in a neural network. ">Layer</a>. </p>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="classcattle_1_1_layer.html#a6e2e726f9677758ea61c6916a5c88b92" title="It returns a reference to the gradient of the learnable parameters of the layer. ">Layer::get_params_grad()</a></dd></dl>
 <p>It returns a non-constant reference to the gradient of the specified layer's parameters.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
@@ -400,8 +424,9 @@ template&lt;typename Scalar , std::size_t Rank, bool Sequential&gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
-<p>A method to expose protected methods of the <a class="el" href="classcattle_1_1_layer.html">Layer</a> class to subclasses of <a class="el" href="classcattle_1_1_optimizer.html">Optimizer</a> that are not friend classes of <a class="el" href="classcattle_1_1_layer.html">Layer</a>.</p>
-<dl class="section see"><dt>See also</dt><dd><a class="el" href="classcattle_1_1_layer.html#a3dd89c138cfc74ca6e7572337d68e44e">Layer::get_regularization_penalty()</a></dd></dl>
+
+<p>A method to expose protected methods of the <a class="el" href="classcattle_1_1_layer.html" title="An abstract class template representing layers in a neural network. ">Layer</a> class to subclasses of <a class="el" href="classcattle_1_1_optimizer.html" title="An abstract class template for neural network optimizer algorithm implementations. ">Optimizer</a> that are not friend classes of <a class="el" href="classcattle_1_1_layer.html" title="An abstract class template representing layers in a neural network. ">Layer</a>. </p>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="classcattle_1_1_layer.html#a3dd89c138cfc74ca6e7572337d68e44e" title="It calculates the regularization penalty of the layer&#39;s parameters. ">Layer::get_regularization_penalty()</a></dd></dl>
 <p>It calculates the regularization penalty of the layer's parameters.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
@@ -438,8 +463,9 @@ template&lt;typename Scalar , std::size_t Rank, bool Sequential&gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
-<p>A method to expose protected methods of the <a class="el" href="classcattle_1_1_layer.html">Layer</a> class to subclasses of <a class="el" href="classcattle_1_1_optimizer.html">Optimizer</a> that are not friend classes of <a class="el" href="classcattle_1_1_layer.html">Layer</a>.</p>
-<dl class="section see"><dt>See also</dt><dd><a class="el" href="classcattle_1_1_layer.html#a92963ac4a339d9174a3aef3dbf3c271f">Layer::is_parametric()</a></dd></dl>
+
+<p>A method to expose protected methods of the <a class="el" href="classcattle_1_1_layer.html" title="An abstract class template representing layers in a neural network. ">Layer</a> class to subclasses of <a class="el" href="classcattle_1_1_optimizer.html" title="An abstract class template for neural network optimizer algorithm implementations. ">Optimizer</a> that are not friend classes of <a class="el" href="classcattle_1_1_layer.html" title="An abstract class template representing layers in a neural network. ">Layer</a>. </p>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="classcattle_1_1_layer.html#a92963ac4a339d9174a3aef3dbf3c271f" title="A method that returns whether the layer has parameters that can be learned. ">Layer::is_parametric()</a></dd></dl>
 <p>It returns whether the layer has learnable parameters.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
@@ -510,7 +536,8 @@ template&lt;typename Scalar , std::size_t Rank, bool Sequential&gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
-<p>It optimizes the specified neural network using the given data providers according to the optimizers loss function.</p>
+
+<p>It optimizes the specified neural network using the given data providers according to the optimizers loss function. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">net</td><td>A reference to the network whose parameters are to be optimized. </td></tr>
@@ -561,8 +588,9 @@ template&lt;typename Scalar , std::size_t Rank, bool Sequential&gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
-<p>A method to expose protected methods of the <a class="el" href="classcattle_1_1_neural_network.html">NeuralNetwork</a> class to subclasses of <a class="el" href="classcattle_1_1_optimizer.html">Optimizer</a> that are not friend classes of <a class="el" href="classcattle_1_1_neural_network.html">NeuralNetwork</a>.</p>
-<dl class="section see"><dt>See also</dt><dd><a class="el" href="classcattle_1_1_neural_network.html#a6ade9cd95110766ff25e7b157c9fddcf">NeuralNetwork::propagate</a>(<a class="el" href="namespacecattle.html#a8b9323ad928764340e46f0802bf27fbb">Tensor</a>&lt;Scalar,Rank + Sequential + 1&gt;,bool)</dd></dl>
+
+<p>A method to expose protected methods of the <a class="el" href="classcattle_1_1_neural_network.html" title="An abstract neural network class template. ">NeuralNetwork</a> class to subclasses of <a class="el" href="classcattle_1_1_optimizer.html" title="An abstract class template for neural network optimizer algorithm implementations. ">Optimizer</a> that are not friend classes of <a class="el" href="classcattle_1_1_neural_network.html" title="An abstract neural network class template. ">NeuralNetwork</a>. </p>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="classcattle_1_1_neural_network.html#a6ade9cd95110766ff25e7b157c9fddcf" title="It propagates the input tensor through the network and outputs its prediction. ">NeuralNetwork::propagate</a>(<a class="el" href="namespacecattle.html#a8b9323ad928764340e46f0802bf27fbb" title="An alias for a tensor of arbitrary rank and scalar type with dynamic dimensionality. ">Tensor</a>&lt;Scalar,Rank + Sequential + 1&gt;,bool)</dd></dl>
 <p>It propagates the input tensor through the specified network in training mode.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
@@ -600,8 +628,9 @@ template&lt;typename Scalar , std::size_t Rank, bool Sequential&gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
-<p>A method to expose protected methods of the <a class="el" href="classcattle_1_1_layer.html">Layer</a> class to subclasses of <a class="el" href="classcattle_1_1_optimizer.html">Optimizer</a> that are not friend classes of <a class="el" href="classcattle_1_1_layer.html">Layer</a>.</p>
-<dl class="section see"><dt>See also</dt><dd><a class="el" href="classcattle_1_1_layer.html#aae685cf7e708e0c4f32ddc4c10254046">Layer::regularize()</a></dd></dl>
+
+<p>A method to expose protected methods of the <a class="el" href="classcattle_1_1_layer.html" title="An abstract class template representing layers in a neural network. ">Layer</a> class to subclasses of <a class="el" href="classcattle_1_1_optimizer.html" title="An abstract class template for neural network optimizer algorithm implementations. ">Optimizer</a> that are not friend classes of <a class="el" href="classcattle_1_1_layer.html" title="An abstract class template representing layers in a neural network. ">Layer</a>. </p>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="classcattle_1_1_layer.html#aae685cf7e708e0c4f32ddc4c10254046" title="It computes the derivative of the regularization function w.r.t. ">Layer::regularize()</a></dd></dl>
 <p>It regularizes the layer's parameters by adding the derivative of the regularization function of the layer w.r.t. the parameters to the parameters' gradient.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
@@ -659,7 +688,8 @@ template&lt;typename Scalar , std::size_t Rank, bool Sequential&gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
-<p>It tests the specified neural network for a single epoch on the test data provided by the specified data provider.</p>
+
+<p>It tests the specified neural network for a single epoch on the test data provided by the specified data provider. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">net</td><td>A reference to the neural network to test. </td></tr>
@@ -722,7 +752,8 @@ template&lt;typename Scalar , std::size_t Rank, bool Sequential&gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
-<p>It trains the specified neural network for a single epoch on data provided by the specified data provider.</p>
+
+<p>It trains the specified neural network for a single epoch on data provided by the specified data provider. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">net</td><td>A reference to the neural network to optimize. </td></tr>
@@ -797,7 +828,9 @@ template&lt;typename Scalar , std::size_t Rank, bool Sequential&gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
-<p>It performs a gradient check to verify the correctness of the neural network and layer implementations. It is recommended to use double precision floating points; however, non-differentiable layers such as rectified linear units may still fail.</p>
+
+<p>It performs a gradient check to verify the correctness of the neural network and layer implementations. </p>
+<p>It is recommended to use double precision floating points; however, non-differentiable layers such as rectified linear units may still fail.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">net</td><td>A reference to the network on which the gradient check is to be performed. </td></tr>
@@ -814,8 +847,8 @@ template&lt;typename Scalar , std::size_t Rank, bool Sequential&gt; </div>
 </div>
 </div>
 <hr/>The documentation for this class was generated from the following files:<ul>
-<li>C:/Users/Viktor/git/C-ATTL3/C-ATTL3/<a class="el" href="_layer_8hpp_source.html">Layer.hpp</a></li>
-<li>C:/Users/Viktor/git/C-ATTL3/C-ATTL3/<a class="el" href="_optimizer_8hpp_source.html">Optimizer.hpp</a></li>
+<li>C:/Users/A6714/git/C-ATTL3/C-ATTL3/<a class="el" href="_layer_8hpp_source.html">Layer.hpp</a></li>
+<li>C:/Users/A6714/git/C-ATTL3/C-ATTL3/<a class="el" href="_optimizer_8hpp_source.html">Optimizer.hpp</a></li>
 </ul>
 </div><!-- contents -->
 <!-- start footer part -->
