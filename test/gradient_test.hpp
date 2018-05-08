@@ -149,15 +149,15 @@ inline void dense_layer_grad_test() {
 	auto reg1 = ParamRegSharedPtr<Scalar>(new L1ParameterRegularization<Scalar>());
 	auto reg2 = ParamRegSharedPtr<Scalar>(new L2ParameterRegularization<Scalar>());
 	auto reg3 = ParamRegSharedPtr<Scalar>(new ElasticNetParameterRegularization<Scalar>());
-	LayerPtr<Scalar,1> layer1_1(new DenseLayer<Scalar,1>(Dimensions<std::size_t,1>({ 32u }), 16, init1));
+	LayerPtr<Scalar,1> layer1_1(new DenseLayer<Scalar,1>({ 32u }, 16, init1));
 	LayerPtr<Scalar,1> layer1_2(new DenseLayer<Scalar,1>(layer1_1->get_output_dims(), 1, init1, reg3));
 	layer_grad_test<Scalar,1>("fc layer", std::move(layer1_1), std::move(layer1_2), 5, ScalarTraits<Scalar>::step_size,
 			ScalarTraits<float>::abs_epsilon, ScalarTraits<float>::rel_epsilon);
-	LayerPtr<Scalar,2> layer2_1(new DenseLayer<Scalar,2>(Dimensions<std::size_t,2>({ 6u, 6u }), 16, init2));
+	LayerPtr<Scalar,2> layer2_1(new DenseLayer<Scalar,2>({ 6u, 6u }, 16, init2));
 	LayerPtr<Scalar,2> layer2_2(new DenseLayer<Scalar,2>(layer2_1->get_output_dims(), 2, init2, reg1));
 	layer_grad_test<Scalar,2>("fc layer", std::move(layer2_1), std::move(layer2_2), 5, ScalarTraits<Scalar>::step_size,
 			ScalarTraits<float>::abs_epsilon, ScalarTraits<float>::rel_epsilon);
-	LayerPtr<Scalar,3> layer3_1(new DenseLayer<Scalar,3>(Dimensions<std::size_t,3>({ 4u, 4u, 2u }), 16, init1, reg2));
+	LayerPtr<Scalar,3> layer3_1(new DenseLayer<Scalar,3>({ 4u, 4u, 2u }, 16, init1, reg2));
 	LayerPtr<Scalar,3> layer3_2(new DenseLayer<Scalar,3>(layer3_1->get_output_dims(), 4, init1, reg2));
 	layer_grad_test<Scalar,3>("fc layer", std::move(layer3_1), std::move(layer3_2));
 }
@@ -315,9 +315,9 @@ inline void activation_layer_grad_test(const typename std::enable_if<Rank == 3,
 template<typename Scalar>
 inline void activation_layer_grad_test() {
 	Dimensions<std::size_t,1>({ 24 });
-	activation_layer_grad_test<Scalar,1>(Dimensions<std::size_t,1>({ 24u }));
-	activation_layer_grad_test<Scalar,2>(Dimensions<std::size_t,2>({ 5u, 5u }));
-	activation_layer_grad_test<Scalar,3>(Dimensions<std::size_t,3>({ 4u, 3u, 2u }));
+	activation_layer_grad_test<Scalar,1>({ 24u });
+	activation_layer_grad_test<Scalar,2>({ 5u, 5u });
+	activation_layer_grad_test<Scalar,3>({ 4u, 3u, 2u });
 }
 
 TEST(GradientTest, ActivationLayer) {
@@ -357,10 +357,10 @@ inline void broadcast_layer_grad_test() {
 	LayerPtr<Scalar,1> layer1_1(new DenseLayer<Scalar,1>({ 8u }, 8, init));
 	LayerPtr<Scalar,1> layer2_1(new BroadcastLayer<Scalar,1>(layer1_1->get_output_dims(), { 3u }));
 	layer_grad_test<Scalar,1>("broadcast layer", std::move(layer1_1), std::move(layer2_1));
-	LayerPtr<Scalar,2> layer1_2(new DenseLayer<Scalar,2>(Dimensions<std::size_t,2>({ 6u, 6u }), 12, init));
+	LayerPtr<Scalar,2> layer1_2(new DenseLayer<Scalar,2>({ 6u, 6u }, 12, init));
 	LayerPtr<Scalar,2> layer2_2(new BroadcastLayer<Scalar,2>(layer1_2->get_output_dims(), { 1u, 3u }));
 	layer_grad_test<Scalar,2>("broadcast layer", std::move(layer1_2), std::move(layer2_2));
-	LayerPtr<Scalar,3> layer1_3(new ConvolutionLayer<Scalar>(Dimensions<std::size_t,3>({ 16u, 16u, 2u }), 2, init));
+	LayerPtr<Scalar,3> layer1_3(new ConvolutionLayer<Scalar>({ 16u, 16u, 2u }, 2, init));
 	LayerPtr<Scalar,3> layer2_3(new BroadcastLayer<Scalar,3>(layer1_3->get_output_dims(), { 2u, 2u, 2u }));
 	layer_grad_test<Scalar,3>("broadcast layer", std::move(layer1_3), std::move(layer2_3));
 }
@@ -378,14 +378,14 @@ inline void batch_norm_layer_grad_test() {
 	auto init = WeightInitSharedPtr<Scalar>(new HeWeightInitialization<Scalar>());
 	auto reg1 = ParamRegSharedPtr<Scalar>(new L1ParameterRegularization<Scalar>());
 	auto reg2 = ParamRegSharedPtr<Scalar>(new L2ParameterRegularization<Scalar>());
-	LayerPtr<Scalar,1> layer1_1(new DenseLayer<Scalar,1>(Dimensions<std::size_t,1>({ 32u }), 16, init));
+	LayerPtr<Scalar,1> layer1_1(new DenseLayer<Scalar,1>({ 32u }, 16, init));
 	LayerPtr<Scalar,1> layer1_2(new BatchNormLayer<Scalar,1>(layer1_1->get_output_dims(), reg2, reg1));
 	layer_grad_test<Scalar,1>("batch norm layer", std::move(layer1_1), std::move(layer1_2), 5,
 			ScalarTraits<Scalar>::step_size, ScalarTraits<float>::abs_epsilon, ScalarTraits<float>::rel_epsilon);
-	LayerPtr<Scalar,2> layer2_1(new BatchNormLayer<Scalar,2>(Dimensions<std::size_t,2>({ 6u, 6u })));
+	LayerPtr<Scalar,2> layer2_1(new BatchNormLayer<Scalar,2>({ 6u, 6u }));
 	LayerPtr<Scalar,2> layer2_2(new IdentityActivationLayer<Scalar,2>(layer2_1->get_output_dims()));
 	layer_grad_test<Scalar,2>("batch norm layer", std::move(layer2_1), std::move(layer2_2));
-	LayerPtr<Scalar,3> layer3_1(new ConvolutionLayer<Scalar>(Dimensions<std::size_t,3>({ 4u, 4u, 2u }), 2, init));
+	LayerPtr<Scalar,3> layer3_1(new ConvolutionLayer<Scalar>({ 4u, 4u, 2u }, 2, init));
 	LayerPtr<Scalar,3> layer3_2(new BatchNormLayer<Scalar,3>(layer3_1->get_output_dims(), reg2, reg2));
 	layer_grad_test<Scalar,3>("batch norm layer", std::move(layer3_1), std::move(layer3_2));
 }
@@ -401,10 +401,10 @@ TEST(GradientTest, BatchNormLayer) {
 template<typename Scalar>
 inline void reshape_layer_grad_test() {
 	auto init = WeightInitSharedPtr<Scalar>(new HeWeightInitialization<Scalar>());
-	LayerPtr<Scalar,2> layer1_2(new DenseLayer<Scalar,2>(Dimensions<std::size_t,2>({ 6u, 6u }), 12, init));
+	LayerPtr<Scalar,2> layer1_2(new DenseLayer<Scalar,2>({ 6u, 6u }, 12, init));
 	LayerPtr<Scalar,2> layer2_2(new ReshapeLayer<Scalar,2>(layer1_2->get_output_dims(), { 4u, 3u }));
 	layer_grad_test<Scalar,2>("reshape layer", std::move(layer1_2), std::move(layer2_2));
-	LayerPtr<Scalar,3> layer1_3(new ConvolutionLayer<Scalar>(Dimensions<std::size_t,3>({ 16u, 16u, 2u }), 2, init));
+	LayerPtr<Scalar,3> layer1_3(new ConvolutionLayer<Scalar>({ 16u, 16u, 2u }, 2, init));
 	LayerPtr<Scalar,3> layer2_3(new ReshapeLayer<Scalar,3>(layer1_3->get_output_dims(), { 8u, 8u, 8u }));
 	layer_grad_test<Scalar,3>("reshape layer", std::move(layer1_3), std::move(layer2_3));
 }
@@ -500,7 +500,7 @@ inline void residual_net_grad_test() {
 	std::vector<NeuralNetPtr<Scalar,1,false>> modules_1;
 	std::vector<NeuralNetPtr<Scalar,1,false>> sub_modules1_1;
 	std::vector<LayerPtr<Scalar,1>> layers1_1(2);
-	layers1_1[0] = LayerPtr<Scalar,1>(new DenseLayer<Scalar,1>(Dimensions<std::size_t,1>({ 32u }), 18, init));
+	layers1_1[0] = LayerPtr<Scalar,1>(new DenseLayer<Scalar,1>({ 32u }, 18, init));
 	layers1_1[1] = LayerPtr<Scalar,1>(new SigmoidActivationLayer<Scalar,1>(layers1_1[0]->get_output_dims()));
 	sub_modules1_1.push_back(NeuralNetPtr<Scalar,1,false>(new FeedforwardNeuralNetwork<Scalar,1>(std::move(layers1_1))));
 	sub_modules1_1.push_back(NeuralNetPtr<Scalar,1,false>(new FeedforwardNeuralNetwork<Scalar,1>(LayerPtr<Scalar,1>(
@@ -515,7 +515,7 @@ inline void residual_net_grad_test() {
 	std::vector<NeuralNetPtr<Scalar,3,false>> modules_3;
 	std::vector<NeuralNetPtr<Scalar,3,false>> sub_modules1_3;
 	std::vector<LayerPtr<Scalar,3>> layers1_3(2);
-	layers1_3[0] = LayerPtr<Scalar,3>(new ConvolutionLayer<Scalar>(Dimensions<std::size_t,3>({ 4u, 4u, 3u }), 4, init));
+	layers1_3[0] = LayerPtr<Scalar,3>(new ConvolutionLayer<Scalar>({ 4u, 4u, 3u }, 4, init));
 	layers1_3[1] = LayerPtr<Scalar,3>(new SigmoidActivationLayer<Scalar,3>(layers1_3[0]->get_output_dims()));
 	sub_modules1_3.push_back(NeuralNetPtr<Scalar,3,false>(new FeedforwardNeuralNetwork<Scalar,3>(std::move(layers1_3))));
 	sub_modules1_3.push_back(NeuralNetPtr<Scalar,3,false>(new FeedforwardNeuralNetwork<Scalar,3>(LayerPtr<Scalar,3>(
@@ -602,7 +602,7 @@ inline void sequential_net_grad_test() {
 	auto init = WeightInitSharedPtr<Scalar>(new GlorotWeightInitialization<Scalar>());
 	// Rank 1.
 	std::vector<LayerPtr<Scalar,1>> layers_1(3);
-	layers_1[0] = LayerPtr<Scalar,1>(new DenseLayer<Scalar,1>(Dimensions<std::size_t,1>({ 32u }), 16, init));
+	layers_1[0] = LayerPtr<Scalar,1>(new DenseLayer<Scalar,1>({ 32u }, 16, init));
 	layers_1[1] = LayerPtr<Scalar,1>(new TanhActivationLayer<Scalar,1>(layers_1[0]->get_output_dims()));
 	layers_1[2] = LayerPtr<Scalar,1>(new DenseLayer<Scalar,1>(layers_1[1]->get_output_dims(), 4, init));
 	seq_network_grad_test("sequential net", NeuralNetPtr<Scalar,1,true>(
@@ -610,7 +610,7 @@ inline void sequential_net_grad_test() {
 					new FeedforwardNeuralNetwork<Scalar,1>(std::move(layers_1))))));
 	// Rank 3.
 	std::vector<LayerPtr<Scalar,3>> layers_3(4);
-	layers_3[0] = LayerPtr<Scalar,3>(new ConvolutionLayer<Scalar>(Dimensions<std::size_t,3>({ 4u, 4u, 2u }), 4, init));
+	layers_3[0] = LayerPtr<Scalar,3>(new ConvolutionLayer<Scalar>({ 4u, 4u, 2u }, 4, init));
 	layers_3[1] = LayerPtr<Scalar,3>(new ReLUActivationLayer<Scalar,3>(layers_3[0]->get_output_dims()));
 	layers_3[2] = LayerPtr<Scalar,3>(new MaxPoolLayer<Scalar>(layers_3[1]->get_output_dims()));
 	layers_3[3] = LayerPtr<Scalar,3>(new DenseLayer<Scalar,3>(layers_3[2]->get_output_dims(), 1, init));
@@ -632,7 +632,7 @@ inline void recurrent_net_grad_test() {
 	auto init = WeightInitSharedPtr<Scalar>(new OrthogonalWeightInitialization<Scalar>());
 	auto reg = ParamRegSharedPtr<Scalar>(new L2ParameterRegularization<Scalar>());
 	// Rank 1.
-	KernelPtr<Scalar,1> input_kernel1_1(new DenseLayer<Scalar,1>(Dimensions<std::size_t,1>({ 12u }), 12, init, reg));
+	KernelPtr<Scalar,1> input_kernel1_1(new DenseLayer<Scalar,1>({ 12u }, 12, init, reg));
 	KernelPtr<Scalar,1> state_kernel1_1(new DenseLayer<Scalar,1>(input_kernel1_1->get_output_dims(), 12, init, reg));
 	KernelPtr<Scalar,1> output_kernel1_1(new DenseLayer<Scalar,1>(state_kernel1_1->get_output_dims(), 4, init, reg));
 	ActivationPtr<Scalar,1> state_act1_1(new SigmoidActivationLayer<Scalar,1>(state_kernel1_1->get_output_dims()));
@@ -651,7 +651,7 @@ inline void recurrent_net_grad_test() {
 					std::move(output_kernel2_1), std::move(state_act2_1), std::move(output_act2_1),
 					[](int input_seq_length) { return std::make_pair(1, input_seq_length - 1); })), 5, 1);
 	// Rank 3.
-	KernelPtr<Scalar,3> input_kernel1_3(new ConvolutionLayer<Scalar>(Dimensions<std::size_t,3>({ 4u, 4u, 2u }), 5, init, reg));
+	KernelPtr<Scalar,3> input_kernel1_3(new ConvolutionLayer<Scalar>({ 4u, 4u, 2u }, 5, init, reg));
 	KernelPtr<Scalar,3> state_kernel1_3(new ConvolutionLayer<Scalar>(input_kernel1_3->get_output_dims(), 5, init, reg));
 	KernelPtr<Scalar,3> output_kernel1_3(new DenseLayer<Scalar,3>(state_kernel1_3->get_output_dims(), 2, init, reg));
 	ActivationPtr<Scalar,3> state_act1_3(new SoftplusActivationLayer<Scalar,3>(state_kernel1_3->get_output_dims()));
@@ -780,7 +780,7 @@ inline void bidirectional_net_grad_test() {
 	auto init = WeightInitSharedPtr<Scalar>(new OrthogonalWeightInitialization<Scalar>());
 	auto reg = ParamRegSharedPtr<Scalar>(new L2ParameterRegularization<Scalar>());
 	// 3rd degree RNN with highest rank concatenation.
-	KernelPtr<Scalar,3> input_kernel1(new ConvolutionLayer<Scalar>(Dimensions<std::size_t,3>({ 4u, 4u, 2u }), 5, init, reg));
+	KernelPtr<Scalar,3> input_kernel1(new ConvolutionLayer<Scalar>({ 4u, 4u, 2u }, 5, init, reg));
 	KernelPtr<Scalar,3> state_kernel1(new ConvolutionLayer<Scalar>(input_kernel1->get_output_dims(), 5, init, reg));
 	KernelPtr<Scalar,3> output_kernel1(new DenseLayer<Scalar,3>(input_kernel1->get_output_dims(), 2, init, reg));
 	ActivationPtr<Scalar,3> state_act1(new SigmoidActivationLayer<Scalar,3>(input_kernel1->get_output_dims()));
@@ -816,7 +816,7 @@ inline void bidirectional_net_grad_test() {
 							std::move(candidate_act2), std::move(state_act2), std::move(read_act2),
 							[](int input_seq_length) { return std::make_pair(1, 2); })))), 5, 1);
 	// 1st degree RNN with summation.
-	KernelPtr<Scalar,1> input_kernel3(new DenseLayer<Scalar,1>(Dimensions<std::size_t,1>({ 24u }), 8, init, reg));
+	KernelPtr<Scalar,1> input_kernel3(new DenseLayer<Scalar,1>({ 24u }, 8, init, reg));
 	KernelPtr<Scalar,1> state_kernel3(new DenseLayer<Scalar,1>(input_kernel3->get_output_dims(), 8, init, reg));
 	KernelPtr<Scalar,1> output_kernel3(new DenseLayer<Scalar,1>(input_kernel3->get_output_dims(), 1, init, reg));
 	ActivationPtr<Scalar,1> state_act3(new SigmoidActivationLayer<Scalar,1>(input_kernel3->get_output_dims()));
@@ -827,7 +827,7 @@ inline void bidirectional_net_grad_test() {
 							std::move(output_kernel3), std::move(state_act3), std::move(output_act3),
 							[](int input_seq_length) { return std::make_pair(5, 2); })))), 7, 5);
 	// 3rd degree RNN with multiplication.
-	KernelPtr<Scalar,3> input_kernel4(new ConvolutionLayer<Scalar>(Dimensions<std::size_t,3>({ 4u, 4u, 2u }), 5, init, reg));
+	KernelPtr<Scalar,3> input_kernel4(new ConvolutionLayer<Scalar>({ 4u, 4u, 2u }, 5, init, reg));
 	KernelPtr<Scalar,3> state_kernel4(new ConvolutionLayer<Scalar>(input_kernel4->get_output_dims(), 5, init, reg));
 	KernelPtr<Scalar,3> output_kernel4(new DenseLayer<Scalar,3>(input_kernel4->get_output_dims(), 2, init, reg));
 	ActivationPtr<Scalar,3> state_act4(new SigmoidActivationLayer<Scalar,3>(input_kernel4->get_output_dims()));
@@ -888,9 +888,9 @@ inline void absolute_loss_grad_test(const Dimensions<std::size_t,Rank>& dims, st
  */
 template<typename Scalar>
 inline void absolute_loss_grad_test() {
-	absolute_loss_grad_test<Scalar,1>(Dimensions<std::size_t,1>({ 24 }));
-	absolute_loss_grad_test<Scalar,2>(Dimensions<std::size_t,2>({ 6, 6 }));
-	absolute_loss_grad_test<Scalar,3>(Dimensions<std::size_t,3>({ 4, 4, 2 }));
+	absolute_loss_grad_test<Scalar,1>({ 24u });
+	absolute_loss_grad_test<Scalar,2>({ 6u, 6u });
+	absolute_loss_grad_test<Scalar,3>({ 4u, 4u, 2u });
 }
 
 TEST(GradientTest, AbsoluteLoss) {
@@ -939,13 +939,13 @@ inline void hinge_loss_grad_test(const Dimensions<std::size_t,Rank>& dims, std::
  */
 template<typename Scalar>
 inline void hinge_loss_grad_test() {
-	Dimensions<std::size_t,1> dims_1({ 24 });
+	Dimensions<std::size_t,1> dims_1({ 24u });
 	hinge_loss_grad_test<Scalar,1,false>(dims_1);
 	hinge_loss_grad_test<Scalar,1,true>(dims_1);
-	Dimensions<std::size_t,2> dims_2({ 6, 6 });
+	Dimensions<std::size_t,2> dims_2({ 6u, 6u });
 	hinge_loss_grad_test<Scalar,2,false>(dims_2);
 	hinge_loss_grad_test<Scalar,2,true>(dims_2);
-	Dimensions<std::size_t,3> dims_3({ 4, 4, 2 });
+	Dimensions<std::size_t,3> dims_3({ 4u, 4u, 2u });
 	hinge_loss_grad_test<Scalar,3,false>(dims_3);
 	hinge_loss_grad_test<Scalar,3,true>(dims_3);
 }
@@ -995,9 +995,9 @@ inline void cross_entropy_loss_grad_test(const Dimensions<std::size_t,Rank>& dim
  */
 template<typename Scalar>
 inline void cross_entropy_loss_grad_test() {
-	cross_entropy_loss_grad_test<Scalar,1>(Dimensions<std::size_t,1>({ 24 }));
-	cross_entropy_loss_grad_test<Scalar,2>(Dimensions<std::size_t,2>({ 6, 6 }));
-	cross_entropy_loss_grad_test<Scalar,3>(Dimensions<std::size_t,3>({ 4, 4, 2 }));
+	cross_entropy_loss_grad_test<Scalar,1>({ 24u });
+	cross_entropy_loss_grad_test<Scalar,2>({ 6u, 6u });
+	cross_entropy_loss_grad_test<Scalar,3>({ 4u, 4u, 2u });
 }
 
 TEST(GradientTest, CrossEntropyLoss) {
@@ -1045,9 +1045,9 @@ inline void softmax_cross_entropy_loss_grad_test(const Dimensions<std::size_t,Ra
  */
 template<typename Scalar>
 inline void softmax_cross_entropy_loss_grad_test() {
-	softmax_cross_entropy_loss_grad_test<Scalar,1>(Dimensions<std::size_t,1>({ 24 }));
-	softmax_cross_entropy_loss_grad_test<Scalar,2>(Dimensions<std::size_t,2>({ 6, 6 }));
-	softmax_cross_entropy_loss_grad_test<Scalar,3>(Dimensions<std::size_t,3>({ 4, 4, 2 }));
+	softmax_cross_entropy_loss_grad_test<Scalar,1>({ 24u });
+	softmax_cross_entropy_loss_grad_test<Scalar,2>({ 6u, 6u });
+	softmax_cross_entropy_loss_grad_test<Scalar,3>({ 4u, 4u, 2u });
 }
 
 TEST(GradientTest, SoftmaxCrossEntropyLoss) {
@@ -1096,13 +1096,13 @@ inline void multi_label_hinge_loss_grad_test(const Dimensions<std::size_t,Rank>&
  */
 template<typename Scalar>
 inline void multi_label_hinge_loss_grad_test() {
-	Dimensions<std::size_t,1> dims_1({ 24 });
+	Dimensions<std::size_t,1> dims_1({ 24u });
 	multi_label_hinge_loss_grad_test<Scalar,1,false>(dims_1);
 	multi_label_hinge_loss_grad_test<Scalar,1,true>(dims_1);
-	Dimensions<std::size_t,2> dims_2({ 6, 6 });
+	Dimensions<std::size_t,2> dims_2({ 6u, 6u });
 	multi_label_hinge_loss_grad_test<Scalar,2,false>(dims_2);
 	multi_label_hinge_loss_grad_test<Scalar,2,true>(dims_2);
-	Dimensions<std::size_t,3> dims_3({ 4, 4, 2 });
+	Dimensions<std::size_t,3> dims_3({ 4u, 4u, 2u });
 	multi_label_hinge_loss_grad_test<Scalar,3,false>(dims_3);
 	multi_label_hinge_loss_grad_test<Scalar,3,true>(dims_3);
 }
@@ -1152,9 +1152,9 @@ inline void multi_label_log_loss_grad_test(const Dimensions<std::size_t,Rank>& d
  */
 template<typename Scalar>
 inline void multi_label_log_loss_grad_test() {
-	multi_label_log_loss_grad_test<Scalar,1>(Dimensions<std::size_t,1>({ 24 }));
-	multi_label_log_loss_grad_test<Scalar,2>(Dimensions<std::size_t,2>({ 6, 6 }));
-	multi_label_log_loss_grad_test<Scalar,3>(Dimensions<std::size_t,3>({ 4, 4, 2 }));
+	multi_label_log_loss_grad_test<Scalar,1>({ 24u });
+	multi_label_log_loss_grad_test<Scalar,2>({ 6u, 6u });
+	multi_label_log_loss_grad_test<Scalar,3>({ 4u, 4u, 2u });
 }
 
 TEST(GradientTest, MultiLabelLogLoss) {
