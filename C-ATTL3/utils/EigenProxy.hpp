@@ -1,17 +1,19 @@
 /*
- * Eigen.h
+ * EigenProxy.hpp
  *
  *  Created on: 12 Apr 2018
  *      Author: Viktor Csomor
  */
 
-#ifndef CATTL3_UTILS_EIGEN_H_
-#define CATTL3_UTILS_EIGEN_H_
+#ifndef CATTL3_UTILS_EIGENPROXY_H_
+#define CATTL3_UTILS_EIGENPROXY_H_
 
 #define EIGEN_USE_THREADS
 
+#include <algorithm>
 #include <cstddef>
 #include <Eigen/Dense>
+#include <thread>
 #include <unsupported/Eigen/CXX11/Tensor>
 
 /**
@@ -86,22 +88,32 @@ using SVD = Eigen::BDCSVD<Matrix<Scalar>>;
 using SVDOptions = Eigen::DecompositionOptions;
 
 /**
- * @return The number of threads used by Eigen to accelerate operations
- * supporting multithreading.
+ * A struct for retrieving and setting the number of threads Eigen should use
+ * for matrix multiplication and other parallelized operations.
  */
-inline int num_of_eval_threads() {
-	return Eigen::nbThreads();
-}
-/**
- * @param num_of_threads The number of threads Eigen should use to accelerate
- * operations supporting multithreading.
- */
-inline void set_num_of_eval_threads(int num_of_threads) {
-	Eigen::setNbThreads(num_of_threads);
-}
+struct EigenProxy {
+	EigenProxy() = delete;
+	/**
+	 * @return The number of threads used by Eigen to accelerate operations
+	 * supporting multithreading.
+	 */
+	inline static int num_of_eval_threads() {
+		return Eigen::nbThreads();
+	}
+	/**
+	 * @param num_of_threads The number of threads Eigen should use to accelerate
+	 * operations supporting multithreading. The lower bound of the actual value
+	 * applied is 1 while the upper bound is the maximum of 1 and the level of
+	 * hardware concurrency detected.
+	 */
+	inline static void set_num_of_eval_threads(int num_of_threads) {
+		int max = std::max(1, (int) std::thread::hardware_concurrency());
+		Eigen::setNbThreads(std::max(1, std::min(num_of_threads, max)));
+	}
+};
 
 }
 
 }
 
-#endif /* CATTL3_UTILS_EIGEN_H_ */
+#endif /* CATTL3_UTILS_EIGENPROXY_H_ */

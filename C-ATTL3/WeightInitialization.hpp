@@ -1,5 +1,5 @@
 /*
- * WeightInitialization.h
+ * WeightInitialization.hpp
  *
  *  Created on: 13.12.2017
  *      Author: Viktor Csomor
@@ -13,7 +13,7 @@
 #include <string>
 #include <type_traits>
 
-#include "utils/Eigen.hpp"
+#include "utils/EigenProxy.hpp"
 
 namespace cattle {
 

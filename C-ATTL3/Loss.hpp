@@ -1,5 +1,5 @@
 /*
- * Loss.h
+ * Loss.hpp
  *
  *  Created on: 4 Dec 2017
  *      Author: Viktor Csomor
@@ -17,7 +17,7 @@
 #include <type_traits>
 #include <utility>
 
-#include "utils/Eigen.hpp"
+#include "utils/EigenProxy.hpp"
 #include "utils/NumericUtils.hpp"
 
 namespace cattle {

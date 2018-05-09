@@ -1,5 +1,5 @@
 /*
- * NumericUtils.h
+ * NumericUtils.hpp
  *
  *  Created on: 20.12.2017
  *      Author: Viktor Csomor
@@ -23,13 +23,13 @@ template<typename Scalar>
 class NumericUtils {
 	static_assert(std::is_floating_point<Scalar>::value, "non floating-point scalar type");
 private:
-	NumericUtils() { }
 public:
 	static constexpr Scalar MIN = std::numeric_limits<Scalar>::lowest();
 	static constexpr Scalar MAX = std::numeric_limits<Scalar>::max();
 	static constexpr Scalar EPSILON1 = std::numeric_limits<Scalar>::epsilon();
 	static constexpr Scalar EPSILON2 = 1e-8;
 	static constexpr Scalar EPSILON3 = 1e-4;
+	NumericUtils() = delete;
 	/**
 	 * Returns whether the two numerals are close enough to be considered equal.
 	 *

@@ -1,5 +1,5 @@
 /*
- * Dimensions.h
+ * Dimensions.hpp
  *
  *  Created on: 13 Jan 2018
  *      Author: Viktor Csomor

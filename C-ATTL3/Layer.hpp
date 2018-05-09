@@ -1,5 +1,5 @@
 /*
- * Layer.h
+ * Layer.hpp
  *
  *  Created on: 04.12.2017
  *      Author: Viktor Csomor
@@ -21,12 +21,12 @@
 
 #include "Dimensions.hpp"
 #include "ParameterRegularization.hpp"
-#include "utils/Eigen.hpp"
+#include "utils/EigenProxy.hpp"
 #include "utils/NumericUtils.hpp"
 #include "WeightInitialization.hpp"
 
 #ifdef CATTL3_USE_CUBLAS
-#include "utils/CuBLASUtils.hpp"
+#include "utils/CuBLASHandle.hpp"
 #endif
 
 namespace cattle {
@@ -360,7 +360,7 @@ protected:
 #ifndef CATTL3_USE_CUBLAS
 		Matrix<Scalar> out = biased_in_mat * Base::weights_ref;
 #else
-		Matrix<Scalar> out = internal::CuBLASUtils<Scalar>::get_instance().mul(biased_in_conv_mat, Base::weights_ref, false, false);
+		Matrix<Scalar> out = internal::CuBLASHandle<Scalar>::get_instance().mul(biased_in_conv_mat, Base::weights_ref, false, false);
 #endif
 		out_conversion_dims[0] = out.rows();
 		return TensorMap<Scalar,Root::DATA_RANK>(out.data(), out_conversion_dims);
@@ -380,11 +380,11 @@ protected:
 #else
 		Matrix<Scalar> out_grads_mat = MatrixMap<Scalar>(out_grads.data(), out_grads.dimension(0),
 				Base::output_dims.get_volume());
-		Base::weights_grad = internal::CuBLASUtils<Scalar>::get_instance().mul(biased_in_mat, out_grads_mat, true, false);
+		Base::weights_grad = internal::CuBLASHandle<Scalar>::get_instance().mul(biased_in_mat, out_grads_mat, true, false);
 		if (Base::is_input_layer())
 			return typename Root::Data();
 		Matrix<Scalar> weights_without_bias = Base::weights_ref.topRows(Base::input_dims.get_volume());
-		Matrix<Scalar> prev_out_grads = internal::CuBLASUtils<Scalar>::get_instance().mul(out_grads_mat,
+		Matrix<Scalar> prev_out_grads = internal::CuBLASHandle<Scalar>::get_instance().mul(out_grads_mat,
 				weights_without_bias, false, true);
 #endif
 		prev_out_conversion_dims[0] = prev_out_grads.rows();
@@ -537,7 +537,7 @@ protected:
 #ifndef CATTL3_USE_CUBLAS
 		Matrix<Scalar> out = biased_in_conv_mat * Base::weights_ref;
 #else
-		Matrix<Scalar> out = internal::CuBLASUtils<Scalar>::get_instance().mul(biased_in_conv_mat,
+		Matrix<Scalar> out = internal::CuBLASHandle<Scalar>::get_instance().mul(biased_in_conv_mat,
 				Base::weights_ref, false, false);
 #endif
 		out_conversion_dims[0] = rows;
@@ -561,11 +561,11 @@ protected:
 #else
 		Matrix<Scalar> out_grads_mat = MatrixMap<Scalar>(out_grads.data(),
 				rows * Base::output_dims(0) * Base::output_dims(1), filters);
-		Base::weights_grad = internal::CuBLASUtils<Scalar>::get_instance().mul(biased_in_conv_mat, out_grads_mat, true, false);
+		Base::weights_grad = internal::CuBLASHandle<Scalar>::get_instance().mul(biased_in_conv_mat, out_grads_mat, true, false);
 		if (Base::is_input_layer())
 			return typename Root::Data();
 		Matrix<Scalar> weights_without_bias = Base::weights_ref.topRows(receptor_vol);
-		Matrix<Scalar> prev_out_grads_conv_mat = internal::CuBLASUtils<Scalar>::get_instance().mul(out_grads_mat,
+		Matrix<Scalar> prev_out_grads_conv_mat = internal::CuBLASHandle<Scalar>::get_instance().mul(out_grads_mat,
 				weights_without_bias, false, true);
 #endif
 		/* Given the gradient of the stretched out receptor patches, perform a 'backwards' convolution
@@ -753,7 +753,7 @@ protected:
 #ifndef CATTL3_USE_CUBLAS
 		Matrix<Scalar> out_conv_mat = biased_in_mat * Base::weights_ref;
 #else
-		Matrix<Scalar> out_conv_mat = internal::CuBLASUtils<Scalar>::get_instance().mul(biased_in_mat,
+		Matrix<Scalar> out_conv_mat = internal::CuBLASHandle<Scalar>::get_instance().mul(biased_in_mat,
 				Base::weights_ref, false, false);
 #endif
 		/* Given the values of the stretched out receptor patches, accumulate them in the output tensor. */
@@ -820,12 +820,12 @@ protected:
 			return typename Root::Data();
 		Matrix<Scalar> prev_out_grads = out_grads_conv_mat * Base::weights_ref.topRows(depth).transpose();
 #else
-		Base::weights_grad = internal::CuBLASUtils<Scalar>::get_instance().mul(biased_in_mat,
+		Base::weights_grad = internal::CuBLASHandle<Scalar>::get_instance().mul(biased_in_mat,
 				out_grads_conv_mat, true, false);
 		if (Base::is_input_layer())
 			return typename Root::Data();
 		Matrix<Scalar> weights_without_bias = Base::weights_ref.rows(depth);
-		Matrix<Scalar> prev_out_grads = internal::CuBLASUtils<Scalar>::get_instance().mul(out_grads_conv_mat,
+		Matrix<Scalar> prev_out_grads = internal::CuBLASHandle<Scalar>::get_instance().mul(out_grads_conv_mat,
 				weights_without_bias, false, true);
 #endif
 		prev_out_conversion_dims[0] = rows;

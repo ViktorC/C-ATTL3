@@ -1,5 +1,5 @@
 /*
- * Optimizer.h
+ * Optimizer.hpp
  *
  *  Created on: 6 Dec 2017
  *      Author: Viktor Csomor
@@ -23,7 +23,7 @@
 #include "Loss.hpp"
 #include "NeuralNetwork.hpp"
 #include "ParameterRegularization.hpp"
-#include "utils/Eigen.hpp"
+#include "utils/EigenProxy.hpp"
 #include "utils/NumericUtils.hpp"
 #include "WeightInitialization.hpp"
 

@@ -1,12 +1,12 @@
 /*
- * CuBLASUtils.h
+ * CuBLASHandle.hpp
  *
  *  Created on: 12 Apr 2018
  *      Author: Viktor Csomor
  */
 
-#ifndef CATTL3_UTILS_CUBLASUTILS_H_
-#define CATTL3_UTILS_CUBLASUTILS_H_
+#ifndef CATTL3_UTILS_CUBLASHANDLE_H_
+#define CATTL3_UTILS_CUBLASHANDLE_H_
 
 #include <cassert>
 #include <cstddef>
@@ -16,7 +16,7 @@
 #include <string>
 #include <type_traits>
 
-#include "Eigen.hpp"
+#include "EigenProxy.hpp"
 
 namespace cattle {
 namespace internal {
@@ -43,16 +43,16 @@ template<> __inline__ GemmRoutine<float> get_gemm_routine() {
  * using cuBLAS.
  */
 template<typename Scalar>
-class CuBLASUtils {
+class CuBLASHandle {
 	static_assert(std::is_floating_point<Scalar>::value, "non floating-point scalar type");
 public:
-	CuBLASUtils(const CuBLASUtils&) = delete;
-	~CuBLASUtils() {
+	CuBLASHandle(const CuBLASHandle&) = delete;
+	~CuBLASHandle() {
 		// Destroy the cuBLAS handle.
 		cublasStatus_t cublas_stat = cublasDestroy(handle);
 		assert(cublas_stat == CUBLAS_STATUS_SUCCESS);
 	}
-	CuBLASUtils& operator=(const CuBLASUtils&) = delete;
+	CuBLASHandle& operator=(const CuBLASHandle&) = delete;
 	/**
 	 * @return A reference to the only instance of the class.
 	 */
@@ -165,7 +165,7 @@ public:
 	}
 private:
 	cublasHandle_t handle;
-	CuBLASUtils() :
+	CuBLASHandle() :
 			handle() {
 		// Create the cuBLAS handle.
 		cublasStatus_t cublas_stat = cublasCreate(&handle);
@@ -176,4 +176,4 @@ private:
 }
 } /* namespace cattle */
 
-#endif /* CATTL3_UTILS_CUBLASUTILS_H_ */
+#endif /* CATTL3_UTILS_CUBLASHANDLE_H_ */

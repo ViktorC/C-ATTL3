@@ -1,5 +1,5 @@
 /*
- * NeuralNetwork.h
+ * NeuralNetwork.hpp
  *
  *  Created on: 04.12.2017
  *      Author: Viktor Csomor
@@ -25,7 +25,7 @@
 
 #include "Dimensions.hpp"
 #include "Layer.hpp"
-#include "utils/Eigen.hpp"
+#include "utils/EigenProxy.hpp"
 
 // TODO Serialization.
 // TODO GRU network.

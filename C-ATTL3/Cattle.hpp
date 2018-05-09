@@ -1,5 +1,5 @@
 /*
- * Cattle.h
+ * Cattle.hpp
  *
  *  Created on: 18.01.2018
  *      Author: Viktor Csomor
@@ -17,5 +17,6 @@
 #include "ParameterRegularization.hpp"
 #include "Preprocessor.hpp"
 #include "WeightInitialization.hpp"
+#include "utils/Codec.hpp"
 
 #endif /* CATTL3_CATTLE_H_ */

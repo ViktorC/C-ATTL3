@@ -1,5 +1,5 @@
 /*
- * ParameterRegularization.h
+ * ParameterRegularization.hpp
  *
  *  Created on: 4 Dec 2017
  *      Author: Viktor Csomor
@@ -11,7 +11,7 @@
 #include <memory>
 #include <type_traits>
 
-#include "utils/Eigen.hpp"
+#include "utils/EigenProxy.hpp"
 
 namespace cattle {
 

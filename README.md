@@ -194,15 +194,16 @@ More examples of neural network constructs can be found [here](https://github.co
 
 ## TODO
 The list below contains the planned features of the library.
-- [ ] Test automation using Google Test
+- [x] __Test automation using Google Test__
 - [ ] CMake build
 - [x] Deconvolutional layer
 - [x] Broadcast and reshaping layers
 - [ ] Temporal (convolutional) networks
 - [ ] Convolution, deconvolution and pooling for 1st and 2nd degree features
-- [ ] More comprehensive GPU support via cuDNN utilization
+- [ ] More comprehensive GPU support and cuDNN utilization
 - [ ] Data pre-fetching for file based providers
-- [ ] Network serialization and de-serialization
+- [x] A codec for at least one or two simple image formats such as PPM
+- [ ] __Network serialization and de-serialization__
 - [ ] AMSGrad optimizer
 - [ ] Hessian-free optimizer with conjugate gradient descent
 - [ ] L-BFGS optimizer

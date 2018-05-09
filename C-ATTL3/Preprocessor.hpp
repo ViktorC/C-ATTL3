@@ -1,5 +1,5 @@
 /*
- * Preprocessor.h
+ * Preprocessor.hpp
  *
  *  Created on: 12.12.2017
  *      Author: Viktor Csomor
@@ -17,7 +17,7 @@
 #include <type_traits>
 #include <vector>
 
-#include "utils/Eigen.hpp"
+#include "utils/EigenProxy.hpp"
 #include "utils/NumericUtils.hpp"
 
 namespace cattle {

@@ -1,5 +1,5 @@
 /*
- * DataProvider.h
+ * DataProvider.hpp
  *
  *  Created on: 18.01.2018
  *      Author: Viktor Csomor
@@ -22,7 +22,7 @@
 #include <vector>
 
 #include "Dimensions.hpp"
-#include "utils/Eigen.hpp"
+#include "utils/EigenProxy.hpp"
 
 // TODO Pre-fetch batches from the files.
 
