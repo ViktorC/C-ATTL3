@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 if [ "$COMPILER_NAME" = "g++" ]; then
   make coverage
@@ -13,7 +13,6 @@ if [ "$rc" -ne 0 ]; then
   echo "Build failed" >&2
   exit "$rc"
 fi
-set -o braceexpand
 for i in {1..3}
 do
   make check

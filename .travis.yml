@@ -36,7 +36,7 @@ before_install:
     fi
 script:
   - chmod +x build.sh
-  - ./build.sh
+  - bash build.sh
 after_success:
   - if [ "$COMPILER_NAME" = "g++" ]; then
       bash <(curl -s https://codecov.io/bash) || echo "Codecov did not collect coverage reports";
