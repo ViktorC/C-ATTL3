@@ -235,7 +235,7 @@ inline NeuralNetPtr<Scalar,Rank,false> softmax_neural_net(const Dimensions<std::
  * @param test_name The name of the test.
  */
 template<typename Scalar, std::size_t Rank, bool Sequential>
-inline void print_test_header(const std::string& test_case_name, const std::string& test_name) {
+inline void print_test_header(std::string test_case_name, std::string test_name) {
 	std::transform(test_case_name.begin(), test_case_name.end(), test_case_name.begin(), ::toupper);
 	std::transform(test_name.begin(), test_name.end(), test_name.begin(), ::toupper);
 	std::string header = "|   " + test_case_name + ": " + test_name + "; SCALAR TYPE: " +

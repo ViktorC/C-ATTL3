@@ -6,6 +6,7 @@ var searchData=
   ['dataprovider',['DataProvider',['../classcattle_1_1_data_provider.html',1,'cattle']]],
   ['decidedly_5fgreater',['decidedly_greater',['../classcattle_1_1internal_1_1_numeric_utils.html#ae73d7c1b4caf84f0227e7b04c4d7512b',1,'cattle::internal::NumericUtils']]],
   ['decidedly_5flesser',['decidedly_lesser',['../classcattle_1_1internal_1_1_numeric_utils.html#a4ccb98354f5c472bf029545c79ea2cad',1,'cattle::internal::NumericUtils']]],
+  ['decode',['decode',['../classcattle_1_1_codec.html#ac12d07b6fc6d80d061ce80ebbdbc13cf',1,'cattle::Codec::decode()'],['../classcattle_1_1_p_p_m_codec.html#ab32b94e471c7a61432542380e32952b9',1,'cattle::PPMCodec::decode()']]],
   ['deconvolutionlayer',['DeconvolutionLayer',['../classcattle_1_1_deconvolution_layer.html',1,'cattle::DeconvolutionLayer&lt; Scalar &gt;'],['../classcattle_1_1_deconvolution_layer.html#a6871e7463988a2810d520934fdb5a70f',1,'cattle::DeconvolutionLayer::DeconvolutionLayer()']]],
   ['demote',['demote',['../classcattle_1_1_dimensions.html#a3f279dec6f26b6e1fbe9adb5c1369bab',1,'cattle::Dimensions']]],
   ['denseconcattype',['DenseConcatType',['../namespacecattle.html#a962c4b25a74fac744864b9fa4fca4a0b',1,'cattle']]],

@@ -14,8 +14,9 @@
 #include "Cattle.hpp"
 
 int main() {
+	using namespace cattle;
 	// Create a CIFAR-10 data provider by specifying the paths to the training files.
-	std::string cifar_folder = "test/data/cifar10/";
+	std::string cifar_folder = "test/data/cifar-10/";
 	CIFARDataProvider<float> file_train_prov({ cifar_folder + "data_batch_1.bin", cifar_folder + "data_batch_2.bin",
 			cifar_folder + "data_batch_3.bin", cifar_folder + "data_batch_4.bin", cifar_folder + "data_batch_5.bin",
 			cifar_folder + "data_batch_6.bin", });

@@ -56,8 +56,8 @@ public:
 	/**
 	 * @return A reference to the only instance of the class.
 	 */
-	inline static CuBLASUtils& get_instance() {
-		static CuBLASUtils instance;
+	inline static CuBLASHandle& get_instance() {
+		static CuBLASHandle instance;
 		return instance;
 	}
 	/**

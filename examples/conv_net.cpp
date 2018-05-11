@@ -12,6 +12,7 @@
 #include "Cattle.hpp"
 
 int main() {
+	using namespace cattle;
 	// Create random observation and objective tensors for training.
 	TensorPtr<double,4> training_obs_ptr(new Tensor<double,4>(80u, 32u, 32u, 3u));
 	TensorPtr<double,4> training_obj_ptr(new Tensor<double,4>(80u, 1u, 1u, 1u));

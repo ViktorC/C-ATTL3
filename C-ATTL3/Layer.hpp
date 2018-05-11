@@ -360,7 +360,7 @@ protected:
 #ifndef CATTL3_USE_CUBLAS
 		Matrix<Scalar> out = biased_in_mat * Base::weights_ref;
 #else
-		Matrix<Scalar> out = internal::CuBLASHandle<Scalar>::get_instance().mul(biased_in_conv_mat, Base::weights_ref, false, false);
+		Matrix<Scalar> out = internal::CuBLASHandle<Scalar>::get_instance().mul(biased_in_mat, Base::weights_ref, false, false);
 #endif
 		out_conversion_dims[0] = out.rows();
 		return TensorMap<Scalar,Root::DATA_RANK>(out.data(), out_conversion_dims);
@@ -466,8 +466,8 @@ public:
 		assert(receptor_height > 0);
 		assert(receptor_width > 0);
 		assert(vertical_stride > 0 && horizontal_stride > 0);
-		assert(input_dims(1) + 2 * vertical_padding >= dil_receptor_height &&
-				input_dims(2) + 2 * horizontal_padding >= dil_receptor_width);
+		assert(input_dims(0) + 2 * vertical_padding >= dil_receptor_height &&
+				input_dims(1) + 2 * horizontal_padding >= dil_receptor_width);
 	}
 	inline Root* clone() const {
 		return new ConvolutionLayer(*this);
@@ -704,8 +704,8 @@ public:
 		assert(receptor_height > 0);
 		assert(receptor_width > 0);
 		assert(vertical_stride > 0 && horizontal_stride > 0);
-		assert(Base::output_dims(1) + 2 * vertical_padding >= dil_receptor_height &&
-				Base::output_dims(2) + 2 * horizontal_padding >= dil_receptor_width);
+		assert(Base::output_dims(0) + 2 * vertical_padding >= dil_receptor_height &&
+				Base::output_dims(1) + 2 * horizontal_padding >= dil_receptor_width);
 	}
 	inline Root* clone() const {
 		return new DeconvolutionLayer(*this);
@@ -824,7 +824,7 @@ protected:
 				out_grads_conv_mat, true, false);
 		if (Base::is_input_layer())
 			return typename Root::Data();
-		Matrix<Scalar> weights_without_bias = Base::weights_ref.rows(depth);
+		Matrix<Scalar> weights_without_bias = Base::weights_ref.topRows(depth);
 		Matrix<Scalar> prev_out_grads = internal::CuBLASHandle<Scalar>::get_instance().mul(out_grads_conv_mat,
 				weights_without_bias, false, true);
 #endif

@@ -4,6 +4,7 @@ var searchData=
   ['d_5freduce',['d_reduce',['../classcattle_1_1_pool_layer.html#a598f288735fc8a7b83fc99847bd0794b',1,'cattle::PoolLayer::d_reduce()'],['../classcattle_1_1_sum_pool_layer.html#abec8a81fa176b9f0dc13d605b262a16c',1,'cattle::SumPoolLayer::d_reduce()'],['../classcattle_1_1_mean_pool_layer.html#a95c35eba3c1d1af7053e3434bfda80ce',1,'cattle::MeanPoolLayer::d_reduce()'],['../classcattle_1_1_max_pool_layer.html#a7ed18e81439c80bd8d91b136a80e34bc',1,'cattle::MaxPoolLayer::d_reduce()']]],
   ['decidedly_5fgreater',['decidedly_greater',['../classcattle_1_1internal_1_1_numeric_utils.html#ae73d7c1b4caf84f0227e7b04c4d7512b',1,'cattle::internal::NumericUtils']]],
   ['decidedly_5flesser',['decidedly_lesser',['../classcattle_1_1internal_1_1_numeric_utils.html#a4ccb98354f5c472bf029545c79ea2cad',1,'cattle::internal::NumericUtils']]],
+  ['decode',['decode',['../classcattle_1_1_codec.html#ac12d07b6fc6d80d061ce80ebbdbc13cf',1,'cattle::Codec::decode()'],['../classcattle_1_1_p_p_m_codec.html#ab32b94e471c7a61432542380e32952b9',1,'cattle::PPMCodec::decode()']]],
   ['deconvolutionlayer',['DeconvolutionLayer',['../classcattle_1_1_deconvolution_layer.html#a6871e7463988a2810d520934fdb5a70f',1,'cattle::DeconvolutionLayer']]],
   ['demote',['demote',['../classcattle_1_1_dimensions.html#a3f279dec6f26b6e1fbe9adb5c1369bab',1,'cattle::Dimensions']]],
   ['denselayer',['DenseLayer',['../classcattle_1_1_dense_layer.html#a739653b471ab0424c66abcaa93428fab',1,'cattle::DenseLayer']]],
