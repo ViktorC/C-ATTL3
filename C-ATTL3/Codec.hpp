@@ -5,8 +5,8 @@
  *      Author: Viktor Csomor
  */
 
-#ifndef C_ATTL3_UTILS_CODEC_H_
-#define C_ATTL3_UTILS_CODEC_H_
+#ifndef C_ATTL3_CODEC_H_
+#define C_ATTL3_CODEC_H_
 
 #include <algorithm>
 #include <cstddef>
@@ -16,7 +16,7 @@
 #include <string>
 #include <vector>
 
-#include "EigenProxy.hpp"
+#include "utils/EigenProxy.hpp"
 
 namespace cattle {
 
@@ -69,7 +69,7 @@ public:
 	PPMCodec() : type(resolve_type_string()) { }
 	inline void encode(const Tensor<Scalar,3>& data, const std::string& file_path) const {
 		assert(data.dimension(0) > 0 && data.dimension(1) > 0 &&
-				data.dimension(2) == GRAY_SCALE ? 1 : 3);
+				data.dimension(2) == (GRAY_SCALE ? 1 : 3));
 		std::ofstream file_stream(file_path, BINARY ? std::ios::binary : std::ios::out);
 		assert(file_stream.is_open());
 		Tensor<Scalar,0> max_tensor = data.maximum();
@@ -219,4 +219,4 @@ private:
 
 } /* namespace cattle */
 
-#endif /* C_ATTL3_UTILS_CODEC_H_ */
+#endif /* C_ATTL3_CODEC_H_ */

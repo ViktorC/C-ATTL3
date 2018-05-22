@@ -1,5 +1,5 @@
 /*
- * auto_encoder.cpp
+ * mnist_autoencoder.cpp
  *
  *  Created on: 11 May 2018
  *      Author: Viktor Csomor
@@ -14,7 +14,7 @@
 int main() {
 	using namespace cattle;
 	// Load the MNIST data set into memory.
-	std::string mnist_folder = "test/data/mnist/";
+	std::string mnist_folder = "data/mnist/";
 	MNISTDataProvider<float> file_train_prov(mnist_folder + "train-images.idx3-ubyte", mnist_folder + "train-labels.idx1-ubyte");
 	MNISTDataProvider<float> file_test_prov(mnist_folder + "t10k-images.idx3-ubyte", mnist_folder + "t10k-labels.idx1-ubyte");
 	TensorPtr<float,4> train_data(new Tensor<float,4>(file_train_prov.get_data(60000).first));
@@ -30,35 +30,35 @@ int main() {
 	std::vector<LayerPtr<float,3>> encoder_layers(5);
 	encoder_layers[0] = LayerPtr<float,3>(new ConvolutionLayer<float>(train_prov.get_obs_dims(), 3, init,
 			ConvolutionLayer<float>::NO_PARAM_REG, 4, 4, 0, 0, 2, 2));
-	encoder_layers[1] = LayerPtr<float,3>(new ReLUActivationLayer<float,3>(encoder_layers[0]->get_output_dims()));
+	encoder_layers[1] = LayerPtr<float,3>(new SoftplusActivationLayer<float,3>(encoder_layers[0]->get_output_dims()));
 	encoder_layers[2] = LayerPtr<float,3>(new ConvolutionLayer<float>(encoder_layers[1]->get_output_dims(), 3, init,
 			ConvolutionLayer<float>::NO_PARAM_REG, 4, 4, 0, 0, 1, 1));
-	encoder_layers[3] = LayerPtr<float,3>(new ReLUActivationLayer<float,3>(encoder_layers[2]->get_output_dims()));
-	encoder_layers[4] = LayerPtr<float,3>(new DenseLayer<float,3>(encoder_layers[2]->get_output_dims(), 150, init));
+	encoder_layers[3] = LayerPtr<float,3>(new SoftplusActivationLayer<float,3>(encoder_layers[2]->get_output_dims()));
+	encoder_layers[4] = LayerPtr<float,3>(new DenseLayer<float,3>(encoder_layers[2]->get_output_dims(), 100, init));
 	NeuralNetPtr<float,3,false> encoder(new FeedforwardNeuralNetwork<float,3>(std::move(encoder_layers)));
 	std::vector<LayerPtr<float,3>> decoder_layers(6);
 	decoder_layers[0] = LayerPtr<float,3>(new DenseLayer<float,3>(encoder->get_output_dims(), 300, init));
-	decoder_layers[1] = LayerPtr<float,3>(new ReLUActivationLayer<float,3>(decoder_layers[0]->get_output_dims()));
+	decoder_layers[1] = LayerPtr<float,3>(new SoftplusActivationLayer<float,3>(decoder_layers[0]->get_output_dims()));
 	decoder_layers[2] = LayerPtr<float,3>(new ReshapeLayer<float,3>(decoder_layers[1]->get_output_dims(), { 10u, 10u, 3u }));
 	decoder_layers[3] = LayerPtr<float,3>(new DeconvolutionLayer<float>(decoder_layers[2]->get_output_dims(), 3, init,
 			DeconvolutionLayer<float>::NO_PARAM_REG, 4, 4, 0, 0, 1, 1));
-	decoder_layers[4] = LayerPtr<float,3>(new ReLUActivationLayer<float,3>(decoder_layers[3]->get_output_dims()));
+	decoder_layers[4] = LayerPtr<float,3>(new SoftplusActivationLayer<float,3>(decoder_layers[3]->get_output_dims()));
 	decoder_layers[5] = LayerPtr<float,3>(new DeconvolutionLayer<float>(decoder_layers[4]->get_output_dims(), 1, init,
 			DeconvolutionLayer<float>::NO_PARAM_REG, 4, 4, 0, 0, 2, 2));
 	NeuralNetPtr<float,3,false> decoder(new FeedforwardNeuralNetwork<float,3>(std::move(decoder_layers)));
 	std::vector<NeuralNetPtr<float,3,false>> modules;
 	modules.push_back(std::move(encoder));
 	modules.push_back(std::move(decoder));
-	StackedNeuralNetwork<float,3,false> auto_encoder(std::move(modules));
-	auto_encoder.init();
+	StackedNeuralNetwork<float,3,false> autoencoder(std::move(modules));
+	autoencoder.init();
 	// Specify the loss and the optimizer.
-	LossSharedPtr<float,3,false> loss(new QuadraticLoss<float,3,false>());
+	auto loss = std::make_shared<SquaredLoss<float,3,false>>();
 	NadamOptimizer<float,3,false> opt(loss, 1000);
 	// Optimize.
-	opt.optimize(auto_encoder, train_prov, test_prov, 30);
+	opt.optimize(autoencoder, train_prov, test_prov, 30);
 	// Output some test image reconstructions.
 	PPMCodec<float,P5> ppm_codec;
-	std::vector<NeuralNetwork<float,3,false>*> module_ptrs = auto_encoder.get_modules();
+	std::vector<NeuralNetwork<float,3,false>*> module_ptrs = autoencoder.get_modules();
 	for (int i = 0; i < 10; ++i) {
 		Tensor<float,4> image = test_prov.get_data(1).first;
 		ppm_codec.encode(TensorMap<float,3>(image.data(), { 28u, 28u, 1u }), std::string("image") + std::to_string(i) +

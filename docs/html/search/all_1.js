@@ -1,6 +1,7 @@
 var searchData=
 [
   ['absoluteloss',['AbsoluteLoss',['../classcattle_1_1_absolute_loss.html',1,'cattle']]],
+  ['absoluteparameterregularization',['AbsoluteParameterRegularization',['../classcattle_1_1_absolute_parameter_regularization.html',1,'cattle::AbsoluteParameterRegularization&lt; Scalar &gt;'],['../classcattle_1_1_absolute_parameter_regularization.html#a61c3c0f9721f9dc82e3f11a0b629afc3',1,'cattle::AbsoluteParameterRegularization::AbsoluteParameterRegularization()']]],
   ['activationlayer',['ActivationLayer',['../classcattle_1_1_activation_layer.html',1,'cattle']]],
   ['activationptr',['ActivationPtr',['../namespacecattle.html#a33c43d0983f054e904daa2806ce17231',1,'cattle']]],
   ['adadeltaoptimizer',['AdadeltaOptimizer',['../classcattle_1_1_adadelta_optimizer.html',1,'cattle::AdadeltaOptimizer&lt; Scalar, Rank, Sequential &gt;'],['../classcattle_1_1_adadelta_optimizer.html#a73cf29d63eebf79af1b7b0099527f038',1,'cattle::AdadeltaOptimizer::AdadeltaOptimizer()']]],

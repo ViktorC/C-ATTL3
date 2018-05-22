@@ -12,7 +12,7 @@ var searchData=
   ['pcapreprocessor_3c_20scalar_2c_203_2c_20standardize_2c_20whiten_20_3e',['PCAPreprocessor&lt; Scalar, 3, Standardize, Whiten &gt;',['../classcattle_1_1_p_c_a_preprocessor_3_01_scalar_00_013_00_01_standardize_00_01_whiten_01_4.html',1,'cattle']]],
   ['pcapreprocessorbase',['PCAPreprocessorBase',['../classcattle_1_1_p_c_a_preprocessor_base.html',1,'cattle']]],
   ['pcapreprocessorbase_3c_20scalar_2c_203_2c_20standardize_2c_20whiten_20_3e',['PCAPreprocessorBase&lt; Scalar, 3, Standardize, Whiten &gt;',['../classcattle_1_1_p_c_a_preprocessor_base.html',1,'cattle']]],
-  ['permmatrix',['PermMatrix',['../namespacecattle_1_1internal.html#a7091932f25b7326f10fc49f79d38ca76',1,'cattle::internal']]],
+  ['permmatrix',['PermMatrix',['../namespacecattle.html#a4e83e75cf6fc91facbcae6c5bb14c09a',1,'cattle']]],
   ['poollayer',['PoolLayer',['../classcattle_1_1_pool_layer.html',1,'cattle']]],
   ['ppmcodec',['PPMCodec',['../classcattle_1_1_p_p_m_codec.html',1,'cattle']]],
   ['ppmformattype',['PPMFormatType',['../namespacecattle.html#a8ac8a938d166ae3b376b47b6020922ab',1,'cattle']]],

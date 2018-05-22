@@ -1,5 +1,5 @@
 /*
- * cifar_dataset.cpp
+ * cifar_convnet.cpp
  *
  *  Created on: 18 Apr 2018
  *      Author: Viktor Csomor
@@ -16,7 +16,7 @@
 int main() {
 	using namespace cattle;
 	// Create a CIFAR-10 data provider by specifying the paths to the training files.
-	std::string cifar_folder = "test/data/cifar-10/";
+	std::string cifar_folder = "data/cifar-10/";
 	CIFARDataProvider<float> file_train_prov({ cifar_folder + "data_batch_1.bin", cifar_folder + "data_batch_2.bin",
 			cifar_folder + "data_batch_3.bin", cifar_folder + "data_batch_4.bin", cifar_folder + "data_batch_5.bin",
 			cifar_folder + "data_batch_6.bin", });
@@ -43,7 +43,7 @@ int main() {
 	// Initialize.
 	nn.init();
 	// Specify the loss and the optimizer.
-	LossSharedPtr<float,3,false> loss(new CrossEntropyLoss<float,3,false>());
+	auto loss = std::make_shared<CrossEntropyLoss<float,3,false>>();
 	AdadeltaOptimizer<float,3,false> opt(loss, 200);
 	// Optimize the network and measure how long it takes.
 	std::chrono::steady_clock::time_point begin = std::chrono::steady_clock::now();

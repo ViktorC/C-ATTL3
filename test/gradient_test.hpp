@@ -74,7 +74,7 @@ inline void nonseq_network_grad_test(std::string name, NeuralNetPtr<Scalar,Rank,
 	TensorPtr<Scalar,Rank + 1> obj = random_tensor<Scalar,Rank + 1>(output_dims);
 	MemoryDataProvider<Scalar,Rank,false> prov(std::move(obs), std::move(obj));
 	net->init();
-	auto loss = LossSharedPtr<Scalar,Rank,false>(new QuadraticLoss<Scalar,Rank,false>());
+	auto loss = LossSharedPtr<Scalar,Rank,false>(new SquaredLoss<Scalar,Rank,false>());
 	VanillaSGDOptimizer<Scalar,Rank,false> opt(loss, samples);
 	grad_test<Scalar,Rank,false>(name, prov, *net, opt, step_size, abs_epsilon, rel_epsilon);
 }
@@ -106,7 +106,7 @@ inline void seq_network_grad_test(std::string name, NeuralNetPtr<Scalar,Rank,tru
 	TensorPtr<Scalar,Rank + 2> obj = random_tensor<Scalar,Rank + 2>(output_dims);
 	MemoryDataProvider<Scalar,Rank,true> prov(std::move(obs), std::move(obj));
 	net->init();
-	auto loss = LossSharedPtr<Scalar,Rank,true>(new QuadraticLoss<Scalar,Rank,true>());
+	auto loss = LossSharedPtr<Scalar,Rank,true>(new SquaredLoss<Scalar,Rank,true>());
 	VanillaSGDOptimizer<Scalar,Rank,true> opt(loss, samples);
 	grad_test<Scalar,Rank,true>(name, prov, *net, opt, step_size, abs_epsilon, rel_epsilon);
 }
@@ -146,8 +146,8 @@ template<typename Scalar>
 inline void dense_layer_grad_test() {
 	auto init1 = WeightInitSharedPtr<Scalar>(new GlorotWeightInitialization<Scalar>());
 	auto init2 = WeightInitSharedPtr<Scalar>(new LeCunWeightInitialization<Scalar>());
-	auto reg1 = ParamRegSharedPtr<Scalar>(new L1ParameterRegularization<Scalar>());
-	auto reg2 = ParamRegSharedPtr<Scalar>(new L2ParameterRegularization<Scalar>());
+	auto reg1 = ParamRegSharedPtr<Scalar>(new AbsoluteParameterRegularization<Scalar>());
+	auto reg2 = ParamRegSharedPtr<Scalar>(new SquaredParameterRegularization<Scalar>());
 	auto reg3 = ParamRegSharedPtr<Scalar>(new ElasticNetParameterRegularization<Scalar>());
 	LayerPtr<Scalar,1> layer1_1(new DenseLayer<Scalar,1>({ 32u }, 16, init1));
 	LayerPtr<Scalar,1> layer1_2(new DenseLayer<Scalar,1>(layer1_1->get_output_dims(), 1, init1, reg3));
@@ -173,7 +173,7 @@ TEST(GradientTest, DenseLayer) {
 template<typename Scalar>
 inline void conv_layer_grad_test() {
 	auto init = WeightInitSharedPtr<Scalar>(new HeWeightInitialization<Scalar>());
-	auto reg = ParamRegSharedPtr<Scalar>(new L2ParameterRegularization<Scalar>());
+	auto reg = ParamRegSharedPtr<Scalar>(new SquaredParameterRegularization<Scalar>());
 	LayerPtr<Scalar,3> layer1(new ConvolutionLayer<Scalar>({ 8u, 8u, 2u }, 5, init,
 			ConvolutionLayer<Scalar>::NO_PARAM_REG, 3, 2, 1, 2, 1, 2, 1, 0));
 	LayerPtr<Scalar,3> layer2(new ConvolutionLayer<Scalar>(layer1->get_output_dims(), 1, init, reg, 1, 1));
@@ -191,7 +191,7 @@ TEST(GradientTest, ConvolutionLayer) {
 template<typename Scalar>
 inline void deconv_layer_grad_test() {
 	auto init = WeightInitSharedPtr<Scalar>(new HeWeightInitialization<Scalar>());
-	auto reg = ParamRegSharedPtr<Scalar>(new L2ParameterRegularization<Scalar>());
+	auto reg = ParamRegSharedPtr<Scalar>(new SquaredParameterRegularization<Scalar>());
 	LayerPtr<Scalar,3> layer1(new DeconvolutionLayer<Scalar>({ 2u, 3u, 2u }, 5, init,
 			DeconvolutionLayer<Scalar>::NO_PARAM_REG, 5, 3, 1, 0, 1, 2, 0, 1));
 	LayerPtr<Scalar,3> layer2(new DeconvolutionLayer<Scalar>(layer1->get_output_dims(), 1, init, reg, 1, 1));
@@ -250,7 +250,7 @@ inline void activation_layer_grad_test(const typename std::enable_if<Rank != 3,
 	Dimensions<std::size_t,Rank> dims_10 = layer1_10->get_output_dims();
 	layer_grad_test<Scalar,Rank>("elu activation layer rank", std::move(layer1_10),
 			LayerPtr<Scalar,Rank>(new ELUActivationLayer<Scalar,Rank>(dims_10, 2e-1)));
-	auto reg = ParamRegSharedPtr<Scalar>(new L2ParameterRegularization<Scalar>());
+	auto reg = ParamRegSharedPtr<Scalar>(new SquaredParameterRegularization<Scalar>());
 	layer_grad_test<Scalar,Rank>("prelu activation layer rank",
 			LayerPtr<Scalar,Rank>(new PReLUActivationLayer<Scalar,Rank>(dims, reg, 2e-1)),
 			LayerPtr<Scalar,Rank>(new PReLUActivationLayer<Scalar,Rank>(dims)));
@@ -303,7 +303,7 @@ inline void activation_layer_grad_test(const typename std::enable_if<Rank == 3,
 	Dimensions<std::size_t,3> dims_10 = layer1_10->get_output_dims();
 	layer_grad_test<Scalar,3>("elu activation layer", std::move(layer1_10),
 			LayerPtr<Scalar,3>(new ELUActivationLayer<Scalar,3>(dims_10, 2e-1)));
-	auto reg = ParamRegSharedPtr<Scalar>(new L2ParameterRegularization<Scalar>());
+	auto reg = ParamRegSharedPtr<Scalar>(new SquaredParameterRegularization<Scalar>());
 	layer_grad_test<Scalar,3>("prelu activation layer",
 			LayerPtr<Scalar,3>(new PReLUActivationLayer<Scalar,3>(dims, reg, 2e-1)),
 			LayerPtr<Scalar,3>(new PReLUActivationLayer<Scalar,3>(dims)));
@@ -376,8 +376,8 @@ TEST(GradientTest, BroadcastLayer) {
 template<typename Scalar>
 inline void batch_norm_layer_grad_test() {
 	auto init = WeightInitSharedPtr<Scalar>(new HeWeightInitialization<Scalar>());
-	auto reg1 = ParamRegSharedPtr<Scalar>(new L1ParameterRegularization<Scalar>());
-	auto reg2 = ParamRegSharedPtr<Scalar>(new L2ParameterRegularization<Scalar>());
+	auto reg1 = ParamRegSharedPtr<Scalar>(new AbsoluteParameterRegularization<Scalar>());
+	auto reg2 = ParamRegSharedPtr<Scalar>(new SquaredParameterRegularization<Scalar>());
 	LayerPtr<Scalar,1> layer1_1(new DenseLayer<Scalar,1>({ 32u }, 16, init));
 	LayerPtr<Scalar,1> layer1_2(new BatchNormLayer<Scalar,1>(layer1_1->get_output_dims(), reg2, reg1));
 	layer_grad_test<Scalar,1>("batch norm layer", std::move(layer1_1), std::move(layer1_2), 5,
@@ -630,7 +630,7 @@ TEST(GradientTest, SequentialNet) {
 template<typename Scalar>
 inline void recurrent_net_grad_test() {
 	auto init = WeightInitSharedPtr<Scalar>(new OrthogonalWeightInitialization<Scalar>());
-	auto reg = ParamRegSharedPtr<Scalar>(new L2ParameterRegularization<Scalar>());
+	auto reg = ParamRegSharedPtr<Scalar>(new SquaredParameterRegularization<Scalar>());
 	// Rank 1.
 	KernelPtr<Scalar,1> input_kernel1_1(new DenseLayer<Scalar,1>({ 12u }, 12, init, reg));
 	KernelPtr<Scalar,1> state_kernel1_1(new DenseLayer<Scalar,1>(input_kernel1_1->get_output_dims(), 12, init, reg));
@@ -682,7 +682,7 @@ TEST(GradientTest, RecurrentNet) {
 template<typename Scalar>
 inline void lstm_net_grad_test() {
 	auto init = WeightInitSharedPtr<Scalar>(new OrthogonalWeightInitialization<Scalar>());
-	auto reg = ParamRegSharedPtr<Scalar>(new L2ParameterRegularization<Scalar>());
+	auto reg = ParamRegSharedPtr<Scalar>(new SquaredParameterRegularization<Scalar>());
 	// Rank 1.
 	Dimensions<std::size_t,1> input_dims_1({ 32u });
 	Dimensions<std::size_t,1> output_dims_1({ 5u });
@@ -778,7 +778,7 @@ TEST(GradientTest, LSTMNet) {
 template<typename Scalar>
 inline void bidirectional_net_grad_test() {
 	auto init = WeightInitSharedPtr<Scalar>(new OrthogonalWeightInitialization<Scalar>());
-	auto reg = ParamRegSharedPtr<Scalar>(new L2ParameterRegularization<Scalar>());
+	auto reg = ParamRegSharedPtr<Scalar>(new SquaredParameterRegularization<Scalar>());
 	// 3rd degree RNN with highest rank concatenation.
 	KernelPtr<Scalar,3> input_kernel1(new ConvolutionLayer<Scalar>({ 4u, 4u, 2u }, 5, init, reg));
 	KernelPtr<Scalar,3> state_kernel1(new ConvolutionLayer<Scalar>(input_kernel1->get_output_dims(), 5, init, reg));
@@ -953,6 +953,64 @@ inline void hinge_loss_grad_test() {
 TEST(GradientTest, HingeLoss) {
 	hinge_loss_grad_test<float>();
 	hinge_loss_grad_test<double>();
+}
+
+/**
+ * @param dims The dimensions of the input data.
+ * @param samples The number of samples in the batch.
+ * @param time_steps The number of time steps for sequential loss gradient testing.
+ */
+template<typename Scalar, std::size_t Rank>
+inline void binary_cross_entropy_loss_grad_test(const Dimensions<std::size_t,Rank>& dims, std::size_t samples = 5,
+		std::size_t time_steps = 3) {
+	// Non-sequential.
+	std::vector<LayerPtr<Scalar,Rank>> layers(2);
+	layers[0] = LayerPtr<Scalar,Rank>(new DenseLayer<Scalar,Rank>(dims, 1,
+			WeightInitSharedPtr<Scalar>(new GlorotWeightInitialization<Scalar>())));
+	layers[1] = LayerPtr<Scalar,Rank>(new SigmoidActivationLayer<Scalar,Rank>(layers[0]->get_output_dims()));
+	auto net = NeuralNetPtr<Scalar,Rank,false>(new FeedforwardNeuralNetwork<Scalar,Rank>(std::move(layers)));
+	net->init();
+	Dimensions<std::size_t,Rank + 1> batch_dims = dims.template promote<>();
+	batch_dims(0) = samples;
+	Dimensions<std::size_t,Rank + 1> batch_out_dims = net->get_output_dims().template promote<>();
+	batch_out_dims(0) = samples;
+	auto obj_tensor = random_tensor<Scalar,Rank + 1>(batch_out_dims);
+	*obj_tensor = obj_tensor->unaryExpr([](Scalar i) { return (Scalar) (i >= 0 ? 1 : 0); });
+	MemoryDataProvider<Scalar,Rank,false> prov(random_tensor<Scalar,Rank + 1>(batch_dims),
+			std::move(obj_tensor));
+	LossSharedPtr<Scalar,Rank,false> loss(new BinaryCrossEntropyLoss<Scalar,Rank,false>());
+	VanillaSGDOptimizer<Scalar,Rank,false> opt(loss, samples);
+	grad_test<Scalar,Rank,false>("binary cross entropy loss", prov, *net, opt);
+	// Sequential.
+	SequentialNeuralNetwork<Scalar,Rank> seq_net(std::move(net));
+	Dimensions<std::size_t,Rank + 2> seq_batch_dims = dims.template promote<2>();
+	seq_batch_dims(0) = samples;
+	seq_batch_dims(1) = time_steps;
+	Dimensions<std::size_t,Rank + 2> seq_batch_out_dims = seq_net.get_output_dims().template promote<2>();
+	seq_batch_out_dims(0) = samples;
+	seq_batch_out_dims(1) = time_steps;
+	auto seq_obj_tensor = random_tensor<Scalar,Rank + 2>(seq_batch_out_dims);
+	*seq_obj_tensor = seq_obj_tensor->unaryExpr([](Scalar i) { return (Scalar) (i >= 0 ? 1 : 0); });
+	MemoryDataProvider<Scalar,Rank,true> seq_prov(random_tensor<Scalar,Rank + 2>(seq_batch_dims),
+			std::move(seq_obj_tensor));
+	LossSharedPtr<Scalar,Rank,true> seq_loss(new BinaryCrossEntropyLoss<Scalar,Rank,true>());
+	VanillaSGDOptimizer<Scalar,Rank,true> seq_opt(seq_loss, samples);
+	grad_test<Scalar,Rank,true>("binary cross entropy loss", seq_prov, seq_net, seq_opt);
+}
+
+/**
+ * Performs gradient checks on the binary cross entropy loss function.
+ */
+template<typename Scalar>
+inline void binary_cross_entropy_loss_grad_test() {
+	binary_cross_entropy_loss_grad_test<Scalar,1>({ 24u });
+	binary_cross_entropy_loss_grad_test<Scalar,2>({ 6u, 6u });
+	binary_cross_entropy_loss_grad_test<Scalar,3>({ 4u, 4u, 2u });
+}
+
+TEST(GradientTest, BinaryCrossEntropyLoss) {
+	binary_cross_entropy_loss_grad_test<float>();
+	binary_cross_entropy_loss_grad_test<double>();
 }
 
 /**

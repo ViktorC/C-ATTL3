@@ -79,13 +79,6 @@ public:
 	 */
 	virtual NeuralNetwork<Scalar,Rank,Sequential>* clone() const = 0;
 	/**
-	 * @return Whether the instance is a foremost network. If the instance is not a stand-alone
-	 * network and it is not the first module of a complex network, it is not a foremost
-	 * network. Foremost networks do not need to back-propagate the gradients all the way
-	 * given that no other network is expected to depend on them.
-	 */
-	virtual bool is_foremost() const = 0;
-	/**
 	 * @return A constant reference to the member variable denoting the dimensions of the
 	 * tensors accepted by the network as its input along (except for the first rank which
 	 * denotes the variable sample size and in case of sequential networks the second rank
@@ -104,6 +97,25 @@ public:
 	 * layers remains with the network.
 	 */
 	virtual std::vector<Layer<Scalar,Rank>*> get_layers() = 0;
+	/**
+	 * @return Whether the instance is a foremost network. If the instance is not a stand-alone
+	 * network and it is not the first module of a complex network, it is not a foremost
+	 * network. Foremost networks do not need to back-propagate the gradients all the way
+	 * given that no other network is expected to depend on them.
+	 */
+	virtual bool is_foremost() const = 0;
+	/**
+	 * Invokes the Layer#set_frozen(bool) method of all layers of the network with the
+	 * provided argument. A frozen networks parameters are not regularized.
+	 *
+	 * @param frozen Whether the parameters of all layers should be frozen (i.e. not updatable
+	 * via optimization) or active.
+	 */
+	inline virtual void set_frozen(bool frozen) {
+		std::vector<Layer<Scalar,Rank>*> layers = get_layers();
+		for (unsigned i = 0; i < layers.size(); ++i)
+			layers[i]->set_frozen(frozen);
+	}
 	/**
 	 * Initializes all layers of the network.
 	 */

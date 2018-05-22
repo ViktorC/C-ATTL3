@@ -8,6 +8,7 @@
 #ifndef CATTL3_CATTLE_H_
 #define CATTL3_CATTLE_H_
 
+#include "Codec.hpp"
 #include "DataProvider.hpp"
 #include "Dimensions.hpp"
 #include "Layer.hpp"
@@ -17,6 +18,5 @@
 #include "ParameterRegularization.hpp"
 #include "Preprocessor.hpp"
 #include "WeightInitialization.hpp"
-#include "utils/Codec.hpp"
 
 #endif /* CATTL3_CATTLE_H_ */

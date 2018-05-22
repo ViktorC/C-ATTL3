@@ -105,14 +105,17 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a2abd58d4e18caa4ae95563da19c8338b"><td class="memItemLeft" align="right" valign="top">virtual <a class="el" href="classcattle_1_1_neural_network.html">NeuralNetwork</a>&lt; Scalar, Rank, Sequential &gt; *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_neural_network.html#a2abd58d4e18caa4ae95563da19c8338b">clone</a> () const =0</td></tr>
 <tr class="memdesc:a2abd58d4e18caa4ae95563da19c8338b"><td class="mdescLeft">&#160;</td><td class="mdescRight">A constant method implementing the clone pattern.  <a href="#a2abd58d4e18caa4ae95563da19c8338b">More...</a><br /></td></tr>
 <tr class="separator:a2abd58d4e18caa4ae95563da19c8338b"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a5dadb8900281afff9167f02b2d75c86a"><td class="memItemLeft" align="right" valign="top">virtual bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_neural_network.html#a5dadb8900281afff9167f02b2d75c86a">is_foremost</a> () const =0</td></tr>
-<tr class="separator:a5dadb8900281afff9167f02b2d75c86a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:acbea7d3cad12acbd2728e092acba4a25"><td class="memItemLeft" align="right" valign="top">virtual const <a class="el" href="classcattle_1_1_dimensions.html">Dims</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_neural_network.html#acbea7d3cad12acbd2728e092acba4a25">get_input_dims</a> () const =0</td></tr>
 <tr class="separator:acbea7d3cad12acbd2728e092acba4a25"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:abae4c549cee2b29c2b6e072ce0314303"><td class="memItemLeft" align="right" valign="top">virtual const <a class="el" href="classcattle_1_1_dimensions.html">Dims</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_neural_network.html#abae4c549cee2b29c2b6e072ce0314303">get_output_dims</a> () const =0</td></tr>
 <tr class="separator:abae4c549cee2b29c2b6e072ce0314303"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a297039d2fff23643c9b73da7b4bb686c"><td class="memItemLeft" align="right" valign="top">virtual std::vector&lt; <a class="el" href="classcattle_1_1_layer.html">Layer</a>&lt; Scalar, Rank &gt; * &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_neural_network.html#a297039d2fff23643c9b73da7b4bb686c">get_layers</a> ()=0</td></tr>
 <tr class="separator:a297039d2fff23643c9b73da7b4bb686c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5dadb8900281afff9167f02b2d75c86a"><td class="memItemLeft" align="right" valign="top">virtual bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_neural_network.html#a5dadb8900281afff9167f02b2d75c86a">is_foremost</a> () const =0</td></tr>
+<tr class="separator:a5dadb8900281afff9167f02b2d75c86a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a94a8c8170471486c5f10ba09a5709ad6"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_neural_network.html#a94a8c8170471486c5f10ba09a5709ad6">set_frozen</a> (bool frozen)</td></tr>
+<tr class="memdesc:a94a8c8170471486c5f10ba09a5709ad6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Invokes the <a class="el" href="classcattle_1_1_layer.html#a2efa46d4b10ec998cb7b09a3c430e025" title="A method for setting whether the parameters of the layer should not be updated during optimization...">Layer::set_frozen(bool)</a> method of all layers of the network with the provided argument.  <a href="#a94a8c8170471486c5f10ba09a5709ad6">More...</a><br /></td></tr>
+<tr class="separator:a94a8c8170471486c5f10ba09a5709ad6"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ae59c0963d75b1f2de4f18a6c8fe85fa8"><td class="memItemLeft" align="right" valign="top"><a id="ae59c0963d75b1f2de4f18a6c8fe85fa8"></a>
 virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_neural_network.html#ae59c0963d75b1f2de4f18a6c8fe85fa8">init</a> ()</td></tr>
 <tr class="memdesc:ae59c0963d75b1f2de4f18a6c8fe85fa8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initializes all layers of the network. <br /></td></tr>
@@ -707,6 +710,43 @@ template&lt;typename Scalar, std::size_t Rank, bool Sequential&gt; </div>
 
 </div>
 </div>
+<a id="a94a8c8170471486c5f10ba09a5709ad6"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a94a8c8170471486c5f10ba09a5709ad6">&#9670;&nbsp;</a></span>set_frozen()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename Scalar, std::size_t Rank, bool Sequential&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual void <a class="el" href="classcattle_1_1_neural_network.html">cattle::NeuralNetwork</a>&lt; Scalar, Rank, Sequential &gt;::set_frozen </td>
+          <td>(</td>
+          <td class="paramtype">bool&#160;</td>
+          <td class="paramname"><em>frozen</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Invokes the <a class="el" href="classcattle_1_1_layer.html#a2efa46d4b10ec998cb7b09a3c430e025" title="A method for setting whether the parameters of the layer should not be updated during optimization...">Layer::set_frozen(bool)</a> method of all layers of the network with the provided argument. </p>
+<p>A frozen networks parameters are not regularized.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">frozen</td><td>Whether the parameters of all layers should be frozen (i.e. not updatable via optimization) or active. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
 <a id="a6cdd26677f188f7c499f520a01082b60"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a6cdd26677f188f7c499f520a01082b60">&#9670;&nbsp;</a></span>set_input_layer()</h2>
 
@@ -744,7 +784,7 @@ template&lt;typename Scalar, std::size_t Rank, bool Sequential&gt; </div>
 </div><div class="memdoc">
 
 <p>A method to expose protected methods of the <a class="el" href="classcattle_1_1_layer.html" title="An abstract class template representing layers in a neural network. ">Layer</a> class to subclasses of <a class="el" href="classcattle_1_1_neural_network.html" title="An abstract neural network class template. ">NeuralNetwork</a> that are not friend classes of <a class="el" href="classcattle_1_1_layer.html" title="An abstract class template representing layers in a neural network. ">Layer</a>. </p>
-<dl class="section see"><dt>See also</dt><dd><a class="el" href="classcattle_1_1_layer.html#a7aafba96b6e30bc67eaef0a9db3ad2e4" title="Sets this instance&#39;s input layer status to the given value. ">Layer::set_input_layer(bool)</a></dd></dl>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="classcattle_1_1_layer.html#a9557e077d940b2ff0c280e9a78c4b52e" title="Sets this instance&#39;s input layer status to the given value. ">Layer::set_input_layer(bool)</a></dd></dl>
 <p>It sets the specified layer's input-layer-status.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">

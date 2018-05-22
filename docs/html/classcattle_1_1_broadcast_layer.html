@@ -102,6 +102,12 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a96c2d546cf321f1532e4efde7fc44419"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="classcattle_1_1_dimensions.html">Dimensions</a>&lt; std::size_t, Rank &gt; &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_broadcast_layer.html#a96c2d546cf321f1532e4efde7fc44419">get_output_dims</a> () const</td></tr>
 <tr class="memdesc:a96c2d546cf321f1532e4efde7fc44419"><td class="mdescLeft">&#160;</td><td class="mdescRight">A simple constant getter method for the output dimensionality of the layer.  <a href="#a96c2d546cf321f1532e4efde7fc44419">More...</a><br /></td></tr>
 <tr class="separator:a96c2d546cf321f1532e4efde7fc44419"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa69b5903eb6b03f700cbde298718f695"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_broadcast_layer.html#aa69b5903eb6b03f700cbde298718f695">is_frozen</a> () const</td></tr>
+<tr class="memdesc:aa69b5903eb6b03f700cbde298718f695"><td class="mdescLeft">&#160;</td><td class="mdescRight">A constant method for determining whether the parameters of the layer, if there are any, are to be updated during optimization.  <a href="#aa69b5903eb6b03f700cbde298718f695">More...</a><br /></td></tr>
+<tr class="separator:aa69b5903eb6b03f700cbde298718f695"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1c430298492efebd89502cd1af32ab32"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_broadcast_layer.html#a1c430298492efebd89502cd1af32ab32">set_frozen</a> (bool frozen)</td></tr>
+<tr class="memdesc:a1c430298492efebd89502cd1af32ab32"><td class="mdescLeft">&#160;</td><td class="mdescRight">A method for setting whether the parameters of the layer should not be updated during optimization.  <a href="#a1c430298492efebd89502cd1af32ab32">More...</a><br /></td></tr>
+<tr class="separator:a1c430298492efebd89502cd1af32ab32"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:afc538c1dccf3c50e090356562456fb23"><td class="memItemLeft" align="right" valign="top"><a id="afc538c1dccf3c50e090356562456fb23"></a>
 void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_broadcast_layer.html#afc538c1dccf3c50e090356562456fb23">init</a> ()</td></tr>
 <tr class="memdesc:afc538c1dccf3c50e090356562456fb23"><td class="mdescLeft">&#160;</td><td class="mdescRight">It initializes the layer and its parameters. <br /></td></tr>
@@ -428,6 +434,38 @@ template&lt;typename Scalar , std::size_t Rank&gt; </div>
 
 </div>
 </div>
+<a id="aa69b5903eb6b03f700cbde298718f695"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa69b5903eb6b03f700cbde298718f695">&#9670;&nbsp;</a></span>is_frozen()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename Scalar , std::size_t Rank&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool <a class="el" href="classcattle_1_1_broadcast_layer.html">cattle::BroadcastLayer</a>&lt; Scalar, Rank &gt;::is_frozen </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>A constant method for determining whether the parameters of the layer, if there are any, are to be updated during optimization. </p>
+<dl class="section return"><dt>Returns</dt><dd>Whether the parameters should not be updated during optimization. </dd></dl>
+
+<p>Implements <a class="el" href="classcattle_1_1_layer.html#a9b9374ca0299ed3b599c0403174a79af">cattle::Layer&lt; Scalar, Rank &gt;</a>.</p>
+
+</div>
+</div>
 <a id="ab3321ebfcbeeaf3c97a8a3ed4c3d48fc"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#ab3321ebfcbeeaf3c97a8a3ed4c3d48fc">&#9670;&nbsp;</a></span>is_input_layer()</h2>
 
@@ -457,7 +495,7 @@ template&lt;typename Scalar , std::size_t Rank&gt; </div>
 <p>An input layer does not need to propagate the gradients all the way during the backward pass as it is assumed that no other layer needs them derive the gradient on its parameters. It is therefore possible for an input layer to simply return a null tensor as the output of its backward pass.</p>
 <dl class="section return"><dt>Returns</dt><dd>Whether this layer is the input layer of the neural network that contains it. </dd></dl>
 
-<p>Reimplemented from <a class="el" href="classcattle_1_1_layer.html#a65bfa4d93279548dad4e57d7f03cbd51">cattle::Layer&lt; Scalar, Rank &gt;</a>.</p>
+<p>Implements <a class="el" href="classcattle_1_1_layer.html#af208065ae34cbebcdc932c84383ea159">cattle::Layer&lt; Scalar, Rank &gt;</a>.</p>
 
 </div>
 </div>
@@ -583,6 +621,45 @@ template&lt;typename Scalar , std::size_t Rank&gt; </div>
 
 </div>
 </div>
+<a id="a1c430298492efebd89502cd1af32ab32"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a1c430298492efebd89502cd1af32ab32">&#9670;&nbsp;</a></span>set_frozen()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename Scalar , std::size_t Rank&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void <a class="el" href="classcattle_1_1_broadcast_layer.html">cattle::BroadcastLayer</a>&lt; Scalar, Rank &gt;::set_frozen </td>
+          <td>(</td>
+          <td class="paramtype">bool&#160;</td>
+          <td class="paramname"><em>frozen</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>A method for setting whether the parameters of the layer should not be updated during optimization. </p>
+<p>Frozen layers are not regularized either.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">frozen</td><td>Whether the parameters of the layer are to be frozen, i.e. not updatable via optimization. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+<p>Implements <a class="el" href="classcattle_1_1_layer.html#a2efa46d4b10ec998cb7b09a3c430e025">cattle::Layer&lt; Scalar, Rank &gt;</a>.</p>
+
+</div>
+</div>
 <a id="ac454d37d09cc063531c2e750f45cf511"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#ac454d37d09cc063531c2e750f45cf511">&#9670;&nbsp;</a></span>set_input_layer()</h2>
 
@@ -617,7 +694,7 @@ template&lt;typename Scalar , std::size_t Rank&gt; </div>
   </dd>
 </dl>
 
-<p>Reimplemented from <a class="el" href="classcattle_1_1_layer.html#a7aafba96b6e30bc67eaef0a9db3ad2e4">cattle::Layer&lt; Scalar, Rank &gt;</a>.</p>
+<p>Implements <a class="el" href="classcattle_1_1_layer.html#a9557e077d940b2ff0c280e9a78c4b52e">cattle::Layer&lt; Scalar, Rank &gt;</a>.</p>
 
 </div>
 </div>

@@ -60,12 +60,12 @@ public:
  * A class template for an L1 (first-norm) regularization penalty.
  */
 template<typename Scalar>
-class L1ParameterRegularization : public ParamaterRegularization<Scalar> {
+class AbsoluteParameterRegularization : public ParamaterRegularization<Scalar> {
 public:
 	/**
 	 * @param lambda The constant by which the penalty is to be scaled.
 	 */
-	inline L1ParameterRegularization(Scalar lambda = 1e-2) :
+	inline AbsoluteParameterRegularization(Scalar lambda = 1e-2) :
 			lambda(lambda) { }
 	inline Scalar function(const Matrix<Scalar>& params) const {
 		return lambda * params.cwiseAbs().sum();
@@ -81,18 +81,18 @@ private:
  * A class template for an L2 (second-norm) regularization penalty.
  */
 template<typename Scalar>
-class L2ParameterRegularization : public ParamaterRegularization<Scalar> {
+class SquaredParameterRegularization : public ParamaterRegularization<Scalar> {
 public:
 	/**
 	 * @param lambda The constant by which the penalty is to be scaled.
 	 */
-	inline L2ParameterRegularization(Scalar lambda = 1e-2) :
+	inline SquaredParameterRegularization(Scalar lambda = 1e-2) :
 			lambda(lambda) { }
 	inline Scalar function(const Matrix<Scalar>& params) const {
-		return (Scalar) .5 * lambda * params.array().square().mean();
+		return (Scalar) .5 * lambda * params.array().square().sum();
 	}
 	inline Matrix<Scalar> d_function(const Matrix<Scalar>& params) const {
-		return (lambda / params.size()) * params;
+		return lambda * params;
 	}
 private:
 	const Scalar lambda;
@@ -106,23 +106,23 @@ template<typename Scalar>
 class ElasticNetParameterRegularization : public ParamaterRegularization<Scalar> {
 public:
 	/**
-	 * @param l1_lambda The constant by which the L1 penalty is to be scaled.
-	 * @param l2_lambda The constant by which the L2 penalty is to be scaled.
+	 * @param abs_lambda The constant by which the L1 penalty is to be scaled.
+	 * @param sqrd_lambda The constant by which the L2 penalty is to be scaled.
 	 */
-	inline ElasticNetParameterRegularization(Scalar l1_lambda = 1e-2, Scalar l2_lambda = 1e-2) :
-			l1_lambda(l1_lambda),
-			l2_lambda(l2_lambda) { }
+	inline ElasticNetParameterRegularization(Scalar abs_lambda = 1e-2, Scalar sqrd_lambda = 1e-2) :
+			abs_lambda(abs_lambda),
+			sqrd_lambda(sqrd_lambda) { }
 	inline Scalar function(const Matrix<Scalar>& params) const {
-		return l1_lambda * params.array().abs().sum() +
-				(Scalar) .5 * l2_lambda * params.array().square().sum();
+		return abs_lambda * params.array().abs().sum() +
+				(Scalar) .5 * sqrd_lambda * params.array().square().sum();
 	}
 	inline Matrix<Scalar> d_function(const Matrix<Scalar>& params) const {
-		return params.unaryExpr([this](Scalar i) { return i >= 0 ? l1_lambda : -l1_lambda; }) +
-				l2_lambda * params;
+		return params.unaryExpr([this](Scalar i) { return i >= 0 ? abs_lambda : -abs_lambda; }) +
+				sqrd_lambda * params;
 	}
 private:
-	const Scalar l1_lambda;
-	const Scalar l2_lambda;
+	const Scalar abs_lambda;
+	const Scalar sqrd_lambda;
 };
 
 } /* namespace cattle */

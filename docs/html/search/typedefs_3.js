@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['eigensolver',['EigenSolver',['../namespacecattle_1_1internal.html#a06111765fdc27ecdc122889ac6f0d3d0',1,'cattle::internal']]]
+  ['eigensolver',['EigenSolver',['../namespacecattle.html#ac6bf33124a40f94b69ab87fe5e2b2bec',1,'cattle']]]
 ];

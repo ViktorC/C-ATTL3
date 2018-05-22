@@ -135,7 +135,7 @@ using DataProviderPtr = std::unique_ptr<DataProvider<Scalar,Rank,Sequential>>;
  */
 template<typename Scalar>
 inline std::pair<DataProviderPtr<Scalar,3,false>,DataProviderPtr<Scalar,3,false>> mnist_provs() {
-	std::string mnist_folder = "test/data/mnist/";
+	std::string mnist_folder = "data/mnist/";
 	DataProviderPtr<Scalar,3,false> train_prov(new MNISTDataProvider<Scalar>(mnist_folder + "train-images.idx3-ubyte",
 			mnist_folder + "train-labels.idx1-ubyte"));
 	DataProviderPtr<Scalar,3,false> test_prov(new MNISTDataProvider<Scalar>(mnist_folder + "t10k-images.idx3-ubyte",
@@ -149,7 +149,7 @@ inline std::pair<DataProviderPtr<Scalar,3,false>,DataProviderPtr<Scalar,3,false>
  */
 template<typename Scalar>
 inline std::pair<DataProviderPtr<Scalar,3,false>,DataProviderPtr<Scalar,3,false>> cifar10_provs() {
-	std::string cifar_folder = "test/data/cifar10/";
+	std::string cifar_folder = "data/cifar10/";
 	DataProviderPtr<Scalar,3,false> train_prov(new CIFARDataProvider<Scalar>({ cifar_folder + "data_batch_1.bin",
 			cifar_folder + "data_batch_2.bin", cifar_folder + "data_batch_3.bin", cifar_folder + "data_batch_4.bin",
 			cifar_folder + "data_batch_5.bin", cifar_folder + "data_batch_6.bin", }));

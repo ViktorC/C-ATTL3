@@ -14,6 +14,7 @@
 #include <fstream>
 #include <initializer_list>
 #include <iostream>
+#include <limits>
 #include <memory>
 #include <stdexcept>
 #include <string>
@@ -192,7 +193,7 @@ public:
 	inline bool has_more() {
 		return offsets[0] < (int) instances;
 	}
-	inline DataPair<Scalar,Rank,Sequential> get_data(std::size_t batch_size) {
+	inline DataPair<Scalar,Rank,Sequential> get_data(std::size_t batch_size = std::numeric_limits<Scalar>::max()) {
 		if (!has_more())
 			throw std::out_of_range("no more data left to fetch");
 		std::size_t max_batch_size = std::min(batch_size, instances - offsets[0]);
@@ -215,7 +216,7 @@ protected:
 		MatrixMap<Scalar> obs_mat(obs->data(), rows, obs->size() / rows);
 		MatrixMap<Scalar> obj_mat(obj->data(), rows, obj->size() / rows);
 		// Create an identity matrix.
-		internal::PermMatrix perm(rows);
+		PermMatrix perm(rows);
 		perm.setIdentity();
 		// Shuffle its indices.
 		std::random_shuffle(perm.indices().data(), perm.indices().data() + perm.indices().size());

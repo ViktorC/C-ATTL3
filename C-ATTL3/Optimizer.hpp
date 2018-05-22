@@ -76,9 +76,9 @@ public:
 	 * @return Whether the gradient check has been passed or failed.
 	 */
 	inline bool verify_gradients(Net& net, Provider& provider, bool verbose = true,
-			Scalar step_size = internal::NumericUtils<Scalar>::EPSILON3 / 2,
+			Scalar step_size = internal::NumericUtils<Scalar>::EPSILON2 / 2,
 			Scalar abs_epsilon = internal::NumericUtils<Scalar>::EPSILON2,
-			Scalar rel_epsilon = internal::NumericUtils<Scalar>::EPSILON3) const {
+			Scalar rel_epsilon = internal::NumericUtils<Scalar>::EPSILON2) const {
 		assert(net.get_input_dims() == provider.get_obs_dims());
 		assert(net.get_output_dims() == provider.get_obj_dims());
 		assert(step_size > 0);
@@ -165,6 +165,8 @@ public:
 		fit(net);
 		Scalar prev_test_loss = internal::NumericUtils<Scalar>::MAX;
 		unsigned cons_loss_inc = 0;
+		if (verbose)
+			std::cout << "<Optimization>" << std::endl;
 		// Start the optimization iterations.
 		for (unsigned i = 0; i <= epochs; ++i) {
 			if (verbose)
@@ -173,11 +175,11 @@ public:
 			if (i != 0) {
 				training_prov.reset();
 				if (verbose)
-					std::cout << "\ttraining loss: " << std::to_string(train(net, training_prov, i, verbose)) << std::endl;
+					std::cout << "\ttraining loss: " << std::to_string(_train(net, training_prov, i, verbose)) << std::endl;
 			}
 			// Validate.
 			test_prov.reset();
-			Scalar test_loss = test(net, test_prov, i, verbose);
+			Scalar test_loss = _test(net, test_prov, i, verbose);
 			if (verbose)
 				std::cout << "\ttest loss: " << std::to_string(test_loss);
 			if (test_loss >= prev_test_loss) {
@@ -199,6 +201,60 @@ public:
 		net.empty_caches();
 		return prev_test_loss;
 	}
+	/**
+	 * It trains the specified neural network using the given training data provider according to
+	 * the optimizers loss function for the specified number of epochs.
+	 *
+	 * @param net A reference to the network whose parameters are to be optimized.
+	 * @param prov A reference to the provider of the training data.
+	 * @param epochs The number of epochs for which the training should proceed.
+	 * @param verbose Whether the training losses for of the epochs should be printed to the
+	 * standard out stream.
+	 * @return The training loss of the last epoch.
+	 */
+	inline Scalar train(Net& net, Provider& prov, unsigned epochs, bool verbose = true) {
+		assert(net.get_input_dims() == prov.get_obs_dims());
+		assert(net.get_output_dims() == prov.get_obj_dims());
+		fit(net);
+		Scalar train_loss;
+		if (verbose)
+			std::cout << "<Training>" << std::endl;
+		for (unsigned i = 1; i <= epochs; ++i) {
+			if (verbose)
+				std::cout << "Epoch " << std::setw(3) << i << std::string(28, '-') << std::endl;
+			prov.reset();
+			train_loss = _train(net, prov, i, verbose);
+			if (verbose)
+				std::cout << "\ttraining loss: " << std::to_string(train_loss) << std::endl;
+		}
+		prov.reset();
+		net.empty_caches();
+		return train_loss;
+	}
+	/**
+	 * It tests the specified neural network using the given test data provider according to the
+	 * optimizers loss function.
+	 *
+	 * @param net A reference to the network whose parameters are to be optimized.
+	 * @param prov A reference to the provider of the training data.
+	 * @param verbose Whether the training, test, and regularization losses for each epoch should
+	 * be printed to the standard out stream.
+	 * @return The test loss of the last epoch.
+	 */
+	inline Scalar test(Net& net, Provider& prov, bool verbose = true) {
+		assert(net.get_input_dims() == prov.get_obs_dims());
+		assert(net.get_output_dims() == prov.get_obj_dims());
+		fit(net);
+		if (verbose)
+			std::cout << "<Testing>" << std::endl;
+		prov.reset();
+		Scalar test_loss = _test(net, prov, 0, verbose);
+		if (verbose)
+			std::cout << "\ttest loss: " << std::to_string(test_loss);
+		prov.reset();
+		net.empty_caches();
+		return test_loss;
+	}
 protected:
 	/**
 	 * It fits the optimizer to the neural network. It allows optimizers with individual
@@ -218,7 +274,7 @@ protected:
 	 * information should be printed to the standard out stream.
 	 * @return The training loss of the epoch.
 	 */
-	virtual Scalar train(Net& net, Provider& training_prov, unsigned epoch, bool verbose) = 0;
+	virtual Scalar _train(Net& net, Provider& training_prov, unsigned epoch, bool verbose) = 0;
 	/**
 	 * It tests the specified neural network for a single epoch on the test data
 	 * provided by the specified data provider.
@@ -230,7 +286,7 @@ protected:
 	 * information should be printed to the standard out stream.
 	 * @return The test loss of the epoch.
 	 */
-	virtual Scalar test(Net& net, Provider& test_prov, unsigned epoch, bool verbose) = 0;
+	virtual Scalar _test(Net& net, Provider& test_prov, unsigned epoch, bool verbose) = 0;
 	/**
 	 * A method to expose protected methods of the NeuralNetwork class to subclasses of
 	 * Optimizer that are not friend classes of NeuralNetwork.
@@ -378,7 +434,7 @@ public:
 	}
 	virtual ~SGDOptimizer() = default;
 protected:
-	inline Scalar train(typename Base::Net& net, typename Base::Provider& training_prov, unsigned epoch, bool verbose) {
+	inline Scalar _train(typename Base::Net& net, typename Base::Provider& training_prov, unsigned epoch, bool verbose) {
 		Scalar training_loss = 0;
 		Scalar instances = 0;
 		std::vector<Layer<Scalar,Rank>*> layers = Base::get_layers(net);
@@ -397,7 +453,7 @@ protected:
 			Base::backpropagate(net, Base::loss->d_function(std::move(out), std::move(data_pair.second)) / (Scalar) batch_size);
 			for (unsigned k = 0; k < layers.size(); ++k) {
 				Layer<Scalar,Rank>& layer = *(layers[k]);
-				if (Base::is_parametric(layer)) {
+				if (Base::is_parametric(layer) && !layer.is_frozen()) {
 					Base::regularize(layer);
 					update_params(layer, k, epoch - 1);
 					Base::enforce_constraints(layer);
@@ -406,7 +462,7 @@ protected:
 		}
 		return training_loss / instances;
 	}
-	inline Scalar test(typename Base::Net& net, typename Base::Provider& test_prov, unsigned epoch, bool verbose) {
+	inline Scalar _test(typename Base::Net& net, typename Base::Provider& test_prov, unsigned epoch, bool verbose) {
 		Scalar obj_loss = 0;
 		Scalar instances = 0;
 		std::vector<Layer<Scalar,Rank>*> layers = Base::get_layers(net);

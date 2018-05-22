@@ -92,8 +92,8 @@ Inheritance diagram for cattle::BatchNormLayer&lt; Scalar, Rank &gt;:</div>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:abb975e2f5e03ab7ac41437fa99e63e3c"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_batch_norm_layer.html#abb975e2f5e03ab7ac41437fa99e63e3c">BatchNormLayer</a> (const <a class="el" href="classcattle_1_1_dimensions.html">Dimensions</a>&lt; std::size_t, Rank &gt; &amp;dims, <a class="el" href="namespacecattle.html#a083ab63c64a5c935b2d2cd3f03c4e27a">ParamRegSharedPtr</a>&lt; Scalar &gt; gamma_reg=Root::NO_PARAM_REG, <a class="el" href="namespacecattle.html#a083ab63c64a5c935b2d2cd3f03c4e27a">ParamRegSharedPtr</a>&lt; Scalar &gt; beta_reg=Root::NO_PARAM_REG, Scalar gamma_max_norm_constraint=0, Scalar beta_max_norm_constraint=0, Scalar norm_avg_decay=.1, Scalar epsilon=<a class="el" href="classcattle_1_1internal_1_1_numeric_utils.html">internal::NumericUtils</a>&lt; Scalar &gt;::EPSILON3)</td></tr>
-<tr class="separator:abb975e2f5e03ab7ac41437fa99e63e3c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a462f927cb719194c5e5b9a4dcdda5614"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_batch_norm_layer.html#a462f927cb719194c5e5b9a4dcdda5614">BatchNormLayer</a> (const <a class="el" href="classcattle_1_1_dimensions.html">Dimensions</a>&lt; std::size_t, Rank &gt; &amp;dims, <a class="el" href="namespacecattle.html#a083ab63c64a5c935b2d2cd3f03c4e27a">ParamRegSharedPtr</a>&lt; Scalar &gt; gamma_reg=Root::NO_PARAM_REG, <a class="el" href="namespacecattle.html#a083ab63c64a5c935b2d2cd3f03c4e27a">ParamRegSharedPtr</a>&lt; Scalar &gt; beta_reg=Root::NO_PARAM_REG, Scalar gamma_max_norm_constraint=0, Scalar beta_max_norm_constraint=0, Scalar norm_avg_decay=.1, Scalar epsilon=<a class="el" href="classcattle_1_1internal_1_1_numeric_utils.html">internal::NumericUtils</a>&lt; Scalar &gt;::EPSILON2)</td></tr>
+<tr class="separator:a462f927cb719194c5e5b9a4dcdda5614"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a1812f43bb048fe50d23d8983fbc08a60"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classcattle_1_1_layer.html">Root</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_batch_norm_layer.html#a1812f43bb048fe50d23d8983fbc08a60">clone</a> () const</td></tr>
 <tr class="memdesc:a1812f43bb048fe50d23d8983fbc08a60"><td class="mdescLeft">&#160;</td><td class="mdescRight">A constant method implementing the clone pattern.  <a href="#a1812f43bb048fe50d23d8983fbc08a60">More...</a><br /></td></tr>
 <tr class="separator:a1812f43bb048fe50d23d8983fbc08a60"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -104,6 +104,12 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a0c548711dd37518e24da9814841e5654 inherit pub_methods_classcattle_1_1_batch_norm_layer_base"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="classcattle_1_1_dimensions.html">Dimensions</a>&lt; std::size_t, Rank &gt; &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_batch_norm_layer_base.html#a0c548711dd37518e24da9814841e5654">get_output_dims</a> () const</td></tr>
 <tr class="memdesc:a0c548711dd37518e24da9814841e5654 inherit pub_methods_classcattle_1_1_batch_norm_layer_base"><td class="mdescLeft">&#160;</td><td class="mdescRight">A simple constant getter method for the output dimensionality of the layer.  <a href="classcattle_1_1_batch_norm_layer_base.html#a0c548711dd37518e24da9814841e5654">More...</a><br /></td></tr>
 <tr class="separator:a0c548711dd37518e24da9814841e5654 inherit pub_methods_classcattle_1_1_batch_norm_layer_base"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7f5b87fd95040110d560e314ee910b4f inherit pub_methods_classcattle_1_1_batch_norm_layer_base"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_batch_norm_layer_base.html#a7f5b87fd95040110d560e314ee910b4f">is_frozen</a> () const</td></tr>
+<tr class="memdesc:a7f5b87fd95040110d560e314ee910b4f inherit pub_methods_classcattle_1_1_batch_norm_layer_base"><td class="mdescLeft">&#160;</td><td class="mdescRight">A constant method for determining whether the parameters of the layer, if there are any, are to be updated during optimization.  <a href="classcattle_1_1_batch_norm_layer_base.html#a7f5b87fd95040110d560e314ee910b4f">More...</a><br /></td></tr>
+<tr class="separator:a7f5b87fd95040110d560e314ee910b4f inherit pub_methods_classcattle_1_1_batch_norm_layer_base"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:abc769d1686d9485048a109d94267d93b inherit pub_methods_classcattle_1_1_batch_norm_layer_base"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_batch_norm_layer_base.html#abc769d1686d9485048a109d94267d93b">set_frozen</a> (bool frozen)</td></tr>
+<tr class="memdesc:abc769d1686d9485048a109d94267d93b inherit pub_methods_classcattle_1_1_batch_norm_layer_base"><td class="mdescLeft">&#160;</td><td class="mdescRight">A method for setting whether the parameters of the layer should not be updated during optimization.  <a href="classcattle_1_1_batch_norm_layer_base.html#abc769d1686d9485048a109d94267d93b">More...</a><br /></td></tr>
+<tr class="separator:abc769d1686d9485048a109d94267d93b inherit pub_methods_classcattle_1_1_batch_norm_layer_base"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aa0e1e98fdcdfca64ae43140d56c3bf9c inherit pub_methods_classcattle_1_1_batch_norm_layer_base"><td class="memItemLeft" align="right" valign="top"><a id="aa0e1e98fdcdfca64ae43140d56c3bf9c"></a>
 void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_batch_norm_layer_base.html#aa0e1e98fdcdfca64ae43140d56c3bf9c">init</a> ()</td></tr>
 <tr class="memdesc:aa0e1e98fdcdfca64ae43140d56c3bf9c inherit pub_methods_classcattle_1_1_batch_norm_layer_base"><td class="mdescLeft">&#160;</td><td class="mdescRight">It initializes the layer and its parameters. <br /></td></tr>
@@ -160,8 +166,8 @@ class cattle::BatchNormLayer&lt; Scalar, Rank &gt;</h3>
 
 <p>A class template for a batch normalization layer. </p>
 </div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
-<a id="abb975e2f5e03ab7ac41437fa99e63e3c"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#abb975e2f5e03ab7ac41437fa99e63e3c">&#9670;&nbsp;</a></span>BatchNormLayer()</h2>
+<a id="a462f927cb719194c5e5b9a4dcdda5614"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a462f927cb719194c5e5b9a4dcdda5614">&#9670;&nbsp;</a></span>BatchNormLayer()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -211,7 +217,7 @@ template&lt;typename Scalar, std::size_t Rank&gt; </div>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">Scalar&#160;</td>
-          <td class="paramname"><em>epsilon</em> = <code><a class="el" href="classcattle_1_1internal_1_1_numeric_utils.html">internal::NumericUtils</a>&lt;Scalar&gt;::EPSILON3</code>&#160;</td>
+          <td class="paramname"><em>epsilon</em> = <code><a class="el" href="classcattle_1_1internal_1_1_numeric_utils.html">internal::NumericUtils</a>&lt;Scalar&gt;::EPSILON2</code>&#160;</td>
         </tr>
         <tr>
           <td></td>

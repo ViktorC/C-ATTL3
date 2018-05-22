@@ -1,5 +1,5 @@
 /*
- * conv_net.cpp
+ * simple_convnet.cpp
  *
  *  Created on: 18 Apr 2018
  *      Author: Viktor Csomor
@@ -32,7 +32,7 @@ int main() {
 	MemoryDataProvider<double,3,false> test_prov(std::move(test_obs_ptr), std::move(test_obj_ptr));
 	// Create weight initialization and parameter regularization instances.
 	auto init = std::make_shared<HeWeightInitialization<double>>();
-	auto reg = std::make_shared<L2ParameterRegularization<double>>();
+	auto reg = std::make_shared<SquaredParameterRegularization<double>>();
 	// Create the convolutional network.
 	std::vector<LayerPtr<double,3>> layers(9);
 	layers[0] = LayerPtr<double,3>(new ConvolutionLayer<double>(training_prov.get_obs_dims(), 10, init, reg, 5, 2));
@@ -48,7 +48,7 @@ int main() {
 	// Initialize the network.
 	nn.init();
 	// Create the loss and the optimizer.
-	auto loss = std::make_shared<QuadraticLoss<double,3,false>>();
+	auto loss = std::make_shared<SquaredLoss<double,3,false>>();
 	NadamOptimizer<double,3,false> opt(loss, 20);
 	// Optimize the network.
 	opt.optimize(nn, training_prov, test_prov, 500);

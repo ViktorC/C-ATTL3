@@ -86,6 +86,9 @@ Classes</h2></td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_absolute_loss.html">AbsoluteLoss</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">A template class representing the absolute error (L1) loss function.  <a href="classcattle_1_1_absolute_loss.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_absolute_parameter_regularization.html">AbsoluteParameterRegularization</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">A class template for an L1 (first-norm) regularization penalty.  <a href="classcattle_1_1_absolute_parameter_regularization.html#details">More...</a><br /></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_activation_layer.html">ActivationLayer</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">An abstract class template that represents an activation function layer.  <a href="classcattle_1_1_activation_layer.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -112,6 +115,9 @@ Classes</h2></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_bidirectional_neural_network.html">BidirectionalNeuralNetwork</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">A class template for a bidirectional neural network that takes a unidirectional recurrent network, clones it, reverses the clone's processing direction, and uses the two networks as its parallel sub-modules.  <a href="classcattle_1_1_bidirectional_neural_network.html#details">More...</a><br /></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_binary_cross_entropy_loss.html">BinaryCrossEntropyLoss</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">A template class representing the binary cross entropy loss function.  <a href="classcattle_1_1_binary_cross_entropy_loss.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_binary_dim_expression.html">BinaryDimExpression</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">An expression representing an operation between two dimension expressions of the same rank.  <a href="classcattle_1_1_binary_dim_expression.html#details">More...</a><br /></td></tr>
@@ -190,12 +196,6 @@ Classes</h2></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_kernel_layer.html">KernelLayer</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">An abstract base class template for layers representing linear kernel-based operations such as matrix multiplication or convolution.  <a href="classcattle_1_1_kernel_layer.html#details">More...</a><br /></td></tr>
-<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_l1_parameter_regularization.html">L1ParameterRegularization</a></td></tr>
-<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">A class template for an L1 (first-norm) regularization penalty.  <a href="classcattle_1_1_l1_parameter_regularization.html#details">More...</a><br /></td></tr>
-<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_l2_parameter_regularization.html">L2ParameterRegularization</a></td></tr>
-<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">A class template for an L2 (second-norm) regularization penalty.  <a href="classcattle_1_1_l2_parameter_regularization.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_layer.html">Layer</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">An abstract class template representing layers in a neural network.  <a href="classcattle_1_1_layer.html#details">More...</a><br /></td></tr>
@@ -290,9 +290,6 @@ Classes</h2></td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_preprocessor.html">Preprocessor</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">An abstract class template for data preprocessors.  <a href="classcattle_1_1_preprocessor.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_quadratic_loss.html">QuadraticLoss</a></td></tr>
-<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">A template class representing the squared error (L2) loss function.  <a href="classcattle_1_1_quadratic_loss.html#details">More...</a><br /></td></tr>
-<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_recurrent_neural_network.html">RecurrentNeuralNetwork</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">A class template for a simple recurrent neural network (RNN).  <a href="classcattle_1_1_recurrent_neural_network.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -331,6 +328,12 @@ Classes</h2></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_split_file_data_provider.html">SplitFileDataProvider</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">An abstract class template for a data provider backed by an arbitrary number of file pairs containing the separated observations and the objectives.  <a href="classcattle_1_1_split_file_data_provider.html#details">More...</a><br /></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_squared_loss.html">SquaredLoss</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">A template class representing the squared error (L2) loss function.  <a href="classcattle_1_1_squared_loss.html#details">More...</a><br /></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_squared_parameter_regularization.html">SquaredParameterRegularization</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">A class template for an L2 (second-norm) regularization penalty.  <a href="classcattle_1_1_squared_parameter_regularization.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_stacked_neural_network.html">StackedNeuralNetwork</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">A class template for a composite neural network that consists of a set of serially stacked neural network sub-modules.  <a href="classcattle_1_1_stacked_neural_network.html#details">More...</a><br /></td></tr>
@@ -447,9 +450,35 @@ template&lt;typename Scalar , std::size_t Rank&gt; </td></tr>
 <tr class="memitem:a7dfcb4d57e2c5da3170ebd8d13fd0431"><td class="memTemplItemLeft" align="right" valign="top">using&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespacecattle.html#a7dfcb4d57e2c5da3170ebd8d13fd0431">TensorMap</a> = Eigen::TensorMap&lt; <a class="el" href="namespacecattle.html#a8b9323ad928764340e46f0802bf27fbb">Tensor</a>&lt; Scalar, Rank &gt; &gt;</td></tr>
 <tr class="memdesc:a7dfcb4d57e2c5da3170ebd8d13fd0431"><td class="mdescLeft">&#160;</td><td class="mdescRight">An for a class that can be used to map raw pointer data to a tensor of arbitrary rank and scalar type with dynamic dimensionality. <br /></td></tr>
 <tr class="separator:a7dfcb4d57e2c5da3170ebd8d13fd0431"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3d5583e1cbc5ce841b868dc085eacf14"><td class="memTemplParams" colspan="2"><a id="a3d5583e1cbc5ce841b868dc085eacf14"></a>
+template&lt;typename Scalar &gt; </td></tr>
+<tr class="memitem:a3d5583e1cbc5ce841b868dc085eacf14"><td class="memTemplItemLeft" align="right" valign="top">using&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespacecattle.html#a3d5583e1cbc5ce841b868dc085eacf14">NormalRandGen</a> = Eigen::internal::NormalRandomGenerator&lt; Scalar &gt;</td></tr>
+<tr class="memdesc:a3d5583e1cbc5ce841b868dc085eacf14"><td class="mdescLeft">&#160;</td><td class="mdescRight">An alias for Eigen's normal standard distribution random number generator for tensors. <br /></td></tr>
+<tr class="separator:a3d5583e1cbc5ce841b868dc085eacf14"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4e83e75cf6fc91facbcae6c5bb14c09a"><td class="memItemLeft" align="right" valign="top"><a id="a4e83e75cf6fc91facbcae6c5bb14c09a"></a>
+using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacecattle.html#a4e83e75cf6fc91facbcae6c5bb14c09a">PermMatrix</a> = Eigen::PermutationMatrix&lt; Eigen::Dynamic, Eigen::Dynamic &gt;</td></tr>
+<tr class="memdesc:a4e83e75cf6fc91facbcae6c5bb14c09a"><td class="mdescLeft">&#160;</td><td class="mdescRight">An alias for permutation matrices. <br /></td></tr>
+<tr class="separator:a4e83e75cf6fc91facbcae6c5bb14c09a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac6bf33124a40f94b69ab87fe5e2b2bec"><td class="memTemplParams" colspan="2"><a id="ac6bf33124a40f94b69ab87fe5e2b2bec"></a>
+template&lt;typename Scalar &gt; </td></tr>
+<tr class="memitem:ac6bf33124a40f94b69ab87fe5e2b2bec"><td class="memTemplItemLeft" align="right" valign="top">using&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespacecattle.html#ac6bf33124a40f94b69ab87fe5e2b2bec">EigenSolver</a> = Eigen::SelfAdjointEigenSolver&lt; <a class="el" href="namespacecattle.html#a1d78623a47279d516750a44dbad6090b">Matrix</a>&lt; Scalar &gt; &gt;</td></tr>
+<tr class="memdesc:ac6bf33124a40f94b69ab87fe5e2b2bec"><td class="mdescLeft">&#160;</td><td class="mdescRight">An alias for self-adjoint eigen solvers. <br /></td></tr>
+<tr class="separator:ac6bf33124a40f94b69ab87fe5e2b2bec"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5046b5358713feff920da6a78545e383"><td class="memTemplParams" colspan="2"><a id="a5046b5358713feff920da6a78545e383"></a>
+template&lt;typename Scalar &gt; </td></tr>
+<tr class="memitem:a5046b5358713feff920da6a78545e383"><td class="memTemplItemLeft" align="right" valign="top">using&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespacecattle.html#a5046b5358713feff920da6a78545e383">SVD</a> = Eigen::BDCSVD&lt; <a class="el" href="namespacecattle.html#a1d78623a47279d516750a44dbad6090b">Matrix</a>&lt; Scalar &gt; &gt;</td></tr>
+<tr class="memdesc:a5046b5358713feff920da6a78545e383"><td class="mdescLeft">&#160;</td><td class="mdescRight">An alias for Eigen's bi-diagonal divide and conquer singular-value decomposition. <br /></td></tr>
+<tr class="separator:a5046b5358713feff920da6a78545e383"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5e371fed327ca32225ec810aa5ebeb8b"><td class="memItemLeft" align="right" valign="top"><a id="a5e371fed327ca32225ec810aa5ebeb8b"></a>
+using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacecattle.html#a5e371fed327ca32225ec810aa5ebeb8b">SVDOptions</a> = Eigen::DecompositionOptions</td></tr>
+<tr class="memdesc:a5e371fed327ca32225ec810aa5ebeb8b"><td class="mdescLeft">&#160;</td><td class="mdescRight">An alias for Eigen's singular-value decomposition options. <br /></td></tr>
+<tr class="separator:a5e371fed327ca32225ec810aa5ebeb8b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="enum-members"></a>
 Enumerations</h2></td></tr>
+<tr class="memitem:a8ac8a938d166ae3b376b47b6020922ab"><td class="memItemLeft" align="right" valign="top"><a id="a8ac8a938d166ae3b376b47b6020922ab"></a>enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacecattle.html#a8ac8a938d166ae3b376b47b6020922ab">PPMFormatType</a> </td></tr>
+<tr class="memdesc:a8ac8a938d166ae3b376b47b6020922ab"><td class="mdescLeft">&#160;</td><td class="mdescRight">An enumeration for PPM format types. <br /></td></tr>
+<tr class="separator:a8ac8a938d166ae3b376b47b6020922ab"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a3aba4c1d42028d369dfb60a0507d3785"><td class="memItemLeft" align="right" valign="top"><a id="a3aba4c1d42028d369dfb60a0507d3785"></a>enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacecattle.html#a3aba4c1d42028d369dfb60a0507d3785">CIFARType</a> </td></tr>
 <tr class="memdesc:a3aba4c1d42028d369dfb60a0507d3785"><td class="mdescLeft">&#160;</td><td class="mdescRight">An enum denoting different CIFAR data set types. <br /></td></tr>
 <tr class="separator:a3aba4c1d42028d369dfb60a0507d3785"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -459,9 +488,6 @@ Enumerations</h2></td></tr>
 <tr class="memitem:a962c4b25a74fac744864b9fa4fca4a0b"><td class="memItemLeft" align="right" valign="top"><a id="a962c4b25a74fac744864b9fa4fca4a0b"></a>enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacecattle.html#a962c4b25a74fac744864b9fa4fca4a0b">DenseConcatType</a> </td></tr>
 <tr class="memdesc:a962c4b25a74fac744864b9fa4fca4a0b"><td class="mdescLeft">&#160;</td><td class="mdescRight">An enumeration type for the different ways the input of a layer in a dense network may be concatenated to its output. <br /></td></tr>
 <tr class="separator:a962c4b25a74fac744864b9fa4fca4a0b"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a8ac8a938d166ae3b376b47b6020922ab"><td class="memItemLeft" align="right" valign="top"><a id="a8ac8a938d166ae3b376b47b6020922ab"></a>enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacecattle.html#a8ac8a938d166ae3b376b47b6020922ab">PPMFormatType</a> </td></tr>
-<tr class="memdesc:a8ac8a938d166ae3b376b47b6020922ab"><td class="mdescLeft">&#160;</td><td class="mdescRight">An enumeration for PPM format types. <br /></td></tr>
-<tr class="separator:a8ac8a938d166ae3b376b47b6020922ab"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>The namespace containing all classes and typedefs of the C-ATTL3 library. </p>

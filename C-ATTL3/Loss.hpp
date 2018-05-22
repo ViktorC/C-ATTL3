@@ -188,7 +188,7 @@ protected:
  * A template class representing the squared error (L2) loss function.
  */
 template<typename Scalar, std::size_t Rank, bool Sequential>
-class QuadraticLoss : public UniversalLoss<Scalar,Rank,Sequential> {
+class SquaredLoss : public UniversalLoss<Scalar,Rank,Sequential> {
 	typedef Loss<Scalar,Rank,Sequential> Root;
 	typedef UniversalLoss<Scalar,Rank,Sequential> Base;
 protected:
@@ -282,6 +282,37 @@ protected:
 		}
 		return TensorMap<Scalar,Root::DATA_RANK>(out_grads.data(), grad_dims);
 	}
+};
+
+/**
+ * A template class representing the binary cross entropy loss function. The objective
+ * is expected to be a size-1 tensor with the value of either 0 or 1.
+ */
+template<typename Scalar, std::size_t Rank, bool Sequential>
+class BinaryCrossEntropyLoss : public UniversalLoss<Scalar,Rank,Sequential> {
+	typedef Loss<Scalar,Rank,Sequential> Root;
+	typedef UniversalLoss<Scalar,Rank,Sequential> Base;
+public:
+	/**
+	 * @param epsilon A small constant used to maintain numerical stability.
+	 */
+	BinaryCrossEntropyLoss(Scalar epsilon = internal::NumericUtils<Scalar>::EPSILON2) :
+			epsilon(epsilon) { };
+protected:
+	inline ColVector<Scalar> _function(typename Root::Data out, typename Root::Data obj) const {
+		assert(out.size() == out.dimension(0));
+		typename Root::Data loss = -(obj * out.log() +
+				(obj.constant(1) - obj) * (out.constant(1) - out).log());
+		return MatrixMap<Scalar>(loss.data(), out.dimension(0), 1);
+	}
+	inline typename Root::Data _d_function(typename Root::Data out, typename Root::Data obj,
+			const typename Base::RankwiseArray& grad_dims) const {
+		assert(out.size() == out.dimension(0));
+		return -(obj / (out + out.constant(epsilon)) -
+				(obj.constant(1) - obj) / (out.constant(1 + epsilon) - out));
+	}
+private:
+	Scalar epsilon;
 };
 
 /**

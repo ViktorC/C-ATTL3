@@ -1,5 +1,4 @@
 var searchData=
 [
-  ['weightinitialization',['WeightInitialization',['../classcattle_1_1_weight_initialization.html',1,'cattle']]],
-  ['weightinitsharedptr',['WeightInitSharedPtr',['../namespacecattle.html#a96574a467e593e2c62c432b0c8ec8349',1,'cattle']]]
+  ['zeroweightinitialization',['ZeroWeightInitialization',['../classcattle_1_1_zero_weight_initialization.html',1,'cattle::ZeroWeightInitialization&lt; Scalar &gt;'],['../classcattle_1_1_zero_weight_initialization.html#a26252daffa57216aa12dd304c577e9fa',1,'cattle::ZeroWeightInitialization::ZeroWeightInitialization()']]]
 ];

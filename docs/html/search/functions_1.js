@@ -1,5 +1,6 @@
 var searchData=
 [
+  ['absoluteparameterregularization',['AbsoluteParameterRegularization',['../classcattle_1_1_absolute_parameter_regularization.html#a61c3c0f9721f9dc82e3f11a0b629afc3',1,'cattle::AbsoluteParameterRegularization']]],
   ['adadeltaoptimizer',['AdadeltaOptimizer',['../classcattle_1_1_adadelta_optimizer.html#a73cf29d63eebf79af1b7b0099527f038',1,'cattle::AdadeltaOptimizer']]],
   ['adagradoptimizer',['AdagradOptimizer',['../classcattle_1_1_adagrad_optimizer.html#ac36bda055ce015ac572398dee21a6f85',1,'cattle::AdagradOptimizer']]],
   ['adamaxoptimizer',['AdaMaxOptimizer',['../classcattle_1_1_ada_max_optimizer.html#a3303ee97e0c61518c3195b5c3e0c2802',1,'cattle::AdaMaxOptimizer']]],

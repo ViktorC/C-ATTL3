@@ -89,6 +89,21 @@ public:
 	 */
 	virtual const Dimensions<std::size_t,Rank>& get_output_dims() const = 0;
 	/**
+	 * A constant method for determining whether the parameters of the layer,
+	 * if there are any, are to be updated during optimization.
+	 *
+	 * @return Whether the parameters should not be updated during optimization.
+	 */
+	virtual bool is_frozen() const = 0;
+	/**
+	 * A method for setting whether the parameters of the layer should not be updated
+	 * during optimization. Frozen layers are not regularized either.
+	 *
+	 * @param frozen Whether the parameters of the layer are to be frozen, i.e. not
+	 * updatable via optimization.
+	 */
+	virtual void set_frozen(bool frozen) = 0;
+	/**
 	 * It initializes the layer and its parameters.
 	 */
 	virtual void init() = 0;
@@ -152,13 +167,13 @@ protected:
 	 *
 	 * @return Whether this layer is the input layer of the neural network that contains it.
 	 */
-	virtual bool is_input_layer() const;
+	virtual bool is_input_layer() const = 0;
 	/**
 	 * Sets this instance's input layer status to the given value.
 	 *
 	 * @param input_layer Whether this layer is to be an input layer or not.
 	 */
-	virtual void set_input_layer(bool input_layer);
+	virtual void set_input_layer(bool input_layer) = 0;
 	/**
 	 * It empties the layer's caches such as those required for the derivation of the function
 	 * represented by the layer.
@@ -238,6 +253,12 @@ public:
 	inline const Dimensions<std::size_t,Rank>& get_output_dims() const {
 		return output_dims;
 	}
+	inline bool is_frozen() const {
+		return frozen;
+	}
+	inline void set_frozen(bool frozen) {
+		this->frozen = frozen;
+	}
 	inline void init() {
 		weight_init->apply(weights_ref);
 		weights_grad.setZero(weights_grad.rows(), weights_grad.cols());
@@ -253,6 +274,7 @@ protected:
 				max_norm_constraint(max_norm_constraint),
 				max_norm(internal::NumericUtils<Scalar>::decidedly_greater(max_norm_constraint, (Scalar) 0)),
 				input_layer(false),
+				frozen(false),
 				weights(weight_rows, weight_cols),
 				weights_grad(weight_rows, weight_cols),
 				weights_ref(weights) {
@@ -267,6 +289,7 @@ protected:
 			max_norm_constraint(layer.max_norm_constraint),
 			max_norm(layer.max_norm),
 			input_layer(layer.input_layer),
+			frozen(layer.frozen),
 			weights(share_params ? Matrix<Scalar>(0, 0) : layer.weights),
 			weights_grad(layer.weights_grad),
 			weights_ref(share_params ? layer.weights : weights) { }
@@ -307,6 +330,7 @@ protected:
 	Matrix<Scalar>& weights_ref;
 private:
 	bool input_layer;
+	bool frozen;
 	mutable Matrix<Scalar> weights;
 };
 
@@ -886,18 +910,26 @@ public:
 	inline const Dimensions<std::size_t,Rank>& get_output_dims() const {
 		return dims;
 	}
+	inline bool is_frozen() const {
+		return frozen;
+	}
+	inline void set_frozen(bool frozen) {
+		this->frozen = frozen;
+	}
 	inline void init() { }
 protected:
 	inline ActivationLayer(const Dimensions<std::size_t,Rank>& dims, std::size_t param_rows = 0,
 			std::size_t params_cols = 0) :
 				dims(dims),
 				input_layer(false),
+				frozen(false),
 				params(param_rows, params_cols),
 				params_grad(param_rows, params_cols),
 				params_ref(params) { }
 	inline ActivationLayer(const ActivationLayer<Scalar,Rank>& layer, bool share_params = false) :
 			dims(layer.dims),
 			input_layer(layer.input_layer),
+			frozen(layer.frozen),
 			params(share_params ? Matrix<Scalar>(0, 0) : layer.params),
 			params_grad(layer.params_grad),
 			params_ref(share_params ? layer.params : params) { }
@@ -924,6 +956,7 @@ protected:
 	Matrix<Scalar>& params_ref;
 private:
 	bool input_layer;
+	bool frozen;
 	mutable Matrix<Scalar> params;
 };
 
@@ -1495,6 +1528,12 @@ public:
 	inline const Dimensions<std::size_t,3>& get_output_dims() const {
 		return output_dims;
 	}
+	inline bool is_frozen() const {
+		return frozen;
+	}
+	inline void set_frozen(bool frozen) {
+		this->frozen = frozen;
+	}
 	inline void init() { }
 protected:
 	typedef std::array<std::size_t,4> RankwiseArray;
@@ -1518,6 +1557,7 @@ protected:
 				height_rem(input_dims(0) - dil_receptor_height),
 				width_rem(input_dims(1) - dil_receptor_width),
 				input_layer(false),
+				frozen(false),
 				reduction_ranks({ 1u, 2u }),
 				broadcast({ 1u, receptor_height, receptor_width, 1u }),
 				patch_offsets({ 0u, 0u, 0u, 0u }),
@@ -1660,6 +1700,7 @@ protected:
 	RankwiseArray dil_strides;
 private:
 	bool input_layer;
+	bool frozen;
 	// No actual parameters.
 	Matrix<Scalar> params;
 	Matrix<Scalar> params_grad;
@@ -1858,6 +1899,8 @@ public:
 			const Dimensions<std::size_t,Rank>& broadcast) :
 				input_dims(input_dims),
 				output_dims(input_dims * broadcast),
+				input_layer(false),
+				frozen(false),
 				broadcast(broadcast.template promote<>()),
 				params(0, 0),
 				params_grad(0, 0) {
@@ -1873,6 +1916,12 @@ public:
 	}
 	inline const Dimensions<std::size_t,Rank>& get_output_dims() const {
 		return output_dims;
+	}
+	inline bool is_frozen() const {
+		return frozen;
+	}
+	inline void set_frozen(bool frozen) {
+		this->frozen = frozen;
 	}
 	inline void init() { }
 protected:
@@ -1933,6 +1982,7 @@ private:
 	RankwiseArray slice_extents;
 	std::size_t rows;
 	bool input_layer;
+	bool frozen;
 	Matrix<Scalar> params;
 	Matrix<Scalar> params_grad;
 };
@@ -1950,6 +2000,12 @@ public:
 	}
 	inline const Dimensions<std::size_t,Rank>& get_output_dims() const {
 		return dims;
+	}
+	inline bool is_frozen() const {
+		return frozen;
+	}
+	inline void set_frozen(bool frozen) {
+		this->frozen = frozen;
 	}
 	inline void init() {
 		// Gamma.
@@ -1979,6 +2035,7 @@ protected:
 				norm_avg_decay(norm_avg_decay),
 				epsilon(epsilon),
 				input_layer(false),
+				frozen(false),
 				avg_means(depth, dims.get_volume() / depth),
 				avg_inv_sds(depth, dims.get_volume() / depth),
 				avgs_init(false),
@@ -2004,6 +2061,7 @@ protected:
 			norm_avg_decay(layer.norm_avg_decay),
 			epsilon(layer.epsilon),
 			input_layer(layer.input_layer),
+			frozen(layer.frozen),
 			avg_means(layer.avg_means),
 			avg_inv_sds(layer.avg_inv_sds),
 			avgs_init(layer.avgs_init),
@@ -2063,14 +2121,16 @@ protected:
 			cache.std_in = norm_in * cache.inv_in_sd.asDiagonal();
 			in_mat = cache.std_in;
 			// Maintain a moving average of means and variances for testing.
-			if (avgs_init) {
-				avg_means.row(i) = (1.0 - norm_avg_decay) * avg_means.row(i) + norm_avg_decay * means;
-				avg_inv_sds.row(i) = (1.0 - norm_avg_decay) * avg_inv_sds.row(i) + norm_avg_decay *
-						cache.inv_in_sd;
-			} else {
-				avg_means.row(i) = means;
-				avg_inv_sds.row(i) = cache.inv_in_sd;
-				avgs_init = true;
+			if (!frozen) { // Only if parameters are not frozen.
+				if (avgs_init) {
+					avg_means.row(i) = (1.0 - norm_avg_decay) * avg_means.row(i) + norm_avg_decay * means;
+					avg_inv_sds.row(i) = (1.0 - norm_avg_decay) * avg_inv_sds.row(i) + norm_avg_decay *
+							cache.inv_in_sd;
+				} else {
+					avg_means.row(i) = means;
+					avg_inv_sds.row(i) = cache.inv_in_sd;
+					avgs_init = true;
+				}
 			}
 		} else // For testing, use the moving averages.
 			in_mat = (in_mat.rowwise() - avg_means.row(i)) * avg_inv_sds.row(i).asDiagonal();
@@ -2109,6 +2169,7 @@ protected:
 	Matrix<Scalar>& params_ref;
 private:
 	bool input_layer;
+	bool frozen;
 	// Dynamic batch normalization parameters.
 	Matrix<Scalar> avg_means;
 	Matrix<Scalar> avg_inv_sds;
@@ -2145,7 +2206,7 @@ public:
 	 */
 	inline BatchNormLayer(const Dimensions<std::size_t,Rank>& dims, ParamRegSharedPtr<Scalar> gamma_reg = Root::NO_PARAM_REG,
 			ParamRegSharedPtr<Scalar> beta_reg = Root::NO_PARAM_REG, Scalar gamma_max_norm_constraint = 0,
-			Scalar beta_max_norm_constraint = 0, Scalar norm_avg_decay = .1, Scalar epsilon = internal::NumericUtils<Scalar>::EPSILON3) :
+			Scalar beta_max_norm_constraint = 0, Scalar norm_avg_decay = .1, Scalar epsilon = internal::NumericUtils<Scalar>::EPSILON2) :
 				Base::BatchNormLayerBase(dims, 1, gamma_reg, beta_reg, gamma_max_norm_constraint, beta_max_norm_constraint,
 						norm_avg_decay, epsilon),
 				conversion_dims(dims.template promote<>()) { }
@@ -2196,7 +2257,7 @@ public:
 		 */
 	inline BatchNormLayer(Dimensions<std::size_t,3> dims, ParamRegSharedPtr<Scalar> gamma_reg = Root::NO_PARAM_REG,
 			ParamRegSharedPtr<Scalar> beta_reg = Root::NO_PARAM_REG, Scalar gamma_max_norm_constraint = 0,
-			Scalar beta_max_norm_constraint = 0, Scalar norm_avg_decay = .1, Scalar epsilon = internal::NumericUtils<Scalar>::EPSILON3) :
+			Scalar beta_max_norm_constraint = 0, Scalar norm_avg_decay = .1, Scalar epsilon = internal::NumericUtils<Scalar>::EPSILON2) :
 				Base::BatchNormLayerBase(dims, dims(2), gamma_reg, beta_reg, gamma_max_norm_constraint,
 						beta_max_norm_constraint, norm_avg_decay, epsilon),
 				offsets({ 0u, 0u, 0u, 0u }),
@@ -2217,9 +2278,8 @@ protected:
 		assert(in.dimension(0) > 0);
 		std::size_t rows = in.dimension(0);
 		if (Base::dims(2) == 1) {
-			std::array<std::size_t,Root::DATA_RANK> out_dims = Base::dims.template promote<>();
-			out_dims[0] = rows;
-			return Base::_pass_forward(std::move(in), out_dims, training, 0);
+			extents[0] = rows;
+			return Base::_pass_forward(std::move(in), extents, training, 0);
 		} else { // Multi-channel image data; depth-wise normalization.
 			typename Root::Data out(rows, Base::dims(0), Base::dims(1), Base::dims(2));
 			extents[0] = rows;
@@ -2236,11 +2296,9 @@ protected:
 		assert(out_grads.dimension(0) > 0 && extents[0] == out_grads.dimension(0));
 		std::size_t rows = out_grads.dimension(0);
 		typename Root::Data prev_out_grads;
-		if (Base::dims(2) == 1) {
-			std::array<std::size_t,Root::DATA_RANK> prev_out_dims = Base::dims.template promote<>();
-			prev_out_dims[0] = out_grads.dimension(0);
-			prev_out_grads = Base::_pass_back(std::move(out_grads), prev_out_dims, 0);
-		} else {
+		if (Base::dims(2) == 1)
+			prev_out_grads = Base::_pass_back(std::move(out_grads), extents, 0);
+		else {
 			if (!Base::is_input_layer())
 				prev_out_grads = typename Base::Data(rows, Base::dims(0), Base::dims(1), Base::dims(2));
 			for (int i = 0; i < Base::dims(2); ++i) {
@@ -2272,12 +2330,13 @@ public:
 	 * @param epsilon A small constant used to maintain numerical stability.
 	 */
 	inline DropoutLayer(const Dimensions<std::size_t,Rank>& dims, Scalar dropout_prob,
-			Scalar epsilon = internal::NumericUtils<Scalar>::EPSILON3) :
+			Scalar epsilon = internal::NumericUtils<Scalar>::EPSILON2) :
 				dims(dims),
 				dropout_prob(dropout_prob),
 				epsilon(epsilon),
 				dropout(internal::NumericUtils<Scalar>::decidedly_greater(dropout_prob, .0)),
 				input_layer(false),
+				frozen(false),
 				params(0, 0),
 				params_grad(0, 0) {
 		assert(dropout_prob <= 1 && "dropout prob must not be greater than 1");
@@ -2291,6 +2350,12 @@ public:
 	}
 	inline const Dimensions<std::size_t,Rank>& get_output_dims() const {
 		return dims;
+	}
+	inline bool is_frozen() const {
+		return frozen;
+	}
+	inline void set_frozen(bool frozen) {
+		this->frozen = frozen;
 	}
 	inline void init() { }
 protected:
@@ -2347,6 +2412,7 @@ private:
 	const Scalar epsilon;
 	const bool dropout;
 	bool input_layer;
+	bool frozen;
 	Matrix<Scalar> params;
 	Matrix<Scalar> params_grad;
 	// Staged computation cache.
@@ -2371,6 +2437,8 @@ public:
 			const Dimensions<std::size_t,Rank>& output_dims) :
 				input_dims(input_dims),
 				output_dims(output_dims),
+				input_layer(false),
+				frozen(false),
 				input_conversion_dims(output_dims.template promote<>()),
 				output_conversion_dims(input_dims.template promote<>()),
 				params(0, 0),
@@ -2385,6 +2453,12 @@ public:
 	}
 	inline const Dimensions<std::size_t,Rank>& get_output_dims() const {
 		return output_dims;
+	}
+	inline bool is_frozen() const {
+		return frozen;
+	}
+	inline void set_frozen(bool frozen) {
+		this->frozen = frozen;
 	}
 	inline void init() { }
 protected:
@@ -2427,6 +2501,7 @@ private:
 	RankwiseArray input_conversion_dims;
 	RankwiseArray output_conversion_dims;
 	bool input_layer;
+	bool frozen;
 	Matrix<Scalar> params;
 	Matrix<Scalar> params_grad;
 };

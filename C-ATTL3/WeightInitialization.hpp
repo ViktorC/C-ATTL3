@@ -81,15 +81,15 @@ private:
 template<typename Scalar>
 class GaussianWeightInitialization : public WeightInitialization<Scalar> {
 public:
-	inline GaussianWeightInitialization(Scalar scaling_factor, Scalar bias) :
+	inline GaussianWeightInitialization(Scalar sd_scaling_factor = 1, Scalar bias = 0) :
 		bias(bias),
-		scaling_factor(scaling_factor) { }
+		sd_scaling_factor(sd_scaling_factor) { }
 	virtual ~GaussianWeightInitialization() = default;
 	inline virtual void apply(Matrix<Scalar>& weights) const {
 		int rows = weights.rows();
 		int cols = weights.cols();
 		std::default_random_engine gen;
-		std::normal_distribution<Scalar> dist(0, scaling_factor * sd(rows -  1, cols));
+		std::normal_distribution<Scalar> dist(0, sd_scaling_factor * sd(rows -  1, cols));
 		for (int i = 0; i < rows; ++i) {
 			if (i == rows - 1) // Bias row.
 				weights.row(i).setConstant(bias);
@@ -110,9 +110,11 @@ protected:
 	 * @return The standard deviation of the normal distribution from which the values
 	 * of the initialized weight matrix are to be sampled.
 	 */
-	virtual Scalar sd(unsigned fan_ins, unsigned fan_outs) const = 0;
+	virtual Scalar sd(unsigned fan_ins, unsigned fan_outs) const {
+		return 1;
+	}
 private:
-	const Scalar scaling_factor;
+	const Scalar sd_scaling_factor;
 	const Scalar bias;
 };
 
@@ -123,12 +125,12 @@ template<typename Scalar>
 class LeCunWeightInitialization : public GaussianWeightInitialization<Scalar> {
 public:
 	/**
-	 * @param scaling_factor The value by which the randomly initialized weights
+	 * @param sd_scaling_factor The value by which the randomly initialized weights
 	 * are to be scaled.
 	 * @param bias The value to which the elements of the bias row are to be set.
 	 */
-	inline LeCunWeightInitialization(Scalar scaling_factor = 1, Scalar bias = 0) :
-		GaussianWeightInitialization<Scalar>::GaussianWeightInitialization(scaling_factor, bias) { }
+	inline LeCunWeightInitialization(Scalar sd_scaling_factor = 1, Scalar bias = 0) :
+		GaussianWeightInitialization<Scalar>::GaussianWeightInitialization(sd_scaling_factor, bias) { }
 protected:
 	inline Scalar sd(unsigned fan_ins, unsigned fan_outs) const {
 		return sqrt(1.0 / (Scalar) fan_ins);
@@ -142,12 +144,12 @@ template<typename Scalar>
 class GlorotWeightInitialization : public GaussianWeightInitialization<Scalar> {
 public:
 	/**
-	 * @param scaling_factor The value by which the randomly initialized weights
+	 * @param sd_scaling_factor The value by which the randomly initialized weights
 	 * are to be scaled.
 	 * @param bias The value to which the elements of the bias row are to be set.
 	 */
-	inline GlorotWeightInitialization(Scalar scaling_factor = 1, Scalar bias = 0) :
-		GaussianWeightInitialization<Scalar>::GaussianWeightInitialization(scaling_factor, bias) { }
+	inline GlorotWeightInitialization(Scalar sd_scaling_factor = 1, Scalar bias = 0) :
+		GaussianWeightInitialization<Scalar>::GaussianWeightInitialization(sd_scaling_factor, bias) { }
 protected:
 	inline Scalar sd(unsigned fan_ins, unsigned fan_outs) const {
 		return sqrt(2.0 / (Scalar) (fan_ins + fan_outs));
@@ -161,12 +163,12 @@ template<typename Scalar>
 class HeWeightInitialization : public GaussianWeightInitialization<Scalar> {
 public:
 	/**
-	 * @param scaling_factor The value by which the randomly initialized weights
+	 * @param sd_scaling_factor The value by which the randomly initialized weights
 	 * are to be scaled.
 	 * @param bias The value to which the elements of the bias row are to be set.
 	 */
-	inline HeWeightInitialization(Scalar scaling_factor = 1, Scalar bias = 0) :
-		GaussianWeightInitialization<Scalar>::GaussianWeightInitialization(scaling_factor, bias) { }
+	inline HeWeightInitialization(Scalar sd_scaling_factor = 1, Scalar bias = 0) :
+		GaussianWeightInitialization<Scalar>::GaussianWeightInitialization(sd_scaling_factor, bias) { }
 protected:
 	inline Scalar sd(unsigned fan_ins, unsigned fan_outs) const {
 		return sqrt(2.0 / (Scalar) fan_ins);
@@ -192,10 +194,10 @@ public:
 		int rows = weights.rows() - 1;
 		int cols = weights.cols();
 		bool more_rows = rows > cols;
-		internal::SVD<Scalar> svd;
+		SVD<Scalar> svd;
 		weights.block(0, 0, rows, cols) = more_rows ?
-				svd.compute(weights, internal::SVDOptions::ComputeFullU).matrixU().block(0, 0, rows, cols) :
-				svd.compute(weights, internal::SVDOptions::ComputeFullV).matrixV().block(0, 0, rows, cols);
+				svd.compute(weights, SVDOptions::ComputeFullU).matrixU().block(0, 0, rows, cols) :
+				svd.compute(weights, SVDOptions::ComputeFullV).matrixV().block(0, 0, rows, cols);
 	}
 protected:
 	Scalar sd(unsigned fan_ins, unsigned fan_outs) const {
