@@ -13,6 +13,7 @@
 #include <cmath>
 #include <cstddef>
 #include <cstdlib>
+#include <memory>
 #include <string>
 #include <type_traits>
 #include <utility>
@@ -52,6 +53,39 @@ public:
 	 * @return The derivative of the loss function w.r.t. the output.
 	 */
 	virtual Data d_function(Data out, Data obj) const = 0;
+};
+
+
+/**
+ * An alias for a unique pointer to a loss function of arbitrary rank, scalar type and
+ * sequentiality.
+ */
+template<typename Scalar, std::size_t Rank, bool Sequential>
+using LossSharedPtr = std::shared_ptr<Loss<Scalar,Rank,Sequential>>;
+
+/**
+ * A wrapper class template for negating losses and thus allowing for their maximization
+ * via the standard optimization methods.
+ */
+template<typename Scalar, std::size_t Rank, bool Sequential>
+class NegatedLoss : public Loss<Scalar,Rank,Sequential> {
+	typedef Loss<Scalar,Rank,Sequential> Base;
+public:
+	/**
+	 * @param loss A shared pointer to the loss instance to negate.
+	 */
+	NegatedLoss(LossSharedPtr<Scalar,Rank,Sequential> loss) :
+			loss(loss) {
+		assert(loss);
+	}
+	inline ColVector<Scalar> function(typename Base::Data out, typename Base::Data obj) const {
+		return -(loss->function(std::move(out), std::move(obj)));
+	}
+	inline typename Base::Data d_function(typename Base::Data out, typename Base::Data obj) const {
+		return -(loss->d_function(std::move(out), std::move(obj)));
+	}
+private:
+	LossSharedPtr<Scalar,Rank,Sequential> loss;
 };
 
 /**

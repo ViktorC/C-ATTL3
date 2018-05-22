@@ -36,13 +36,6 @@ namespace cattle {
 // TODO PBIL
 
 /**
- * An alias for a unique pointer to a loss function of arbitrary rank, scalar type and
- * sequentiality.
- */
-template<typename Scalar, std::size_t Rank, bool Sequential>
-using LossSharedPtr = std::shared_ptr<Loss<Scalar,Rank,Sequential>>;
-
-/**
  * An abstract class template for neural network optimizer algorithm implementations.
  */
 template<typename Scalar, std::size_t Rank, bool Sequential>

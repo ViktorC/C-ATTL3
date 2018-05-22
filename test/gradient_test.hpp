@@ -854,6 +854,58 @@ TEST(GradientTest, BidirectionalNet) {
  * @param time_steps The number of time steps for sequential loss gradient testing.
  */
 template<typename Scalar, std::size_t Rank>
+inline void negated_loss_grad_test(const Dimensions<std::size_t,Rank>& dims, std::size_t samples = 5,
+		std::size_t time_steps = 3) {
+	// Non-sequential.
+	auto net = reg_neural_net<Scalar,Rank>(dims);
+	net->init();
+	Dimensions<std::size_t,Rank + 1> batch_dims = dims.template promote<>();
+	batch_dims(0) = samples;
+	Dimensions<std::size_t,Rank + 1> batch_out_dims = net->get_output_dims().template promote<>();
+	batch_out_dims(0) = samples;
+	MemoryDataProvider<Scalar,Rank,false> prov(random_tensor<Scalar,Rank + 1>(batch_dims),
+			random_tensor<Scalar,Rank + 1>(batch_out_dims));
+	auto loss = std::make_shared<SquaredLoss<Scalar,Rank,false>>();
+	auto neg_loss = std::make_shared<NegatedLoss<Scalar,Rank,false>>(loss);
+	VanillaSGDOptimizer<Scalar,Rank,false> opt(neg_loss, samples);
+	grad_test<Scalar,Rank,false>("negated quadratic loss", prov, *net, opt);
+	// Sequential.
+	SequentialNeuralNetwork<Scalar,Rank> seq_net(std::move(net));
+	Dimensions<std::size_t,Rank + 2> seq_batch_dims = dims.template promote<2>();
+	seq_batch_dims(0) = samples;
+	seq_batch_dims(1) = time_steps;
+	Dimensions<std::size_t,Rank + 2> seq_batch_out_dims = seq_net.get_output_dims().template promote<2>();
+	seq_batch_out_dims(0) = samples;
+	seq_batch_out_dims(1) = time_steps;
+	MemoryDataProvider<Scalar,Rank,true> seq_prov(random_tensor<Scalar,Rank + 2>(seq_batch_dims),
+			random_tensor<Scalar,Rank + 2>(seq_batch_out_dims));
+	auto seq_loss = std::make_shared<SquaredLoss<Scalar,Rank,true>>();
+	auto seq_neg_loss = std::make_shared<NegatedLoss<Scalar,Rank,true>>(loss);
+	VanillaSGDOptimizer<Scalar,Rank,true> seq_opt(seq_neg_loss, samples);
+	grad_test<Scalar,Rank,true>("negated quadratic loss", seq_prov, seq_net, seq_opt);
+}
+
+/**
+ * Performs gradient checks on the negated squared loss function.
+ */
+template<typename Scalar>
+inline void negated_loss_grad_test() {
+	negated_loss_grad_test<Scalar,1>({ 24u });
+	negated_loss_grad_test<Scalar,2>({ 6u, 6u });
+	negated_loss_grad_test<Scalar,3>({ 4u, 4u, 2u });
+}
+
+TEST(GradientTest, NegatedLoss) {
+	negated_loss_grad_test<float>();
+	negated_loss_grad_test<double>();
+}
+
+/**
+ * @param dims The dimensions of the input data.
+ * @param samples The number of samples in the batch.
+ * @param time_steps The number of time steps for sequential loss gradient testing.
+ */
+template<typename Scalar, std::size_t Rank>
 inline void absolute_loss_grad_test(const Dimensions<std::size_t,Rank>& dims, std::size_t samples = 5,
 		std::size_t time_steps = 3) {
 	// Non-sequential.

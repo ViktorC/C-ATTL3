@@ -99,6 +99,7 @@ These optimizers all aim to minimize a loss function with respect to the learnab
 #### Loss
 Similarly to the layers, optimizers rely on several hyper-parameters as well. Besides the hyper-parameters, optimizers also rely on 'practically' differentiable loss functions to minimize. The library provides the following out of the box loss functions:
 * [Loss](https://viktorc.github.io/C-ATTL3/html/classcattle_1_1_loss.html) [A]
+  * [NegatedLoss](https://viktorc.github.io/C-ATTL3/html/classcattle_1_1_negated_loss.html)
   * [UniversalLoss](https://viktorc.github.io/C-ATTL3/html/classcattle_1_1_universal_loss.html) [A]
     * [AbsoluteLoss](https://viktorc.github.io/C-ATTL3/html/classcattle_1_1_absolute_loss.html)
     * [SquaredLoss](https://viktorc.github.io/C-ATTL3/html/classcattle_1_1_quadratic_loss.html)
@@ -191,4 +192,4 @@ Tensor<double,4> prediction = nn.infer(input);
 ```	
 The final code snippet demonstrates the usage of the trained neural network for inference. A random input tensor of the correct nominal input dimensions is generated, transformed using the PCA preprocessor, and fed to the `infer` method which has the neural network propagate the tensor through its layers and output its prediction. As seen above, inference is not restricted to single instances but can be performed on batches of data as well.
 
-More examples usages of the library (autoencoders, GANs, etc.) can be found [here](https://github.com/ViktorC/C-ATTL3/tree/master/examples).
+More examples (autoencoders, GANs, etc.) can be found [here](https://github.com/ViktorC/C-ATTL3/tree/master/examples).
