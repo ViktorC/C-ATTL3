@@ -880,7 +880,7 @@ inline void negated_loss_grad_test(const Dimensions<std::size_t,Rank>& dims, std
 	MemoryDataProvider<Scalar,Rank,true> seq_prov(random_tensor<Scalar,Rank + 2>(seq_batch_dims),
 			random_tensor<Scalar,Rank + 2>(seq_batch_out_dims));
 	auto seq_loss = std::make_shared<SquaredLoss<Scalar,Rank,true>>();
-	auto seq_neg_loss = std::make_shared<NegatedLoss<Scalar,Rank,true>>(loss);
+	auto seq_neg_loss = std::make_shared<NegatedLoss<Scalar,Rank,true>>(seq_loss);
 	VanillaSGDOptimizer<Scalar,Rank,true> seq_opt(seq_neg_loss, samples);
 	grad_test<Scalar,Rank,true>("negated quadratic loss", seq_prov, seq_net, seq_opt);
 }
