@@ -1,6 +1,7 @@
 var searchData=
 [
   ['nadamoptimizer',['NadamOptimizer',['../classcattle_1_1_nadam_optimizer.html',1,'cattle::NadamOptimizer&lt; Scalar, Rank, Sequential &gt;'],['../classcattle_1_1_nadam_optimizer.html#a1c86f3ddf2cd66c023e7093dfa6b6de8',1,'cattle::NadamOptimizer::NadamOptimizer()']]],
+  ['negatedloss',['NegatedLoss',['../classcattle_1_1_negated_loss.html',1,'cattle::NegatedLoss&lt; Scalar, Rank, Sequential &gt;'],['../classcattle_1_1_negated_loss.html#a90d3de1427d4becf5ee8ebd13273e028',1,'cattle::NegatedLoss::NegatedLoss()']]],
   ['nesterovmomentumacceleratedsgdoptimizer',['NesterovMomentumAcceleratedSGDOptimizer',['../classcattle_1_1_nesterov_momentum_accelerated_s_g_d_optimizer.html',1,'cattle::NesterovMomentumAcceleratedSGDOptimizer&lt; Scalar, Rank, Sequential &gt;'],['../classcattle_1_1_nesterov_momentum_accelerated_s_g_d_optimizer.html#a14ed8b913c5547b22eae298749246c23',1,'cattle::NesterovMomentumAcceleratedSGDOptimizer::NesterovMomentumAcceleratedSGDOptimizer()']]],
   ['neuralnetptr',['NeuralNetPtr',['../namespacecattle.html#a4d754351864153898cdbd3918dc1525b',1,'cattle']]],
   ['neuralnetwork',['NeuralNetwork',['../classcattle_1_1_neural_network.html',1,'cattle']]],

@@ -135,7 +135,8 @@ public:
 	}
 	/**
 	 * It optimizes the specified neural network using the given data providers according to the
-	 * optimizers loss function.
+	 * optimizers loss function. It also fits the optimizer to the network before the otpimization
+	 * begins.
 	 *
 	 * @param net A reference to the network whose parameters are to be optimized.
 	 * @param training_prov A reference to the provider of the training data.
@@ -196,7 +197,8 @@ public:
 	}
 	/**
 	 * It trains the specified neural network using the given training data provider according to
-	 * the optimizers loss function for the specified number of epochs.
+	 * the optimizers loss function for the specified number of epochs. It does not fit the
+	 * optimizer to the network, thus the #fit(Net&) method might need to be invoked beforehand.
 	 *
 	 * @param net A reference to the network whose parameters are to be optimized.
 	 * @param prov A reference to the provider of the training data.
@@ -208,7 +210,6 @@ public:
 	inline Scalar train(Net& net, Provider& prov, unsigned epochs, bool verbose = true) {
 		assert(net.get_input_dims() == prov.get_obs_dims());
 		assert(net.get_output_dims() == prov.get_obj_dims());
-		fit(net);
 		Scalar train_loss;
 		if (verbose)
 			std::cout << "<Training>" << std::endl;
@@ -226,7 +227,8 @@ public:
 	}
 	/**
 	 * It tests the specified neural network using the given test data provider according to the
-	 * optimizers loss function.
+	 * optimizers loss function. It does not fit the optimizer to the network, thus the
+	 * #fit(Net&) method might need to be invoked beforehand.
 	 *
 	 * @param net A reference to the network whose parameters are to be optimized.
 	 * @param prov A reference to the provider of the training data.
@@ -237,7 +239,6 @@ public:
 	inline Scalar test(Net& net, Provider& prov, bool verbose = true) {
 		assert(net.get_input_dims() == prov.get_obs_dims());
 		assert(net.get_output_dims() == prov.get_obj_dims());
-		fit(net);
 		if (verbose)
 			std::cout << "<Testing>" << std::endl;
 		prov.reset();
@@ -248,7 +249,6 @@ public:
 		net.empty_caches();
 		return test_loss;
 	}
-protected:
 	/**
 	 * It fits the optimizer to the neural network. It allows optimizers with individual
 	 * learning rates for each parameter to set up their necessary internal data structures.
@@ -256,6 +256,7 @@ protected:
 	 * @param net A reference to the neural network that is to be optimized.
 	 */
 	virtual void fit(Net& net) = 0;
+protected:
 	/**
 	 * It trains the specified neural network for a single epoch on data provided by the
 	 * specified data provider.
@@ -506,8 +507,8 @@ public:
 				learning_rate(learning_rate) {
 		assert(learning_rate > 0);
 	}
-protected:
 	inline void fit(NeuralNetwork<Scalar,Rank,Sequential>& net) { }
+protected:
 	inline void update_params(Layer<Scalar,Rank>& layer, unsigned i, unsigned epoch) {
 		Matrix<Scalar>& params = Optimizer<Scalar,Rank,Sequential>::get_params(layer);
 		params -= learning_rate * Optimizer<Scalar,Rank,Sequential>::get_params_grad(layer);
@@ -544,7 +545,6 @@ public:
 		assert(momentum > 0 && momentum < 1);
 	}
 	virtual ~MomentumAcceleratedSGDOptimizer() = default;
-protected:
 	inline void fit(NeuralNetwork<Scalar,Rank,Sequential>& net) {
 		std::vector<Layer<Scalar,Rank>*> layers = Optimizer<Scalar,Rank,Sequential>::get_layers(net);
 		params_grad_vec = std::vector<Matrix<Scalar>>(layers.size());
@@ -555,6 +555,7 @@ protected:
 			params_grad_vec[i] = acc_params_grad;
 		}
 	}
+protected:
 	inline void update_params(Layer<Scalar,Rank>& layer, unsigned i, unsigned epoch) {
 		Scalar learning_rate = calculate_learning_rate(epoch);
 		Matrix<Scalar>& params_grad = params_grad_vec[i];
@@ -633,6 +634,7 @@ public:
 	}
 	virtual ~AdagradOptimizer() = default;
 protected:
+public:
 	inline void fit(NeuralNetwork<Scalar,Rank,Sequential>& net) {
 		std::vector<Layer<Scalar,Rank>*> layers = Optimizer<Scalar,Rank,Sequential>::get_layers(net);
 		params_grad_sqrs_vec = std::vector<Matrix<Scalar>>(layers.size());
@@ -720,7 +722,6 @@ public:
 		assert(decay >= 0 && decay <= 1);
 		assert(epsilon > 0);
 	}
-protected:
 	inline void fit(NeuralNetwork<Scalar,Rank,Sequential>& net) {
 		std::vector<Layer<Scalar,Rank>*> layers = Optimizer<Scalar,Rank,Sequential>::get_layers(net);
 		pgus_vec = std::vector<ParamGradAndUpdateSqrs>(layers.size());
@@ -733,6 +734,7 @@ protected:
 			pgus_vec[i] = pgus;
 		}
 	}
+protected:
 	inline void update_params(Layer<Scalar,Rank>& layer, unsigned i, unsigned epoch) {
 		ParamGradAndUpdateSqrs& pgus = pgus_vec[i];
 		Matrix<Scalar>& params = Optimizer<Scalar,Rank,Sequential>::get_params(layer);
@@ -788,7 +790,6 @@ public:
 		assert(epsilon > 0);
 	}
 	virtual ~AdamOptimizer() = default;
-protected:
 	inline void fit(NeuralNetwork<Scalar,Rank,Sequential>& net) {
 		std::vector<Layer<Scalar,Rank>*> layers = Optimizer<Scalar,Rank,Sequential>::get_layers(net);
 		pgn_vec = std::vector<ParamGradNorms>(layers.size());
@@ -801,6 +802,7 @@ protected:
 			pgn_vec[i] = vel;
 		}
 	}
+protected:
 	inline void update_params(Layer<Scalar,Rank>& layer, unsigned i, unsigned epoch) {
 		ParamGradNorms& grad_norms = pgn_vec[i];
 		Scalar l1_corr = (Scalar) 1 / (1 - pow(1 - l1_decay, epoch + 1) + epsilon);

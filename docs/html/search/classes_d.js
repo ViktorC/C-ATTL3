@@ -1,6 +1,7 @@
 var searchData=
 [
   ['nadamoptimizer',['NadamOptimizer',['../classcattle_1_1_nadam_optimizer.html',1,'cattle']]],
+  ['negatedloss',['NegatedLoss',['../classcattle_1_1_negated_loss.html',1,'cattle']]],
   ['nesterovmomentumacceleratedsgdoptimizer',['NesterovMomentumAcceleratedSGDOptimizer',['../classcattle_1_1_nesterov_momentum_accelerated_s_g_d_optimizer.html',1,'cattle']]],
   ['neuralnetwork',['NeuralNetwork',['../classcattle_1_1_neural_network.html',1,'cattle']]],
   ['neuralnetwork_3c_20scalar_2c_20rank_2c_20false_20_3e',['NeuralNetwork&lt; Scalar, Rank, false &gt;',['../classcattle_1_1_neural_network.html',1,'cattle']]],

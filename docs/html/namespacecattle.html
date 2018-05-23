@@ -236,6 +236,9 @@ Classes</h2></td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_nadam_optimizer.html">NadamOptimizer</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">A class template for the Nesterov accelerated Adam (Nadam) optimization algorithm.  <a href="classcattle_1_1_nadam_optimizer.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_negated_loss.html">NegatedLoss</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">A wrapper class template for negating losses and thus allowing for their maximization via the standard optimization methods.  <a href="classcattle_1_1_negated_loss.html#details">More...</a><br /></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_nesterov_momentum_accelerated_s_g_d_optimizer.html">NesterovMomentumAcceleratedSGDOptimizer</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">A class template for Nesterov momentum accelerated SGD optimizers.  <a href="classcattle_1_1_nesterov_momentum_accelerated_s_g_d_optimizer.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -390,6 +393,11 @@ template&lt;typename Scalar &gt; </td></tr>
 <tr class="memitem:a083ab63c64a5c935b2d2cd3f03c4e27a"><td class="memTemplItemLeft" align="right" valign="top">using&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespacecattle.html#a083ab63c64a5c935b2d2cd3f03c4e27a">ParamRegSharedPtr</a> = std::shared_ptr&lt; <a class="el" href="classcattle_1_1_paramater_regularization.html">ParamaterRegularization</a>&lt; Scalar &gt; &gt;</td></tr>
 <tr class="memdesc:a083ab63c64a5c935b2d2cd3f03c4e27a"><td class="mdescLeft">&#160;</td><td class="mdescRight">An alias for a shared pointer to a regularization penalty of an arbitrary scalar type. <br /></td></tr>
 <tr class="separator:a083ab63c64a5c935b2d2cd3f03c4e27a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5fa4a5f7df1ad35afbadd9975ec24a12"><td class="memTemplParams" colspan="2"><a id="a5fa4a5f7df1ad35afbadd9975ec24a12"></a>
+template&lt;typename Scalar , std::size_t Rank, bool Sequential&gt; </td></tr>
+<tr class="memitem:a5fa4a5f7df1ad35afbadd9975ec24a12"><td class="memTemplItemLeft" align="right" valign="top">using&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespacecattle.html#a5fa4a5f7df1ad35afbadd9975ec24a12">LossSharedPtr</a> = std::shared_ptr&lt; <a class="el" href="classcattle_1_1_loss.html">Loss</a>&lt; Scalar, Rank, Sequential &gt; &gt;</td></tr>
+<tr class="memdesc:a5fa4a5f7df1ad35afbadd9975ec24a12"><td class="mdescLeft">&#160;</td><td class="mdescRight">An alias for a unique pointer to a loss function of arbitrary rank, scalar type and sequentiality. <br /></td></tr>
+<tr class="separator:a5fa4a5f7df1ad35afbadd9975ec24a12"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ad9bc255ce8185babba9c66dbc39ee77f"><td class="memTemplParams" colspan="2"><a id="ad9bc255ce8185babba9c66dbc39ee77f"></a>
 template&lt;typename Scalar , std::size_t Rank&gt; </td></tr>
 <tr class="memitem:ad9bc255ce8185babba9c66dbc39ee77f"><td class="memTemplItemLeft" align="right" valign="top">using&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespacecattle.html#ad9bc255ce8185babba9c66dbc39ee77f">LayerPtr</a> = std::unique_ptr&lt; <a class="el" href="classcattle_1_1_layer.html">Layer</a>&lt; Scalar, Rank &gt; &gt;</td></tr>
@@ -415,11 +423,6 @@ template&lt;typename Scalar , std::size_t Rank&gt; </td></tr>
 <tr class="memitem:a011c68542051b5509475ef3f94aaa048"><td class="memTemplItemLeft" align="right" valign="top">using&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespacecattle.html#a011c68542051b5509475ef3f94aaa048">UnidirNeuralNetPtr</a> = std::unique_ptr&lt; <a class="el" href="classcattle_1_1_unidirectional_neural_network.html">UnidirectionalNeuralNetwork</a>&lt; Scalar, Rank &gt; &gt;</td></tr>
 <tr class="memdesc:a011c68542051b5509475ef3f94aaa048"><td class="mdescLeft">&#160;</td><td class="mdescRight">An alias for unidirectional recurrent neural network of arbitrary scalar type and rank. <br /></td></tr>
 <tr class="separator:a011c68542051b5509475ef3f94aaa048"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a5fa4a5f7df1ad35afbadd9975ec24a12"><td class="memTemplParams" colspan="2"><a id="a5fa4a5f7df1ad35afbadd9975ec24a12"></a>
-template&lt;typename Scalar , std::size_t Rank, bool Sequential&gt; </td></tr>
-<tr class="memitem:a5fa4a5f7df1ad35afbadd9975ec24a12"><td class="memTemplItemLeft" align="right" valign="top">using&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespacecattle.html#a5fa4a5f7df1ad35afbadd9975ec24a12">LossSharedPtr</a> = std::shared_ptr&lt; <a class="el" href="classcattle_1_1_loss.html">Loss</a>&lt; Scalar, Rank, Sequential &gt; &gt;</td></tr>
-<tr class="memdesc:a5fa4a5f7df1ad35afbadd9975ec24a12"><td class="mdescLeft">&#160;</td><td class="mdescRight">An alias for a unique pointer to a loss function of arbitrary rank, scalar type and sequentiality. <br /></td></tr>
-<tr class="separator:a5fa4a5f7df1ad35afbadd9975ec24a12"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a23ebf4fefd4f6b9dc0cd34afb1ce1b65"><td class="memTemplParams" colspan="2"><a id="a23ebf4fefd4f6b9dc0cd34afb1ce1b65"></a>
 template&lt;typename Scalar &gt; </td></tr>
 <tr class="memitem:a23ebf4fefd4f6b9dc0cd34afb1ce1b65"><td class="memTemplItemLeft" align="right" valign="top">using&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespacecattle.html#a23ebf4fefd4f6b9dc0cd34afb1ce1b65">RowVector</a> = Eigen::Matrix&lt; Scalar, 1, Eigen::Dynamic, Eigen::RowMajor, 1, Eigen::Dynamic &gt;</td></tr>

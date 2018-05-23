@@ -113,12 +113,12 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:ab9ef4c2483ea46b160f1b60381764df1"><td class="memItemLeft" align="right" valign="top">Scalar&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_optimizer.html#ab9ef4c2483ea46b160f1b60381764df1">test</a> (<a class="el" href="classcattle_1_1_neural_network.html">Net</a> &amp;net, <a class="el" href="classcattle_1_1_data_provider.html">Provider</a> &amp;prov, bool verbose=true)</td></tr>
 <tr class="memdesc:ab9ef4c2483ea46b160f1b60381764df1"><td class="mdescLeft">&#160;</td><td class="mdescRight">It tests the specified neural network using the given test data provider according to the optimizers loss function.  <a href="#ab9ef4c2483ea46b160f1b60381764df1">More...</a><br /></td></tr>
 <tr class="separator:ab9ef4c2483ea46b160f1b60381764df1"><td class="memSeparator" colspan="2">&#160;</td></tr>
-</table><table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pro-methods"></a>
-Protected Member Functions</h2></td></tr>
 <tr class="memitem:a5ea3b9b9173bf065c6d3f3978b57b823"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_optimizer.html#a5ea3b9b9173bf065c6d3f3978b57b823">fit</a> (<a class="el" href="classcattle_1_1_neural_network.html">Net</a> &amp;net)=0</td></tr>
 <tr class="memdesc:a5ea3b9b9173bf065c6d3f3978b57b823"><td class="mdescLeft">&#160;</td><td class="mdescRight">It fits the optimizer to the neural network.  <a href="#a5ea3b9b9173bf065c6d3f3978b57b823">More...</a><br /></td></tr>
 <tr class="separator:a5ea3b9b9173bf065c6d3f3978b57b823"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pro-methods"></a>
+Protected Member Functions</h2></td></tr>
 <tr class="memitem:a3be9925988952c49bbb2f4574a2b7dee"><td class="memItemLeft" align="right" valign="top">virtual Scalar&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_optimizer.html#a3be9925988952c49bbb2f4574a2b7dee">_train</a> (<a class="el" href="classcattle_1_1_neural_network.html">Net</a> &amp;net, <a class="el" href="classcattle_1_1_data_provider.html">Provider</a> &amp;training_prov, unsigned epoch, bool verbose)=0</td></tr>
 <tr class="memdesc:a3be9925988952c49bbb2f4574a2b7dee"><td class="mdescLeft">&#160;</td><td class="mdescRight">It trains the specified neural network for a single epoch on data provided by the specified data provider.  <a href="#a3be9925988952c49bbb2f4574a2b7dee">More...</a><br /></td></tr>
 <tr class="separator:a3be9925988952c49bbb2f4574a2b7dee"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -398,7 +398,7 @@ template&lt;typename Scalar , std::size_t Rank, bool Sequential&gt; </div>
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">protected</span><span class="mlabel">pure virtual</span></span>  </td>
+<span class="mlabels"><span class="mlabel">pure virtual</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
@@ -672,6 +672,7 @@ template&lt;typename Scalar , std::size_t Rank, bool Sequential&gt; </div>
 </div><div class="memdoc">
 
 <p>It optimizes the specified neural network using the given data providers according to the optimizers loss function. </p>
+<p>It also fits the optimizer to the network before the otpimization begins.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">net</td><td>A reference to the network whose parameters are to be optimized. </td></tr>
@@ -818,6 +819,7 @@ template&lt;typename Scalar , std::size_t Rank, bool Sequential&gt; </div>
 </div><div class="memdoc">
 
 <p>It tests the specified neural network using the given test data provider according to the optimizers loss function. </p>
+<p>It does not fit the optimizer to the network, thus the <a class="el" href="classcattle_1_1_optimizer.html#a5ea3b9b9173bf065c6d3f3978b57b823" title="It fits the optimizer to the neural network. ">fit(Net&amp;)</a> method might need to be invoked beforehand.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">net</td><td>A reference to the network whose parameters are to be optimized. </td></tr>
@@ -879,6 +881,7 @@ template&lt;typename Scalar , std::size_t Rank, bool Sequential&gt; </div>
 </div><div class="memdoc">
 
 <p>It trains the specified neural network using the given training data provider according to the optimizers loss function for the specified number of epochs. </p>
+<p>It does not fit the optimizer to the network, thus the <a class="el" href="classcattle_1_1_optimizer.html#a5ea3b9b9173bf065c6d3f3978b57b823" title="It fits the optimizer to the neural network. ">fit(Net&amp;)</a> method might need to be invoked beforehand.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">net</td><td>A reference to the network whose parameters are to be optimized. </td></tr>
