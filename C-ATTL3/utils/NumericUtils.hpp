@@ -27,7 +27,7 @@ public:
 	static constexpr Scalar MIN = std::numeric_limits<Scalar>::lowest();
 	static constexpr Scalar MAX = std::numeric_limits<Scalar>::max();
 	static constexpr Scalar EPSILON1 = std::numeric_limits<Scalar>::epsilon();
-	static constexpr Scalar EPSILON2 = 1e-5;
+	static constexpr Scalar EPSILON2 = 1e-4;
 	NumericUtils() = delete;
 	/**
 	 * Returns whether the two numerals are close enough to be considered equal.

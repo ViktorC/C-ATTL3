@@ -1,8 +1,8 @@
 var searchData=
 [
-  ['array_3c_20indextype_2c_20rank_20_3e',['array&lt; IndexType, Rank &gt;',['../classcattle_1_1_dimensions.html#acc77fb2b9c5a34856cc17c31bd8399b4',1,'cattle::Dimensions']]],
-  ['oneweightinitialization',['OneWeightInitialization',['../classcattle_1_1_one_weight_initialization.html#ab37a5bfc05e360771243195dcc7586a2',1,'cattle::OneWeightInitialization']]],
-  ['operator_28_29',['operator()',['../classcattle_1_1_dimensions.html#aa0bf24c514d12ab7cd939471d81bc823',1,'cattle::Dimensions::operator()(std::size_t i) const'],['../classcattle_1_1_dimensions.html#a5e8d00bd2c1f053d71c7256a9963d1b9',1,'cattle::Dimensions::operator()(std::size_t i)'],['../classcattle_1_1_dim_expression.html#a04c4cf3f267946addfe24852e78e4818',1,'cattle::DimExpression::operator()()']]],
-  ['optimize',['optimize',['../classcattle_1_1_optimizer.html#ac25499c3dfbb1995dcbe747868a26c8c',1,'cattle::Optimizer']]],
-  ['orthogonalweightinitialization',['OrthogonalWeightInitialization',['../classcattle_1_1_orthogonal_weight_initialization.html#a00998ff9be4fa047fb2505450af2ee4f',1,'cattle::OrthogonalWeightInitialization']]]
+  ['nadamoptimizer',['NadamOptimizer',['../classcattle_1_1_nadam_optimizer.html#a1c86f3ddf2cd66c023e7093dfa6b6de8',1,'cattle::NadamOptimizer']]],
+  ['negatedloss',['NegatedLoss',['../classcattle_1_1_negated_loss.html#a90d3de1427d4becf5ee8ebd13273e028',1,'cattle::NegatedLoss']]],
+  ['nesterovmomentumacceleratedsgdoptimizer',['NesterovMomentumAcceleratedSGDOptimizer',['../classcattle_1_1_nesterov_momentum_accelerated_s_g_d_optimizer.html#a14ed8b913c5547b22eae298749246c23',1,'cattle::NesterovMomentumAcceleratedSGDOptimizer']]],
+  ['normalizationpreprocessor',['NormalizationPreprocessor',['../classcattle_1_1_normalization_preprocessor.html#a1987f52abf107c7435181946179ac385',1,'cattle::NormalizationPreprocessor::NormalizationPreprocessor()'],['../classcattle_1_1_normalization_preprocessor_3_01_scalar_00_013_00_01_standardize_01_4.html#a240e252e0ff20b0435300fb859f742e2',1,'cattle::NormalizationPreprocessor&lt; Scalar, 3, Standardize &gt;::NormalizationPreprocessor()']]],
+  ['num_5fof_5feval_5fthreads',['num_of_eval_threads',['../structcattle_1_1internal_1_1_eigen_proxy.html#af477cfbcfe5fbb0703a8ad5a4e9b8368',1,'cattle::internal::EigenProxy']]]
 ];

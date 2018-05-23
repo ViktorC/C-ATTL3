@@ -468,8 +468,11 @@ protected:
 		}
 		Scalar mean_obj_loss = obj_loss / instances;
 		Scalar reg_loss = 0;
-		for (unsigned j = 0; j < layers.size(); ++j)
-			reg_loss += Base::get_regularization_penalty(*layers[j]);
+		for (unsigned j = 0; j < layers.size(); ++j) {
+			Layer<Scalar,Rank>& layer = *(layers[j]);
+			if (Base::is_parametric(layer) && !layer.is_frozen())
+				reg_loss += Base::get_regularization_penalty(layer);
+		}
 		if (verbose) {
 			std::cout << "\tobj loss: " << std::to_string(mean_obj_loss) << std::endl;
 			std::cout << "\treg loss: " << std::to_string(reg_loss) << std::endl;

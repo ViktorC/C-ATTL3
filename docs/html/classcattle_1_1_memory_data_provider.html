@@ -103,9 +103,9 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a3b0281356e976cd5cd61985e3bd245b9"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_memory_data_provider.html#a3b0281356e976cd5cd61985e3bd245b9">has_more</a> ()</td></tr>
 <tr class="memdesc:a3b0281356e976cd5cd61985e3bd245b9"><td class="mdescLeft">&#160;</td><td class="mdescRight">A method that returns whether the data provider instance has more data to provide.  <a href="#a3b0281356e976cd5cd61985e3bd245b9">More...</a><br /></td></tr>
 <tr class="separator:a3b0281356e976cd5cd61985e3bd245b9"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aacc7968c58f6432f546c1e8bb9683a6a"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespacecattle.html#aaf234deaf1504300126fed57912a132e">DataPair</a>&lt; Scalar, Rank, Sequential &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_memory_data_provider.html#aacc7968c58f6432f546c1e8bb9683a6a">get_data</a> (std::size_t batch_size=std::numeric_limits&lt; Scalar &gt;::max())</td></tr>
-<tr class="memdesc:aacc7968c58f6432f546c1e8bb9683a6a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Reads and returns the specified number of observation-objective pairs.  <a href="#aacc7968c58f6432f546c1e8bb9683a6a">More...</a><br /></td></tr>
-<tr class="separator:aacc7968c58f6432f546c1e8bb9683a6a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a887e4721068db4b9854df41851c0867b"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespacecattle.html#aaf234deaf1504300126fed57912a132e">DataPair</a>&lt; Scalar, Rank, Sequential &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_memory_data_provider.html#a887e4721068db4b9854df41851c0867b">get_data</a> (std::size_t batch_size=std::numeric_limits&lt; std::size_t &gt;::max())</td></tr>
+<tr class="memdesc:a887e4721068db4b9854df41851c0867b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Reads and returns the specified number of observation-objective pairs.  <a href="#a887e4721068db4b9854df41851c0867b">More...</a><br /></td></tr>
+<tr class="separator:a887e4721068db4b9854df41851c0867b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:acd2d39fd367b01f0eb0499978eac43ac"><td class="memItemLeft" align="right" valign="top"><a id="acd2d39fd367b01f0eb0499978eac43ac"></a>
 void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_memory_data_provider.html#acd2d39fd367b01f0eb0499978eac43ac">reset</a> ()</td></tr>
 <tr class="memdesc:acd2d39fd367b01f0eb0499978eac43ac"><td class="mdescLeft">&#160;</td><td class="mdescRight">It resets the reader head to the beginning of the data storage. <br /></td></tr>
@@ -172,8 +172,8 @@ template&lt;typename Scalar , std::size_t Rank, bool Sequential, bool Shuffle = 
 </div>
 </div>
 <h2 class="groupheader">Member Function Documentation</h2>
-<a id="aacc7968c58f6432f546c1e8bb9683a6a"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aacc7968c58f6432f546c1e8bb9683a6a">&#9670;&nbsp;</a></span>get_data()</h2>
+<a id="a887e4721068db4b9854df41851c0867b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a887e4721068db4b9854df41851c0867b">&#9670;&nbsp;</a></span>get_data()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -187,7 +187,7 @@ template&lt;typename Scalar , std::size_t Rank, bool Sequential, bool Shuffle = 
           <td class="memname"><a class="el" href="namespacecattle.html#aaf234deaf1504300126fed57912a132e">DataPair</a>&lt;Scalar,Rank,Sequential&gt; <a class="el" href="classcattle_1_1_memory_data_provider.html">cattle::MemoryDataProvider</a>&lt; Scalar, Rank, Sequential, Shuffle &gt;::get_data </td>
           <td>(</td>
           <td class="paramtype">std::size_t&#160;</td>
-          <td class="paramname"><em>batch_size</em> = <code>std::numeric_limits&lt;&#160;Scalar&#160;&gt;::max()</code></td><td>)</td>
+          <td class="paramname"><em>batch_size</em> = <code>std::numeric_limits&lt;&#160;std::size_t&#160;&gt;::max()</code></td><td>)</td>
           <td></td>
         </tr>
       </table>
@@ -302,7 +302,7 @@ template&lt;typename Scalar , std::size_t Rank, bool Sequential, bool Shuffle = 
 </div><div class="memdoc">
 
 <p>A method that returns whether the data provider instance has more data to provide. </p>
-<p>It should always be called before calling <a class="el" href="classcattle_1_1_memory_data_provider.html#aacc7968c58f6432f546c1e8bb9683a6a" title="Reads and returns the specified number of observation-objective pairs. ">get_data(std::size_t)</a>.</p>
+<p>It should always be called before calling <a class="el" href="classcattle_1_1_memory_data_provider.html#a887e4721068db4b9854df41851c0867b" title="Reads and returns the specified number of observation-objective pairs. ">get_data(std::size_t)</a>.</p>
 <dl class="section return"><dt>Returns</dt><dd>Whether there are more observation-objective pairs to read from the instance. </dd></dl>
 
 <p>Implements <a class="el" href="classcattle_1_1_data_provider.html#aee0611bb90c18970eac4bc403ca8d0b3">cattle::DataProvider&lt; Scalar, Rank, Sequential &gt;</a>.</p>
@@ -349,7 +349,7 @@ template&lt;typename Scalar , std::size_t Rank, bool Sequential, bool Shuffle = 
 </div>
 </div>
 <hr/>The documentation for this class was generated from the following file:<ul>
-<li>C:/Users/Viktor/git/C-ATTL3/C-ATTL3/<a class="el" href="_data_provider_8hpp_source.html">DataProvider.hpp</a></li>
+<li>C:/Users/A6714/git/C-ATTL3/C-ATTL3/<a class="el" href="_data_provider_8hpp_source.html">DataProvider.hpp</a></li>
 </ul>
 </div><!-- contents -->
 <!-- start footer part -->

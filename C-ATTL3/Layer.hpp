@@ -2121,16 +2121,14 @@ protected:
 			cache.std_in = norm_in * cache.inv_in_sd.asDiagonal();
 			in_mat = cache.std_in;
 			// Maintain a moving average of means and variances for testing.
-			if (!frozen) { // Only if parameters are not frozen.
-				if (avgs_init) {
-					avg_means.row(i) = (1.0 - norm_avg_decay) * avg_means.row(i) + norm_avg_decay * means;
-					avg_inv_sds.row(i) = (1.0 - norm_avg_decay) * avg_inv_sds.row(i) + norm_avg_decay *
-							cache.inv_in_sd;
-				} else {
-					avg_means.row(i) = means;
-					avg_inv_sds.row(i) = cache.inv_in_sd;
-					avgs_init = true;
-				}
+			if (avgs_init) {
+				avg_means.row(i) = (1.0 - norm_avg_decay) * avg_means.row(i) + norm_avg_decay * means;
+				avg_inv_sds.row(i) = (1.0 - norm_avg_decay) * avg_inv_sds.row(i) + norm_avg_decay *
+						cache.inv_in_sd;
+			} else {
+				avg_means.row(i) = means;
+				avg_inv_sds.row(i) = cache.inv_in_sd;
+				avgs_init = true;
 			}
 		} else // For testing, use the moving averages.
 			in_mat = (in_mat.rowwise() - avg_means.row(i)) * avg_inv_sds.row(i).asDiagonal();

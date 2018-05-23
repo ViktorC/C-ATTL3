@@ -107,6 +107,7 @@ Similarly to the layers, optimizers rely on several hyper-parameters as well. Be
     * [BinaryCrossEntropyLoss](https://viktorc.github.io/C-ATTL3/html/classcattle_1_1_binary_cross_entropy_loss.html)
     * [CrossEntropyLoss](https://viktorc.github.io/C-ATTL3/html/classcattle_1_1_cross_entropy_loss.html)
     * [SoftmaxCrossEntropyLoss](https://viktorc.github.io/C-ATTL3/html/classcattle_1_1_softmax_cross_entropy_loss.html)
+    * [KullbackLeiblerLoss](https://viktorc.github.io/C-ATTL3/html/classcattle_1_1_kullback_leibler_loss.html)
     * [MultiLabelHingeLoss](https://viktorc.github.io/C-ATTL3/html/classcattle_1_1_multi_label_hinge_loss.html)
     * [MultiLabelLogLoss](https://viktorc.github.io/C-ATTL3/html/classcattle_1_1_multi_label_log_loss.html)
 

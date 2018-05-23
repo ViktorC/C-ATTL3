@@ -335,8 +335,8 @@ public:
 protected:
 	inline ColVector<Scalar> _function(typename Root::Data out, typename Root::Data obj) const {
 		assert(out.size() == out.dimension(0));
-		typename Root::Data loss = -(obj * out.log() +
-				(obj.constant(1) - obj) * (out.constant(1) - out).log());
+		typename Root::Data loss = -(obj * (out + out.constant(epsilon)).log() +
+				(obj.constant(1) - obj) * (out.constant(1 + epsilon) - out).log());
 		return MatrixMap<Scalar>(loss.data(), out.dimension(0), 1);
 	}
 	inline typename Root::Data _d_function(typename Root::Data out, typename Root::Data obj,
@@ -361,12 +361,13 @@ public:
 	/**
 	 * @param epsilon A small constant used to maintain numerical stability.
 	 */
-	CrossEntropyLoss(Scalar epsilon = internal::NumericUtils<Scalar>::EPSILON2) : epsilon(epsilon) { };
+	CrossEntropyLoss(Scalar epsilon = internal::NumericUtils<Scalar>::EPSILON2) :
+			epsilon(epsilon) { };
 protected:
 	inline ColVector<Scalar> _function(typename Root::Data out, typename Root::Data obj) const {
 		std::size_t rows = out.dimension(0);
 		std::size_t cols = out.size() / rows;
-		return -(MatrixMap<Scalar>(out.data(), rows, cols).array().log() *
+		return -((MatrixMap<Scalar>(out.data(), rows, cols).array() + epsilon).log() *
 				MatrixMap<Scalar>(obj.data(), rows, cols).array()).matrix().rowwise().sum();
 	}
 	inline typename Root::Data _d_function(typename Root::Data out, typename Root::Data obj,
@@ -389,7 +390,8 @@ public:
 	/**
 	 * @param epsilon A small constant used to maintain numerical stability.
 	 */
-	SoftmaxCrossEntropyLoss(Scalar epsilon = internal::NumericUtils<Scalar>::EPSILON2) : epsilon(epsilon) { };
+	SoftmaxCrossEntropyLoss(Scalar epsilon = internal::NumericUtils<Scalar>::EPSILON2) :
+			epsilon(epsilon) { };
 protected:
 	inline ColVector<Scalar> _function(typename Root::Data out, typename Root::Data obj) const {
 		std::size_t rows = out.dimension(0);
@@ -408,6 +410,36 @@ protected:
 		Matrix<Scalar> grads = (out_exp.array().colwise() / (out_exp.array().rowwise().sum() + epsilon)) -
 				MatrixMap<Scalar>(obj.data(), rows, cols).array();
 		return TensorMap<Scalar,Root::DATA_RANK>(grads.data(), grad_dims);
+	}
+private:
+	Scalar epsilon;
+};
+
+/**
+ * A template class representing the cross Kullback-Leibler divergence loss function.
+ */
+template<typename Scalar, std::size_t Rank, bool Sequential>
+class KullbackLeiblerLoss : public UniversalLoss<Scalar,Rank,Sequential> {
+	typedef Loss<Scalar,Rank,Sequential> Root;
+	typedef UniversalLoss<Scalar,Rank,Sequential> Base;
+public:
+	/**
+	 * @param epsilon A small constant used to maintain numerical stability.
+	 */
+	KullbackLeiblerLoss(Scalar epsilon = internal::NumericUtils<Scalar>::EPSILON2) :
+			epsilon(epsilon) { };
+protected:
+	inline ColVector<Scalar> _function(typename Root::Data out, typename Root::Data obj) const {
+		std::size_t rows = out.dimension(0);
+		std::size_t cols = out.size() / rows;
+		MatrixMap<Scalar> obj_mat(obj.data(), rows, cols);
+		return -((MatrixMap<Scalar>(out.data(), rows, cols).array() /
+				(obj_mat.array() + epsilon) + epsilon).log() *
+				obj_mat.array()).matrix().rowwise().sum();
+	}
+	inline typename Root::Data _d_function(typename Root::Data out, typename Root::Data obj,
+			const typename Base::RankwiseArray& grad_dims) const {
+		return -obj / (out + epsilon);
 	}
 private:
 	Scalar epsilon;

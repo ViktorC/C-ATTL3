@@ -193,7 +193,7 @@ public:
 	inline bool has_more() {
 		return offsets[0] < (int) instances;
 	}
-	inline DataPair<Scalar,Rank,Sequential> get_data(std::size_t batch_size = std::numeric_limits<Scalar>::max()) {
+	inline DataPair<Scalar,Rank,Sequential> get_data(std::size_t batch_size = std::numeric_limits<std::size_t>::max()) {
 		if (!has_more())
 			throw std::out_of_range("no more data left to fetch");
 		std::size_t max_batch_size = std::min(batch_size, instances - offsets[0]);
