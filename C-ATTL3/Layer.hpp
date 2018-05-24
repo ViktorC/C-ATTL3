@@ -422,14 +422,17 @@ private:
 };
 
 /**
- * A class template for a 2D convolutional layer.
+ * A class template for a 2D convolutional layer operating on rank-3 data batches (rank-4 tensors).  The results
+ * of the convolutions of the filters and the input tensor are concatenated along the highest (4th) rank of the
+ * output tensor.
  */
-template<typename Scalar>
-class ConvolutionLayer : public KernelLayer<Scalar,3> {
+template<typename Scalar, std::size_t Rank = 3>
+class ConvolutionLayer : public KernelLayer<Scalar,Rank> {
 	typedef Layer<Scalar,3> Root;
 	typedef KernelLayer<Scalar,3> Base;
 	typedef std::array<std::size_t,4> RankwiseArray;
 	typedef std::array<std::pair<std::size_t,std::size_t>,4> PaddingsArray;
+	template<typename _Scalar, std::size_t _Rank> friend class ConvolutionLayer;
 public:
 	/**
 	 * @param input_dims The dimensionality of the observations to be processed by the layer.
@@ -448,8 +451,8 @@ public:
 	 * receptor is to be shifted along the height of the input tensor.
 	 * @param horizontal_stride The horizonzal convolution stride i.e. the number of elements by which the
 	 * receptor is to be shifted along the width of the input tensor.
-	 * @param vertical_dilation The extent of the vertical padding between voxels of the receptor.
-	 * @param horizontal_dilation The extent of the horizontal padding between voxels of the receptor.
+	 * @param vertical_dilation The extent of vertical dilation to apply to the receptor.
+	 * @param horizontal_dilation The extent of horizontal dilation to apply to the receptor.
 	 * @param max_norm_constraint An optional max-norm constraint. If it is 0 or less, no
 	 * constraint is applied.
 	 */
@@ -664,14 +667,182 @@ private:
 };
 
 /**
- * A class template for a transposed 2D convolutional layer.
+ * A class template for a 2D convolutional layer operating on rank-2 data batches (rank-3 tensors).  The results
+ * of the convolutions of the filters and the input tensor are concatenated along the highest (3rd) rank of the
+ * output tensor.
  */
 template<typename Scalar>
-class DeconvolutionLayer : public KernelLayer<Scalar,3> {
+class ConvolutionLayer<Scalar,2> : public KernelLayer<Scalar,2> {
+	typedef Layer<Scalar,2> Root;
+	typedef KernelLayer<Scalar,2> Base;
+public:
+	/**
+	 * @param input_dims The dimensionality of the observations to be processed by the layer.
+	 * The ranks of the input tensors denote the sample, height, and width (N,H,W).
+	 * @param filters The number of filters to use.
+	 * @param weight_init A shared pointer to a weight initialization used to initialize the
+	 * values of the parametric kernel backing the layer.
+	 * @param weight_reg The regularization function to apply to the layer's parameters.
+	 * @param receptor_height The height of the receptor field.
+	 * @param receptor_width The width of the receptor field.
+	 * @param vertical_padding The extent of padding to apply to the input tensor along its height (both
+	 * at the top and at the bottom).
+	 * @param horizontal_padding The extent of padding to apply to the input tensor along its width (both
+	 * at the left and at the right).
+	 * @param vertical_stride The vertical convolution stride i.e. the number of elements by which the
+	 * receptor is to be shifted along the height of the input tensor.
+	 * @param horizontal_stride The horizonzal convolution stride i.e. the number of elements by which the
+	 * receptor is to be shifted along the width of the input tensor.
+	 * @param vertical_dilation The extent of vertical dilation to apply to the receptor.
+	 * @param horizontal_dilation The extent of horizontal dilation to apply to the receptor.
+	 * @param max_norm_constraint An optional max-norm constraint. If it is 0 or less, no
+	 * constraint is applied.
+	 */
+	ConvolutionLayer(const Dimensions<std::size_t,2>& input_dims, std::size_t filters, WeightInitSharedPtr<Scalar> weight_init,
+			ParamRegSharedPtr<Scalar> weight_reg = Root::NO_PARAM_REG, std::size_t receptor_height = 3, std::size_t receptor_width = 3,
+			std::size_t vertical_padding = 1, std::size_t horizontal_padding = 1, std::size_t vertical_stride = 1,
+			std::size_t horizontal_stride = 1, std::size_t vertical_dilation = 0, std::size_t horizontal_dilation = 0,
+			Scalar max_norm_constraint = 0) :
+				Base::KernelLayer(input_dims, Dimensions<std::size_t,2>({
+						ConvolutionLayer<Scalar,3>::calculate_output_dim(input_dims(0), receptor_height, vertical_padding,
+								vertical_dilation, vertical_stride),
+						ConvolutionLayer<Scalar,3>::calculate_output_dim(input_dims(1), receptor_width, horizontal_padding,
+								horizontal_dilation, horizontal_stride) * filters }),
+						weight_init, weight_reg, 0, 0, 0),
+				conv3d({ input_dims(0), input_dims(1), 1u }, filters, weight_init, weight_reg, receptor_height, receptor_width,
+						vertical_padding, horizontal_padding, vertical_stride, horizontal_stride, vertical_dilation, horizontal_dilation,
+						max_norm_constraint) { }
+	inline Root* clone() const {
+		return new ConvolutionLayer(*this);
+	}
+	inline void init() {
+		conv3d.init();
+	}
+protected:
+	inline ConvolutionLayer(const ConvolutionLayer<Scalar,2>& layer, bool share_params = false) :
+			Base::KernelLayer(layer, share_params),
+			conv3d(layer.conv3d, share_params) { }
+	inline Root* clone_with_shared_params() const {
+		return new ConvolutionLayer(*this, true);
+	}
+	inline Matrix<Scalar>& get_params() {
+		return conv3d.get_params();
+	}
+	inline Matrix<Scalar>& get_params_grad() {
+		return conv3d.get_params_grad();
+	}
+	inline void regularize() {
+		conv3d.regularize();
+	}
+	inline Scalar get_regularization_penalty() {
+		return conv3d.get_regularization_penalty();
+	}
+	inline void enforce_constraints() {
+		conv3d.enforce_constraints();
+	}
+	inline void empty_cache() {
+		conv3d.empty_cache();
+	}
+	inline typename Root::Data pass_forward(typename Root::Data in, bool training) {
+		return conv3d.pass_forward(TensorMap<Scalar,4>(in.data(), { in.dimension(0), in.dimension(1), in.dimension(2), 1u }), training)
+				.reshape(std::array<std::size_t,3>({ in.dimension(0), Base::output_dims(0), Base::output_dims(1) }));
+	}
+	inline typename Root::Data pass_back(typename Root::Data out_grads) {
+		return conv3d.pass_back(TensorMap<Scalar,4>(out_grads.data(), { out_grads.dimension(0), out_grads.dimension(1), out_grads.dimension(2), 1u }))
+				.reshape(std::array<std::size_t,3>({ out_grads.dimension(0), Base::input_dims(0), Base::input_dims(1) }));
+	}
+private:
+	ConvolutionLayer<Scalar,3> conv3d;
+};
+
+/**
+ * A class template for a 1D convolutional layer operating on rank-1 data batches (rank-2 tensors).  The results
+ * of the convolutions of the filters and the input tensor are concatenated along the highest (2nd) rank of the
+ * output tensor.
+ */
+template<typename Scalar>
+class ConvolutionLayer<Scalar,1> : public KernelLayer<Scalar,1> {
+	typedef Layer<Scalar,1> Root;
+	typedef KernelLayer<Scalar,1> Base;
+public:
+	/**
+	 * @param input_dims The dimensionality of the observations to be processed by the layer.
+	 * The ranks of the input tensors denote the sample and the length (N,L).
+	 * @param filters The number of filters to use.
+	 * @param weight_init A shared pointer to a weight initialization used to initialize the
+	 * values of the parametric kernel backing the layer.
+	 * @param weight_reg The regularization function to apply to the layer's parameters.
+	 * @param receptor_length The length of the receptor.
+	 * @param padding The extent of padding to apply to the input tensor along its length on both ends.
+	 * @param stride The convolution stride i.e. the number of elements by which the receptor is to be
+	 * shifted along the length of the input tensor.
+	 * @param dilation The extent of dilation to apply to the receptor.
+	 * @param max_norm_constraint An optional max-norm constraint. If it is 0 or less, no
+	 * constraint is applied.
+	 */
+	ConvolutionLayer(const Dimensions<std::size_t,1>& input_dims, std::size_t filters, WeightInitSharedPtr<Scalar> weight_init,
+			ParamRegSharedPtr<Scalar> weight_reg = Root::NO_PARAM_REG, std::size_t receptor_length = 3, std::size_t padding = 1,
+			std::size_t stride = 1, std::size_t dilation = 0, Scalar max_norm_constraint = 0) :
+				Base::KernelLayer(input_dims, Dimensions<std::size_t,1>({
+						ConvolutionLayer<Scalar,3>::calculate_output_dim(input_dims(0), receptor_length, padding, dilation, stride) * filters }),
+						weight_init, weight_reg, 0, 0, 0),
+				conv3d({ input_dims(0), 1u, 1u }, filters, weight_init, weight_reg, receptor_length, 1, padding, 0, stride, 1, dilation, 0,
+						max_norm_constraint) { }
+	inline Root* clone() const {
+		return new ConvolutionLayer(*this);
+	}
+	inline void init() {
+		conv3d.init();
+	}
+protected:
+	inline ConvolutionLayer(const ConvolutionLayer<Scalar,1>& layer, bool share_params = false) :
+			Base::KernelLayer(layer, share_params),
+			conv3d(layer.conv3d, share_params) { }
+	inline Root* clone_with_shared_params() const {
+		return new ConvolutionLayer(*this, true);
+	}
+	inline Matrix<Scalar>& get_params() {
+		return conv3d.get_params();
+	}
+	inline Matrix<Scalar>& get_params_grad() {
+		return conv3d.get_params_grad();
+	}
+	inline void regularize() {
+		conv3d.regularize();
+	}
+	inline Scalar get_regularization_penalty() {
+		return conv3d.get_regularization_penalty();
+	}
+	inline void enforce_constraints() {
+		conv3d.enforce_constraints();
+	}
+	inline void empty_cache() {
+		conv3d.empty_cache();
+	}
+	inline typename Root::Data pass_forward(typename Root::Data in, bool training) {
+		return conv3d.pass_forward(TensorMap<Scalar,4>(in.data(), { in.dimension(0), in.dimension(1), 1u, 1u }), training)
+				.reshape(std::array<std::size_t,2>({ in.dimension(0), Base::output_dims(0) }));
+	}
+	inline typename Root::Data pass_back(typename Root::Data out_grads) {
+		return conv3d.pass_back(TensorMap<Scalar,4>(out_grads.data(), { out_grads.dimension(0), out_grads.dimension(1), 1u, 1u }))
+				.reshape(std::array<std::size_t,2>({ out_grads.dimension(0), Base::input_dims(0) }));
+	}
+private:
+	ConvolutionLayer<Scalar,3> conv3d;
+};
+
+/**
+ * A class template for a transposed 2D convolutional layer operating on rank-3 data batches (rank-4 tensors).
+ * The results of the convolutions of the filters and the input tensor are concatenated along the highest (4th)
+ * rank of the output tensor.
+ */
+template<typename Scalar, std::size_t Rank = 3>
+class DeconvolutionLayer : public KernelLayer<Scalar,Rank> {
 	typedef Layer<Scalar,3> Root;
 	typedef KernelLayer<Scalar,3> Base;
 	typedef std::array<std::size_t,4> RankwiseArray;
 	typedef std::array<std::pair<std::size_t,std::size_t>,4> PaddingsArray;
+	template<typename _Scalar, std::size_t _Rank> friend class DeconvolutionLayer;
 public:
 	/**
 	 * @param input_dims The dimensionality of the observations to be processed by the layer.
@@ -688,8 +859,8 @@ public:
 	 * receptor is to be shifted along the height of the output tensor.
 	 * @param horizontal_stride The horizonzal convolution stride i.e. the number of elements by which the
 	 * receptor is to be shifted along the width of the output tensor.
-	 * @param vertical_dilation The extent of the vertical padding between voxels of the receptor.
-	 * @param horizontal_dilation The extent of the horizontal padding between voxels of the receptor.
+	 * @param vertical_dilation The extent of vertical dilation to apply to the receptor.
+	 * @param horizontal_dilation The extent of horizontal dilation to apply to the receptor.
 	 * @param max_norm_constraint An optional max-norm constraint. If it is 0 or less, no
 	 * constraint is applied.
 	 */
@@ -894,6 +1065,171 @@ private:
 	PaddingsArray paddings;
 	// Staged computation caches
 	Matrix<Scalar> biased_in_mat;
+};
+
+/**
+ * A class template for a transposed 2D convolutional layer operating on rank-2 data batches (rank-3 tensors).
+ * The results of the convolutions of the filters and the input tensor are concatenated along the highest (3rd)
+ * rank of the output tensor.
+ */
+template<typename Scalar>
+class DeconvolutionLayer<Scalar,2> : public KernelLayer<Scalar,2> {
+	typedef Layer<Scalar,2> Root;
+	typedef KernelLayer<Scalar,2> Base;
+public:
+	/**
+	 * @param input_dims The dimensionality of the observations to be processed by the layer.
+	 * The ranks of the input tensors denote the sample, height, and width (N,H,W).
+	 * @param filters The number of filters to use.
+	 * @param weight_init A shared pointer to a weight initialization used to initialize the
+	 * values of the parametric kernel backing the layer.
+	 * @param weight_reg The regularization function to apply to the layer's parameters.
+	 * @param receptor_height The height of the receptor field.
+	 * @param receptor_width The width of the receptor field.
+	 * @param vertical_padding The extent of padding to apply to the input tensor along its height (both
+	 * at the top and at the bottom).
+	 * @param horizontal_padding The extent of padding to apply to the input tensor along its width (both
+	 * at the left and at the right).
+	 * @param vertical_stride The vertical convolution stride i.e. the number of elements by which the
+	 * receptor is to be shifted along the height of the input tensor.
+	 * @param horizontal_stride The horizonzal convolution stride i.e. the number of elements by which the
+	 * receptor is to be shifted along the width of the input tensor.
+	 * @param vertical_dilation The extent of vertical dilation to apply to the receptor.
+	 * @param horizontal_dilation The extent of horizontal dilation to apply to the receptor.
+	 * @param max_norm_constraint An optional max-norm constraint. If it is 0 or less, no
+	 * constraint is applied.
+	 */
+	DeconvolutionLayer(const Dimensions<std::size_t,2>& input_dims, std::size_t filters, WeightInitSharedPtr<Scalar> weight_init,
+			ParamRegSharedPtr<Scalar> weight_reg = Root::NO_PARAM_REG, std::size_t receptor_height = 3, std::size_t receptor_width = 3,
+			std::size_t vertical_padding = 1, std::size_t horizontal_padding = 1, std::size_t vertical_stride = 1,
+			std::size_t horizontal_stride = 1, std::size_t vertical_dilation = 0, std::size_t horizontal_dilation = 0,
+			Scalar max_norm_constraint = 0) :
+				Base::KernelLayer(input_dims, Dimensions<std::size_t,2>({
+						DeconvolutionLayer<Scalar,3>::calculate_output_dim(input_dims(0), receptor_height, vertical_padding,
+								vertical_dilation, vertical_stride),
+						DeconvolutionLayer<Scalar,3>::calculate_output_dim(input_dims(1), receptor_width, horizontal_padding,
+								horizontal_dilation, horizontal_stride) * filters }),
+						weight_init, weight_reg, 0, 0, 0),
+				deconv3d({ input_dims(0), input_dims(1), 1u }, filters, weight_init, weight_reg, receptor_height, receptor_width,
+						vertical_padding, horizontal_padding, vertical_stride, horizontal_stride, vertical_dilation, horizontal_dilation,
+						max_norm_constraint) { }
+	inline Root* clone() const {
+		return new DeconvolutionLayer(*this);
+	}
+	inline void init() {
+		deconv3d.init();
+	}
+protected:
+	inline DeconvolutionLayer(const DeconvolutionLayer<Scalar,2>& layer, bool share_params = false) :
+			Base::KernelLayer(layer, share_params),
+			deconv3d(layer.deconv3d, share_params) { }
+	inline Root* clone_with_shared_params() const {
+		return new DeconvolutionLayer(*this, true);
+	}
+	inline Matrix<Scalar>& get_params() {
+		return deconv3d.get_params();
+	}
+	inline Matrix<Scalar>& get_params_grad() {
+		return deconv3d.get_params_grad();
+	}
+	inline void regularize() {
+		deconv3d.regularize();
+	}
+	inline Scalar get_regularization_penalty() {
+		return deconv3d.get_regularization_penalty();
+	}
+	inline void enforce_constraints() {
+		deconv3d.enforce_constraints();
+	}
+	inline void empty_cache() {
+		deconv3d.empty_cache();
+	}
+	inline typename Root::Data pass_forward(typename Root::Data in, bool training) {
+		return deconv3d.pass_forward(TensorMap<Scalar,4>(in.data(), { in.dimension(0), in.dimension(1), in.dimension(2), 1u }), training)
+				.reshape(std::array<std::size_t,3>({ in.dimension(0), Base::output_dims(0), Base::output_dims(1) }));
+	}
+	inline typename Root::Data pass_back(typename Root::Data out_grads) {
+		return deconv3d.pass_back(TensorMap<Scalar,4>(out_grads.data(), { out_grads.dimension(0), out_grads.dimension(1), out_grads.dimension(2), 1u }))
+				.reshape(std::array<std::size_t,3>({ out_grads.dimension(0), Base::input_dims(0), Base::input_dims(1) }));
+	}
+private:
+	DeconvolutionLayer<Scalar,3> deconv3d;
+};
+
+/**
+ * A class template for a transposed 2D convolutional layer operating on rank-1 data batches (rank-2 tensors).
+ * The results of the convolutions of the filters and the input tensor are concatenated along the highest (2nd)
+ * rank of the output tensor.
+ */
+template<typename Scalar>
+class DeconvolutionLayer<Scalar,1> : public KernelLayer<Scalar,1> {
+	typedef Layer<Scalar,1> Root;
+	typedef KernelLayer<Scalar,1> Base;
+public:
+	/**
+	 * @param input_dims The dimensionality of the observations to be processed by the layer.
+	 * The ranks of the input tensors denote the sample and the length (N,L).
+	 * @param filters The number of filters to use.
+	 * @param weight_init A shared pointer to a weight initialization used to initialize the
+	 * values of the parametric kernel backing the layer.
+	 * @param weight_reg The regularization function to apply to the layer's parameters.
+	 * @param receptor_length The length of the receptor.
+	 * @param padding The extent of padding to apply to the input tensor along its length on both ends.
+	 * @param stride The convolution stride i.e. the number of elements by which the receptor is to be
+	 * shifted along the length of the input tensor.
+	 * @param dilation The extent of dilation to apply to the receptor.
+	 * @param max_norm_constraint An optional max-norm constraint. If it is 0 or less, no
+	 * constraint is applied.
+	 */
+	DeconvolutionLayer(const Dimensions<std::size_t,1>& input_dims, std::size_t filters, WeightInitSharedPtr<Scalar> weight_init,
+			ParamRegSharedPtr<Scalar> weight_reg = Root::NO_PARAM_REG, std::size_t receptor_length = 3, std::size_t padding = 1,
+			std::size_t stride = 1, std::size_t dilation = 0, Scalar max_norm_constraint = 0) :
+				Base::KernelLayer(input_dims, Dimensions<std::size_t,1>({
+						DeconvolutionLayer<Scalar,3>::calculate_output_dim(input_dims(0), receptor_length, padding, dilation, stride) * filters }),
+						weight_init, weight_reg, 0, 0, 0),
+				deconv3d({ input_dims(0), 1u, 1u }, filters, weight_init, weight_reg, receptor_length, 1, padding, 0, stride, 1, dilation, 0,
+						max_norm_constraint) { }
+	inline Root* clone() const {
+		return new DeconvolutionLayer(*this);
+	}
+	inline void init() {
+		deconv3d.init();
+	}
+protected:
+	inline DeconvolutionLayer(const DeconvolutionLayer<Scalar,1>& layer, bool share_params = false) :
+			Base::KernelLayer(layer, share_params),
+			deconv3d(layer.deconv3d, share_params) { }
+	inline Root* clone_with_shared_params() const {
+		return new DeconvolutionLayer(*this, true);
+	}
+	inline Matrix<Scalar>& get_params() {
+		return deconv3d.get_params();
+	}
+	inline Matrix<Scalar>& get_params_grad() {
+		return deconv3d.get_params_grad();
+	}
+	inline void regularize() {
+		deconv3d.regularize();
+	}
+	inline Scalar get_regularization_penalty() {
+		return deconv3d.get_regularization_penalty();
+	}
+	inline void enforce_constraints() {
+		deconv3d.enforce_constraints();
+	}
+	inline void empty_cache() {
+		deconv3d.empty_cache();
+	}
+	inline typename Root::Data pass_forward(typename Root::Data in, bool training) {
+		return deconv3d.pass_forward(TensorMap<Scalar,4>(in.data(), { in.dimension(0), in.dimension(1), 1u, 1u }), training)
+				.reshape(std::array<std::size_t,2>({ in.dimension(0), Base::output_dims(0) }));
+	}
+	inline typename Root::Data pass_back(typename Root::Data out_grads) {
+		return deconv3d.pass_back(TensorMap<Scalar,4>(out_grads.data(), { out_grads.dimension(0), out_grads.dimension(1), 1u, 1u }))
+				.reshape(std::array<std::size_t,2>({ out_grads.dimension(0), Base::input_dims(0) }));
+	}
+private:
+	DeconvolutionLayer<Scalar,3> deconv3d;
 };
 
 /**

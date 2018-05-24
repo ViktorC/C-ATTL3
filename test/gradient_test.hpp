@@ -174,10 +174,18 @@ template<typename Scalar>
 inline void conv_layer_grad_test() {
 	auto init = WeightInitSharedPtr<Scalar>(new HeWeightInitialization<Scalar>());
 	auto reg = ParamRegSharedPtr<Scalar>(new SquaredParameterRegularization<Scalar>());
-	LayerPtr<Scalar,3> layer1(new ConvolutionLayer<Scalar>({ 8u, 8u, 2u }, 5, init,
+	LayerPtr<Scalar,1> layer1_1(new ConvolutionLayer<Scalar,1>({ 32u }, 5, init,
+			ConvolutionLayer<Scalar>::NO_PARAM_REG, 3, 2, 1, 1));
+	LayerPtr<Scalar,1> layer2_1(new ConvolutionLayer<Scalar,1>(layer1_1->get_output_dims(), 1, init, reg, 1, 1));
+	layer_grad_test<Scalar,1>("convolution layer ", std::move(layer1_1), std::move(layer2_1));
+	LayerPtr<Scalar,2> layer1_2(new ConvolutionLayer<Scalar,2>({ 10u, 10u }, 5, init,
 			ConvolutionLayer<Scalar>::NO_PARAM_REG, 3, 2, 1, 2, 1, 2, 1, 0));
-	LayerPtr<Scalar,3> layer2(new ConvolutionLayer<Scalar>(layer1->get_output_dims(), 1, init, reg, 1, 1));
-	layer_grad_test<Scalar,3>("convolution layer ", std::move(layer1), std::move(layer2));
+	LayerPtr<Scalar,2> layer2_2(new ConvolutionLayer<Scalar,2>(layer1_2->get_output_dims(), 1, init, reg, 1, 1));
+	layer_grad_test<Scalar,2>("convolution layer ", std::move(layer1_2), std::move(layer2_2));
+	LayerPtr<Scalar,3> layer1_3(new ConvolutionLayer<Scalar>({ 8u, 8u, 2u }, 5, init,
+			ConvolutionLayer<Scalar>::NO_PARAM_REG, 3, 2, 1, 2, 1, 2, 1, 0));
+	LayerPtr<Scalar,3> layer2_3(new ConvolutionLayer<Scalar>(layer1_3->get_output_dims(), 1, init, reg, 1, 1));
+	layer_grad_test<Scalar,3>("convolution layer ", std::move(layer1_3), std::move(layer2_3));
 }
 
 TEST(GradientTest, ConvolutionLayer) {
