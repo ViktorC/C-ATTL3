@@ -816,7 +816,7 @@ protected:
 		grad_norms.params_grad_l2 = (1 - l2_decay) * grad_norms.params_grad_l2 +
 				l2_decay * params_grad.cwiseProduct(params_grad);
 		params -= (learning_rate * (grad_norms.params_grad_l1 * l1_corr).array() /
-				((grad_norms.params_grad_l2 * l2_corr).array().sqrt() + epsilon)).matrix();
+				((grad_norms.params_grad_l2 * l2_corr).array() + epsilon).sqrt()).matrix();
 	}
 	const Scalar learning_rate;
 	const Scalar l1_decay;
@@ -907,7 +907,7 @@ protected:
 				params_grad.cwiseProduct(params_grad);
 		params -= (Base::learning_rate * (Base::l1_decay * l1_corr * params_grad +
 				(1.0 - Base::l1_decay) * l1_next_corr * grad_norms.params_grad_l1).array() /
-				((grad_norms.params_grad_l2 * l2_corr).array().sqrt() + Base::epsilon)).matrix();
+				((grad_norms.params_grad_l2 * l2_corr).array() + Base::epsilon).sqrt()).matrix();
 	}
 };
 
