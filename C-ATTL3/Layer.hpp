@@ -748,8 +748,9 @@ protected:
 				.reshape(std::array<std::size_t,3>({ in.dimension(0), Base::output_dims(0), Base::output_dims(1) }));
 	}
 	inline typename Root::Data pass_back(typename Root::Data out_grads) {
-		return conv3d.pass_back(TensorMap<Scalar,4>(out_grads.data(), { out_grads.dimension(0), out_grads.dimension(1), out_grads.dimension(2), 1u }))
-				.reshape(std::array<std::size_t,3>({ out_grads.dimension(0), Base::input_dims(0), Base::input_dims(1) }));
+		return conv3d.pass_back(TensorMap<Scalar,4>(out_grads.data(), { out_grads.dimension(0), conv3d.output_dims(0),
+				conv3d.output_dims(1), conv3d.output_dims(2) })).reshape(std::array<std::size_t,3>({ out_grads.dimension(0),
+						Base::input_dims(0), Base::input_dims(1) }));
 	}
 private:
 	ConvolutionLayer<Scalar,3> conv3d;
@@ -824,8 +825,9 @@ protected:
 				.reshape(std::array<std::size_t,2>({ in.dimension(0), Base::output_dims(0) }));
 	}
 	inline typename Root::Data pass_back(typename Root::Data out_grads) {
-		return conv3d.pass_back(TensorMap<Scalar,4>(out_grads.data(), { out_grads.dimension(0), out_grads.dimension(1), 1u, 1u }))
-				.reshape(std::array<std::size_t,2>({ out_grads.dimension(0), Base::input_dims(0) }));
+		return conv3d.pass_back(TensorMap<Scalar,4>(out_grads.data(), { out_grads.dimension(0), conv3d.output_dims(0),
+				conv3d.output_dims(1), conv3d.output_dims(2) })).reshape(std::array<std::size_t,2>({ out_grads.dimension(0),
+						Base::input_dims(0) }));
 	}
 private:
 	ConvolutionLayer<Scalar,3> conv3d;
@@ -1149,8 +1151,9 @@ protected:
 				.reshape(std::array<std::size_t,3>({ in.dimension(0), Base::output_dims(0), Base::output_dims(1) }));
 	}
 	inline typename Root::Data pass_back(typename Root::Data out_grads) {
-		return deconv3d.pass_back(TensorMap<Scalar,4>(out_grads.data(), { out_grads.dimension(0), out_grads.dimension(1), out_grads.dimension(2), 1u }))
-				.reshape(std::array<std::size_t,3>({ out_grads.dimension(0), Base::input_dims(0), Base::input_dims(1) }));
+		return deconv3d.pass_back(TensorMap<Scalar,4>(out_grads.data(), { out_grads.dimension(0), deconv3d.output_dims(0),
+				deconv3d.output_dims(1), deconv3d.output_dims(2) })).reshape(std::array<std::size_t,3>({ out_grads.dimension(0),
+						Base::input_dims(0), Base::input_dims(1) }));
 	}
 private:
 	DeconvolutionLayer<Scalar,3> deconv3d;
@@ -1225,8 +1228,9 @@ protected:
 				.reshape(std::array<std::size_t,2>({ in.dimension(0), Base::output_dims(0) }));
 	}
 	inline typename Root::Data pass_back(typename Root::Data out_grads) {
-		return deconv3d.pass_back(TensorMap<Scalar,4>(out_grads.data(), { out_grads.dimension(0), out_grads.dimension(1), 1u, 1u }))
-				.reshape(std::array<std::size_t,2>({ out_grads.dimension(0), Base::input_dims(0) }));
+		return deconv3d.pass_back(TensorMap<Scalar,4>(out_grads.data(), { out_grads.dimension(0), deconv3d.output_dims(0),
+				deconv3d.output_dims(1), deconv3d.output_dims(2) })).reshape(std::array<std::size_t,2>({ out_grads.dimension(0),
+						Base::input_dims(0) }));
 	}
 private:
 	DeconvolutionLayer<Scalar,3> deconv3d;
