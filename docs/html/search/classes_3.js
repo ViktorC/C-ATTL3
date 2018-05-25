@@ -2,6 +2,11 @@ var searchData=
 [
   ['dataprovider',['DataProvider',['../classcattle_1_1_data_provider.html',1,'cattle']]],
   ['deconvolutionlayer',['DeconvolutionLayer',['../classcattle_1_1_deconvolution_layer.html',1,'cattle']]],
+  ['deconvolutionlayer_3c_20scalar_2c_201_20_3e',['DeconvolutionLayer&lt; Scalar, 1 &gt;',['../classcattle_1_1_deconvolution_layer_3_01_scalar_00_011_01_4.html',1,'cattle']]],
+  ['deconvolutionlayer_3c_20scalar_2c_202_20_3e',['DeconvolutionLayer&lt; Scalar, 2 &gt;',['../classcattle_1_1_deconvolution_layer_3_01_scalar_00_012_01_4.html',1,'cattle']]],
+  ['deconvolutionlayerbase',['DeconvolutionLayerBase',['../classcattle_1_1_deconvolution_layer_base.html',1,'cattle']]],
+  ['deconvolutionlayerbase_3c_20scalar_2c_201_20_3e',['DeconvolutionLayerBase&lt; Scalar, 1 &gt;',['../classcattle_1_1_deconvolution_layer_base.html',1,'cattle']]],
+  ['deconvolutionlayerbase_3c_20scalar_2c_202_20_3e',['DeconvolutionLayerBase&lt; Scalar, 2 &gt;',['../classcattle_1_1_deconvolution_layer_base.html',1,'cattle']]],
   ['denselayer',['DenseLayer',['../classcattle_1_1_dense_layer.html',1,'cattle']]],
   ['denseneuralnetwork',['DenseNeuralNetwork',['../classcattle_1_1_dense_neural_network.html',1,'cattle']]],
   ['dimensions',['Dimensions',['../classcattle_1_1_dimensions.html',1,'cattle']]],

@@ -98,6 +98,14 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a3f279dec6f26b6e1fbe9adb5c1369bab"><td class="memTemplItemLeft" align="right" valign="top"><a class="el" href="classcattle_1_1_dimensions.html">Dimensions</a>&lt; IndexType, Rank - Ranks &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classcattle_1_1_dimensions.html#a3f279dec6f26b6e1fbe9adb5c1369bab">demote</a> () const</td></tr>
 <tr class="memdesc:a3f279dec6f26b6e1fbe9adb5c1369bab"><td class="mdescLeft">&#160;</td><td class="mdescRight">A constant method that returns a copy of the instance without the most-significant rank.  <a href="#a3f279dec6f26b6e1fbe9adb5c1369bab">More...</a><br /></td></tr>
 <tr class="separator:a3f279dec6f26b6e1fbe9adb5c1369bab"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a86d98a09d1de142bab8100618ce5fa84"><td class="memTemplParams" colspan="2">template&lt;std::size_t Ranks = 1&gt; </td></tr>
+<tr class="memitem:a86d98a09d1de142bab8100618ce5fa84"><td class="memTemplItemLeft" align="right" valign="top"><a class="el" href="classcattle_1_1_dimensions.html">Dimensions</a>&lt; IndexType, Rank+Ranks &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classcattle_1_1_dimensions.html#a86d98a09d1de142bab8100618ce5fa84">extend</a> () const</td></tr>
+<tr class="memdesc:a86d98a09d1de142bab8100618ce5fa84"><td class="mdescLeft">&#160;</td><td class="mdescRight">A constant method that returns a copy of the instance with an additional least-significant rank.  <a href="#a86d98a09d1de142bab8100618ce5fa84">More...</a><br /></td></tr>
+<tr class="separator:a86d98a09d1de142bab8100618ce5fa84"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa34ca504ab537adb21e0e2b22ad7fe19"><td class="memTemplParams" colspan="2">template&lt;std::size_t Ranks = 1&gt; </td></tr>
+<tr class="memitem:aa34ca504ab537adb21e0e2b22ad7fe19"><td class="memTemplItemLeft" align="right" valign="top"><a class="el" href="classcattle_1_1_dimensions.html">Dimensions</a>&lt; IndexType, Rank - Ranks &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classcattle_1_1_dimensions.html#aa34ca504ab537adb21e0e2b22ad7fe19">contract</a> () const</td></tr>
+<tr class="memdesc:aa34ca504ab537adb21e0e2b22ad7fe19"><td class="mdescLeft">&#160;</td><td class="mdescRight">A constant method that returns a copy of the instance without the least-significant rank.  <a href="#aa34ca504ab537adb21e0e2b22ad7fe19">More...</a><br /></td></tr>
+<tr class="separator:aa34ca504ab537adb21e0e2b22ad7fe19"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aa0bf24c514d12ab7cd939471d81bc823"><td class="memItemLeft" align="right" valign="top">IndexType&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_dimensions.html#aa0bf24c514d12ab7cd939471d81bc823">operator()</a> (std::size_t i) const</td></tr>
 <tr class="memdesc:aa0bf24c514d12ab7cd939471d81bc823"><td class="mdescLeft">&#160;</td><td class="mdescRight">A simple constant method that returns a copy of the numeral representing the number of dimensions along a given rank.  <a href="#aa0bf24c514d12ab7cd939471d81bc823">More...</a><br /></td></tr>
 <tr class="separator:aa0bf24c514d12ab7cd939471d81bc823"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -141,6 +149,38 @@ class cattle::Dimensions&lt; IndexType, Rank &gt;</h3>
 <p>A class representing dimensions along one or more ranks. </p>
 <p>It can describe the dimensionality of tensors of arbitrary ranks. </p>
 </div><h2 class="groupheader">Member Function Documentation</h2>
+<a id="aa34ca504ab537adb21e0e2b22ad7fe19"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa34ca504ab537adb21e0e2b22ad7fe19">&#9670;&nbsp;</a></span>contract()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename IndexType, std::size_t Rank&gt; </div>
+<div class="memtemplate">
+template&lt;std::size_t Ranks = 1&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classcattle_1_1_dimensions.html">Dimensions</a>&lt;IndexType,Rank - Ranks&gt; <a class="el" href="classcattle_1_1_dimensions.html">cattle::Dimensions</a>&lt; IndexType, Rank &gt;::contract </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>A constant method that returns a copy of the instance without the least-significant rank. </p>
+<dl class="section return"><dt>Returns</dt><dd>A new <a class="el" href="classcattle_1_1_dimensions.html" title="A class representing dimensions along one or more ranks. ">Dimensions</a> instance with the last x ranks removed. </dd></dl>
+
+</div>
+</div>
 <a id="a3f279dec6f26b6e1fbe9adb5c1369bab"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a3f279dec6f26b6e1fbe9adb5c1369bab">&#9670;&nbsp;</a></span>demote()</h2>
 
@@ -169,7 +209,39 @@ template&lt;std::size_t Ranks = 1&gt; </div>
 </div><div class="memdoc">
 
 <p>A constant method that returns a copy of the instance without the most-significant rank. </p>
-<dl class="section return"><dt>Returns</dt><dd>A new <a class="el" href="classcattle_1_1_dimensions.html" title="A class representing dimensions along one or more ranks. ">Dimensions</a> instance with the first rank removed. </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>A new <a class="el" href="classcattle_1_1_dimensions.html" title="A class representing dimensions along one or more ranks. ">Dimensions</a> instance with the first x ranks removed. </dd></dl>
+
+</div>
+</div>
+<a id="a86d98a09d1de142bab8100618ce5fa84"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a86d98a09d1de142bab8100618ce5fa84">&#9670;&nbsp;</a></span>extend()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename IndexType, std::size_t Rank&gt; </div>
+<div class="memtemplate">
+template&lt;std::size_t Ranks = 1&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classcattle_1_1_dimensions.html">Dimensions</a>&lt;IndexType,Rank + Ranks&gt; <a class="el" href="classcattle_1_1_dimensions.html">cattle::Dimensions</a>&lt; IndexType, Rank &gt;::extend </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>A constant method that returns a copy of the instance with an additional least-significant rank. </p>
+<dl class="section return"><dt>Returns</dt><dd>A new <a class="el" href="classcattle_1_1_dimensions.html" title="A class representing dimensions along one or more ranks. ">Dimensions</a> instance with additional x ranks with size 1 appended to it. </dd></dl>
 
 </div>
 </div>
@@ -275,12 +347,12 @@ template&lt;std::size_t Ranks = 1&gt; </div>
 </div><div class="memdoc">
 
 <p>A constant method that returns a copy of the instance with an additional most-significant rank. </p>
-<dl class="section return"><dt>Returns</dt><dd>A new <a class="el" href="classcattle_1_1_dimensions.html" title="A class representing dimensions along one or more ranks. ">Dimensions</a> instance with an additional rank with a dimensionality of one prepended to it. </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>A new <a class="el" href="classcattle_1_1_dimensions.html" title="A class representing dimensions along one or more ranks. ">Dimensions</a> instance with additional x ranks of size 1 prepended to it. </dd></dl>
 
 </div>
 </div>
 <hr/>The documentation for this class was generated from the following file:<ul>
-<li>C:/Users/A6714/git/C-ATTL3/C-ATTL3/<a class="el" href="_dimensions_8hpp_source.html">Dimensions.hpp</a></li>
+<li>C:/Users/Viktor/git/C-ATTL3/C-ATTL3/<a class="el" href="_dimensions_8hpp_source.html">Dimensions.hpp</a></li>
 </ul>
 </div><!-- contents -->
 <!-- start footer part -->

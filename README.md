@@ -27,16 +27,16 @@ The lowest level building blocks of neural networks in C-ATTL3 are the layers. T
     * [LeakyReLUActivationLayer](https://viktorc.github.io/C-ATTL3/html/classcattle_1_1_leaky_re_l_u_activation_layer.html)
     * [ELUActivationLayer](https://viktorc.github.io/C-ATTL3/html/classcattle_1_1_e_l_u_activation_layer.html)
     * [PReLUActivationLayer](https://viktorc.github.io/C-ATTL3/html/classcattle_1_1_p_re_l_u_activation_layer.html)
-  * [PoolLayer](https://viktorc.github.io/C-ATTL3/html/classcattle_1_1_pooling_layer.html) [A] (3)
-    * [SumPoolLayer](https://viktorc.github.io/C-ATTL3/html/classcattle_1_1_sum_pool_layer.html) (3)
-    * [MaxPoolLayer](https://viktorc.github.io/C-ATTL3/html/classcattle_1_1_max_pool_layer.html) (3)
-    * [MeanPoolLayer](https://viktorc.github.io/C-ATTL3/html/classcattle_1_1_mean_pool_layer.html) (3)
+  * [PoolLayer](https://viktorc.github.io/C-ATTL3/html/classcattle_1_1_pooling_layer.html) [A]
+    * [SumPoolLayer](https://viktorc.github.io/C-ATTL3/html/classcattle_1_1_sum_pool_layer.html)
+    * [MaxPoolLayer](https://viktorc.github.io/C-ATTL3/html/classcattle_1_1_max_pool_layer.html)
+    * [MeanPoolLayer](https://viktorc.github.io/C-ATTL3/html/classcattle_1_1_mean_pool_layer.html)
   * [BroadcastLayer](https://viktorc.github.io/C-ATTL3/html/classcattle_1_1_broadcast_layer.html)
   * [BatchNormalizationLayer](https://viktorc.github.io/C-ATTL3/html/classcattle_1_1_batch_normalization_layer.html)
   * [DropoutLayer](https://viktorc.github.io/C-ATTL3/html/classcattle_1_1_dropout_layer.html)
   * [ReshapeLayer](https://viktorc.github.io/C-ATTL3/html/classcattle_1_1_reshape_layer.html)
 
-Most layers can handle data of rank 1 to 3 with the exception of convolutional and pooling layers which only accept rank 3 data. The actual rank of the input and output of the layers is one greater than the nominal rank of the layers to allow for batch learning. In the case of a layer with a nominal rank of 3, the input tensor is expected to be a rank-4 tensor with its ranks representing the sample number, height, width, and depth/channel (N,H,W,C) respectively. The nominal dimensionalities of the accepted input tensors of the different layers are specified using instances of the [Dimensions](https://viktorc.github.io/C-ATTL3/html/classcattle_1_1_dimensions.html) class which relies on expression templates and compile time polymorphism to enable the fast and easy computation of the input dimensions of intermediary layers in complex neural networks. Besides the input dimensions, the one parameter required by all, most layers rely on multiple other hyper-parameters as well (e.g. max-norm constraint, dilation, receptor field size, etc.). These parameters may need to be fine-tuned manually or via random search (or in some other way) to optimize the behaviour of the networks.
+All layers can handle data of rank 1, 2, or 3. The actual rank of the input and output of the layers is one greater than the nominal rank of the layers to allow for batch learning. In the case of a layer with a nominal rank of 3, the input tensor is expected to be a rank-4 tensor with its ranks representing the sample number, height, width, and depth/channel (N,H,W,C) respectively. The nominal dimensionalities of the accepted input tensors of the different layers are specified using instances of the [Dimensions](https://viktorc.github.io/C-ATTL3/html/classcattle_1_1_dimensions.html) class which relies on expression templates and compile time polymorphism to enable the fast and easy computation of the input dimensions of intermediary layers in complex neural networks. Besides the input dimensions, the one parameter required by all, most layers rely on multiple other hyper-parameters as well (e.g. max-norm constraint, dilation, receptor field size, etc.). These parameters may need to be fine-tuned manually or via random search (or in some other way) to optimize the behaviour of the networks.
 
 #### WeightInitialization
 The kernel layers (fully-connected and convolutional) also require weight initialization. The out-of-the-box weight initializations include:
