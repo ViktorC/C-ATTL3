@@ -58,8 +58,7 @@ public:
 	/**
 	 * A constant method that returns a copy of the instance with an additional most-significant rank.
 	 *
-	 * @return A new Dimensions instance with an additional rank with a dimensionality of one
-	 * prepended to it.
+	 * @return A new Dimensions instance with additional x ranks of size 1 prepended to it.
 	 */
 	template<std::size_t Ranks = 1>
 	inline Dimensions<IndexType,Rank + Ranks> promote() const {
@@ -70,7 +69,7 @@ public:
 	/**
 	 * A constant method that returns a copy of the instance without the most-significant rank.
 	 *
-	 * @return A new Dimensions instance with the first rank removed.
+	 * @return A new Dimensions instance with the first x ranks removed.
 	 */
 	template<std::size_t Ranks = 1>
 	inline Dimensions<IndexType,Rank - Ranks> demote() const {
@@ -78,6 +77,29 @@ public:
 		Dimensions<IndexType,Rank - Ranks> demoted;
 		std::copy(values.begin() + Ranks, values.end(), demoted.values.begin());
 		return demoted;
+	}
+	/**
+	 * A constant method that returns a copy of the instance with an additional least-significant rank.
+	 *
+	 * @return A new Dimensions instance with additional x ranks with size 1 appended to it.
+	 */
+	template<std::size_t Ranks = 1>
+	inline Dimensions<IndexType,Rank + Ranks> extend() const {
+		Dimensions<IndexType,Rank + Ranks> extended;
+		std::copy(values.begin(), values.end(), extended.values.begin());
+		return extended;
+	}
+	/**
+	 * A constant method that returns a copy of the instance without the least-significant rank.
+	 *
+	 * @return A new Dimensions instance with the last x ranks removed.
+	 */
+	template<std::size_t Ranks = 1>
+	inline Dimensions<IndexType,Rank - Ranks> contract() const {
+		static_assert(Rank > Ranks, "rank must be greater than the number of ranks to contract by");
+		Dimensions<IndexType,Rank - Ranks> contracted;
+		std::copy(values.begin() + Ranks, values.end() - Ranks, contracted.values.begin());
+		return contracted;
 	}
 	/**
 	 * A simple constant method that returns a copy of the numeral representing the
