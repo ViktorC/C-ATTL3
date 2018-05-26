@@ -1896,16 +1896,16 @@ private:
 };
 
 /**
- * An abstract class template representing a pooling layer for batches of rank 3 data.
+ * An abstract base class template representing a pooling layer.
  */
-template<typename Scalar>
-class PoolLayer : public Layer<Scalar,3> {
-	typedef Layer<Scalar,3> Base;
+template<typename Scalar, std::size_t Rank>
+class PoolLayer : public Layer<Scalar,Rank> {
+	typedef Layer<Scalar,Rank> Base;
 public:
-	inline const Dimensions<std::size_t,3>& get_input_dims() const {
+	inline const Dimensions<std::size_t,Rank>& get_input_dims() const {
 		return input_dims;
 	}
-	inline const Dimensions<std::size_t,3>& get_output_dims() const {
+	inline const Dimensions<std::size_t,Rank>& get_output_dims() const {
 		return output_dims;
 	}
 	inline bool is_frozen() const {
@@ -1916,16 +1916,15 @@ public:
 	}
 	inline void init() { }
 protected:
-	typedef std::array<std::size_t,4> RankwiseArray;
-	typedef std::array<std::size_t,2> ReductionRanksArray;
-	typedef Tensor<Scalar,2> ReducedData;
-	inline PoolLayer(const Dimensions<std::size_t,3>& input_dims, std::size_t receptor_height, std::size_t receptor_width,
-			std::size_t vertical_stride, std::size_t horizontal_stride, std::size_t vertical_dilation,
-			std::size_t horizontal_dilation) :
+	typedef std::array<std::size_t,4> Array4D;
+	typedef std::array<std::size_t,2> ReductionRanksArray2D;
+	inline PoolLayer(const Dimensions<std::size_t,Rank>& input_dims, const Dimensions<std::size_t,Rank>& output_dims,
+			std::size_t receptor_height, std::size_t receptor_width, std::size_t vertical_stride, std::size_t horizontal_stride,
+			std::size_t vertical_dilation, std::size_t horizontal_dilation) :
 				input_dims(input_dims),
-				output_dims({ calculate_output_dim(input_dims(0), receptor_height, vertical_dilation, vertical_stride),
-						calculate_output_dim(input_dims(1), receptor_width, horizontal_dilation, horizontal_stride),
-						input_dims(2) }),
+				output_dims(output_dims),
+				ext_input_dims(input_dims.template extend<3 - Rank>()),
+				ext_output_dims(output_dims.template extend<3 - Rank>()),
 				receptor_height(receptor_height),
 				receptor_width(receptor_width),
 				vertical_stride(vertical_stride),
@@ -1934,20 +1933,20 @@ protected:
 				horizontal_dilation(horizontal_dilation),
 				dil_receptor_height(receptor_height + (receptor_height - 1) * vertical_dilation),
 				dil_receptor_width(receptor_width + (receptor_width - 1) * horizontal_dilation),
-				height_rem(input_dims(0) - dil_receptor_height),
-				width_rem(input_dims(1) - dil_receptor_width),
+				height_rem(ext_input_dims(0) - dil_receptor_height),
+				width_rem(ext_input_dims(1) - dil_receptor_width),
 				input_layer(false),
 				frozen(false),
 				reduction_ranks({ 1u, 2u }),
 				broadcast({ 1u, receptor_height, receptor_width, 1u }),
 				patch_offsets({ 0u, 0u, 0u, 0u }),
-				patch_extents({ 0u, dil_receptor_height, dil_receptor_width, input_dims(2) }),
+				patch_extents({ 0u, dil_receptor_height, dil_receptor_width, ext_input_dims(2) }),
 				reduced_patch_offsets({ 0u, 0u, 0u, 0u }),
-				reduced_patch_extents({ 0u, 1u, 1u, input_dims(2) }),
+				reduced_patch_extents({ 0u, 1u, 1u, ext_input_dims(2) }),
 				dil_strides({ 1u, vertical_dilation + 1u, horizontal_dilation + 1u, 1u }),
 				params(0, 0),
 				params_grad(0, 0) {
-		assert(input_dims(0) >= dil_receptor_height && input_dims(1) >= dil_receptor_width);
+		assert(ext_input_dims(0) >= dil_receptor_height && ext_input_dims(1) >= dil_receptor_width);
 		assert(receptor_height > 0 && receptor_width > 0);
 		assert(vertical_stride > 0 && horizontal_stride > 0);
 	}
@@ -1962,7 +1961,7 @@ protected:
 	 * @param patch_ind The index of the patch.
 	 * @return The reduced tensor.
 	 */
-	virtual typename Base::Data reduce(const typename Base::Data& patch, std::size_t patch_ind) = 0;
+	virtual Tensor<Scalar,4> reduce(const Tensor<Scalar,4>& patch, std::size_t patch_ind) = 0;
 	/**
 	 * Differentiates the reduction function and returns the derivative of the loss function
 	 * w.r.t. the non-reduced patch.
@@ -1971,7 +1970,7 @@ protected:
 	 * @param patch_ind The index of the patch.
 	 * @return The derivative of the loss function w.r.t. the non-reduced patch.
 	 */
-	virtual typename Base::Data d_reduce(const typename Base::Data& grad, std::size_t patch_ind) = 0;
+	virtual Tensor<Scalar,4> d_reduce(const Tensor<Scalar,4>& grad, std::size_t patch_ind) = 0;
 	inline bool is_input_layer() const {
 		return input_layer;
 	}
@@ -1989,13 +1988,11 @@ protected:
 		return 0;
 	}
 	inline void enforce_constraints() { }
-	inline typename Base::Data pass_forward(typename Base::Data in, bool training) {
-		assert((Dimensions<std::size_t,4>(in.dimensions()).template demote<>()) == input_dims);
-		assert(in.dimension(0) > 0);
+	inline Tensor<Scalar,4> _pass_forward(Tensor<Scalar,4> in, bool training) {
 		std::size_t rows = in.dimension(0);
 		patch_extents[0] = rows;
 		reduced_patch_extents[0] = rows;
-		typename Base::Data out(rows, output_dims(0), output_dims(1), output_dims(2));
+		Tensor<Scalar,4> out(rows, ext_output_dims(0), ext_output_dims(1), ext_output_dims(2));
 		init_cache();
 		std::size_t patch_ind = 0;
 		std::size_t out_i = 0;
@@ -2006,7 +2003,7 @@ protected:
 			for (std::size_t j = 0; j <= height_rem; j += vertical_stride, ++out_j) {
 				patch_offsets[1] = j;
 				reduced_patch_offsets[1] = out_j;
-				typename Base::Data patch;
+				Tensor<Scalar,4> patch;
 				// Dilated receptor support.
 				if (vertical_dilation > 0 || horizontal_dilation > 0)
 					patch = in.slice(patch_offsets, patch_extents).stride(dil_strides);
@@ -2017,12 +2014,10 @@ protected:
 		}
 		return out;
 	}
-	inline typename Base::Data pass_back(typename Base::Data out_grads) {
-		assert((Dimensions<std::size_t,4>(out_grads.dimensions()).template demote<>()) == output_dims);
-		assert(out_grads.dimension(0) > 0 && patch_extents[0] == out_grads.dimension(0));
+	inline Tensor<Scalar,4> _pass_back(Tensor<Scalar,4> out_grads) {
 		if (input_layer)
-			return typename Base::Data();
-		typename Base::Data prev_out_grads(patch_extents[0], input_dims(0), input_dims(1),  input_dims(2));
+			return Tensor<Scalar,4>();
+		Tensor<Scalar,4> prev_out_grads(patch_extents[0], ext_input_dims(0), ext_input_dims(1),  ext_input_dims(2));
 		prev_out_grads.setZero();
 		std::size_t patch_ind = 0;
 		std::size_t out_grads_i = 0;
@@ -2033,7 +2028,7 @@ protected:
 			for (std::size_t j = 0; j <= height_rem; j += vertical_stride, ++out_grads_j) {
 				patch_offsets[1] = j;
 				reduced_patch_offsets[1] = out_grads_j;
-				typename Base::Data reduced_patch_grads = out_grads.slice(reduced_patch_offsets, reduced_patch_extents);
+				Tensor<Scalar,4> reduced_patch_grads = out_grads.slice(reduced_patch_offsets, reduced_patch_extents);
 				// Accumulate the gradients where the patches overlap.
 				if (vertical_dilation > 0 || horizontal_dilation > 0)
 					prev_out_grads.slice(patch_offsets, patch_extents).stride(dil_strides) +=
@@ -2058,8 +2053,10 @@ protected:
 			std::size_t stride) {
 		return (input_dim - receptor_size - (receptor_size - 1) * dilation) / stride + 1;
 	}
-	const Dimensions<std::size_t,3> input_dims;
-	const Dimensions<std::size_t,3> output_dims;
+	const Dimensions<std::size_t,Rank> input_dims;
+	const Dimensions<std::size_t,Rank> output_dims;
+	const Dimensions<std::size_t,3> ext_input_dims;
+	const Dimensions<std::size_t,3> ext_output_dims;
 	const std::size_t receptor_height;
 	const std::size_t receptor_width;
 	const std::size_t vertical_stride;
@@ -2071,13 +2068,13 @@ protected:
 	const std::size_t height_rem;
 	const std::size_t width_rem;
 	// Arrays for tensor manipulation.
-	ReductionRanksArray reduction_ranks;
-	RankwiseArray broadcast;
-	RankwiseArray patch_offsets;
-	RankwiseArray patch_extents;
-	RankwiseArray reduced_patch_offsets;
-	RankwiseArray reduced_patch_extents;
-	RankwiseArray dil_strides;
+	ReductionRanksArray2D reduction_ranks;
+	Array4D broadcast;
+	Array4D patch_offsets;
+	Array4D patch_extents;
+	Array4D reduced_patch_offsets;
+	Array4D reduced_patch_extents;
+	Array4D dil_strides;
 private:
 	bool input_layer;
 	bool frozen;
@@ -2087,13 +2084,39 @@ private:
 };
 
 /**
- * A class template representing a pooling layer that reduces patches of the input by taking their
- * sums.
+ * An abstract class template representing a sum pooling layer that reduces patches of the input by taking
+ * their sums.
  */
-template<typename Scalar>
-class SumPoolLayer : public PoolLayer<Scalar> {
+template<typename Scalar, std::size_t Rank>
+class SumPoolLayerBase : public PoolLayer<Scalar,Rank> {
+	typedef Layer<Scalar,Rank> Root;
+	typedef PoolLayer<Scalar,Rank> Base;
+public:
+	inline SumPoolLayerBase(const Dimensions<std::size_t,Rank>& input_dims, const Dimensions<std::size_t,Rank>& output_dims,
+			std::size_t receptor_height, std::size_t receptor_width, std::size_t vertical_stride, std::size_t horizontal_stride,
+			std::size_t vertical_dilation, std::size_t horizontal_dilation) :
+				Base::PoolLayer(input_dims, output_dims, receptor_height, receptor_width, vertical_stride,
+						horizontal_stride, vertical_dilation, horizontal_dilation) { }
+protected:
+	inline void init_cache() { };
+	inline void empty_cache() { }
+	inline Tensor<Scalar,4> reduce(const Tensor<Scalar,4>& patch, std::size_t patch_ind) {
+		Tensor<Scalar,2> reduced_patch = patch.sum(Base::reduction_ranks);
+		return TensorMap<Scalar,4>(reduced_patch.data(), Base::reduced_patch_extents);
+	}
+	inline Tensor<Scalar,4> d_reduce(const Tensor<Scalar,4>& grad, std::size_t patch_ind) {
+		return grad.broadcast(Base::broadcast);
+	}
+};
+
+/**
+ * A class template representing a 2D sum pooling layer operating on rank-3 data.
+ */
+template<typename Scalar, std::size_t Rank = 3>
+class SumPoolLayer : public SumPoolLayerBase<Scalar,Rank> {
 	typedef Layer<Scalar,3> Root;
-	typedef PoolLayer<Scalar> Base;
+	typedef PoolLayer<Scalar,3> PoolBase;
+	typedef SumPoolLayerBase<Scalar,3> SumPoolBase;
 public:
 	/**
 	 * @param input_dims The dimensionality of the input tensor.
@@ -2103,14 +2126,17 @@ public:
 	 * elements by which the receptor is to be shifted along the height of the input tensor).
 	 * @param horizontal_stride The horizontal stride at which the input is to be pooled (i.e. the number
 	 * of elements by which the receptor is to be shifted along the width of the input tensor).
-	 * @param vertical_dilation The extent of the vertical dilation to apply to the receptor field.
-	 * @param horizontal_dilation The extent of the horizontal dilation to apply to the receptor field.
+	 * @param vertical_dilation The extent of vertical dilation to apply to the receptor field.
+	 * @param horizontal_dilation The extent of horizontal dilation to apply to the receptor field.
 	 */
 	inline SumPoolLayer(const Dimensions<std::size_t,3>& input_dims, std::size_t receptor_height = 2,
 			std::size_t receptor_width = 2, std::size_t vertical_stride = 2, std::size_t horizontal_stride = 2,
 			std::size_t vertical_dilation = 0, std::size_t horizontal_dilation = 0) :
-				Base::PoolLayer(input_dims, receptor_height, receptor_width, vertical_stride,
-						horizontal_stride, vertical_dilation, horizontal_dilation) { }
+				SumPoolBase::SumPoolLayerBase(input_dims, {
+						PoolBase::calculate_output_dim(input_dims(0), receptor_height, vertical_dilation, vertical_stride),
+						PoolBase::calculate_output_dim(input_dims(1), receptor_width, horizontal_dilation, horizontal_stride),
+						input_dims(2) }, receptor_height, receptor_width, vertical_stride, horizontal_stride,
+						vertical_dilation, horizontal_dilation) { }
 	inline Root* clone() const {
 		return new SumPoolLayer(*this);
 	}
@@ -2118,25 +2144,29 @@ protected:
 	inline Root* clone_with_shared_params() const {
 		return clone();
 	}
-	inline void init_cache() { };
-	inline typename Root::Data reduce(const typename Root::Data& patch, std::size_t patch_ind) {
-		typename Base::ReducedData reduced_patch = patch.sum(Base::reduction_ranks);
-		return TensorMap<Scalar,4>(reduced_patch.data(), Base::reduced_patch_extents);
+	inline typename Root::Data pass_forward(typename Root::Data in, bool training) {
+		assert((Dimensions<std::size_t,4>(in.dimensions()).template demote<>()) == PoolBase::input_dims);
+		assert(in.dimension(0) > 0);
+		batch_size = in.dimension(0);
+		return PoolBase::_pass_forward(std::move(in), training);
 	}
-	inline typename Root::Data d_reduce(const typename Root::Data& grad, std::size_t patch_ind) {
-		return grad.broadcast(Base::broadcast);
+	inline typename Root::Data pass_back(typename Root::Data out_grads) {
+		assert((Dimensions<std::size_t,4>(out_grads.dimensions()).template demote<>()) == PoolBase::output_dims);
+		assert(out_grads.dimension(0) > 0 && batch_size == out_grads.dimension(0));
+		return PoolBase::_pass_back(std::move(out_grads));
 	}
-	inline void empty_cache() { }
+private:
+	std::size_t batch_size;
 };
 
 /**
- * A class template representing a pooling layer that reduces patches of the input by taking their
- * means.
+ * A class template representing a 2D sum pooling layer operating on rank-2 data.
  */
 template<typename Scalar>
-class MeanPoolLayer : public PoolLayer<Scalar> {
-	typedef Layer<Scalar,3> Root;
-	typedef PoolLayer<Scalar> Base;
+class SumPoolLayer<Scalar,2> : public SumPoolLayerBase<Scalar,2> {
+	typedef Layer<Scalar,2> Root;
+	typedef PoolLayer<Scalar,2> PoolBase;
+	typedef SumPoolLayerBase<Scalar,2> SumPoolBase;
 public:
 	/**
 	 * @param input_dims The dimensionality of the input tensor.
@@ -2146,15 +2176,149 @@ public:
 	 * elements by which the receptor is to be shifted along the height of the input tensor).
 	 * @param horizontal_stride The horizontal stride at which the input is to be pooled (i.e. the number
 	 * of elements by which the receptor is to be shifted along the width of the input tensor).
-	 * @param vertical_dilation The extent of the vertical dilation to apply to the receptor field.
-	 * @param horizontal_dilation The extent of the horizontal dilation to apply to the receptor field.
+	 * @param vertical_dilation The extent of vertical dilation to apply to the receptor field.
+	 * @param horizontal_dilation The extent of horizontal dilation to apply to the receptor field.
+	 */
+	inline SumPoolLayer(const Dimensions<std::size_t,2>& input_dims, std::size_t receptor_height = 2,
+			std::size_t receptor_width = 2, std::size_t vertical_stride = 2, std::size_t horizontal_stride = 2,
+			std::size_t vertical_dilation = 0, std::size_t horizontal_dilation = 0) :
+				SumPoolBase::SumPoolLayerBase(input_dims, {
+						PoolBase::calculate_output_dim(input_dims(0), receptor_height, vertical_dilation, vertical_stride),
+						PoolBase::calculate_output_dim(input_dims(1), receptor_width, horizontal_dilation, horizontal_stride) },
+						receptor_height, receptor_width, vertical_stride, horizontal_stride, vertical_dilation,
+						horizontal_dilation) { }
+	inline Root* clone() const {
+		return new SumPoolLayer(*this);
+	}
+protected:
+	inline Root* clone_with_shared_params() const {
+		return clone();
+	}
+	inline typename Root::Data pass_forward(typename Root::Data in, bool training) {
+		assert((Dimensions<std::size_t,3>(in.dimensions()).template demote<>()) == PoolBase::input_dims);
+		assert(in.dimension(0) > 0);
+		batch_size = in.dimension(0);
+		return PoolBase::_pass_forward(TensorMap<Scalar,4>(in.data(), { batch_size, in.dimension(1), in.dimension(2), 1u }), training)
+				.reshape(std::array<std::size_t,3>({ batch_size, PoolBase::output_dims(0), PoolBase::output_dims(1) }));
+	}
+	inline typename Root::Data pass_back(typename Root::Data out_grads) {
+		assert((Dimensions<std::size_t,3>(out_grads.dimensions()).template demote<>()) == PoolBase::output_dims);
+		assert(out_grads.dimension(0) > 0 && batch_size == out_grads.dimension(0));
+		Tensor<Scalar,4> prev_out_grads = PoolBase::_pass_back(TensorMap<Scalar,4>(out_grads.data(),
+				{ batch_size, PoolBase::ext_output_dims(0), PoolBase::ext_output_dims(1), PoolBase::ext_output_dims(2) }));
+		if (PoolBase::is_input_layer())
+			return Tensor<Scalar,3>();
+		return TensorMap<Scalar,3>(prev_out_grads.data(), { batch_size, PoolBase::input_dims(0), PoolBase::input_dims(1) });
+	}
+private:
+	std::size_t batch_size;
+};
+
+/**
+ * A class template representing a 1D sum pooling layer.
+ */
+template<typename Scalar>
+class SumPoolLayer<Scalar,1> : public SumPoolLayerBase<Scalar,1> {
+	typedef Layer<Scalar,1> Root;
+	typedef PoolLayer<Scalar,1> PoolBase;
+	typedef SumPoolLayerBase<Scalar,1> SumPoolBase;
+public:
+	/**
+	 * @param input_dims The dimensionality of the input tensor.
+	 * @param receptor_length The length of the pooling receptor.
+	 * @param stride The stride at which the input is to be pooled (i.e. the number of
+	 * elements by which the receptor is to be shifted along the length of the input tensor).
+	 * @param dilation The extent of dilation to apply to the receptor field.
+	 */
+	inline SumPoolLayer(const Dimensions<std::size_t,1>& input_dims, std::size_t receptor_length = 2,
+			std::size_t stride = 2, std::size_t dilation = 0) :
+				SumPoolBase::SumPoolLayerBase(input_dims, {
+						PoolBase::calculate_output_dim(input_dims(0), receptor_length, dilation, stride) },
+						receptor_length, 1, stride, 1, dilation, 0) { }
+	inline Root* clone() const {
+		return new SumPoolLayer(*this);
+	}
+protected:
+	inline Root* clone_with_shared_params() const {
+		return clone();
+	}
+	inline typename Root::Data pass_forward(typename Root::Data in, bool training) {
+		assert((Dimensions<std::size_t,2>(in.dimensions()).template demote<>()) == PoolBase::input_dims);
+		assert(in.dimension(0) > 0);
+		batch_size = in.dimension(0);
+		return PoolBase::_pass_forward(TensorMap<Scalar,4>(in.data(), { batch_size, in.dimension(1), 1u, 1u }), training)
+				.reshape(std::array<std::size_t,2>({ batch_size, PoolBase::output_dims(0) }));
+	}
+	inline typename Root::Data pass_back(typename Root::Data out_grads) {
+		assert((Dimensions<std::size_t,2>(out_grads.dimensions()).template demote<>()) == PoolBase::output_dims);
+		assert(out_grads.dimension(0) > 0 && batch_size == out_grads.dimension(0));
+		Tensor<Scalar,4> prev_out_grads = PoolBase::_pass_back(TensorMap<Scalar,4>(out_grads.data(),
+				{ batch_size, PoolBase::ext_output_dims(0), PoolBase::ext_output_dims(1), PoolBase::ext_output_dims(2) }));
+		if (PoolBase::is_input_layer())
+			return Tensor<Scalar,2>();
+		return TensorMap<Scalar,2>(prev_out_grads.data(), { batch_size, PoolBase::input_dims(0) });
+	}
+private:
+	std::size_t batch_size;
+};
+
+/**
+ * An abstract class template representing a pooling layer that reduces patches of the input by taking their
+ * means.
+ */
+template<typename Scalar, std::size_t Rank>
+class MeanPoolLayerBase : public PoolLayer<Scalar,Rank> {
+	typedef Layer<Scalar,Rank> Root;
+	typedef PoolLayer<Scalar,Rank> Base;
+public:
+	inline MeanPoolLayerBase(const Dimensions<std::size_t,Rank>& input_dims, const Dimensions<std::size_t,Rank>& output_dims,
+			std::size_t receptor_height, std::size_t receptor_width, std::size_t vertical_stride, std::size_t horizontal_stride,
+			std::size_t vertical_dilation, std::size_t horizontal_dilation) :
+				Base::PoolLayer(input_dims, output_dims, receptor_height, receptor_width, vertical_stride,
+						horizontal_stride, vertical_dilation, horizontal_dilation),
+				receptor_area(receptor_height * receptor_width) { }
+protected:
+	inline void init_cache() { };
+	inline void empty_cache() { }
+	inline Tensor<Scalar,4> reduce(const Tensor<Scalar,4>& patch, std::size_t patch_ind) {
+		Tensor<Scalar,2> reduced_patch = patch.mean(Base::reduction_ranks);
+		return TensorMap<Scalar,4>(reduced_patch.data(), Base::reduced_patch_extents);
+	}
+	inline Tensor<Scalar,4> d_reduce(const Tensor<Scalar,4>& grad, std::size_t patch_ind) {
+		return (grad / (Scalar) receptor_area).broadcast(Base::broadcast);
+	}
+private:
+	std::size_t receptor_area;
+};
+
+/**
+ * A class template representing a 2D mean pooling layer operating on rank-3 data.
+ */
+template<typename Scalar, std::size_t Rank = 3>
+class MeanPoolLayer : public MeanPoolLayerBase<Scalar,Rank> {
+	typedef Layer<Scalar,3> Root;
+	typedef PoolLayer<Scalar,3> PoolBase;
+	typedef MeanPoolLayerBase<Scalar,3> MeanPoolBase;
+public:
+	/**
+	 * @param input_dims The dimensionality of the input tensor.
+	 * @param receptor_height The height of the pooling receptor.
+	 * @param receptor_width The width of the pooling receptor.
+	 * @param vertical_stride The vertical stride at which the input is to be pooled (i.e. the number of
+	 * elements by which the receptor is to be shifted along the height of the input tensor).
+	 * @param horizontal_stride The horizontal stride at which the input is to be pooled (i.e. the number
+	 * of elements by which the receptor is to be shifted along the width of the input tensor).
+	 * @param vertical_dilation The extent of vertical dilation to apply to the receptor field.
+	 * @param horizontal_dilation The extent of horizontal dilation to apply to the receptor field.
 	 */
 	inline MeanPoolLayer(const Dimensions<std::size_t,3>& input_dims, std::size_t receptor_height = 2,
 			std::size_t receptor_width = 2, std::size_t vertical_stride = 2, std::size_t horizontal_stride = 2,
 			std::size_t vertical_dilation = 0, std::size_t horizontal_dilation = 0) :
-				Base::PoolLayer(input_dims, receptor_height, receptor_width, vertical_stride,
-						horizontal_stride, vertical_dilation, horizontal_dilation),
-				receptor_area(receptor_height * receptor_width) { }
+				MeanPoolBase::MeanPoolLayerBase(input_dims, {
+						PoolBase::calculate_output_dim(input_dims(0), receptor_height, vertical_dilation, vertical_stride),
+						PoolBase::calculate_output_dim(input_dims(1), receptor_width, horizontal_dilation, horizontal_stride),
+						input_dims(2) }, receptor_height, receptor_width, vertical_stride, horizontal_stride,
+						vertical_dilation, horizontal_dilation) { }
 	inline Root* clone() const {
 		return new MeanPoolLayer(*this);
 	}
@@ -2162,27 +2326,29 @@ protected:
 	inline Root* clone_with_shared_params() const {
 		return clone();
 	}
-	inline void init_cache() { }
-	inline typename Root::Data reduce(const typename Root::Data& patch, std::size_t patch_ind) {
-		typename Base::ReducedData reduced_patch = patch.mean(Base::reduction_ranks);
-		return TensorMap<Scalar,4>(reduced_patch.data(), Base::reduced_patch_extents);
+	inline typename Root::Data pass_forward(typename Root::Data in, bool training) {
+		assert((Dimensions<std::size_t,4>(in.dimensions()).template demote<>()) == PoolBase::input_dims);
+		assert(in.dimension(0) > 0);
+		batch_size = in.dimension(0);
+		return PoolBase::_pass_forward(std::move(in), training);
 	}
-	inline typename Root::Data d_reduce(const typename Root::Data& grad, std::size_t patch_ind) {
-		return (grad / (Scalar) receptor_area).broadcast(Base::broadcast);
+	inline typename Root::Data pass_back(typename Root::Data out_grads) {
+		assert((Dimensions<std::size_t,4>(out_grads.dimensions()).template demote<>()) == PoolBase::output_dims);
+		assert(out_grads.dimension(0) > 0 && batch_size == out_grads.dimension(0));
+		return PoolBase::_pass_back(std::move(out_grads));
 	}
-	inline void empty_cache() { }
 private:
-	std::size_t receptor_area;
+	std::size_t batch_size;
 };
 
 /**
- * A class template representing a pooling layer that reduces patches of the input by taking their
- * maximums.
+ * A class template representing a 2D mean pooling layer operating on rank-2 data.
  */
 template<typename Scalar>
-class MaxPoolLayer : public PoolLayer<Scalar> {
-	typedef Layer<Scalar,3> Root;
-	typedef PoolLayer<Scalar> Base;
+class MeanPoolLayer<Scalar,2> : public MeanPoolLayerBase<Scalar,2> {
+	typedef Layer<Scalar,2> Root;
+	typedef PoolLayer<Scalar,2> PoolBase;
+	typedef MeanPoolLayerBase<Scalar,2> MeanPoolBase;
 public:
 	/**
 	 * @param input_dims The dimensionality of the input tensor.
@@ -2192,29 +2358,118 @@ public:
 	 * elements by which the receptor is to be shifted along the height of the input tensor).
 	 * @param horizontal_stride The horizontal stride at which the input is to be pooled (i.e. the number
 	 * of elements by which the receptor is to be shifted along the width of the input tensor).
-	 * @param vertical_dilation The extent of the vertical dilation to apply to the receptor field.
-	 * @param horizontal_dilation The extent of the horizontal dilation to apply to the receptor field.
+	 * @param vertical_dilation The extent of vertical dilation to apply to the receptor field.
+	 * @param horizontal_dilation The extent of horizontal dilation to apply to the receptor field.
 	 */
-	inline MaxPoolLayer(const Dimensions<std::size_t,3>& input_dims, std::size_t receptor_height = 2,
+	inline MeanPoolLayer(const Dimensions<std::size_t,2>& input_dims, std::size_t receptor_height = 2,
 			std::size_t receptor_width = 2, std::size_t vertical_stride = 2, std::size_t horizontal_stride = 2,
 			std::size_t vertical_dilation = 0, std::size_t horizontal_dilation = 0) :
-				Base::PoolLayer(input_dims, receptor_height, receptor_width, vertical_stride,
-						horizontal_stride, vertical_dilation, horizontal_dilation) { }
+				MeanPoolBase::MeanPoolLayerBase(input_dims, {
+						PoolBase::calculate_output_dim(input_dims(0), receptor_height, vertical_dilation, vertical_stride),
+						PoolBase::calculate_output_dim(input_dims(1), receptor_width, horizontal_dilation, horizontal_stride) },
+						receptor_height, receptor_width, vertical_stride, horizontal_stride, vertical_dilation,
+						horizontal_dilation) { }
 	inline Root* clone() const {
-		return new MaxPoolLayer(*this);
+		return new MeanPoolLayer(*this);
 	}
 protected:
 	inline Root* clone_with_shared_params() const {
 		return clone();
 	}
-	inline void init_cache() {
-		max_inds = std::vector<std::vector<unsigned>>(Base::output_dims(0) * Base::output_dims(1));
+	inline typename Root::Data pass_forward(typename Root::Data in, bool training) {
+		assert((Dimensions<std::size_t,3>(in.dimensions()).template demote<>()) == PoolBase::input_dims);
+		assert(in.dimension(0) > 0);
+		batch_size = in.dimension(0);
+		return PoolBase::_pass_forward(TensorMap<Scalar,4>(in.data(), { batch_size, in.dimension(1), in.dimension(2), 1u }), training)
+				.reshape(std::array<std::size_t,3>({ batch_size, PoolBase::output_dims(0), PoolBase::output_dims(1) }));
 	}
-	inline typename Root::Data reduce(const typename Root::Data& patch, std::size_t patch_ind) {
+	inline typename Root::Data pass_back(typename Root::Data out_grads) {
+		assert((Dimensions<std::size_t,3>(out_grads.dimensions()).template demote<>()) == PoolBase::output_dims);
+		assert(out_grads.dimension(0) > 0 && batch_size == out_grads.dimension(0));
+		Tensor<Scalar,4> prev_out_grads = PoolBase::_pass_back(TensorMap<Scalar,4>(out_grads.data(),
+				{ batch_size, PoolBase::ext_output_dims(0), PoolBase::ext_output_dims(1), PoolBase::ext_output_dims(2) }));
+		if (PoolBase::is_input_layer())
+			return Tensor<Scalar,3>();
+		return TensorMap<Scalar,3>(prev_out_grads.data(), { batch_size, PoolBase::input_dims(0), PoolBase::input_dims(1) });
+	}
+private:
+	std::size_t batch_size;
+};
+
+/**
+ * A class template representing a 1D mean pooling layer.
+ */
+template<typename Scalar>
+class MeanPoolLayer<Scalar,1> : public MeanPoolLayerBase<Scalar,1> {
+	typedef Layer<Scalar,1> Root;
+	typedef PoolLayer<Scalar,1> PoolBase;
+	typedef MeanPoolLayerBase<Scalar,1> MeanPoolBase;
+public:
+	/**
+	 * @param input_dims The dimensionality of the input tensor.
+	 * @param receptor_length The length of the pooling receptor.
+	 * @param stride The stride at which the input is to be pooled (i.e. the number of
+	 * elements by which the receptor is to be shifted along the length of the input tensor).
+	 * @param dilation The extent of dilation to apply to the receptor field.
+	 */
+	inline MeanPoolLayer(const Dimensions<std::size_t,1>& input_dims, std::size_t receptor_length = 2,
+			std::size_t stride = 2, std::size_t dilation = 0) :
+				MeanPoolBase::MeanPoolLayerBase(input_dims, {
+						PoolBase::calculate_output_dim(input_dims(0), receptor_length, dilation, stride) },
+						receptor_length, 1, stride, 1, dilation, 0) { }
+	inline Root* clone() const {
+		return new MeanPoolLayer(*this);
+	}
+protected:
+	inline Root* clone_with_shared_params() const {
+		return clone();
+	}
+	inline typename Root::Data pass_forward(typename Root::Data in, bool training) {
+		assert((Dimensions<std::size_t,2>(in.dimensions()).template demote<>()) == PoolBase::input_dims);
+		assert(in.dimension(0) > 0);
+		batch_size = in.dimension(0);
+		return PoolBase::_pass_forward(TensorMap<Scalar,4>(in.data(), { batch_size, in.dimension(1), 1u, 1u }), training)
+				.reshape(std::array<std::size_t,2>({ batch_size, PoolBase::output_dims(0) }));
+	}
+	inline typename Root::Data pass_back(typename Root::Data out_grads) {
+		assert((Dimensions<std::size_t,2>(out_grads.dimensions()).template demote<>()) == PoolBase::output_dims);
+		assert(out_grads.dimension(0) > 0 && batch_size == out_grads.dimension(0));
+		Tensor<Scalar,4> prev_out_grads = PoolBase::_pass_back(TensorMap<Scalar,4>(out_grads.data(),
+				{ batch_size, PoolBase::ext_output_dims(0), PoolBase::ext_output_dims(1), PoolBase::ext_output_dims(2) }));
+		if (PoolBase::is_input_layer())
+			return Tensor<Scalar,2>();
+		return TensorMap<Scalar,2>(prev_out_grads.data(), { batch_size, PoolBase::input_dims(0) });
+	}
+private:
+	std::size_t batch_size;
+};
+
+/**
+ * An abstract class template representing a pooling layer that reduces patches of the input by taking their
+ * maxima.
+ */
+template<typename Scalar, std::size_t Rank>
+class MaxPoolLayerBase : public PoolLayer<Scalar,Rank> {
+	typedef Layer<Scalar,Rank> Root;
+	typedef PoolLayer<Scalar,Rank> Base;
+public:
+	inline MaxPoolLayerBase(const Dimensions<std::size_t,Rank>& input_dims, const Dimensions<std::size_t,Rank>& output_dims,
+			std::size_t receptor_height, std::size_t receptor_width, std::size_t vertical_stride, std::size_t horizontal_stride,
+			std::size_t vertical_dilation, std::size_t horizontal_dilation) :
+				Base::PoolLayer(input_dims, output_dims, receptor_height, receptor_width, vertical_stride,
+						horizontal_stride, vertical_dilation, horizontal_dilation) { }
+protected:
+	inline void init_cache() {
+		max_inds = std::vector<std::vector<unsigned>>(Base::ext_output_dims(0) * Base::ext_output_dims(1));
+	}
+	inline void empty_cache() {
+		max_inds = std::vector<std::vector<unsigned>>(0);
+	}
+	inline Tensor<Scalar,4> reduce(const Tensor<Scalar,4>& patch, std::size_t patch_ind) {
 		std::size_t rows = patch.dimension(0);
 		std::size_t depth = patch.dimension(3);
 		std::vector<unsigned> inds(rows * depth);
-		typename Root::Data reduced_patch(rows, 1u, 1u, depth);
+		Tensor<Scalar,4> reduced_patch(rows, 1u, 1u, depth);
 		for (std::size_t i = 0; i < depth; ++i) {
 			for (std::size_t j = 0; j < rows; ++j) {
 				Scalar max = internal::NumericUtils<Scalar>::MIN;
@@ -2237,10 +2492,10 @@ protected:
 		max_inds[patch_ind] = inds;
 		return reduced_patch;
 	}
-	inline typename Root::Data d_reduce(const typename Root::Data& grad, std::size_t patch_ind) {
+	inline Tensor<Scalar,4> d_reduce(const Tensor<Scalar,4>& grad, std::size_t patch_ind) {
 		std::size_t rows = grad.dimension(0);
 		std::size_t depth = grad.dimension(3);
-		typename Root::Data patch(rows, Base::receptor_height, Base::receptor_width, depth);
+		Tensor<Scalar,4> patch(rows, Base::receptor_height, Base::receptor_width, depth);
 		patch.setZero();
 		std::vector<unsigned>& inds = max_inds[patch_ind];
 		for (std::size_t i = 0; i < depth; ++i) {
@@ -2253,12 +2508,162 @@ protected:
 		}
 		return patch;
 	}
-	inline void empty_cache() {
-		max_inds = std::vector<std::vector<unsigned>>(0);
-	}
 private:
 	// Cache
 	std::vector<std::vector<unsigned>> max_inds;
+};
+
+/**
+ * A class template representing a 2D max pooling layer operating on rank-3 data.
+ */
+template<typename Scalar, std::size_t Rank = 3>
+class MaxPoolLayer : public MaxPoolLayerBase<Scalar,Rank> {
+	typedef Layer<Scalar,3> Root;
+	typedef PoolLayer<Scalar,3> PoolBase;
+	typedef MaxPoolLayerBase<Scalar,3> MaxPoolBase;
+public:
+	/**
+	 * @param input_dims The dimensionality of the input tensor.
+	 * @param receptor_height The height of the pooling receptor.
+	 * @param receptor_width The width of the pooling receptor.
+	 * @param vertical_stride The vertical stride at which the input is to be pooled (i.e. the number of
+	 * elements by which the receptor is to be shifted along the height of the input tensor).
+	 * @param horizontal_stride The horizontal stride at which the input is to be pooled (i.e. the number
+	 * of elements by which the receptor is to be shifted along the width of the input tensor).
+	 * @param vertical_dilation The extent of vertical dilation to apply to the receptor field.
+	 * @param horizontal_dilation The extent of horizontal dilation to apply to the receptor field.
+	 */
+	inline MaxPoolLayer(const Dimensions<std::size_t,3>& input_dims, std::size_t receptor_height = 2,
+			std::size_t receptor_width = 2, std::size_t vertical_stride = 2, std::size_t horizontal_stride = 2,
+			std::size_t vertical_dilation = 0, std::size_t horizontal_dilation = 0) :
+				MaxPoolBase::MaxPoolLayerBase(input_dims, {
+						PoolBase::calculate_output_dim(input_dims(0), receptor_height, vertical_dilation, vertical_stride),
+						PoolBase::calculate_output_dim(input_dims(1), receptor_width, horizontal_dilation, horizontal_stride),
+						input_dims(2) }, receptor_height, receptor_width, vertical_stride, horizontal_stride,
+						vertical_dilation, horizontal_dilation) { }
+	inline Root* clone() const {
+		return new MaxPoolLayer(*this);
+	}
+protected:
+	inline Root* clone_with_shared_params() const {
+		return clone();
+	}
+	inline typename Root::Data pass_forward(typename Root::Data in, bool training) {
+		assert((Dimensions<std::size_t,4>(in.dimensions()).template demote<>()) == PoolBase::input_dims);
+		assert(in.dimension(0) > 0);
+		batch_size = in.dimension(0);
+		return PoolBase::_pass_forward(std::move(in), training);
+	}
+	inline typename Root::Data pass_back(typename Root::Data out_grads) {
+		assert((Dimensions<std::size_t,4>(out_grads.dimensions()).template demote<>()) == PoolBase::output_dims);
+		assert(out_grads.dimension(0) > 0 && batch_size == out_grads.dimension(0));
+		return PoolBase::_pass_back(std::move(out_grads));
+	}
+private:
+	std::size_t batch_size;
+};
+
+/**
+ * A class template representing a 2D max pooling layer operating on rank-2 data.
+ */
+template<typename Scalar>
+class MaxPoolLayer<Scalar,2> : public MaxPoolLayerBase<Scalar,2> {
+	typedef Layer<Scalar,2> Root;
+	typedef PoolLayer<Scalar,2> PoolBase;
+	typedef MaxPoolLayerBase<Scalar,2> MaxPoolBase;
+public:
+	/**
+	 * @param input_dims The dimensionality of the input tensor.
+	 * @param receptor_height The height of the pooling receptor.
+	 * @param receptor_width The width of the pooling receptor.
+	 * @param vertical_stride The vertical stride at which the input is to be pooled (i.e. the number of
+	 * elements by which the receptor is to be shifted along the height of the input tensor).
+	 * @param horizontal_stride The horizontal stride at which the input is to be pooled (i.e. the number
+	 * of elements by which the receptor is to be shifted along the width of the input tensor).
+	 * @param vertical_dilation The extent of vertical dilation to apply to the receptor field.
+	 * @param horizontal_dilation The extent of horizontal dilation to apply to the receptor field.
+	 */
+	inline MaxPoolLayer(const Dimensions<std::size_t,2>& input_dims, std::size_t receptor_height = 2,
+			std::size_t receptor_width = 2, std::size_t vertical_stride = 2, std::size_t horizontal_stride = 2,
+			std::size_t vertical_dilation = 0, std::size_t horizontal_dilation = 0) :
+				MaxPoolBase::MaxPoolLayerBase(input_dims, {
+						PoolBase::calculate_output_dim(input_dims(0), receptor_height, vertical_dilation, vertical_stride),
+						PoolBase::calculate_output_dim(input_dims(1), receptor_width, horizontal_dilation, horizontal_stride) },
+						receptor_height, receptor_width, vertical_stride, horizontal_stride, vertical_dilation,
+						horizontal_dilation) { }
+	inline Root* clone() const {
+		return new MaxPoolLayer(*this);
+	}
+protected:
+	inline Root* clone_with_shared_params() const {
+		return clone();
+	}
+	inline typename Root::Data pass_forward(typename Root::Data in, bool training) {
+		assert((Dimensions<std::size_t,3>(in.dimensions()).template demote<>()) == PoolBase::input_dims);
+		assert(in.dimension(0) > 0);
+		batch_size = in.dimension(0);
+		return PoolBase::_pass_forward(TensorMap<Scalar,4>(in.data(), { batch_size, in.dimension(1), in.dimension(2), 1u }), training)
+				.reshape(std::array<std::size_t,3>({ batch_size, PoolBase::output_dims(0), PoolBase::output_dims(1) }));
+	}
+	inline typename Root::Data pass_back(typename Root::Data out_grads) {
+		assert((Dimensions<std::size_t,3>(out_grads.dimensions()).template demote<>()) == PoolBase::output_dims);
+		assert(out_grads.dimension(0) > 0 && batch_size == out_grads.dimension(0));
+		Tensor<Scalar,4> prev_out_grads = PoolBase::_pass_back(TensorMap<Scalar,4>(out_grads.data(),
+				{ batch_size, PoolBase::ext_output_dims(0), PoolBase::ext_output_dims(1), PoolBase::ext_output_dims(2) }));
+		if (PoolBase::is_input_layer())
+			return Tensor<Scalar,3>();
+		return TensorMap<Scalar,3>(prev_out_grads.data(), { batch_size, PoolBase::input_dims(0), PoolBase::input_dims(1) });
+	}
+private:
+	std::size_t batch_size;
+};
+
+/**
+ * A class template representing a 1D max pooling layer.
+ */
+template<typename Scalar>
+class MaxPoolLayer<Scalar,1> : public MaxPoolLayerBase<Scalar,1> {
+	typedef Layer<Scalar,1> Root;
+	typedef PoolLayer<Scalar,1> PoolBase;
+	typedef MaxPoolLayerBase<Scalar,1> MaxPoolBase;
+public:
+	/**
+	 * @param input_dims The dimensionality of the input tensor.
+	 * @param receptor_length The length of the pooling receptor.
+	 * @param stride The stride at which the input is to be pooled (i.e. the number of
+	 * elements by which the receptor is to be shifted along the length of the input tensor).
+	 * @param dilation The extent of dilation to apply to the receptor field.
+	 */
+	inline MaxPoolLayer(const Dimensions<std::size_t,1>& input_dims, std::size_t receptor_length = 2,
+			std::size_t stride = 2, std::size_t dilation = 0) :
+				MaxPoolBase::MaxPoolLayerBase(input_dims, {
+						PoolBase::calculate_output_dim(input_dims(0), receptor_length, dilation, stride) },
+						receptor_length, 1, stride, 1, dilation, 0) { }
+	inline Root* clone() const {
+		return new MaxPoolLayer(*this);
+	}
+protected:
+	inline Root* clone_with_shared_params() const {
+		return clone();
+	}
+	inline typename Root::Data pass_forward(typename Root::Data in, bool training) {
+		assert((Dimensions<std::size_t,2>(in.dimensions()).template demote<>()) == PoolBase::input_dims);
+		assert(in.dimension(0) > 0);
+		batch_size = in.dimension(0);
+		return PoolBase::_pass_forward(TensorMap<Scalar,4>(in.data(), { batch_size, in.dimension(1), 1u, 1u }), training)
+				.reshape(std::array<std::size_t,2>({ batch_size, PoolBase::output_dims(0) }));
+	}
+	inline typename Root::Data pass_back(typename Root::Data out_grads) {
+		assert((Dimensions<std::size_t,2>(out_grads.dimensions()).template demote<>()) == PoolBase::output_dims);
+		assert(out_grads.dimension(0) > 0 && batch_size == out_grads.dimension(0));
+		Tensor<Scalar,4> prev_out_grads = PoolBase::_pass_back(TensorMap<Scalar,4>(out_grads.data(),
+				{ batch_size, PoolBase::ext_output_dims(0), PoolBase::ext_output_dims(1), PoolBase::ext_output_dims(2) }));
+		if (PoolBase::is_input_layer())
+			return Tensor<Scalar,2>();
+		return TensorMap<Scalar,2>(prev_out_grads.data(), { batch_size, PoolBase::input_dims(0) });
+	}
+private:
+	std::size_t batch_size;
 };
 
 /**
