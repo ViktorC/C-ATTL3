@@ -1202,11 +1202,11 @@ public:
 			net(Net(network.net->clone())),
 			foremost(network.foremost),
 			input_dims(network.input_dims),
+			output_dims(network.output_dims),
 			joint_input_dims(network.joint_input_dims),
 			joint_output_dims(network.joint_output_dims),
 			split_input_dims(network.split_input_dims),
-			split_output_dims(network.split_output_dims),
-			output_dims(network.output_dims) { }
+			split_output_dims(network.split_output_dims) { }
 	inline SequentialNeuralNetwork(Self&& network) {
 		swap(*this, network);
 	}
@@ -1291,6 +1291,209 @@ private:
 	std::array<std::size_t,Rank + 1> joint_output_dims;
 	std::array<std::size_t,Rank + 2> split_input_dims;
 	std::array<std::size_t,Rank + 2> split_output_dims;
+};
+
+/**
+ * A class template for a wrapper neural network that enables the use of non-sequential networks on
+ * sequential data by concatenating the time steps along the lowest nominal rank. Temporal networks
+ * operate on fixed-size sequences of data.
+ */
+template<typename Scalar, std::size_t Rank>
+class TemporalNeuralNetwork :
+		public CompositeNeuralNetwork<Scalar,Rank,true,NeuralNetwork<Scalar,Rank,false>> {
+	typedef NeuralNetwork<Scalar,Rank,true> Base;
+	typedef TemporalNeuralNetwork<Scalar,Rank> Self;
+	typedef NeuralNetPtr<Scalar,Rank,false> Net;
+	typedef Tensor<Scalar,Rank + 1> NonSeqData;
+	typedef std::array<std::size_t,Rank + 1> NonSeqArray;
+	typedef std::array<std::size_t,Base::DATA_RANK> SeqArray;
+public:
+	/**
+	 * @param network A unique pointer to a non-sequential neural network to wrap.
+	 * @param input_time_steps The input sequence length accepted by the network. The input dimension
+	 * of the foremost layer of the network along the lowest nominal rank must be a multiple of the
+	 * number of input time steps.
+	 * @param output_time_steps The output sequence length produced by the network. The output
+	 * dimension of the last layer of the network along the lowest nominal rank must be a multiple of
+	 * the number of output time steps.
+	 * @param foremost Whether the network is to function as a foremost network.
+	 */
+	inline TemporalNeuralNetwork(Net&& network, std::size_t input_time_steps, std::size_t output_time_steps,
+			bool foremost = true) :
+				net(std::move(network)),
+				input_time_steps(input_time_steps),
+				output_time_steps(output_time_steps),
+				foremost(foremost),
+				seq_input_offsets(),
+				seq_output_offsets(),
+				non_seq_input_offsets(),
+				non_seq_output_offsets() {
+		assert(input_time_steps > 0);
+		assert(output_time_steps > 0);
+		assert(net);
+		assert(net->get_input_dims()(0) % input_time_steps == 0);
+		assert(net->get_input_dims()(0) % output_time_steps == 0);
+		input_dims = net->get_input_dims();
+		input_dims(0) /= input_time_steps;
+		output_dims = net->get_output_dims();
+		output_dims(0) /= output_time_steps;
+		seq_input_offsets.fill(0);
+		seq_output_offsets.fill(0);
+		seq_input_extents = input_dims.template promote<2>();
+		seq_output_extents = output_dims.template promote<2>();
+		non_seq_input_offsets.fill(0);
+		non_seq_output_offsets.fill(0);
+		non_seq_input_extents = input_dims.template promote<>();
+		non_seq_output_extents = output_dims.template promote<>();
+		set_foremost(foremost);
+	}
+	inline TemporalNeuralNetwork(const Self& network) :
+			net(Net(network.net->clone())),
+			input_time_steps(network.input_time_steps),
+			output_time_steps(network.output_time_steps),
+			foremost(network.foremost),
+			input_dims(network.input_dims),
+			output_dims(network.output_dims),
+			seq_input_offsets(network.seq_input_offsets),
+			seq_output_offsets(network.seq_output_offsets),
+			seq_input_extents(network.seq_input_extents),
+			seq_output_extents(network.seq_output_extents),
+			non_seq_input_offsets(network.non_seq_input_offsets),
+			non_seq_output_offsets(network.non_seq_output_offsets),
+			non_seq_input_extents(network.non_seq_input_extents),
+			non_seq_output_extents(network.non_seq_output_extents) { }
+	inline TemporalNeuralNetwork(Self&& network) {
+		swap(*this, network);
+	}
+	~TemporalNeuralNetwork() = default;
+	inline Self& operator=(Self network) {
+		swap(*this, network);
+		return *this;
+	}
+	inline Base* clone() const {
+		return new TemporalNeuralNetwork(*this);
+	}
+	inline bool is_foremost() const {
+		return foremost;
+	}
+	inline const typename Base::Dims& get_input_dims() const {
+		return input_dims;
+	}
+	inline const typename Base::Dims& get_output_dims() const {
+		return output_dims;
+	}
+	inline std::vector<Layer<Scalar,Rank>*> get_layers() {
+		return net->get_layers();
+	}
+	inline std::vector<NeuralNetwork<Scalar,Rank,false>*> get_modules() {
+		std::vector<NeuralNetwork<Scalar,Rank,false>*> modules;
+		modules.push_back(net.get());
+		return modules;
+	}
+	inline friend void swap(Self& network1, Self& network2) {
+		using std::swap;
+		swap(network1.net, network2.net);
+		swap(network1.input_time_steps, network2.input_time_steps);
+		swap(network1.output_time_steps, network2.output_time_steps);
+		swap(network1.foremost, network2.foremost);
+		swap(network1.input_dims, network2.input_dims);
+		swap(network1.output_dims, network2.output_dims);
+		swap(network1.seq_input_offsets, network2.seq_input_offsets);
+		swap(network1.seq_output_offsets, network2.seq_output_offsets);
+		swap(network1.seq_input_extents, network2.seq_input_extents);
+		swap(network1.seq_output_extents, network2.seq_output_extents);
+		swap(network1.non_seq_input_offsets, network2.non_seq_input_offsets);
+		swap(network1.non_seq_output_offsets, network2.non_seq_output_offsets);
+		swap(network1.non_seq_input_extents, network2.non_seq_input_extents);
+		swap(network1.non_seq_output_extents, network2.non_seq_output_extents);
+	}
+protected:
+	inline void set_foremost(bool foremost) {
+		net->set_foremost(foremost);
+		this->foremost = foremost;
+	}
+	inline void empty_caches() {
+		net->empty_caches();
+	}
+	inline typename Base::Data propagate(typename Base::Data input, bool training) {
+		assert(input_dims == (Dimensions<std::size_t,Base::DATA_RANK>(input.dimensions()).template demote<2>()));
+		assert(input.dimension(1) == input_time_steps);
+		std::size_t batch_size = input.dimension(0);
+		seq_input_extents[0] = batch_size;
+		non_seq_input_offsets[1] = 0;
+		non_seq_input_extents[0] = batch_size;
+		non_seq_input_extents[1] *= input_time_steps;
+		NonSeqData non_seq_input(non_seq_input_extents);
+		non_seq_input_extents[1] /= input_time_steps;
+		for (std::size_t i = 0; i < input_time_steps; ++i) {
+			seq_input_offsets[1] = i;
+			non_seq_input.slice(non_seq_input_offsets, non_seq_input_extents) = input.slice(seq_input_extents, seq_input_extents)
+					.reshape(non_seq_input_extents);
+			non_seq_input_offsets[1] += seq_input_offsets[2];
+		}
+		NonSeqData out = net->propagate(std::move(non_seq_input), training);
+		non_seq_output_offsets[1] = 0;
+		non_seq_output_extents[0] = batch_size;
+		seq_output_extents[0] = batch_size;
+		seq_output_extents[1] = output_time_steps;
+		typename Base::Data seq_out(seq_output_extents);
+		seq_output_extents[1] = 1;
+		for (std::size_t i = 0; i < output_time_steps; ++i) {
+			seq_output_offsets[1] = i;
+			seq_out.slice(seq_output_offsets, seq_output_extents) = out.slice(non_seq_output_offsets, non_seq_output_extents)
+					.reshape(seq_output_extents);
+			non_seq_output_offsets[1] += seq_output_offsets[2];
+		}
+		return seq_out;
+	}
+	inline typename Base::Data backpropagate(typename Base::Data out_grads) {
+		assert(output_dims == (Dimensions<std::size_t,Base::DATA_RANK>(out_grads.dimensions()).template demote<2>()));
+		assert(seq_output_extents[0] == out_grads.dimension(0));
+		assert(out_grads.dimension(1) == output_time_steps);
+		non_seq_output_offsets[1] = 0;
+		non_seq_output_extents[1] *= output_time_steps;
+		NonSeqData non_seq_out_grads(non_seq_output_extents);
+		non_seq_input_extents[1] /= output_time_steps;
+		for (std::size_t i = 0; i < output_time_steps; ++i) {
+			seq_output_offsets[1] = i;
+			non_seq_out_grads.slice(non_seq_output_offsets, non_seq_output_extents) = out_grads.slice(seq_output_offsets,
+					seq_output_extents).reshape(non_seq_output_extents);
+			non_seq_output_extents[1] += seq_output_offsets[2];
+		}
+		if (foremost) {
+			net->backpropagate(std::move(non_seq_out_grads));
+			return typename Base::Data();
+		} else {
+			NonSeqData non_seq_prev_out_grads = net->backpropagate(std::move(non_seq_out_grads));
+			non_seq_input_offsets[1] = 0;
+			seq_input_extents[1] = input_time_steps;
+			typename Base::Data seq_prev_out_grads(seq_input_extents);
+			seq_input_extents[1] = 1;
+			for (std::size_t i = 0; i < input_time_steps; ++i) {
+				seq_input_offsets[1] = i;
+				seq_prev_out_grads.slice(seq_input_offsets, seq_input_extents) = non_seq_prev_out_grads.slice(non_seq_input_offsets,
+						non_seq_input_extents).reshape(seq_input_extents);
+				non_seq_input_offsets[1] += seq_input_offsets[2];
+			}
+			return seq_prev_out_grads;
+
+		}
+	}
+private:
+	Net net;
+	std::size_t input_time_steps;
+	std::size_t output_time_steps;
+	bool foremost;
+	typename Base::Dims input_dims;
+	typename Base::Dims output_dims;
+	SeqArray seq_input_offsets;
+	SeqArray seq_output_offsets;
+	SeqArray seq_input_extents;
+	SeqArray seq_output_extents;
+	NonSeqArray non_seq_input_offsets;
+	NonSeqArray non_seq_output_offsets;
+	NonSeqArray non_seq_input_extents;
+	NonSeqArray non_seq_output_extents;
 };
 
 /**
