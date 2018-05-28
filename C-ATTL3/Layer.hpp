@@ -384,7 +384,7 @@ protected:
 #ifndef CATTL3_USE_CUBLAS
 		Matrix<Scalar> out = biased_in_mat * Base::weights_ref;
 #else
-		Matrix<Scalar> out = internal::CuBLASHandle<Scalar>::get_instance().mul(biased_in_mat, ConvBase::weights_ref, false, false);
+		Matrix<Scalar> out = internal::CuBLASHandle<Scalar>::get_instance().mul(biased_in_mat, Base::weights_ref, false, false);
 #endif
 		out_conversion_dims[0] = out.rows();
 		return TensorMap<Scalar,Root::DATA_RANK>(out.data(), out_conversion_dims);
@@ -403,11 +403,11 @@ protected:
 		Matrix<Scalar> prev_out_grads = out_grads_mat * Base::weights_ref.topRows(Base::input_dims.get_volume()).transpose();
 #else
 		Matrix<Scalar> out_grads_mat = MatrixMap<Scalar>(out_grads.data(), out_grads.dimension(0),
-				ConvBase::output_dims.get_volume());
-		ConvBase::weights_grad = internal::CuBLASHandle<Scalar>::get_instance().mul(biased_in_mat, out_grads_mat, true, false);
-		if (ConvBase::is_input_layer())
+				Base::output_dims.get_volume());
+		Base::weights_grad = internal::CuBLASHandle<Scalar>::get_instance().mul(biased_in_mat, out_grads_mat, true, false);
+		if (Base::is_input_layer())
 			return typename Root::Data();
-		Matrix<Scalar> weights_without_bias = ConvBase::weights_ref.topRows(ConvBase::input_dims.get_volume());
+		Matrix<Scalar> weights_without_bias = Base::weights_ref.topRows(Base::input_dims.get_volume());
 		Matrix<Scalar> prev_out_grads = internal::CuBLASHandle<Scalar>::get_instance().mul(out_grads_mat,
 				weights_without_bias, false, true);
 #endif
@@ -535,7 +535,7 @@ protected:
 		Matrix<Scalar> out = biased_in_conv_mat * Base::weights_ref;
 #else
 		Matrix<Scalar> out = internal::CuBLASHandle<Scalar>::get_instance().mul(biased_in_conv_mat,
-				ConvBase::weights_ref, false, false);
+				Base::weights_ref, false, false);
 #endif
 		out_conversion_dims[0] = rows;
 		return TensorMap<Scalar,4>(out.data(), out_conversion_dims);
@@ -555,9 +555,9 @@ protected:
 #else
 		Matrix<Scalar> out_grads_mat = MatrixMap<Scalar>(out_grads.data(), total_patches, filters);
 		Base::weights_grad = internal::CuBLASHandle<Scalar>::get_instance().mul(biased_in_conv_mat, out_grads_mat, true, false);
-		if (ConvBase::is_input_layer())
+		if (Base::is_input_layer())
 			return Tensor<Scalar,4>();
-		Matrix<Scalar> weights_without_bias = ConvBase::weights_ref.topRows(receptor_vol);
+		Matrix<Scalar> weights_without_bias = Base::weights_ref.topRows(receptor_vol);
 		Matrix<Scalar> prev_out_grads_conv_mat = internal::CuBLASHandle<Scalar>::get_instance().mul(out_grads_mat,
 				weights_without_bias, false, true);
 #endif
@@ -1444,7 +1444,7 @@ protected:
 	inline typename Root::Data pass_back(typename Root::Data out_grads) {
 		assert((Dimensions<std::size_t,Base::DATA_RANK>(out_grads.dimensions()).template demote<>()) == Base::dims);
 		assert(out_grads.dimension(0) > 0 && batch_size == out_grads.dimension(0));
-		return out_grads.constant((Scalar) 0);
+		return out_grads.constant(0);
 	}
 private:
 	std::size_t batch_size;
@@ -1476,7 +1476,7 @@ protected:
 	inline typename Root::Data pass_forward(typename Root::Data in, bool training) {
 		assert((Dimensions<std::size_t,Base::DATA_RANK>(in.dimensions()).template demote<>()) == Base::dims);
 		assert(in.dimension(0) > 0);
-		auto out = ((-in).exp() + in.constant((Scalar) 1)).inverse();
+		auto out = ((-in).exp() + in.constant(1)).inverse();
 		if (training) {
 			this->out = out;
 			return this->out;
@@ -1486,7 +1486,7 @@ protected:
 	inline typename Root::Data pass_back(typename Root::Data out_grads) {
 		assert((Dimensions<std::size_t,Base::DATA_RANK>(out_grads.dimensions()).template demote<>()) == Base::dims);
 		assert(out_grads.dimension(0) > 0 && out.dimension(0) == out_grads.dimension(0));
-		return (out * (-out + out.constant((Scalar) 1))) * out_grads;
+		return (out * (-out + out.constant(1))) * out_grads;
 	}
 private:
 	// Staged computation cache.
@@ -1529,7 +1529,7 @@ protected:
 	inline typename Root::Data pass_back(typename Root::Data out_grads) {
 		assert((Dimensions<std::size_t,Base::DATA_RANK>(out_grads.dimensions()).template demote<>()) == Base::dims);
 		assert(out_grads.dimension(0) > 0 && out.dimension(0) == out_grads.dimension(0));
-		return (-out * out + out.constant((Scalar) 1)) * out_grads;
+		return (-out * out + out.constant(1)) * out_grads;
 	}
 private:
 	typename Root::Data out;
@@ -1564,14 +1564,14 @@ protected:
 		assert(in.dimension(0) > 0);
 		if (training) {
 			this->in = std::move(in);
-			return (this->in.exp() + this->in.constant((Scalar) 1)).log();
+			return (this->in.exp() + this->in.constant(1)).log();
 		}
-		return (in.exp() + in.constant((Scalar) 1)).log();
+		return (in.exp() + in.constant(1)).log();
 	}
 	inline typename Root::Data pass_back(typename Root::Data out_grads) {
 		assert((Dimensions<std::size_t,Base::DATA_RANK>(out_grads.dimensions()).template demote<>()) == Base::dims);
 		assert(out_grads.dimension(0) > 0 && in.dimension(0) == out_grads.dimension(0));
-		return ((-in).exp() + in.constant((Scalar) 1)).inverse() * out_grads;
+		return ((-in).exp() + in.constant(1)).inverse() * out_grads;
 	}
 private:
 	// Staged computation cache.
@@ -3173,7 +3173,7 @@ protected:
 			Scalar scaling_factor = (Scalar) 1 / (1 - dropout_prob + epsilon);
 			typename Base::Data random_tensor(in.dimensions());
 			random_tensor.setRandom();
-			dropout_mask = ((random_tensor + random_tensor.constant((Scalar) 1)) / (Scalar) 2)
+			dropout_mask = ((random_tensor + random_tensor.constant(1)) / (Scalar) 2)
 					.unaryExpr([this,scaling_factor](Scalar i) {
 				return (Scalar) (i <= dropout_prob ? 0 : scaling_factor);
 			});

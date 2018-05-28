@@ -1,7 +1,6 @@
 var searchData=
 [
   ['layer',['Layer',['../classcattle_1_1_layer.html',1,'cattle']]],
-  ['layer_3c_20scalar_2c_203_20_3e',['Layer&lt; Scalar, 3 &gt;',['../classcattle_1_1_layer.html',1,'cattle']]],
   ['layerptr',['LayerPtr',['../namespacecattle.html#ad9bc255ce8185babba9c66dbc39ee77f',1,'cattle']]],
   ['leakyreluactivationlayer',['LeakyReLUActivationLayer',['../classcattle_1_1_leaky_re_l_u_activation_layer.html',1,'cattle::LeakyReLUActivationLayer&lt; Scalar, Rank &gt;'],['../classcattle_1_1_leaky_re_l_u_activation_layer.html#ab2363872da292de34c35c3983d5b97ee',1,'cattle::LeakyReLUActivationLayer::LeakyReLUActivationLayer()']]],
   ['lecunweightinitialization',['LeCunWeightInitialization',['../classcattle_1_1_le_cun_weight_initialization.html',1,'cattle::LeCunWeightInitialization&lt; Scalar &gt;'],['../classcattle_1_1_le_cun_weight_initialization.html#a572f2499cbf682ac7c11b9b30202fa95',1,'cattle::LeCunWeightInitialization::LeCunWeightInitialization()']]],
