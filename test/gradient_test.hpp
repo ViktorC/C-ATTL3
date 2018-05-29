@@ -661,6 +661,45 @@ TEST(GradientTest, SequentialNet) {
 }
 
 /**
+ * Performs gradient checks on temporal neural networks.
+ */
+template<typename Scalar>
+inline void temporal_net_grad_test() {
+	auto init = WeightInitSharedPtr<Scalar>(new GlorotWeightInitialization<Scalar>());
+	// Rank 1.
+	std::vector<LayerPtr<Scalar,1>> layers_1(3);
+	layers_1[0] = LayerPtr<Scalar,1>(new ConvolutionLayer<Scalar,1>({ 32u }, 16, init,
+			Layer<Scalar,1>::NO_PARAM_REG, 4, 0, 4));
+	layers_1[1] = LayerPtr<Scalar,1>(new TanhActivationLayer<Scalar,1>(layers_1[0]->get_output_dims()));
+	layers_1[2] = LayerPtr<Scalar,1>(new DenseLayer<Scalar,1>(layers_1[1]->get_output_dims(), 1, init));
+	seq_network_grad_test("temporal net", NeuralNetPtr<Scalar,1,true>(
+			new TemporalNeuralNetwork<Scalar,1>(NeuralNetPtr<Scalar,1,false>(
+					new FeedforwardNeuralNetwork<Scalar,1>(std::move(layers_1))), 8, 1)), 8, 1);
+	// Rank 2.
+	std::vector<LayerPtr<Scalar,2>> layers_2(3);
+	layers_2[0] = LayerPtr<Scalar,2>(new DenseLayer<Scalar,2>({ 24u, 6u }, 16, init));
+	layers_2[1] = LayerPtr<Scalar,2>(new TanhActivationLayer<Scalar,2>(layers_2[0]->get_output_dims()));
+	layers_2[2] = LayerPtr<Scalar,2>(new DenseLayer<Scalar,2>(layers_2[1]->get_output_dims(), 2, init));
+	seq_network_grad_test("temporal net", NeuralNetPtr<Scalar,2,true>(
+			new TemporalNeuralNetwork<Scalar,2>(NeuralNetPtr<Scalar,2,false>(
+					new FeedforwardNeuralNetwork<Scalar,2>(std::move(layers_2))), 4, 2)), 4, 2);
+	// Rank 3.
+	std::vector<LayerPtr<Scalar,3>> layers_3(3);
+	layers_3[0] = LayerPtr<Scalar,3>(new ConvolutionLayer<Scalar>({ 20u, 4u, 2u }, 4, init,
+			Layer<Scalar,1>::NO_PARAM_REG, 4, 4, 0, 0, 4, 4));
+	layers_3[1] = LayerPtr<Scalar,3>(new ReLUActivationLayer<Scalar,3>(layers_3[0]->get_output_dims()));
+	layers_3[2] = LayerPtr<Scalar,3>(new DenseLayer<Scalar,3>(layers_3[1]->get_output_dims(), 5, init));
+	seq_network_grad_test("temporal net", NeuralNetPtr<Scalar,3,true>(
+			new TemporalNeuralNetwork<Scalar,3>(NeuralNetPtr<Scalar,3,false>(
+					new FeedforwardNeuralNetwork<Scalar,3>(std::move(layers_3))), 5, 5)));
+}
+
+TEST(GradientTest, TemporalNet) {
+	temporal_net_grad_test<float>();
+	temporal_net_grad_test<double>();
+}
+
+/**
  * Performs gradient checks on recurrent neural networks.
  */
 template<typename Scalar>

@@ -65,6 +65,8 @@ class NeuralNetwork {
 	friend class DenseNeuralNetwork;
 	template<typename _Scalar, std::size_t _Rank>
 	friend class SequentialNeuralNetwork;
+	template<typename _Scalar, std::size_t _Rank>
+	friend class TemporalNeuralNetwork;
 protected:
 	static constexpr std::size_t DATA_RANK = Rank + Sequential + 1;
 	typedef Tensor<Scalar,DATA_RANK> Data;
@@ -1427,9 +1429,9 @@ protected:
 		non_seq_input_extents[1] /= input_time_steps;
 		for (std::size_t i = 0; i < input_time_steps; ++i) {
 			seq_input_offsets[1] = i;
-			non_seq_input.slice(non_seq_input_offsets, non_seq_input_extents) = input.slice(seq_input_extents, seq_input_extents)
+			non_seq_input.slice(non_seq_input_offsets, non_seq_input_extents) = input.slice(seq_input_offsets, seq_input_extents)
 					.reshape(non_seq_input_extents);
-			non_seq_input_offsets[1] += seq_input_offsets[2];
+			non_seq_input_offsets[1] += non_seq_input_extents[1];
 		}
 		NonSeqData out = net->propagate(std::move(non_seq_input), training);
 		non_seq_output_offsets[1] = 0;
@@ -1442,7 +1444,7 @@ protected:
 			seq_output_offsets[1] = i;
 			seq_out.slice(seq_output_offsets, seq_output_extents) = out.slice(non_seq_output_offsets, non_seq_output_extents)
 					.reshape(seq_output_extents);
-			non_seq_output_offsets[1] += seq_output_offsets[2];
+			non_seq_output_offsets[1] += non_seq_output_extents[1];
 		}
 		return seq_out;
 	}
@@ -1453,12 +1455,12 @@ protected:
 		non_seq_output_offsets[1] = 0;
 		non_seq_output_extents[1] *= output_time_steps;
 		NonSeqData non_seq_out_grads(non_seq_output_extents);
-		non_seq_input_extents[1] /= output_time_steps;
+		non_seq_output_extents[1] /= output_time_steps;
 		for (std::size_t i = 0; i < output_time_steps; ++i) {
 			seq_output_offsets[1] = i;
 			non_seq_out_grads.slice(non_seq_output_offsets, non_seq_output_extents) = out_grads.slice(seq_output_offsets,
 					seq_output_extents).reshape(non_seq_output_extents);
-			non_seq_output_extents[1] += seq_output_offsets[2];
+			non_seq_output_offsets[1] += non_seq_output_extents[1];
 		}
 		if (foremost) {
 			net->backpropagate(std::move(non_seq_out_grads));
@@ -1473,7 +1475,7 @@ protected:
 				seq_input_offsets[1] = i;
 				seq_prev_out_grads.slice(seq_input_offsets, seq_input_extents) = non_seq_prev_out_grads.slice(non_seq_input_offsets,
 						non_seq_input_extents).reshape(seq_input_extents);
-				non_seq_input_offsets[1] += seq_input_offsets[2];
+				non_seq_input_offsets[1] += non_seq_input_extents[1];
 			}
 			return seq_prev_out_grads;
 
