@@ -3171,10 +3171,7 @@ protected:
 		if (training && dropout) {
 			// Inverted dropout.
 			Scalar scaling_factor = (Scalar) 1 / (1 - dropout_prob + epsilon);
-			typename Base::Data random_tensor(in.dimensions());
-			random_tensor.setRandom();
-			dropout_mask = ((random_tensor + random_tensor.constant(1)) / (Scalar) 2)
-					.unaryExpr([this,scaling_factor](Scalar i) {
+			dropout_mask = ((in.random() + in.constant(1)) / (Scalar) 2).unaryExpr([this,scaling_factor](Scalar i) {
 				return (Scalar) (i <= dropout_prob ? 0 : scaling_factor);
 			});
 			return in * dropout_mask;
