@@ -89,7 +89,7 @@ public:
 		int rows = weights.rows();
 		int cols = weights.cols();
 		std::default_random_engine gen;
-		std::normal_distribution<Scalar> dist(0, sd_scaling_factor * sd(rows -  1, cols));
+		std::normal_distribution<Scalar> dist(0, sd_scaling_factor * _sd(rows -  1, cols));
 		for (int i = 0; i < rows; ++i) {
 			if (i == rows - 1) // Bias row.
 				weights.row(i).setConstant(bias);
@@ -110,7 +110,7 @@ protected:
 	 * @return The standard deviation of the normal distribution from which the values
 	 * of the initialized weight matrix are to be sampled.
 	 */
-	virtual Scalar sd(unsigned fan_ins, unsigned fan_outs) const {
+	virtual Scalar _sd(unsigned fan_ins, unsigned fan_outs) const {
 		return 1;
 	}
 private:
@@ -132,7 +132,7 @@ public:
 	inline LeCunWeightInitialization(Scalar sd_scaling_factor = 1, Scalar bias = 0) :
 		GaussianWeightInitialization<Scalar>::GaussianWeightInitialization(sd_scaling_factor, bias) { }
 protected:
-	inline Scalar sd(unsigned fan_ins, unsigned fan_outs) const {
+	inline Scalar _sd(unsigned fan_ins, unsigned fan_outs) const {
 		return sqrt(1.0 / (Scalar) fan_ins);
 	}
 };
@@ -151,7 +151,7 @@ public:
 	inline GlorotWeightInitialization(Scalar sd_scaling_factor = 1, Scalar bias = 0) :
 		GaussianWeightInitialization<Scalar>::GaussianWeightInitialization(sd_scaling_factor, bias) { }
 protected:
-	inline Scalar sd(unsigned fan_ins, unsigned fan_outs) const {
+	inline Scalar _sd(unsigned fan_ins, unsigned fan_outs) const {
 		return sqrt(2.0 / (Scalar) (fan_ins + fan_outs));
 	}
 };
@@ -170,7 +170,7 @@ public:
 	inline HeWeightInitialization(Scalar sd_scaling_factor = 1, Scalar bias = 0) :
 		GaussianWeightInitialization<Scalar>::GaussianWeightInitialization(sd_scaling_factor, bias) { }
 protected:
-	inline Scalar sd(unsigned fan_ins, unsigned fan_outs) const {
+	inline Scalar _sd(unsigned fan_ins, unsigned fan_outs) const {
 		return sqrt(2.0 / (Scalar) fan_ins);
 	}
 };
@@ -188,23 +188,23 @@ public:
 	 */
 	inline OrthogonalWeightInitialization(Scalar sd = 1, Scalar bias = 0) :
 			GaussianWeightInitialization<Scalar>::GaussianWeightInitialization(1, bias),
-			_sd(sd) { }
+			sd(sd) { }
 	inline void apply(Matrix<Scalar>& weights) const {
 		GaussianWeightInitialization<Scalar>::apply(weights);
 		int rows = weights.rows() - 1;
 		int cols = weights.cols();
 		bool more_rows = rows > cols;
-		SVD<Scalar> svd;
+		internal::SVD<Scalar> svd;
 		weights.block(0, 0, rows, cols) = more_rows ?
-				svd.compute(weights, SVDOptions::ComputeFullU).matrixU().block(0, 0, rows, cols) :
-				svd.compute(weights, SVDOptions::ComputeFullV).matrixV().block(0, 0, rows, cols);
+				svd.compute(weights, internal::SVDOptions::ComputeFullU).matrixU().block(0, 0, rows, cols) :
+				svd.compute(weights, internal::SVDOptions::ComputeFullV).matrixV().block(0, 0, rows, cols);
 	}
 protected:
-	Scalar sd(unsigned fan_ins, unsigned fan_outs) const {
-		return _sd;
+	Scalar _sd(unsigned fan_ins, unsigned fan_outs) const {
+		return sd;
 	}
 private:
-	const Scalar _sd;
+	const Scalar sd;
 };
 
 } /* namespace cattle */

@@ -1953,7 +1953,7 @@ protected:
 	/**
 	 * Initializes the cache required for back-propagation.
 	 */
-	virtual void init_cache() = 0;
+	virtual void _init_cache() = 0;
 	/**
 	 * Reduces the input tensor patch along the specified ranks.
 	 *
@@ -1961,7 +1961,7 @@ protected:
 	 * @param patch_ind The index of the patch.
 	 * @return The reduced tensor.
 	 */
-	virtual Tensor<Scalar,4> reduce(const Tensor<Scalar,4>& patch, std::size_t patch_ind) = 0;
+	virtual Tensor<Scalar,4> _reduce(const Tensor<Scalar,4>& patch, std::size_t patch_ind) = 0;
 	/**
 	 * Differentiates the reduction function and returns the derivative of the loss function
 	 * w.r.t. the non-reduced patch.
@@ -1970,7 +1970,7 @@ protected:
 	 * @param patch_ind The index of the patch.
 	 * @return The derivative of the loss function w.r.t. the non-reduced patch.
 	 */
-	virtual Tensor<Scalar,4> d_reduce(const Tensor<Scalar,4>& grad, std::size_t patch_ind) = 0;
+	virtual Tensor<Scalar,4> _d_reduce(const Tensor<Scalar,4>& grad, std::size_t patch_ind) = 0;
 	inline bool is_input_layer() const {
 		return input_layer;
 	}
@@ -1993,7 +1993,7 @@ protected:
 		patch_extents[0] = rows;
 		reduced_patch_extents[0] = rows;
 		Tensor<Scalar,4> out(rows, ext_output_dims(0), ext_output_dims(1), ext_output_dims(2));
-		init_cache();
+		_init_cache();
 		std::size_t patch_ind = 0;
 		std::size_t out_i = 0;
 		for (std::size_t i = 0; i <= width_rem; i += horizontal_stride, ++out_i) {
@@ -2009,7 +2009,7 @@ protected:
 					patch = in.slice(patch_offsets, patch_extents).stride(dil_strides);
 				else
 					patch = in.slice(patch_offsets, patch_extents);
-				out.slice(reduced_patch_offsets, reduced_patch_extents) = reduce(patch, patch_ind++);
+				out.slice(reduced_patch_offsets, reduced_patch_extents) = _reduce(patch, patch_ind++);
 			}
 		}
 		return out;
@@ -2032,9 +2032,9 @@ protected:
 				// Accumulate the gradients where the patches overlap.
 				if (vertical_dilation > 0 || horizontal_dilation > 0)
 					prev_out_grads.slice(patch_offsets, patch_extents).stride(dil_strides) +=
-							d_reduce(reduced_patch_grads, patch_ind++);
+							_d_reduce(reduced_patch_grads, patch_ind++);
 				else
-					prev_out_grads.slice(patch_offsets, patch_extents) += d_reduce(reduced_patch_grads, patch_ind++);
+					prev_out_grads.slice(patch_offsets, patch_extents) += _d_reduce(reduced_patch_grads, patch_ind++);
 			}
 		}
 		return prev_out_grads;
@@ -2098,13 +2098,13 @@ public:
 				Base::PoolLayer(input_dims, output_dims, receptor_height, receptor_width, vertical_stride,
 						horizontal_stride, vertical_dilation, horizontal_dilation) { }
 protected:
-	inline void init_cache() { };
 	inline void empty_cache() { }
-	inline Tensor<Scalar,4> reduce(const Tensor<Scalar,4>& patch, std::size_t patch_ind) {
+	inline void _init_cache() { }
+	inline Tensor<Scalar,4> _reduce(const Tensor<Scalar,4>& patch, std::size_t patch_ind) {
 		Tensor<Scalar,2> reduced_patch = patch.sum(Base::reduction_ranks);
 		return TensorMap<Scalar,4>(reduced_patch.data(), Base::reduced_patch_extents);
 	}
-	inline Tensor<Scalar,4> d_reduce(const Tensor<Scalar,4>& grad, std::size_t patch_ind) {
+	inline Tensor<Scalar,4> _d_reduce(const Tensor<Scalar,4>& grad, std::size_t patch_ind) {
 		return grad.broadcast(Base::broadcast);
 	}
 };
@@ -2278,13 +2278,13 @@ public:
 						horizontal_stride, vertical_dilation, horizontal_dilation),
 				receptor_area(receptor_height * receptor_width) { }
 protected:
-	inline void init_cache() { };
 	inline void empty_cache() { }
-	inline Tensor<Scalar,4> reduce(const Tensor<Scalar,4>& patch, std::size_t patch_ind) {
+	inline void _init_cache() { }
+	inline Tensor<Scalar,4> _reduce(const Tensor<Scalar,4>& patch, std::size_t patch_ind) {
 		Tensor<Scalar,2> reduced_patch = patch.mean(Base::reduction_ranks);
 		return TensorMap<Scalar,4>(reduced_patch.data(), Base::reduced_patch_extents);
 	}
-	inline Tensor<Scalar,4> d_reduce(const Tensor<Scalar,4>& grad, std::size_t patch_ind) {
+	inline Tensor<Scalar,4> _d_reduce(const Tensor<Scalar,4>& grad, std::size_t patch_ind) {
 		return (grad / (Scalar) receptor_area).broadcast(Base::broadcast);
 	}
 private:
@@ -2459,13 +2459,13 @@ public:
 				Base::PoolLayer(input_dims, output_dims, receptor_height, receptor_width, vertical_stride,
 						horizontal_stride, vertical_dilation, horizontal_dilation) { }
 protected:
-	inline void init_cache() {
-		max_inds = std::vector<std::vector<unsigned>>(Base::ext_output_dims(0) * Base::ext_output_dims(1));
-	}
 	inline void empty_cache() {
 		max_inds = std::vector<std::vector<unsigned>>(0);
 	}
-	inline Tensor<Scalar,4> reduce(const Tensor<Scalar,4>& patch, std::size_t patch_ind) {
+	inline void _init_cache() {
+		max_inds = std::vector<std::vector<unsigned>>(Base::ext_output_dims(0) * Base::ext_output_dims(1));
+	}
+	inline Tensor<Scalar,4> _reduce(const Tensor<Scalar,4>& patch, std::size_t patch_ind) {
 		std::size_t rows = patch.dimension(0);
 		std::size_t depth = patch.dimension(3);
 		std::vector<unsigned> inds(rows * depth);
@@ -2492,7 +2492,7 @@ protected:
 		max_inds[patch_ind] = inds;
 		return reduced_patch;
 	}
-	inline Tensor<Scalar,4> d_reduce(const Tensor<Scalar,4>& grad, std::size_t patch_ind) {
+	inline Tensor<Scalar,4> _d_reduce(const Tensor<Scalar,4>& grad, std::size_t patch_ind) {
 		std::size_t rows = grad.dimension(0);
 		std::size_t depth = grad.dimension(3);
 		Tensor<Scalar,4> patch(rows, Base::receptor_height, Base::receptor_width, depth);

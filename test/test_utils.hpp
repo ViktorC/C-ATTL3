@@ -163,10 +163,10 @@ inline std::pair<DataProviderPtr<Scalar,3,false>,DataProviderPtr<Scalar,3,false>
  * @return A fully connected kernel layer.
  */
 template<typename Scalar, std::size_t Rank>
-inline KernelPtr<Scalar,Rank> kernel_layer(const typename std::enable_if<Rank != 3,
+inline KernelPtr<Scalar,Rank> kernel_layer(const typename std::enable_if<Rank != 1,
 		Dimensions<std::size_t,Rank>>::type& input_dims) {
-	return KernelPtr<Scalar,Rank>(new DenseLayer<Scalar,Rank>(input_dims, 4,
-			WeightInitSharedPtr<Scalar>(new GlorotWeightInitialization<Scalar>())));
+	return KernelPtr<Scalar,Rank>(new ConvolutionLayer<Scalar,Rank>(input_dims, input_dims(Rank - 1),
+			WeightInitSharedPtr<Scalar>(new HeWeightInitialization<Scalar>())));
 }
 
 /**
@@ -174,9 +174,9 @@ inline KernelPtr<Scalar,Rank> kernel_layer(const typename std::enable_if<Rank !=
  * @return A convolutional kernel layer.
  */
 template<typename Scalar, std::size_t Rank>
-inline KernelPtr<Scalar,Rank> kernel_layer(const typename std::enable_if<Rank == 3,
+inline KernelPtr<Scalar,Rank> kernel_layer(const typename std::enable_if<Rank == 1,
 		Dimensions<std::size_t,Rank>>::type& input_dims) {
-	return KernelPtr<Scalar,Rank>(new ConvolutionLayer<Scalar>(input_dims, input_dims(2),
+	return KernelPtr<Scalar,Rank>(new DenseLayer<Scalar>(input_dims, input_dims.get_volume(),
 			WeightInitSharedPtr<Scalar>(new GlorotWeightInitialization<Scalar>())));
 }
 
@@ -228,6 +228,20 @@ inline NeuralNetPtr<Scalar,Rank,false> softmax_neural_net(const Dimensions<std::
 	layers[0] = kernel_layer<Scalar,Rank>(input_dims);
 	layers[1] = LayerPtr<Scalar,Rank>(new SoftmaxActivationLayer<Scalar,Rank>(layers[0]->get_output_dims()));
 	return NeuralNetPtr<Scalar,Rank,false>(new FeedforwardNeuralNetwork<Scalar,Rank>(std::move(layers)));
+}
+
+/**
+ * @param input_dims The input dimensions of the neural network.
+ * @return A simple recurrent neural network without an identity output activation function and with a
+ * single output time step.
+ */
+template<typename Scalar, std::size_t Rank>
+inline NeuralNetPtr<Scalar,Rank,true> recurrent_neural_net(const Dimensions<std::size_t,Rank>& input_dims) {
+	return NeuralNetPtr<Scalar,Rank,false>(new RecurrentNeuralNetwork<Scalar,Rank>(kernel_layer<Scalar,Rank>(input_dims),
+			kernel_layer<Scalar,Rank>(input_dims), kernel_layer<Scalar,Rank>(input_dims),
+			Layer<Scalar,Rank>(new TanhActivationLayer<Scalar,Rank>(input_dims)),
+			Layer<Scalar,Rank>(new IdentityActivationLayer<Scalar,Rank>(input_dims)),
+			[](int input_seq_length) { return std::make_pair(1, input_seq_length - 1); }));
 }
 
 /**

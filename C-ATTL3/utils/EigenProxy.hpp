@@ -61,11 +61,9 @@ template<typename Scalar, std::size_t Rank>
 using TensorMap = Eigen::TensorMap<Tensor<Scalar,Rank>>;
 
 /**
- * An alias for Eigen's normal standard distribution random number generator
- * for tensors.
+ * A namespace for utilities used by C-ATTL3 internally.
  */
-template<typename Scalar>
-using NormalRandGen = Eigen::internal::NormalRandomGenerator<Scalar>;
+namespace internal {
 
 /**
  * An alias for permutation matrices.
@@ -88,11 +86,6 @@ using SVD = Eigen::BDCSVD<Matrix<Scalar>>;
  * An alias for Eigen's singular-value decomposition options.
  */
 using SVDOptions = Eigen::DecompositionOptions;
-
-/**
- * A namespace for utilities used by C-ATTL3 internally.
- */
-namespace internal {
 
 /**
  * A struct for retrieving and setting the number of threads Eigen should use
