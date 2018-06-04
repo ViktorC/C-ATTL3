@@ -1580,7 +1580,7 @@ protected:
 	}
 	inline typename Root::Data pass_back(typename Root::Data out_grads) {
 		assert((Dimensions<std::size_t,Base::DATA_RANK>(out_grads.dimensions()).template demote<>()) == Base::dims);
-		assert(out_grads.dimension(0) > 0 && in.dimension(0) == out_grads.dimension(0));
+		assert(out_grads.dimension(0) > 0 && denominator.dimension(0) == out_grads.dimension(0));
 		return denominator.square().inverse() * out_grads;
 	}
 private:
