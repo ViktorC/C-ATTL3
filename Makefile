@@ -58,21 +58,6 @@ coverage:
 		CXX='$(GCC_CXX)' \
 		CXXFLAGS='$(GCC_CXXFLAGS)' \
 		OPT_FLAGS='$(COVERAGE_OPT_FLAGS)'
-clang_all:
-	$(MAKE) $(TARGET) \
-		CXX='$(CLANG_CXX)' \
-		CXXFLAGS='$(CLANG_CXXFLAGS)' \
-		OPT_FLAGS='$(RELEASE_OPT_FLAGS)'
-clang_debug:
-	$(MAKE) $(TARGET) \
-		CXX='$(CLANG_CXX)' \
-		CXXFLAGS='$(CLANG_CXXFLAGS)' \
-		OPT_FLAGS='$(DEBUG_OPT_FLAGS)'
-clang_coverage:
-	$(MAKE) $(TARGET) \
-		CXX='$(CLANG_CXX)' \
-		CXXFLAGS='$(CLANG_CXXFLAGS)' \
-		OPT_FLAGS='$(COVERAGE_OPT_FLAGS)'
 cuda_all:
 	$(MAKE) $(TARGET) \
 		CXX='$(GCC_CXX)' \
@@ -87,6 +72,16 @@ cuda_debug:
 		OPT_FLAGS='$(DEBUG_OPT_FLAGS)' \
 		INCLUDES='$(CUDA_INCLUDES)' \
 		LIBS='$(CUDA_LIBS)'
+clang_all:
+	$(MAKE) $(TARGET) \
+		CXX='$(CLANG_CXX)' \
+		CXXFLAGS='$(CLANG_CXXFLAGS)' \
+		OPT_FLAGS='$(RELEASE_OPT_FLAGS)'
+clang_debug:
+	$(MAKE) $(TARGET) \
+		CXX='$(CLANG_CXX)' \
+		CXXFLAGS='$(CLANG_CXXFLAGS)' \
+		OPT_FLAGS='$(DEBUG_OPT_FLAGS)'
 clang_cuda_all:
 	$(MAKE) $(TARGET) \
 		CXX='$(CLANG_CXX)' \
