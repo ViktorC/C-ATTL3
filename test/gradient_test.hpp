@@ -246,26 +246,30 @@ inline void activation_layer_grad_test(const typename std::enable_if<Rank != 3,
 	Dimensions<std::size_t,Rank> dims_5 = layer1_5->get_output_dims();
 	layer_grad_test<Scalar,Rank>("tanh activation layer rank", std::move(layer1_5),
 			LayerPtr<Scalar,Rank>(new TanhActivationLayer<Scalar,Rank>(dims_5)));
-	LayerPtr<Scalar,Rank> layer1_6(new DenseLayer<Scalar,Rank>(dims, 9, init));
+	LayerPtr<Scalar,Rank> layer1_6(new DenseLayer<Scalar,Rank>(dims, 12, init));
 	Dimensions<std::size_t,Rank> dims_6 = layer1_6->get_output_dims();
-	layer_grad_test<Scalar,Rank>("softplus activation layer rank", std::move(layer1_6),
-			LayerPtr<Scalar,Rank>(new SoftplusActivationLayer<Scalar,Rank>(dims_6)));
-	LayerPtr<Scalar,Rank> layer1_7(new DenseLayer<Scalar,Rank>(dims, 12, init));
+	layer_grad_test<Scalar,Rank>("softsign activation layer rank", std::move(layer1_6),
+			LayerPtr<Scalar,Rank>(new SoftsignActivationLayer<Scalar,Rank>(dims_6)));
+	LayerPtr<Scalar,Rank> layer1_7(new DenseLayer<Scalar,Rank>(dims, 9, init));
 	Dimensions<std::size_t,Rank> dims_7 = layer1_7->get_output_dims();
-	layer_grad_test<Scalar,Rank>("softmax activation layer rank", std::move(layer1_7),
-			LayerPtr<Scalar,Rank>(new SoftmaxActivationLayer<Scalar,Rank>(dims_7)));
-	LayerPtr<Scalar,Rank> layer1_8(new DenseLayer<Scalar,Rank>(dims, 10, init));
+	layer_grad_test<Scalar,Rank>("softplus activation layer rank", std::move(layer1_7),
+			LayerPtr<Scalar,Rank>(new SoftplusActivationLayer<Scalar,Rank>(dims_7)));
+	LayerPtr<Scalar,Rank> layer1_8(new DenseLayer<Scalar,Rank>(dims, 12, init));
 	Dimensions<std::size_t,Rank> dims_8 = layer1_8->get_output_dims();
-	layer_grad_test<Scalar,Rank>("relu activation layer rank", std::move(layer1_8),
-			LayerPtr<Scalar,Rank>(new ReLUActivationLayer<Scalar,Rank>(dims_8)));
-	LayerPtr<Scalar,Rank> layer1_9(new DenseLayer<Scalar,Rank>(dims, 12, init));
+	layer_grad_test<Scalar,Rank>("softmax activation layer rank", std::move(layer1_8),
+			LayerPtr<Scalar,Rank>(new SoftmaxActivationLayer<Scalar,Rank>(dims_8)));
+	LayerPtr<Scalar,Rank> layer1_9(new DenseLayer<Scalar,Rank>(dims, 10, init));
 	Dimensions<std::size_t,Rank> dims_9 = layer1_9->get_output_dims();
-	layer_grad_test<Scalar,Rank>("leaky relu activation layer rank", std::move(layer1_9),
-			LayerPtr<Scalar,Rank>(new LeakyReLUActivationLayer<Scalar,Rank>(dims_9, 2e-1)));
-	LayerPtr<Scalar,Rank> layer1_10(new DenseLayer<Scalar,Rank>(dims, 11, init));
+	layer_grad_test<Scalar,Rank>("relu activation layer rank", std::move(layer1_9),
+			LayerPtr<Scalar,Rank>(new ReLUActivationLayer<Scalar,Rank>(dims_9)));
+	LayerPtr<Scalar,Rank> layer1_10(new DenseLayer<Scalar,Rank>(dims, 12, init));
 	Dimensions<std::size_t,Rank> dims_10 = layer1_10->get_output_dims();
-	layer_grad_test<Scalar,Rank>("elu activation layer rank", std::move(layer1_10),
-			LayerPtr<Scalar,Rank>(new ELUActivationLayer<Scalar,Rank>(dims_10, 2e-1)));
+	layer_grad_test<Scalar,Rank>("leaky relu activation layer rank", std::move(layer1_10),
+			LayerPtr<Scalar,Rank>(new LeakyReLUActivationLayer<Scalar,Rank>(dims_10, 2e-1)));
+	LayerPtr<Scalar,Rank> layer1_11(new DenseLayer<Scalar,Rank>(dims, 11, init));
+	Dimensions<std::size_t,Rank> dims_11 = layer1_11->get_output_dims();
+	layer_grad_test<Scalar,Rank>("elu activation layer rank", std::move(layer1_11),
+			LayerPtr<Scalar,Rank>(new ELUActivationLayer<Scalar,Rank>(dims_11, 2e-1)));
 	auto reg = ParamRegSharedPtr<Scalar>(new SquaredParameterRegularization<Scalar>());
 	layer_grad_test<Scalar,Rank>("prelu activation layer rank",
 			LayerPtr<Scalar,Rank>(new PReLUActivationLayer<Scalar,Rank>(dims, reg, 2e-1)),
@@ -301,24 +305,28 @@ inline void activation_layer_grad_test(const typename std::enable_if<Rank == 3,
 			LayerPtr<Scalar,3>(new TanhActivationLayer<Scalar,3>(dims_5)));
 	LayerPtr<Scalar,3> layer1_6(new ConvolutionLayer<Scalar>(dims, 2, init));
 	Dimensions<std::size_t,3> dims_6 = layer1_6->get_output_dims();
-	layer_grad_test<Scalar,3>("softplus activation layer", std::move(layer1_6),
-			LayerPtr<Scalar,3>(new SoftplusActivationLayer<Scalar,3>(dims_6)));
+	layer_grad_test<Scalar,3>("softsign activation layer", std::move(layer1_6),
+			LayerPtr<Scalar,3>(new SoftsignActivationLayer<Scalar,3>(dims_6)));
 	LayerPtr<Scalar,3> layer1_7(new ConvolutionLayer<Scalar>(dims, 2, init));
 	Dimensions<std::size_t,3> dims_7 = layer1_7->get_output_dims();
-	layer_grad_test<Scalar,3>("softmax activation layer", std::move(layer1_7),
-			LayerPtr<Scalar,3>(new SoftmaxActivationLayer<Scalar,3>(dims_7)));
+	layer_grad_test<Scalar,3>("softplus activation layer", std::move(layer1_7),
+			LayerPtr<Scalar,3>(new SoftplusActivationLayer<Scalar,3>(dims_7)));
 	LayerPtr<Scalar,3> layer1_8(new ConvolutionLayer<Scalar>(dims, 2, init));
 	Dimensions<std::size_t,3> dims_8 = layer1_8->get_output_dims();
-	layer_grad_test<Scalar,3>("relu activation layer", std::move(layer1_8),
-			LayerPtr<Scalar,3>(new ReLUActivationLayer<Scalar,3>(dims_8)));
+	layer_grad_test<Scalar,3>("softmax activation layer", std::move(layer1_8),
+			LayerPtr<Scalar,3>(new SoftmaxActivationLayer<Scalar,3>(dims_8)));
 	LayerPtr<Scalar,3> layer1_9(new ConvolutionLayer<Scalar>(dims, 2, init));
 	Dimensions<std::size_t,3> dims_9 = layer1_9->get_output_dims();
-	layer_grad_test<Scalar,3>("leaky relu activation layer", std::move(layer1_9),
-			LayerPtr<Scalar,3>(new LeakyReLUActivationLayer<Scalar,3>(dims_9, 2e-1)));
+	layer_grad_test<Scalar,3>("relu activation layer", std::move(layer1_9),
+			LayerPtr<Scalar,3>(new ReLUActivationLayer<Scalar,3>(dims_9)));
 	LayerPtr<Scalar,3> layer1_10(new ConvolutionLayer<Scalar>(dims, 2, init));
 	Dimensions<std::size_t,3> dims_10 = layer1_10->get_output_dims();
-	layer_grad_test<Scalar,3>("elu activation layer", std::move(layer1_10),
-			LayerPtr<Scalar,3>(new ELUActivationLayer<Scalar,3>(dims_10, 2e-1)));
+	layer_grad_test<Scalar,3>("leaky relu activation layer", std::move(layer1_10),
+			LayerPtr<Scalar,3>(new LeakyReLUActivationLayer<Scalar,3>(dims_10, 2e-1)));
+	LayerPtr<Scalar,3> layer1_11(new ConvolutionLayer<Scalar>(dims, 2, init));
+	Dimensions<std::size_t,3> dims_11 = layer1_11->get_output_dims();
+	layer_grad_test<Scalar,3>("elu activation layer", std::move(layer1_11),
+			LayerPtr<Scalar,3>(new ELUActivationLayer<Scalar,3>(dims_11, 2e-1)));
 	auto reg = ParamRegSharedPtr<Scalar>(new SquaredParameterRegularization<Scalar>());
 	layer_grad_test<Scalar,3>("prelu activation layer",
 			LayerPtr<Scalar,3>(new PReLUActivationLayer<Scalar,3>(dims, reg, 2e-1)),

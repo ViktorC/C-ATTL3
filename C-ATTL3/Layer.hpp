@@ -1566,7 +1566,7 @@ protected:
 		return clone();
 	}
 	inline void empty_cache() {
-		in = typename Root::Data();
+		denominator = typename Root::Data();
 	}
 	inline typename Root::Data pass_forward(typename Root::Data in, bool training) {
 		assert((Dimensions<std::size_t,Base::DATA_RANK>(in.dimensions()).template demote<>()) == Base::dims);
