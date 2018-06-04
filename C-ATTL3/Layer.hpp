@@ -8,6 +8,11 @@
 #ifndef CATTL3_LAYER_H_
 #define CATTL3_LAYER_H_
 
+#ifdef CATTL3_USE_CUDA
+#define CATTL3_USE_CUBLAS
+#define CATTL3_USE_CUDNN
+#endif
+
 #include <algorithm>
 #include <array>
 #include <cassert>
@@ -27,6 +32,10 @@
 
 #ifdef CATTL3_USE_CUBLAS
 #include "utils/CuBLASHandle.hpp"
+#endif
+
+#ifdef CATTL3_USE_CUDNN
+#include "utils/CuDNNHandle.hpp"
 #endif
 
 namespace cattle {
@@ -1533,6 +1542,50 @@ protected:
 	}
 private:
 	typename Root::Data out;
+};
+
+/**
+ * A class template representing a softsign activation function layer, an alternative to the
+ * tanh layer.
+ */
+template<typename Scalar, std::size_t Rank>
+class SoftsignActivationLayer : public ActivationLayer<Scalar,Rank> {
+	typedef Layer<Scalar,Rank> Root;
+	typedef ActivationLayer<Scalar,Rank> Base;
+public:
+	/**
+	 * @param dims The dimensionality of the input tensor.
+	 */
+	inline SoftsignActivationLayer(const Dimensions<std::size_t,Rank>& dims) :
+			ActivationLayer<Scalar,Rank>::ActivationLayer(dims) { }
+	inline Layer<Scalar,Rank>* clone() const {
+		return new SoftsignActivationLayer(*this);
+	}
+protected:
+	inline Layer<Scalar,Rank>* clone_with_shared_params() const {
+		return clone();
+	}
+	inline void empty_cache() {
+		in = typename Root::Data();
+	}
+	inline typename Root::Data pass_forward(typename Root::Data in, bool training) {
+		assert((Dimensions<std::size_t,Base::DATA_RANK>(in.dimensions()).template demote<>()) == Base::dims);
+		assert(in.dimension(0) > 0);
+		auto denominator = in.constant(1) + in.abs();
+		if (training) {
+			this->denominator = denominator;
+			return in / this->denominator;
+		}
+		return in / denominator;
+	}
+	inline typename Root::Data pass_back(typename Root::Data out_grads) {
+		assert((Dimensions<std::size_t,Base::DATA_RANK>(out_grads.dimensions()).template demote<>()) == Base::dims);
+		assert(out_grads.dimension(0) > 0 && in.dimension(0) == out_grads.dimension(0));
+		return denominator.square().inverse() * out_grads;
+	}
+private:
+	// Staged computation cache.
+	typename Root::Data denominator;
 };
 
 /**

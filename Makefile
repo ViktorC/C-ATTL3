@@ -5,10 +5,10 @@ COV := gcov
 CXXFLAGS := -std=c++11 -fmessage-length=0 -ftemplate-backtrace-limit=0
 # AVX instructions are problematic with GCC 64 bit on Windows due to its lack of support for 32 byte stack alignment.
 GCC_CXXFLAGS := $(CXXFLAGS) -Wno-ignored-attributes -fopenmp
-GCC_CUDA_CXXFLAGS := $(GCC_CXXFLAGS) -DCATTL3_USE_CUBLAS
+GCC_CUDA_CXXFLAGS := $(GCC_CXXFLAGS) -DCATTL3_USE_CUDA
 # Clang does not actually utilize OpenMP on Windows; no libomp or libiomp5.
 CLANG_CXXFLAGS := $(CXXFLAGS) -march=native
-CLANG_CUDA_CXXFLAGS := $(CLANG_CXXFLAGS) -DCATTL3_USE_CUBLAS
+CLANG_CUDA_CXXFLAGS := $(CLANG_CXXFLAGS) -DCATTL3_USE_CUDA
 RELEASE_OPT_FLAGS := -O3 -DNDEBUG
 # Without level 1 optimization, the object file is too big.
 DEBUG_OPT_FLAGS := -O1 -g
@@ -19,8 +19,8 @@ GTEST_DIR := test/gtest
 INCLUDES := -IC-ATTL3 -IEigen -I$(GTEST_DIR)/include -Itest/
 CUDA_INCLUDES := -I"$(CUDA_INC_PATH)" $(INCLUDES)
 LIBS := -lpthread -lgomp
-CUDA_LIBS := $(LIBS) -L"$(CUDA_LIB_PATH)" -lcudart -lcublas
-HEADERS := DataProvider.hpp Dimensions.hpp Layer.hpp Loss.hpp \
+CUDA_LIBS := $(LIBS) -L"$(CUDA_LIB_PATH)" -lcudart -lcublas -lcudnn
+HEADERS := Codec.hpp DataProvider.hpp Dimensions.hpp Layer.hpp Loss.hpp \
 	NeuralNetwork.hpp Optimizer.hpp ParameterRegularization.hpp \
 	Preprocessor.hpp WeightInitialization.hpp
 SOURCE_DIR := test

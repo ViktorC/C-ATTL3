@@ -1,10 +1,9 @@
 # C-ATTL3 [![Codecov](https://img.shields.io/codecov/c/github/ViktorC/C-ATTL3.svg)](https://codecov.io/gh/ViktorC/C-ATTL3) [![Docs](https://img.shields.io/badge/docs-latest-blue.svg)](https://viktorc.github.io/C-ATTL3/html/annotated.html) [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
-| | Clang++ 5.0 | G++ 7 |
-|---|---|---|
-| CPU | [![Clang](https://travis-matrix-badges.herokuapp.com/repos/ViktorC/C-ATTL3/branches/master/1)](https://travis-ci.org/ViktorC/C-ATTL3) | [![GCC](https://travis-matrix-badges.herokuapp.com/repos/ViktorC/C-ATTL3/branches/master/2)](https://travis-ci.org/ViktorC/C-ATTL3) |
-| CUDA 9.2 | [![Clang](https://travis-matrix-badges.herokuapp.com/repos/ViktorC/C-ATTL3/branches/master/1)](https://travis-ci.org/ViktorC/C-ATTL3) | [![GCC](https://travis-matrix-badges.herokuapp.com/repos/ViktorC/C-ATTL3/branches/master/2)](https://travis-ci.org/ViktorC/C-ATTL3) |
+| Clang++ 5.0 | G++ 7 |
+|---|---|
+| [![Clang](https://travis-matrix-badges.herokuapp.com/repos/ViktorC/C-ATTL3/branches/master/1)](https://travis-ci.org/ViktorC/C-ATTL3) | [![GCC](https://travis-matrix-badges.herokuapp.com/repos/ViktorC/C-ATTL3/branches/master/2)](https://travis-ci.org/ViktorC/C-ATTL3) |
 
-A header-only neural network template library written in C++11. C-ATTL3 uses [Eigen](http://eigen.tuxfamily.org), the popular linear algebra library. If GPU acceleration is enabled, it also utilizes NVIDIA's CUDA toolkit and specifically the [cuBLAS](https://developer.nvidia.com/cublas) library. C-ATTL3 allows for the easy construction and training of both feed-forward and recurrent neural networks ranging from simple MLPs and RNNs to state-of-the-art InceptionNets, ResNets, DenseNets,  and convolutional LSTMs. The library can handle data of different ranks and different floating point scalar types such as `float` and `double`. The Doxygen documentation of the library can be found [here](https://viktorc.github.io/C-ATTL3/html/annotated.html).
+A header-only neural network template library written in C++11. C-ATTL3 uses [Eigen](http://eigen.tuxfamily.org), the popular linear algebra library. If GPU acceleration is enabled, it also utilizes NVIDIA's CUDA toolkit and specifically the [cuBLAS](https://developer.nvidia.com/cublas) library. C-ATTL3 allows for the easy construction and training of both feed-forward and recurrent neural networks ranging from simple MLPs and RNNs to state-of-the-art InceptionNets, ResNets, DenseNets,  and convolutional LSTMs. The library can handle data of different ranks and different floating point scalar types such as `float` and `double`.
 
 ## Components
 The following sub-sections describe the main components of the C-ATTL3 deep learning library. Knowledge of these components and their relations is required for the effective usage of the library.
@@ -22,6 +21,7 @@ The lowest level building blocks of neural networks in C-ATTL3 are the layers. T
     * [BinaryStepActivationLayer](https://viktorc.github.io/C-ATTL3/html/classcattle_1_1_binary_step_activation_layer.html)
     * [SigmoidActivationLayer](https://viktorc.github.io/C-ATTL3/html/classcattle_1_1_sigmoid_activation_layer.html)
     * [TanhActivationLayer](https://viktorc.github.io/C-ATTL3/html/classcattle_1_1_tanh_activation_layer.html)
+    * [SoftsignActivationLayer](https://viktorc.github.io/C-ATTL3/html/classcattle_1_1_softsign_activation_layer.html)
     * [SoftplusActivationLayer](https://viktorc.github.io/C-ATTL3/html/classcattle_1_1_softplus_activation_layer.html)
     * [SoftmaxActivationLayer](https://viktorc.github.io/C-ATTL3/html/classcattle_1_1_softmax_activation_layer.html)
     * [ReLUActivationLayer](https://viktorc.github.io/C-ATTL3/html/classcattle_1_1_re_l_u_activation_layer.html)

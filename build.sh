@@ -1,9 +1,9 @@
 #!/bin/bash
 
 if [ "$COMPILER_NAME" = "g++" ]; then
-  make coverage
+  make all
 elif [ "$COMPILER_NAME" = "clang++" ]; then
-  make clang_all
+  make clang_coverage
 else
   echo "Invalid compiler" >&2
   exit 1
@@ -26,7 +26,7 @@ if [ "$rc" -ne 0 ]; then
   echo "Tests failed" >&2
   exit "$rc"
 fi
-if [ "$COMPILER_NAME" = "g++" ]; then
+if [ "$COMPILER_NAME" = "clang++" ]; then
   make report
   rc=$?
   if [ "$rc" -ne 0 ]; then
