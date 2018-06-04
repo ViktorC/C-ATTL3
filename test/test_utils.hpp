@@ -54,6 +54,12 @@ struct ScalarTraits<float> {
 };
 
 /**
+ * An alias for a unique pointer to an optimizer.
+ */
+template<typename Scalar, std::size_t Rank, bool Sequential>
+using OptimizerPtr = std::unique_ptr<Optimizer<Scalar,Rank,Sequential>>;
+
+/**
  * @param dims The dimensions of the prospective tensor.
  * @return The number of samples.
  */
@@ -165,7 +171,8 @@ inline std::pair<DataProviderPtr<Scalar,3,false>,DataProviderPtr<Scalar,3,false>
 template<typename Scalar, std::size_t Rank>
 inline KernelPtr<Scalar,Rank> kernel_layer(const typename std::enable_if<Rank != 1,
 		Dimensions<std::size_t,Rank>>::type& input_dims) {
-	return KernelPtr<Scalar,Rank>(new ConvolutionLayer<Scalar,Rank>(input_dims, input_dims(Rank - 1),
+	return KernelPtr<Scalar,Rank>(
+			new ConvolutionLayer<Scalar,Rank>(input_dims, input_dims.template extend<3 - Rank>()(2),
 			WeightInitSharedPtr<Scalar>(new HeWeightInitialization<Scalar>())));
 }
 
@@ -176,7 +183,8 @@ inline KernelPtr<Scalar,Rank> kernel_layer(const typename std::enable_if<Rank !=
 template<typename Scalar, std::size_t Rank>
 inline KernelPtr<Scalar,Rank> kernel_layer(const typename std::enable_if<Rank == 1,
 		Dimensions<std::size_t,Rank>>::type& input_dims) {
-	return KernelPtr<Scalar,Rank>(new DenseLayer<Scalar>(input_dims, input_dims.get_volume(),
+	return KernelPtr<Scalar,Rank>(
+			new DenseLayer<Scalar,Rank>(input_dims, input_dims.get_volume(),
 			WeightInitSharedPtr<Scalar>(new GlorotWeightInitialization<Scalar>())));
 }
 
@@ -185,7 +193,7 @@ inline KernelPtr<Scalar,Rank> kernel_layer(const typename std::enable_if<Rank ==
  * @return A simple feed-forward neural network with unrestricted output values.
  */
 template<typename Scalar, std::size_t Rank>
-inline NeuralNetPtr<Scalar,Rank,false> reg_neural_net(const Dimensions<std::size_t,Rank>& input_dims) {
+inline NeuralNetPtr<Scalar,Rank,false> neural_net(const Dimensions<std::size_t,Rank>& input_dims) {
 	std::vector<LayerPtr<Scalar,Rank>> layers(1);
 	layers[0] = kernel_layer<Scalar,Rank>(input_dims);
 	return NeuralNetPtr<Scalar,Rank,false>(new FeedforwardNeuralNetwork<Scalar,Rank>(std::move(layers)));
@@ -236,12 +244,42 @@ inline NeuralNetPtr<Scalar,Rank,false> softmax_neural_net(const Dimensions<std::
  * single output time step.
  */
 template<typename Scalar, std::size_t Rank>
-inline NeuralNetPtr<Scalar,Rank,true> recurrent_neural_net(const Dimensions<std::size_t,Rank>& input_dims) {
-	return NeuralNetPtr<Scalar,Rank,false>(new RecurrentNeuralNetwork<Scalar,Rank>(kernel_layer<Scalar,Rank>(input_dims),
+inline NeuralNetPtr<Scalar,Rank,true> recurrent_neural_net(const Dimensions<std::size_t,Rank>& input_dims,
+		std::function<std::pair<std::size_t,std::size_t>(std::size_t)> seq_schedule_func) {
+	return NeuralNetPtr<Scalar,Rank,true>(new RecurrentNeuralNetwork<Scalar,Rank>(kernel_layer<Scalar,Rank>(input_dims),
 			kernel_layer<Scalar,Rank>(input_dims), kernel_layer<Scalar,Rank>(input_dims),
-			Layer<Scalar,Rank>(new TanhActivationLayer<Scalar,Rank>(input_dims)),
-			Layer<Scalar,Rank>(new IdentityActivationLayer<Scalar,Rank>(input_dims)),
-			[](int input_seq_length) { return std::make_pair(1, input_seq_length - 1); }));
+			ActivationPtr<Scalar,Rank>(new TanhActivationLayer<Scalar,Rank>(input_dims)),
+			ActivationPtr<Scalar,Rank>(new IdentityActivationLayer<Scalar,Rank>(input_dims)), seq_schedule_func));
+}
+
+/**
+ * @param input_dims The input dimensions of the neural network.
+ * @return A simple single-output recurrent neural network without an identity output activation function
+ * and with a single output time step.
+ */
+template<typename Scalar, std::size_t Rank>
+inline NeuralNetPtr<Scalar,Rank,true> single_output_recurrent_neural_net(const Dimensions<std::size_t,Rank>& input_dims,
+		std::function<std::pair<std::size_t,std::size_t>(std::size_t)> seq_schedule_func) {
+	auto init = std::make_shared<GlorotWeightInitialization<Scalar>>();
+	return NeuralNetPtr<Scalar,Rank,true>(new RecurrentNeuralNetwork<Scalar,Rank>(kernel_layer<Scalar,Rank>(input_dims),
+			kernel_layer<Scalar,Rank>(input_dims), KernelPtr<Scalar,Rank>(new DenseLayer<Scalar,Rank>(input_dims, 1, init)),
+			ActivationPtr<Scalar,Rank>(new TanhActivationLayer<Scalar,Rank>(input_dims)),
+			ActivationPtr<Scalar,Rank>(new IdentityActivationLayer<Scalar,Rank>(Dimensions<std::size_t,Rank>())),
+			seq_schedule_func));
+}
+
+/**
+ * @param net The first module of the composite single-output network.
+ * @return A stacked network with an output dimensionality of one.
+ */
+template<typename Scalar, std::size_t Rank>
+inline NeuralNetPtr<Scalar,Rank,false> single_output_net(NeuralNetPtr<Scalar,Rank,false> net) {
+	auto init = std::make_shared<GlorotWeightInitialization<Scalar>>();
+	std::vector<NeuralNetPtr<Scalar,Rank,false>> modules(2);
+	modules[0] = std::move(net);
+	modules[1] = NeuralNetPtr<Scalar,Rank,false>(new FeedforwardNeuralNetwork<Scalar,Rank>(
+			LayerPtr<Scalar,Rank>(new DenseLayer<Scalar,Rank>(modules[0]->get_output_dims(), 1, init))));
+	return NeuralNetPtr<Scalar,Rank,false>(new StackedNeuralNetwork<Scalar,Rank,false>(std::move(modules)));
 }
 
 /**

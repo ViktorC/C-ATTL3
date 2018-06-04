@@ -101,9 +101,9 @@ Public Member Functions</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pro-methods"></a>
 Protected Member Functions</h2></td></tr>
-<tr class="memitem:a0948da19bf87dd83bed6fa91e846dc41"><td class="memItemLeft" align="right" valign="top">virtual Scalar&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_gaussian_weight_initialization.html#a0948da19bf87dd83bed6fa91e846dc41">sd</a> (unsigned fan_ins, unsigned fan_outs) const</td></tr>
-<tr class="memdesc:a0948da19bf87dd83bed6fa91e846dc41"><td class="mdescLeft">&#160;</td><td class="mdescRight">It computes the standard deviation of the distribution to sample from.  <a href="#a0948da19bf87dd83bed6fa91e846dc41">More...</a><br /></td></tr>
-<tr class="separator:a0948da19bf87dd83bed6fa91e846dc41"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3832b44192a20a6c4039008edaa9cab5"><td class="memItemLeft" align="right" valign="top">virtual Scalar&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_gaussian_weight_initialization.html#a3832b44192a20a6c4039008edaa9cab5">_sd</a> (unsigned fan_ins, unsigned fan_outs) const</td></tr>
+<tr class="memdesc:a3832b44192a20a6c4039008edaa9cab5"><td class="mdescLeft">&#160;</td><td class="mdescRight">It computes the standard deviation of the distribution to sample from.  <a href="#a3832b44192a20a6c4039008edaa9cab5">More...</a><br /></td></tr>
+<tr class="separator:a3832b44192a20a6c4039008edaa9cab5"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><h3>template&lt;typename Scalar&gt;<br />
@@ -111,6 +111,56 @@ class cattle::GaussianWeightInitialization&lt; Scalar &gt;</h3>
 
 <p>An abstract class template representing a random weight initialization method that samples from a Gaussian distribution. </p>
 </div><h2 class="groupheader">Member Function Documentation</h2>
+<a id="a3832b44192a20a6c4039008edaa9cab5"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a3832b44192a20a6c4039008edaa9cab5">&#9670;&nbsp;</a></span>_sd()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename Scalar &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual Scalar <a class="el" href="classcattle_1_1_gaussian_weight_initialization.html">cattle::GaussianWeightInitialization</a>&lt; Scalar &gt;::_sd </td>
+          <td>(</td>
+          <td class="paramtype">unsigned&#160;</td>
+          <td class="paramname"><em>fan_ins</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">unsigned&#160;</td>
+          <td class="paramname"><em>fan_outs</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">protected</span><span class="mlabel">virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>It computes the standard deviation of the distribution to sample from. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">fan_ins</td><td>The input size of the kernel (the number of rows in the weight matrix excluding the bias row). </td></tr>
+    <tr><td class="paramname">fan_outs</td><td>The output size of the kernel (the number of columns in the weight matrix). </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>The standard deviation of the normal distribution from which the values of the initialized weight matrix are to be sampled. </dd></dl>
+
+<p>Reimplemented in <a class="el" href="classcattle_1_1_orthogonal_weight_initialization.html#aef8bd77b145ce1b31cfbc5b0b2992aef">cattle::OrthogonalWeightInitialization&lt; Scalar &gt;</a>, <a class="el" href="classcattle_1_1_he_weight_initialization.html#a7d05aa855a4ddcbe1696a8d1d469ac62">cattle::HeWeightInitialization&lt; Scalar &gt;</a>, <a class="el" href="classcattle_1_1_glorot_weight_initialization.html#a399e14a822992ce9c8cd8127a9407e50">cattle::GlorotWeightInitialization&lt; Scalar &gt;</a>, and <a class="el" href="classcattle_1_1_le_cun_weight_initialization.html#ac8de55ced39c6e9695f99153fce3f034">cattle::LeCunWeightInitialization&lt; Scalar &gt;</a>.</p>
+
+</div>
+</div>
 <a id="ac40c05d1bc293b57a99cbc68a8204279"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#ac40c05d1bc293b57a99cbc68a8204279">&#9670;&nbsp;</a></span>apply()</h2>
 
@@ -152,58 +202,8 @@ template&lt;typename Scalar &gt; </div>
 
 </div>
 </div>
-<a id="a0948da19bf87dd83bed6fa91e846dc41"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a0948da19bf87dd83bed6fa91e846dc41">&#9670;&nbsp;</a></span>sd()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<div class="memtemplate">
-template&lt;typename Scalar &gt; </div>
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">virtual Scalar <a class="el" href="classcattle_1_1_gaussian_weight_initialization.html">cattle::GaussianWeightInitialization</a>&lt; Scalar &gt;::sd </td>
-          <td>(</td>
-          <td class="paramtype">unsigned&#160;</td>
-          <td class="paramname"><em>fan_ins</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">unsigned&#160;</td>
-          <td class="paramname"><em>fan_outs</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td> const</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">protected</span><span class="mlabel">virtual</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>It computes the standard deviation of the distribution to sample from. </p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">fan_ins</td><td>The input size of the kernel (the number of rows in the weight matrix excluding the bias row). </td></tr>
-    <tr><td class="paramname">fan_outs</td><td>The output size of the kernel (the number of columns in the weight matrix). </td></tr>
-  </table>
-  </dd>
-</dl>
-<dl class="section return"><dt>Returns</dt><dd>The standard deviation of the normal distribution from which the values of the initialized weight matrix are to be sampled. </dd></dl>
-
-<p>Reimplemented in <a class="el" href="classcattle_1_1_orthogonal_weight_initialization.html#a3d76302db391c53346a2a2783ba4b2db">cattle::OrthogonalWeightInitialization&lt; Scalar &gt;</a>, <a class="el" href="classcattle_1_1_he_weight_initialization.html#aca8a14673b6f5f7ee07839111175814e">cattle::HeWeightInitialization&lt; Scalar &gt;</a>, <a class="el" href="classcattle_1_1_glorot_weight_initialization.html#a535754fd38d757ed7a038f7b7e4f526b">cattle::GlorotWeightInitialization&lt; Scalar &gt;</a>, and <a class="el" href="classcattle_1_1_le_cun_weight_initialization.html#aa0e25c71355d571abdecd003eb07d74a">cattle::LeCunWeightInitialization&lt; Scalar &gt;</a>.</p>
-
-</div>
-</div>
 <hr/>The documentation for this class was generated from the following file:<ul>
-<li>C:/Users/A6714/git/C-ATTL3/C-ATTL3/<a class="el" href="_weight_initialization_8hpp_source.html">WeightInitialization.hpp</a></li>
+<li>C:/Users/Viktor/git/C-ATTL3/C-ATTL3/<a class="el" href="_weight_initialization_8hpp_source.html">WeightInitialization.hpp</a></li>
 </ul>
 </div><!-- contents -->
 <!-- start footer part -->

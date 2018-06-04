@@ -9,6 +9,7 @@
 #include <gtest/gtest.h>
 
 #include "gradient_test.hpp"
+#include "training_test.hpp"
 
 bool cattle::test::verbose;
 

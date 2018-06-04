@@ -102,21 +102,27 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a0db51fa56d54ea3801bc2fe07ac9bd94 inherit pub_methods_classcattle_1_1_optimizer"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_optimizer.html#a0db51fa56d54ea3801bc2fe07ac9bd94">verify_gradients</a> (<a class="el" href="classcattle_1_1_neural_network.html">Net</a> &amp;net, <a class="el" href="classcattle_1_1_data_provider.html">Provider</a> &amp;provider, bool verbose=true, Scalar step_size=<a class="el" href="classcattle_1_1internal_1_1_numeric_utils.html">internal::NumericUtils</a>&lt; Scalar &gt;::EPSILON2/2, Scalar abs_epsilon=<a class="el" href="classcattle_1_1internal_1_1_numeric_utils.html">internal::NumericUtils</a>&lt; Scalar &gt;::EPSILON2, Scalar rel_epsilon=<a class="el" href="classcattle_1_1internal_1_1_numeric_utils.html">internal::NumericUtils</a>&lt; Scalar &gt;::EPSILON2) const</td></tr>
 <tr class="memdesc:a0db51fa56d54ea3801bc2fe07ac9bd94 inherit pub_methods_classcattle_1_1_optimizer"><td class="mdescLeft">&#160;</td><td class="mdescRight">It performs a gradient check to verify the correctness of the neural network and layer implementations.  <a href="classcattle_1_1_optimizer.html#a0db51fa56d54ea3801bc2fe07ac9bd94">More...</a><br /></td></tr>
 <tr class="separator:a0db51fa56d54ea3801bc2fe07ac9bd94 inherit pub_methods_classcattle_1_1_optimizer"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ac25499c3dfbb1995dcbe747868a26c8c inherit pub_methods_classcattle_1_1_optimizer"><td class="memItemLeft" align="right" valign="top">Scalar&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_optimizer.html#ac25499c3dfbb1995dcbe747868a26c8c">optimize</a> (<a class="el" href="classcattle_1_1_neural_network.html">Net</a> &amp;net, <a class="el" href="classcattle_1_1_data_provider.html">Provider</a> &amp;training_prov, <a class="el" href="classcattle_1_1_data_provider.html">Provider</a> &amp;test_prov, unsigned epochs, unsigned early_stop=0, bool verbose=true)</td></tr>
-<tr class="memdesc:ac25499c3dfbb1995dcbe747868a26c8c inherit pub_methods_classcattle_1_1_optimizer"><td class="mdescLeft">&#160;</td><td class="mdescRight">It optimizes the specified neural network using the given data providers according to the optimizers loss function.  <a href="classcattle_1_1_optimizer.html#ac25499c3dfbb1995dcbe747868a26c8c">More...</a><br /></td></tr>
-<tr class="separator:ac25499c3dfbb1995dcbe747868a26c8c inherit pub_methods_classcattle_1_1_optimizer"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a142ff5943251e0519831f74ad824a4c2 inherit pub_methods_classcattle_1_1_optimizer"><td class="memItemLeft" align="right" valign="top">Scalar&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_optimizer.html#a142ff5943251e0519831f74ad824a4c2">train</a> (<a class="el" href="classcattle_1_1_neural_network.html">Net</a> &amp;net, <a class="el" href="classcattle_1_1_data_provider.html">Provider</a> &amp;prov, unsigned epochs, bool verbose=true)</td></tr>
-<tr class="memdesc:a142ff5943251e0519831f74ad824a4c2 inherit pub_methods_classcattle_1_1_optimizer"><td class="mdescLeft">&#160;</td><td class="mdescRight">It trains the specified neural network using the given training data provider according to the optimizers loss function for the specified number of epochs.  <a href="classcattle_1_1_optimizer.html#a142ff5943251e0519831f74ad824a4c2">More...</a><br /></td></tr>
-<tr class="separator:a142ff5943251e0519831f74ad824a4c2 inherit pub_methods_classcattle_1_1_optimizer"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ab9ef4c2483ea46b160f1b60381764df1 inherit pub_methods_classcattle_1_1_optimizer"><td class="memItemLeft" align="right" valign="top">Scalar&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_optimizer.html#ab9ef4c2483ea46b160f1b60381764df1">test</a> (<a class="el" href="classcattle_1_1_neural_network.html">Net</a> &amp;net, <a class="el" href="classcattle_1_1_data_provider.html">Provider</a> &amp;prov, bool verbose=true)</td></tr>
-<tr class="memdesc:ab9ef4c2483ea46b160f1b60381764df1 inherit pub_methods_classcattle_1_1_optimizer"><td class="mdescLeft">&#160;</td><td class="mdescRight">It tests the specified neural network using the given test data provider according to the optimizers loss function.  <a href="classcattle_1_1_optimizer.html#ab9ef4c2483ea46b160f1b60381764df1">More...</a><br /></td></tr>
-<tr class="separator:ab9ef4c2483ea46b160f1b60381764df1 inherit pub_methods_classcattle_1_1_optimizer"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5c45d54f43f81258e9445215e5a862f8 inherit pub_methods_classcattle_1_1_optimizer"><td class="memItemLeft" align="right" valign="top">Scalar&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_optimizer.html#a5c45d54f43f81258e9445215e5a862f8">optimize</a> (<a class="el" href="classcattle_1_1_neural_network.html">Net</a> &amp;net, <a class="el" href="classcattle_1_1_data_provider.html">Provider</a> &amp;training_prov, <a class="el" href="classcattle_1_1_data_provider.html">Provider</a> &amp;test_prov, unsigned epochs, unsigned early_stop=0, Scalar target_loss=<a class="el" href="classcattle_1_1internal_1_1_numeric_utils.html">internal::NumericUtils</a>&lt; Scalar &gt;::MIN, bool verbose=true)</td></tr>
+<tr class="memdesc:a5c45d54f43f81258e9445215e5a862f8 inherit pub_methods_classcattle_1_1_optimizer"><td class="mdescLeft">&#160;</td><td class="mdescRight">It optimizes the specified neural network using the given data providers according to the optimizers loss function.  <a href="classcattle_1_1_optimizer.html#a5c45d54f43f81258e9445215e5a862f8">More...</a><br /></td></tr>
+<tr class="separator:a5c45d54f43f81258e9445215e5a862f8 inherit pub_methods_classcattle_1_1_optimizer"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2a2f1204cac7ec993a5f11d08727144d inherit pub_methods_classcattle_1_1_optimizer"><td class="memItemLeft" align="right" valign="top">Scalar&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_optimizer.html#a2a2f1204cac7ec993a5f11d08727144d">optimize</a> (<a class="el" href="classcattle_1_1_neural_network.html">Net</a> &amp;net, <a class="el" href="classcattle_1_1_data_provider.html">Provider</a> &amp;training_prov, <a class="el" href="classcattle_1_1_data_provider.html">Provider</a> &amp;test_prov, unsigned epochs, bool verbose=true)</td></tr>
+<tr class="memdesc:a2a2f1204cac7ec993a5f11d08727144d inherit pub_methods_classcattle_1_1_optimizer"><td class="mdescLeft">&#160;</td><td class="mdescRight">It optimizes the specified neural network using the given data providers according to the optimizers loss function.  <a href="classcattle_1_1_optimizer.html#a2a2f1204cac7ec993a5f11d08727144d">More...</a><br /></td></tr>
+<tr class="separator:a2a2f1204cac7ec993a5f11d08727144d inherit pub_methods_classcattle_1_1_optimizer"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab5d2c6485674eff4d3359e424fb8d03d inherit pub_methods_classcattle_1_1_optimizer"><td class="memItemLeft" align="right" valign="top">Scalar&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_optimizer.html#ab5d2c6485674eff4d3359e424fb8d03d">train</a> (<a class="el" href="classcattle_1_1_neural_network.html">Net</a> &amp;net, <a class="el" href="classcattle_1_1_data_provider.html">Provider</a> &amp;prov, unsigned epochs, unsigned early_stop=0, Scalar target_loss=<a class="el" href="classcattle_1_1internal_1_1_numeric_utils.html">internal::NumericUtils</a>&lt; Scalar &gt;::MIN, bool verbose=false)</td></tr>
+<tr class="memdesc:ab5d2c6485674eff4d3359e424fb8d03d inherit pub_methods_classcattle_1_1_optimizer"><td class="mdescLeft">&#160;</td><td class="mdescRight">It trains the specified neural network using the given training data provider according to the optimizers loss function for the specified number of epochs.  <a href="classcattle_1_1_optimizer.html#ab5d2c6485674eff4d3359e424fb8d03d">More...</a><br /></td></tr>
+<tr class="separator:ab5d2c6485674eff4d3359e424fb8d03d inherit pub_methods_classcattle_1_1_optimizer"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a205d9b1969f5dac9e7e3366709208a11 inherit pub_methods_classcattle_1_1_optimizer"><td class="memItemLeft" align="right" valign="top">Scalar&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_optimizer.html#a205d9b1969f5dac9e7e3366709208a11">train</a> (<a class="el" href="classcattle_1_1_neural_network.html">Net</a> &amp;net, <a class="el" href="classcattle_1_1_data_provider.html">Provider</a> &amp;prov, unsigned epochs, bool verbose=false)</td></tr>
+<tr class="memdesc:a205d9b1969f5dac9e7e3366709208a11 inherit pub_methods_classcattle_1_1_optimizer"><td class="mdescLeft">&#160;</td><td class="mdescRight">It trains the specified neural network using the given training data provider according to the optimizers loss function for the specified number of epochs.  <a href="classcattle_1_1_optimizer.html#a205d9b1969f5dac9e7e3366709208a11">More...</a><br /></td></tr>
+<tr class="separator:a205d9b1969f5dac9e7e3366709208a11 inherit pub_methods_classcattle_1_1_optimizer"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af7cb73ae3bf774fa84ec25df5fa13528 inherit pub_methods_classcattle_1_1_optimizer"><td class="memItemLeft" align="right" valign="top">Scalar&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_optimizer.html#af7cb73ae3bf774fa84ec25df5fa13528">test</a> (<a class="el" href="classcattle_1_1_neural_network.html">Net</a> &amp;net, <a class="el" href="classcattle_1_1_data_provider.html">Provider</a> &amp;prov, bool verbose=false)</td></tr>
+<tr class="memdesc:af7cb73ae3bf774fa84ec25df5fa13528 inherit pub_methods_classcattle_1_1_optimizer"><td class="mdescLeft">&#160;</td><td class="mdescRight">It tests the specified neural network using the given test data provider according to the optimizers loss function.  <a href="classcattle_1_1_optimizer.html#af7cb73ae3bf774fa84ec25df5fa13528">More...</a><br /></td></tr>
+<tr class="separator:af7cb73ae3bf774fa84ec25df5fa13528 inherit pub_methods_classcattle_1_1_optimizer"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pro-methods"></a>
 Protected Member Functions</h2></td></tr>
-<tr class="memitem:a95941f89564f5f20de746fe52be6eb40"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_momentum_accelerated_s_g_d_optimizer.html#a95941f89564f5f20de746fe52be6eb40">update_params</a> (<a class="el" href="classcattle_1_1_layer.html">Layer</a>&lt; Scalar, Rank &gt; &amp;layer, unsigned i, unsigned epoch)</td></tr>
-<tr class="memdesc:a95941f89564f5f20de746fe52be6eb40"><td class="mdescLeft">&#160;</td><td class="mdescRight">It updates the parameters of the specified layer based on their gradients after back-propagation.  <a href="#a95941f89564f5f20de746fe52be6eb40">More...</a><br /></td></tr>
-<tr class="separator:a95941f89564f5f20de746fe52be6eb40"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a39e75583dfd1b7c19d6ea86317d114aa"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_momentum_accelerated_s_g_d_optimizer.html#a39e75583dfd1b7c19d6ea86317d114aa">_update_params</a> (<a class="el" href="classcattle_1_1_layer.html">Layer</a>&lt; Scalar, Rank &gt; &amp;layer, unsigned i, unsigned epoch)</td></tr>
+<tr class="memdesc:a39e75583dfd1b7c19d6ea86317d114aa"><td class="mdescLeft">&#160;</td><td class="mdescRight">It updates the parameters of the specified layer based on their gradients after back-propagation.  <a href="#a39e75583dfd1b7c19d6ea86317d114aa">More...</a><br /></td></tr>
+<tr class="separator:a39e75583dfd1b7c19d6ea86317d114aa"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a83c7e177b2e02790e308610900323f49"><td class="memItemLeft" align="right" valign="top">Scalar&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_momentum_accelerated_s_g_d_optimizer.html#a83c7e177b2e02790e308610900323f49">calculate_learning_rate</a> (unsigned epoch)</td></tr>
 <tr class="memdesc:a83c7e177b2e02790e308610900323f49"><td class="mdescLeft">&#160;</td><td class="mdescRight">It calculates the annealed learning rate as a function of the epoch index.  <a href="#a83c7e177b2e02790e308610900323f49">More...</a><br /></td></tr>
 <tr class="separator:a83c7e177b2e02790e308610900323f49"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -232,6 +238,64 @@ template&lt;typename Scalar , std::size_t Rank, bool Sequential&gt; </div>
 </div>
 </div>
 <h2 class="groupheader">Member Function Documentation</h2>
+<a id="a39e75583dfd1b7c19d6ea86317d114aa"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a39e75583dfd1b7c19d6ea86317d114aa">&#9670;&nbsp;</a></span>_update_params()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename Scalar , std::size_t Rank, bool Sequential&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void <a class="el" href="classcattle_1_1_momentum_accelerated_s_g_d_optimizer.html">cattle::MomentumAcceleratedSGDOptimizer</a>&lt; Scalar, Rank, Sequential &gt;::_update_params </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="classcattle_1_1_layer.html">Layer</a>&lt; Scalar, Rank &gt; &amp;&#160;</td>
+          <td class="paramname"><em>layer</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">unsigned&#160;</td>
+          <td class="paramname"><em>i</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">unsigned&#160;</td>
+          <td class="paramname"><em>epoch</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">protected</span><span class="mlabel">virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>It updates the parameters of the specified layer based on their gradients after back-propagation. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">layer</td><td>A reference to the layer whose parameters are to be updated. </td></tr>
+    <tr><td class="paramname">i</td><td>The index of the layer. </td></tr>
+    <tr><td class="paramname">epoch</td><td>The index of the epoch. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+<p>Implements <a class="el" href="classcattle_1_1_s_g_d_optimizer.html#ae937dbf0ae64bce50d53e3593be25385">cattle::SGDOptimizer&lt; Scalar, Rank, Sequential &gt;</a>.</p>
+
+<p>Reimplemented in <a class="el" href="classcattle_1_1_nesterov_momentum_accelerated_s_g_d_optimizer.html#aa3a9ceb0c50184e41c018c897798afa2">cattle::NesterovMomentumAcceleratedSGDOptimizer&lt; Scalar, Rank, Sequential &gt;</a>.</p>
+
+</div>
+</div>
 <a id="a83c7e177b2e02790e308610900323f49"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a83c7e177b2e02790e308610900323f49">&#9670;&nbsp;</a></span>calculate_learning_rate()</h2>
 
@@ -308,66 +372,8 @@ template&lt;typename Scalar , std::size_t Rank, bool Sequential&gt; </div>
 
 </div>
 </div>
-<a id="a95941f89564f5f20de746fe52be6eb40"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a95941f89564f5f20de746fe52be6eb40">&#9670;&nbsp;</a></span>update_params()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<div class="memtemplate">
-template&lt;typename Scalar , std::size_t Rank, bool Sequential&gt; </div>
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">void <a class="el" href="classcattle_1_1_momentum_accelerated_s_g_d_optimizer.html">cattle::MomentumAcceleratedSGDOptimizer</a>&lt; Scalar, Rank, Sequential &gt;::update_params </td>
-          <td>(</td>
-          <td class="paramtype"><a class="el" href="classcattle_1_1_layer.html">Layer</a>&lt; Scalar, Rank &gt; &amp;&#160;</td>
-          <td class="paramname"><em>layer</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">unsigned&#160;</td>
-          <td class="paramname"><em>i</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">unsigned&#160;</td>
-          <td class="paramname"><em>epoch</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">protected</span><span class="mlabel">virtual</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>It updates the parameters of the specified layer based on their gradients after back-propagation. </p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">layer</td><td>A reference to the layer whose parameters are to be updated. </td></tr>
-    <tr><td class="paramname">i</td><td>The index of the layer. </td></tr>
-    <tr><td class="paramname">epoch</td><td>The index of the epoch. </td></tr>
-  </table>
-  </dd>
-</dl>
-
-<p>Implements <a class="el" href="classcattle_1_1_s_g_d_optimizer.html#a79317598e4426c479f42f8272d7c4689">cattle::SGDOptimizer&lt; Scalar, Rank, Sequential &gt;</a>.</p>
-
-<p>Reimplemented in <a class="el" href="classcattle_1_1_nesterov_momentum_accelerated_s_g_d_optimizer.html#a208e4155a3ff62d348bb232fb8ccb906">cattle::NesterovMomentumAcceleratedSGDOptimizer&lt; Scalar, Rank, Sequential &gt;</a>.</p>
-
-</div>
-</div>
 <hr/>The documentation for this class was generated from the following file:<ul>
-<li>C:/Users/A6714/git/C-ATTL3/C-ATTL3/<a class="el" href="_optimizer_8hpp_source.html">Optimizer.hpp</a></li>
+<li>C:/Users/Viktor/git/C-ATTL3/C-ATTL3/<a class="el" href="_optimizer_8hpp_source.html">Optimizer.hpp</a></li>
 </ul>
 </div><!-- contents -->
 <!-- start footer part -->

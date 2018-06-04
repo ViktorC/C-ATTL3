@@ -104,13 +104,13 @@ int main() {
 			MemoryDataProvider<float,3,false,false> disc_train_prov(
 					TensorPtr<float,4>(new Tensor<float,4>(std::move(train_data))),
 					TensorPtr<float,4>(new Tensor<float,4>(std::move(train_label))));
-			disc_train_loss += disc_opt.train(*gan.get_modules()[1], disc_train_prov, 1, false) * actual_m;
+			disc_train_loss += disc_opt.train(*gan.get_modules()[1], disc_train_prov, 1) * actual_m;
 			// Then optimize the generator by maximizing the GAN's loss w.r.t. the parameters of the generator.
 			MemoryDataProvider<float,3,false,false> gen_train_prov(
 					TensorPtr<float,4>(new Tensor<float,4>(Tensor<float,4>(l * actual_m, 1u, 1u, 100u).random())),
 					TensorPtr<float,4>(new Tensor<float,4>(Tensor<float,4>(l * actual_m, 1u, 1u, 1u).constant(1))));
 			gan.get_modules()[1]->set_frozen(true);
-			gen_train_loss += gen_opt.train(gan, gen_train_prov, 1, false) * actual_m;
+			gen_train_loss += gen_opt.train(gan, gen_train_prov, 1) * actual_m;
 			gan.get_modules()[1]->set_frozen(false);
 			counter++;
 		}

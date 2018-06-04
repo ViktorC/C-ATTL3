@@ -92,20 +92,20 @@ Inheritance diagram for cattle::MeanPoolLayerBase&lt; Scalar, Rank &gt;:</div>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pro-methods"></a>
 Protected Member Functions</h2></td></tr>
-<tr class="memitem:a3f7faf62f9b6645794f85c12e27a8681"><td class="memItemLeft" align="right" valign="top"><a id="a3f7faf62f9b6645794f85c12e27a8681"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_mean_pool_layer_base.html#a3f7faf62f9b6645794f85c12e27a8681">init_cache</a> ()</td></tr>
-<tr class="memdesc:a3f7faf62f9b6645794f85c12e27a8681"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initializes the cache required for back-propagation. <br /></td></tr>
-<tr class="separator:a3f7faf62f9b6645794f85c12e27a8681"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ae8cc07b8101db1e0ba06bc48ceca3b0e"><td class="memItemLeft" align="right" valign="top"><a id="ae8cc07b8101db1e0ba06bc48ceca3b0e"></a>
 void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_mean_pool_layer_base.html#ae8cc07b8101db1e0ba06bc48ceca3b0e">empty_cache</a> ()</td></tr>
 <tr class="memdesc:ae8cc07b8101db1e0ba06bc48ceca3b0e"><td class="mdescLeft">&#160;</td><td class="mdescRight">It empties the layer's caches such as those required for the derivation of the function represented by the layer. <br /></td></tr>
 <tr class="separator:ae8cc07b8101db1e0ba06bc48ceca3b0e"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a892366c7dec7af411cfe78d56620de2c"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespacecattle.html#a8b9323ad928764340e46f0802bf27fbb">Tensor</a>&lt; Scalar, 4 &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_mean_pool_layer_base.html#a892366c7dec7af411cfe78d56620de2c">reduce</a> (const <a class="el" href="namespacecattle.html#a8b9323ad928764340e46f0802bf27fbb">Tensor</a>&lt; Scalar, 4 &gt; &amp;patch, std::size_t patch_ind)</td></tr>
-<tr class="memdesc:a892366c7dec7af411cfe78d56620de2c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Reduces the input tensor patch along the specified ranks.  <a href="#a892366c7dec7af411cfe78d56620de2c">More...</a><br /></td></tr>
-<tr class="separator:a892366c7dec7af411cfe78d56620de2c"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ad86a994b6da32cebc6fdb854b12f8072"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespacecattle.html#a8b9323ad928764340e46f0802bf27fbb">Tensor</a>&lt; Scalar, 4 &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_mean_pool_layer_base.html#ad86a994b6da32cebc6fdb854b12f8072">d_reduce</a> (const <a class="el" href="namespacecattle.html#a8b9323ad928764340e46f0802bf27fbb">Tensor</a>&lt; Scalar, 4 &gt; &amp;grad, std::size_t patch_ind)</td></tr>
-<tr class="memdesc:ad86a994b6da32cebc6fdb854b12f8072"><td class="mdescLeft">&#160;</td><td class="mdescRight">Differentiates the reduction function and returns the derivative of the loss function w.r.t.  <a href="#ad86a994b6da32cebc6fdb854b12f8072">More...</a><br /></td></tr>
-<tr class="separator:ad86a994b6da32cebc6fdb854b12f8072"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab7afcbc0dacf7a340d313c521c6a4d87"><td class="memItemLeft" align="right" valign="top"><a id="ab7afcbc0dacf7a340d313c521c6a4d87"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_mean_pool_layer_base.html#ab7afcbc0dacf7a340d313c521c6a4d87">_init_cache</a> ()</td></tr>
+<tr class="memdesc:ab7afcbc0dacf7a340d313c521c6a4d87"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initializes the cache required for back-propagation. <br /></td></tr>
+<tr class="separator:ab7afcbc0dacf7a340d313c521c6a4d87"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0b9a18aa55e2c5e3653f85950980ab74"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespacecattle.html#a8b9323ad928764340e46f0802bf27fbb">Tensor</a>&lt; Scalar, 4 &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_mean_pool_layer_base.html#a0b9a18aa55e2c5e3653f85950980ab74">_reduce</a> (const <a class="el" href="namespacecattle.html#a8b9323ad928764340e46f0802bf27fbb">Tensor</a>&lt; Scalar, 4 &gt; &amp;patch, std::size_t patch_ind)</td></tr>
+<tr class="memdesc:a0b9a18aa55e2c5e3653f85950980ab74"><td class="mdescLeft">&#160;</td><td class="mdescRight">Reduces the input tensor patch along the specified ranks.  <a href="#a0b9a18aa55e2c5e3653f85950980ab74">More...</a><br /></td></tr>
+<tr class="separator:a0b9a18aa55e2c5e3653f85950980ab74"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a11d69acda36367bdb1187f7485b90f9e"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespacecattle.html#a8b9323ad928764340e46f0802bf27fbb">Tensor</a>&lt; Scalar, 4 &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_mean_pool_layer_base.html#a11d69acda36367bdb1187f7485b90f9e">_d_reduce</a> (const <a class="el" href="namespacecattle.html#a8b9323ad928764340e46f0802bf27fbb">Tensor</a>&lt; Scalar, 4 &gt; &amp;grad, std::size_t patch_ind)</td></tr>
+<tr class="memdesc:a11d69acda36367bdb1187f7485b90f9e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Differentiates the reduction function and returns the derivative of the loss function w.r.t.  <a href="#a11d69acda36367bdb1187f7485b90f9e">More...</a><br /></td></tr>
+<tr class="separator:a11d69acda36367bdb1187f7485b90f9e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="inherit_header pro_methods_classcattle_1_1_pool_layer"><td colspan="2" onclick="javascript:toggleInherit('pro_methods_classcattle_1_1_pool_layer')"><img src="closed.png" alt="-"/>&#160;Protected Member Functions inherited from <a class="el" href="classcattle_1_1_pool_layer.html">cattle::PoolLayer&lt; Scalar, Rank &gt;</a></td></tr>
 <tr class="memitem:a1f08f1fb9ee99afb1a899a38ff12adbf inherit pro_methods_classcattle_1_1_pool_layer"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_pool_layer.html#a1f08f1fb9ee99afb1a899a38ff12adbf">is_input_layer</a> () const</td></tr>
 <tr class="memdesc:a1f08f1fb9ee99afb1a899a38ff12adbf inherit pro_methods_classcattle_1_1_pool_layer"><td class="mdescLeft">&#160;</td><td class="mdescRight">A constant method that returns whether this layer functions as an input layer.  <a href="classcattle_1_1_pool_layer.html#a1f08f1fb9ee99afb1a899a38ff12adbf">More...</a><br /></td></tr>
@@ -179,8 +179,8 @@ class cattle::MeanPoolLayerBase&lt; Scalar, Rank &gt;</h3>
 
 <p>An abstract class template representing a pooling layer that reduces patches of the input by taking their means. </p>
 </div><h2 class="groupheader">Member Function Documentation</h2>
-<a id="ad86a994b6da32cebc6fdb854b12f8072"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ad86a994b6da32cebc6fdb854b12f8072">&#9670;&nbsp;</a></span>d_reduce()</h2>
+<a id="a11d69acda36367bdb1187f7485b90f9e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a11d69acda36367bdb1187f7485b90f9e">&#9670;&nbsp;</a></span>_d_reduce()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -191,7 +191,7 @@ template&lt;typename Scalar, std::size_t Rank&gt; </div>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="namespacecattle.html#a8b9323ad928764340e46f0802bf27fbb">Tensor</a>&lt;Scalar,4&gt; <a class="el" href="classcattle_1_1_mean_pool_layer_base.html">cattle::MeanPoolLayerBase</a>&lt; Scalar, Rank &gt;::d_reduce </td>
+          <td class="memname"><a class="el" href="namespacecattle.html#a8b9323ad928764340e46f0802bf27fbb">Tensor</a>&lt;Scalar,4&gt; <a class="el" href="classcattle_1_1_mean_pool_layer_base.html">cattle::MeanPoolLayerBase</a>&lt; Scalar, Rank &gt;::_d_reduce </td>
           <td>(</td>
           <td class="paramtype">const <a class="el" href="namespacecattle.html#a8b9323ad928764340e46f0802bf27fbb">Tensor</a>&lt; Scalar, 4 &gt; &amp;&#160;</td>
           <td class="paramname"><em>grad</em>, </td>
@@ -226,12 +226,12 @@ template&lt;typename Scalar, std::size_t Rank&gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>The derivative of the loss function w.r.t. the non-reduced patch. </dd></dl>
 
-<p>Implements <a class="el" href="classcattle_1_1_pool_layer.html#aec724492c24bfdcd7873f0ac6fffc176">cattle::PoolLayer&lt; Scalar, Rank &gt;</a>.</p>
+<p>Implements <a class="el" href="classcattle_1_1_pool_layer.html#a88b451faf349bb303657bc6c6d60abf8">cattle::PoolLayer&lt; Scalar, Rank &gt;</a>.</p>
 
 </div>
 </div>
-<a id="a892366c7dec7af411cfe78d56620de2c"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a892366c7dec7af411cfe78d56620de2c">&#9670;&nbsp;</a></span>reduce()</h2>
+<a id="a0b9a18aa55e2c5e3653f85950980ab74"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a0b9a18aa55e2c5e3653f85950980ab74">&#9670;&nbsp;</a></span>_reduce()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -242,7 +242,7 @@ template&lt;typename Scalar, std::size_t Rank&gt; </div>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="namespacecattle.html#a8b9323ad928764340e46f0802bf27fbb">Tensor</a>&lt;Scalar,4&gt; <a class="el" href="classcattle_1_1_mean_pool_layer_base.html">cattle::MeanPoolLayerBase</a>&lt; Scalar, Rank &gt;::reduce </td>
+          <td class="memname"><a class="el" href="namespacecattle.html#a8b9323ad928764340e46f0802bf27fbb">Tensor</a>&lt;Scalar,4&gt; <a class="el" href="classcattle_1_1_mean_pool_layer_base.html">cattle::MeanPoolLayerBase</a>&lt; Scalar, Rank &gt;::_reduce </td>
           <td>(</td>
           <td class="paramtype">const <a class="el" href="namespacecattle.html#a8b9323ad928764340e46f0802bf27fbb">Tensor</a>&lt; Scalar, 4 &gt; &amp;&#160;</td>
           <td class="paramname"><em>patch</em>, </td>
@@ -276,12 +276,12 @@ template&lt;typename Scalar, std::size_t Rank&gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>The reduced tensor. </dd></dl>
 
-<p>Implements <a class="el" href="classcattle_1_1_pool_layer.html#a636cc2f87c0e0e51f4f4a113e9da098c">cattle::PoolLayer&lt; Scalar, Rank &gt;</a>.</p>
+<p>Implements <a class="el" href="classcattle_1_1_pool_layer.html#af4ba868123db71633f79628f5112fa06">cattle::PoolLayer&lt; Scalar, Rank &gt;</a>.</p>
 
 </div>
 </div>
 <hr/>The documentation for this class was generated from the following file:<ul>
-<li>C:/Users/A6714/git/C-ATTL3/C-ATTL3/<a class="el" href="_layer_8hpp_source.html">Layer.hpp</a></li>
+<li>C:/Users/Viktor/git/C-ATTL3/C-ATTL3/<a class="el" href="_layer_8hpp_source.html">Layer.hpp</a></li>
 </ul>
 </div><!-- contents -->
 <!-- start footer part -->

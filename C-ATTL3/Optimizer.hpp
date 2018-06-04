@@ -145,12 +145,14 @@ public:
 	 * @param early_stop An unsigned integer denoting the number of consecutive loss increases
 	 * after which the optimization process is to be terminated prematurely. If it is 0, the
 	 * process is never terminated prematurely.
+	 * @param target_loss The target test loss value. If the test loss reaches this value or
+	 * drops below it, the optimization process is terminated.
 	 * @param verbose Whether the training, test, and regularization losses for each epoch should
 	 * be printed to the standard out stream.
 	 * @return The test loss of the last epoch.
 	 */
 	inline Scalar optimize(Net& net, Provider& training_prov, Provider& test_prov, unsigned epochs, unsigned early_stop = 0,
-			bool verbose = true) {
+			Scalar target_loss = internal::NumericUtils<Scalar>::MIN, bool verbose = true) {
 		assert(net.get_input_dims() == training_prov.get_obs_dims());
 		assert(net.get_output_dims() == training_prov.get_obj_dims());
 		assert(training_prov.get_obs_dims() == test_prov.get_obs_dims());
@@ -181,12 +183,14 @@ public:
 				if (verbose)
 					std::cout << " *****INCREASED LOSS*****";
 				if (early_stop > 0 && cons_loss_inc >= early_stop)
-					return prev_test_loss;
+					break;
 			} else
 				cons_loss_inc = 0;
 			if (verbose)
 				std::cout << std::endl << std::endl;
 			prev_test_loss = test_loss;
+			if (prev_test_loss <= target_loss)
+				break;
 		}
 		// Reset the providers.
 		training_prov.reset();
@@ -194,6 +198,73 @@ public:
 		// Empty the network caches.
 		net.empty_caches();
 		return prev_test_loss;
+	}
+	/**
+	 * It optimizes the specified neural network using the given data providers according to the
+	 * optimizers loss function. It also fits the optimizer to the network before the otpimization
+	 * begins.
+	 *
+	 * @param net A reference to the network whose parameters are to be optimized.
+	 * @param training_prov A reference to the provider of the training data.
+	 * @param test_prov A reference to the provider of the test data.
+	 * @param epochs The number of epochs for which the optimization should proceed.
+	 * @param verbose Whether the training, test, and regularization losses for each epoch should
+	 * be printed to the standard out stream.
+	 * @return The test loss of the last epoch.
+	 */
+	inline Scalar optimize(Net& net, Provider& training_prov, Provider& test_prov, unsigned epochs, bool verbose = true) {
+		return optimize(net, training_prov, test_prov, epochs, 0, internal::NumericUtils<Scalar>::MIN, verbose);
+	}
+	/**
+	 * It trains the specified neural network using the given training data provider according to
+	 * the optimizers loss function for the specified number of epochs. It does not fit the
+	 * optimizer to the network, thus the #fit(Net&) method might need to be invoked beforehand.
+	 *
+	 * @param net A reference to the network whose parameters are to be optimized.
+	 * @param prov A reference to the provider of the training data.
+	 * @param epochs The number of epochs for which the training should proceed.
+	 * @param early_stop An unsigned integer denoting the number of consecutive loss increases
+	 * after which the optimization process is to be terminated prematurely. If it is 0, the
+	 * process is never terminated prematurely.
+	 * @param target_loss The target test loss value. If the test loss reaches this value or
+	 * drops below it, the optimization process is terminated.
+	 * @param verbose Whether the training losses for of the epochs should be printed to the
+	 * standard out stream.
+	 * @return The training loss of the last epoch.
+	 */
+	inline Scalar train(Net& net, Provider& prov, unsigned epochs, unsigned early_stop = 0,
+			Scalar target_loss = internal::NumericUtils<Scalar>::MIN, bool verbose = false) {
+		assert(net.get_input_dims() == prov.get_obs_dims());
+		assert(net.get_output_dims() == prov.get_obj_dims());
+		Scalar train_loss;
+		Scalar prev_train_loss = internal::NumericUtils<Scalar>::MAX;
+		unsigned cons_loss_inc = 0;
+		if (verbose)
+			std::cout << "<Training>" << std::endl;
+		for (unsigned i = 1; i <= epochs; ++i) {
+			if (verbose)
+				std::cout << "Epoch " << std::setw(3) << i << std::string(28, '-') << std::endl;
+			prov.reset();
+			train_loss = _train(net, prov, i, verbose);
+			if (verbose)
+				std::cout << "\ttraining loss: " << std::to_string(train_loss);
+			if (train_loss >= prev_train_loss) {
+				cons_loss_inc++;
+				if (verbose)
+					std::cout << " *****INCREASED LOSS*****";
+				if (early_stop > 0 && cons_loss_inc >= early_stop)
+					break;
+			} else
+				cons_loss_inc = 0;
+			if (verbose)
+				std::cout << std::endl << std::endl;
+			prev_train_loss = train_loss;
+			if (prev_train_loss <= target_loss)
+				break;
+		}
+		prov.reset();
+		net.empty_caches();
+		return prev_train_loss;
 	}
 	/**
 	 * It trains the specified neural network using the given training data provider according to
@@ -207,23 +278,8 @@ public:
 	 * standard out stream.
 	 * @return The training loss of the last epoch.
 	 */
-	inline Scalar train(Net& net, Provider& prov, unsigned epochs, bool verbose = true) {
-		assert(net.get_input_dims() == prov.get_obs_dims());
-		assert(net.get_output_dims() == prov.get_obj_dims());
-		Scalar train_loss;
-		if (verbose)
-			std::cout << "<Training>" << std::endl;
-		for (unsigned i = 1; i <= epochs; ++i) {
-			if (verbose)
-				std::cout << "Epoch " << std::setw(3) << i << std::string(28, '-') << std::endl;
-			prov.reset();
-			train_loss = _train(net, prov, i, verbose);
-			if (verbose)
-				std::cout << "\ttraining loss: " << std::to_string(train_loss) << std::endl;
-		}
-		prov.reset();
-		net.empty_caches();
-		return train_loss;
+	inline Scalar train(Net& net, Provider& prov, unsigned epochs, bool verbose = false) {
+		return train(net, prov, epochs, 0, internal::NumericUtils<Scalar>::MIN, verbose);
 	}
 	/**
 	 * It tests the specified neural network using the given test data provider according to the
@@ -236,7 +292,7 @@ public:
 	 * be printed to the standard out stream.
 	 * @return The test loss of the last epoch.
 	 */
-	inline Scalar test(Net& net, Provider& prov, bool verbose = true) {
+	inline Scalar test(Net& net, Provider& prov, bool verbose = false) {
 		assert(net.get_input_dims() == prov.get_obs_dims());
 		assert(net.get_output_dims() == prov.get_obj_dims());
 		if (verbose)
