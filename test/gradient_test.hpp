@@ -932,7 +932,7 @@ template<typename Scalar, std::size_t Rank>
 inline void negated_loss_grad_test(const Dimensions<std::size_t,Rank>& dims, std::size_t samples = 5,
 		std::size_t time_steps = 3) {
 	// Non-sequential.
-	auto net = reg_neural_net<Scalar,Rank>(dims);
+	auto net = neural_net<Scalar,Rank>(dims);
 	net->init();
 	Dimensions<std::size_t,Rank + 1> batch_dims = dims.template promote<>();
 	batch_dims(0) = samples;
@@ -984,7 +984,7 @@ template<typename Scalar, std::size_t Rank>
 inline void absolute_loss_grad_test(const Dimensions<std::size_t,Rank>& dims, std::size_t samples = 5,
 		std::size_t time_steps = 3) {
 	// Non-sequential.
-	auto net = reg_neural_net<Scalar,Rank>(dims);
+	auto net = neural_net<Scalar,Rank>(dims);
 	net->init();
 	Dimensions<std::size_t,Rank + 1> batch_dims = dims.template promote<>();
 	batch_dims(0) = samples;
@@ -1199,7 +1199,7 @@ template<typename Scalar, std::size_t Rank>
 inline void softmax_cross_entropy_loss_grad_test(const Dimensions<std::size_t,Rank>& dims, std::size_t samples = 5,
 		std::size_t time_steps = 3) {
 	// Non-sequential.
-	auto net = reg_neural_net<Scalar,Rank>(dims);
+	auto net = neural_net<Scalar,Rank>(dims);
 	net->init();
 	Dimensions<std::size_t,Rank + 1> batch_dims = dims.template promote<>();
 	batch_dims(0) = samples;
