@@ -343,8 +343,8 @@ inline void adam_train_test() {
 	const unsigned samples = 20;
 	const unsigned time_steps = 3;
 	const unsigned epochs = 500;
-	const Scalar epsilon = .01;
-	const Scalar seq_epsilon = .05;
+	const Scalar epsilon = .015;
+	const Scalar seq_epsilon = .1;
 	const Dimensions<std::size_t,3> dims({ 6u, 6u, 2u });
 	auto loss = std::make_shared<SquaredLoss<Scalar,3,false>>();
 	ffnn_train_test<Scalar,3>("adam batch",
@@ -358,7 +358,7 @@ inline void adam_train_test() {
 			dims, samples, epochs, epsilon);
 	auto seq_loss = std::make_shared<SquaredLoss<Scalar,3,true>>();
 	rnn_train_test<Scalar,3>("adam batch",
-			OptimizerPtr<Scalar,3,true>(new AdamOptimizer<Scalar,3,true>(seq_loss, samples, 1e-2)),
+			OptimizerPtr<Scalar,3,true>(new AdamOptimizer<Scalar,3,true>(seq_loss, samples, 5e-3)),
 			dims, samples, time_steps, epochs, seq_epsilon);
 	rnn_train_test<Scalar,3>("adam mini-batch",
 			OptimizerPtr<Scalar,3,true>(new AdamOptimizer<Scalar,3,true>(seq_loss, 10, 1e-3, 5e-2, 5e-3)),
@@ -381,8 +381,8 @@ inline void adamax_train_test() {
 	const unsigned samples = 20;
 	const unsigned time_steps = 3;
 	const unsigned epochs = 500;
-	const Scalar epsilon = .01;
-	const Scalar seq_epsilon = .05;
+	const Scalar epsilon = .015;
+	const Scalar seq_epsilon = .1;
 	const Dimensions<std::size_t,3> dims({ 6u, 6u, 2u });
 	auto loss = std::make_shared<SquaredLoss<Scalar,3,false>>();
 	ffnn_train_test<Scalar,3>("adamax batch",
@@ -420,7 +420,7 @@ inline void nadam_train_test() {
 	const unsigned time_steps = 3;
 	const unsigned epochs = 500;
 	const Scalar epsilon = .01;
-	const Scalar seq_epsilon = .05;
+	const Scalar seq_epsilon = .06;
 	const Dimensions<std::size_t,3> dims({ 6u, 6u, 2u });
 	auto loss = std::make_shared<SquaredLoss<Scalar,3,false>>();
 	ffnn_train_test<Scalar,3>("nadam batch",
@@ -457,8 +457,8 @@ inline void amsgrad_train_test() {
 	const unsigned samples = 20;
 	const unsigned time_steps = 3;
 	const unsigned epochs = 500;
-	const Scalar epsilon = .01;
-	const Scalar seq_epsilon = .05;
+	const Scalar epsilon = .015;
+	const Scalar seq_epsilon = .1;
 	const Dimensions<std::size_t,3> dims({ 6u, 6u, 2u });
 	auto loss = std::make_shared<SquaredLoss<Scalar,3,false>>();
 	ffnn_train_test<Scalar,3>("amsgrad batch",

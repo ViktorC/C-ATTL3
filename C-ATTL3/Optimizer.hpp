@@ -987,7 +987,8 @@ protected:
  * \see https://openreview.net/pdf?id=ryQu7f-RZ
  */
 template<typename Scalar, std::size_t Rank, bool Sequential>
-class AMSGradOptimizer : public SGDOptimizer<Scalar,Rank,Sequential> {
+class AMSGradOptimizer : public AdamOptimizer<Scalar,Rank,Sequential> {
+	typedef AdamOptimizer<Scalar,Rank,Sequential> Base;
 public:
 	/**
 	 * @param loss A shared pointer to the loss function to use.
@@ -995,54 +996,37 @@ public:
 	 * be greater than 0.
 	 * @param learning_rate The learning rate (a.k.a. step size) to use. It is expected to
 	 * be greater than 0.
+	 * @param l1_decay The decay rate of the accumulated parameter gradients. It is expected
+	 * to be in the range [0,1]. The greater it is, the faster the accumulated gradients
+	 * decay.
+	 * @param l2_decay The decay rate of the accumulated squared parameter gradients. It is
+	 * expected to be in the range [0,1]. The greater it is, the faster the accumulated
+	 * squared gradients decay.
 	 * @param epsilon A small constant used to maintain numerical stability.
 	 */
 	inline AMSGradOptimizer(LossSharedPtr<Scalar,Rank,Sequential> loss, unsigned batch_size = 1, Scalar learning_rate = 1e-3,
-			Scalar epsilon = internal::NumericUtils<Scalar>::EPSILON2) :
-				SGDOptimizer<Scalar,Rank,Sequential>::SGDOptimizer(loss, batch_size),
-				learning_rate(learning_rate),
-				epsilon(epsilon) {
-		assert(learning_rate > 0);
-		assert(epsilon > 0);
-	}
+			Scalar l1_decay = 1e-1, Scalar l2_decay = 1e-3, Scalar epsilon = internal::NumericUtils<Scalar>::EPSILON2) :
+				Base::AdamOptimizer(loss, batch_size, learning_rate, l1_decay, l2_decay, epsilon) { }
 	inline void fit(NeuralNetwork<Scalar,Rank,Sequential>& net) {
-		std::vector<Layer<Scalar,Rank>*> layers = Optimizer<Scalar,Rank,Sequential>::get_layers(net);
-		pgn_vec = std::vector<ParamGradNorms>(layers.size());
-		for (unsigned i = 0; i < pgn_vec.size(); ++i) {
-			Layer<Scalar,Rank>& layer = *(layers[i]);
-			const Matrix<Scalar>& param_grads = Optimizer<Scalar,Rank,Sequential>::get_params_grad(layer);
-			ParamGradNorms vel;
-			vel.params_grad_l1 = Matrix<Scalar>::Zero(param_grads.rows(), param_grads.cols());
-			vel.params_grad_l2 = Matrix<Scalar>::Zero(vel.params_grad_l1.rows(), vel.params_grad_l1.cols());
-			vel.params_grad_l2_max = Matrix<Scalar>::Zero(vel.params_grad_l1.rows(), vel.params_grad_l1.cols());
-			pgn_vec[i] = vel;
-		}
+		Base::fit(net);
+		params_grad_l2_max = std::vector<Matrix<Scalar>>(Base::pgn_vec.size());
+		for (unsigned i = 0; i < params_grad_l2_max.size(); ++i)
+			params_grad_l2_max[i] = Base::pgn_vec[i].params_grad_l2;
 	}
 protected:
 	inline void _update_params(Layer<Scalar,Rank>& layer, unsigned i, unsigned epoch) {
-		ParamGradNorms& grad_norms = pgn_vec[i];
+		typename Base::ParamGradNorms& grad_norms = Base::pgn_vec[i];
 		Matrix<Scalar>& params = Optimizer<Scalar,Rank,Sequential>::get_params(layer);
 		const Matrix<Scalar>& params_grad = Optimizer<Scalar,Rank,Sequential>::get_params_grad(layer);
-		grad_norms.params_grad_l1 = (1 - l1_decay) * grad_norms.params_grad_l1 + l1_decay * params_grad;
-		grad_norms.params_grad_l2 = (1 - l2_decay) * grad_norms.params_grad_l2 +
-				l2_decay * params_grad.cwiseProduct(params_grad);
-		grad_norms.params_grad_l2_max = grad_norms.params_grad_l2.cwiseMax(grad_norms.params_grad_l2_max);
-		params -= (learning_rate * grad_norms.params_grad_l1.array() /
-				(grad_norms.params_grad_l2_max.array() + epsilon).sqrt()).matrix();
+		grad_norms.params_grad_l1 = (1 - Base::l1_decay) * grad_norms.params_grad_l1 + Base::l1_decay * params_grad;
+		grad_norms.params_grad_l2 = (1 - Base::l2_decay) * grad_norms.params_grad_l2 +
+				Base::l2_decay * params_grad.cwiseProduct(params_grad);
+		params_grad_l2_max[i] = grad_norms.params_grad_l2.cwiseMax(params_grad_l2_max[i]);
+		params -= (Base::learning_rate * grad_norms.params_grad_l1.array() /
+				(params_grad_l2_max[i].array() + Base::epsilon).sqrt()).matrix();
 	}
 private:
-	const Scalar learning_rate;
-	const Scalar epsilon;
-	/**
-	 * A struct containing the first and second norm averages and the maximum second norm of the parameter
-	 * gradients of a layer.
-	 */
-	struct ParamGradNorms {
-		Matrix<Scalar> params_grad_l1;
-		Matrix<Scalar> params_grad_l2;
-		Matrix<Scalar> params_grad_l2_max;
-	};
-	std::vector<ParamGradNorms> pgn_vec;
+	std::vector<Matrix<Scalar>> params_grad_l2_max;
 };
 
 } /* namespace cattle */

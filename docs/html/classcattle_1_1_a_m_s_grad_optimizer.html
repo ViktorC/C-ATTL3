@@ -85,6 +85,7 @@ Inheritance diagram for cattle::AMSGradOptimizer&lt; Scalar, Rank, Sequential &g
  <div class="center">
   <img src="classcattle_1_1_a_m_s_grad_optimizer.png" usemap="#cattle::AMSGradOptimizer_3C_20Scalar_2C_20Rank_2C_20Sequential_20_3E_map" alt=""/>
   <map id="cattle::AMSGradOptimizer_3C_20Scalar_2C_20Rank_2C_20Sequential_20_3E_map" name="cattle::AMSGradOptimizer_3C_20Scalar_2C_20Rank_2C_20Sequential_20_3E_map">
+<area href="classcattle_1_1_adam_optimizer.html" title="A class template for the Adam optimization algorithm. " alt="cattle::AdamOptimizer&lt; Scalar, Rank, Sequential &gt;" shape="rect" coords="0,112,322,136"/>
 <area href="classcattle_1_1_s_g_d_optimizer.html" title="An abstract class template for stochastic gradient descent (SGD) optimizers. " alt="cattle::SGDOptimizer&lt; Scalar, Rank, Sequential &gt;" shape="rect" coords="0,56,322,80"/>
 <area href="classcattle_1_1_optimizer.html" title="An abstract class template for neural network optimizer algorithm implementations. " alt="cattle::Optimizer&lt; Scalar, Rank, Sequential &gt;" shape="rect" coords="0,0,322,24"/>
 </map>
@@ -92,11 +93,14 @@ Inheritance diagram for cattle::AMSGradOptimizer&lt; Scalar, Rank, Sequential &g
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:a35d3688774cbec9d67b67ab60b35020b"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_a_m_s_grad_optimizer.html#a35d3688774cbec9d67b67ab60b35020b">AMSGradOptimizer</a> (<a class="el" href="namespacecattle.html#a5fa4a5f7df1ad35afbadd9975ec24a12">LossSharedPtr</a>&lt; Scalar, Rank, Sequential &gt; loss, unsigned batch_size=1, Scalar learning_rate=1e-3, Scalar epsilon=internal::NumericUtils&lt; Scalar &gt;::EPSILON2)</td></tr>
-<tr class="separator:a35d3688774cbec9d67b67ab60b35020b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:adb9b23602f50e70ab41610d411fc7c23"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_a_m_s_grad_optimizer.html#adb9b23602f50e70ab41610d411fc7c23">AMSGradOptimizer</a> (<a class="el" href="namespacecattle.html#a5fa4a5f7df1ad35afbadd9975ec24a12">LossSharedPtr</a>&lt; Scalar, Rank, Sequential &gt; loss, unsigned batch_size=1, Scalar learning_rate=1e-3, Scalar l1_decay=1e-1, Scalar l2_decay=1e-3, Scalar epsilon=internal::NumericUtils&lt; Scalar &gt;::EPSILON2)</td></tr>
+<tr class="separator:adb9b23602f50e70ab41610d411fc7c23"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a9e3b2f0abd9e9607b955b611e21c78a3"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_a_m_s_grad_optimizer.html#a9e3b2f0abd9e9607b955b611e21c78a3">fit</a> (<a class="el" href="classcattle_1_1_neural_network.html">NeuralNetwork</a>&lt; Scalar, Rank, Sequential &gt; &amp;net)</td></tr>
 <tr class="memdesc:a9e3b2f0abd9e9607b955b611e21c78a3"><td class="mdescLeft">&#160;</td><td class="mdescRight">It fits the optimizer to the neural network.  <a href="#a9e3b2f0abd9e9607b955b611e21c78a3">More...</a><br /></td></tr>
 <tr class="separator:a9e3b2f0abd9e9607b955b611e21c78a3"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="inherit_header pub_methods_classcattle_1_1_adam_optimizer"><td colspan="2" onclick="javascript:toggleInherit('pub_methods_classcattle_1_1_adam_optimizer')"><img src="closed.png" alt="-"/>&#160;Public Member Functions inherited from <a class="el" href="classcattle_1_1_adam_optimizer.html">cattle::AdamOptimizer&lt; Scalar, Rank, Sequential &gt;</a></td></tr>
+<tr class="memitem:acd21a516925a4de03ce63c9ac38ad735 inherit pub_methods_classcattle_1_1_adam_optimizer"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_adam_optimizer.html#acd21a516925a4de03ce63c9ac38ad735">AdamOptimizer</a> (<a class="el" href="namespacecattle.html#a5fa4a5f7df1ad35afbadd9975ec24a12">LossSharedPtr</a>&lt; Scalar, Rank, Sequential &gt; loss, unsigned batch_size=1, Scalar learning_rate=1e-3, Scalar l1_decay=1e-1, Scalar l2_decay=1e-3, Scalar epsilon=internal::NumericUtils&lt; Scalar &gt;::EPSILON2)</td></tr>
+<tr class="separator:acd21a516925a4de03ce63c9ac38ad735 inherit pub_methods_classcattle_1_1_adam_optimizer"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="inherit_header pub_methods_classcattle_1_1_optimizer"><td colspan="2" onclick="javascript:toggleInherit('pub_methods_classcattle_1_1_optimizer')"><img src="closed.png" alt="-"/>&#160;Public Member Functions inherited from <a class="el" href="classcattle_1_1_optimizer.html">cattle::Optimizer&lt; Scalar, Rank, Sequential &gt;</a></td></tr>
 <tr class="memitem:a0db51fa56d54ea3801bc2fe07ac9bd94 inherit pub_methods_classcattle_1_1_optimizer"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_optimizer.html#a0db51fa56d54ea3801bc2fe07ac9bd94">verify_gradients</a> (<a class="el" href="classcattle_1_1_neural_network.html">Net</a> &amp;net, <a class="el" href="classcattle_1_1_data_provider.html">Provider</a> &amp;provider, bool verbose=true, Scalar step_size=<a class="el" href="classcattle_1_1internal_1_1_numeric_utils.html">internal::NumericUtils</a>&lt; Scalar &gt;::EPSILON2/2, Scalar abs_epsilon=<a class="el" href="classcattle_1_1internal_1_1_numeric_utils.html">internal::NumericUtils</a>&lt; Scalar &gt;::EPSILON2, Scalar rel_epsilon=<a class="el" href="classcattle_1_1internal_1_1_numeric_utils.html">internal::NumericUtils</a>&lt; Scalar &gt;::EPSILON2) const</td></tr>
 <tr class="memdesc:a0db51fa56d54ea3801bc2fe07ac9bd94 inherit pub_methods_classcattle_1_1_optimizer"><td class="mdescLeft">&#160;</td><td class="mdescRight">It performs a gradient check to verify the correctness of the neural network and layer implementations.  <a href="classcattle_1_1_optimizer.html#a0db51fa56d54ea3801bc2fe07ac9bd94">More...</a><br /></td></tr>
@@ -168,8 +172,8 @@ class cattle::AMSGradOptimizer&lt; Scalar, Rank, Sequential &gt;</h3>
 <p>A class template for the AMSGrad optimization algorithm. </p>
 <dl class="section see"><dt>See also</dt><dd><a href="https://openreview.net/pdf?id=ryQu7f-RZ">https://openreview.net/pdf?id=ryQu7f-RZ</a> </dd></dl>
 </div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
-<a id="a35d3688774cbec9d67b67ab60b35020b"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a35d3688774cbec9d67b67ab60b35020b">&#9670;&nbsp;</a></span>AMSGradOptimizer()</h2>
+<a id="adb9b23602f50e70ab41610d411fc7c23"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#adb9b23602f50e70ab41610d411fc7c23">&#9670;&nbsp;</a></span>AMSGradOptimizer()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -201,6 +205,18 @@ template&lt;typename Scalar , std::size_t Rank, bool Sequential&gt; </div>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">Scalar&#160;</td>
+          <td class="paramname"><em>l1_decay</em> = <code>1e-1</code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">Scalar&#160;</td>
+          <td class="paramname"><em>l2_decay</em> = <code>1e-3</code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">Scalar&#160;</td>
           <td class="paramname"><em>epsilon</em> = <code><a class="el" href="classcattle_1_1internal_1_1_numeric_utils.html">internal::NumericUtils</a>&lt;Scalar&gt;::EPSILON2</code>&#160;</td>
         </tr>
         <tr>
@@ -220,6 +236,8 @@ template&lt;typename Scalar , std::size_t Rank, bool Sequential&gt; </div>
     <tr><td class="paramname">loss</td><td>A shared pointer to the loss function to use. </td></tr>
     <tr><td class="paramname">batch_size</td><td>The batch size to use for training and testing. It is expected to be greater than 0. </td></tr>
     <tr><td class="paramname">learning_rate</td><td>The learning rate (a.k.a. step size) to use. It is expected to be greater than 0. </td></tr>
+    <tr><td class="paramname">l1_decay</td><td>The decay rate of the accumulated parameter gradients. It is expected to be in the range [0,1]. The greater it is, the faster the accumulated gradients decay. </td></tr>
+    <tr><td class="paramname">l2_decay</td><td>The decay rate of the accumulated squared parameter gradients. It is expected to be in the range [0,1]. The greater it is, the faster the accumulated squared gradients decay. </td></tr>
     <tr><td class="paramname">epsilon</td><td>A small constant used to maintain numerical stability. </td></tr>
   </table>
   </dd>
@@ -280,7 +298,7 @@ template&lt;typename Scalar , std::size_t Rank, bool Sequential&gt; </div>
   </dd>
 </dl>
 
-<p>Implements <a class="el" href="classcattle_1_1_s_g_d_optimizer.html#ae937dbf0ae64bce50d53e3593be25385">cattle::SGDOptimizer&lt; Scalar, Rank, Sequential &gt;</a>.</p>
+<p>Reimplemented from <a class="el" href="classcattle_1_1_adam_optimizer.html#aca3d6c46cd4a9be07ccd4094ae5efe6c">cattle::AdamOptimizer&lt; Scalar, Rank, Sequential &gt;</a>.</p>
 
 </div>
 </div>
@@ -319,12 +337,12 @@ template&lt;typename Scalar , std::size_t Rank, bool Sequential&gt; </div>
   </dd>
 </dl>
 
-<p>Implements <a class="el" href="classcattle_1_1_optimizer.html#a5ea3b9b9173bf065c6d3f3978b57b823">cattle::Optimizer&lt; Scalar, Rank, Sequential &gt;</a>.</p>
+<p>Reimplemented from <a class="el" href="classcattle_1_1_adam_optimizer.html#a3d0ea04bf2796b9364eb9fcb42026c9f">cattle::AdamOptimizer&lt; Scalar, Rank, Sequential &gt;</a>.</p>
 
 </div>
 </div>
 <hr/>The documentation for this class was generated from the following file:<ul>
-<li>C:/Users/A6714/git/C-ATTL3/C-ATTL3/<a class="el" href="_optimizer_8hpp_source.html">Optimizer.hpp</a></li>
+<li>C:/Users/Viktor/git/C-ATTL3/C-ATTL3/<a class="el" href="_optimizer_8hpp_source.html">Optimizer.hpp</a></li>
 </ul>
 </div><!-- contents -->
 <!-- start footer part -->
