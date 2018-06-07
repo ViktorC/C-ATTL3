@@ -2,7 +2,7 @@ var searchData=
 [
   ['parallelneuralnetwork',['ParallelNeuralNetwork',['../classcattle_1_1_parallel_neural_network.html',1,'cattle::ParallelNeuralNetwork&lt; Scalar, Rank, MergeType &gt;'],['../classcattle_1_1_parallel_neural_network.html#a13e1a4201d072bca0476a2280b0eb40f',1,'cattle::ParallelNeuralNetwork::ParallelNeuralNetwork(std::vector&lt; Lane &gt; &amp;&amp;lanes, bool foremost=true)'],['../classcattle_1_1_parallel_neural_network.html#a31b122373065a443474ce5a5c2dd7188',1,'cattle::ParallelNeuralNetwork::ParallelNeuralNetwork(Base &amp;&amp;lane, bool foremost=true)']]],
   ['paramaterregularization',['ParamaterRegularization',['../classcattle_1_1_paramater_regularization.html',1,'cattle']]],
-  ['paramgradandupdatesqrs',['ParamGradAndUpdateSqrs',['../structcattle_1_1_adadelta_optimizer_1_1_param_grad_and_update_sqrs.html',1,'cattle::AdadeltaOptimizer']]],
+  ['paramgradandupdatesqrs',['ParamGradAndUpdateSqrs',['../structcattle_1_1_ada_delta_optimizer_1_1_param_grad_and_update_sqrs.html',1,'cattle::AdaDeltaOptimizer']]],
   ['paramgradnorms',['ParamGradNorms',['../structcattle_1_1_adam_optimizer_1_1_param_grad_norms.html',1,'cattle::AdamOptimizer']]],
   ['paramregsharedptr',['ParamRegSharedPtr',['../namespacecattle.html#a083ab63c64a5c935b2d2cd3f03c4e27a',1,'cattle']]],
   ['partitiondataprovider',['PartitionDataProvider',['../classcattle_1_1_partition_data_provider.html',1,'cattle']]],

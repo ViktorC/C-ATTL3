@@ -44,7 +44,7 @@ int main() {
 	nn.init();
 	// Specify the loss and the optimizer.
 	auto loss = std::make_shared<CrossEntropyLoss<float,3,false>>();
-	AdadeltaOptimizer<float,3,false> opt(loss, 200);
+	AdaDeltaOptimizer<float,3,false> opt(loss, 200);
 	// Optimize the network and measure how long it takes.
 	std::chrono::steady_clock::time_point begin = std::chrono::steady_clock::now();
 	opt.optimize(nn, file_train_prov, file_test_prov, 10);

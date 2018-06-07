@@ -2,7 +2,7 @@ var searchData=
 [
   ['parallelneuralnetwork',['ParallelNeuralNetwork',['../classcattle_1_1_parallel_neural_network.html',1,'cattle']]],
   ['paramaterregularization',['ParamaterRegularization',['../classcattle_1_1_paramater_regularization.html',1,'cattle']]],
-  ['paramgradandupdatesqrs',['ParamGradAndUpdateSqrs',['../structcattle_1_1_adadelta_optimizer_1_1_param_grad_and_update_sqrs.html',1,'cattle::AdadeltaOptimizer']]],
+  ['paramgradandupdatesqrs',['ParamGradAndUpdateSqrs',['../structcattle_1_1_ada_delta_optimizer_1_1_param_grad_and_update_sqrs.html',1,'cattle::AdaDeltaOptimizer']]],
   ['paramgradnorms',['ParamGradNorms',['../structcattle_1_1_adam_optimizer_1_1_param_grad_norms.html',1,'cattle::AdamOptimizer']]],
   ['partitiondataprovider',['PartitionDataProvider',['../classcattle_1_1_partition_data_provider.html',1,'cattle']]],
   ['pcapreprocessor',['PCAPreprocessor',['../classcattle_1_1_p_c_a_preprocessor.html',1,'cattle']]],

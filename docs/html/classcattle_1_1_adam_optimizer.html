@@ -96,7 +96,7 @@ Inheritance diagram for cattle::AdamOptimizer&lt; Scalar, Rank, Sequential &gt;:
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="nested-classes"></a>
 Classes</h2></td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structcattle_1_1_adam_optimizer_1_1_param_grad_norms.html">ParamGradNorms</a></td></tr>
-<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">A struct containing the accumulated first and second norms of the parameter gradients of a layer.  <a href="structcattle_1_1_adam_optimizer_1_1_param_grad_norms.html#details">More...</a><br /></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">A struct containing the moving averages of the first and second norms of the parameter gradients of a layer.  <a href="structcattle_1_1_adam_optimizer_1_1_param_grad_norms.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
@@ -175,6 +175,7 @@ Additional Inherited Members</h2></td></tr>
 class cattle::AdamOptimizer&lt; Scalar, Rank, Sequential &gt;</h3>
 
 <p>A class template for the Adam optimization algorithm. </p>
+<dl class="section see"><dt>See also</dt><dd><a href="https://arxiv.org/abs/1412.6980">https://arxiv.org/abs/1412.6980</a> </dd></dl>
 </div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
 <a id="acd21a516925a4de03ce63c9ac38ad735"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#acd21a516925a4de03ce63c9ac38ad735">&#9670;&nbsp;</a></span>AdamOptimizer()</h2>
@@ -348,7 +349,7 @@ template&lt;typename Scalar , std::size_t Rank, bool Sequential&gt; </div>
 </div>
 </div>
 <hr/>The documentation for this class was generated from the following file:<ul>
-<li>C:/Users/Viktor/git/C-ATTL3/C-ATTL3/<a class="el" href="_optimizer_8hpp_source.html">Optimizer.hpp</a></li>
+<li>C:/Users/A6714/git/C-ATTL3/C-ATTL3/<a class="el" href="_optimizer_8hpp_source.html">Optimizer.hpp</a></li>
 </ul>
 </div><!-- contents -->
 <!-- start footer part -->

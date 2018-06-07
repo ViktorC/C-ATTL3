@@ -89,12 +89,13 @@ The library also provides optimizers that can be used to train the networks via 
     * [VanillaSGDOptimizer](https://viktorc.github.io/C-ATTL3/html/classcattle_1_1_vanilla_s_g_d_optimizer.html)
     * [MomentumAcceleratedSGDOptimizer](https://viktorc.github.io/C-ATTL3/html/classcattle_1_1_momentum_accelerated_s_g_d_optimizer.html)
       * [NesterovMomentumAcceleratedSGDOptimizer](https://viktorc.github.io/C-ATTL3/html/classcattle_1_1_nesterov_momentum_accelerated_s_g_d_optimizer.html)
-    * [AdagradOptimizer](https://viktorc.github.io/C-ATTL3/html/classcattle_1_1_adagrad_optimizer.html)
+    * [AdaGradOptimizer](https://viktorc.github.io/C-ATTL3/html/classcattle_1_1_ada_grad_optimizer.html)
       * [RMSPropOptimizer](https://viktorc.github.io/C-ATTL3/html/classcattle_1_1_r_m_s_prop_optimizer.html)
-    * [AdadeltaOptimizer](https://viktorc.github.io/C-ATTL3/html/classcattle_1_1_adadelta_optimizer.html)
+    * [AdaDeltaOptimizer](https://viktorc.github.io/C-ATTL3/html/classcattle_1_1_ada_delta_optimizer.html)
     * [AdamOptimizer](https://viktorc.github.io/C-ATTL3/html/classcattle_1_1_adam_optimizer.html)
       * [AdaMaxOptimizer](https://viktorc.github.io/C-ATTL3/html/classcattle_1_1_ada_max_optimizer.html)
       * [NadamOptimizer](https://viktorc.github.io/C-ATTL3/html/classcattle_1_1_nadam_optimizer.html)
+    * [AMSGradOptimizer](https://viktorc.github.io/C-ATTL3/html/classcattle_1_1_a_m_s_grad_optimizer.html)
 
 These optimizers all aim to minimize a loss function with respect to the learnable parameters of the layers making up a neural network. The direction and magnitude of the updates depend on the update schemes of the optimizers and on the derivatives of the loss function with respect to the parameters as computed during back-propagation. Some of the optimizers maintain moving averages over the gradients to simulate momentum and reduce the chances of getting stuck in local minima, some use annealing to reduce the magnitude of updates over 'time' so that they can settle on a minimum instead of dancing around it, some use individual parameter-specific learning rates, and others use combinations of these techniques.
 

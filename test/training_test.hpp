@@ -78,7 +78,7 @@ inline void ffnn_train_test(std::string name, OptimizerPtr<Scalar,Rank,false> op
 
 /**
  * @param name The name of the training test.
- * @param opt The optimizer to use to train the recurrent network.
+ * @param opt The optimizer to use to train the network.
  * @param input_dims The input dimensions of the network.
  * @param samples The total number of data samples to include in the training data.
  * @param time_steps The number of time steps each sample is to contain.
@@ -118,23 +118,23 @@ inline void vanilla_sgd_train_test() {
 	const Scalar seq_epsilon = .25;
 	const Dimensions<std::size_t,3> dims({ 6u, 6u, 2u });
 	auto loss = std::make_shared<SquaredLoss<Scalar,3,false>>();
-	ffnn_train_test<Scalar,3>("vanilla sgd feedforward batch",
+	ffnn_train_test<Scalar,3>("vanilla sgd batch",
 			OptimizerPtr<Scalar,3,false>(new VanillaSGDOptimizer<Scalar,3,false>(loss, samples, 2e-3)),
 			dims, samples, epochs, epsilon);
-	ffnn_train_test<Scalar,3>("vanilla sgd feedforward mini-batch",
+	ffnn_train_test<Scalar,3>("vanilla sgd mini-batch",
 			OptimizerPtr<Scalar,3,false>(new VanillaSGDOptimizer<Scalar,3,false>(loss, 10, 5e-4)),
 			dims, samples, epochs, epsilon);
-	ffnn_train_test<Scalar,3>("vanilla sgd feedforward online",
+	ffnn_train_test<Scalar,3>("vanilla sgd online",
 			OptimizerPtr<Scalar,3,false>(new VanillaSGDOptimizer<Scalar,3,false>(loss, 1, 1e-4)),
 			dims, samples, epochs, epsilon);
 	auto seq_loss = std::make_shared<SquaredLoss<Scalar,3,true>>();
-	rnn_train_test<Scalar,3>("vanilla sgd recurrent batch",
+	rnn_train_test<Scalar,3>("vanilla sgd batch",
 			OptimizerPtr<Scalar,3,true>(new VanillaSGDOptimizer<Scalar,3,true>(seq_loss, samples, 2e-3)),
 			dims, samples, time_steps, epochs, seq_epsilon);
-	rnn_train_test<Scalar,3>("vanilla sgd recurrent mini-batch",
+	rnn_train_test<Scalar,3>("vanilla sgd mini-batch",
 			OptimizerPtr<Scalar,3,true>(new VanillaSGDOptimizer<Scalar,3,true>(seq_loss, 10, 5e-4)),
 			dims, samples, time_steps, epochs, seq_epsilon);
-	rnn_train_test<Scalar,3>("vanilla sgd recurrent online",
+	rnn_train_test<Scalar,3>("vanilla sgd online",
 			OptimizerPtr<Scalar,3,true>(new VanillaSGDOptimizer<Scalar,3,true>(seq_loss, 1, 1e-4)),
 			dims, samples, time_steps, epochs, seq_epsilon);
 }
@@ -156,23 +156,23 @@ inline void momentum_accelerated_sgd_train_test() {
 	const Scalar seq_epsilon = .22;
 	const Dimensions<std::size_t,3> dims({ 6u, 6u, 2u });
 	auto loss = std::make_shared<SquaredLoss<Scalar,3,false>>();
-	ffnn_train_test<Scalar,3>("momentum accelerated sgd feedforward batch",
+	ffnn_train_test<Scalar,3>("momentum accelerated sgd batch",
 			OptimizerPtr<Scalar,3,false>(new MomentumAcceleratedSGDOptimizer<Scalar,3,false>(loss, samples, 2e-3)),
 			dims, samples, epochs, epsilon);
-	ffnn_train_test<Scalar,3>("momentum accelerated sgd feedforward mini-batch",
+	ffnn_train_test<Scalar,3>("momentum accelerated sgd mini-batch",
 			OptimizerPtr<Scalar,3,false>(new MomentumAcceleratedSGDOptimizer<Scalar,3,false>(loss, 10, 1e-3, 1e-2, .99)),
 			dims, samples, epochs, epsilon);
-	ffnn_train_test<Scalar,3>("momentum accelerated sgd feedforward online",
+	ffnn_train_test<Scalar,3>("momentum accelerated sgd online",
 			OptimizerPtr<Scalar,3,false>(new MomentumAcceleratedSGDOptimizer<Scalar,3,false>(loss, 1, 5e-4)),
 			dims, samples, epochs, epsilon);
 	auto seq_loss = std::make_shared<SquaredLoss<Scalar,3,true>>();
-	rnn_train_test<Scalar,3>("momentum accelerated sgd recurrent batch",
+	rnn_train_test<Scalar,3>("momentum accelerated sgd batch",
 			OptimizerPtr<Scalar,3,true>(new MomentumAcceleratedSGDOptimizer<Scalar,3,true>(seq_loss, samples, 2e-3)),
 			dims, samples, time_steps, epochs, seq_epsilon);
-	rnn_train_test<Scalar,3>("momentum accelerated sgd recurrent mini-batch",
+	rnn_train_test<Scalar,3>("momentum accelerated sgd mini-batch",
 			OptimizerPtr<Scalar,3,true>(new MomentumAcceleratedSGDOptimizer<Scalar,3,true>(seq_loss, 10, 1e-3, 1e-2, .99)),
 			dims, samples, time_steps, epochs, seq_epsilon);
-	rnn_train_test<Scalar,3>("momentum accelerated sgd recurrent online",
+	rnn_train_test<Scalar,3>("momentum accelerated sgd online",
 			OptimizerPtr<Scalar,3,true>(new MomentumAcceleratedSGDOptimizer<Scalar,3,true>(seq_loss, 1, 5e-4)),
 			dims, samples, time_steps, epochs, seq_epsilon);
 }
@@ -195,23 +195,23 @@ inline void nesterov_momentum_accelerated_sgd_train_test() {
 	const Scalar seq_epsilon = .22;
 	const Dimensions<std::size_t,3> dims({ 6u, 6u, 2u });
 	auto loss = std::make_shared<SquaredLoss<Scalar,3,false>>();
-	ffnn_train_test<Scalar,3>("nesterov momentum accelerated sgd feedforward batch",
+	ffnn_train_test<Scalar,3>("nesterov momentum accelerated sgd batch",
 			OptimizerPtr<Scalar,3,false>(new NesterovMomentumAcceleratedSGDOptimizer<Scalar,3,false>(loss, samples)),
 			dims, samples, epochs, epsilon);
-	ffnn_train_test<Scalar,3>("nesterov momentum accelerated sgd feedforward mini-batch",
+	ffnn_train_test<Scalar,3>("nesterov momentum accelerated sgd mini-batch",
 			OptimizerPtr<Scalar,3,false>(new NesterovMomentumAcceleratedSGDOptimizer<Scalar,3,false>(loss, 10, 1e-3, 1e-2, .99)),
 			dims, samples, epochs, epsilon);
-	ffnn_train_test<Scalar,3>("nesterov momentum accelerated sgd feedforward online",
+	ffnn_train_test<Scalar,3>("nesterov momentum accelerated sgd online",
 			OptimizerPtr<Scalar,3,false>(new NesterovMomentumAcceleratedSGDOptimizer<Scalar,3,false>(loss, 1, 5e-4)),
 			dims, samples, epochs, epsilon);
 //	auto seq_loss = std::make_shared<SquaredLoss<Scalar,3,true>>();
-//	rnn_train_test<Scalar,3>("nesterov momentum accelerated sgd recurrent batch",
+//	rnn_train_test<Scalar,3>("nesterov momentum accelerated sgd batch",
 //			OptimizerPtr<Scalar,3,true>(new NesterovMomentumAcceleratedSGDOptimizer<Scalar,3,true>(seq_loss, samples)),
 //			dims, samples, time_steps, epochs, seq_epsilon);
-//	rnn_train_test<Scalar,3>("nesterov momentum accelerated sgd recurrent mini-batch",
+//	rnn_train_test<Scalar,3>("nesterov momentum accelerated sgd mini-batch",
 //			OptimizerPtr<Scalar,3,true>(new NesterovMomentumAcceleratedSGDOptimizer<Scalar,3,true>(seq_loss, 10, 1e-3, 1e-2, .99)),
 //			dims, samples, time_steps, epochs, seq_epsilon);
-//	rnn_train_test<Scalar,3>("nesterov momentum accelerated sgd recurrent online",
+//	rnn_train_test<Scalar,3>("nesterov momentum accelerated sgd online",
 //			OptimizerPtr<Scalar,3,true>(new NesterovMomentumAcceleratedSGDOptimizer<Scalar,3,true>(seq_loss, 1, 5e-4)),
 //			dims, samples, time_steps, epochs, seq_epsilon);
 }
@@ -222,7 +222,7 @@ TEST(TrainingTest, NesterovMomentumAcceleratedSGD) {
 }
 
 /**
- * Performs training tests using an Adagrad optimizer.
+ * Performs training tests using an AdaGrad optimizer.
  */
 template<typename Scalar>
 inline void adagrad_train_test() {
@@ -233,28 +233,28 @@ inline void adagrad_train_test() {
 	const Scalar seq_epsilon = .08;
 	const Dimensions<std::size_t,3> dims({ 6u, 6u, 2u });
 	auto loss = std::make_shared<SquaredLoss<Scalar,3,false>>();
-	ffnn_train_test<Scalar,3>("adagrad feedforward batch",
-			OptimizerPtr<Scalar,3,false>(new AdagradOptimizer<Scalar,3,false>(loss, samples, 1e-2)),
+	ffnn_train_test<Scalar,3>("adagrad batch",
+			OptimizerPtr<Scalar,3,false>(new AdaGradOptimizer<Scalar,3,false>(loss, samples, 1e-2)),
 			dims, samples, epochs, epsilon);
-	ffnn_train_test<Scalar,3>("adagrad feedforward mini-batch",
-			OptimizerPtr<Scalar,3,false>(new AdagradOptimizer<Scalar,3,false>(loss, 10, 5e-3)),
+	ffnn_train_test<Scalar,3>("adagrad mini-batch",
+			OptimizerPtr<Scalar,3,false>(new AdaGradOptimizer<Scalar,3,false>(loss, 10, 5e-3)),
 			dims, samples, epochs, epsilon);
-	ffnn_train_test<Scalar,3>("adagrad feedforward online",
-			OptimizerPtr<Scalar,3,false>(new AdagradOptimizer<Scalar,3,false>(loss)),
+	ffnn_train_test<Scalar,3>("adagrad online",
+			OptimizerPtr<Scalar,3,false>(new AdaGradOptimizer<Scalar,3,false>(loss)),
 			dims, samples, epochs, epsilon);
 	auto seq_loss = std::make_shared<SquaredLoss<Scalar,3,true>>();
-	rnn_train_test<Scalar,3>("adagrad recurrent batch",
-			OptimizerPtr<Scalar,3,true>(new AdagradOptimizer<Scalar,3,true>(seq_loss, samples, 1e-2)),
+	rnn_train_test<Scalar,3>("adagrad batch",
+			OptimizerPtr<Scalar,3,true>(new AdaGradOptimizer<Scalar,3,true>(seq_loss, samples, 1e-2)),
 			dims, samples, time_steps, epochs, seq_epsilon);
-	rnn_train_test<Scalar,3>("adagrad recurrent mini-batch",
-			OptimizerPtr<Scalar,3,true>(new AdagradOptimizer<Scalar,3,true>(seq_loss, 10, 5e-3)),
+	rnn_train_test<Scalar,3>("adagrad mini-batch",
+			OptimizerPtr<Scalar,3,true>(new AdaGradOptimizer<Scalar,3,true>(seq_loss, 10, 5e-3)),
 			dims, samples, time_steps, epochs, seq_epsilon);
-	rnn_train_test<Scalar,3>("adagrad recurrent online",
-			OptimizerPtr<Scalar,3,true>(new AdagradOptimizer<Scalar,3,true>(seq_loss)),
+	rnn_train_test<Scalar,3>("adagrad online",
+			OptimizerPtr<Scalar,3,true>(new AdaGradOptimizer<Scalar,3,true>(seq_loss)),
 			dims, samples, time_steps, epochs, seq_epsilon);
 }
 
-TEST(TrainingTest, Adagrad) {
+TEST(TrainingTest, AdaGrad) {
 	adagrad_train_test<float>();
 	adagrad_train_test<double>();
 }
@@ -271,23 +271,23 @@ inline void rmsprop_train_test() {
 	const Scalar seq_epsilon = .08;
 	const Dimensions<std::size_t,3> dims({ 6u, 6u, 2u });
 	auto loss = std::make_shared<SquaredLoss<Scalar,3,false>>();
-	ffnn_train_test<Scalar,3>("rmsprop feedforward batch",
+	ffnn_train_test<Scalar,3>("rmsprop batch",
 			OptimizerPtr<Scalar,3,false>(new RMSPropOptimizer<Scalar,3,false>(loss, samples, 1e-2)),
 			dims, samples, epochs, epsilon);
-	ffnn_train_test<Scalar,3>("rmsprop feedforward mini-batch",
+	ffnn_train_test<Scalar,3>("rmsprop mini-batch",
 			OptimizerPtr<Scalar,3,false>(new RMSPropOptimizer<Scalar,3,false>(loss, 10, 5e-3, 1e-2)),
 			dims, samples, epochs, epsilon);
-	ffnn_train_test<Scalar,3>("rmsprop feedforward online",
+	ffnn_train_test<Scalar,3>("rmsprop online",
 			OptimizerPtr<Scalar,3,false>(new RMSPropOptimizer<Scalar,3,false>(loss)),
 			dims, samples, epochs, epsilon);
 	auto seq_loss = std::make_shared<SquaredLoss<Scalar,3,true>>();
-	rnn_train_test<Scalar,3>("rmsprop recurrent batch",
+	rnn_train_test<Scalar,3>("rmsprop batch",
 			OptimizerPtr<Scalar,3,true>(new RMSPropOptimizer<Scalar,3,true>(seq_loss, samples, 1e-2)),
 			dims, samples, time_steps, epochs, seq_epsilon);
-	rnn_train_test<Scalar,3>("rmsprop recurrent mini-batch",
+	rnn_train_test<Scalar,3>("rmsprop mini-batch",
 			OptimizerPtr<Scalar,3,true>(new RMSPropOptimizer<Scalar,3,true>(seq_loss, 10, 5e-3, 1e-2)),
 			dims, samples, time_steps, epochs, seq_epsilon);
-	rnn_train_test<Scalar,3>("rmsprop recurrent online",
+	rnn_train_test<Scalar,3>("rmsprop online",
 			OptimizerPtr<Scalar,3,true>(new RMSPropOptimizer<Scalar,3,true>(seq_loss)),
 			dims, samples, time_steps, epochs, seq_epsilon);
 }
@@ -298,7 +298,7 @@ TEST(TrainingTest, RMSProp) {
 }
 
 /**
- * Performs training tests using an Adadelta optimizer.
+ * Performs training tests using an AdaDelta optimizer.
  */
 template<typename Scalar>
 inline void adadelta_train_test() {
@@ -309,28 +309,28 @@ inline void adadelta_train_test() {
 	const Scalar seq_epsilon = .1;
 	const Dimensions<std::size_t,3> dims({ 6u, 6u, 2u });
 	auto loss = std::make_shared<SquaredLoss<Scalar,3,false>>();
-	ffnn_train_test<Scalar,3>("adadelta feedforward batch",
-			OptimizerPtr<Scalar,3,false>(new AdadeltaOptimizer<Scalar,3,false>(loss, samples)),
+	ffnn_train_test<Scalar,3>("adadelta batch",
+			OptimizerPtr<Scalar,3,false>(new AdaDeltaOptimizer<Scalar,3,false>(loss, samples)),
 			dims, samples, epochs, epsilon);
-	ffnn_train_test<Scalar,3>("adadelta feedforward mini-batch",
-			OptimizerPtr<Scalar,3,false>(new AdadeltaOptimizer<Scalar,3,false>(loss, 10, 1e-2)),
+	ffnn_train_test<Scalar,3>("adadelta mini-batch",
+			OptimizerPtr<Scalar,3,false>(new AdaDeltaOptimizer<Scalar,3,false>(loss, 10, 1e-2)),
 			dims, samples, epochs, epsilon);
-	ffnn_train_test<Scalar,3>("adadelta feedforward online",
-			OptimizerPtr<Scalar,3,false>(new AdadeltaOptimizer<Scalar,3,false>(loss, 1, 1e-1)),
+	ffnn_train_test<Scalar,3>("adadelta online",
+			OptimizerPtr<Scalar,3,false>(new AdaDeltaOptimizer<Scalar,3,false>(loss, 1, 1e-1)),
 			dims, samples, epochs, epsilon);
 //	auto seq_loss = std::make_shared<SquaredLoss<Scalar,3,true>>();
-//	rnn_train_test<Scalar,3>("adadelta recurrent batch",
-//			OptimizerPtr<Scalar,3,true>(new AdadeltaOptimizer<Scalar,3,true>(seq_loss, samples, 5e-2)),
+//	rnn_train_test<Scalar,3>("adadelta batch",
+//			OptimizerPtr<Scalar,3,true>(new AdaDeltaOptimizer<Scalar,3,true>(seq_loss, samples, 5e-2)),
 //			dims, samples, time_steps, epochs, seq_epsilon);
-//	rnn_train_test<Scalar,3>("adadelta recurrent mini-batch",
-//			OptimizerPtr<Scalar,3,true>(new AdadeltaOptimizer<Scalar,3,true>(seq_loss, 10, 1e-2)),
+//	rnn_train_test<Scalar,3>("adadelta mini-batch",
+//			OptimizerPtr<Scalar,3,true>(new AdaDeltaOptimizer<Scalar,3,true>(seq_loss, 10, 1e-2)),
 //			dims, samples, time_steps, epochs, seq_epsilon);
-//	rnn_train_test<Scalar,3>("adadelta recurrent online",
-//			OptimizerPtr<Scalar,3,true>(new AdadeltaOptimizer<Scalar,3,true>(seq_loss, 1, 1e-1)),
+//	rnn_train_test<Scalar,3>("adadelta online",
+//			OptimizerPtr<Scalar,3,true>(new AdaDeltaOptimizer<Scalar,3,true>(seq_loss, 1, 1e-1)),
 //			dims, samples, time_steps, epochs, seq_epsilon);
 }
 
-TEST(TrainingTest, Adadelta) {
+TEST(TrainingTest, AdaDelta) {
 	adadelta_train_test<float>();
 	adadelta_train_test<double>();
 }
@@ -347,23 +347,23 @@ inline void adam_train_test() {
 	const Scalar seq_epsilon = .05;
 	const Dimensions<std::size_t,3> dims({ 6u, 6u, 2u });
 	auto loss = std::make_shared<SquaredLoss<Scalar,3,false>>();
-	ffnn_train_test<Scalar,3>("adam feedforward batch",
+	ffnn_train_test<Scalar,3>("adam batch",
 			OptimizerPtr<Scalar,3,false>(new AdamOptimizer<Scalar,3,false>(loss, samples, 1e-2)),
 			dims, samples, epochs, epsilon);
-	ffnn_train_test<Scalar,3>("adam feedforward mini-batch",
+	ffnn_train_test<Scalar,3>("adam mini-batch",
 			OptimizerPtr<Scalar,3,false>(new AdamOptimizer<Scalar,3,false>(loss, 10, 1e-3, 5e-2, 5e-3)),
 			dims, samples, epochs, epsilon);
-	ffnn_train_test<Scalar,3>("adam feedforward online",
+	ffnn_train_test<Scalar,3>("adam online",
 			OptimizerPtr<Scalar,3,false>(new AdamOptimizer<Scalar,3,false>(loss)),
 			dims, samples, epochs, epsilon);
 	auto seq_loss = std::make_shared<SquaredLoss<Scalar,3,true>>();
-	rnn_train_test<Scalar,3>("adam recurrent batch",
+	rnn_train_test<Scalar,3>("adam batch",
 			OptimizerPtr<Scalar,3,true>(new AdamOptimizer<Scalar,3,true>(seq_loss, samples, 1e-2)),
 			dims, samples, time_steps, epochs, seq_epsilon);
-	rnn_train_test<Scalar,3>("adam recurrent mini-batch",
+	rnn_train_test<Scalar,3>("adam mini-batch",
 			OptimizerPtr<Scalar,3,true>(new AdamOptimizer<Scalar,3,true>(seq_loss, 10, 1e-3, 5e-2, 5e-3)),
 			dims, samples, time_steps, epochs, seq_epsilon);
-	rnn_train_test<Scalar,3>("adam recurrent online",
+	rnn_train_test<Scalar,3>("adam online",
 			OptimizerPtr<Scalar,3,true>(new AdamOptimizer<Scalar,3,true>(seq_loss)),
 			dims, samples, time_steps, epochs, seq_epsilon);
 }
@@ -385,23 +385,23 @@ inline void adamax_train_test() {
 	const Scalar seq_epsilon = .05;
 	const Dimensions<std::size_t,3> dims({ 6u, 6u, 2u });
 	auto loss = std::make_shared<SquaredLoss<Scalar,3,false>>();
-	ffnn_train_test<Scalar,3>("adamax feedforward batch",
+	ffnn_train_test<Scalar,3>("adamax batch",
 			OptimizerPtr<Scalar,3,false>(new AdaMaxOptimizer<Scalar,3,false>(loss, samples, 1e-2)),
 			dims, samples, epochs, epsilon);
-	ffnn_train_test<Scalar,3>("adamax feedforward mini-batch",
+	ffnn_train_test<Scalar,3>("adamax mini-batch",
 			OptimizerPtr<Scalar,3,false>(new AdaMaxOptimizer<Scalar,3,false>(loss, 10, 1e-3, 5e-2, 5e-3)),
 			dims, samples, epochs, epsilon);
-	ffnn_train_test<Scalar,3>("adamax feedforward online",
+	ffnn_train_test<Scalar,3>("adamax online",
 			OptimizerPtr<Scalar,3,false>(new AdaMaxOptimizer<Scalar,3,false>(loss)),
 			dims, samples, epochs, epsilon);
 	auto seq_loss = std::make_shared<SquaredLoss<Scalar,3,true>>();
-	rnn_train_test<Scalar,3>("adamax recurrent batch",
+	rnn_train_test<Scalar,3>("adamax batch",
 			OptimizerPtr<Scalar,3,true>(new AdaMaxOptimizer<Scalar,3,true>(seq_loss, samples, 5e-3)),
 			dims, samples, time_steps, epochs, seq_epsilon);
-	rnn_train_test<Scalar,3>("adamax recurrent mini-batch",
+	rnn_train_test<Scalar,3>("adamax mini-batch",
 			OptimizerPtr<Scalar,3,true>(new AdaMaxOptimizer<Scalar,3,true>(seq_loss, 10, 1e-3, 5e-2, 5e-3)),
 			dims, samples, time_steps, epochs, seq_epsilon);
-	rnn_train_test<Scalar,3>("adamax recurrent online",
+	rnn_train_test<Scalar,3>("adamax online",
 			OptimizerPtr<Scalar,3,true>(new AdaMaxOptimizer<Scalar,3,true>(seq_loss)),
 			dims, samples, time_steps, epochs, seq_epsilon);
 }
@@ -423,23 +423,23 @@ inline void nadam_train_test() {
 	const Scalar seq_epsilon = .05;
 	const Dimensions<std::size_t,3> dims({ 6u, 6u, 2u });
 	auto loss = std::make_shared<SquaredLoss<Scalar,3,false>>();
-	ffnn_train_test<Scalar,3>("nadam feedforward batch",
+	ffnn_train_test<Scalar,3>("nadam batch",
 			OptimizerPtr<Scalar,3,false>(new NadamOptimizer<Scalar,3,false>(loss, samples, 1e-2)),
 			dims, samples, epochs, epsilon);
-	ffnn_train_test<Scalar,3>("nadam feedforward mini-batch",
+	ffnn_train_test<Scalar,3>("nadam mini-batch",
 			OptimizerPtr<Scalar,3,false>(new NadamOptimizer<Scalar,3,false>(loss, 10, 1e-3, 5e-2, 5e-3)),
 			dims, samples, epochs, epsilon);
-	ffnn_train_test<Scalar,3>("nadam feedforward online",
+	ffnn_train_test<Scalar,3>("nadam online",
 			OptimizerPtr<Scalar,3,false>(new NadamOptimizer<Scalar,3,false>(loss)),
 			dims, samples, epochs, epsilon);
 	auto seq_loss = std::make_shared<SquaredLoss<Scalar,3,true>>();
-	rnn_train_test<Scalar,3>("nadam recurrent batch",
+	rnn_train_test<Scalar,3>("nadam batch",
 			OptimizerPtr<Scalar,3,true>(new NadamOptimizer<Scalar,3,true>(seq_loss, samples, 5e-3)),
 			dims, samples, time_steps, epochs, seq_epsilon);
-	rnn_train_test<Scalar,3>("nadam recurrent mini-batch",
+	rnn_train_test<Scalar,3>("nadam mini-batch",
 			OptimizerPtr<Scalar,3,true>(new NadamOptimizer<Scalar,3,true>(seq_loss, 10, 1e-3, 5e-2, 5e-3)),
 			dims, samples, time_steps, epochs, seq_epsilon);
-	rnn_train_test<Scalar,3>("nadam recurrent online",
+	rnn_train_test<Scalar,3>("nadam online",
 			OptimizerPtr<Scalar,3,true>(new NadamOptimizer<Scalar,3,true>(seq_loss)),
 			dims, samples, time_steps, epochs, seq_epsilon);
 }
@@ -447,6 +447,44 @@ inline void nadam_train_test() {
 TEST(TrainingTest, Nadam) {
 	nadam_train_test<float>();
 	nadam_train_test<double>();
+}
+
+/**
+ * Performs training tests using an AMSGrad optimizer.
+ */
+template<typename Scalar>
+inline void amsgrad_train_test() {
+	const unsigned samples = 20;
+	const unsigned time_steps = 3;
+	const unsigned epochs = 500;
+	const Scalar epsilon = .01;
+	const Scalar seq_epsilon = .05;
+	const Dimensions<std::size_t,3> dims({ 6u, 6u, 2u });
+	auto loss = std::make_shared<SquaredLoss<Scalar,3,false>>();
+	ffnn_train_test<Scalar,3>("amsgrad batch",
+			OptimizerPtr<Scalar,3,false>(new AMSGradOptimizer<Scalar,3,false>(loss, samples, 1e-2)),
+			dims, samples, epochs, epsilon);
+	ffnn_train_test<Scalar,3>("amsgrad mini-batch",
+			OptimizerPtr<Scalar,3,false>(new AMSGradOptimizer<Scalar,3,false>(loss, 10, 1e-3)),
+			dims, samples, epochs, epsilon);
+	ffnn_train_test<Scalar,3>("amsgrad online",
+			OptimizerPtr<Scalar,3,false>(new AMSGradOptimizer<Scalar,3,false>(loss)),
+			dims, samples, epochs, epsilon);
+	auto seq_loss = std::make_shared<SquaredLoss<Scalar,3,true>>();
+	rnn_train_test<Scalar,3>("amsgrad batch",
+			OptimizerPtr<Scalar,3,true>(new AMSGradOptimizer<Scalar,3,true>(seq_loss, samples, 5e-3)),
+			dims, samples, time_steps, epochs, seq_epsilon);
+	rnn_train_test<Scalar,3>("amsgrad mini-batch",
+			OptimizerPtr<Scalar,3,true>(new AMSGradOptimizer<Scalar,3,true>(seq_loss, 10, 1e-3)),
+			dims, samples, time_steps, epochs, seq_epsilon);
+	rnn_train_test<Scalar,3>("amsgrad online",
+			OptimizerPtr<Scalar,3,true>(new AMSGradOptimizer<Scalar,3,true>(seq_loss)),
+			dims, samples, time_steps, epochs, seq_epsilon);
+}
+
+TEST(TrainingTest, AMSGrad) {
+	amsgrad_train_test<float>();
+	amsgrad_train_test<double>();
 }
 
 } /* namespace test */

@@ -638,6 +638,8 @@ protected:
 
 /**
  * A class template for Nesterov momentum accelerated SGD optimizers.
+ *
+ * \see https://arxiv.org/abs/1212.0901
  */
 template<typename Scalar, std::size_t Rank, bool Sequential>
 class NesterovMomentumAcceleratedSGDOptimizer : public MomentumAcceleratedSGDOptimizer<Scalar,Rank,Sequential> {
@@ -670,10 +672,12 @@ protected:
 };
 
 /**
- * A class template for the Adagrad optimization algorithm.
+ * A class template for the AdaGrad optimization algorithm.
+ *
+ * \see http://www.jmlr.org/papers/volume12/duchi11a/duchi11a.pdf
  */
 template<typename Scalar, std::size_t Rank, bool Sequential>
-class AdagradOptimizer : public SGDOptimizer<Scalar,Rank,Sequential> {
+class AdaGradOptimizer : public SGDOptimizer<Scalar,Rank,Sequential> {
 public:
 	/**
 	 * @param loss A shared pointer to the loss function to use.
@@ -683,7 +687,7 @@ public:
 	 * be greater than 0.
 	 * @param epsilon A small constant used to maintain numerical stability.
 	 */
-	inline AdagradOptimizer(LossSharedPtr<Scalar,Rank,Sequential> loss, unsigned batch_size = 1,
+	inline AdaGradOptimizer(LossSharedPtr<Scalar,Rank,Sequential> loss, unsigned batch_size = 1,
 			Scalar learning_rate = 1e-2, Scalar epsilon = internal::NumericUtils<Scalar>::EPSILON2) :
 				SGDOptimizer<Scalar,Rank,Sequential>::SGDOptimizer(loss, batch_size),
 				learning_rate(learning_rate),
@@ -691,7 +695,7 @@ public:
 		assert(learning_rate > 0);
 		assert(epsilon > 0);
 	}
-	virtual ~AdagradOptimizer() = default;
+	virtual ~AdaGradOptimizer() = default;
 protected:
 public:
 	inline void fit(NeuralNetwork<Scalar,Rank,Sequential>& net) {
@@ -729,9 +733,11 @@ public:
 
 /**
  * A class template for the RMSProp optimizer.
+ *
+ * \see https://www.cs.toronto.edu/~tijmen/csc321/slides/lecture_slides_lec6.pdf
  */
 template<typename Scalar, std::size_t Rank, bool Sequential>
-class RMSPropOptimizer : public AdagradOptimizer<Scalar,Rank,Sequential> {
+class RMSPropOptimizer : public AdaGradOptimizer<Scalar,Rank,Sequential> {
 public:
 	/**
 	 * @param loss A shared pointer to the loss function to use.
@@ -746,7 +752,7 @@ public:
 	 */
 	inline RMSPropOptimizer(LossSharedPtr<Scalar,Rank,Sequential> loss, unsigned batch_size = 1, Scalar learning_rate = 1e-3,
 			Scalar l2_decay = 1e-1, Scalar epsilon = internal::NumericUtils<Scalar>::EPSILON2) :
-				AdagradOptimizer<Scalar,Rank,Sequential>::AdagradOptimizer(loss, batch_size, learning_rate, epsilon),
+				AdaGradOptimizer<Scalar,Rank,Sequential>::AdaGradOptimizer(loss, batch_size, learning_rate, epsilon),
 				l2_decay(l2_decay) {
 		assert(l2_decay >= 0 && l2_decay <= 1);
 	}
@@ -759,10 +765,12 @@ protected:
 };
 
 /**
- * A class template for the Adadelta optimization algorithm.
+ * A class template for the ADADELTA optimization algorithm.
+ *
+ * \see https://arxiv.org/abs/1212.5701
  */
 template<typename Scalar, std::size_t Rank, bool Sequential>
-class AdadeltaOptimizer : public SGDOptimizer<Scalar,Rank,Sequential> {
+class AdaDeltaOptimizer : public SGDOptimizer<Scalar,Rank,Sequential> {
 public:
 	/**
 	 * @param loss A shared pointer to the loss function to use.
@@ -773,7 +781,7 @@ public:
 	 * gradients decay.
 	 * @param epsilon A small constant used to maintain numerical stability.
 	 */
-	inline AdadeltaOptimizer(LossSharedPtr<Scalar,Rank,Sequential> loss, unsigned batch_size = 1,
+	inline AdaDeltaOptimizer(LossSharedPtr<Scalar,Rank,Sequential> loss, unsigned batch_size = 1,
 			Scalar decay = 5e-2, Scalar epsilon = internal::NumericUtils<Scalar>::EPSILON2) :
 				SGDOptimizer<Scalar,Rank,Sequential>::SGDOptimizer(loss, batch_size),
 				decay(decay),
@@ -807,7 +815,7 @@ protected:
 	const Scalar decay;
 	const Scalar epsilon;
 	/**
-	 * A struct containing the accumulated squared gradients and squared gradients updates of a layer.
+	 * A struct containing the moving averages of the squared gradients and squared updates of a layer.
 	 */
 	struct ParamGradAndUpdateSqrs {
 		Matrix<Scalar> params_grad;
@@ -818,6 +826,8 @@ protected:
 
 /**
  * A class template for the Adam optimization algorithm.
+ *
+ * \see https://arxiv.org/abs/1412.6980
  */
 template<typename Scalar, std::size_t Rank, bool Sequential>
 class AdamOptimizer : public SGDOptimizer<Scalar,Rank,Sequential> {
@@ -879,7 +889,7 @@ protected:
 	const Scalar l2_decay;
 	const Scalar epsilon;
 	/**
-	 * A struct containing the accumulated first and second norms of the parameter gradients
+	 * A struct containing the moving averages of the first and second norms of the parameter gradients
 	 * of a layer.
 	 */
 	struct ParamGradNorms {
@@ -891,6 +901,8 @@ protected:
 
 /**
  * A class template for the AdaMax optimization algorithm.
+ *
+ * \see https://arxiv.org/abs/1412.6980
  */
 template<typename Scalar, std::size_t Rank, bool Sequential>
 class AdaMaxOptimizer : public AdamOptimizer<Scalar,Rank,Sequential> {
@@ -928,6 +940,8 @@ protected:
 
 /**
  * A class template for the Nesterov accelerated Adam (Nadam) optimization algorithm.
+ *
+ * \see http://cs229.stanford.edu/proj2015/054_report.pdf
  */
 template<typename Scalar, std::size_t Rank, bool Sequential>
 class NadamOptimizer : public AdamOptimizer<Scalar,Rank,Sequential> {
@@ -965,6 +979,70 @@ protected:
 				(1.0 - Base::l1_decay) * l1_next_corr * grad_norms.params_grad_l1).array() /
 				((grad_norms.params_grad_l2 * l2_corr).array() + Base::epsilon).sqrt()).matrix();
 	}
+};
+
+/**
+ * A class template for the AMSGrad optimization algorithm.
+ *
+ * \see https://openreview.net/pdf?id=ryQu7f-RZ
+ */
+template<typename Scalar, std::size_t Rank, bool Sequential>
+class AMSGradOptimizer : public SGDOptimizer<Scalar,Rank,Sequential> {
+public:
+	/**
+	 * @param loss A shared pointer to the loss function to use.
+	 * @param batch_size The batch size to use for training and testing. It is expected to
+	 * be greater than 0.
+	 * @param learning_rate The learning rate (a.k.a. step size) to use. It is expected to
+	 * be greater than 0.
+	 * @param epsilon A small constant used to maintain numerical stability.
+	 */
+	inline AMSGradOptimizer(LossSharedPtr<Scalar,Rank,Sequential> loss, unsigned batch_size = 1, Scalar learning_rate = 1e-3,
+			Scalar epsilon = internal::NumericUtils<Scalar>::EPSILON2) :
+				SGDOptimizer<Scalar,Rank,Sequential>::SGDOptimizer(loss, batch_size),
+				learning_rate(learning_rate),
+				epsilon(epsilon) {
+		assert(learning_rate > 0);
+		assert(epsilon > 0);
+	}
+	inline void fit(NeuralNetwork<Scalar,Rank,Sequential>& net) {
+		std::vector<Layer<Scalar,Rank>*> layers = Optimizer<Scalar,Rank,Sequential>::get_layers(net);
+		pgn_vec = std::vector<ParamGradNorms>(layers.size());
+		for (unsigned i = 0; i < pgn_vec.size(); ++i) {
+			Layer<Scalar,Rank>& layer = *(layers[i]);
+			const Matrix<Scalar>& param_grads = Optimizer<Scalar,Rank,Sequential>::get_params_grad(layer);
+			ParamGradNorms vel;
+			vel.params_grad_l1 = Matrix<Scalar>::Zero(param_grads.rows(), param_grads.cols());
+			vel.params_grad_l2 = Matrix<Scalar>::Zero(vel.params_grad_l1.rows(), vel.params_grad_l1.cols());
+			vel.params_grad_l2_max = Matrix<Scalar>::Zero(vel.params_grad_l1.rows(), vel.params_grad_l1.cols());
+			pgn_vec[i] = vel;
+		}
+	}
+protected:
+	inline void _update_params(Layer<Scalar,Rank>& layer, unsigned i, unsigned epoch) {
+		ParamGradNorms& grad_norms = pgn_vec[i];
+		Matrix<Scalar>& params = Optimizer<Scalar,Rank,Sequential>::get_params(layer);
+		const Matrix<Scalar>& params_grad = Optimizer<Scalar,Rank,Sequential>::get_params_grad(layer);
+		grad_norms.params_grad_l1 = (1 - l1_decay) * grad_norms.params_grad_l1 + l1_decay * params_grad;
+		grad_norms.params_grad_l2 = (1 - l2_decay) * grad_norms.params_grad_l2 +
+				l2_decay * params_grad.cwiseProduct(params_grad);
+		grad_norms.params_grad_l2_max = grad_norms.params_grad_l2.cwiseMax(grad_norms.params_grad_l2_max);
+		params -= (learning_rate * grad_norms.params_grad_l1.array() /
+				(grad_norms.params_grad_l2_max.array() + epsilon).sqrt()).matrix();
+	}
+private:
+	const Scalar learning_rate;
+	const Scalar epsilon;
+	/**
+	 * A struct containing the first and second norm averages and the maximum second norm of the parameter
+	 * gradients of a layer.
+	 */
+	struct ParamGradNorms {
+		Matrix<Scalar> params_grad_l1;
+		Matrix<Scalar> params_grad_l2;
+		Matrix<Scalar> params_grad_l2_max;
+	};
+	std::vector<ParamGradNorms> pgn_vec;
 };
 
 } /* namespace cattle */

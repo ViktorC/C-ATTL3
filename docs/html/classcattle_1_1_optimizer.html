@@ -86,16 +86,17 @@ Inheritance diagram for cattle::Optimizer&lt; Scalar, Rank, Sequential &gt;:</di
  <div class="center">
   <img src="classcattle_1_1_optimizer.png" usemap="#cattle::Optimizer_3C_20Scalar_2C_20Rank_2C_20Sequential_20_3E_map" alt=""/>
   <map id="cattle::Optimizer_3C_20Scalar_2C_20Rank_2C_20Sequential_20_3E_map" name="cattle::Optimizer_3C_20Scalar_2C_20Rank_2C_20Sequential_20_3E_map">
-<area href="classcattle_1_1_s_g_d_optimizer.html" title="An abstract class template for stochastic gradient descent (SGD) optimizers. " alt="cattle::SGDOptimizer&lt; Scalar, Rank, Sequential &gt;" shape="rect" coords="1205,56,1677,80"/>
-<area href="classcattle_1_1_adadelta_optimizer.html" title="A class template for the Adadelta optimization algorithm. " alt="cattle::AdadeltaOptimizer&lt; Scalar, Rank, Sequential &gt;" shape="rect" coords="0,112,472,136"/>
-<area href="classcattle_1_1_adagrad_optimizer.html" title="A class template for the Adagrad optimization algorithm. " alt="cattle::AdagradOptimizer&lt; Scalar, Rank, Sequential &gt;" shape="rect" coords="482,112,954,136"/>
+<area href="classcattle_1_1_s_g_d_optimizer.html" title="An abstract class template for stochastic gradient descent (SGD) optimizers. " alt="cattle::SGDOptimizer&lt; Scalar, Rank, Sequential &gt;" shape="rect" coords="1446,56,1918,80"/>
+<area href="classcattle_1_1_ada_delta_optimizer.html" title="A class template for the ADADELTA optimization algorithm. " alt="cattle::AdaDeltaOptimizer&lt; Scalar, Rank, Sequential &gt;" shape="rect" coords="0,112,472,136"/>
+<area href="classcattle_1_1_ada_grad_optimizer.html" title="A class template for the AdaGrad optimization algorithm. " alt="cattle::AdaGradOptimizer&lt; Scalar, Rank, Sequential &gt;" shape="rect" coords="482,112,954,136"/>
 <area href="classcattle_1_1_adam_optimizer.html" title="A class template for the Adam optimization algorithm. " alt="cattle::AdamOptimizer&lt; Scalar, Rank, Sequential &gt;" shape="rect" coords="1205,112,1677,136"/>
-<area href="classcattle_1_1_momentum_accelerated_s_g_d_optimizer.html" title="A class template for a momentum accelerated SGD optimizer. " alt="cattle::MomentumAcceleratedSGDOptimizer&lt; Scalar, Rank, Sequential &gt;" shape="rect" coords="1928,112,2400,136"/>
-<area href="classcattle_1_1_vanilla_s_g_d_optimizer.html" title="A class template for a vanilla SGD optimizer. " alt="cattle::VanillaSGDOptimizer&lt; Scalar, Rank, Sequential &gt;" shape="rect" coords="2410,112,2882,136"/>
+<area href="classcattle_1_1_a_m_s_grad_optimizer.html" title="A class template for the AMSGrad optimization algorithm. " alt="cattle::AMSGradOptimizer&lt; Scalar, Rank, Sequential &gt;" shape="rect" coords="1687,112,2159,136"/>
+<area href="classcattle_1_1_momentum_accelerated_s_g_d_optimizer.html" title="A class template for a momentum accelerated SGD optimizer. " alt="cattle::MomentumAcceleratedSGDOptimizer&lt; Scalar, Rank, Sequential &gt;" shape="rect" coords="2169,112,2641,136"/>
+<area href="classcattle_1_1_vanilla_s_g_d_optimizer.html" title="A class template for a vanilla SGD optimizer. " alt="cattle::VanillaSGDOptimizer&lt; Scalar, Rank, Sequential &gt;" shape="rect" coords="2651,112,3123,136"/>
 <area href="classcattle_1_1_r_m_s_prop_optimizer.html" title="A class template for the RMSProp optimizer. " alt="cattle::RMSPropOptimizer&lt; Scalar, Rank, Sequential &gt;" shape="rect" coords="482,168,954,192"/>
 <area href="classcattle_1_1_ada_max_optimizer.html" title="A class template for the AdaMax optimization algorithm. " alt="cattle::AdaMaxOptimizer&lt; Scalar, Rank, Sequential &gt;" shape="rect" coords="964,168,1436,192"/>
 <area href="classcattle_1_1_nadam_optimizer.html" title="A class template for the Nesterov accelerated Adam (Nadam) optimization algorithm. " alt="cattle::NadamOptimizer&lt; Scalar, Rank, Sequential &gt;" shape="rect" coords="1446,168,1918,192"/>
-<area href="classcattle_1_1_nesterov_momentum_accelerated_s_g_d_optimizer.html" title="A class template for Nesterov momentum accelerated SGD optimizers. " alt="cattle::NesterovMomentumAcceleratedSGDOptimizer&lt; Scalar, Rank, Sequential &gt;" shape="rect" coords="1928,168,2400,192"/>
+<area href="classcattle_1_1_nesterov_momentum_accelerated_s_g_d_optimizer.html" title="A class template for Nesterov momentum accelerated SGD optimizers. " alt="cattle::NesterovMomentumAcceleratedSGDOptimizer&lt; Scalar, Rank, Sequential &gt;" shape="rect" coords="2169,168,2641,192"/>
 </map>
  </div></div>
 <table class="memberdecls">
@@ -418,7 +419,7 @@ template&lt;typename Scalar , std::size_t Rank, bool Sequential&gt; </div>
   </dd>
 </dl>
 
-<p>Implemented in <a class="el" href="classcattle_1_1_adam_optimizer.html#a3d0ea04bf2796b9364eb9fcb42026c9f">cattle::AdamOptimizer&lt; Scalar, Rank, Sequential &gt;</a>, <a class="el" href="classcattle_1_1_adadelta_optimizer.html#a318a515804dfb0adaf5d339213d50e19">cattle::AdadeltaOptimizer&lt; Scalar, Rank, Sequential &gt;</a>, <a class="el" href="classcattle_1_1_adagrad_optimizer.html#ae400b62713d31b250e142514fd0626c4">cattle::AdagradOptimizer&lt; Scalar, Rank, Sequential &gt;</a>, <a class="el" href="classcattle_1_1_momentum_accelerated_s_g_d_optimizer.html#ad2dfe28f2d034e6ae633a0c3d0a68660">cattle::MomentumAcceleratedSGDOptimizer&lt; Scalar, Rank, Sequential &gt;</a>, and <a class="el" href="classcattle_1_1_vanilla_s_g_d_optimizer.html#a2aaacb301fb9e9c02d4f99cc433e9f75">cattle::VanillaSGDOptimizer&lt; Scalar, Rank, Sequential &gt;</a>.</p>
+<p>Implemented in <a class="el" href="classcattle_1_1_a_m_s_grad_optimizer.html#a9e3b2f0abd9e9607b955b611e21c78a3">cattle::AMSGradOptimizer&lt; Scalar, Rank, Sequential &gt;</a>, <a class="el" href="classcattle_1_1_adam_optimizer.html#a3d0ea04bf2796b9364eb9fcb42026c9f">cattle::AdamOptimizer&lt; Scalar, Rank, Sequential &gt;</a>, <a class="el" href="classcattle_1_1_ada_delta_optimizer.html#a49183c965e797f0f95be76e271bc1ea7">cattle::AdaDeltaOptimizer&lt; Scalar, Rank, Sequential &gt;</a>, <a class="el" href="classcattle_1_1_ada_grad_optimizer.html#a25c0e9a9289cd9b8f57a8d621c3c8fae">cattle::AdaGradOptimizer&lt; Scalar, Rank, Sequential &gt;</a>, <a class="el" href="classcattle_1_1_momentum_accelerated_s_g_d_optimizer.html#ad2dfe28f2d034e6ae633a0c3d0a68660">cattle::MomentumAcceleratedSGDOptimizer&lt; Scalar, Rank, Sequential &gt;</a>, and <a class="el" href="classcattle_1_1_vanilla_s_g_d_optimizer.html#a2aaacb301fb9e9c02d4f99cc433e9f75">cattle::VanillaSGDOptimizer&lt; Scalar, Rank, Sequential &gt;</a>.</p>
 
 </div>
 </div>
@@ -1133,8 +1134,8 @@ template&lt;typename Scalar , std::size_t Rank, bool Sequential&gt; </div>
 </div>
 </div>
 <hr/>The documentation for this class was generated from the following files:<ul>
-<li>C:/Users/Viktor/git/C-ATTL3/C-ATTL3/<a class="el" href="_layer_8hpp_source.html">Layer.hpp</a></li>
-<li>C:/Users/Viktor/git/C-ATTL3/C-ATTL3/<a class="el" href="_optimizer_8hpp_source.html">Optimizer.hpp</a></li>
+<li>C:/Users/A6714/git/C-ATTL3/C-ATTL3/<a class="el" href="_layer_8hpp_source.html">Layer.hpp</a></li>
+<li>C:/Users/A6714/git/C-ATTL3/C-ATTL3/<a class="el" href="_optimizer_8hpp_source.html">Optimizer.hpp</a></li>
 </ul>
 </div><!-- contents -->
 <!-- start footer part -->
