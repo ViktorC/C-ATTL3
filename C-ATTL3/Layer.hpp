@@ -1087,6 +1087,8 @@ private:
  * A class template for a transposed 2D convolutional layer operating on rank-3 data batches (rank-4 tensors).
  * The results of the convolutions of the filters and the input tensor are concatenated along the highest (4th)
  * rank of the output tensor.
+ *
+ * \see https://arxiv.org/abs/1603.07285v1
  */
 template<typename Scalar, std::size_t Rank = 3>
 class DeconvolutionLayer : public DeconvolutionLayerBase<Scalar,Rank> {
@@ -1153,6 +1155,8 @@ private:
  * A class template for a transposed 2D convolutional layer operating on rank-2 data batches (rank-3 tensors).
  * The results of the convolutions of the filters and the input tensor are concatenated along the highest (3rd)
  * rank of the output tensor.
+ *
+ * \see https://arxiv.org/abs/1603.07285v1
  */
 template<typename Scalar>
 class DeconvolutionLayer<Scalar,2> : public DeconvolutionLayerBase<Scalar,2> {
@@ -1226,6 +1230,8 @@ private:
  * A class template for a transposed 2D convolutional layer operating on rank-1 data batches (rank-2 tensors).
  * The results of the convolutions of the filters and the input tensor are concatenated along the highest (2nd)
  * rank of the output tensor.
+ *
+ * \see https://arxiv.org/abs/1603.07285v1
  */
 template<typename Scalar>
 class DeconvolutionLayer<Scalar,1> : public DeconvolutionLayerBase<Scalar,1> {
@@ -1425,7 +1431,7 @@ private:
 
 /**
  * A class template that represents a binary step activation function that outputs either
- * 1 or 0 based on the signum of its input. This function is not theoretically differentiable.
+ * 1 or 0 based on the signum of its input. This function is not differentiable.
  */
 template<typename Scalar, std::size_t Rank>
 class BinaryStepActivationLayer : public ActivationLayer<Scalar,Rank> {
@@ -1700,8 +1706,7 @@ private:
 
 /**
  * A class template representing a rectified linear unit (ReLU) activation function. ReLU
- * layers set all negative elements of the input to 0. This function is not theoretically
- * differentiable.
+ * layers set all negative elements of the input to 0. This function is not differentiable.
  */
 template<typename Scalar, std::size_t Rank>
 class ReLUActivationLayer : public ActivationLayer<Scalar,Rank> {
@@ -1742,8 +1747,9 @@ private:
 /**
  * A class template representing a leaky rectified linear unit activation function. Unlike
  * traditional ReLU layers leaky ReLU layers do not set negative elements of the input to
- * 0 but scale them by a small constant alpha. This function is not theoretically
- * differentiable.
+ * 0 but scale them by a small constant alpha. This function is not differentiable.
+ *
+ * \see https://ai.stanford.edu/~amaas/papers/relu_hybrid_icml2013_final.pdf
  */
 template<typename Scalar, std::size_t Rank>
 class LeakyReLUActivationLayer : public ActivationLayer<Scalar,Rank> {
@@ -1787,7 +1793,9 @@ private:
 /**
  * A class template representing an exponential linear unit (ELU) activation function. ELUs
  * apply an exponential (e based) function scaled by alpha to the negative elements of the input.
- * ELU layers are not theoretically differentiable.
+ * ELU layers are not differentiable.
+ *
+ * \see https://arxiv.org/abs/1511.07289
  */
 template<typename Scalar, std::size_t Rank>
 class ELUActivationLayer : public ActivationLayer<Scalar,Rank> {
@@ -1849,7 +1857,9 @@ private:
 /**
  * A class template representing a parametric rectified linear unit (PReLU) activation function.
  * PReLU layers are Leaky ReLU activation functions with element-wise, learnable alphas. PReLU
- * activation functions are not theoretically differentiable.
+ * activation functions are not differentiable.
+ *
+ * \see https://arxiv.org/abs/1502.01852
  */
 template<typename Scalar, std::size_t Rank>
 class PReLUActivationLayer : public ActivationLayer<Scalar,Rank> {
@@ -2568,6 +2578,8 @@ private:
 
 /**
  * A class template representing a 2D max pooling layer operating on rank-3 data.
+ *
+ * \see http://ais.uni-bonn.de/papers/icann2010_maxpool.pdf
  */
 template<typename Scalar, std::size_t Rank = 3>
 class MaxPoolLayer : public MaxPoolLayerBase<Scalar,Rank> {
@@ -2618,6 +2630,8 @@ private:
 
 /**
  * A class template representing a 2D max pooling layer operating on rank-2 data.
+ *
+ * \see http://ais.uni-bonn.de/papers/icann2010_maxpool.pdf
  */
 template<typename Scalar>
 class MaxPoolLayer<Scalar,2> : public MaxPoolLayerBase<Scalar,2> {
@@ -2673,6 +2687,8 @@ private:
 
 /**
  * A class template representing a 1D max pooling layer.
+ *
+ * \see http://ais.uni-bonn.de/papers/icann2010_maxpool.pdf
  */
 template<typename Scalar>
 class MaxPoolLayer<Scalar,1> : public MaxPoolLayerBase<Scalar,1> {
@@ -3023,6 +3039,8 @@ private:
 
 /**
  * A class template for a batch normalization layer.
+ *
+ * \see https://arxiv.org/abs/1502.03167
  */
 template<typename Scalar, std::size_t Rank>
 class BatchNormLayer : public BatchNormLayerBase<Scalar,Rank> {
@@ -3074,6 +3092,8 @@ private:
 
 /**
  * A partial template specialization for multi-channel input tensors.
+ *
+ * \see https://arxiv.org/abs/1502.03167
  */
 template<typename Scalar>
 class BatchNormLayer<Scalar,3> : public BatchNormLayerBase<Scalar,3> {
@@ -3155,6 +3175,9 @@ private:
 
 /**
  * A class template representing a drop-out layer.
+ *
+ * \see https://arxiv.org/abs/1207.0580
+ * \see http://www.cs.toronto.edu/~rsalakhu/papers/srivastava14a.pdf
  */
 template<typename Scalar, std::size_t Rank>
 class DropoutLayer : public Layer<Scalar,Rank> {

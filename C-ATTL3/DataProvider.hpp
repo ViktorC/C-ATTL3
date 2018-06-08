@@ -457,6 +457,8 @@ private:
 
 /**
  * A data provider template for the MNIST data set.
+ *
+ * \see http://yann.lecun.com/exdb/mnist/
  */
 template<typename Scalar>
 class MNISTDataProvider : public SplitFileDataProvider<Scalar,3,false,true,true> {
@@ -553,6 +555,8 @@ enum CIFARType { CIFAR_10, CIFAR_100 };
 
 /**
  * A data provider template for the CIFAR-10 and CIFAR-100 data sets.
+ *
+ * \see https://www.cs.toronto.edu/~kriz/cifar.html
  */
 template<typename Scalar, CIFARType CIFARType = CIFAR_10>
 class CIFARDataProvider : public JointFileDataProvider<Scalar,3,false,true> {

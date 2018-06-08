@@ -120,6 +120,8 @@ private:
 
 /**
  * An abstract class representing the LeCun weight initialization method.
+ *
+ * \see http://yann.lecun.com/exdb/publis/pdf/lecun-98b.pdf
  */
 template<typename Scalar>
 class LeCunWeightInitialization : public GaussianWeightInitialization<Scalar> {
@@ -139,6 +141,8 @@ protected:
 
 /**
  * An abstract class representing the Xavier/Glorot weight initialization method.
+ *
+ * \see http://proceedings.mlr.press/v9/glorot10a/glorot10a.pdf
  */
 template<typename Scalar>
 class GlorotWeightInitialization : public GaussianWeightInitialization<Scalar> {
@@ -158,6 +162,8 @@ protected:
 
 /**
  * An abstract class representing the He weight initialization method.
+ *
+ * \see https://arxiv.org/abs/1502.01852
  */
 template<typename Scalar>
 class HeWeightInitialization : public GaussianWeightInitialization<Scalar> {
@@ -177,6 +183,8 @@ protected:
 
 /**
  * A class template representing the orthogonal weight initialization method.
+ *
+ * \see https://arxiv.org/abs/1312.6120
  */
 template<typename Scalar>
 class OrthogonalWeightInitialization : public GaussianWeightInitialization<Scalar> {

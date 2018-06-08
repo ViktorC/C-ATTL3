@@ -571,6 +571,8 @@ private:
  * and gradients are propagated through the lanes simultaneously using multithreading.
  * The outputs of the lanes are merged by concatenation (either along the lowest
  * or hightest rank), summation, or multiplication.
+ *
+ * \see https://arxiv.org/abs/1409.4842
  */
 template<typename Scalar, std::size_t Rank, OutputMergeType MergeType = CONCAT_HI_RANK>
 class ParallelNeuralNetwork :
@@ -880,8 +882,10 @@ private:
 };
 
 /**
- * A class template for ResNets. These networks take vectors of StackedNeuralNetworks as their
+ * A class template for ResNets. These networks take vectors of neural networks as their
  * sub-modules.
+ *
+ * \see https://arxiv.org/abs/1512.03385
  */
 template<typename Scalar, std::size_t Rank>
 class ResidualNeuralNetwork :
@@ -1015,6 +1019,8 @@ private:
  * 'connected' to each other as in the input of each module is concatenated to its output and then
  * propagated to the next module as its input. The input is concatenated to the output either along
  * its lowest or highest rank.
+ *
+ * \see https://arxiv.org/abs/1608.06993
  */
 template<typename Scalar, std::size_t Rank, DenseConcatType ConcatType = HIGHEST_RANK>
 class DenseNeuralNetwork :
@@ -1299,6 +1305,8 @@ private:
  * A class template for a wrapper neural network that enables the use of non-sequential networks on
  * sequential data by concatenating the time steps along the lowest nominal rank. Temporal networks
  * operate on fixed-size sequences of data.
+ *
+ * \see http://openaccess.thecvf.com/content_cvpr_2017/papers/Lea_Temporal_Convolutional_Networks_CVPR_2017_paper.pdf
  */
 template<typename Scalar, std::size_t Rank>
 class TemporalNeuralNetwork :
@@ -1988,6 +1996,8 @@ private:
  * can use multiplicative integration to combine its linearly transformed inputs and its linearly
  * transformed hidden outputs. A stateful network retains its hidden state across sequences as long as
  * the batch size is constant.
+ *
+ * \see http://www.bioinf.jku.at/publications/older/2604.pdf
  */
 template<typename Scalar, std::size_t Rank, bool MulInt = false, bool Stateful = false>
 class LSTMNeuralNetwork : public UnidirectionalNeuralNetwork<Scalar,Rank> {
@@ -2807,6 +2817,8 @@ using UnidirNeuralNetPtr = std::unique_ptr<UnidirectionalNeuralNetwork<Scalar,Ra
  * as its parallel sub-modules. The outputs of the two sub-networks can be merged by summation
  * or concatenation either along the lowest (the 3rd after the sample and time-step ranks) or
  * highest rank.
+ *
+ * \see https://pdfs.semanticscholar.org/4b80/89bc9b49f84de43acc2eb8900035f7d492b2.pdf
  */
 template<typename Scalar, std::size_t Rank, OutputMergeType MergeType = CONCAT_LO_RANK>
 class BidirectionalNeuralNetwork :
