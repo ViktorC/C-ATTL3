@@ -458,7 +458,7 @@ inline void amsgrad_train_test() {
 	const unsigned time_steps = 3;
 	const unsigned epochs = 500;
 	const Scalar epsilon = .015;
-	const Scalar seq_epsilon = .1;
+	const Scalar seq_epsilon = .12;
 	const Dimensions<std::size_t,3> dims({ 6u, 6u, 2u });
 	auto loss = std::make_shared<SquaredLoss<Scalar,3,false>>();
 	ffnn_train_test<Scalar,3>("amsgrad batch",
