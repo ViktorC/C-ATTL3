@@ -26,5 +26,6 @@ var searchData=
   ['sumpoollayerbase_3c_20scalar_2c_201_20_3e',['SumPoolLayerBase&lt; Scalar, 1 &gt;',['../classcattle_1_1_sum_pool_layer_base.html',1,'cattle']]],
   ['sumpoollayerbase_3c_20scalar_2c_202_20_3e',['SumPoolLayerBase&lt; Scalar, 2 &gt;',['../classcattle_1_1_sum_pool_layer_base.html',1,'cattle']]],
   ['svd',['SVD',['../namespacecattle_1_1internal.html#a3e63c9777951b7b3512ff92061e292d2',1,'cattle::internal']]],
-  ['svdoptions',['SVDOptions',['../namespacecattle_1_1internal.html#afe0f43a473fb65d81bd656efbe10e1c4',1,'cattle::internal']]]
+  ['svdoptions',['SVDOptions',['../namespacecattle_1_1internal.html#afe0f43a473fb65d81bd656efbe10e1c4',1,'cattle::internal']]],
+  ['swishactivationlayer',['SwishActivationLayer',['../classcattle_1_1_swish_activation_layer.html',1,'cattle::SwishActivationLayer&lt; Scalar, Rank &gt;'],['../classcattle_1_1_swish_activation_layer.html#a87b1c9e1f24d354b6e3bf92e411afa16',1,'cattle::SwishActivationLayer::SwishActivationLayer()']]]
 ];

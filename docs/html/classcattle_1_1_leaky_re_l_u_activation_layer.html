@@ -12,6 +12,12 @@
 <link href="search/search.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="search/searchdata.js"></script>
 <script type="text/javascript" src="search/search.js"></script>
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    extensions: ["tex2jax.js"],
+    jax: ["input/TeX","output/HTML-CSS"],
+});
+</script><script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/MathJax.js"></script>
 <link href="doxygen.css" rel="stylesheet" type="text/css" />
 </head>
 <body>
@@ -166,6 +172,9 @@ class cattle::LeakyReLUActivationLayer&lt; Scalar, Rank &gt;</h3>
 
 <p>A class template representing a leaky rectified linear unit activation function. </p>
 <p>Unlike traditional ReLU layers leaky ReLU layers do not set negative elements of the input to 0 but scale them by a small constant alpha. This function is not differentiable.</p>
+<p class="formulaDsp">
+\[ f(x) = \begin{cases} \alpha x &amp; \text{for } x &lt; 0\\ x &amp; \text{for } x \geq 0 \end{cases} \]
+</p>
 <dl class="section see"><dt>See also</dt><dd><a href="https://ai.stanford.edu/~amaas/papers/relu_hybrid_icml2013_final.pdf">https://ai.stanford.edu/~amaas/papers/relu_hybrid_icml2013_final.pdf</a> </dd></dl>
 </div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
 <a id="ab2363872da292de34c35c3983d5b97ee"></a>
@@ -369,7 +378,7 @@ template&lt;typename Scalar , std::size_t Rank&gt; </div>
 </div>
 </div>
 <hr/>The documentation for this class was generated from the following file:<ul>
-<li>C:/Users/A6714/git/C-ATTL3/C-ATTL3/<a class="el" href="_layer_8hpp_source.html">Layer.hpp</a></li>
+<li>C:/Users/Viktor/git/C-ATTL3/C-ATTL3/<a class="el" href="_layer_8hpp_source.html">Layer.hpp</a></li>
 </ul>
 </div><!-- contents -->
 <!-- start footer part -->

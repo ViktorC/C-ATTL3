@@ -223,114 +223,63 @@ TEST(GradientTest, DeconvolutionLayer) {
  * @param dims The dimensions of the layers' input tensors.
  */
 template<typename Scalar, std::size_t Rank>
-inline void activation_layer_grad_test(const typename std::enable_if<Rank != 3,
-		Dimensions<std::size_t,Rank>>::type& dims) {
+inline void activation_layer_grad_test(const Dimensions<std::size_t,Rank>& dims) {
 	auto init = WeightInitSharedPtr<Scalar>(new GlorotWeightInitialization<Scalar>());
-	LayerPtr<Scalar,Rank> layer1_1(new DenseLayer<Scalar,Rank>(dims, 12, init));
-	Dimensions<std::size_t,Rank> dims_1 = layer1_1->get_output_dims();
-	layer_grad_test<Scalar,Rank>("identity activation layer", std::move(layer1_1),
+	LayerPtr<Scalar,Rank> kernel_layer_1 = kernel_layer<Scalar,Rank>(dims);
+	Dimensions<std::size_t,Rank> dims_1 = kernel_layer_1->get_output_dims();
+	layer_grad_test<Scalar,Rank>("identity activation layer", std::move(kernel_layer_1),
 			LayerPtr<Scalar,Rank>(new IdentityActivationLayer<Scalar,Rank>(dims_1)));
-	LayerPtr<Scalar,Rank> layer1_2(new DenseLayer<Scalar,Rank>(dims, 8, init));
-	Dimensions<std::size_t,Rank> dims_2 = layer1_2->get_output_dims();
-	layer_grad_test<Scalar,Rank>("scaling activation layer", std::move(layer1_2),
+	LayerPtr<Scalar,Rank> kernel_layer_2 = kernel_layer<Scalar,Rank>(dims);
+	Dimensions<std::size_t,Rank> dims_2 = kernel_layer_2->get_output_dims();
+	layer_grad_test<Scalar,Rank>("scaled activation layer", std::move(kernel_layer_2),
 			LayerPtr<Scalar,Rank>(new ScaledActivationLayer<Scalar,Rank>(dims_2, 1.5)));
-	LayerPtr<Scalar,Rank> layer1_3(new DenseLayer<Scalar,Rank>(dims, 12, init));
-	Dimensions<std::size_t,Rank> dims_3 = layer1_3->get_output_dims();
-	layer_grad_test<Scalar,Rank>("binary step activation layer", std::move(layer1_3),
+	LayerPtr<Scalar,Rank> kernel_layer_3 = kernel_layer<Scalar,Rank>(dims);
+	Dimensions<std::size_t,Rank> dims_3 = kernel_layer_3->get_output_dims();
+	layer_grad_test<Scalar,Rank>("binary step activation layer", std::move(kernel_layer_3),
 			LayerPtr<Scalar,Rank>(new BinaryStepActivationLayer<Scalar,Rank>(dims_3)));
-	LayerPtr<Scalar,Rank> layer1_4(new DenseLayer<Scalar,Rank>(dims, 16, init));
-	Dimensions<std::size_t,Rank> dims_4 = layer1_4->get_output_dims();
-	layer_grad_test<Scalar,Rank>("sigmoid activation layer rank", std::move(layer1_4),
+	LayerPtr<Scalar,Rank> kernel_layer_4 = kernel_layer<Scalar,Rank>(dims);
+	Dimensions<std::size_t,Rank> dims_4 = kernel_layer_4->get_output_dims();
+	layer_grad_test<Scalar,Rank>("sigmoid activation layer rank", std::move(kernel_layer_4),
 			LayerPtr<Scalar,Rank>(new SigmoidActivationLayer<Scalar,Rank>(dims_4)));
-	LayerPtr<Scalar,Rank> layer1_5(new DenseLayer<Scalar,Rank>(dims, 12, init));
-	Dimensions<std::size_t,Rank> dims_5 = layer1_5->get_output_dims();
-	layer_grad_test<Scalar,Rank>("tanh activation layer rank", std::move(layer1_5),
+	LayerPtr<Scalar,Rank> kernel_layer_5 = kernel_layer<Scalar,Rank>(dims);
+	Dimensions<std::size_t,Rank> dims_5 = kernel_layer_5->get_output_dims();
+	layer_grad_test<Scalar,Rank>("tanh activation layer rank", std::move(kernel_layer_5),
 			LayerPtr<Scalar,Rank>(new TanhActivationLayer<Scalar,Rank>(dims_5)));
-	LayerPtr<Scalar,Rank> layer1_6(new DenseLayer<Scalar,Rank>(dims, 12, init));
-	Dimensions<std::size_t,Rank> dims_6 = layer1_6->get_output_dims();
-	layer_grad_test<Scalar,Rank>("softsign activation layer rank", std::move(layer1_6),
+	LayerPtr<Scalar,Rank> kernel_layer_6 = kernel_layer<Scalar,Rank>(dims);
+	Dimensions<std::size_t,Rank> dims_6 = kernel_layer_6->get_output_dims();
+	layer_grad_test<Scalar,Rank>("softsign activation layer rank", std::move(kernel_layer_6),
 			LayerPtr<Scalar,Rank>(new SoftsignActivationLayer<Scalar,Rank>(dims_6)));
-	LayerPtr<Scalar,Rank> layer1_7(new DenseLayer<Scalar,Rank>(dims, 9, init));
-	Dimensions<std::size_t,Rank> dims_7 = layer1_7->get_output_dims();
-	layer_grad_test<Scalar,Rank>("softplus activation layer rank", std::move(layer1_7),
+	LayerPtr<Scalar,Rank> kernel_layer_7 = kernel_layer<Scalar,Rank>(dims);
+	Dimensions<std::size_t,Rank> dims_7 = kernel_layer_7->get_output_dims();
+	layer_grad_test<Scalar,Rank>("softplus activation layer rank", std::move(kernel_layer_7),
 			LayerPtr<Scalar,Rank>(new SoftplusActivationLayer<Scalar,Rank>(dims_7)));
-	LayerPtr<Scalar,Rank> layer1_8(new DenseLayer<Scalar,Rank>(dims, 12, init));
-	Dimensions<std::size_t,Rank> dims_8 = layer1_8->get_output_dims();
-	layer_grad_test<Scalar,Rank>("softmax activation layer rank", std::move(layer1_8),
+	LayerPtr<Scalar,Rank> kernel_layer_8 = kernel_layer<Scalar,Rank>(dims);
+	Dimensions<std::size_t,Rank> dims_8 = kernel_layer_8->get_output_dims();
+	layer_grad_test<Scalar,Rank>("softmax activation layer rank", std::move(kernel_layer_8),
 			LayerPtr<Scalar,Rank>(new SoftmaxActivationLayer<Scalar,Rank>(dims_8)));
-	LayerPtr<Scalar,Rank> layer1_9(new DenseLayer<Scalar,Rank>(dims, 10, init));
-	Dimensions<std::size_t,Rank> dims_9 = layer1_9->get_output_dims();
-	layer_grad_test<Scalar,Rank>("relu activation layer rank", std::move(layer1_9),
+	LayerPtr<Scalar,Rank> kernel_layer_9 = kernel_layer<Scalar,Rank>(dims);
+	Dimensions<std::size_t,Rank> dims_9 = kernel_layer_9->get_output_dims();
+	layer_grad_test<Scalar,Rank>("relu activation layer rank", std::move(kernel_layer_9),
 			LayerPtr<Scalar,Rank>(new ReLUActivationLayer<Scalar,Rank>(dims_9)));
-	LayerPtr<Scalar,Rank> layer1_10(new DenseLayer<Scalar,Rank>(dims, 12, init));
-	Dimensions<std::size_t,Rank> dims_10 = layer1_10->get_output_dims();
-	layer_grad_test<Scalar,Rank>("leaky relu activation layer rank", std::move(layer1_10),
+	LayerPtr<Scalar,Rank> kernel_layer_10 = kernel_layer<Scalar,Rank>(dims);
+	Dimensions<std::size_t,Rank> dims_10 = kernel_layer_10->get_output_dims();
+	layer_grad_test<Scalar,Rank>("leaky relu activation layer rank", std::move(kernel_layer_10),
 			LayerPtr<Scalar,Rank>(new LeakyReLUActivationLayer<Scalar,Rank>(dims_10, 2e-1)));
-	LayerPtr<Scalar,Rank> layer1_11(new DenseLayer<Scalar,Rank>(dims, 11, init));
-	Dimensions<std::size_t,Rank> dims_11 = layer1_11->get_output_dims();
-	layer_grad_test<Scalar,Rank>("elu activation layer rank", std::move(layer1_11),
+	LayerPtr<Scalar,Rank> kernel_layer_11 = kernel_layer<Scalar,Rank>(dims);
+	Dimensions<std::size_t,Rank> dims_11 = kernel_layer_11->get_output_dims();
+	layer_grad_test<Scalar,Rank>("elu activation layer rank", std::move(kernel_layer_11),
 			LayerPtr<Scalar,Rank>(new ELUActivationLayer<Scalar,Rank>(dims_11, 2e-1)));
 	auto reg = ParamRegSharedPtr<Scalar>(new SquaredParameterRegularization<Scalar>());
 	layer_grad_test<Scalar,Rank>("prelu activation layer rank",
 			LayerPtr<Scalar,Rank>(new PReLUActivationLayer<Scalar,Rank>(dims, reg, 2e-1)),
 			LayerPtr<Scalar,Rank>(new PReLUActivationLayer<Scalar,Rank>(dims)));
-}
-
-/**
- *@param dims The dimensions of the layers' input tensors.
- */
-template<typename Scalar, std::size_t Rank>
-inline void activation_layer_grad_test(const typename std::enable_if<Rank == 3,
-		Dimensions<std::size_t,Rank>>::type& dims) {
-	auto init = WeightInitSharedPtr<Scalar>(new HeWeightInitialization<Scalar>());
-	LayerPtr<Scalar,3> layer1_1(new ConvolutionLayer<Scalar>(dims, 2, init));
-	Dimensions<std::size_t,3> dims_1 = layer1_1->get_output_dims();
-	layer_grad_test<Scalar,3>("identity activation layer", std::move(layer1_1),
-			LayerPtr<Scalar,3>(new IdentityActivationLayer<Scalar,3>(dims_1)));
-	LayerPtr<Scalar,3> layer1_2(new ConvolutionLayer<Scalar>(dims, 2, init));
-	Dimensions<std::size_t,3> dims_2 = layer1_2->get_output_dims();
-	layer_grad_test<Scalar,3>("scaling activation layer", std::move(layer1_2),
-			LayerPtr<Scalar,3>(new ScaledActivationLayer<Scalar,3>(dims_2, 1.5)));
-	LayerPtr<Scalar,3> layer1_3(new ConvolutionLayer<Scalar>(dims, 2, init));
-	Dimensions<std::size_t,3> dims_3 = layer1_3->get_output_dims();
-	layer_grad_test<Scalar,3>("binary step activation layer", std::move(layer1_3),
-			LayerPtr<Scalar,3>(new BinaryStepActivationLayer<Scalar,3>(dims_3)));
-	LayerPtr<Scalar,3> layer1_4(new ConvolutionLayer<Scalar>(dims, 2, init));
-	Dimensions<std::size_t,3> dims_4 = layer1_4->get_output_dims();
-	layer_grad_test<Scalar,3>("sigmoid activation layer", std::move(layer1_4),
-			LayerPtr<Scalar,3>(new SigmoidActivationLayer<Scalar,3>(dims_4)));
-	LayerPtr<Scalar,3> layer1_5(new ConvolutionLayer<Scalar>(dims, 2, init));
-	Dimensions<std::size_t,3> dims_5 = layer1_5->get_output_dims();
-	layer_grad_test<Scalar,3>("tanh activation layer", std::move(layer1_5),
-			LayerPtr<Scalar,3>(new TanhActivationLayer<Scalar,3>(dims_5)));
-	LayerPtr<Scalar,3> layer1_6(new ConvolutionLayer<Scalar>(dims, 2, init));
-	Dimensions<std::size_t,3> dims_6 = layer1_6->get_output_dims();
-	layer_grad_test<Scalar,3>("softsign activation layer", std::move(layer1_6),
-			LayerPtr<Scalar,3>(new SoftsignActivationLayer<Scalar,3>(dims_6)));
-	LayerPtr<Scalar,3> layer1_7(new ConvolutionLayer<Scalar>(dims, 2, init));
-	Dimensions<std::size_t,3> dims_7 = layer1_7->get_output_dims();
-	layer_grad_test<Scalar,3>("softplus activation layer", std::move(layer1_7),
-			LayerPtr<Scalar,3>(new SoftplusActivationLayer<Scalar,3>(dims_7)));
-	LayerPtr<Scalar,3> layer1_8(new ConvolutionLayer<Scalar>(dims, 2, init));
-	Dimensions<std::size_t,3> dims_8 = layer1_8->get_output_dims();
-	layer_grad_test<Scalar,3>("softmax activation layer", std::move(layer1_8),
-			LayerPtr<Scalar,3>(new SoftmaxActivationLayer<Scalar,3>(dims_8)));
-	LayerPtr<Scalar,3> layer1_9(new ConvolutionLayer<Scalar>(dims, 2, init));
-	Dimensions<std::size_t,3> dims_9 = layer1_9->get_output_dims();
-	layer_grad_test<Scalar,3>("relu activation layer", std::move(layer1_9),
-			LayerPtr<Scalar,3>(new ReLUActivationLayer<Scalar,3>(dims_9)));
-	LayerPtr<Scalar,3> layer1_10(new ConvolutionLayer<Scalar>(dims, 2, init));
-	Dimensions<std::size_t,3> dims_10 = layer1_10->get_output_dims();
-	layer_grad_test<Scalar,3>("leaky relu activation layer", std::move(layer1_10),
-			LayerPtr<Scalar,3>(new LeakyReLUActivationLayer<Scalar,3>(dims_10, 2e-1)));
-	LayerPtr<Scalar,3> layer1_11(new ConvolutionLayer<Scalar>(dims, 2, init));
-	Dimensions<std::size_t,3> dims_11 = layer1_11->get_output_dims();
-	layer_grad_test<Scalar,3>("elu activation layer", std::move(layer1_11),
-			LayerPtr<Scalar,3>(new ELUActivationLayer<Scalar,3>(dims_11, 2e-1)));
-	auto reg = ParamRegSharedPtr<Scalar>(new SquaredParameterRegularization<Scalar>());
-	layer_grad_test<Scalar,3>("prelu activation layer",
-			LayerPtr<Scalar,3>(new PReLUActivationLayer<Scalar,3>(dims, reg, 2e-1)),
-			LayerPtr<Scalar,3>(new PReLUActivationLayer<Scalar,3>(dims)));
+	LayerPtr<Scalar,Rank> kernel_layer_12 = kernel_layer<Scalar,Rank>(dims);
+	Dimensions<std::size_t,Rank> dims_12 = kernel_layer_12->get_output_dims();
+	layer_grad_test<Scalar,Rank>("swish activation layer rank", std::move(kernel_layer_12),
+			LayerPtr<Scalar,Rank>(new SwishActivationLayer<Scalar,Rank>(dims_12, 1.2)));
+	layer_grad_test<Scalar,Rank>("pswish activation layer rank",
+			LayerPtr<Scalar,Rank>(new PSwishActivationLayer<Scalar,Rank>(dims)),
+			LayerPtr<Scalar,Rank>(new PSwishActivationLayer<Scalar,Rank>(dims, reg, 1.2)));
 }
 
 /**
@@ -338,10 +287,9 @@ inline void activation_layer_grad_test(const typename std::enable_if<Rank == 3,
  */
 template<typename Scalar>
 inline void activation_layer_grad_test() {
-	Dimensions<std::size_t,1>({ 24 });
-	activation_layer_grad_test<Scalar,1>({ 24u });
-	activation_layer_grad_test<Scalar,2>({ 5u, 5u });
-	activation_layer_grad_test<Scalar,3>({ 4u, 3u, 2u });
+	activation_layer_grad_test<Scalar,1>({ 16u });
+	activation_layer_grad_test<Scalar,2>({ 4u, 4u });
+	activation_layer_grad_test<Scalar,3>({ 3u, 2u, 2u });
 }
 
 TEST(GradientTest, ActivationLayer) {

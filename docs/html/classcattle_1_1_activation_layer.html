@@ -12,6 +12,12 @@
 <link href="search/search.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="search/searchdata.js"></script>
 <script type="text/javascript" src="search/search.js"></script>
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    extensions: ["tex2jax.js"],
+    jax: ["input/TeX","output/HTML-CSS"],
+});
+</script><script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/MathJax.js"></script>
 <link href="doxygen.css" rel="stylesheet" type="text/css" />
 </head>
 <body>
@@ -91,13 +97,15 @@ Inheritance diagram for cattle::ActivationLayer&lt; Scalar, Rank &gt;:</div>
 <area href="classcattle_1_1_identity_activation_layer.html" title="A class template representing an identity activation layer that merely outputs its input..." alt="cattle::IdentityActivationLayer&lt; Scalar, Rank &gt;" shape="rect" coords="309,224,608,248"/>
 <area href="classcattle_1_1_leaky_re_l_u_activation_layer.html" title="A class template representing a leaky rectified linear unit activation function. " alt="cattle::LeakyReLUActivationLayer&lt; Scalar, Rank &gt;" shape="rect" coords="309,280,608,304"/>
 <area href="classcattle_1_1_p_re_l_u_activation_layer.html" title="A class template representing a parametric rectified linear unit (PReLU) activation function..." alt="cattle::PReLUActivationLayer&lt; Scalar, Rank &gt;" shape="rect" coords="309,336,608,360"/>
-<area href="classcattle_1_1_re_l_u_activation_layer.html" title="A class template representing a rectified linear unit (ReLU) activation function. ..." alt="cattle::ReLUActivationLayer&lt; Scalar, Rank &gt;" shape="rect" coords="309,392,608,416"/>
-<area href="classcattle_1_1_scaled_activation_layer.html" title="A class template that represents a linearly scaling activation layer. " alt="cattle::ScaledActivationLayer&lt; Scalar, Rank &gt;" shape="rect" coords="309,448,608,472"/>
-<area href="classcattle_1_1_sigmoid_activation_layer.html" title="A class template representing a sigmoid activation function layer. " alt="cattle::SigmoidActivationLayer&lt; Scalar, Rank &gt;" shape="rect" coords="309,504,608,528"/>
-<area href="classcattle_1_1_softmax_activation_layer.html" title="A class template for a softmax activation function layer. " alt="cattle::SoftmaxActivationLayer&lt; Scalar, Rank &gt;" shape="rect" coords="309,560,608,584"/>
-<area href="classcattle_1_1_softplus_activation_layer.html" title="A class template representing a softplus activation function layer. " alt="cattle::SoftplusActivationLayer&lt; Scalar, Rank &gt;" shape="rect" coords="309,616,608,640"/>
-<area href="classcattle_1_1_softsign_activation_layer.html" title="A class template representing a softsign activation function layer, an alternative to the tanh layer..." alt="cattle::SoftsignActivationLayer&lt; Scalar, Rank &gt;" shape="rect" coords="309,672,608,696"/>
-<area href="classcattle_1_1_tanh_activation_layer.html" title="A class template representing a hyperbolic tangent activation function layer. " alt="cattle::TanhActivationLayer&lt; Scalar, Rank &gt;" shape="rect" coords="309,728,608,752"/>
+<area href="classcattle_1_1_p_swish_activation_layer.html" title="A class template representing the parametric Swish activation function with learnable beta values..." alt="cattle::PSwishActivationLayer&lt; Scalar, Rank &gt;" shape="rect" coords="309,392,608,416"/>
+<area href="classcattle_1_1_re_l_u_activation_layer.html" title="A class template representing a rectified linear unit (ReLU) activation function. ..." alt="cattle::ReLUActivationLayer&lt; Scalar, Rank &gt;" shape="rect" coords="309,448,608,472"/>
+<area href="classcattle_1_1_scaled_activation_layer.html" title="A class template that represents a linearly scaling activation layer. " alt="cattle::ScaledActivationLayer&lt; Scalar, Rank &gt;" shape="rect" coords="309,504,608,528"/>
+<area href="classcattle_1_1_sigmoid_activation_layer.html" title="A class template representing a sigmoid activation function layer. " alt="cattle::SigmoidActivationLayer&lt; Scalar, Rank &gt;" shape="rect" coords="309,560,608,584"/>
+<area href="classcattle_1_1_softmax_activation_layer.html" title="A class template for a softmax activation function layer. " alt="cattle::SoftmaxActivationLayer&lt; Scalar, Rank &gt;" shape="rect" coords="309,616,608,640"/>
+<area href="classcattle_1_1_softplus_activation_layer.html" title="A class template representing a softplus activation function layer. " alt="cattle::SoftplusActivationLayer&lt; Scalar, Rank &gt;" shape="rect" coords="309,672,608,696"/>
+<area href="classcattle_1_1_softsign_activation_layer.html" title="A class template representing a softsign activation function layer, an alternative to the tanh layer..." alt="cattle::SoftsignActivationLayer&lt; Scalar, Rank &gt;" shape="rect" coords="309,728,608,752"/>
+<area href="classcattle_1_1_swish_activation_layer.html" title="A class template representing the Swish activation function. " alt="cattle::SwishActivationLayer&lt; Scalar, Rank &gt;" shape="rect" coords="309,784,608,808"/>
+<area href="classcattle_1_1_tanh_activation_layer.html" title="A class template representing a hyperbolic tangent activation function layer. " alt="cattle::TanhActivationLayer&lt; Scalar, Rank &gt;" shape="rect" coords="309,840,608,864"/>
 </map>
  </div></div>
 <table class="memberdecls">
@@ -333,7 +341,7 @@ template&lt;typename Scalar , std::size_t Rank&gt; </div>
 
 <p>Implements <a class="el" href="classcattle_1_1_layer.html#a3dd89c138cfc74ca6e7572337d68e44e">cattle::Layer&lt; Scalar, Rank &gt;</a>.</p>
 
-<p>Reimplemented in <a class="el" href="classcattle_1_1_p_re_l_u_activation_layer.html#a3c7f81f3fd23a585d6f6ec11b136b058">cattle::PReLUActivationLayer&lt; Scalar, Rank &gt;</a>.</p>
+<p>Reimplemented in <a class="el" href="classcattle_1_1_p_swish_activation_layer.html#af1e1f85dce86cc365e329e9165a2571f">cattle::PSwishActivationLayer&lt; Scalar, Rank &gt;</a>, and <a class="el" href="classcattle_1_1_p_re_l_u_activation_layer.html#a3c7f81f3fd23a585d6f6ec11b136b058">cattle::PReLUActivationLayer&lt; Scalar, Rank &gt;</a>.</p>
 
 </div>
 </div>
@@ -432,7 +440,7 @@ template&lt;typename Scalar , std::size_t Rank&gt; </div>
 
 <p>Implements <a class="el" href="classcattle_1_1_layer.html#aae685cf7e708e0c4f32ddc4c10254046">cattle::Layer&lt; Scalar, Rank &gt;</a>.</p>
 
-<p>Reimplemented in <a class="el" href="classcattle_1_1_p_re_l_u_activation_layer.html#a7bb2f7bd02261af5aae033d9727c00c8">cattle::PReLUActivationLayer&lt; Scalar, Rank &gt;</a>.</p>
+<p>Reimplemented in <a class="el" href="classcattle_1_1_p_swish_activation_layer.html#af217f7a8a67fa7cff16930a071616ec6">cattle::PSwishActivationLayer&lt; Scalar, Rank &gt;</a>, and <a class="el" href="classcattle_1_1_p_re_l_u_activation_layer.html#a7bb2f7bd02261af5aae033d9727c00c8">cattle::PReLUActivationLayer&lt; Scalar, Rank &gt;</a>.</p>
 
 </div>
 </div>
@@ -514,7 +522,7 @@ template&lt;typename Scalar , std::size_t Rank&gt; </div>
 </div>
 </div>
 <hr/>The documentation for this class was generated from the following file:<ul>
-<li>C:/Users/A6714/git/C-ATTL3/C-ATTL3/<a class="el" href="_layer_8hpp_source.html">Layer.hpp</a></li>
+<li>C:/Users/Viktor/git/C-ATTL3/C-ATTL3/<a class="el" href="_layer_8hpp_source.html">Layer.hpp</a></li>
 </ul>
 </div><!-- contents -->
 <!-- start footer part -->

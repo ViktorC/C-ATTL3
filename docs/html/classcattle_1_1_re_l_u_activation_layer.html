@@ -12,6 +12,12 @@
 <link href="search/search.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="search/searchdata.js"></script>
 <script type="text/javascript" src="search/search.js"></script>
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    extensions: ["tex2jax.js"],
+    jax: ["input/TeX","output/HTML-CSS"],
+});
+</script><script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/MathJax.js"></script>
 <link href="doxygen.css" rel="stylesheet" type="text/css" />
 </head>
 <body>
@@ -165,8 +171,11 @@ void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="clas
 class cattle::ReLUActivationLayer&lt; Scalar, Rank &gt;</h3>
 
 <p>A class template representing a rectified linear unit (ReLU) activation function. </p>
-<p>ReLU layers set all negative elements of the input to 0. This function is not differentiable. </p>
-</div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
+<p>ReLU layers set all negative elements of the input to 0. This function is not differentiable.</p>
+<p class="formulaDsp">
+\[ f(x) = \begin{cases} 0 &amp; \text{for } x &lt; 0\\ x &amp; \text{for } x \geq 0 \end{cases} \]
+</p>
+ </div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
 <a id="a413bba29e917c3de534cf9fcf7f85d11"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a413bba29e917c3de534cf9fcf7f85d11">&#9670;&nbsp;</a></span>ReLUActivationLayer()</h2>
 
@@ -357,7 +366,7 @@ template&lt;typename Scalar , std::size_t Rank&gt; </div>
 </div>
 </div>
 <hr/>The documentation for this class was generated from the following file:<ul>
-<li>C:/Users/A6714/git/C-ATTL3/C-ATTL3/<a class="el" href="_layer_8hpp_source.html">Layer.hpp</a></li>
+<li>C:/Users/Viktor/git/C-ATTL3/C-ATTL3/<a class="el" href="_layer_8hpp_source.html">Layer.hpp</a></li>
 </ul>
 </div><!-- contents -->
 <!-- start footer part -->

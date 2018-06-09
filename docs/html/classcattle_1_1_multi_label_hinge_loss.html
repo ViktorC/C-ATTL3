@@ -12,6 +12,12 @@
 <link href="search/search.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="search/searchdata.js"></script>
 <script type="text/javascript" src="search/search.js"></script>
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    extensions: ["tex2jax.js"],
+    jax: ["input/TeX","output/HTML-CSS"],
+});
+</script><script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/MathJax.js"></script>
 <link href="doxygen.css" rel="stylesheet" type="text/css" />
 </head>
 <body>
@@ -114,7 +120,8 @@ Additional Inherited Members</h2></td></tr>
 class cattle::MultiLabelHingeLoss&lt; Scalar, Rank, Sequential, Squared &gt;</h3>
 
 <p>A class template representing the hinge loss function for multi-label objectives. </p>
-<p>True labels are expected to have the value 1, while false labels are expected to correspond to the value -1. </p>
+<p>True labels are expected to have the value 1, while false labels are expected to correspond to the value -1.</p>
+<p>\(L_i = \sum_j \max(0, 1 - {y_i}_j \hat{y_i}_j)\) or \(L_i = \sum_j \max(0, 1 - {y_i}_j \hat{y_i}_j)^2\) </p>
 </div><h2 class="groupheader">Member Function Documentation</h2>
 <a id="abdc90e68e3e56760023b09f73752f105"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#abdc90e68e3e56760023b09f73752f105">&#9670;&nbsp;</a></span>_function()</h2>
@@ -167,7 +174,7 @@ template&lt;typename Scalar , std::size_t Rank, bool Sequential, bool Squared = 
 </div>
 </div>
 <hr/>The documentation for this class was generated from the following file:<ul>
-<li>C:/Users/A6714/git/C-ATTL3/C-ATTL3/<a class="el" href="_loss_8hpp_source.html">Loss.hpp</a></li>
+<li>C:/Users/Viktor/git/C-ATTL3/C-ATTL3/<a class="el" href="_loss_8hpp_source.html">Loss.hpp</a></li>
 </ul>
 </div><!-- contents -->
 <!-- start footer part -->

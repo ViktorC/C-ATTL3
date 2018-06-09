@@ -13,5 +13,6 @@ var searchData=
   ['ppmcodec',['PPMCodec',['../classcattle_1_1_p_p_m_codec.html',1,'cattle']]],
   ['preluactivationlayer',['PReLUActivationLayer',['../classcattle_1_1_p_re_l_u_activation_layer.html',1,'cattle']]],
   ['preprocessor',['Preprocessor',['../classcattle_1_1_preprocessor.html',1,'cattle']]],
-  ['preprocessor_3c_20scalar_2c_20rank_2c_20false_20_3e',['Preprocessor&lt; Scalar, Rank, false &gt;',['../classcattle_1_1_preprocessor.html',1,'cattle']]]
+  ['preprocessor_3c_20scalar_2c_20rank_2c_20false_20_3e',['Preprocessor&lt; Scalar, Rank, false &gt;',['../classcattle_1_1_preprocessor.html',1,'cattle']]],
+  ['pswishactivationlayer',['PSwishActivationLayer',['../classcattle_1_1_p_swish_activation_layer.html',1,'cattle']]]
 ];

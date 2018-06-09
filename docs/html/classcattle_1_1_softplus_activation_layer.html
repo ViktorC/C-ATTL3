@@ -12,6 +12,12 @@
 <link href="search/search.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="search/searchdata.js"></script>
 <script type="text/javascript" src="search/search.js"></script>
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    extensions: ["tex2jax.js"],
+    jax: ["input/TeX","output/HTML-CSS"],
+});
+</script><script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/MathJax.js"></script>
 <link href="doxygen.css" rel="stylesheet" type="text/css" />
 </head>
 <body>
@@ -165,7 +171,8 @@ void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="clas
 class cattle::SoftplusActivationLayer&lt; Scalar, Rank &gt;</h3>
 
 <p>A class template representing a softplus activation function layer. </p>
-<p>The softplus activation function is a differentiable function that approximates the rectified linear unit function. </p>
+<p>The softplus activation function is a differentiable function that approximates the rectified linear unit function.</p>
+<p>\(f(x) = \ln(1 + e^x)\) </p>
 </div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
 <a id="ac1533119d3423aa2130d01eb95b12431"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#ac1533119d3423aa2130d01eb95b12431">&#9670;&nbsp;</a></span>SoftplusActivationLayer()</h2>
@@ -357,7 +364,7 @@ template&lt;typename Scalar , std::size_t Rank&gt; </div>
 </div>
 </div>
 <hr/>The documentation for this class was generated from the following file:<ul>
-<li>C:/Users/A6714/git/C-ATTL3/C-ATTL3/<a class="el" href="_layer_8hpp_source.html">Layer.hpp</a></li>
+<li>C:/Users/Viktor/git/C-ATTL3/C-ATTL3/<a class="el" href="_layer_8hpp_source.html">Layer.hpp</a></li>
 </ul>
 </div><!-- contents -->
 <!-- start footer part -->

@@ -58,6 +58,8 @@ public:
 
 /**
  * A class template for an L1 (first-norm) regularization penalty.
+ *
+ * \f$P = \sum\limits_{i = 1}^n \left|w_i\right|\f$
  */
 template<typename Scalar>
 class AbsoluteParameterRegularization : public ParamaterRegularization<Scalar> {
@@ -79,6 +81,8 @@ private:
 
 /**
  * A class template for an L2 (second-norm) regularization penalty.
+ *
+ * \f$P = \sum\limits_{i = 1}^n w_i^2\f$
  */
 template<typename Scalar>
 class SquaredParameterRegularization : public ParamaterRegularization<Scalar> {
@@ -101,6 +105,10 @@ private:
 /**
  * A class template for the elastic net regularization penalty which is a combination of
  * the L1 and L2 regularization penalties.
+ *
+ * \f$P = \sum\limits_{i = 1}^n \left|w_i\right| + w_i^2\f$
+ *
+ * \see http://citeseerx.ist.psu.edu/viewdoc/summary?doi=10.1.1.124.4696
  */
 template<typename Scalar>
 class ElasticNetParameterRegularization : public ParamaterRegularization<Scalar> {

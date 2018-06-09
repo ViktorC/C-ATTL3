@@ -121,6 +121,8 @@ private:
 /**
  * An abstract class representing the LeCun weight initialization method.
  *
+ * \f$\sigma = c \sqrt{\frac{1}{fan_{in}}}\f$
+ *
  * \see http://yann.lecun.com/exdb/publis/pdf/lecun-98b.pdf
  */
 template<typename Scalar>
@@ -142,6 +144,8 @@ protected:
 /**
  * An abstract class representing the Xavier/Glorot weight initialization method.
  *
+ * \f$\sigma = c \sqrt{\frac{2}{fan_{in} + fan_{out}}}\f$
+ *
  * \see http://proceedings.mlr.press/v9/glorot10a/glorot10a.pdf
  */
 template<typename Scalar>
@@ -162,6 +166,8 @@ protected:
 
 /**
  * An abstract class representing the He weight initialization method.
+ *
+ * \f$\sigma = c \sqrt{\frac{2}{fan_{in}}}\f$
  *
  * \see https://arxiv.org/abs/1502.01852
  */

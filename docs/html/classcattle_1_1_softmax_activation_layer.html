@@ -12,6 +12,12 @@
 <link href="search/search.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="search/searchdata.js"></script>
 <script type="text/javascript" src="search/search.js"></script>
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    extensions: ["tex2jax.js"],
+    jax: ["input/TeX","output/HTML-CSS"],
+});
+</script><script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/MathJax.js"></script>
 <link href="doxygen.css" rel="stylesheet" type="text/css" />
 </head>
 <body>
@@ -165,7 +171,8 @@ void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="clas
 class cattle::SoftmaxActivationLayer&lt; Scalar, Rank &gt;</h3>
 
 <p>A class template for a softmax activation function layer. </p>
-<p>Unlike most other activation layers which represent element-wise functions, the softmax layer represents a multivariate function. </p>
+<p>Unlike most other activation functions, the softmax layer does not represent a simple coefficient-wise function but a multivariate one. The per-sample sums of the elements of the output tensor of the layer are always 1.</p>
+<p>\(f(x_i) = \frac{e^{x_i}}{\epsilon + \sum\limits_{j = 1}^J e^{x_j}}\) </p>
 </div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
 <a id="a2a8be6bee1fb6cf884f4f2d3f613257a"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a2a8be6bee1fb6cf884f4f2d3f613257a">&#9670;&nbsp;</a></span>SoftmaxActivationLayer()</h2>
@@ -368,7 +375,7 @@ template&lt;typename Scalar , std::size_t Rank&gt; </div>
 </div>
 </div>
 <hr/>The documentation for this class was generated from the following file:<ul>
-<li>C:/Users/A6714/git/C-ATTL3/C-ATTL3/<a class="el" href="_layer_8hpp_source.html">Layer.hpp</a></li>
+<li>C:/Users/Viktor/git/C-ATTL3/C-ATTL3/<a class="el" href="_layer_8hpp_source.html">Layer.hpp</a></li>
 </ul>
 </div><!-- contents -->
 <!-- start footer part -->

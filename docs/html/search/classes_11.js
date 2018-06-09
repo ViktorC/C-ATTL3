@@ -18,5 +18,6 @@ var searchData=
   ['sumpoollayer_3c_20scalar_2c_202_20_3e',['SumPoolLayer&lt; Scalar, 2 &gt;',['../classcattle_1_1_sum_pool_layer_3_01_scalar_00_012_01_4.html',1,'cattle']]],
   ['sumpoollayerbase',['SumPoolLayerBase',['../classcattle_1_1_sum_pool_layer_base.html',1,'cattle']]],
   ['sumpoollayerbase_3c_20scalar_2c_201_20_3e',['SumPoolLayerBase&lt; Scalar, 1 &gt;',['../classcattle_1_1_sum_pool_layer_base.html',1,'cattle']]],
-  ['sumpoollayerbase_3c_20scalar_2c_202_20_3e',['SumPoolLayerBase&lt; Scalar, 2 &gt;',['../classcattle_1_1_sum_pool_layer_base.html',1,'cattle']]]
+  ['sumpoollayerbase_3c_20scalar_2c_202_20_3e',['SumPoolLayerBase&lt; Scalar, 2 &gt;',['../classcattle_1_1_sum_pool_layer_base.html',1,'cattle']]],
+  ['swishactivationlayer',['SwishActivationLayer',['../classcattle_1_1_swish_activation_layer.html',1,'cattle']]]
 ];

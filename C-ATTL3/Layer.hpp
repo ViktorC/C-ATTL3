@@ -1358,6 +1358,8 @@ private:
 /**
  * A class template representing an identity activation layer that merely outputs
  * its input.
+ *
+ * \f$f(x) = x\f$
  */
 template<typename Scalar, std::size_t Rank>
 class IdentityActivationLayer : public ActivationLayer<Scalar,Rank> {
@@ -1393,6 +1395,8 @@ private:
 
 /**
  * A class template that represents a linearly scaling activation layer.
+ *
+ * \f$f(x) = c x\f$
  */
 template<typename Scalar, std::size_t Rank>
 class ScaledActivationLayer : public ActivationLayer<Scalar,Rank> {
@@ -1432,6 +1436,13 @@ private:
 /**
  * A class template that represents a binary step activation function that outputs either
  * 1 or 0 based on the signum of its input. This function is not differentiable.
+ *
+ * \f[
+ *   f(x) = \begin{cases}
+ *     0 & \text{for } x < 0\\
+ *     1 & \text{for } x \geq 0
+ *   \end{cases}
+ * \f]
  */
 template<typename Scalar, std::size_t Rank>
 class BinaryStepActivationLayer : public ActivationLayer<Scalar,Rank> {
@@ -1467,6 +1478,8 @@ private:
 
 /**
  * A class template representing a sigmoid activation function layer.
+ *
+ * \f$f(x) = \sigma(x) = \frac{1}{1 + e^{-x}}\f$
  */
 template<typename Scalar, std::size_t Rank>
 class SigmoidActivationLayer : public ActivationLayer<Scalar,Rank> {
@@ -1501,7 +1514,7 @@ protected:
 	inline typename Root::Data pass_back(typename Root::Data out_grads) {
 		assert((Dimensions<std::size_t,Base::DATA_RANK>(out_grads.dimensions()).template demote<>()) == Base::dims);
 		assert(out_grads.dimension(0) > 0 && out.dimension(0) == out_grads.dimension(0));
-		return (out * (-out + out.constant(1))) * out_grads;
+		return (out * (out.constant(1) - out)) * out_grads;
 	}
 private:
 	// Staged computation cache.
@@ -1510,6 +1523,8 @@ private:
 
 /**
  * A class template representing a hyperbolic tangent activation function layer.
+ *
+ * \f$f(x) = \text{tanh}(x)\f$
  */
 template<typename Scalar, std::size_t Rank>
 class TanhActivationLayer : public ActivationLayer<Scalar,Rank> {
@@ -1544,7 +1559,7 @@ protected:
 	inline typename Root::Data pass_back(typename Root::Data out_grads) {
 		assert((Dimensions<std::size_t,Base::DATA_RANK>(out_grads.dimensions()).template demote<>()) == Base::dims);
 		assert(out_grads.dimension(0) > 0 && out.dimension(0) == out_grads.dimension(0));
-		return (-out * out + out.constant(1)) * out_grads;
+		return (out.constant(1) - out * out) * out_grads;
 	}
 private:
 	typename Root::Data out;
@@ -1553,6 +1568,8 @@ private:
 /**
  * A class template representing a softsign activation function layer, an alternative to the
  * tanh layer.
+ *
+ * \f$f(x) = \frac{x}{1 + \left|x\right|}\f$
  */
 template<typename Scalar, std::size_t Rank>
 class SoftsignActivationLayer : public ActivationLayer<Scalar,Rank> {
@@ -1597,6 +1614,8 @@ private:
 /**
  * A class template representing a softplus activation function layer. The softplus activation function
  * is a differentiable function that approximates the rectified linear unit function.
+ *
+ * \f$f(x) = \ln(1 + e^x)\f$
  */
 template<typename Scalar, std::size_t Rank>
 class SoftplusActivationLayer : public ActivationLayer<Scalar,Rank> {
@@ -1639,8 +1658,11 @@ private:
 
 /**
  * A class template for a softmax activation function layer. Unlike most other activation
- * layers which represent element-wise functions, the softmax layer represents a multivariate
- * function.
+ * functions, the softmax layer does not represent a simple coefficient-wise function but
+ * a multivariate one. The per-sample sums of the elements of the output tensor of the layer
+ * are always 1.
+ *
+ * \f$f(x_i) = \frac{e^{x_i}}{\epsilon + \sum\limits_{j = 1}^J e^{x_j}}\f$
  */
 template<typename Scalar, std::size_t Rank>
 class SoftmaxActivationLayer : public ActivationLayer<Scalar,Rank> {
@@ -1707,6 +1729,13 @@ private:
 /**
  * A class template representing a rectified linear unit (ReLU) activation function. ReLU
  * layers set all negative elements of the input to 0. This function is not differentiable.
+
+ * \f[
+ *   f(x) = \begin{cases}
+ *     0 & \text{for } x < 0\\
+ *     x & \text{for } x \geq 0
+ *   \end{cases}
+ * \f]
  */
 template<typename Scalar, std::size_t Rank>
 class ReLUActivationLayer : public ActivationLayer<Scalar,Rank> {
@@ -1748,6 +1777,13 @@ private:
  * A class template representing a leaky rectified linear unit activation function. Unlike
  * traditional ReLU layers leaky ReLU layers do not set negative elements of the input to
  * 0 but scale them by a small constant alpha. This function is not differentiable.
+ *
+ * \f[
+ *   f(x) = \begin{cases}
+ *     \alpha x & \text{for } x < 0\\
+ *     x & \text{for } x \geq 0
+ *   \end{cases}
+ * \f]
  *
  * \see https://ai.stanford.edu/~amaas/papers/relu_hybrid_icml2013_final.pdf
  */
@@ -1794,6 +1830,13 @@ private:
  * A class template representing an exponential linear unit (ELU) activation function. ELUs
  * apply an exponential (e based) function scaled by alpha to the negative elements of the input.
  * ELU layers are not differentiable.
+ *
+ * \f[
+ *   f(x) = \begin{cases}
+ *     \alpha (e^x - 1) & \text{for } x < 0\\
+ *     x & \text{for } x \geq 0
+ *   \end{cases}
+ * \f]
  *
  * \see https://arxiv.org/abs/1511.07289
  */
@@ -1856,8 +1899,15 @@ private:
 
 /**
  * A class template representing a parametric rectified linear unit (PReLU) activation function.
- * PReLU layers are Leaky ReLU activation functions with element-wise, learnable alphas. PReLU
- * activation functions are not differentiable.
+ * PReLU layers are Leaky ReLU activation functions with learnable alphas. PReLU activation
+ * functions are not differentiable.
+ *
+ * \f[
+ *   f(x) = \begin{cases}
+ *     \alpha x & \text{for } x < 0\\
+ *     x & \text{for } x \geq 0
+ *   \end{cases}
+ * \f]
  *
  * \see https://arxiv.org/abs/1502.01852
  */
@@ -1945,7 +1995,6 @@ protected:
 				}
 			}
 		}
-
 		return TensorMap<Scalar,Root::DATA_RANK>(prev_out_grads.data(), conversion_dims);
 	}
 private:
@@ -1956,6 +2005,163 @@ private:
 	RankwiseArray conversion_dims;
 	// Staged computation caches.
 	Matrix<Scalar> in;
+};
+
+/**
+ * A class template representing the Swish activation function.
+ *
+ * \f$f(x) = x \sigma(\beta x)\f$
+ *
+ * \see https://arxiv.org/abs/1710.05941
+ */
+template<typename Scalar, std::size_t Rank>
+class SwishActivationLayer : public ActivationLayer<Scalar,Rank> {
+	typedef Layer<Scalar,Rank> Root;
+	typedef ActivationLayer<Scalar,Rank> Base;
+public:
+	/**
+	 * @param dims The dimensionality of the input tensor.
+	 * @param beta The factor by which the input of the sigmoid factor of the Swish
+	 * function is to be scaled.
+	 */
+	inline SwishActivationLayer(const Dimensions<std::size_t,Rank>& dims, Scalar beta = 1) :
+			ActivationLayer<Scalar,Rank>::ActivationLayer(dims),
+			beta(beta) { }
+	inline Layer<Scalar,Rank>* clone() const {
+		return new SwishActivationLayer(*this);
+	}
+protected:
+	inline Layer<Scalar,Rank>* clone_with_shared_params() const {
+		return clone();
+	}
+	inline void empty_cache() {
+		in = typename Root::Data();
+		sig_out = typename Root::Data();
+	}
+	inline typename Root::Data pass_forward(typename Root::Data in, bool training) {
+		assert((Dimensions<std::size_t,Base::DATA_RANK>(in.dimensions()).template demote<>()) == Base::dims);
+		assert(in.dimension(0) > 0);
+		auto sig_denom = (-beta * in).exp() + in.constant(1);
+		if (training) {
+			sig_out = sig_denom.inverse();
+			this->in = std::move(in);
+			return this->in * sig_out;
+		}
+		return in / sig_denom;
+	}
+	inline typename Root::Data pass_back(typename Root::Data out_grads) {
+		assert((Dimensions<std::size_t,Base::DATA_RANK>(out_grads.dimensions()).template demote<>()) == Base::dims);
+		assert(out_grads.dimension(0) > 0 && sig_out.dimension(0) == out_grads.dimension(0));
+		return sig_out * ((sig_out.constant(1) - sig_out) * beta * in + sig_out.constant(1)) * out_grads;
+	}
+private:
+	const Scalar beta;
+	// Staged computation cache.
+	typename Root::Data in;
+	typename Root::Data sig_out;
+};
+
+/**
+ * A class template representing the parametric Swish activation function with learnable beta
+ * values.
+ *
+ * \f$f(x) = x \sigma(\beta x)\f$
+ *
+ * \see https://arxiv.org/abs/1710.05941
+ */
+template<typename Scalar, std::size_t Rank>
+class PSwishActivationLayer : public ActivationLayer<Scalar,Rank> {
+	typedef Layer<Scalar,Rank> Root;
+	typedef ActivationLayer<Scalar,Rank> Base;
+	typedef std::array<std::size_t,Root::DATA_RANK> RankwiseArray;
+public:
+	/**
+	 * @param dims The dimensionality of the input tensor.
+	 * @param param_reg The regularization function to apply to the layer's parameters.
+	 * @param init_beta The initial factor by which the input of the sigmoid factor of the
+	 * Swish function is to be scaled.
+	 * @param max_norm_constraint An optional max-norm constraint. If it is 0 or less, no
+	 * constraint is applied.
+	 */
+	inline PSwishActivationLayer(const Dimensions<std::size_t,Rank>& dims, ParamRegSharedPtr<Scalar> param_reg = Root::NO_PARAM_REG,
+			Scalar init_beta = 1e-1, Scalar max_norm_constraint = 0) :
+				Base::ActivationLayer(dims, 1, dims.get_volume()),
+				param_reg(param_reg),
+				init_beta(init_beta),
+				max_norm_constraint(max_norm_constraint),
+				max_norm(internal::NumericUtils<Scalar>::decidedly_greater(max_norm_constraint, (Scalar) 0)),
+				conversion_dims(dims.template promote<>()) {
+		assert(param_reg != nullptr);
+	}
+	inline Layer<Scalar,Rank>* clone() const {
+		return new PSwishActivationLayer(*this);
+	}
+	inline void init() {
+		Base::params_ref.setConstant(init_beta);
+		Base::params_grad.setZero(1, Base::dims.get_volume());
+	}
+protected:
+	inline PSwishActivationLayer(const PSwishActivationLayer<Scalar,Rank>& layer, bool share_params = false) :
+			Base::ActivationLayer(layer, share_params),
+			param_reg(layer.param_reg),
+			init_beta(layer.init_beta),
+			max_norm_constraint(layer.max_norm_constraint),
+			max_norm(layer.max_norm),
+			conversion_dims(layer.conversion_dims) { }
+	inline Layer<Scalar,Rank>* clone_with_shared_params() const {
+		return new PSwishActivationLayer(*this, true);
+	}
+	inline void empty_cache() {
+		in = Matrix<Scalar>(0, 0);
+		sig_out = Matrix<Scalar>(0, 0);
+	}
+	inline void regularize() {
+		Base::params_grad += param_reg->d_function(Base::params_ref);
+	}
+	inline Scalar get_regularization_penalty() {
+		return param_reg->function(Base::params_ref);
+	}
+	inline void enforce_constraints() {
+		if (max_norm) {
+			Scalar l2_norm = Base::params_ref.squaredNorm();
+			if (l2_norm > max_norm_constraint)
+				Base::params_ref *= (max_norm_constraint / l2_norm);
+		}
+	}
+	inline typename Root::Data pass_forward(typename Root::Data in, bool training) {
+		assert((Dimensions<std::size_t,Base::DATA_RANK>(in.dimensions()).template demote<>()) == Base::dims);
+		assert(in.dimension(0) > 0);
+		conversion_dims[0] = in.dimension(0);
+		this->in = MatrixMap<Scalar>(in.data(), conversion_dims[0], in.size() / conversion_dims[0]);
+		auto sig_out = ((this->in * (Base::params_ref.row(0).asDiagonal() * -1)).array().exp() + 1);
+		Matrix<Scalar> out;
+		if (training) {
+			this->sig_out = sig_out.inverse();
+			out = this->in.cwiseProduct(this->sig_out);
+		} else
+			out = this->in.array() / sig_out;
+		return TensorMap<Scalar,Root::DATA_RANK>(out.data(), conversion_dims);
+	}
+	inline typename Root::Data pass_back(typename Root::Data out_grads) {
+		assert((Dimensions<std::size_t,Base::DATA_RANK>(out_grads.dimensions()).template demote<>()) == Base::dims);
+		assert(out_grads.dimension(0) > 0 && conversion_dims[0] == out_grads.dimension(0));
+		MatrixMap<Scalar> out_grads_mat(out_grads.data(), conversion_dims[0], out_grads.size() / conversion_dims[0]);
+		Matrix<Scalar> one_min_sig_out = 1 - sig_out.array();
+		Base::params_grad = sig_out.cwiseProduct(one_min_sig_out).cwiseProduct(in).cwiseProduct(in)
+				.cwiseProduct(out_grads_mat).colwise().sum();
+		Matrix<Scalar> prev_out_grads = sig_out.cwiseProduct(((one_min_sig_out * Base::params_ref.row(0).asDiagonal()).array() *
+				in.array() + 1).matrix()).cwiseProduct(out_grads_mat);
+		return TensorMap<Scalar,Root::DATA_RANK>(prev_out_grads.data(), conversion_dims);
+	}
+private:
+	const ParamRegSharedPtr<Scalar> param_reg;
+	const Scalar init_beta;
+	const Scalar max_norm_constraint;
+	const bool max_norm;
+	RankwiseArray conversion_dims;
+	// Staged computation caches.
+	Matrix<Scalar> in;
+	Matrix<Scalar> sig_out;
 };
 
 /**

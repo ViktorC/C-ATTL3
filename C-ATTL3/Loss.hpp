@@ -199,6 +199,8 @@ public:
 
 /**
  * A template class representing the absolute error (L1) loss function.
+ *
+ * \f$L_i = \left|\hat{y_i} - y_i\right|\f$
  */
 template<typename Scalar, std::size_t Rank, bool Sequential>
 class AbsoluteLoss : public UniversalLoss<Scalar,Rank,Sequential> {
@@ -220,6 +222,8 @@ protected:
 
 /**
  * A template class representing the squared error (L2) loss function.
+ *
+ * \f$L_i = (\hat{y_i} - y_i)^2\f$
  */
 template<typename Scalar, std::size_t Rank, bool Sequential>
 class SquaredLoss : public UniversalLoss<Scalar,Rank,Sequential> {
@@ -241,6 +245,9 @@ protected:
 /**
  * A template class representing the hinge loss function. This class assumes the objectives for
  * each sample (and time step) to be a one-hot vector (tensor rank).
+ *
+ * \f$L_i = \sum_{j \neq y_i} \max(0, \hat{y_i}_j - \hat{y_i}_{y_i} + 1)\f$ or
+ * \f$L_i = \sum_{j \neq y_i} \max(0, \hat{y_i}_j - \hat{y_i}_{y_i} + 1)^2\f$
  */
 template<typename Scalar, std::size_t Rank, bool Sequential, bool Squared = false>
 class HingeLoss : public UniversalLoss<Scalar,Rank,Sequential> {
@@ -320,7 +327,9 @@ protected:
 
 /**
  * A template class representing the binary cross entropy loss function. The objective
- * is expected to be a size-1 tensor with the value of either 0 or 1.
+ * is expected to be a size-1 tensor with values in the range [0, 1].
+ *
+ * \f$L_i = -(y_i \ln(\hat{y_i} + \epsilon) + (1 - y_i) \ln(1 + \epsilon - \hat{y_i}))\f$
  */
 template<typename Scalar, std::size_t Rank, bool Sequential>
 class BinaryCrossEntropyLoss : public UniversalLoss<Scalar,Rank,Sequential> {
@@ -352,6 +361,8 @@ private:
 /**
  * A template class representing the cross entropy loss function. This class assumes the objective
  * values for each sample (and time step) to be in the range [0, 1].
+ *
+ * \f$L_i = -\ln(\hat{y_i} + \epsilon) y_i\f$
  */
 template<typename Scalar, std::size_t Rank, bool Sequential>
 class CrossEntropyLoss : public UniversalLoss<Scalar,Rank,Sequential> {
@@ -381,6 +392,8 @@ private:
 /**
  * A loss function template that applies the softmax function to its input before calculating the cross
  * entropy loss. This allows for increased numerical stability and faster computation.
+ *
+ * \f$L_i = -\ln(\text{softmax}(\hat{y_i}) + \epsilon) y_i\f$
  */
 template<typename Scalar, std::size_t Rank, bool Sequential>
 class SoftmaxCrossEntropyLoss : public UniversalLoss<Scalar,Rank,Sequential> {
@@ -417,6 +430,8 @@ private:
 
 /**
  * A template class representing the cross Kullback-Leibler divergence loss function.
+ *
+ * \f$L_i = -\ln(\frac{-\hat{y_i}}{y_i + \epsilon} + \epsilon) y_i\f$
  */
 template<typename Scalar, std::size_t Rank, bool Sequential>
 class KullbackLeiblerLoss : public UniversalLoss<Scalar,Rank,Sequential> {
@@ -448,6 +463,9 @@ private:
 /**
  * A class template representing the hinge loss function for multi-label objectives. True labels
  * are expected to have the value 1, while false labels are expected to correspond to the value -1.
+ *
+ * \f$L_i = \sum_j \max(0, 1 - {y_i}_j \hat{y_i}_j)\f$ or
+ * \f$L_i = \sum_j \max(0, 1 - {y_i}_j \hat{y_i}_j)^2\f$
  */
 template<typename Scalar, std::size_t Rank, bool Sequential, bool Squared = false>
 class MultiLabelHingeLoss : public UniversalLoss<Scalar,Rank,Sequential> {
@@ -501,6 +519,8 @@ protected:
  * A class template representing the logarithmic loss function for multi-label objectives. True
  * labels are expected to have the value 1, while false labels are expected to correspond to the
  * value 0.
+ *
+ * \f$L_i = \sum_j {y_i}_j \ln(\hat{y_i}_j + \epsilon) + (1 - {y_i}_j) \ln(1 + \epsilon - \hat{y_i}_j)\f$
  */
 template<typename Scalar, std::size_t Rank, bool Sequential>
 class MultiLabelLogLoss : public UniversalLoss<Scalar,Rank,Sequential> {
@@ -526,7 +546,7 @@ protected:
 				assert(internal::NumericUtils<Scalar>::almost_equal(obj_ij, (Scalar) 0) ||
 						internal::NumericUtils<Scalar>::almost_equal(obj_ij, (Scalar) 1));
 				Scalar out_ij = out_mat(i,j);
-				loss_i += obj_ij * log(out_ij) + (1 - obj_ij) * log(1 - out_ij);
+				loss_i += obj_ij * log(out_ij + epsilon) + (1 - obj_ij) * log(1 + epsilon - out_ij);
 			}
 			loss(i) = loss_i;
 		}

@@ -12,6 +12,12 @@
 <link href="search/search.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="search/searchdata.js"></script>
 <script type="text/javascript" src="search/search.js"></script>
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    extensions: ["tex2jax.js"],
+    jax: ["input/TeX","output/HTML-CSS"],
+});
+</script><script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/MathJax.js"></script>
 <link href="doxygen.css" rel="stylesheet" type="text/css" />
 </head>
 <body>
@@ -110,6 +116,7 @@ Protected Member Functions</h2></td></tr>
 class cattle::GlorotWeightInitialization&lt; Scalar &gt;</h3>
 
 <p>An abstract class representing the Xavier/Glorot weight initialization method. </p>
+<p>\(\sigma = c \sqrt{\frac{2}{fan_{in} + fan_{out}}}\)</p>
 <dl class="section see"><dt>See also</dt><dd><a href="http://proceedings.mlr.press/v9/glorot10a/glorot10a.pdf">http://proceedings.mlr.press/v9/glorot10a/glorot10a.pdf</a> </dd></dl>
 </div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
 <a id="a234fb09106e93532b47452da89296a56"></a>
@@ -209,7 +216,7 @@ template&lt;typename Scalar &gt; </div>
 </div>
 </div>
 <hr/>The documentation for this class was generated from the following file:<ul>
-<li>C:/Users/A6714/git/C-ATTL3/C-ATTL3/<a class="el" href="_weight_initialization_8hpp_source.html">WeightInitialization.hpp</a></li>
+<li>C:/Users/Viktor/git/C-ATTL3/C-ATTL3/<a class="el" href="_weight_initialization_8hpp_source.html">WeightInitialization.hpp</a></li>
 </ul>
 </div><!-- contents -->
 <!-- start footer part -->

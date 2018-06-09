@@ -12,6 +12,12 @@
 <link href="search/search.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="search/searchdata.js"></script>
 <script type="text/javascript" src="search/search.js"></script>
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    extensions: ["tex2jax.js"],
+    jax: ["input/TeX","output/HTML-CSS"],
+});
+</script><script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/MathJax.js"></script>
 <link href="doxygen.css" rel="stylesheet" type="text/css" />
 </head>
 <body>
@@ -93,6 +99,7 @@ $(function() {
 , <a class="el" href="classcattle_1_1_mean_pool_layer_3_01_scalar_00_012_01_4.html#a83d2c0b5eed97514c42ebdf4ac5d67f0">cattle::MeanPoolLayer&lt; Scalar, 2 &gt;</a>
 , <a class="el" href="classcattle_1_1_neural_network.html#a6ad331a525fefb2384ec045c7c7b46de">cattle::NeuralNetwork&lt; Scalar, Rank, Sequential &gt;</a>
 , <a class="el" href="classcattle_1_1_p_re_l_u_activation_layer.html#a50562bf1416371801c5abba6a1b206b0">cattle::PReLUActivationLayer&lt; Scalar, Rank &gt;</a>
+, <a class="el" href="classcattle_1_1_p_swish_activation_layer.html#a448fb02f20482c52531c4335df5db16a">cattle::PSwishActivationLayer&lt; Scalar, Rank &gt;</a>
 , <a class="el" href="classcattle_1_1_re_l_u_activation_layer.html#aa497fd14a3b3cab2495a6fecfdeaf116">cattle::ReLUActivationLayer&lt; Scalar, Rank &gt;</a>
 , <a class="el" href="classcattle_1_1_reshape_layer.html#a70a43ccc8946bc1e7603c896b7c76994">cattle::ReshapeLayer&lt; Scalar, Rank &gt;</a>
 , <a class="el" href="classcattle_1_1_scaled_activation_layer.html#aa97c4b7e04a4b2570c8d6e38248241e7">cattle::ScaledActivationLayer&lt; Scalar, Rank &gt;</a>
@@ -103,6 +110,7 @@ $(function() {
 , <a class="el" href="classcattle_1_1_sum_pool_layer.html#a0e79f751dfe0643323cdfabaa089457c">cattle::SumPoolLayer&lt; Scalar, Rank &gt;</a>
 , <a class="el" href="classcattle_1_1_sum_pool_layer_3_01_scalar_00_011_01_4.html#a0597592a027373991adf92066847cd16">cattle::SumPoolLayer&lt; Scalar, 1 &gt;</a>
 , <a class="el" href="classcattle_1_1_sum_pool_layer_3_01_scalar_00_012_01_4.html#a859025a9acbe10fe84fb99c39b83889e">cattle::SumPoolLayer&lt; Scalar, 2 &gt;</a>
+, <a class="el" href="classcattle_1_1_swish_activation_layer.html#ac64b9ea2bc88298fcf0ccfd01030c5e1">cattle::SwishActivationLayer&lt; Scalar, Rank &gt;</a>
 , <a class="el" href="classcattle_1_1_tanh_activation_layer.html#a1b720dbc5a38be7f95a59e8800a8a5f4">cattle::TanhActivationLayer&lt; Scalar, Rank &gt;</a>
 </li>
 <li>pass_forward()
@@ -130,6 +138,7 @@ $(function() {
 , <a class="el" href="classcattle_1_1_mean_pool_layer_3_01_scalar_00_012_01_4.html#adf15353dcff3915634b18f3bbd533c6c">cattle::MeanPoolLayer&lt; Scalar, 2 &gt;</a>
 , <a class="el" href="classcattle_1_1_neural_network.html#a7daf5b9eb47ba2c78c05928a39799cc0">cattle::NeuralNetwork&lt; Scalar, Rank, Sequential &gt;</a>
 , <a class="el" href="classcattle_1_1_p_re_l_u_activation_layer.html#a2c4c775a8f711ecce2636d71b4d31c77">cattle::PReLUActivationLayer&lt; Scalar, Rank &gt;</a>
+, <a class="el" href="classcattle_1_1_p_swish_activation_layer.html#a55177f124396da9ed5d9a6356cd676f5">cattle::PSwishActivationLayer&lt; Scalar, Rank &gt;</a>
 , <a class="el" href="classcattle_1_1_re_l_u_activation_layer.html#ae53d86eece7966ace131af941bb6e095">cattle::ReLUActivationLayer&lt; Scalar, Rank &gt;</a>
 , <a class="el" href="classcattle_1_1_reshape_layer.html#ad90d03809c1a76aee78463a25c7724a3">cattle::ReshapeLayer&lt; Scalar, Rank &gt;</a>
 , <a class="el" href="classcattle_1_1_scaled_activation_layer.html#a42aa507a420c05fb92231beb2771384e">cattle::ScaledActivationLayer&lt; Scalar, Rank &gt;</a>
@@ -140,6 +149,7 @@ $(function() {
 , <a class="el" href="classcattle_1_1_sum_pool_layer.html#aa2f644bff3a428ee0e285dfe9df0c3b8">cattle::SumPoolLayer&lt; Scalar, Rank &gt;</a>
 , <a class="el" href="classcattle_1_1_sum_pool_layer_3_01_scalar_00_011_01_4.html#a94c6224acfba9253d81f4e9ee92c55ca">cattle::SumPoolLayer&lt; Scalar, 1 &gt;</a>
 , <a class="el" href="classcattle_1_1_sum_pool_layer_3_01_scalar_00_012_01_4.html#a1423dc2919eaf86497e0b2090a81a978">cattle::SumPoolLayer&lt; Scalar, 2 &gt;</a>
+, <a class="el" href="classcattle_1_1_swish_activation_layer.html#ad2d918f28cb80019cde160152d85650e">cattle::SwishActivationLayer&lt; Scalar, Rank &gt;</a>
 , <a class="el" href="classcattle_1_1_tanh_activation_layer.html#a8376f4a0a7162753dafa16f5c10bb220">cattle::TanhActivationLayer&lt; Scalar, Rank &gt;</a>
 </li>
 <li>PCAPreprocessor()
@@ -165,6 +175,9 @@ $(function() {
 , <a class="el" href="classcattle_1_1_sequential_neural_network.html#a7938e9ded5e59b86b748a07d25b2a6b7">cattle::SequentialNeuralNetwork&lt; Scalar, Rank &gt;</a>
 , <a class="el" href="classcattle_1_1_stacked_neural_network.html#ad0723d3b9577bda94b20bfdde66f5628">cattle::StackedNeuralNetwork&lt; Scalar, Rank, Sequential &gt;</a>
 , <a class="el" href="classcattle_1_1_temporal_neural_network.html#a6bc17e09f48f808a7e54a0d9ea7adfdb">cattle::TemporalNeuralNetwork&lt; Scalar, Rank &gt;</a>
+</li>
+<li>PSwishActivationLayer()
+: <a class="el" href="classcattle_1_1_p_swish_activation_layer.html#ac760278b4e9f632d4bfea91bd22b1ccf">cattle::PSwishActivationLayer&lt; Scalar, Rank &gt;</a>
 </li>
 </ul>
 </div><!-- contents -->

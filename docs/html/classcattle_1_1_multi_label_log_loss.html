@@ -12,6 +12,12 @@
 <link href="search/search.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="search/searchdata.js"></script>
 <script type="text/javascript" src="search/search.js"></script>
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    extensions: ["tex2jax.js"],
+    jax: ["input/TeX","output/HTML-CSS"],
+});
+</script><script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/MathJax.js"></script>
 <link href="doxygen.css" rel="stylesheet" type="text/css" />
 </head>
 <body>
@@ -117,7 +123,8 @@ Protected Member Functions</h2></td></tr>
 class cattle::MultiLabelLogLoss&lt; Scalar, Rank, Sequential &gt;</h3>
 
 <p>A class template representing the logarithmic loss function for multi-label objectives. </p>
-<p>True labels are expected to have the value 1, while false labels are expected to correspond to the value 0. </p>
+<p>True labels are expected to have the value 1, while false labels are expected to correspond to the value 0.</p>
+<p>\(L_i = \sum_j {y_i}_j \ln(\hat{y_i}_j + \epsilon) + (1 - {y_i}_j) \ln(1 + \epsilon - \hat{y_i}_j)\) </p>
 </div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
 <a id="a7bc29872ff42b858db0bdf17c35fbd5b"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a7bc29872ff42b858db0bdf17c35fbd5b">&#9670;&nbsp;</a></span>MultiLabelLogLoss()</h2>
@@ -205,7 +212,7 @@ template&lt;typename Scalar , std::size_t Rank, bool Sequential&gt; </div>
 </div>
 </div>
 <hr/>The documentation for this class was generated from the following file:<ul>
-<li>C:/Users/A6714/git/C-ATTL3/C-ATTL3/<a class="el" href="_loss_8hpp_source.html">Loss.hpp</a></li>
+<li>C:/Users/Viktor/git/C-ATTL3/C-ATTL3/<a class="el" href="_loss_8hpp_source.html">Loss.hpp</a></li>
 </ul>
 </div><!-- contents -->
 <!-- start footer part -->
