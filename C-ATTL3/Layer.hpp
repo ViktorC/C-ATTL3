@@ -1476,6 +1476,50 @@ private:
 	std::size_t batch_size;
 };
 
+#ifdef CATTL3_USE_CUDNN
+/**
+ * A class template representing a sigmoid activation function layer.
+ *
+ * \f$f(x) = \sigma(x) = \frac{1}{1 + e^{-x}}\f$
+ */
+template<typename Scalar, std::size_t Rank>
+class SigmoidActivationLayer : public ActivationLayer<Scalar,Rank> {
+	typedef Layer<Scalar,Rank> Root;
+	typedef ActivationLayer<Scalar,Rank> Base;
+public:
+	/**
+	 * @param dims The dimensionality of the input tensor.
+	 */
+	inline SigmoidActivationLayer(const Dimensions<std::size_t,Rank>& dims) :
+			ActivationLayer<Scalar,Rank>::ActivationLayer(dims) { }
+	inline Layer<Scalar,Rank>* clone() const {
+		return new SigmoidActivationLayer(*this);
+	}
+protected:
+	inline Layer<Scalar,Rank>* clone_with_shared_params() const {
+		return clone();
+	}
+	inline void empty_cache() {
+		in = typename Root::Data();
+		out = typename Root::Data();
+	}
+	inline typename Root::Data pass_forward(typename Root::Data in, bool training) {
+		assert((Dimensions<std::size_t,Base::DATA_RANK>(in.dimensions()).template demote<>()) == Base::dims);
+		assert(in.dimension(0) > 0);
+		this->in = std::move(in);
+		out = internal::CuDNNHandle<Scalar,Base::DATA_RANK>::get_instance().sigmoid_activation_fwd(this->in);
+		return out;
+	}
+	inline typename Root::Data pass_back(typename Root::Data out_grads) {
+		assert((Dimensions<std::size_t,Base::DATA_RANK>(out_grads.dimensions()).template demote<>()) == Base::dims);
+		assert(out_grads.dimension(0) > 0 && out.dimension(0) == out_grads.dimension(0));
+		return internal::CuDNNHandle<Scalar,Base::DATA_RANK>::get_instance().sigmoid_activation_bwd(in, out, out_grads);
+	}
+private:
+	typename Root::Data in;
+	typename Root::Data out;
+};
+#else
 /**
  * A class template representing a sigmoid activation function layer.
  *
@@ -1520,7 +1564,52 @@ private:
 	// Staged computation cache.
 	typename Root::Data out;
 };
+#endif
 
+#ifdef CATTL3_USE_CUDNN
+/**
+ * A class template representing a hyperbolic tangent activation function layer.
+ *
+ * \f$f(x) = \text{tanh}(x)\f$
+ */
+template<typename Scalar, std::size_t Rank>
+class TanhActivationLayer : public ActivationLayer<Scalar,Rank> {
+	typedef Layer<Scalar,Rank> Root;
+	typedef ActivationLayer<Scalar,Rank> Base;
+public:
+	/**
+	 * @param dims The dimensionality of the input tensor.
+	 */
+	inline TanhActivationLayer(const Dimensions<std::size_t,Rank>& dims) :
+			ActivationLayer<Scalar,Rank>::ActivationLayer(dims) { }
+	inline Layer<Scalar,Rank>* clone() const {
+		return new TanhActivationLayer(*this);
+	}
+protected:
+	inline Layer<Scalar,Rank>* clone_with_shared_params() const {
+		return clone();
+	}
+	inline void empty_cache() {
+		in = typename Root::Data();
+		out = typename Root::Data();
+	}
+	inline typename Root::Data pass_forward(typename Root::Data in, bool training) {
+		assert((Dimensions<std::size_t,Base::DATA_RANK>(in.dimensions()).template demote<>()) == Base::dims);
+		assert(in.dimension(0) > 0);
+		this->in = std::move(in);
+		out = internal::CuDNNHandle<Scalar,Base::DATA_RANK>::get_instance().tanh_activation_fwd(this->in);
+		return out;
+	}
+	inline typename Root::Data pass_back(typename Root::Data out_grads) {
+		assert((Dimensions<std::size_t,Base::DATA_RANK>(out_grads.dimensions()).template demote<>()) == Base::dims);
+		assert(out_grads.dimension(0) > 0 && out.dimension(0) == out_grads.dimension(0));
+		return internal::CuDNNHandle<Scalar,Base::DATA_RANK>::get_instance().tanh_activation_bwd(in, out, out_grads);
+	}
+private:
+	typename Root::Data in;
+	typename Root::Data out;
+};
+#else
 /**
  * A class template representing a hyperbolic tangent activation function layer.
  *
@@ -1564,6 +1653,7 @@ protected:
 private:
 	typename Root::Data out;
 };
+#endif
 
 /**
  * A class template representing a softsign activation function layer, an alternative to the
@@ -1656,6 +1746,50 @@ private:
 	typename Root::Data in;
 };
 
+#ifdef CATTL3_USE_CUDNN
+/**
+ * A class template for a softmax activation function layer. Unlike most other activation
+ * functions, the softmax layer does not represent a simple coefficient-wise function but
+ * a multivariate one. The per-sample sums of the elements of the output tensor of the layer
+ * are always 1.
+ *
+ * \f$f(x_i) = \frac{e^{x_i}}{\sum\limits_{j = 1}^J e^{x_j}}\f$
+ */
+template<typename Scalar, std::size_t Rank>
+class SoftmaxActivationLayer : public ActivationLayer<Scalar,Rank> {
+	typedef Layer<Scalar,Rank> Root;
+	typedef ActivationLayer<Scalar,Rank> Base;
+public:
+	/**
+	 * @param dims The dimensionality of the input tensor.
+	 */
+	inline SoftmaxActivationLayer(const Dimensions<std::size_t,Rank>& dims) :
+			ActivationLayer<Scalar,Rank>::ActivationLayer(dims) { }
+	inline Layer<Scalar,Rank>* clone() const {
+		return new SoftmaxActivationLayer(*this);
+	}
+protected:
+	inline Layer<Scalar,Rank>* clone_with_shared_params() const {
+		return clone();
+	}
+	inline void empty_cache() {
+		out = typename Root::Data();
+	}
+	inline typename Root::Data pass_forward(typename Root::Data in, bool training) {
+		assert((Dimensions<std::size_t,Base::DATA_RANK>(in.dimensions()).template demote<>()) == Base::dims);
+		assert(in.dimension(0) > 0);
+		out = internal::CuDNNHandle<Scalar,Base::DATA_RANK>::get_instance().softmax_fwd(in);
+		return out;
+	}
+	inline typename Root::Data pass_back(typename Root::Data out_grads) {
+		assert((Dimensions<std::size_t,Base::DATA_RANK>(out_grads.dimensions()).template demote<>()) == Base::dims);
+		assert(out_grads.dimension(0) > 0 && out.dimension(0) == out_grads.dimension(0));
+		return internal::CuDNNHandle<Scalar,Base::DATA_RANK>::get_instance().softmax_bwd(out, out_grads);
+	}
+private:
+	typename Root::Data out;
+};
+#else
 /**
  * A class template for a softmax activation function layer. Unlike most other activation
  * functions, the softmax layer does not represent a simple coefficient-wise function but
@@ -1725,7 +1859,58 @@ private:
 	// Staged computation cache matrix.
 	Matrix<Scalar> out;
 };
+#endif
 
+#ifdef CATTL3_USE_CUDNN
+/**
+ * A class template representing a rectified linear unit (ReLU) activation function. ReLU
+ * layers set all negative elements of the input to 0. This function is not differentiable.
+
+ * \f[
+ *   f(x) = \begin{cases}
+ *     0 & \text{for } x < 0\\
+ *     x & \text{for } x \geq 0
+ *   \end{cases}
+ * \f]
+ */
+template<typename Scalar, std::size_t Rank>
+class ReLUActivationLayer : public ActivationLayer<Scalar,Rank> {
+	typedef Layer<Scalar,Rank> Root;
+	typedef ActivationLayer<Scalar,Rank> Base;
+public:
+	/**
+	 * @param dims The dimensionality of the input tensor.
+	 */
+	inline ReLUActivationLayer(const Dimensions<std::size_t,Rank>& dims) :
+			ActivationLayer<Scalar,Rank>::ActivationLayer(dims) { }
+	inline Layer<Scalar,Rank>* clone() const {
+		return new ReLUActivationLayer(*this);
+	}
+protected:
+	inline Layer<Scalar,Rank>* clone_with_shared_params() const {
+		return clone();
+	}
+	inline void empty_cache() {
+		in = typename Root::Data();
+		out = typename Root::Data();
+	}
+	inline typename Root::Data pass_forward(typename Root::Data in, bool training) {
+		assert((Dimensions<std::size_t,Base::DATA_RANK>(in.dimensions()).template demote<>()) == Base::dims);
+		assert(in.dimension(0) > 0);
+		this->in = std::move(in);
+		out = internal::CuDNNHandle<Scalar,Base::DATA_RANK>::get_instance().relu_activation_fwd(this->in);
+		return out;
+	}
+	inline typename Root::Data pass_back(typename Root::Data out_grads) {
+		assert((Dimensions<std::size_t,Base::DATA_RANK>(out_grads.dimensions()).template demote<>()) == Base::dims);
+		assert(out_grads.dimension(0) > 0 && out.dimension(0) == out_grads.dimension(0));
+		return internal::CuDNNHandle<Scalar,Base::DATA_RANK>::get_instance().relu_activation_bwd(in, out, out_grads);
+	}
+private:
+	typename Root::Data in;
+	typename Root::Data out;
+};
+#else
 /**
  * A class template representing a rectified linear unit (ReLU) activation function. ReLU
  * layers set all negative elements of the input to 0. This function is not differentiable.
@@ -1772,6 +1957,7 @@ protected:
 private:
 	typename Root::Data in;
 };
+#endif
 
 /**
  * A class template representing a leaky rectified linear unit activation function. Unlike
@@ -1826,6 +2012,63 @@ private:
 	typename Root::Data in;
 };
 
+#ifdef CATTL3_USE_CUDNN
+/**
+ * A class template representing an exponential linear unit (ELU) activation function. ELUs
+ * apply an exponential (e based) function scaled by alpha to the negative elements of the input.
+ * ELU layers are not differentiable.
+ *
+ * \f[
+ *   f(x) = \begin{cases}
+ *     \alpha (e^x - 1) & \text{for } x < 0\\
+ *     x & \text{for } x \geq 0
+ *   \end{cases}
+ * \f]
+ *
+ * \see https://arxiv.org/abs/1511.07289
+ */
+template<typename Scalar, std::size_t Rank>
+class ELUActivationLayer : public ActivationLayer<Scalar,Rank> {
+	typedef Layer<Scalar,Rank> Root;
+	typedef ActivationLayer<Scalar,Rank> Base;
+public:
+	/**
+	 * @param dims The dimensionality of the input tensor.
+	 * @param alpha The factor by which negative inputs are to be scaled.
+	 */
+	inline ELUActivationLayer(const Dimensions<std::size_t,Rank>& dims, Scalar alpha = 1e-1) :
+			ActivationLayer<Scalar,Rank>::ActivationLayer(dims),
+			alpha(alpha) { }
+	inline Layer<Scalar,Rank>* clone() const {
+		return new ELUActivationLayer(*this);
+	}
+protected:
+	inline Layer<Scalar,Rank>* clone_with_shared_params() const {
+		return clone();
+	}
+	inline void empty_cache() {
+		in = typename Root::Data();
+		out = typename Root::Data();
+	}
+	inline typename Root::Data pass_forward(typename Root::Data in, bool training) {
+		assert((Dimensions<std::size_t,Base::DATA_RANK>(in.dimensions()).template demote<>()) == Base::dims);
+		assert(in.dimension(0) > 0);
+		this->in = std::move(in);
+		out = internal::CuDNNHandle<Scalar,Base::DATA_RANK>::get_instance().elu_activation_fwd(this->in, alpha);
+		return out;
+	}
+	inline typename Root::Data pass_back(typename Root::Data out_grads) {
+		assert((Dimensions<std::size_t,Base::DATA_RANK>(out_grads.dimensions()).template demote<>()) == Base::dims);
+		assert(out_grads.dimension(0) > 0 && out.dimension(0) == out_grads.dimension(0));
+		return internal::CuDNNHandle<Scalar,Base::DATA_RANK>::get_instance().elu_activation_bwd(in, out, out_grads, alpha);
+	}
+private:
+	const Scalar alpha;
+	// Staged computation cache.
+	typename Root::Data in;
+	typename Root::Data out;
+};
+#else
 /**
  * A class template representing an exponential linear unit (ELU) activation function. ELUs
  * apply an exponential (e based) function scaled by alpha to the negative elements of the input.
@@ -1896,6 +2139,7 @@ private:
 	Matrix<Scalar> in;
 	Matrix<Scalar> out;
 };
+#endif
 
 /**
  * A class template representing a parametric rectified linear unit (PReLU) activation function.

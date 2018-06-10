@@ -28,11 +28,11 @@ using GemmRoutine = cublasStatus_t (*)(cublasHandle_t, cublasOperation_t, cublas
 		int, int, int, const Scalar*, const Scalar*, int, const Scalar*, int, const Scalar*,
 		Scalar*, int);
 
-template<typename Scalar> __inline__ GemmRoutine<Scalar> get_gemm_routine() {
+template<typename Scalar> __inline__ GemmRoutine<Scalar> resolve_gemm_routine() {
 	return &cublasDgemm;
 }
 
-template<> __inline__ GemmRoutine<float> get_gemm_routine() {
+template<> __inline__ GemmRoutine<float> resolve_gemm_routine() {
 	return &cublasSgemm;
 }
 
@@ -140,7 +140,7 @@ public:
 		Scalar alpha = 1;
 		Scalar beta = 0;
 		// Resolve the GEMM precision based on the scalar type.
-		GemmRoutine<Scalar> gemm = get_gemm_routine<Scalar>();
+		GemmRoutine<Scalar> gemm = resolve_gemm_routine<Scalar>();
 		// Perform the matrix multiplication.
 		cublas_stat = gemm(handle, a_op, b_op, a_rows, b_cols, a_cols, &alpha, d_a,
 				a_orig_rows, d_b, b_orig_rows, &beta, d_c, a_rows);
