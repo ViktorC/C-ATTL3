@@ -31,11 +31,11 @@
 #include "WeightInitialization.hpp"
 
 #ifdef CATTL3_USE_CUBLAS
-#include "utils/CuBLASHandle.hpp"
+#include "utils/gpu/CuBLASHandle.hpp"
 #endif
 
 #ifdef CATTL3_USE_CUDNN
-#include "utils/CuDNNHandle.hpp"
+#include "utils/gpu/CuDNNHandle.hpp"
 #endif
 
 namespace cattle {
@@ -236,12 +236,12 @@ protected:
 	 * any. If there are, it also calculates the derivative of the regularization penalty
 	 * w.r.t. to the layer's parameters and adds it to their gradient.
 	 *
-	 * @param out_grads The derivative of the loss function w.r.t. the output of the
+	 * @param out_grad The derivative of the loss function w.r.t. the output of the
 	 * layer
 	 * @return The derivative of the loss function w.r.t. the output of the previous layer
 	 * or a null tensor if the layer is an input layer.
 	 */
-	virtual Data pass_back(Data out_grads) = 0;
+	virtual Data pass_back(Data out_grad) = 0;
 };
 
 // Initialize the static default regularization penalty.
@@ -391,37 +391,46 @@ protected:
 		biased_in_mat.leftCols(input_size) = MatrixMap<Scalar>(in.data(), in.dimension(0), input_size);
 		biased_in_mat.col(input_size).setOnes();
 #ifndef CATTL3_USE_CUBLAS
-		Matrix<Scalar> out = biased_in_mat * Base::weights_ref;
+		Matrix<Scalar> out_mat = biased_in_mat * Base::weights_ref;
+		out_conversion_dims[0] = out_mat.rows();
+		return TensorMap<Scalar,Root::DATA_RANK>(out_mat.data(), out_conversion_dims);
 #else
-		Matrix<Scalar> out = internal::CuBLASHandle<Scalar>::get_instance().mul(biased_in_mat, Base::weights_ref, false, false);
+		out_conversion_dims[0] = biased_in_mat.rows();
+		typename Root::Data out(out_conversion_dims);
+		internal::CuBLASHandle<Scalar>::get_instance().matrix_mul(biased_in_mat.data(), biased_in_mat.rows(), biased_in_mat.cols(),
+				false, Base::weights_ref.data(), Base::weights_ref.rows(), Base::weights_ref.cols(), false, out.data());
+		return out;
 #endif
-		out_conversion_dims[0] = out.rows();
-		return TensorMap<Scalar,Root::DATA_RANK>(out.data(), out_conversion_dims);
 	}
-	inline typename Root::Data pass_back(typename Root::Data out_grads) {
-		assert((Dimensions<std::size_t,Root::DATA_RANK>(out_grads.dimensions()).template demote<>()) == Base::output_dims);
-		assert(out_grads.dimension(0) > 0 && biased_in_mat.rows() == out_grads.dimension(0));
+	inline typename Root::Data pass_back(typename Root::Data out_grad) {
+		assert((Dimensions<std::size_t,Root::DATA_RANK>(out_grad.dimensions()).template demote<>()) == Base::output_dims);
+		assert(out_grad.dimension(0) > 0 && biased_in_mat.rows() == out_grad.dimension(0));
 		// Compute the gradient of the outputs with respect to the weights.
 #ifndef CATTL3_USE_CUBLAS
-		MatrixMap<Scalar> out_grads_mat(out_grads.data(), out_grads.dimension(0), Base::output_dims.get_volume());
-		Base::weights_grad = biased_in_mat.transpose() * out_grads_mat;
+		MatrixMap<Scalar> out_grad_mat(out_grad.data(), out_grad.dimension(0), Base::output_dims.get_volume());
+		Base::weights_grad = biased_in_mat.transpose() * out_grad_mat;
 		if (Base::is_input_layer())
 			return typename Root::Data();
 		/* Remove the bias row from the weight matrix, transpose it, and compute the derivative w.r.t. the
 		 * previous layer's output. */
-		Matrix<Scalar> prev_out_grads = out_grads_mat * Base::weights_ref.topRows(Base::input_dims.get_volume()).transpose();
+		Matrix<Scalar> prev_out_grad_mat = out_grad_mat * Base::weights_ref.topRows(Base::input_dims.get_volume()).transpose();
+		prev_out_conversion_dims[0] = prev_out_grad_mat.rows();
+		return TensorMap<Scalar,Root::DATA_RANK>(prev_out_grad_mat.data(), prev_out_conversion_dims);
 #else
-		Matrix<Scalar> out_grads_mat = MatrixMap<Scalar>(out_grads.data(), out_grads.dimension(0),
-				Base::output_dims.get_volume());
-		Base::weights_grad = internal::CuBLASHandle<Scalar>::get_instance().mul(biased_in_mat, out_grads_mat, true, false);
+		std::size_t out_grad_rows = out_grad.dimension(0);
+		std::size_t out_grad_cols = out_grad.size() / out_grad_rows;
+		internal::CuBLASHandle<Scalar>::get_instance().matrix_mul(biased_in_mat.data(), biased_in_mat.rows(), biased_in_mat.cols(),
+				true, out_grad.data(), out_grad_rows, out_grad_cols, false, Base::weights_grad.data());
 		if (Base::is_input_layer())
 			return typename Root::Data();
 		Matrix<Scalar> weights_without_bias = Base::weights_ref.topRows(Base::input_dims.get_volume());
-		Matrix<Scalar> prev_out_grads = internal::CuBLASHandle<Scalar>::get_instance().mul(out_grads_mat,
-				weights_without_bias, false, true);
+		prev_out_conversion_dims[0] = out_grad_rows;
+		typename Root::Data prev_out_grad(prev_out_conversion_dims);
+		internal::CuBLASHandle<Scalar>::get_instance().matrix_mul(out_grad.data(), out_grad_rows, out_grad_cols, false,
+				weights_without_bias.data(), weights_without_bias.rows(), weights_without_bias.cols(), true,
+				prev_out_grad.data());
+		return prev_out_grad;
 #endif
-		prev_out_conversion_dims[0] = prev_out_grads.rows();
-		return TensorMap<Scalar,Root::DATA_RANK>(prev_out_grads.data(), prev_out_conversion_dims);
 	}
 private:
 	RankwiseArray out_conversion_dims;
@@ -541,39 +550,46 @@ protected:
 		// Bias trick.
 		biased_in_conv_mat.col(receptor_vol).setOnes();
 #ifndef CATTL3_USE_CUBLAS
-		Matrix<Scalar> out = biased_in_conv_mat * Base::weights_ref;
-#else
-		Matrix<Scalar> out = internal::CuBLASHandle<Scalar>::get_instance().mul(biased_in_conv_mat,
-				Base::weights_ref, false, false);
-#endif
+		Matrix<Scalar> out_mat = biased_in_conv_mat * Base::weights_ref;
 		out_conversion_dims[0] = rows;
-		return TensorMap<Scalar,4>(out.data(), out_conversion_dims);
+		return TensorMap<Scalar,4>(out_mat.data(), out_conversion_dims);
+#else
+		out_conversion_dims[0] = rows;
+		Tensor<Scalar,4> out(out_conversion_dims);
+		internal::CuBLASHandle<Scalar>::get_instance().matrix_mul(biased_in_conv_mat.data(), biased_in_conv_mat.rows(),
+				biased_in_conv_mat.cols(), false, Base::weights_ref.data(), Base::weights_ref.rows(), Base::weights_ref.cols(),
+				false, out.data());
+		return out;
+#endif
 	}
-	inline Tensor<Scalar,4> _pass_back(Tensor<Scalar,4> out_grads) {
-		std::size_t rows = out_grads.dimension(0);
+	inline Tensor<Scalar,4> _pass_back(Tensor<Scalar,4> out_grad) {
+		std::size_t rows = out_grad.dimension(0);
 		std::size_t total_patches = rows * patches_per_sample;
 		std::size_t receptor_vol = Base::weights_ref.rows() - 1;
 #ifndef CATTL3_USE_CUBLAS
-		MatrixMap<Scalar> out_grads_mat(out_grads.data(), total_patches, filters);
-		Base::weights_grad = biased_in_conv_mat.transpose() * out_grads_mat;
+		MatrixMap<Scalar> out_grad_mat(out_grad.data(), total_patches, filters);
+		Base::weights_grad = biased_in_conv_mat.transpose() * out_grad_mat;
 		if (Base::is_input_layer())
 			return Tensor<Scalar,4>();
 		/* Remove the bias row from the weight matrix, transpose it, and compute the gradient of the
 		 * previous layer's output. */
-		Matrix<Scalar> prev_out_grads_conv_mat = out_grads_mat * Base::weights_ref.topRows(receptor_vol).transpose();
+		Matrix<Scalar> prev_out_grad_conv_mat = out_grad_mat * Base::weights_ref.topRows(receptor_vol).transpose();
 #else
-		Matrix<Scalar> out_grads_mat = MatrixMap<Scalar>(out_grads.data(), total_patches, filters);
-		Base::weights_grad = internal::CuBLASHandle<Scalar>::get_instance().mul(biased_in_conv_mat, out_grads_mat, true, false);
+		internal::CuBLASHandle<Scalar>::get_instance().matrix_mul(biased_in_conv_mat.data(), biased_in_conv_mat.rows(),
+				biased_in_conv_mat.cols(), true, out_grad.data(), total_patches, filters, false, Base::weights_grad.data());
 		if (Base::is_input_layer())
 			return Tensor<Scalar,4>();
-		Matrix<Scalar> weights_without_bias = Base::weights_ref.topRows(receptor_vol);
-		Matrix<Scalar> prev_out_grads_conv_mat = internal::CuBLASHandle<Scalar>::get_instance().mul(out_grads_mat,
-				weights_without_bias, false, true);
+		Matrix<Scalar> prev_out_grad_conv_mat(total_patches, receptor_vol);
+		{
+			Matrix<Scalar> weights_without_bias = Base::weights_ref.topRows(receptor_vol);
+			internal::CuBLASHandle<Scalar>::get_instance().matrix_mul(out_grad.data(), total_patches, filters, false,
+					weights_without_bias.data(), receptor_vol, filters, true, prev_out_grad_conv_mat.data());
+		}
 #endif
 		/* Given the gradient of the stretched out receptor patches, perform a 'backwards' convolution
 		 * to get the derivative w.r.t. the individual input nodes. */
-		Tensor<Scalar,4> prev_out_grads(rows, padded_height, padded_width, ext_input_dims(2));
-		prev_out_grads.setZero();
+		Tensor<Scalar,4> prev_out_grad(rows, padded_height, padded_width, ext_input_dims(2));
+		prev_out_grad.setZero();
 		std::size_t patch_ind = 0;
 		patch_extents[0] = rows;
 		for (std::size_t i = 0; i <= padded_width - dil_receptor_width; i += horizontal_stride) {
@@ -581,24 +597,24 @@ protected:
 			for (std::size_t j = 0; j <= padded_height - dil_receptor_height; j += vertical_stride) {
 				patch_offsets[1] = j;
 				// Accumulate the gradients where the receptor-patch-tensors overlap.
-				Matrix<Scalar> prev_out_grads_conv_mat_block = prev_out_grads_conv_mat.block(patch_ind, 0,
+				Matrix<Scalar> prev_out_grad_conv_mat_block = prev_out_grad_conv_mat.block(patch_ind, 0,
 						rows, receptor_vol);
-				TensorMap<Scalar,4> prev_out_grads_patch(prev_out_grads_conv_mat_block.data(), rows,
+				TensorMap<Scalar,4> prev_out_grad_patch(prev_out_grad_conv_mat_block.data(), rows,
 						receptor_height, receptor_width, ext_input_dims(2));
 				if (vertical_dilation > 0 || horizontal_dilation > 0)
-					prev_out_grads.slice(patch_offsets, patch_extents).stride(dil_strides) += prev_out_grads_patch;
+					prev_out_grad.slice(patch_offsets, patch_extents).stride(dil_strides) += prev_out_grad_patch;
 				else
-					prev_out_grads.slice(patch_offsets, patch_extents) += prev_out_grads_patch;
+					prev_out_grad.slice(patch_offsets, patch_extents) += prev_out_grad_patch;
 				patch_ind += rows;
 			}
 		}
-		assert(patch_ind == prev_out_grads_conv_mat.rows());
+		assert(patch_ind == prev_out_grad_conv_mat.rows());
 		if (vertical_padding > 0 || horizontal_padding > 0) {
 			// Cut off the padding.
 			no_padding_extents[0] = rows;
-			return prev_out_grads.slice(no_padding_offsets, no_padding_extents);
+			return prev_out_grad.slice(no_padding_offsets, no_padding_extents);
 		} else
-			return prev_out_grads;
+			return prev_out_grad;
 	}
 	/**
 	 * It computes the dimension of the output tensor along a rank.
@@ -717,10 +733,10 @@ protected:
 		batch_size = in.dimension(0);
 		return ConvBase::_pass_forward(std::move(in), training);
 	}
-	inline typename Root::Data pass_back(typename Root::Data out_grads) {
-		assert((Dimensions<std::size_t,4>(out_grads.dimensions()).template demote<>()) == KernelBase::output_dims);
-		assert(out_grads.dimension(0) > 0 && batch_size == out_grads.dimension(0));
-		return ConvBase::_pass_back(std::move(out_grads));
+	inline typename Root::Data pass_back(typename Root::Data out_grad) {
+		assert((Dimensions<std::size_t,4>(out_grad.dimensions()).template demote<>()) == KernelBase::output_dims);
+		assert(out_grad.dimension(0) > 0 && batch_size == out_grad.dimension(0));
+		return ConvBase::_pass_back(std::move(out_grad));
 	}
 private:
 	std::size_t batch_size;
@@ -786,14 +802,14 @@ protected:
 		return ConvBase::_pass_forward(TensorMap<Scalar,4>(in.data(), { batch_size, in.dimension(1), in.dimension(2), 1u }), training)
 				.reshape(std::array<std::size_t,3>({ batch_size, KernelBase::output_dims(0), KernelBase::output_dims(1) }));
 	}
-	inline typename Root::Data pass_back(typename Root::Data out_grads) {
-		assert((Dimensions<std::size_t,3>(out_grads.dimensions()).template demote<>()) == KernelBase::output_dims);
-		assert(out_grads.dimension(0) > 0 && batch_size == out_grads.dimension(0));
-		Tensor<Scalar,4> prev_out_grads = ConvBase::_pass_back(TensorMap<Scalar,4>(out_grads.data(),
+	inline typename Root::Data pass_back(typename Root::Data out_grad) {
+		assert((Dimensions<std::size_t,3>(out_grad.dimensions()).template demote<>()) == KernelBase::output_dims);
+		assert(out_grad.dimension(0) > 0 && batch_size == out_grad.dimension(0));
+		Tensor<Scalar,4> prev_out_grad = ConvBase::_pass_back(TensorMap<Scalar,4>(out_grad.data(),
 				{ batch_size, ConvBase::ext_output_dims(0), ConvBase::ext_output_dims(1), ConvBase::ext_output_dims(2) }));
 		if (KernelBase::is_input_layer())
 			return Tensor<Scalar,3>();
-		return TensorMap<Scalar,3>(prev_out_grads.data(), { batch_size, KernelBase::input_dims(0), KernelBase::input_dims(1) });
+		return TensorMap<Scalar,3>(prev_out_grad.data(), { batch_size, KernelBase::input_dims(0), KernelBase::input_dims(1) });
 	}
 private:
 	std::size_t batch_size;
@@ -850,14 +866,14 @@ protected:
 		return ConvBase::_pass_forward(TensorMap<Scalar,4>(in.data(), { batch_size, in.dimension(1), 1u, 1u }), training)
 				.reshape(std::array<std::size_t,2>({ batch_size, KernelBase::output_dims(0) }));
 	}
-	inline typename Root::Data pass_back(typename Root::Data out_grads) {
-		assert((Dimensions<std::size_t,2>(out_grads.dimensions()).template demote<>()) == KernelBase::output_dims);
-		assert(out_grads.dimension(0) > 0 && batch_size == out_grads.dimension(0));
-		Tensor<Scalar,4> prev_out_grads = ConvBase::_pass_back(TensorMap<Scalar,4>(out_grads.data(),
+	inline typename Root::Data pass_back(typename Root::Data out_grad) {
+		assert((Dimensions<std::size_t,2>(out_grad.dimensions()).template demote<>()) == KernelBase::output_dims);
+		assert(out_grad.dimension(0) > 0 && batch_size == out_grad.dimension(0));
+		Tensor<Scalar,4> prev_out_grad = ConvBase::_pass_back(TensorMap<Scalar,4>(out_grad.data(),
 				{ batch_size, ConvBase::ext_output_dims(0), ConvBase::ext_output_dims(1), ConvBase::ext_output_dims(2) }));
 		if (KernelBase::is_input_layer())
 			return Tensor<Scalar,2>();
-		return TensorMap<Scalar,2>(prev_out_grads.data(), { batch_size, KernelBase::input_dims(0) });
+		return TensorMap<Scalar,2>(prev_out_grad.data(), { batch_size, KernelBase::input_dims(0) });
 	}
 private:
 	std::size_t batch_size;
@@ -950,8 +966,10 @@ protected:
 #ifndef CATTL3_USE_CUBLAS
 		Matrix<Scalar> out_conv_mat = biased_in_mat * Base::weights_ref;
 #else
-		Matrix<Scalar> out_conv_mat = internal::CuBLASHandle<Scalar>::get_instance().mul(biased_in_mat,
-				Base::weights_ref, false, false);
+		Matrix<Scalar> out_conv_mat(total_patches, Base::weights_ref.cols());
+		internal::CuBLASHandle<Scalar>::get_instance().matrix_mul(biased_in_mat.data(), biased_in_mat.rows(),
+				biased_in_mat.cols(), false, Base::weights_ref.data(), Base::weights_ref.rows(),
+				Base::weights_ref.cols(), false, out_conv_mat.data());
 #endif
 		/* Given the values of the stretched out receptor patches, accumulate them in the output tensor. */
 		Tensor<Scalar,4> out(rows, padded_height, padded_width, ext_output_dims(2));
@@ -981,17 +999,17 @@ protected:
 		} else
 			return out;
 	}
-	inline Tensor<Scalar,4> _pass_back(Tensor<Scalar,4> out_grads) {
+	inline Tensor<Scalar,4> _pass_back(Tensor<Scalar,4> out_grad) {
 		// Spatial padding.
 		if (vertical_padding > 0 || horizontal_padding > 0)
-			out_grads = Tensor<Scalar,4>(out_grads.pad(paddings));
-		std::size_t rows = out_grads.dimension(0);
+			out_grad = Tensor<Scalar,4>(out_grad.pad(paddings));
+		std::size_t rows = out_grad.dimension(0);
 		std::size_t depth = ext_input_dims(2);
 		std::size_t receptor_vol = Base::weights_ref.cols();
 		std::size_t total_patches = rows * patches_per_sample;
 		std::size_t patch_ind = 0;
 		patch_extents[0] = rows;
-		Matrix<Scalar> out_grads_conv_mat(total_patches, receptor_vol);
+		Matrix<Scalar> out_grad_conv_mat(total_patches, receptor_vol);
 		for (std::size_t i = 0; i <= padded_width - dil_receptor_width; i += horizontal_stride) {
 			patch_offsets[2] = i;
 			for (std::size_t j = 0; j <= padded_height - dil_receptor_height; j += vertical_stride) {
@@ -999,31 +1017,38 @@ protected:
 				Tensor<Scalar,4> patch;
 				// If the patch is dilated, skip the 'internal padding' when flattening it into a matrix.
 				if (vertical_dilation > 0 || horizontal_dilation > 0)
-					patch = out_grads.slice(patch_offsets, patch_extents).stride(dil_strides);
+					patch = out_grad.slice(patch_offsets, patch_extents).stride(dil_strides);
 				else
-					patch = out_grads.slice(patch_offsets, patch_extents);
-				out_grads_conv_mat.block(patch_ind, 0, rows, receptor_vol) = MatrixMap<Scalar>(patch.data(),
+					patch = out_grad.slice(patch_offsets, patch_extents);
+				out_grad_conv_mat.block(patch_ind, 0, rows, receptor_vol) = MatrixMap<Scalar>(patch.data(),
 						rows, receptor_vol);
 				patch_ind += rows;
 			}
 		}
 		assert(patch_ind == total_patches);
 #ifndef CATTL3_USE_CUBLAS
-		Base::weights_grad = biased_in_mat.transpose() * out_grads_conv_mat;
+		Base::weights_grad = biased_in_mat.transpose() * out_grad_conv_mat;
 		if (Base::is_input_layer())
 			return Tensor<Scalar,4>();
-		Matrix<Scalar> prev_out_grads = out_grads_conv_mat * Base::weights_ref.topRows(depth).transpose();
-#else
-		Base::weights_grad = internal::CuBLASHandle<Scalar>::get_instance().mul(biased_in_mat,
-				out_grads_conv_mat, true, false);
-		if (Base::is_input_layer())
-			return Tensor<Scalar,4>();
-		Matrix<Scalar> weights_without_bias = Base::weights_ref.topRows(depth);
-		Matrix<Scalar> prev_out_grads = internal::CuBLASHandle<Scalar>::get_instance().mul(out_grads_conv_mat,
-				weights_without_bias, false, true);
-#endif
+		Matrix<Scalar> prev_out_grad = out_grad_conv_mat * Base::weights_ref.topRows(depth).transpose();
 		prev_out_conversion_dims[0] = rows;
-		return TensorMap<Scalar,4>(prev_out_grads.data(), prev_out_conversion_dims);
+		return TensorMap<Scalar,4>(prev_out_grad.data(), prev_out_conversion_dims);
+#else
+		internal::CuBLASHandle<Scalar>::get_instance().matrix_mul(biased_in_mat.data(), biased_in_mat.rows(),
+				biased_in_mat.cols(), true, out_grad_conv_mat.data(), total_patches, receptor_vol, false,
+				Base::weights_grad.data());
+		if (Base::is_input_layer())
+			return Tensor<Scalar,4>();
+		prev_out_conversion_dims[0] = rows;
+		Tensor<Scalar,4> prev_out(prev_out_conversion_dims);
+		{
+			Matrix<Scalar> weights_without_bias = Base::weights_ref.topRows(depth);
+			internal::CuBLASHandle<Scalar>::get_instance().matrix_mul(out_grad_conv_mat.data(), total_patches,
+					receptor_vol, false, weights_without_bias.data(), depth, weights_without_bias.cols(),
+					true, prev_out.data());
+		}
+		return prev_out;
+#endif
 	}
 	/**
 	 * It computes the dimension of the output tensor along a rank.
@@ -1142,10 +1167,10 @@ protected:
 		batch_size = in.dimension(0);
 		return DeconvBase::_pass_forward(std::move(in), training);
 	}
-	inline typename Root::Data pass_back(typename Root::Data out_grads) {
-		assert((Dimensions<std::size_t,4>(out_grads.dimensions()).template demote<>()) == KernelBase::output_dims);
-		assert(out_grads.dimension(0) > 0 && batch_size == out_grads.dimension(0));
-		return DeconvBase::_pass_back(std::move(out_grads));
+	inline typename Root::Data pass_back(typename Root::Data out_grad) {
+		assert((Dimensions<std::size_t,4>(out_grad.dimensions()).template demote<>()) == KernelBase::output_dims);
+		assert(out_grad.dimension(0) > 0 && batch_size == out_grad.dimension(0));
+		return DeconvBase::_pass_back(std::move(out_grad));
 	}
 private:
 	std::size_t batch_size;
@@ -1213,14 +1238,14 @@ protected:
 		return DeconvBase::_pass_forward(TensorMap<Scalar,4>(in.data(), { batch_size, in.dimension(1), in.dimension(2), 1u }), training)
 				.reshape(std::array<std::size_t,3>({ batch_size, KernelBase::output_dims(0), KernelBase::output_dims(1) }));
 	}
-	inline typename Root::Data pass_back(typename Root::Data out_grads) {
-		assert((Dimensions<std::size_t,3>(out_grads.dimensions()).template demote<>()) == KernelBase::output_dims);
-		assert(out_grads.dimension(0) > 0 && batch_size == out_grads.dimension(0));
-		Tensor<Scalar,4> prev_out_grads = DeconvBase::_pass_back(TensorMap<Scalar,4>(out_grads.data(),
+	inline typename Root::Data pass_back(typename Root::Data out_grad) {
+		assert((Dimensions<std::size_t,3>(out_grad.dimensions()).template demote<>()) == KernelBase::output_dims);
+		assert(out_grad.dimension(0) > 0 && batch_size == out_grad.dimension(0));
+		Tensor<Scalar,4> prev_out_grad = DeconvBase::_pass_back(TensorMap<Scalar,4>(out_grad.data(),
 				{ batch_size, DeconvBase::ext_output_dims(0), DeconvBase::ext_output_dims(1), DeconvBase::ext_output_dims(2) }));
 		if (KernelBase::is_input_layer())
 			return Tensor<Scalar,3>();
-		return TensorMap<Scalar,3>(prev_out_grads.data(), { batch_size, KernelBase::input_dims(0), KernelBase::input_dims(1) });
+		return TensorMap<Scalar,3>(prev_out_grad.data(), { batch_size, KernelBase::input_dims(0), KernelBase::input_dims(1) });
 	}
 private:
 	std::size_t batch_size;
@@ -1278,14 +1303,14 @@ protected:
 		return DeconvBase::_pass_forward(TensorMap<Scalar,4>(in.data(), { batch_size, in.dimension(1), 1u, 1u }), training)
 				.reshape(std::array<std::size_t,2>({ batch_size, KernelBase::output_dims(0) }));
 	}
-	inline typename Root::Data pass_back(typename Root::Data out_grads) {
-		assert((Dimensions<std::size_t,2>(out_grads.dimensions()).template demote<>()) == KernelBase::output_dims);
-		assert(out_grads.dimension(0) > 0 && batch_size == out_grads.dimension(0));
-		Tensor<Scalar,4> prev_out_grads = DeconvBase::_pass_back(TensorMap<Scalar,4>(out_grads.data(),
+	inline typename Root::Data pass_back(typename Root::Data out_grad) {
+		assert((Dimensions<std::size_t,2>(out_grad.dimensions()).template demote<>()) == KernelBase::output_dims);
+		assert(out_grad.dimension(0) > 0 && batch_size == out_grad.dimension(0));
+		Tensor<Scalar,4> prev_out_grad = DeconvBase::_pass_back(TensorMap<Scalar,4>(out_grad.data(),
 				{ batch_size, DeconvBase::ext_output_dims(0), DeconvBase::ext_output_dims(1), DeconvBase::ext_output_dims(2) }));
 		if (KernelBase::is_input_layer())
 			return Tensor<Scalar,2>();
-		return TensorMap<Scalar,2>(prev_out_grads.data(), { batch_size, KernelBase::input_dims(0) });
+		return TensorMap<Scalar,2>(prev_out_grad.data(), { batch_size, KernelBase::input_dims(0) });
 	}
 private:
 	std::size_t batch_size;
@@ -1384,10 +1409,10 @@ protected:
 		batch_size = in.dimension(0);
 		return in;
 	}
-	inline typename Root::Data pass_back(typename Root::Data out_grads) {
-		assert((Dimensions<std::size_t,Base::DATA_RANK>(out_grads.dimensions()).template demote<>()) == Base::dims);
-		assert(out_grads.dimension(0) > 0 && batch_size == out_grads.dimension(0));
-		return out_grads;
+	inline typename Root::Data pass_back(typename Root::Data out_grad) {
+		assert((Dimensions<std::size_t,Base::DATA_RANK>(out_grad.dimensions()).template demote<>()) == Base::dims);
+		assert(out_grad.dimension(0) > 0 && batch_size == out_grad.dimension(0));
+		return out_grad;
 	}
 private:
 	std::size_t batch_size;
@@ -1423,10 +1448,10 @@ protected:
 		batch_size = in.dimension(0);
 		return in * scale;
 	}
-	inline typename Root::Data pass_back(typename Root::Data out_grads) {
-		assert((Dimensions<std::size_t,Base::DATA_RANK>(out_grads.dimensions()).template demote<>()) == Base::dims);
-		assert(out_grads.dimension(0) > 0 && batch_size == out_grads.dimension(0));
-		return out_grads * scale;
+	inline typename Root::Data pass_back(typename Root::Data out_grad) {
+		assert((Dimensions<std::size_t,Base::DATA_RANK>(out_grad.dimensions()).template demote<>()) == Base::dims);
+		assert(out_grad.dimension(0) > 0 && batch_size == out_grad.dimension(0));
+		return out_grad * scale;
 	}
 private:
 	const Scalar scale;
@@ -1467,10 +1492,10 @@ protected:
 		batch_size = in.dimension(0);
 		return in.unaryExpr([](Scalar i) { return (Scalar) (i >= .0 ? 1.0 : .0); });
 	}
-	inline typename Root::Data pass_back(typename Root::Data out_grads) {
-		assert((Dimensions<std::size_t,Base::DATA_RANK>(out_grads.dimensions()).template demote<>()) == Base::dims);
-		assert(out_grads.dimension(0) > 0 && batch_size == out_grads.dimension(0));
-		return out_grads.constant(0);
+	inline typename Root::Data pass_back(typename Root::Data out_grad) {
+		assert((Dimensions<std::size_t,Base::DATA_RANK>(out_grad.dimensions()).template demote<>()) == Base::dims);
+		assert(out_grad.dimension(0) > 0 && batch_size == out_grad.dimension(0));
+		return out_grad.constant(0);
 	}
 private:
 	std::size_t batch_size;
@@ -1491,7 +1516,8 @@ public:
 	 * @param dims The dimensionality of the input tensor.
 	 */
 	inline SigmoidActivationLayer(const Dimensions<std::size_t,Rank>& dims) :
-			ActivationLayer<Scalar,Rank>::ActivationLayer(dims) { }
+			ActivationLayer<Scalar,Rank>::ActivationLayer(dims),
+			ext_batch_dims(dims.template extend<3 - Rank>().template promote<>()) { }
 	inline Layer<Scalar,Rank>* clone() const {
 		return new SigmoidActivationLayer(*this);
 	}
@@ -1506,16 +1532,22 @@ protected:
 	inline typename Root::Data pass_forward(typename Root::Data in, bool training) {
 		assert((Dimensions<std::size_t,Base::DATA_RANK>(in.dimensions()).template demote<>()) == Base::dims);
 		assert(in.dimension(0) > 0);
+		ext_batch_dims[0] = in.dimension(0);
 		this->in = std::move(in);
-		out = internal::CuDNNHandle<Scalar,Base::DATA_RANK>::get_instance().sigmoid_activation_fwd(this->in);
+		out = typename Root::Data(this->in.dimensions());
+		internal::CuDNNHandle<Scalar>::get_instance().sigmoid_activation_fwd(this->in.data(), ext_batch_dims, out.data());
 		return out;
 	}
-	inline typename Root::Data pass_back(typename Root::Data out_grads) {
-		assert((Dimensions<std::size_t,Base::DATA_RANK>(out_grads.dimensions()).template demote<>()) == Base::dims);
-		assert(out_grads.dimension(0) > 0 && out.dimension(0) == out_grads.dimension(0));
-		return internal::CuDNNHandle<Scalar,Base::DATA_RANK>::get_instance().sigmoid_activation_bwd(in, out, out_grads);
+	inline typename Root::Data pass_back(typename Root::Data out_grad) {
+		assert((Dimensions<std::size_t,Base::DATA_RANK>(out_grad.dimensions()).template demote<>()) == Base::dims);
+		assert(out_grad.dimension(0) > 0 && ext_batch_dims[0] == out_grad.dimension(0));
+		typename Root::Data prev_out_grad(in.dimensions());
+		internal::CuDNNHandle<Scalar>::get_instance().sigmoid_activation_bwd(in.data(), out.data(), out_grad.data(),
+				ext_batch_dims, prev_out_grad.data());
+		return prev_out_grad;
 	}
 private:
+	std::array<std::size_t,4> ext_batch_dims;
 	typename Root::Data in;
 	typename Root::Data out;
 };
@@ -1555,10 +1587,10 @@ protected:
 		}
 		return out;
 	}
-	inline typename Root::Data pass_back(typename Root::Data out_grads) {
-		assert((Dimensions<std::size_t,Base::DATA_RANK>(out_grads.dimensions()).template demote<>()) == Base::dims);
-		assert(out_grads.dimension(0) > 0 && out.dimension(0) == out_grads.dimension(0));
-		return (out * (out.constant(1) - out)) * out_grads;
+	inline typename Root::Data pass_back(typename Root::Data out_grad) {
+		assert((Dimensions<std::size_t,Base::DATA_RANK>(out_grad.dimensions()).template demote<>()) == Base::dims);
+		assert(out_grad.dimension(0) > 0 && out.dimension(0) == out_grad.dimension(0));
+		return (out * (out.constant(1) - out)) * out_grad;
 	}
 private:
 	// Staged computation cache.
@@ -1581,7 +1613,8 @@ public:
 	 * @param dims The dimensionality of the input tensor.
 	 */
 	inline TanhActivationLayer(const Dimensions<std::size_t,Rank>& dims) :
-			ActivationLayer<Scalar,Rank>::ActivationLayer(dims) { }
+			ActivationLayer<Scalar,Rank>::ActivationLayer(dims),
+			ext_batch_dims(dims.template extend<3 - Rank>().template promote<>()) { }
 	inline Layer<Scalar,Rank>* clone() const {
 		return new TanhActivationLayer(*this);
 	}
@@ -1596,16 +1629,22 @@ protected:
 	inline typename Root::Data pass_forward(typename Root::Data in, bool training) {
 		assert((Dimensions<std::size_t,Base::DATA_RANK>(in.dimensions()).template demote<>()) == Base::dims);
 		assert(in.dimension(0) > 0);
+		ext_batch_dims[0] = in.dimension(0);
 		this->in = std::move(in);
-		out = internal::CuDNNHandle<Scalar,Base::DATA_RANK>::get_instance().tanh_activation_fwd(this->in);
+		out = typename Root::Data(this->in.dimensions());
+		internal::CuDNNHandle<Scalar>::get_instance().tanh_activation_fwd(this->in.data(), ext_batch_dims, out.data());
 		return out;
 	}
-	inline typename Root::Data pass_back(typename Root::Data out_grads) {
-		assert((Dimensions<std::size_t,Base::DATA_RANK>(out_grads.dimensions()).template demote<>()) == Base::dims);
-		assert(out_grads.dimension(0) > 0 && out.dimension(0) == out_grads.dimension(0));
-		return internal::CuDNNHandle<Scalar,Base::DATA_RANK>::get_instance().tanh_activation_bwd(in, out, out_grads);
+	inline typename Root::Data pass_back(typename Root::Data out_grad) {
+		assert((Dimensions<std::size_t,Base::DATA_RANK>(out_grad.dimensions()).template demote<>()) == Base::dims);
+		assert(out_grad.dimension(0) > 0 && ext_batch_dims[0] == out_grad.dimension(0));
+		typename Root::Data prev_out_grad(in.dimensions());
+		internal::CuDNNHandle<Scalar>::get_instance().tanh_activation_bwd(in.data(), out.data(), out_grad.data(),
+				ext_batch_dims, prev_out_grad.data());
+		return prev_out_grad;
 	}
 private:
+	std::array<std::size_t,4> ext_batch_dims;
 	typename Root::Data in;
 	typename Root::Data out;
 };
@@ -1645,10 +1684,10 @@ protected:
 		}
 		return out;
 	}
-	inline typename Root::Data pass_back(typename Root::Data out_grads) {
-		assert((Dimensions<std::size_t,Base::DATA_RANK>(out_grads.dimensions()).template demote<>()) == Base::dims);
-		assert(out_grads.dimension(0) > 0 && out.dimension(0) == out_grads.dimension(0));
-		return (out.constant(1) - out * out) * out_grads;
+	inline typename Root::Data pass_back(typename Root::Data out_grad) {
+		assert((Dimensions<std::size_t,Base::DATA_RANK>(out_grad.dimensions()).template demote<>()) == Base::dims);
+		assert(out_grad.dimension(0) > 0 && out.dimension(0) == out_grad.dimension(0));
+		return (out.constant(1) - out * out) * out_grad;
 	}
 private:
 	typename Root::Data out;
@@ -1691,10 +1730,10 @@ protected:
 		}
 		return in / denominator;
 	}
-	inline typename Root::Data pass_back(typename Root::Data out_grads) {
-		assert((Dimensions<std::size_t,Base::DATA_RANK>(out_grads.dimensions()).template demote<>()) == Base::dims);
-		assert(out_grads.dimension(0) > 0 && denominator.dimension(0) == out_grads.dimension(0));
-		return denominator.square().inverse() * out_grads;
+	inline typename Root::Data pass_back(typename Root::Data out_grad) {
+		assert((Dimensions<std::size_t,Base::DATA_RANK>(out_grad.dimensions()).template demote<>()) == Base::dims);
+		assert(out_grad.dimension(0) > 0 && denominator.dimension(0) == out_grad.dimension(0));
+		return denominator.square().inverse() * out_grad;
 	}
 private:
 	// Staged computation cache.
@@ -1736,10 +1775,10 @@ protected:
 		}
 		return (in.exp() + in.constant(1)).log();
 	}
-	inline typename Root::Data pass_back(typename Root::Data out_grads) {
-		assert((Dimensions<std::size_t,Base::DATA_RANK>(out_grads.dimensions()).template demote<>()) == Base::dims);
-		assert(out_grads.dimension(0) > 0 && in.dimension(0) == out_grads.dimension(0));
-		return ((-in).exp() + in.constant(1)).inverse() * out_grads;
+	inline typename Root::Data pass_back(typename Root::Data out_grad) {
+		assert((Dimensions<std::size_t,Base::DATA_RANK>(out_grad.dimensions()).template demote<>()) == Base::dims);
+		assert(out_grad.dimension(0) > 0 && in.dimension(0) == out_grad.dimension(0));
+		return ((-in).exp() + in.constant(1)).inverse() * out_grad;
 	}
 private:
 	// Staged computation cache.
@@ -1764,7 +1803,8 @@ public:
 	 * @param dims The dimensionality of the input tensor.
 	 */
 	inline SoftmaxActivationLayer(const Dimensions<std::size_t,Rank>& dims) :
-			ActivationLayer<Scalar,Rank>::ActivationLayer(dims) { }
+			ActivationLayer<Scalar,Rank>::ActivationLayer(dims),
+			ext_batch_dims(dims.template extend<3 - Rank>().template promote<>()) { }
 	inline Layer<Scalar,Rank>* clone() const {
 		return new SoftmaxActivationLayer(*this);
 	}
@@ -1778,15 +1818,21 @@ protected:
 	inline typename Root::Data pass_forward(typename Root::Data in, bool training) {
 		assert((Dimensions<std::size_t,Base::DATA_RANK>(in.dimensions()).template demote<>()) == Base::dims);
 		assert(in.dimension(0) > 0);
-		out = internal::CuDNNHandle<Scalar,Base::DATA_RANK>::get_instance().softmax_fwd(in);
+		ext_batch_dims[0] = in.dimension(0);
+		out = typename Root::Data(in.dimensions());
+		internal::CuDNNHandle<Scalar>::get_instance().softmax_fwd(in.data(), ext_batch_dims, out.data());
 		return out;
 	}
-	inline typename Root::Data pass_back(typename Root::Data out_grads) {
-		assert((Dimensions<std::size_t,Base::DATA_RANK>(out_grads.dimensions()).template demote<>()) == Base::dims);
-		assert(out_grads.dimension(0) > 0 && out.dimension(0) == out_grads.dimension(0));
-		return internal::CuDNNHandle<Scalar,Base::DATA_RANK>::get_instance().softmax_bwd(out, out_grads);
+	inline typename Root::Data pass_back(typename Root::Data out_grad) {
+		assert((Dimensions<std::size_t,Base::DATA_RANK>(out_grad.dimensions()).template demote<>()) == Base::dims);
+		assert(out_grad.dimension(0) > 0 && ext_batch_dims[0] == out_grad.dimension(0));
+		typename Root::Data prev_out_grad(out_grad.dimensions());
+		internal::CuDNNHandle<Scalar>::get_instance().softmax_bwd(out.data(), out_grad.data(), ext_batch_dims,
+				prev_out_grad.data());
+		return prev_out_grad;
 	}
 private:
+	std::array<std::size_t,4> ext_batch_dims;
 	typename Root::Data out;
 };
 #else
@@ -1838,20 +1884,20 @@ protected:
 		}
 		return TensorMap<Scalar,Root::DATA_RANK>(act.data(), conversion_dims);
 	}
-	inline typename Root::Data pass_back(typename Root::Data out_grads) {
-		assert((Dimensions<std::size_t,Base::DATA_RANK>(out_grads.dimensions()).template demote<>()) == Base::dims);
-		assert(out_grads.dimension(0) > 0 && out.rows() == out_grads.dimension(0));
-		std::size_t rows = out_grads.dimension(0);
-		MatrixMap<Scalar> out_grads_mat(out_grads.data(), rows, out_grads.size() / rows);
-		Matrix<Scalar> prev_out_grads(out.rows(), out.cols());
-		for (int i = 0; i < prev_out_grads.rows(); ++i) {
+	inline typename Root::Data pass_back(typename Root::Data out_grad) {
+		assert((Dimensions<std::size_t,Base::DATA_RANK>(out_grad.dimensions()).template demote<>()) == Base::dims);
+		assert(out_grad.dimension(0) > 0 && out.rows() == out_grad.dimension(0));
+		std::size_t rows = out_grad.dimension(0);
+		MatrixMap<Scalar> out_grad_mat(out_grad.data(), rows, out_grad.size() / rows);
+		Matrix<Scalar> prev_out_grad(out.rows(), out.cols());
+		for (int i = 0; i < prev_out_grad.rows(); ++i) {
 			RowVector<Scalar> row_i = out.row(i);
 			// FIXME Do not evaluate the expressions into a temporary variable.
 			Matrix<Scalar> jacobian = row_i.asDiagonal();
 			jacobian -= row_i.transpose() * row_i;
-			prev_out_grads.row(i) = out_grads_mat.row(i) * jacobian;
+			prev_out_grad.row(i) = out_grad_mat.row(i) * jacobian;
 		}
-		return TensorMap<Scalar,Root::DATA_RANK>(prev_out_grads.data(), conversion_dims);
+		return TensorMap<Scalar,Root::DATA_RANK>(prev_out_grad.data(), conversion_dims);
 	}
 private:
 	const Scalar epsilon;
@@ -1882,7 +1928,8 @@ public:
 	 * @param dims The dimensionality of the input tensor.
 	 */
 	inline ReLUActivationLayer(const Dimensions<std::size_t,Rank>& dims) :
-			ActivationLayer<Scalar,Rank>::ActivationLayer(dims) { }
+			ActivationLayer<Scalar,Rank>::ActivationLayer(dims),
+			ext_batch_dims(dims.template extend<3 - Rank>().template promote<>()) { }
 	inline Layer<Scalar,Rank>* clone() const {
 		return new ReLUActivationLayer(*this);
 	}
@@ -1897,16 +1944,22 @@ protected:
 	inline typename Root::Data pass_forward(typename Root::Data in, bool training) {
 		assert((Dimensions<std::size_t,Base::DATA_RANK>(in.dimensions()).template demote<>()) == Base::dims);
 		assert(in.dimension(0) > 0);
+		ext_batch_dims[0] = in.dimension(0);
 		this->in = std::move(in);
-		out = internal::CuDNNHandle<Scalar,Base::DATA_RANK>::get_instance().relu_activation_fwd(this->in);
+		out = typename Root::Data(this->in.dimensions());
+		internal::CuDNNHandle<Scalar>::get_instance().relu_activation_fwd(this->in.data(), ext_batch_dims, out.data());
 		return out;
 	}
-	inline typename Root::Data pass_back(typename Root::Data out_grads) {
-		assert((Dimensions<std::size_t,Base::DATA_RANK>(out_grads.dimensions()).template demote<>()) == Base::dims);
-		assert(out_grads.dimension(0) > 0 && out.dimension(0) == out_grads.dimension(0));
-		return internal::CuDNNHandle<Scalar,Base::DATA_RANK>::get_instance().relu_activation_bwd(in, out, out_grads);
+	inline typename Root::Data pass_back(typename Root::Data out_grad) {
+		assert((Dimensions<std::size_t,Base::DATA_RANK>(out_grad.dimensions()).template demote<>()) == Base::dims);
+		assert(out_grad.dimension(0) > 0 && ext_batch_dims[0] == out_grad.dimension(0));
+		typename Root::Data prev_out_grad(in.dimensions());
+		internal::CuDNNHandle<Scalar>::get_instance().relu_activation_bwd(in.data(), out.data(), out_grad.data(),
+				ext_batch_dims, prev_out_grad.data());
+		return prev_out_grad;
 	}
 private:
+	std::array<std::size_t,4> ext_batch_dims;
 	typename Root::Data in;
 	typename Root::Data out;
 };
@@ -1949,10 +2002,10 @@ protected:
 			this->in = in;
 		return in.cwiseMax((Scalar) 0);
 	}
-	inline typename Root::Data pass_back(typename Root::Data out_grads) {
-		assert((Dimensions<std::size_t,Base::DATA_RANK>(out_grads.dimensions()).template demote<>()) == Base::dims);
-		assert(out_grads.dimension(0) > 0 && in.dimension(0) == out_grads.dimension(0));
-		return in.unaryExpr([](Scalar i) { return (Scalar) (i >= 0); }) * out_grads;
+	inline typename Root::Data pass_back(typename Root::Data out_grad) {
+		assert((Dimensions<std::size_t,Base::DATA_RANK>(out_grad.dimensions()).template demote<>()) == Base::dims);
+		assert(out_grad.dimension(0) > 0 && in.dimension(0) == out_grad.dimension(0));
+		return in.unaryExpr([](Scalar i) { return (Scalar) (i >= 0); }) * out_grad;
 	}
 private:
 	typename Root::Data in;
@@ -2002,10 +2055,10 @@ protected:
 			this->in = in;
 		return in.cwiseMax(in * alpha);
 	}
-	inline typename Root::Data pass_back(typename Root::Data out_grads) {
-		assert((Dimensions<std::size_t,Base::DATA_RANK>(out_grads.dimensions()).template demote<>()) == Base::dims);
-		assert(out_grads.dimension(0) > 0 && in.dimension(0) == out_grads.dimension(0));
-		return in.unaryExpr([this](Scalar i) { return (Scalar) (i >= 0 ? 1 : alpha); }) * out_grads;
+	inline typename Root::Data pass_back(typename Root::Data out_grad) {
+		assert((Dimensions<std::size_t,Base::DATA_RANK>(out_grad.dimensions()).template demote<>()) == Base::dims);
+		assert(out_grad.dimension(0) > 0 && in.dimension(0) == out_grad.dimension(0));
+		return in.unaryExpr([this](Scalar i) { return (Scalar) (i >= 0 ? 1 : alpha); }) * out_grad;
 	}
 private:
 	const Scalar alpha;
@@ -2038,7 +2091,8 @@ public:
 	 */
 	inline ELUActivationLayer(const Dimensions<std::size_t,Rank>& dims, Scalar alpha = 1e-1) :
 			ActivationLayer<Scalar,Rank>::ActivationLayer(dims),
-			alpha(alpha) { }
+			alpha(alpha),
+			ext_batch_dims(dims.template extend<3 - Rank>().template promote<>()) { }
 	inline Layer<Scalar,Rank>* clone() const {
 		return new ELUActivationLayer(*this);
 	}
@@ -2053,17 +2107,23 @@ protected:
 	inline typename Root::Data pass_forward(typename Root::Data in, bool training) {
 		assert((Dimensions<std::size_t,Base::DATA_RANK>(in.dimensions()).template demote<>()) == Base::dims);
 		assert(in.dimension(0) > 0);
+		ext_batch_dims[0] = in.dimension(0);
 		this->in = std::move(in);
-		out = internal::CuDNNHandle<Scalar,Base::DATA_RANK>::get_instance().elu_activation_fwd(this->in, alpha);
+		out = typename Root::Data(this->in.dimensions());
+		internal::CuDNNHandle<Scalar>::get_instance().elu_activation_fwd(this->in.data(), ext_batch_dims, alpha, out.data());
 		return out;
 	}
-	inline typename Root::Data pass_back(typename Root::Data out_grads) {
-		assert((Dimensions<std::size_t,Base::DATA_RANK>(out_grads.dimensions()).template demote<>()) == Base::dims);
-		assert(out_grads.dimension(0) > 0 && out.dimension(0) == out_grads.dimension(0));
-		return internal::CuDNNHandle<Scalar,Base::DATA_RANK>::get_instance().elu_activation_bwd(in, out, out_grads, alpha);
+	inline typename Root::Data pass_back(typename Root::Data out_grad) {
+		assert((Dimensions<std::size_t,Base::DATA_RANK>(out_grad.dimensions()).template demote<>()) == Base::dims);
+		assert(out_grad.dimension(0) > 0 && ext_batch_dims[0] == out_grad.dimension(0));
+		typename Root::Data prev_out_grad(in.dimensions());
+		internal::CuDNNHandle<Scalar>::get_instance().elu_activation_bwd(in.data(), out.data(), out_grad.data(),
+				ext_batch_dims, alpha, prev_out_grad.data());
+		return prev_out_grad;
 	}
 private:
 	const Scalar alpha;
+	std::array<std::size_t,4> ext_batch_dims;
 	// Staged computation cache.
 	typename Root::Data in;
 	typename Root::Data out;
@@ -2121,16 +2181,16 @@ protected:
 		}
 		return in.unaryExpr([this](Scalar i) { return (Scalar) (i >= 0 ? i : (alpha * (exp(i) - 1))); });
 	}
-	inline typename Root::Data pass_back(typename Root::Data out_grads) {
-		assert((Dimensions<std::size_t,Base::DATA_RANK>(out_grads.dimensions()).template demote<>()) == Base::dims);
-		assert(out_grads.dimension(0) > 0 && conversion_dims[0] == out_grads.dimension(0));
-		MatrixMap<Scalar> out_grads_mat(out_grads.data(), conversion_dims[0], Base::dims.get_volume());
-		Matrix<Scalar> prev_out_grads(in.rows(), in.cols());
+	inline typename Root::Data pass_back(typename Root::Data out_grad) {
+		assert((Dimensions<std::size_t,Base::DATA_RANK>(out_grad.dimensions()).template demote<>()) == Base::dims);
+		assert(out_grad.dimension(0) > 0 && conversion_dims[0] == out_grad.dimension(0));
+		MatrixMap<Scalar> out_grad_mat(out_grad.data(), conversion_dims[0], Base::dims.get_volume());
+		Matrix<Scalar> prev_out_grad(in.rows(), in.cols());
 		for (int i = 0; i < in.cols(); ++i) {
 			for (int j = 0; j < in.rows(); ++j)
-				prev_out_grads(j,i) = (Scalar) ((in(j,i) >= 0 ? 1 : (out(j,i) + alpha)) * out_grads_mat(j,i));
+				prev_out_grad(j,i) = (Scalar) ((in(j,i) >= 0 ? 1 : (out(j,i) + alpha)) * out_grad_mat(j,i));
 		}
-		return TensorMap<Scalar,Root::DATA_RANK>(prev_out_grads.data(), conversion_dims);
+		return TensorMap<Scalar,Root::DATA_RANK>(prev_out_grad.data(), conversion_dims);
 	}
 private:
 	const Scalar alpha;
@@ -2221,25 +2281,25 @@ protected:
 		conversion_dims[0] = rows;
 		return TensorMap<Scalar,Root::DATA_RANK>(out.data(), conversion_dims);
 	}
-	inline typename Root::Data pass_back(typename Root::Data out_grads) {
-		assert((Dimensions<std::size_t,Base::DATA_RANK>(out_grads.dimensions()).template demote<>()) == Base::dims);
-		assert(out_grads.dimension(0) > 0 && conversion_dims[0] == out_grads.dimension(0));
+	inline typename Root::Data pass_back(typename Root::Data out_grad) {
+		assert((Dimensions<std::size_t,Base::DATA_RANK>(out_grad.dimensions()).template demote<>()) == Base::dims);
+		assert(out_grad.dimension(0) > 0 && conversion_dims[0] == out_grad.dimension(0));
 		Base::params_grad.row(0).setZero();
-		MatrixMap<Scalar> out_grads_map(out_grads.data(), conversion_dims[0], Base::dims.get_volume());
-		Matrix<Scalar> prev_out_grads = Matrix<Scalar>(in.rows(), in.cols());
+		MatrixMap<Scalar> out_grad_map(out_grad.data(), conversion_dims[0], Base::dims.get_volume());
+		Matrix<Scalar> prev_out_grad = Matrix<Scalar>(in.rows(), in.cols());
 		for (int i = 0; i < in.cols(); ++i) {
 			for (int j = 0; j < in.rows(); ++j) {
 				Scalar in_ji = in(j,i);
 				if (in_ji >= 0)
-					prev_out_grads(j,i) = out_grads_map(j,i);
+					prev_out_grad(j,i) = out_grad_map(j,i);
 				else {
-					Scalar out_ji = out_grads_map(j,i);
-					prev_out_grads(j,i) = Base::params_ref(0,i) * out_ji;
+					Scalar out_ji = out_grad_map(j,i);
+					prev_out_grad(j,i) = Base::params_ref(0,i) * out_ji;
 					Base::params_grad(0,i) += in_ji * out_ji;
 				}
 			}
 		}
-		return TensorMap<Scalar,Root::DATA_RANK>(prev_out_grads.data(), conversion_dims);
+		return TensorMap<Scalar,Root::DATA_RANK>(prev_out_grad.data(), conversion_dims);
 	}
 private:
 	const ParamRegSharedPtr<Scalar> param_reg;
@@ -2293,10 +2353,10 @@ protected:
 		}
 		return in / sig_denom;
 	}
-	inline typename Root::Data pass_back(typename Root::Data out_grads) {
-		assert((Dimensions<std::size_t,Base::DATA_RANK>(out_grads.dimensions()).template demote<>()) == Base::dims);
-		assert(out_grads.dimension(0) > 0 && sig_out.dimension(0) == out_grads.dimension(0));
-		return sig_out * ((sig_out.constant(1) - sig_out) * beta * in + sig_out.constant(1)) * out_grads;
+	inline typename Root::Data pass_back(typename Root::Data out_grad) {
+		assert((Dimensions<std::size_t,Base::DATA_RANK>(out_grad.dimensions()).template demote<>()) == Base::dims);
+		assert(out_grad.dimension(0) > 0 && sig_out.dimension(0) == out_grad.dimension(0));
+		return sig_out * ((sig_out.constant(1) - sig_out) * beta * in + sig_out.constant(1)) * out_grad;
 	}
 private:
 	const Scalar beta;
@@ -2386,16 +2446,16 @@ protected:
 			out = this->in.array() / sig_out;
 		return TensorMap<Scalar,Root::DATA_RANK>(out.data(), conversion_dims);
 	}
-	inline typename Root::Data pass_back(typename Root::Data out_grads) {
-		assert((Dimensions<std::size_t,Base::DATA_RANK>(out_grads.dimensions()).template demote<>()) == Base::dims);
-		assert(out_grads.dimension(0) > 0 && conversion_dims[0] == out_grads.dimension(0));
-		MatrixMap<Scalar> out_grads_mat(out_grads.data(), conversion_dims[0], out_grads.size() / conversion_dims[0]);
+	inline typename Root::Data pass_back(typename Root::Data out_grad) {
+		assert((Dimensions<std::size_t,Base::DATA_RANK>(out_grad.dimensions()).template demote<>()) == Base::dims);
+		assert(out_grad.dimension(0) > 0 && conversion_dims[0] == out_grad.dimension(0));
+		MatrixMap<Scalar> out_grad_mat(out_grad.data(), conversion_dims[0], out_grad.size() / conversion_dims[0]);
 		Matrix<Scalar> one_min_sig_out = 1 - sig_out.array();
 		Base::params_grad = sig_out.cwiseProduct(one_min_sig_out).cwiseProduct(in).cwiseProduct(in)
-				.cwiseProduct(out_grads_mat).colwise().sum();
-		Matrix<Scalar> prev_out_grads = sig_out.cwiseProduct(((one_min_sig_out * Base::params_ref.row(0).asDiagonal()).array() *
-				in.array() + 1).matrix()).cwiseProduct(out_grads_mat);
-		return TensorMap<Scalar,Root::DATA_RANK>(prev_out_grads.data(), conversion_dims);
+				.cwiseProduct(out_grad_mat).colwise().sum();
+		Matrix<Scalar> prev_out_grad = sig_out.cwiseProduct(((one_min_sig_out * Base::params_ref.row(0).asDiagonal()).array() *
+				in.array() + 1).matrix()).cwiseProduct(out_grad_mat);
+		return TensorMap<Scalar,Root::DATA_RANK>(prev_out_grad.data(), conversion_dims);
 	}
 private:
 	const ParamRegSharedPtr<Scalar> param_reg;
@@ -2527,30 +2587,30 @@ protected:
 		}
 		return out;
 	}
-	inline Tensor<Scalar,4> _pass_back(Tensor<Scalar,4> out_grads) {
+	inline Tensor<Scalar,4> _pass_back(Tensor<Scalar,4> out_grad) {
 		if (input_layer)
 			return Tensor<Scalar,4>();
-		Tensor<Scalar,4> prev_out_grads(patch_extents[0], ext_input_dims(0), ext_input_dims(1),  ext_input_dims(2));
-		prev_out_grads.setZero();
+		Tensor<Scalar,4> prev_out_grad(patch_extents[0], ext_input_dims(0), ext_input_dims(1),  ext_input_dims(2));
+		prev_out_grad.setZero();
 		std::size_t patch_ind = 0;
-		std::size_t out_grads_i = 0;
-		for (std::size_t i = 0; i <= width_rem; i += horizontal_stride, ++out_grads_i) {
+		std::size_t out_grad_i = 0;
+		for (std::size_t i = 0; i <= width_rem; i += horizontal_stride, ++out_grad_i) {
 			patch_offsets[2] = i;
-			reduced_patch_offsets[2] = out_grads_i;
-			std::size_t out_grads_j = 0;
-			for (std::size_t j = 0; j <= height_rem; j += vertical_stride, ++out_grads_j) {
+			reduced_patch_offsets[2] = out_grad_i;
+			std::size_t out_grad_j = 0;
+			for (std::size_t j = 0; j <= height_rem; j += vertical_stride, ++out_grad_j) {
 				patch_offsets[1] = j;
-				reduced_patch_offsets[1] = out_grads_j;
-				Tensor<Scalar,4> reduced_patch_grads = out_grads.slice(reduced_patch_offsets, reduced_patch_extents);
+				reduced_patch_offsets[1] = out_grad_j;
+				Tensor<Scalar,4> reduced_patch_grads = out_grad.slice(reduced_patch_offsets, reduced_patch_extents);
 				// Accumulate the gradients where the patches overlap.
 				if (vertical_dilation > 0 || horizontal_dilation > 0)
-					prev_out_grads.slice(patch_offsets, patch_extents).stride(dil_strides) +=
+					prev_out_grad.slice(patch_offsets, patch_extents).stride(dil_strides) +=
 							_d_reduce(reduced_patch_grads, patch_ind++);
 				else
-					prev_out_grads.slice(patch_offsets, patch_extents) += _d_reduce(reduced_patch_grads, patch_ind++);
+					prev_out_grad.slice(patch_offsets, patch_extents) += _d_reduce(reduced_patch_grads, patch_ind++);
 			}
 		}
-		return prev_out_grads;
+		return prev_out_grad;
 	}
 	/**
 	 * It calculates the depth of the tensor output by the layer for all of its ranks except
@@ -2663,10 +2723,10 @@ protected:
 		batch_size = in.dimension(0);
 		return PoolBase::_pass_forward(std::move(in), training);
 	}
-	inline typename Root::Data pass_back(typename Root::Data out_grads) {
-		assert((Dimensions<std::size_t,4>(out_grads.dimensions()).template demote<>()) == PoolBase::output_dims);
-		assert(out_grads.dimension(0) > 0 && batch_size == out_grads.dimension(0));
-		return PoolBase::_pass_back(std::move(out_grads));
+	inline typename Root::Data pass_back(typename Root::Data out_grad) {
+		assert((Dimensions<std::size_t,4>(out_grad.dimensions()).template demote<>()) == PoolBase::output_dims);
+		assert(out_grad.dimension(0) > 0 && batch_size == out_grad.dimension(0));
+		return PoolBase::_pass_back(std::move(out_grad));
 	}
 private:
 	std::size_t batch_size;
@@ -2714,14 +2774,14 @@ protected:
 		return PoolBase::_pass_forward(TensorMap<Scalar,4>(in.data(), { batch_size, in.dimension(1), in.dimension(2), 1u }), training)
 				.reshape(std::array<std::size_t,3>({ batch_size, PoolBase::output_dims(0), PoolBase::output_dims(1) }));
 	}
-	inline typename Root::Data pass_back(typename Root::Data out_grads) {
-		assert((Dimensions<std::size_t,3>(out_grads.dimensions()).template demote<>()) == PoolBase::output_dims);
-		assert(out_grads.dimension(0) > 0 && batch_size == out_grads.dimension(0));
-		Tensor<Scalar,4> prev_out_grads = PoolBase::_pass_back(TensorMap<Scalar,4>(out_grads.data(),
+	inline typename Root::Data pass_back(typename Root::Data out_grad) {
+		assert((Dimensions<std::size_t,3>(out_grad.dimensions()).template demote<>()) == PoolBase::output_dims);
+		assert(out_grad.dimension(0) > 0 && batch_size == out_grad.dimension(0));
+		Tensor<Scalar,4> prev_out_grad = PoolBase::_pass_back(TensorMap<Scalar,4>(out_grad.data(),
 				{ batch_size, PoolBase::ext_output_dims(0), PoolBase::ext_output_dims(1), PoolBase::ext_output_dims(2) }));
 		if (PoolBase::is_input_layer())
 			return Tensor<Scalar,3>();
-		return TensorMap<Scalar,3>(prev_out_grads.data(), { batch_size, PoolBase::input_dims(0), PoolBase::input_dims(1) });
+		return TensorMap<Scalar,3>(prev_out_grad.data(), { batch_size, PoolBase::input_dims(0), PoolBase::input_dims(1) });
 	}
 private:
 	std::size_t batch_size;
@@ -2762,14 +2822,14 @@ protected:
 		return PoolBase::_pass_forward(TensorMap<Scalar,4>(in.data(), { batch_size, in.dimension(1), 1u, 1u }), training)
 				.reshape(std::array<std::size_t,2>({ batch_size, PoolBase::output_dims(0) }));
 	}
-	inline typename Root::Data pass_back(typename Root::Data out_grads) {
-		assert((Dimensions<std::size_t,2>(out_grads.dimensions()).template demote<>()) == PoolBase::output_dims);
-		assert(out_grads.dimension(0) > 0 && batch_size == out_grads.dimension(0));
-		Tensor<Scalar,4> prev_out_grads = PoolBase::_pass_back(TensorMap<Scalar,4>(out_grads.data(),
+	inline typename Root::Data pass_back(typename Root::Data out_grad) {
+		assert((Dimensions<std::size_t,2>(out_grad.dimensions()).template demote<>()) == PoolBase::output_dims);
+		assert(out_grad.dimension(0) > 0 && batch_size == out_grad.dimension(0));
+		Tensor<Scalar,4> prev_out_grad = PoolBase::_pass_back(TensorMap<Scalar,4>(out_grad.data(),
 				{ batch_size, PoolBase::ext_output_dims(0), PoolBase::ext_output_dims(1), PoolBase::ext_output_dims(2) }));
 		if (PoolBase::is_input_layer())
 			return Tensor<Scalar,2>();
-		return TensorMap<Scalar,2>(prev_out_grads.data(), { batch_size, PoolBase::input_dims(0) });
+		return TensorMap<Scalar,2>(prev_out_grad.data(), { batch_size, PoolBase::input_dims(0) });
 	}
 private:
 	std::size_t batch_size;
@@ -2845,10 +2905,10 @@ protected:
 		batch_size = in.dimension(0);
 		return PoolBase::_pass_forward(std::move(in), training);
 	}
-	inline typename Root::Data pass_back(typename Root::Data out_grads) {
-		assert((Dimensions<std::size_t,4>(out_grads.dimensions()).template demote<>()) == PoolBase::output_dims);
-		assert(out_grads.dimension(0) > 0 && batch_size == out_grads.dimension(0));
-		return PoolBase::_pass_back(std::move(out_grads));
+	inline typename Root::Data pass_back(typename Root::Data out_grad) {
+		assert((Dimensions<std::size_t,4>(out_grad.dimensions()).template demote<>()) == PoolBase::output_dims);
+		assert(out_grad.dimension(0) > 0 && batch_size == out_grad.dimension(0));
+		return PoolBase::_pass_back(std::move(out_grad));
 	}
 private:
 	std::size_t batch_size;
@@ -2896,14 +2956,14 @@ protected:
 		return PoolBase::_pass_forward(TensorMap<Scalar,4>(in.data(), { batch_size, in.dimension(1), in.dimension(2), 1u }), training)
 				.reshape(std::array<std::size_t,3>({ batch_size, PoolBase::output_dims(0), PoolBase::output_dims(1) }));
 	}
-	inline typename Root::Data pass_back(typename Root::Data out_grads) {
-		assert((Dimensions<std::size_t,3>(out_grads.dimensions()).template demote<>()) == PoolBase::output_dims);
-		assert(out_grads.dimension(0) > 0 && batch_size == out_grads.dimension(0));
-		Tensor<Scalar,4> prev_out_grads = PoolBase::_pass_back(TensorMap<Scalar,4>(out_grads.data(),
+	inline typename Root::Data pass_back(typename Root::Data out_grad) {
+		assert((Dimensions<std::size_t,3>(out_grad.dimensions()).template demote<>()) == PoolBase::output_dims);
+		assert(out_grad.dimension(0) > 0 && batch_size == out_grad.dimension(0));
+		Tensor<Scalar,4> prev_out_grad = PoolBase::_pass_back(TensorMap<Scalar,4>(out_grad.data(),
 				{ batch_size, PoolBase::ext_output_dims(0), PoolBase::ext_output_dims(1), PoolBase::ext_output_dims(2) }));
 		if (PoolBase::is_input_layer())
 			return Tensor<Scalar,3>();
-		return TensorMap<Scalar,3>(prev_out_grads.data(), { batch_size, PoolBase::input_dims(0), PoolBase::input_dims(1) });
+		return TensorMap<Scalar,3>(prev_out_grad.data(), { batch_size, PoolBase::input_dims(0), PoolBase::input_dims(1) });
 	}
 private:
 	std::size_t batch_size;
@@ -2944,14 +3004,14 @@ protected:
 		return PoolBase::_pass_forward(TensorMap<Scalar,4>(in.data(), { batch_size, in.dimension(1), 1u, 1u }), training)
 				.reshape(std::array<std::size_t,2>({ batch_size, PoolBase::output_dims(0) }));
 	}
-	inline typename Root::Data pass_back(typename Root::Data out_grads) {
-		assert((Dimensions<std::size_t,2>(out_grads.dimensions()).template demote<>()) == PoolBase::output_dims);
-		assert(out_grads.dimension(0) > 0 && batch_size == out_grads.dimension(0));
-		Tensor<Scalar,4> prev_out_grads = PoolBase::_pass_back(TensorMap<Scalar,4>(out_grads.data(),
+	inline typename Root::Data pass_back(typename Root::Data out_grad) {
+		assert((Dimensions<std::size_t,2>(out_grad.dimensions()).template demote<>()) == PoolBase::output_dims);
+		assert(out_grad.dimension(0) > 0 && batch_size == out_grad.dimension(0));
+		Tensor<Scalar,4> prev_out_grad = PoolBase::_pass_back(TensorMap<Scalar,4>(out_grad.data(),
 				{ batch_size, PoolBase::ext_output_dims(0), PoolBase::ext_output_dims(1), PoolBase::ext_output_dims(2) }));
 		if (PoolBase::is_input_layer())
 			return Tensor<Scalar,2>();
-		return TensorMap<Scalar,2>(prev_out_grads.data(), { batch_size, PoolBase::input_dims(0) });
+		return TensorMap<Scalar,2>(prev_out_grad.data(), { batch_size, PoolBase::input_dims(0) });
 	}
 private:
 	std::size_t batch_size;
@@ -3069,10 +3129,10 @@ protected:
 		batch_size = in.dimension(0);
 		return PoolBase::_pass_forward(std::move(in), training);
 	}
-	inline typename Root::Data pass_back(typename Root::Data out_grads) {
-		assert((Dimensions<std::size_t,4>(out_grads.dimensions()).template demote<>()) == PoolBase::output_dims);
-		assert(out_grads.dimension(0) > 0 && batch_size == out_grads.dimension(0));
-		return PoolBase::_pass_back(std::move(out_grads));
+	inline typename Root::Data pass_back(typename Root::Data out_grad) {
+		assert((Dimensions<std::size_t,4>(out_grad.dimensions()).template demote<>()) == PoolBase::output_dims);
+		assert(out_grad.dimension(0) > 0 && batch_size == out_grad.dimension(0));
+		return PoolBase::_pass_back(std::move(out_grad));
 	}
 private:
 	std::size_t batch_size;
@@ -3122,14 +3182,14 @@ protected:
 		return PoolBase::_pass_forward(TensorMap<Scalar,4>(in.data(), { batch_size, in.dimension(1), in.dimension(2), 1u }), training)
 				.reshape(std::array<std::size_t,3>({ batch_size, PoolBase::output_dims(0), PoolBase::output_dims(1) }));
 	}
-	inline typename Root::Data pass_back(typename Root::Data out_grads) {
-		assert((Dimensions<std::size_t,3>(out_grads.dimensions()).template demote<>()) == PoolBase::output_dims);
-		assert(out_grads.dimension(0) > 0 && batch_size == out_grads.dimension(0));
-		Tensor<Scalar,4> prev_out_grads = PoolBase::_pass_back(TensorMap<Scalar,4>(out_grads.data(),
+	inline typename Root::Data pass_back(typename Root::Data out_grad) {
+		assert((Dimensions<std::size_t,3>(out_grad.dimensions()).template demote<>()) == PoolBase::output_dims);
+		assert(out_grad.dimension(0) > 0 && batch_size == out_grad.dimension(0));
+		Tensor<Scalar,4> prev_out_grad = PoolBase::_pass_back(TensorMap<Scalar,4>(out_grad.data(),
 				{ batch_size, PoolBase::ext_output_dims(0), PoolBase::ext_output_dims(1), PoolBase::ext_output_dims(2) }));
 		if (PoolBase::is_input_layer())
 			return Tensor<Scalar,3>();
-		return TensorMap<Scalar,3>(prev_out_grads.data(), { batch_size, PoolBase::input_dims(0), PoolBase::input_dims(1) });
+		return TensorMap<Scalar,3>(prev_out_grad.data(), { batch_size, PoolBase::input_dims(0), PoolBase::input_dims(1) });
 	}
 private:
 	std::size_t batch_size;
@@ -3172,14 +3232,14 @@ protected:
 		return PoolBase::_pass_forward(TensorMap<Scalar,4>(in.data(), { batch_size, in.dimension(1), 1u, 1u }), training)
 				.reshape(std::array<std::size_t,2>({ batch_size, PoolBase::output_dims(0) }));
 	}
-	inline typename Root::Data pass_back(typename Root::Data out_grads) {
-		assert((Dimensions<std::size_t,2>(out_grads.dimensions()).template demote<>()) == PoolBase::output_dims);
-		assert(out_grads.dimension(0) > 0 && batch_size == out_grads.dimension(0));
-		Tensor<Scalar,4> prev_out_grads = PoolBase::_pass_back(TensorMap<Scalar,4>(out_grads.data(),
+	inline typename Root::Data pass_back(typename Root::Data out_grad) {
+		assert((Dimensions<std::size_t,2>(out_grad.dimensions()).template demote<>()) == PoolBase::output_dims);
+		assert(out_grad.dimension(0) > 0 && batch_size == out_grad.dimension(0));
+		Tensor<Scalar,4> prev_out_grad = PoolBase::_pass_back(TensorMap<Scalar,4>(out_grad.data(),
 				{ batch_size, PoolBase::ext_output_dims(0), PoolBase::ext_output_dims(1), PoolBase::ext_output_dims(2) }));
 		if (PoolBase::is_input_layer())
 			return Tensor<Scalar,2>();
-		return TensorMap<Scalar,2>(prev_out_grads.data(), { batch_size, PoolBase::input_dims(0) });
+		return TensorMap<Scalar,2>(prev_out_grad.data(), { batch_size, PoolBase::input_dims(0) });
 	}
 private:
 	std::size_t batch_size;
@@ -3256,10 +3316,10 @@ protected:
 		rows = in.dimension(0);
 		return in.broadcast(broadcast);
 	}
-	inline typename Base::Data pass_back(typename Base::Data out_grads) {
-		assert((Dimensions<std::size_t,Base::DATA_RANK>(out_grads.dimensions()).template demote<>()) == output_dims);
-		assert(out_grads.dimension(0) > 0 && rows == out_grads.dimension(0));
-		typename Base::Data prev_out_grads = std::move(out_grads);
+	inline typename Base::Data pass_back(typename Base::Data out_grad) {
+		assert((Dimensions<std::size_t,Base::DATA_RANK>(out_grad.dimensions()).template demote<>()) == output_dims);
+		assert(out_grad.dimension(0) > 0 && rows == out_grad.dimension(0));
+		typename Base::Data prev_out_grad = std::move(out_grad);
 		slice_offsets.fill(0);
 		slice_extents = output_dims.template promote<>();
 		slice_extents[0] = rows;
@@ -3270,13 +3330,13 @@ protected:
 			typename Base::Data work_tensor(slice_extents);
 			work_tensor.setZero();
 			for (std::size_t j = 0; j < broadcast[i + 1]; ++j) {
-				work_tensor += prev_out_grads.slice(slice_offsets, slice_extents);
+				work_tensor += prev_out_grad.slice(slice_offsets, slice_extents);
 				slice_offsets[i + 1] += input_dims(i);
 			}
 			slice_offsets[i + 1] = 0;
-			prev_out_grads = std::move(work_tensor);
+			prev_out_grad = std::move(work_tensor);
 		}
-		return prev_out_grads;
+		return prev_out_grad;
 	}
 private:
 	const Dimensions<std::size_t,Rank> input_dims;
@@ -3439,24 +3499,24 @@ protected:
 		Matrix<Scalar> out = (in_mat * params_ref.row(i).asDiagonal()).rowwise() + params_ref.row(depth + i);
 		return TensorMap<Scalar,Base::DATA_RANK>(out.data(), output_dims);
 	}
-	inline typename Base::Data _pass_back(typename Base::Data out_grads, const RankwiseArray& prev_out_dims, int i) {
-		std::size_t rows = out_grads.dimension(0);
+	inline typename Base::Data _pass_back(typename Base::Data out_grad, const RankwiseArray& prev_out_dims, int i) {
+		std::size_t rows = out_grad.dimension(0);
 		Cache& cache = cache_vec[i];
 		Matrix<Scalar> std_in_grads;
 		/* Back-propagate the gradient through the batch normalization 'function' and also calculate the
 		 * gradients of the betas and gammas. */
 		{ // Manage memory by scope restriction.
-			MatrixMap<Scalar> out_grads_mat(out_grads.data(), rows, out_grads.size() / rows);
-			params_grad.row(i) = out_grads_mat.cwiseProduct(cache.std_in).colwise().sum();
-			params_grad.row(depth + i) = out_grads_mat.colwise().sum();
+			MatrixMap<Scalar> out_grad_mat(out_grad.data(), rows, out_grad.size() / rows);
+			params_grad.row(i) = out_grad_mat.cwiseProduct(cache.std_in).colwise().sum();
+			params_grad.row(depth + i) = out_grad_mat.colwise().sum();
 			if (input_layer)
 				return typename Base::Data();
-			std_in_grads = out_grads_mat * params_ref.row(i).asDiagonal();
+			std_in_grads = out_grad_mat * params_ref.row(i).asDiagonal();
 		}
-		Matrix<Scalar> prev_out_grads = (((rows * std_in_grads).rowwise() - std_in_grads.colwise().sum()) -
+		Matrix<Scalar> prev_out_grad = (((rows * std_in_grads).rowwise() - std_in_grads.colwise().sum()) -
 				cache.std_in * (cache.std_in.cwiseProduct(std_in_grads).colwise().sum().asDiagonal())) *
 				((1.0 / rows) * cache.inv_in_sd).asDiagonal();
-		return TensorMap<Scalar,Base::DATA_RANK>(prev_out_grads.data(), prev_out_dims);
+		return TensorMap<Scalar,Base::DATA_RANK>(prev_out_grad.data(), prev_out_dims);
 	}
 	const Dimensions<std::size_t,Rank> dims;
 	const std::size_t depth;
@@ -3530,11 +3590,11 @@ protected:
 		conversion_dims[0] = in.dimension(0);
 		return Base::_pass_forward(std::move(in), conversion_dims, training, 0);
 	}
-	inline typename Root::Data pass_back(typename Root::Data out_grads) {
-		assert((Dimensions<std::size_t,Root::DATA_RANK>(out_grads.dimensions()).template demote<>()) == Base::dims);
-		assert(out_grads.dimension(0) > 0 && conversion_dims[0] == out_grads.dimension(0));
-		typename Root::Data prev_out_grads = Base::_pass_back(std::move(out_grads), conversion_dims, 0);
-		return prev_out_grads;
+	inline typename Root::Data pass_back(typename Root::Data out_grad) {
+		assert((Dimensions<std::size_t,Root::DATA_RANK>(out_grad.dimensions()).template demote<>()) == Base::dims);
+		assert(out_grad.dimension(0) > 0 && conversion_dims[0] == out_grad.dimension(0));
+		typename Root::Data prev_out_grad = Base::_pass_back(std::move(out_grad), conversion_dims, 0);
+		return prev_out_grad;
 	}
 private:
 	typename Base::RankwiseArray conversion_dims;
@@ -3597,32 +3657,134 @@ protected:
 			return out;
 		}
 	}
-	inline typename Root::Data pass_back(typename Root::Data out_grads) {
-		assert((Dimensions<std::size_t,4>(out_grads.dimensions()).template demote<>()) == Base::dims);
-		assert(out_grads.dimension(0) > 0 && extents[0] == out_grads.dimension(0));
-		std::size_t rows = out_grads.dimension(0);
-		typename Root::Data prev_out_grads;
+	inline typename Root::Data pass_back(typename Root::Data out_grad) {
+		assert((Dimensions<std::size_t,4>(out_grad.dimensions()).template demote<>()) == Base::dims);
+		assert(out_grad.dimension(0) > 0 && extents[0] == out_grad.dimension(0));
+		std::size_t rows = out_grad.dimension(0);
+		typename Root::Data prev_out_grad;
 		if (Base::dims(2) == 1)
-			prev_out_grads = Base::_pass_back(std::move(out_grads), extents, 0);
+			prev_out_grad = Base::_pass_back(std::move(out_grad), extents, 0);
 		else {
 			if (!Base::is_input_layer())
-				prev_out_grads = typename Base::Data(rows, Base::dims(0), Base::dims(1), Base::dims(2));
+				prev_out_grad = typename Base::Data(rows, Base::dims(0), Base::dims(1), Base::dims(2));
 			for (int i = 0; i < Base::dims(2); ++i) {
 				offsets[3] = i;
-				typename Root::Data out_grads_slice = out_grads.slice(offsets, extents);
+				typename Root::Data out_grad_slice = out_grad.slice(offsets, extents);
 				if (Base::is_input_layer())
-					Base::_pass_back(std::move(out_grads_slice), extents, i);
+					Base::_pass_back(std::move(out_grad_slice), extents, i);
 				else
-					prev_out_grads.slice(offsets, extents) = Base::_pass_back(std::move(out_grads_slice), extents, i);
+					prev_out_grad.slice(offsets, extents) = Base::_pass_back(std::move(out_grad_slice), extents, i);
 			}
 		}
-		return prev_out_grads;
+		return prev_out_grad;
 	}
 private:
 	typename Base::RankwiseArray offsets;
 	typename Base::RankwiseArray extents;
 };
 
+#ifdef CATTL3_USE_CUDNN
+/**
+ * A class template representing a drop-out layer.
+ *
+ * \see https://arxiv.org/abs/1207.0580
+ * \see http://www.cs.toronto.edu/~rsalakhu/papers/srivastava14a.pdf
+ */
+template<typename Scalar, std::size_t Rank>
+class DropoutLayer : public Layer<Scalar,Rank> {
+	typedef Layer<Scalar,Rank> Base;
+public:
+	/**
+	 * @param dims The dimensionality of the input tensor.
+	 * @param dropout_prob The probability of an element of the input tensor being set to 0.
+	 * @param epsilon A small constant used to maintain numerical stability.
+	 */
+	inline DropoutLayer(const Dimensions<std::size_t,Rank>& dims, Scalar dropout_prob) :
+				dims(dims),
+				dropout_prob(dropout_prob),
+				input_layer(false),
+				frozen(false),
+				ext_batch_dims(dims.template extend<3 - Rank>().template promote<>()),
+				params(0, 0),
+				params_grad(0, 0),
+				reserve() {
+		assert(dropout_prob > 0 && dropout_prob <= 1 &&
+				"dropout probability must be greater than 0 and no greater than 1");
+	}
+	inline Base* clone() const {
+		return new DropoutLayer(*this);
+	}
+	inline const Dimensions<std::size_t,Rank>& get_input_dims() const {
+		return dims;
+	}
+	inline const Dimensions<std::size_t,Rank>& get_output_dims() const {
+		return dims;
+	}
+	inline bool is_frozen() const {
+		return frozen;
+	}
+	inline void set_frozen(bool frozen) {
+		this->frozen = frozen;
+	}
+	inline void init() { }
+protected:
+	inline Layer<Scalar,Rank>* clone_with_shared_params() const {
+		return clone();
+	}
+	inline bool is_input_layer() const {
+		return input_layer;
+	}
+	inline void set_input_layer(bool input_layer) {
+		this->input_layer = input_layer;
+	}
+	inline void empty_cache() {
+		reserve = std::vector<Scalar>(0);
+	}
+	inline Matrix<Scalar>& get_params() {
+		return params;
+	}
+	inline Matrix<Scalar>& get_params_grad() {
+		return params_grad;
+	}
+	inline void regularize() { }
+	inline Scalar get_regularization_penalty() {
+		return 0;
+	}
+	inline void enforce_constraints() { }
+	inline typename Base::Data pass_forward(typename Base::Data in, bool training) {
+		assert((Dimensions<std::size_t,Base::DATA_RANK>(in.dimensions()).template demote<>()) == dims);
+		assert(in.dimension(0) > 0);
+		if (training) {
+			ext_batch_dims[0] = in.dimension(0);
+			typename Base::Data out(in.dimensions());
+			internal::CuDNNHandle<Scalar>::get_instance().dropout_fwd(in.data(), ext_batch_dims, dropout_prob,
+					out.data(), reserve);
+			return out;
+		}
+		return in;
+	}
+	inline typename Base::Data pass_back(typename Base::Data out_grad) {
+		assert((Dimensions<std::size_t,Base::DATA_RANK>(out_grad.dimensions()).template demote<>()) == dims);
+		assert(out_grad.dimension(0) > 0 && ext_batch_dims[0] == out_grad.dimension(0));
+		if (input_layer)
+			return typename Base::Data();
+		typename Base::Data prev_out_grad(out_grad.dimensions());
+		internal::CuDNNHandle<Scalar>::get_instance().dropout_bwd(out_grad.data(), reserve, ext_batch_dims,
+				dropout_prob, prev_out_grad.data());
+		return prev_out_grad;
+	}
+private:
+	const Dimensions<std::size_t,Rank> dims;
+	const Scalar dropout_prob;
+	bool input_layer;
+	bool frozen;
+	Matrix<Scalar> params;
+	Matrix<Scalar> params_grad;
+	std::array<std::size_t,4> ext_batch_dims;
+	// Staged computation cache.
+	std::vector<Scalar> reserve;
+};
+#else
 /**
  * A class template representing a drop-out layer.
  *
@@ -3643,12 +3805,12 @@ public:
 				dims(dims),
 				dropout_prob(dropout_prob),
 				epsilon(epsilon),
-				dropout(internal::NumericUtils<Scalar>::decidedly_greater(dropout_prob, .0)),
 				input_layer(false),
 				frozen(false),
 				params(0, 0),
 				params_grad(0, 0) {
-		assert(dropout_prob <= 1 && "dropout prob must not be greater than 1");
+		assert(dropout_prob > 0 && dropout_prob <= 1 &&
+				"dropout probability must be greater than 0 and no greater than 1");
 		assert(epsilon > 0 && "epsilon must be greater than 0");
 	}
 	inline Base* clone() const {
@@ -3694,7 +3856,7 @@ protected:
 	inline typename Base::Data pass_forward(typename Base::Data in, bool training) {
 		assert((Dimensions<std::size_t,Base::DATA_RANK>(in.dimensions()).template demote<>()) == dims);
 		assert(in.dimension(0) > 0);
-		if (training && dropout) {
+		if (training) {
 			// Inverted dropout.
 			Scalar scaling_factor = (Scalar) 1 / (1 - dropout_prob + epsilon);
 			dropout_mask = ((in.random() + in.constant(1)) / (Scalar) 2).unaryExpr([this,scaling_factor](Scalar i) {
@@ -3704,19 +3866,18 @@ protected:
 		}
 		return in;
 	}
-	inline typename Base::Data pass_back(typename Base::Data out_grads) {
-		assert((Dimensions<std::size_t,Base::DATA_RANK>(out_grads.dimensions()).template demote<>()) == dims);
-		assert(out_grads.dimension(0) > 0 && dropout_mask.dimension(0) == out_grads.dimension(0));
+	inline typename Base::Data pass_back(typename Base::Data out_grad) {
+		assert((Dimensions<std::size_t,Base::DATA_RANK>(out_grad.dimensions()).template demote<>()) == dims);
+		assert(out_grad.dimension(0) > 0 && dropout_mask.dimension(0) == out_grad.dimension(0));
 		if (input_layer)
 			return typename Base::Data();
 		// The derivative of the dropout 'function'.
-		return out_grads * dropout_mask;
+		return out_grad * dropout_mask;
 	}
 private:
 	const Dimensions<std::size_t,Rank> dims;
 	const Scalar dropout_prob;
 	const Scalar epsilon;
-	const bool dropout;
 	bool input_layer;
 	bool frozen;
 	Matrix<Scalar> params;
@@ -3724,6 +3885,7 @@ private:
 	// Staged computation cache.
 	typename Base::Data dropout_mask;
 };
+#endif
 
 /**
  * A class template representing a reshaping layer that outputs a reshaped copy of the input
@@ -3795,11 +3957,11 @@ protected:
 		input_conversion_dims[0] = in.dimension(0);
 		return in.reshape(input_conversion_dims);
 	}
-	inline typename Base::Data pass_back(typename Base::Data out_grads) {
-		assert((Dimensions<std::size_t,Base::DATA_RANK>(out_grads.dimensions()).template demote<>()) == output_dims);
-		assert(out_grads.dimension(0) > 0 && input_conversion_dims[0] == out_grads.dimension(0));
+	inline typename Base::Data pass_back(typename Base::Data out_grad) {
+		assert((Dimensions<std::size_t,Base::DATA_RANK>(out_grad.dimensions()).template demote<>()) == output_dims);
+		assert(out_grad.dimension(0) > 0 && input_conversion_dims[0] == out_grad.dimension(0));
 		output_conversion_dims[0] = input_conversion_dims[0];
-		return out_grads.reshape(output_conversion_dims);
+		return out_grad.reshape(output_conversion_dims);
 	}
 private:
 	const Dimensions<std::size_t,Rank> input_dims;

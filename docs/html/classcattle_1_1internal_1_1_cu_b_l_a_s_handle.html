@@ -88,9 +88,9 @@ $(function() {
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:ab06d75f73b1c6da939a50d8a935d0efa"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespacecattle.html#a1d78623a47279d516750a44dbad6090b">Matrix</a>&lt; Scalar &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1internal_1_1_cu_b_l_a_s_handle.html#ab06d75f73b1c6da939a50d8a935d0efa">mul</a> (<a class="el" href="namespacecattle.html#a1d78623a47279d516750a44dbad6090b">Matrix</a>&lt; Scalar &gt; &amp;a, <a class="el" href="namespacecattle.html#a1d78623a47279d516750a44dbad6090b">Matrix</a>&lt; Scalar &gt; &amp;b, bool transpose_a, bool transpose_b)</td></tr>
-<tr class="memdesc:ab06d75f73b1c6da939a50d8a935d0efa"><td class="mdescLeft">&#160;</td><td class="mdescRight">It computes the product of the matrix multiplication.  <a href="#ab06d75f73b1c6da939a50d8a935d0efa">More...</a><br /></td></tr>
-<tr class="separator:ab06d75f73b1c6da939a50d8a935d0efa"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a6df11f387a8900c13cfb3f3596a443f3"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1internal_1_1_cu_b_l_a_s_handle.html#a6df11f387a8900c13cfb3f3596a443f3">matrix_mul</a> (Scalar *a, std::size_t a_orig_rows, std::size_t a_orig_cols, bool transpose_a, Scalar *b, std::size_t b_orig_rows, std::size_t b_orig_cols, bool transpose_b, Scalar *c)</td></tr>
+<tr class="memdesc:a6df11f387a8900c13cfb3f3596a443f3"><td class="mdescLeft">&#160;</td><td class="mdescRight">It computes the product of the matrix multiplication.  <a href="#a6df11f387a8900c13cfb3f3596a443f3">More...</a><br /></td></tr>
+<tr class="separator:a6df11f387a8900c13cfb3f3596a443f3"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-static-methods"></a>
 Static Public Member Functions</h2></td></tr>
@@ -131,8 +131,8 @@ template&lt;typename Scalar &gt; </div>
 
 </div>
 </div>
-<a id="ab06d75f73b1c6da939a50d8a935d0efa"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ab06d75f73b1c6da939a50d8a935d0efa">&#9670;&nbsp;</a></span>mul()</h2>
+<a id="a6df11f387a8900c13cfb3f3596a443f3"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a6df11f387a8900c13cfb3f3596a443f3">&#9670;&nbsp;</a></span>matrix_mul()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -143,16 +143,22 @@ template&lt;typename Scalar &gt; </div>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="namespacecattle.html#a1d78623a47279d516750a44dbad6090b">Matrix</a>&lt;Scalar&gt; <a class="el" href="classcattle_1_1internal_1_1_cu_b_l_a_s_handle.html">cattle::internal::CuBLASHandle</a>&lt; Scalar &gt;::mul </td>
+          <td class="memname">void <a class="el" href="classcattle_1_1internal_1_1_cu_b_l_a_s_handle.html">cattle::internal::CuBLASHandle</a>&lt; Scalar &gt;::matrix_mul </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="namespacecattle.html#a1d78623a47279d516750a44dbad6090b">Matrix</a>&lt; Scalar &gt; &amp;&#160;</td>
+          <td class="paramtype">Scalar *&#160;</td>
           <td class="paramname"><em>a</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype"><a class="el" href="namespacecattle.html#a1d78623a47279d516750a44dbad6090b">Matrix</a>&lt; Scalar &gt; &amp;&#160;</td>
-          <td class="paramname"><em>b</em>, </td>
+          <td class="paramtype">std::size_t&#160;</td>
+          <td class="paramname"><em>a_orig_rows</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">std::size_t&#160;</td>
+          <td class="paramname"><em>a_orig_cols</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -163,8 +169,32 @@ template&lt;typename Scalar &gt; </div>
         <tr>
           <td class="paramkey"></td>
           <td></td>
+          <td class="paramtype">Scalar *&#160;</td>
+          <td class="paramname"><em>b</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">std::size_t&#160;</td>
+          <td class="paramname"><em>b_orig_rows</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">std::size_t&#160;</td>
+          <td class="paramname"><em>b_orig_cols</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
           <td class="paramtype">bool&#160;</td>
-          <td class="paramname"><em>transpose_b</em>&#160;</td>
+          <td class="paramname"><em>transpose_b</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">Scalar *&#160;</td>
+          <td class="paramname"><em>c</em>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -183,18 +213,24 @@ template&lt;typename Scalar &gt; </div>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">a</td><td>The multiplicand matrix. </td></tr>
-    <tr><td class="paramname">b</td><td>The multiplier matrix. </td></tr>
+    <tr><td class="paramname">a_orig_rows</td><td>The number of rows in matrix a. </td></tr>
+    <tr><td class="paramname">a_orig_cols</td><td>The number of columns in matrix b. </td></tr>
     <tr><td class="paramname">transpose_a</td><td>Whether the multiplicand is to be transposed for the operation. </td></tr>
+    <tr><td class="paramname">b</td><td>The multiplier matrix. </td></tr>
+    <tr><td class="paramname">b_orig_rows</td><td>The number of rows in matrix b. </td></tr>
+    <tr><td class="paramname">b_orig_cols</td><td>The number of columns in matrix b. </td></tr>
     <tr><td class="paramname">transpose_b</td><td>Whether the multiplier is to be transposed for the operation. </td></tr>
+    <tr><td class="paramname">transpose_a</td><td></td></tr>
+    <tr><td class="paramname">transpose_b</td><td></td></tr>
+    <tr><td class="paramname">c</td><td>The product of the matrix multiplication. </td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>The product of the matrix multiplication. </dd></dl>
 
 </div>
 </div>
 <hr/>The documentation for this class was generated from the following file:<ul>
-<li>C:/Users/Viktor/git/C-ATTL3/C-ATTL3/utils/<a class="el" href="_cu_b_l_a_s_handle_8hpp_source.html">CuBLASHandle.hpp</a></li>
+<li>C:/Users/Viktor/git/C-ATTL3/C-ATTL3/utils/gpu/<a class="el" href="_cu_b_l_a_s_handle_8hpp_source.html">CuBLASHandle.hpp</a></li>
 </ul>
 </div><!-- contents -->
 <!-- start footer part -->

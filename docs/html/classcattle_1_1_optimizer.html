@@ -147,9 +147,9 @@ Static Protected Member Functions</h2></td></tr>
 <tr class="memitem:a03eff65d0152bf88d98988808090f34c"><td class="memItemLeft" align="right" valign="top">static Data&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_optimizer.html#a03eff65d0152bf88d98988808090f34c">propagate</a> (<a class="el" href="classcattle_1_1_neural_network.html">Net</a> &amp;net, Data in)</td></tr>
 <tr class="memdesc:a03eff65d0152bf88d98988808090f34c"><td class="mdescLeft">&#160;</td><td class="mdescRight">A method to expose protected methods of the <a class="el" href="classcattle_1_1_neural_network.html" title="An abstract neural network class template. ">NeuralNetwork</a> class to subclasses of <a class="el" href="classcattle_1_1_optimizer.html" title="An abstract class template for neural network optimizer algorithm implementations. ">Optimizer</a> that are not friend classes of <a class="el" href="classcattle_1_1_neural_network.html" title="An abstract neural network class template. ">NeuralNetwork</a>.  <a href="#a03eff65d0152bf88d98988808090f34c">More...</a><br /></td></tr>
 <tr class="separator:a03eff65d0152bf88d98988808090f34c"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ae9504099cd9dbaa6f64450eb6061efe9"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_optimizer.html#ae9504099cd9dbaa6f64450eb6061efe9">backpropagate</a> (<a class="el" href="classcattle_1_1_neural_network.html">Net</a> &amp;net, Data out_grads)</td></tr>
-<tr class="memdesc:ae9504099cd9dbaa6f64450eb6061efe9"><td class="mdescLeft">&#160;</td><td class="mdescRight">A method to expose protected methods of the <a class="el" href="classcattle_1_1_neural_network.html" title="An abstract neural network class template. ">NeuralNetwork</a> class to subclasses of <a class="el" href="classcattle_1_1_optimizer.html" title="An abstract class template for neural network optimizer algorithm implementations. ">Optimizer</a> that are not friend classes of <a class="el" href="classcattle_1_1_neural_network.html" title="An abstract neural network class template. ">NeuralNetwork</a>.  <a href="#ae9504099cd9dbaa6f64450eb6061efe9">More...</a><br /></td></tr>
-<tr class="separator:ae9504099cd9dbaa6f64450eb6061efe9"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a6a6f6423e9ed52d8f45f4ac54da6dd5e"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_optimizer.html#a6a6f6423e9ed52d8f45f4ac54da6dd5e">backpropagate</a> (<a class="el" href="classcattle_1_1_neural_network.html">Net</a> &amp;net, Data out_grad)</td></tr>
+<tr class="memdesc:a6a6f6423e9ed52d8f45f4ac54da6dd5e"><td class="mdescLeft">&#160;</td><td class="mdescRight">A method to expose protected methods of the <a class="el" href="classcattle_1_1_neural_network.html" title="An abstract neural network class template. ">NeuralNetwork</a> class to subclasses of <a class="el" href="classcattle_1_1_optimizer.html" title="An abstract class template for neural network optimizer algorithm implementations. ">Optimizer</a> that are not friend classes of <a class="el" href="classcattle_1_1_neural_network.html" title="An abstract neural network class template. ">NeuralNetwork</a>.  <a href="#a6a6f6423e9ed52d8f45f4ac54da6dd5e">More...</a><br /></td></tr>
+<tr class="separator:a6a6f6423e9ed52d8f45f4ac54da6dd5e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:abc23bf23413dfa4a8c6a8d9b222af7eb"><td class="memItemLeft" align="right" valign="top">static bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_optimizer.html#abc23bf23413dfa4a8c6a8d9b222af7eb">is_parametric</a> (<a class="el" href="classcattle_1_1_layer.html">Layer</a>&lt; Scalar, Rank &gt; &amp;layer)</td></tr>
 <tr class="memdesc:abc23bf23413dfa4a8c6a8d9b222af7eb"><td class="mdescLeft">&#160;</td><td class="mdescRight">A method to expose protected methods of the <a class="el" href="classcattle_1_1_layer.html" title="An abstract class template representing layers in a neural network. ">Layer</a> class to subclasses of <a class="el" href="classcattle_1_1_optimizer.html" title="An abstract class template for neural network optimizer algorithm implementations. ">Optimizer</a> that are not friend classes of <a class="el" href="classcattle_1_1_layer.html" title="An abstract class template representing layers in a neural network. ">Layer</a>.  <a href="#abc23bf23413dfa4a8c6a8d9b222af7eb">More...</a><br /></td></tr>
 <tr class="separator:abc23bf23413dfa4a8c6a8d9b222af7eb"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -303,8 +303,8 @@ template&lt;typename Scalar , std::size_t Rank, bool Sequential&gt; </div>
 
 </div>
 </div>
-<a id="ae9504099cd9dbaa6f64450eb6061efe9"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ae9504099cd9dbaa6f64450eb6061efe9">&#9670;&nbsp;</a></span>backpropagate()</h2>
+<a id="a6a6f6423e9ed52d8f45f4ac54da6dd5e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a6a6f6423e9ed52d8f45f4ac54da6dd5e">&#9670;&nbsp;</a></span>backpropagate()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -324,7 +324,7 @@ template&lt;typename Scalar , std::size_t Rank, bool Sequential&gt; </div>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">Data&#160;</td>
-          <td class="paramname"><em>out_grads</em>&#160;</td>
+          <td class="paramname"><em>out_grad</em>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -340,12 +340,12 @@ template&lt;typename Scalar , std::size_t Rank, bool Sequential&gt; </div>
 </div><div class="memdoc">
 
 <p>A method to expose protected methods of the <a class="el" href="classcattle_1_1_neural_network.html" title="An abstract neural network class template. ">NeuralNetwork</a> class to subclasses of <a class="el" href="classcattle_1_1_optimizer.html" title="An abstract class template for neural network optimizer algorithm implementations. ">Optimizer</a> that are not friend classes of <a class="el" href="classcattle_1_1_neural_network.html" title="An abstract neural network class template. ">NeuralNetwork</a>. </p>
-<dl class="section see"><dt>See also</dt><dd><a class="el" href="classcattle_1_1_neural_network.html#ae4fd8a1e33b0d9cbb975a6ee5c41fa6c" title="It back-propagates the derivative of the loss function w.r.t. ">NeuralNetwork::backpropagate</a>(<a class="el" href="namespacecattle.html#a8b9323ad928764340e46f0802bf27fbb" title="An alias for a tensor of arbitrary rank and scalar type with dynamic dimensionality. ">Tensor</a>&lt;Scalar,Rank + Sequential + 1&gt;)</dd></dl>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="classcattle_1_1_neural_network.html#a550bd7dea6ddac56160b5cafd54e8962" title="It back-propagates the derivative of the loss function w.r.t. ">NeuralNetwork::backpropagate</a>(<a class="el" href="namespacecattle.html#a8b9323ad928764340e46f0802bf27fbb" title="An alias for a tensor of arbitrary rank and scalar type with dynamic dimensionality. ">Tensor</a>&lt;Scalar,Rank + Sequential + 1&gt;)</dd></dl>
 <p>It back-propagates the gradients through the specified network.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">net</td><td>A reference to the network throught which the gradients are to be back-propagated. </td></tr>
-    <tr><td class="paramname">out_grads</td><td>The gradient tensor. </td></tr>
+    <tr><td class="paramname">out_grad</td><td>The gradient tensor. </td></tr>
   </table>
   </dd>
 </dl>

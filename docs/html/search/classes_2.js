@@ -15,6 +15,9 @@ var searchData=
   ['convolutionlayerbase_3c_20scalar_2c_201_20_3e',['ConvolutionLayerBase&lt; Scalar, 1 &gt;',['../classcattle_1_1_convolution_layer_base.html',1,'cattle']]],
   ['convolutionlayerbase_3c_20scalar_2c_202_20_3e',['ConvolutionLayerBase&lt; Scalar, 2 &gt;',['../classcattle_1_1_convolution_layer_base.html',1,'cattle']]],
   ['crossentropyloss',['CrossEntropyLoss',['../classcattle_1_1_cross_entropy_loss.html',1,'cattle']]],
+  ['cublaserror',['CuBLASError',['../classcattle_1_1internal_1_1_cu_b_l_a_s_error.html',1,'cattle::internal']]],
   ['cublashandle',['CuBLASHandle',['../classcattle_1_1internal_1_1_cu_b_l_a_s_handle.html',1,'cattle::internal']]],
+  ['cudaerror',['CUDAError',['../classcattle_1_1internal_1_1_c_u_d_a_error.html',1,'cattle::internal']]],
+  ['cudnnerror',['CuDNNError',['../classcattle_1_1internal_1_1_cu_d_n_n_error.html',1,'cattle::internal']]],
   ['cudnnhandle',['CuDNNHandle',['../classcattle_1_1internal_1_1_cu_d_n_n_handle.html',1,'cattle::internal']]]
 ];

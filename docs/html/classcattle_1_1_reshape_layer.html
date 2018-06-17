@@ -159,9 +159,9 @@ void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="clas
 <tr class="memitem:ad90d03809c1a76aee78463a25c7724a3"><td class="memItemLeft" align="right" valign="top">Base::Data&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_reshape_layer.html#ad90d03809c1a76aee78463a25c7724a3">pass_forward</a> (typename Base::Data in, bool training)</td></tr>
 <tr class="memdesc:ad90d03809c1a76aee78463a25c7724a3"><td class="mdescLeft">&#160;</td><td class="mdescRight">It has the function represented by the layer applied to the input tensor.  <a href="#ad90d03809c1a76aee78463a25c7724a3">More...</a><br /></td></tr>
 <tr class="separator:ad90d03809c1a76aee78463a25c7724a3"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a70a43ccc8946bc1e7603c896b7c76994"><td class="memItemLeft" align="right" valign="top">Base::Data&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_reshape_layer.html#a70a43ccc8946bc1e7603c896b7c76994">pass_back</a> (typename Base::Data out_grads)</td></tr>
-<tr class="memdesc:a70a43ccc8946bc1e7603c896b7c76994"><td class="mdescLeft">&#160;</td><td class="mdescRight">It back-propagates the derivative of the error function w.r.t.  <a href="#a70a43ccc8946bc1e7603c896b7c76994">More...</a><br /></td></tr>
-<tr class="separator:a70a43ccc8946bc1e7603c896b7c76994"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9ce0f661d35ef7efa79885e76dec673a"><td class="memItemLeft" align="right" valign="top">Base::Data&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_reshape_layer.html#a9ce0f661d35ef7efa79885e76dec673a">pass_back</a> (typename Base::Data out_grad)</td></tr>
+<tr class="memdesc:a9ce0f661d35ef7efa79885e76dec673a"><td class="mdescLeft">&#160;</td><td class="mdescRight">It back-propagates the derivative of the error function w.r.t.  <a href="#a9ce0f661d35ef7efa79885e76dec673a">More...</a><br /></td></tr>
+<tr class="separator:a9ce0f661d35ef7efa79885e76dec673a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><h3>template&lt;typename Scalar, std::size_t Rank&gt;<br />
@@ -506,8 +506,8 @@ template&lt;typename Scalar , std::size_t Rank&gt; </div>
 
 </div>
 </div>
-<a id="a70a43ccc8946bc1e7603c896b7c76994"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a70a43ccc8946bc1e7603c896b7c76994">&#9670;&nbsp;</a></span>pass_back()</h2>
+<a id="a9ce0f661d35ef7efa79885e76dec673a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a9ce0f661d35ef7efa79885e76dec673a">&#9670;&nbsp;</a></span>pass_back()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -521,7 +521,7 @@ template&lt;typename Scalar , std::size_t Rank&gt; </div>
           <td class="memname">Base::Data <a class="el" href="classcattle_1_1_reshape_layer.html">cattle::ReshapeLayer</a>&lt; Scalar, Rank &gt;::pass_back </td>
           <td>(</td>
           <td class="paramtype">typename Base::Data&#160;</td>
-          <td class="paramname"><em>out_grads</em></td><td>)</td>
+          <td class="paramname"><em>out_grad</em></td><td>)</td>
           <td></td>
         </tr>
       </table>
@@ -536,13 +536,13 @@ template&lt;typename Scalar , std::size_t Rank&gt; </div>
 <p>the output of the layer updating the gradient of its learnable parameters along the way if there are any. If there are, it also calculates the derivative of the regularization penalty w.r.t. to the layer's parameters and adds it to their gradient.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">out_grads</td><td>The derivative of the loss function w.r.t. the output of the layer </td></tr>
+    <tr><td class="paramname">out_grad</td><td>The derivative of the loss function w.r.t. the output of the layer </td></tr>
   </table>
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>The derivative of the loss function w.r.t. the output of the previous layer or a null tensor if the layer is an input layer. </dd></dl>
 
-<p>Implements <a class="el" href="classcattle_1_1_layer.html#a10194a9e1de70a94e0e30a4701d14c0f">cattle::Layer&lt; Scalar, Rank &gt;</a>.</p>
+<p>Implements <a class="el" href="classcattle_1_1_layer.html#a7cb51862ef9b87632b5abb8e3ab36dd9">cattle::Layer&lt; Scalar, Rank &gt;</a>.</p>
 
 </div>
 </div>

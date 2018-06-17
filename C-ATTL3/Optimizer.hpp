@@ -376,10 +376,10 @@ protected:
 	 *
 	 * @param net A reference to the network throught which the gradients are to be
 	 * back-propagated.
-	 * @param out_grads The gradient tensor.
+	 * @param out_grad The gradient tensor.
 	 */
-	inline static void backpropagate(Net& net, Data out_grads) {
-		net.backpropagate(std::move(out_grads));
+	inline static void backpropagate(Net& net, Data out_grad) {
+		net.backpropagate(std::move(out_grad));
 	}
 	/**
 	 * A method to expose protected methods of the Layer class to subclasses of

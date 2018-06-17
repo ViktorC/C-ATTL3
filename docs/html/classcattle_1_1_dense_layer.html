@@ -139,9 +139,9 @@ void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="clas
 <tr class="memitem:a023625530cbc2621c39f29031439b6c7"><td class="memItemLeft" align="right" valign="top">Root::Data&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_dense_layer.html#a023625530cbc2621c39f29031439b6c7">pass_forward</a> (typename Root::Data in, bool training)</td></tr>
 <tr class="memdesc:a023625530cbc2621c39f29031439b6c7"><td class="mdescLeft">&#160;</td><td class="mdescRight">It has the function represented by the layer applied to the input tensor.  <a href="#a023625530cbc2621c39f29031439b6c7">More...</a><br /></td></tr>
 <tr class="separator:a023625530cbc2621c39f29031439b6c7"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a509a851affb431196c84d04d11894d74"><td class="memItemLeft" align="right" valign="top">Root::Data&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_dense_layer.html#a509a851affb431196c84d04d11894d74">pass_back</a> (typename Root::Data out_grads)</td></tr>
-<tr class="memdesc:a509a851affb431196c84d04d11894d74"><td class="mdescLeft">&#160;</td><td class="mdescRight">It back-propagates the derivative of the error function w.r.t.  <a href="#a509a851affb431196c84d04d11894d74">More...</a><br /></td></tr>
-<tr class="separator:a509a851affb431196c84d04d11894d74"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2f61bdcf2ed9ccba4e9c677bbd26b24c"><td class="memItemLeft" align="right" valign="top">Root::Data&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_dense_layer.html#a2f61bdcf2ed9ccba4e9c677bbd26b24c">pass_back</a> (typename Root::Data out_grad)</td></tr>
+<tr class="memdesc:a2f61bdcf2ed9ccba4e9c677bbd26b24c"><td class="mdescLeft">&#160;</td><td class="mdescRight">It back-propagates the derivative of the error function w.r.t.  <a href="#a2f61bdcf2ed9ccba4e9c677bbd26b24c">More...</a><br /></td></tr>
+<tr class="separator:a2f61bdcf2ed9ccba4e9c677bbd26b24c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="inherit_header pro_methods_classcattle_1_1_kernel_layer"><td colspan="2" onclick="javascript:toggleInherit('pro_methods_classcattle_1_1_kernel_layer')"><img src="closed.png" alt="-"/>&#160;Protected Member Functions inherited from <a class="el" href="classcattle_1_1_kernel_layer.html">cattle::KernelLayer&lt; Scalar, Rank &gt;</a></td></tr>
 <tr class="memitem:a93f48e39e3e9af884acc8ddd518c45e4 inherit pro_methods_classcattle_1_1_kernel_layer"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_kernel_layer.html#a93f48e39e3e9af884acc8ddd518c45e4">is_input_layer</a> () const</td></tr>
 <tr class="memdesc:a93f48e39e3e9af884acc8ddd518c45e4 inherit pro_methods_classcattle_1_1_kernel_layer"><td class="mdescLeft">&#160;</td><td class="mdescRight">A constant method that returns whether this layer functions as an input layer.  <a href="classcattle_1_1_kernel_layer.html#a93f48e39e3e9af884acc8ddd518c45e4">More...</a><br /></td></tr>
@@ -303,8 +303,8 @@ template&lt;typename Scalar, std::size_t Rank&gt; </div>
 
 </div>
 </div>
-<a id="a509a851affb431196c84d04d11894d74"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a509a851affb431196c84d04d11894d74">&#9670;&nbsp;</a></span>pass_back()</h2>
+<a id="a2f61bdcf2ed9ccba4e9c677bbd26b24c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a2f61bdcf2ed9ccba4e9c677bbd26b24c">&#9670;&nbsp;</a></span>pass_back()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -318,7 +318,7 @@ template&lt;typename Scalar, std::size_t Rank&gt; </div>
           <td class="memname">Root::Data <a class="el" href="classcattle_1_1_dense_layer.html">cattle::DenseLayer</a>&lt; Scalar, Rank &gt;::pass_back </td>
           <td>(</td>
           <td class="paramtype">typename Root::Data&#160;</td>
-          <td class="paramname"><em>out_grads</em></td><td>)</td>
+          <td class="paramname"><em>out_grad</em></td><td>)</td>
           <td></td>
         </tr>
       </table>
@@ -333,13 +333,13 @@ template&lt;typename Scalar, std::size_t Rank&gt; </div>
 <p>the output of the layer updating the gradient of its learnable parameters along the way if there are any. If there are, it also calculates the derivative of the regularization penalty w.r.t. to the layer's parameters and adds it to their gradient.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">out_grads</td><td>The derivative of the loss function w.r.t. the output of the layer </td></tr>
+    <tr><td class="paramname">out_grad</td><td>The derivative of the loss function w.r.t. the output of the layer </td></tr>
   </table>
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>The derivative of the loss function w.r.t. the output of the previous layer or a null tensor if the layer is an input layer. </dd></dl>
 
-<p>Implements <a class="el" href="classcattle_1_1_layer.html#a10194a9e1de70a94e0e30a4701d14c0f">cattle::Layer&lt; Scalar, Rank &gt;</a>.</p>
+<p>Implements <a class="el" href="classcattle_1_1_layer.html#a7cb51862ef9b87632b5abb8e3ab36dd9">cattle::Layer&lt; Scalar, Rank &gt;</a>.</p>
 
 </div>
 </div>

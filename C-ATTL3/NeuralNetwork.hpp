@@ -175,12 +175,12 @@ protected:
 	 * It back-propagates the derivative of the loss function w.r.t. the output of the
 	 * network through its layers updating the gradients on their parameters.
 	 *
-	 * @param out_grads The derivative of the loss function w.r.t. the output of the
+	 * @param out_grad The derivative of the loss function w.r.t. the output of the
 	 * network.
 	 * @return The derivative of the loss function w.r.t. the input of the network or
 	 * a null tensor if the network is a foremost network.
 	 */
-	virtual Data backpropagate(Data out_grads) = 0;
+	virtual Data backpropagate(Data out_grad) = 0;
 	/**
 	 * A method to expose protected methods of the Layer class to subclasses of
 	 * NeuralNetwork that are not friend classes of Layer.
@@ -253,13 +253,13 @@ protected:
 	 * the way.
 	 *
 	 * @param layer The layer through which the gradients are to be back-propagated.
-	 * @param out_grads The derivative of the loss function w.r.t. the output of
+	 * @param out_grad The derivative of the loss function w.r.t. the output of
 	 * the layer
 	 * @return The derivative of the loss function w.r.t. the input of the layer or
 	 * a null tensor if the layer is an input layer.
 	 */
-	inline static Tensor<Scalar,Rank + 1> pass_back(Layer<Scalar,Rank>& layer, Tensor<Scalar,Rank + 1> out_grads) {
-		return layer.pass_back(std::move(out_grads));
+	inline static Tensor<Scalar,Rank + 1> pass_back(Layer<Scalar,Rank>& layer, Tensor<Scalar,Rank + 1> out_grad) {
+		return layer.pass_back(std::move(out_grad));
 	}
 	/**
 	 * A method to expose protected methods of the Layer class to subclasses of
@@ -399,14 +399,14 @@ protected:
 		}
 		return input;
 	}
-	inline typename Base::Data backpropagate(typename Base::Data out_grads) {
-		assert(output_dims == (Dimensions<std::size_t,Base::DATA_RANK>(out_grads.dimensions()).template demote<>()));
+	inline typename Base::Data backpropagate(typename Base::Data out_grad) {
+		assert(output_dims == (Dimensions<std::size_t,Base::DATA_RANK>(out_grad.dimensions()).template demote<>()));
 		for (int i = layers.size() - 1; i >= 0; --i) {
 			Layer<Scalar,Rank>& layer = *layers[i];
-			out_grads = Base::pass_back(layer, std::move(out_grads));
+			out_grad = Base::pass_back(layer, std::move(out_grad));
 			Base::empty_cache(layer);
 		}
-		return out_grads;
+		return out_grad;
 	}
 private:
 	std::vector<LayerPtr<Scalar,Rank>> layers;
@@ -541,11 +541,11 @@ protected:
 			input = blocks[i]->propagate(std::move(input), training);
 		return input;
 	}
-	inline typename Base::Data backpropagate(typename Base::Data out_grads) {
-		assert(output_dims == (Dimensions<std::size_t,Base::DATA_RANK>(out_grads.dimensions()).template demote<>()));
+	inline typename Base::Data backpropagate(typename Base::Data out_grad) {
+		assert(output_dims == (Dimensions<std::size_t,Base::DATA_RANK>(out_grad.dimensions()).template demote<>()));
 		for (int i = blocks.size() - 1; i >= 0; --i)
-			out_grads = blocks[i]->backpropagate(std::move(out_grads));
-		return out_grads;
+			out_grad = blocks[i]->backpropagate(std::move(out_grad));
+		return out_grad;
 	}
 	/**
 	 * Creates a size-1 vector out of the specified unique pointer.
@@ -746,16 +746,16 @@ protected:
 		}
 		return out;
 	}
-	inline typename Base::Data backpropagate(typename Base::Data out_grads) {
-		assert(output_dims == (Dimensions<std::size_t,Base::DATA_RANK>(out_grads.dimensions()).template demote<>()));
-		typename Base::Data prev_out_grads;
+	inline typename Base::Data backpropagate(typename Base::Data out_grad) {
+		assert(output_dims == (Dimensions<std::size_t,Base::DATA_RANK>(out_grad.dimensions()).template demote<>()));
+		typename Base::Data prev_out_grad;
 		if (foremost)
-			prev_out_grads = typename Base::Data();
+			prev_out_grad = typename Base::Data();
 		else {
 			RankwiseArray dims = input_dims.template promote<>();
-			dims[0] = out_grads.dimension(0);
-			prev_out_grads = typename Base::Data(dims);
-			prev_out_grads.setZero();
+			dims[0] = out_grad.dimension(0);
+			prev_out_grad = typename Base::Data(dims);
+			prev_out_grad.setZero();
 		}
 		int pthread_state;
 		unsigned lane_num = lanes.size();
@@ -769,14 +769,14 @@ protected:
 			assert(!pthread_state);
 		}
 		BackpropArgs args_arr[lane_num];
-		int concat_rank_offset = out_grads.dimension(+CONCAT_BATCH_RANK);
+		int concat_rank_offset = out_grad.dimension(+CONCAT_BATCH_RANK);
 		for (int i = helper_thread_num; i >= 0; --i) {
 			concat_rank_offset -= lanes[i]->get_output_dims()(+CONCAT_RANK);
 			BackpropArgs args;
 			args.obj = this;
 			args.lane_id = i;
 			args.concat_rank_offset = concat_rank_offset;
-			args.out_grads = &out_grads;
+			args.out_grad = &out_grad;
 			args_arr[i] = args;
 			// Leave the first lane to the main thread.
 			if (i == 0)
@@ -792,13 +792,13 @@ protected:
 				assert(!pthread_state);
 			}
 			if (!foremost)
-				prev_out_grads += args_arr[i].prev_out_grads;
+				prev_out_grad += args_arr[i].prev_out_grad;
 		}
 		if (helper_thread_num > 0) {
 			pthread_state = pthread_attr_destroy(&attr);
 			assert(!pthread_state);
 		}
-		return prev_out_grads;
+		return prev_out_grad;
 	}
 	/**
 	 * Creates a size-1 vector out of the specified unique pointer.
@@ -834,8 +834,8 @@ private:
 		Self* obj;
 		int lane_id;
 		int concat_rank_offset;
-		typename Base::Data* out_grads;
-		typename Base::Data prev_out_grads;
+		typename Base::Data* out_grad;
+		typename Base::Data prev_out_grad;
 	};
 	/**
 	 * The propagation function executed in a different thread for each lane of a
@@ -860,22 +860,22 @@ private:
 		BackpropArgs& args = *((BackpropArgs*) args_ptr);
 		Base& lane = *args.obj->lanes[args.lane_id];
 		if (MergeType == SUM)
-			args.prev_out_grads = lane.backpropagate(*args.out_grads);
+			args.prev_out_grad = lane.backpropagate(*args.out_grad);
 		else if (MergeType == MUL) {
-			typename Base::Data out_grads = *args.out_grads;
+			typename Base::Data out_grad = *args.out_grad;
 			for (std::size_t i = 0; i < args.obj->lanes.size(); ++i) {
 				if (i != (std::size_t) args.lane_id)
-					out_grads *= args.obj->outputs[i];
+					out_grad *= args.obj->outputs[i];
 			}
-			args.prev_out_grads = lane.backpropagate(std::move(out_grads));
+			args.prev_out_grad = lane.backpropagate(std::move(out_grad));
 		} else {
 			RankwiseArray offsets;
 			RankwiseArray extents = lane.get_output_dims().template promote<>();
 			offsets.fill(0);
 			offsets[+CONCAT_BATCH_RANK] = args.concat_rank_offset;
-			extents[0] = args.out_grads->dimension(0);
-			typename Base::Data out_grads_slice = args.out_grads->slice(offsets, extents);
-			args.prev_out_grads = lane.backpropagate(std::move(out_grads_slice));
+			extents[0] = args.out_grad->dimension(0);
+			typename Base::Data out_grad_slice = args.out_grad->slice(offsets, extents);
+			args.prev_out_grad = lane.backpropagate(std::move(out_grad_slice));
 		}
 		return nullptr;
 	}
@@ -997,15 +997,15 @@ protected:
 			input += modules[i]->propagate(input, training);
 		return input;
 	}
-	inline typename Base::Data backpropagate(typename Base::Data out_grads) {
-		assert(output_dims == (Dimensions<std::size_t,Base::DATA_RANK>(out_grads.dimensions()).template demote<>()));
+	inline typename Base::Data backpropagate(typename Base::Data out_grad) {
+		assert(output_dims == (Dimensions<std::size_t,Base::DATA_RANK>(out_grad.dimensions()).template demote<>()));
 		for (int i = modules.size() - 1; i >= 0; --i) {
 			if (foremost && i == 0)
-				return modules[i]->backpropagate(std::move(out_grads));
+				return modules[i]->backpropagate(std::move(out_grad));
 			else
-				out_grads += modules[i]->backpropagate(out_grads);
+				out_grad += modules[i]->backpropagate(out_grad);
 		}
-		return out_grads;
+		return out_grad;
 	}
 private:
 	std::vector<Module> modules;
@@ -1144,28 +1144,28 @@ protected:
 		}
 		return input;
 	}
-	inline typename Base::Data backpropagate(typename Base::Data out_grads) {
-		assert(output_dims == (Dimensions<std::size_t,Base::DATA_RANK>(out_grads.dimensions()).template demote<>()));
+	inline typename Base::Data backpropagate(typename Base::Data out_grad) {
+		assert(output_dims == (Dimensions<std::size_t,Base::DATA_RANK>(out_grad.dimensions()).template demote<>()));
 		RankwiseArray offsets;
 		RankwiseArray extents = input_dims.template promote<>();
 		offsets.fill(0);
-		extents[0] = out_grads.dimension(0);
+		extents[0] = out_grad.dimension(0);
 		for (int i = modules.size() - 1; i >= 0; --i) {
 			Base& module = *modules[i];
 			int layer_input_concat_rank_dim = module.get_input_dims()(+CONCAT_RANK);
 			int layer_output_concat_rank_dim = module.get_output_dims()(+CONCAT_RANK);
 			offsets[+CONCAT_BATCH_RANK] = layer_input_concat_rank_dim;
 			extents[+CONCAT_BATCH_RANK] = layer_output_concat_rank_dim;
-			typename Base::Data out_grads_i = out_grads.slice(offsets, extents);
+			typename Base::Data out_grad_i = out_grad.slice(offsets, extents);
 			offsets[+CONCAT_BATCH_RANK] = 0;
 			extents[+CONCAT_BATCH_RANK] = layer_input_concat_rank_dim;
 			if (foremost && i == 0)
-				module.backpropagate(std::move(out_grads_i));
+				module.backpropagate(std::move(out_grad_i));
 			else
-				out_grads = typename Base::Data(out_grads.slice(offsets, extents) +
-						module.backpropagate(std::move(out_grads_i)));
+				out_grad = typename Base::Data(out_grad.slice(offsets, extents) +
+						module.backpropagate(std::move(out_grad_i)));
 		}
-		return out_grads;
+		return out_grad;
 	}
 	std::vector<Module> modules;
 	bool foremost;
@@ -1273,21 +1273,21 @@ protected:
 		Tensor<Scalar,Rank + 1> out = net->propagate(joint_input, training);
 		return TensorMap<Scalar,Rank + 2>(out.data(), split_output_dims);
 	}
-	inline typename Base::Data backpropagate(typename Base::Data out_grads) {
-		assert(output_dims == (Dimensions<std::size_t,Base::DATA_RANK>(out_grads.dimensions()).template demote<2>()));
-		assert(split_output_dims[0] == out_grads.dimension(0));
-		std::size_t batch_size = out_grads.dimension(0);
-		std::size_t seq_length = out_grads.dimension(1);
+	inline typename Base::Data backpropagate(typename Base::Data out_grad) {
+		assert(output_dims == (Dimensions<std::size_t,Base::DATA_RANK>(out_grad.dimensions()).template demote<2>()));
+		assert(split_output_dims[0] == out_grad.dimension(0));
+		std::size_t batch_size = out_grad.dimension(0);
+		std::size_t seq_length = out_grad.dimension(1);
 		joint_output_dims[0] = batch_size * seq_length;
-		TensorMap<Scalar,Rank + 1> joint_out_grads(out_grads.data(), joint_output_dims);
+		TensorMap<Scalar,Rank + 1> joint_out_grad(out_grad.data(), joint_output_dims);
 		if (foremost) {
-			net->backpropagate(joint_out_grads);
+			net->backpropagate(joint_out_grad);
 			return typename Base::Data();
 		} else {
-			Tensor<Scalar,Rank + 1> prev_out_grads = net->backpropagate(joint_out_grads);
+			Tensor<Scalar,Rank + 1> prev_out_grad = net->backpropagate(joint_out_grad);
 			split_input_dims[0] = batch_size;
 			split_input_dims[1] = seq_length;
-			return TensorMap<Scalar,Rank + 2>(prev_out_grads.data(), split_input_dims);
+			return TensorMap<Scalar,Rank + 2>(prev_out_grad.data(), split_input_dims);
 		}
 	}
 private:
@@ -1456,36 +1456,36 @@ protected:
 		}
 		return seq_out;
 	}
-	inline typename Base::Data backpropagate(typename Base::Data out_grads) {
-		assert(output_dims == (Dimensions<std::size_t,Base::DATA_RANK>(out_grads.dimensions()).template demote<2>()));
-		assert(seq_output_extents[0] == out_grads.dimension(0));
-		assert(out_grads.dimension(1) == output_time_steps);
+	inline typename Base::Data backpropagate(typename Base::Data out_grad) {
+		assert(output_dims == (Dimensions<std::size_t,Base::DATA_RANK>(out_grad.dimensions()).template demote<2>()));
+		assert(seq_output_extents[0] == out_grad.dimension(0));
+		assert(out_grad.dimension(1) == output_time_steps);
 		non_seq_output_offsets[1] = 0;
 		non_seq_output_extents[1] *= output_time_steps;
-		NonSeqData non_seq_out_grads(non_seq_output_extents);
+		NonSeqData non_seq_out_grad(non_seq_output_extents);
 		non_seq_output_extents[1] /= output_time_steps;
 		for (std::size_t i = 0; i < output_time_steps; ++i) {
 			seq_output_offsets[1] = i;
-			non_seq_out_grads.slice(non_seq_output_offsets, non_seq_output_extents) = out_grads.slice(seq_output_offsets,
+			non_seq_out_grad.slice(non_seq_output_offsets, non_seq_output_extents) = out_grad.slice(seq_output_offsets,
 					seq_output_extents).reshape(non_seq_output_extents);
 			non_seq_output_offsets[1] += non_seq_output_extents[1];
 		}
 		if (foremost) {
-			net->backpropagate(std::move(non_seq_out_grads));
+			net->backpropagate(std::move(non_seq_out_grad));
 			return typename Base::Data();
 		} else {
-			NonSeqData non_seq_prev_out_grads = net->backpropagate(std::move(non_seq_out_grads));
+			NonSeqData non_seq_prev_out_grad = net->backpropagate(std::move(non_seq_out_grad));
 			non_seq_input_offsets[1] = 0;
 			seq_input_extents[1] = input_time_steps;
-			typename Base::Data seq_prev_out_grads(seq_input_extents);
+			typename Base::Data seq_prev_out_grad(seq_input_extents);
 			seq_input_extents[1] = 1;
 			for (std::size_t i = 0; i < input_time_steps; ++i) {
 				seq_input_offsets[1] = i;
-				seq_prev_out_grads.slice(seq_input_offsets, seq_input_extents) = non_seq_prev_out_grads.slice(non_seq_input_offsets,
+				seq_prev_out_grad.slice(seq_input_offsets, seq_input_extents) = non_seq_prev_out_grad.slice(non_seq_input_offsets,
 						non_seq_input_extents).reshape(seq_input_extents);
 				non_seq_input_offsets[1] += non_seq_input_extents[1];
 			}
-			return seq_prev_out_grads;
+			return seq_prev_out_grad;
 
 		}
 	}
@@ -1857,8 +1857,8 @@ protected:
 		this->output_seq_delay = output_seq_delay;
 		return out;
 	}
-	inline typename Root::Data backpropagate(typename Root::Data out_grads) {
-		Dimensions<std::size_t,Root::DATA_RANK> data_dims = out_grads.dimensions();
+	inline typename Root::Data backpropagate(typename Root::Data out_grad) {
+		Dimensions<std::size_t,Root::DATA_RANK> data_dims = out_grad.dimensions();
 		assert(output_dims == data_dims.template demote<2>() && batch_size == data_dims(0) &&
 				output_seq_length == data_dims(1));
 		TimeStepData null_tensor;
@@ -1872,10 +1872,10 @@ protected:
 		input_offsets[1] = input_seq_length - 1;
 		output_extents[1] = 1;
 		input_extents[0] = batch_size;
-		typename Root::Data prev_out_grads;
+		typename Root::Data prev_out_grad;
 		if (input_seq_length > 1) {
 			input_extents[1] = input_seq_length;
-			prev_out_grads = typename Root::Data(input_extents);
+			prev_out_grad = typename Root::Data(input_extents);
 		}
 		input_extents[1] = 1;
 		TimeStepData state_grads(state.dimensions());
@@ -1888,17 +1888,17 @@ protected:
 			Cell& cell = i == 0 ? main_cell : cells[i - 1];
 			// If there was an output at the time step...
 			if (i >= output_seq_delay && i < output_end) {
-				typename Root::Data out_grads_seq_i;
+				typename Root::Data out_grad_seq_i;
 				if (output_seq_length == 1)
-					out_grads_seq_i = std::move(out_grads);
+					out_grad_seq_i = std::move(out_grad);
 				else {
-					out_grads_seq_i = out_grads.slice(output_offsets, output_extents);
+					out_grad_seq_i = out_grad.slice(output_offsets, output_extents);
 					output_offsets[1] -= 1;
 				}
-				TimeStepData out_grads_i = Root::pass_back(*cell.output_act,
-						TensorMap<Scalar,Rank + 1>(out_grads_seq_i.data(), out_time_step_dims));
+				TimeStepData out_grad_i = Root::pass_back(*cell.output_act,
+						TensorMap<Scalar,Rank + 1>(out_grad_seq_i.data(), out_time_step_dims));
 				Root::empty_cache(*cell.output_act);
-				state_grads += Root::pass_back(*cell.output_kernel, std::move(out_grads_i));
+				state_grads += Root::pass_back(*cell.output_kernel, std::move(out_grad_i));
 				Root::empty_cache(*cell.output_kernel);
 			}
 			// Always back-propagate the state gradient.
@@ -1920,7 +1920,7 @@ protected:
 						cell.state_kernel_cache = null_tensor;
 					} else
 						input_i = Root::pass_back(*cell.input_kernel, state_grads);
-					prev_out_grads = TensorMap<Scalar,Root::DATA_RANK>(input_i.data(), input_extents);
+					prev_out_grad = TensorMap<Scalar,Root::DATA_RANK>(input_i.data(), input_extents);
 				} else {
 					TimeStepData input_i;
 					if (MulInt) {
@@ -1928,7 +1928,7 @@ protected:
 						cell.state_kernel_cache = null_tensor;
 					} else
 						input_i = Root::pass_back(*cell.input_kernel, state_grads);
-					prev_out_grads.slice(input_offsets, input_extents) = TensorMap<Scalar,Root::DATA_RANK>(input_i.data(), input_extents);
+					prev_out_grad.slice(input_offsets, input_extents) = TensorMap<Scalar,Root::DATA_RANK>(input_i.data(), input_extents);
 					input_offsets[1] -= 1;
 				}
 				Root::empty_cache(*cell.input_kernel);
@@ -1960,7 +1960,7 @@ protected:
 				output_act_params_grad += Root::get_params_grad(*cell.output_act);
 			}
 		}
-		return prev_out_grads;
+		return prev_out_grad;
 	}
 private:
 	/**
@@ -2594,8 +2594,8 @@ protected:
 		this->output_seq_delay = output_seq_delay;
 		return out;
 	}
-	inline typename Root::Data backpropagate(typename Root::Data out_grads) {
-		Dimensions<std::size_t,Root::DATA_RANK> data_dims = out_grads.dimensions();
+	inline typename Root::Data backpropagate(typename Root::Data out_grad) {
+		Dimensions<std::size_t,Root::DATA_RANK> data_dims = out_grad.dimensions();
 		assert(output_dims == data_dims.template demote<2>() && batch_size == data_dims(0) &&
 				output_seq_length == data_dims(1));
 		TimeStepData null_tensor;
@@ -2609,16 +2609,16 @@ protected:
 		input_offsets[1] = input_seq_length - 1;
 		output_extents[1] = 1;
 		input_extents[0] = batch_size;
-		typename Root::Data prev_out_grads;
+		typename Root::Data prev_out_grad;
 		if (input_seq_length > 1) {
 			input_extents[1] = input_seq_length;
-			prev_out_grads = typename Root::Data(input_extents);
+			prev_out_grad = typename Root::Data(input_extents);
 		}
 		input_extents[1] = 1;
 		TimeStepData state_grads(state.dimensions());
-		TimeStepData hidden_out_grads(state.dimensions());
+		TimeStepData hidden_out_grad(state.dimensions());
 		state_grads.setZero();
-		hidden_out_grads.setZero();
+		hidden_out_grad.setZero();
 		Dimensions<std::size_t,Rank + 1> out_time_step_dims = output_dims.template promote<>();
 		out_time_step_dims(0) = batch_size;
 		int output_end = output_seq_length + output_seq_delay;
@@ -2628,16 +2628,16 @@ protected:
 			// If there was a non-hidden output at the time step, let the gradients flow into the hidden output gradients.
 			if (i >= output_seq_delay && i < output_end) {
 				if (output_seq_length == 1)
-					hidden_out_grads += TensorMap<Scalar,Rank + 1>(out_grads.data(), out_time_step_dims);
+					hidden_out_grad += TensorMap<Scalar,Rank + 1>(out_grad.data(), out_time_step_dims);
 				else {
-					typename Root::Data out_grads_seq = out_grads.slice(output_offsets, output_extents);
+					typename Root::Data out_grad_seq = out_grad.slice(output_offsets, output_extents);
 					output_offsets[1] -= 1;
-					hidden_out_grads += TensorMap<Scalar,Rank + 1>(out_grads_seq.data(), out_time_step_dims);
+					hidden_out_grad += TensorMap<Scalar,Rank + 1>(out_grad_seq.data(), out_time_step_dims);
 				}
 			}
-			state_grads += Root::pass_back(*cell.state_act, cell.read_filter_cache * hidden_out_grads);
+			state_grads += Root::pass_back(*cell.state_act, cell.read_filter_cache * hidden_out_grad);
 			Root::empty_cache(*cell.state_act);
-			TimeStepData weighted_read_grads = Root::pass_back(*cell.read_act, cell.activated_state_cache * hidden_out_grads);
+			TimeStepData weighted_read_grads = Root::pass_back(*cell.read_act, cell.activated_state_cache * hidden_out_grad);
 			Root::empty_cache(*cell.read_act);
 			TimeStepData candidate_grads = Root::pass_back(*cell.candidate_act, cell.write_filter_cache * state_grads);
 			Root::empty_cache(*cell.candidate_act);
@@ -2647,53 +2647,53 @@ protected:
 			Root::empty_cache(*cell.forget_act);
 			state_grads *= cell.forget_filter_cache;
 			if (i < input_seq_length) {
-				TimeStepData prev_out_grads_i;
+				TimeStepData prev_out_grad_i;
 				if (MulInt) {
 					if (i != 0) {
 						// Calculate the previous hidden output gradients.
-						hidden_out_grads = Root::pass_back(*cell.output_read_kernel, cell.weighted_input_read_cache * weighted_read_grads);
+						hidden_out_grad = Root::pass_back(*cell.output_read_kernel, cell.weighted_input_read_cache * weighted_read_grads);
 						Root::empty_cache(*cell.output_read_kernel);
-						hidden_out_grads += Root::pass_back(*cell.output_candidate_kernel, cell.weighted_input_candidate_cache * candidate_grads);
+						hidden_out_grad += Root::pass_back(*cell.output_candidate_kernel, cell.weighted_input_candidate_cache * candidate_grads);
 						Root::empty_cache(*cell.output_candidate_kernel);
-						hidden_out_grads += Root::pass_back(*cell.output_write_kernel, cell.weighted_input_write_cache * weighted_write_grads);
+						hidden_out_grad += Root::pass_back(*cell.output_write_kernel, cell.weighted_input_write_cache * weighted_write_grads);
 						Root::empty_cache(*cell.output_write_kernel);
-						hidden_out_grads += Root::pass_back(*cell.output_forget_kernel, cell.weighted_input_forget_cache * weighted_forget_grads);
+						hidden_out_grad += Root::pass_back(*cell.output_forget_kernel, cell.weighted_input_forget_cache * weighted_forget_grads);
 						Root::empty_cache(*cell.output_forget_kernel);
 						// Calculate the input gradients.
-						prev_out_grads_i = Root::pass_back(*cell.input_read_kernel, cell.weighted_output_read_cache * weighted_read_grads);
+						prev_out_grad_i = Root::pass_back(*cell.input_read_kernel, cell.weighted_output_read_cache * weighted_read_grads);
 						Root::empty_cache(*cell.input_read_kernel);
 						weighted_read_grads = null_tensor;
-						prev_out_grads_i += Root::pass_back(*cell.input_candidate_kernel, cell.weighted_output_candidate_cache * candidate_grads);
+						prev_out_grad_i += Root::pass_back(*cell.input_candidate_kernel, cell.weighted_output_candidate_cache * candidate_grads);
 						Root::empty_cache(*cell.input_candidate_kernel);
 						candidate_grads = null_tensor;
-						prev_out_grads_i += Root::pass_back(*cell.input_write_kernel, cell.weighted_output_write_cache * weighted_write_grads);
+						prev_out_grad_i += Root::pass_back(*cell.input_write_kernel, cell.weighted_output_write_cache * weighted_write_grads);
 						Root::empty_cache(*cell.input_write_kernel);
 						weighted_write_grads = null_tensor;
-						prev_out_grads_i += Root::pass_back(*cell.input_forget_kernel, cell.weighted_output_forget_cache * weighted_forget_grads);
+						prev_out_grad_i += Root::pass_back(*cell.input_forget_kernel, cell.weighted_output_forget_cache * weighted_forget_grads);
 						Root::empty_cache(*cell.input_forget_kernel);
 						weighted_forget_grads = null_tensor;
 					} else {
-						prev_out_grads_i = Root::pass_back(*cell.input_read_kernel, std::move(weighted_read_grads));
+						prev_out_grad_i = Root::pass_back(*cell.input_read_kernel, std::move(weighted_read_grads));
 						Root::empty_cache(*cell.input_read_kernel);
-						prev_out_grads_i += Root::pass_back(*cell.input_candidate_kernel, std::move(candidate_grads));
+						prev_out_grad_i += Root::pass_back(*cell.input_candidate_kernel, std::move(candidate_grads));
 						Root::empty_cache(*cell.input_candidate_kernel);
-						prev_out_grads_i += Root::pass_back(*cell.input_write_kernel, std::move(weighted_write_grads));
+						prev_out_grad_i += Root::pass_back(*cell.input_write_kernel, std::move(weighted_write_grads));
 						Root::empty_cache(*cell.input_write_kernel);
-						prev_out_grads_i += Root::pass_back(*cell.input_forget_kernel, std::move(weighted_forget_grads));
+						prev_out_grad_i += Root::pass_back(*cell.input_forget_kernel, std::move(weighted_forget_grads));
 						Root::empty_cache(*cell.input_forget_kernel);
 					}
 				} else {
 					if (i != 0) {
-						hidden_out_grads = Root::pass_back(*cell.output_read_kernel, weighted_read_grads);
+						hidden_out_grad = Root::pass_back(*cell.output_read_kernel, weighted_read_grads);
 						Root::empty_cache(*cell.output_read_kernel);
-						hidden_out_grads += Root::pass_back(*cell.output_candidate_kernel, candidate_grads);
+						hidden_out_grad += Root::pass_back(*cell.output_candidate_kernel, candidate_grads);
 						Root::empty_cache(*cell.output_candidate_kernel);
-						hidden_out_grads += Root::pass_back(*cell.output_write_kernel, weighted_write_grads);
+						hidden_out_grad += Root::pass_back(*cell.output_write_kernel, weighted_write_grads);
 						Root::empty_cache(*cell.output_write_kernel);
-						hidden_out_grads += Root::pass_back(*cell.output_forget_kernel, weighted_forget_grads);
+						hidden_out_grad += Root::pass_back(*cell.output_forget_kernel, weighted_forget_grads);
 						Root::empty_cache(*cell.output_forget_kernel);
 					}
-					prev_out_grads_i = Root::pass_back(*cell.input_read_kernel, std::move(weighted_read_grads)) +
+					prev_out_grad_i = Root::pass_back(*cell.input_read_kernel, std::move(weighted_read_grads)) +
 							Root::pass_back(*cell.input_candidate_kernel, std::move(candidate_grads)) +
 							Root::pass_back(*cell.input_write_kernel, std::move(weighted_write_grads)) +
 							Root::pass_back(*cell.input_forget_kernel, std::move(weighted_forget_grads));
@@ -2704,20 +2704,20 @@ protected:
 				}
 				if (!foremost) {
 					if (input_seq_length > 1) {
-						prev_out_grads.slice(input_offsets, input_extents) = TensorMap<Scalar,Root::DATA_RANK>(prev_out_grads_i.data(),
+						prev_out_grad.slice(input_offsets, input_extents) = TensorMap<Scalar,Root::DATA_RANK>(prev_out_grad_i.data(),
 								input_extents);
 						input_offsets[1] -= 1;
 					} else
-						prev_out_grads = TensorMap<Scalar,Root::DATA_RANK>(prev_out_grads_i.data(), input_extents);
+						prev_out_grad = TensorMap<Scalar,Root::DATA_RANK>(prev_out_grad_i.data(), input_extents);
 				}
 			} else {
-				hidden_out_grads = Root::pass_back(*cell.output_read_kernel, std::move(weighted_read_grads));
+				hidden_out_grad = Root::pass_back(*cell.output_read_kernel, std::move(weighted_read_grads));
 				Root::empty_cache(*cell.output_read_kernel);
-				hidden_out_grads += Root::pass_back(*cell.output_candidate_kernel, std::move(candidate_grads));
+				hidden_out_grad += Root::pass_back(*cell.output_candidate_kernel, std::move(candidate_grads));
 				Root::empty_cache(*cell.output_candidate_kernel);
-				hidden_out_grads += Root::pass_back(*cell.output_write_kernel, std::move(weighted_write_grads));
+				hidden_out_grad += Root::pass_back(*cell.output_write_kernel, std::move(weighted_write_grads));
 				Root::empty_cache(*cell.output_write_kernel);
-				hidden_out_grads += Root::pass_back(*cell.output_forget_kernel, std::move(weighted_forget_grads));
+				hidden_out_grad += Root::pass_back(*cell.output_forget_kernel, std::move(weighted_forget_grads));
 				Root::empty_cache(*cell.output_forget_kernel);
 			}
 		}
@@ -2753,7 +2753,7 @@ protected:
 				input_read_kernel_params_grad += Root::get_params_grad(*cell.input_read_kernel);
 			}
 		}
-		return prev_out_grads;
+		return prev_out_grad;
 	}
 private:
 	/**
@@ -2943,8 +2943,8 @@ protected:
 		} else
 			return forward_out.concatenate(args.out, +CONCAT_BATCH_RANK);
 	}
-	inline typename Base::Data backpropagate(typename Base::Data out_grads) {
-		Dimensions<std::size_t,Base::DATA_RANK> dims(out_grads.dimensions());
+	inline typename Base::Data backpropagate(typename Base::Data out_grad) {
+		Dimensions<std::size_t,Base::DATA_RANK> dims(out_grad.dimensions());
 		assert(output_dims == dims.template demote<2>());
 		pthread_attr_t attr;
 		pthread_t helper_thread;
@@ -2955,22 +2955,22 @@ protected:
 		assert(!pthread_state);
 		BackpropArgs args;
 		args.obj = this;
-		typename Base::Data forward_prev_out_grads;
+		typename Base::Data forward_prev_out_grad;
 		if (MergeType == SUM) {
-			args.out_grads = &out_grads;
+			args.out_grad = &out_grad;
 			pthread_state = pthread_create(&helper_thread, &attr, backpropagate, &args);
 			assert(!pthread_state);
-			forward_prev_out_grads = net->backpropagate(out_grads);
+			forward_prev_out_grad = net->backpropagate(out_grad);
 			pthread_state = pthread_join(helper_thread, nullptr);
 			assert(!pthread_state);
-			out_grads = typename Base::Data();
+			out_grad = typename Base::Data();
 		} else if (MergeType == MUL) {
-			typename Base::Data out_grads_rev = output * out_grads;
-			args.out_grads = &out_grads_rev;
+			typename Base::Data out_grad_rev = output * out_grad;
+			args.out_grad = &out_grad_rev;
 			pthread_state = pthread_create(&helper_thread, &attr, backpropagate, &args);
 			assert(!pthread_state);
-			out_grads *= output_rev;
-			forward_prev_out_grads = net->backpropagate(std::move(out_grads));
+			out_grad *= output_rev;
+			forward_prev_out_grad = net->backpropagate(std::move(out_grad));
 			pthread_state = pthread_join(helper_thread, nullptr);
 			assert(!pthread_state);
 		} else {
@@ -2979,21 +2979,21 @@ protected:
 			offsets.fill(0);
 			extents[+CONCAT_BATCH_RANK] /= 2;
 			offsets[+CONCAT_BATCH_RANK] += extents[+CONCAT_BATCH_RANK];
-			typename Base::Data backward_slice = out_grads.slice(offsets, extents);
-			args.out_grads = &backward_slice;
+			typename Base::Data backward_slice = out_grad.slice(offsets, extents);
+			args.out_grad = &backward_slice;
 			pthread_state = pthread_create(&helper_thread, &attr, backpropagate, &args);
 			assert(!pthread_state);
 			offsets[+CONCAT_BATCH_RANK] -= extents[+CONCAT_BATCH_RANK];
-			typename Base::Data forward_slice = out_grads.slice(offsets, extents);
-			out_grads = typename Base::Data();
-			forward_prev_out_grads = net->backpropagate(std::move(forward_slice));
+			typename Base::Data forward_slice = out_grad.slice(offsets, extents);
+			out_grad = typename Base::Data();
+			forward_prev_out_grad = net->backpropagate(std::move(forward_slice));
 			// Make sure that backward_slice does not go out of scope before the thread terminates.
 			pthread_state = pthread_join(helper_thread, nullptr);
 			assert(!pthread_state);
 		}
 		pthread_state = pthread_attr_destroy(&attr);
 		assert(!pthread_state);
-		return forward_prev_out_grads + args.prev_out_grads;
+		return forward_prev_out_grad + args.prev_out_grad;
 	}
 private:
 	UnidirNet net;
@@ -3017,8 +3017,8 @@ private:
 	 */
 	struct BackpropArgs {
 		Self* obj;
-		typename Base::Data* out_grads;
-		typename Base::Data prev_out_grads;
+		typename Base::Data* out_grad;
+		typename Base::Data prev_out_grad;
 	};
 	/**
 	 * The propagation function executed in a different thread for each lane of a
@@ -3041,7 +3041,7 @@ private:
 	 */
 	inline static void* backpropagate(void* args_ptr) {
 		BackpropArgs& args = *((BackpropArgs*) args_ptr);
-		args.prev_out_grads = args.obj->net_rev->backpropagate(*args.out_grads);
+		args.prev_out_grad = args.obj->net_rev->backpropagate(*args.out_grad);
 		return nullptr;
 	}
 };
