@@ -5,8 +5,8 @@
  *      Author: Viktor Csomor
  */
 
-#ifndef C_ATTL3_UTILS_GPU_CUDAERROR_HPP_
-#define C_ATTL3_UTILS_GPU_CUDAERROR_HPP_
+#ifndef C_ATTL3_GPU_CUDAERROR_HPP_
+#define C_ATTL3_GPU_CUDAERROR_HPP_
 
 #include <cuda_runtime.h>
 #include <cstdlib>
@@ -56,4 +56,4 @@ __inline__ void _cuda_assert(const char* file, int line, cudaError_t code = cuda
 } /* namespace internal */
 } /* namespace cattle */
 
-#endif /* C_ATTL3_UTILS_GPU_CUDAERROR_HPP_ */
+#endif /* C_ATTL3_GPU_CUDAERROR_HPP_ */

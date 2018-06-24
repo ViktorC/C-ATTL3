@@ -114,15 +114,9 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a5c45d54f43f81258e9445215e5a862f8"><td class="memItemLeft" align="right" valign="top">Scalar&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_optimizer.html#a5c45d54f43f81258e9445215e5a862f8">optimize</a> (<a class="el" href="classcattle_1_1_neural_network.html">Net</a> &amp;net, <a class="el" href="classcattle_1_1_data_provider.html">Provider</a> &amp;training_prov, <a class="el" href="classcattle_1_1_data_provider.html">Provider</a> &amp;test_prov, unsigned epochs, unsigned early_stop=0, Scalar target_loss=<a class="el" href="classcattle_1_1internal_1_1_numeric_utils.html">internal::NumericUtils</a>&lt; Scalar &gt;::MIN, bool verbose=true)</td></tr>
 <tr class="memdesc:a5c45d54f43f81258e9445215e5a862f8"><td class="mdescLeft">&#160;</td><td class="mdescRight">It optimizes the specified neural network using the given data providers according to the optimizers loss function.  <a href="#a5c45d54f43f81258e9445215e5a862f8">More...</a><br /></td></tr>
 <tr class="separator:a5c45d54f43f81258e9445215e5a862f8"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a2a2f1204cac7ec993a5f11d08727144d"><td class="memItemLeft" align="right" valign="top">Scalar&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_optimizer.html#a2a2f1204cac7ec993a5f11d08727144d">optimize</a> (<a class="el" href="classcattle_1_1_neural_network.html">Net</a> &amp;net, <a class="el" href="classcattle_1_1_data_provider.html">Provider</a> &amp;training_prov, <a class="el" href="classcattle_1_1_data_provider.html">Provider</a> &amp;test_prov, unsigned epochs, bool verbose=true)</td></tr>
-<tr class="memdesc:a2a2f1204cac7ec993a5f11d08727144d"><td class="mdescLeft">&#160;</td><td class="mdescRight">It optimizes the specified neural network using the given data providers according to the optimizers loss function.  <a href="#a2a2f1204cac7ec993a5f11d08727144d">More...</a><br /></td></tr>
-<tr class="separator:a2a2f1204cac7ec993a5f11d08727144d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ab5d2c6485674eff4d3359e424fb8d03d"><td class="memItemLeft" align="right" valign="top">Scalar&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_optimizer.html#ab5d2c6485674eff4d3359e424fb8d03d">train</a> (<a class="el" href="classcattle_1_1_neural_network.html">Net</a> &amp;net, <a class="el" href="classcattle_1_1_data_provider.html">Provider</a> &amp;prov, unsigned epochs, unsigned early_stop=0, Scalar target_loss=<a class="el" href="classcattle_1_1internal_1_1_numeric_utils.html">internal::NumericUtils</a>&lt; Scalar &gt;::MIN, bool verbose=false)</td></tr>
 <tr class="memdesc:ab5d2c6485674eff4d3359e424fb8d03d"><td class="mdescLeft">&#160;</td><td class="mdescRight">It trains the specified neural network using the given training data provider according to the optimizers loss function for the specified number of epochs.  <a href="#ab5d2c6485674eff4d3359e424fb8d03d">More...</a><br /></td></tr>
 <tr class="separator:ab5d2c6485674eff4d3359e424fb8d03d"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a205d9b1969f5dac9e7e3366709208a11"><td class="memItemLeft" align="right" valign="top">Scalar&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_optimizer.html#a205d9b1969f5dac9e7e3366709208a11">train</a> (<a class="el" href="classcattle_1_1_neural_network.html">Net</a> &amp;net, <a class="el" href="classcattle_1_1_data_provider.html">Provider</a> &amp;prov, unsigned epochs, bool verbose=false)</td></tr>
-<tr class="memdesc:a205d9b1969f5dac9e7e3366709208a11"><td class="mdescLeft">&#160;</td><td class="mdescRight">It trains the specified neural network using the given training data provider according to the optimizers loss function for the specified number of epochs.  <a href="#a205d9b1969f5dac9e7e3366709208a11">More...</a><br /></td></tr>
-<tr class="separator:a205d9b1969f5dac9e7e3366709208a11"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:af7cb73ae3bf774fa84ec25df5fa13528"><td class="memItemLeft" align="right" valign="top">Scalar&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_optimizer.html#af7cb73ae3bf774fa84ec25df5fa13528">test</a> (<a class="el" href="classcattle_1_1_neural_network.html">Net</a> &amp;net, <a class="el" href="classcattle_1_1_data_provider.html">Provider</a> &amp;prov, bool verbose=false)</td></tr>
 <tr class="memdesc:af7cb73ae3bf774fa84ec25df5fa13528"><td class="mdescLeft">&#160;</td><td class="mdescRight">It tests the specified neural network using the given test data provider according to the optimizers loss function.  <a href="#af7cb73ae3bf774fa84ec25df5fa13528">More...</a><br /></td></tr>
 <tr class="separator:af7cb73ae3bf774fa84ec25df5fa13528"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -625,7 +619,7 @@ template&lt;typename Scalar , std::size_t Rank, bool Sequential&gt; </div>
 </div>
 </div>
 <a id="a5c45d54f43f81258e9445215e5a862f8"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a5c45d54f43f81258e9445215e5a862f8">&#9670;&nbsp;</a></span>optimize() <span class="overload">[1/2]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#a5c45d54f43f81258e9445215e5a862f8">&#9670;&nbsp;</a></span>optimize()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -700,76 +694,6 @@ template&lt;typename Scalar , std::size_t Rank, bool Sequential&gt; </div>
     <tr><td class="paramname">epochs</td><td>The number of epochs for which the optimization should proceed. </td></tr>
     <tr><td class="paramname">early_stop</td><td>An unsigned integer denoting the number of consecutive loss increases after which the optimization process is to be terminated prematurely. If it is 0, the process is never terminated prematurely. </td></tr>
     <tr><td class="paramname">target_loss</td><td>The target test loss value. If the test loss reaches this value or drops below it, the optimization process is terminated. </td></tr>
-    <tr><td class="paramname">verbose</td><td>Whether the training, test, and regularization losses for each epoch should be printed to the standard out stream. </td></tr>
-  </table>
-  </dd>
-</dl>
-<dl class="section return"><dt>Returns</dt><dd>The test loss of the last epoch. </dd></dl>
-
-</div>
-</div>
-<a id="a2a2f1204cac7ec993a5f11d08727144d"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a2a2f1204cac7ec993a5f11d08727144d">&#9670;&nbsp;</a></span>optimize() <span class="overload">[2/2]</span></h2>
-
-<div class="memitem">
-<div class="memproto">
-<div class="memtemplate">
-template&lt;typename Scalar , std::size_t Rank, bool Sequential&gt; </div>
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">Scalar <a class="el" href="classcattle_1_1_optimizer.html">cattle::Optimizer</a>&lt; Scalar, Rank, Sequential &gt;::optimize </td>
-          <td>(</td>
-          <td class="paramtype"><a class="el" href="classcattle_1_1_neural_network.html">Net</a> &amp;&#160;</td>
-          <td class="paramname"><em>net</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype"><a class="el" href="classcattle_1_1_data_provider.html">Provider</a> &amp;&#160;</td>
-          <td class="paramname"><em>training_prov</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype"><a class="el" href="classcattle_1_1_data_provider.html">Provider</a> &amp;&#160;</td>
-          <td class="paramname"><em>test_prov</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">unsigned&#160;</td>
-          <td class="paramname"><em>epochs</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">bool&#160;</td>
-          <td class="paramname"><em>verbose</em> = <code>true</code>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>It optimizes the specified neural network using the given data providers according to the optimizers loss function. </p>
-<p>It also fits the optimizer to the network before the otpimization begins.</p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">net</td><td>A reference to the network whose parameters are to be optimized. </td></tr>
-    <tr><td class="paramname">training_prov</td><td>A reference to the provider of the training data. </td></tr>
-    <tr><td class="paramname">test_prov</td><td>A reference to the provider of the test data. </td></tr>
-    <tr><td class="paramname">epochs</td><td>The number of epochs for which the optimization should proceed. </td></tr>
     <tr><td class="paramname">verbose</td><td>Whether the training, test, and regularization losses for each epoch should be printed to the standard out stream. </td></tr>
   </table>
   </dd>
@@ -923,7 +847,7 @@ template&lt;typename Scalar , std::size_t Rank, bool Sequential&gt; </div>
 </div>
 </div>
 <a id="ab5d2c6485674eff4d3359e424fb8d03d"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ab5d2c6485674eff4d3359e424fb8d03d">&#9670;&nbsp;</a></span>train() <span class="overload">[1/2]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#ab5d2c6485674eff4d3359e424fb8d03d">&#9670;&nbsp;</a></span>train()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -991,69 +915,6 @@ template&lt;typename Scalar , std::size_t Rank, bool Sequential&gt; </div>
     <tr><td class="paramname">epochs</td><td>The number of epochs for which the training should proceed. </td></tr>
     <tr><td class="paramname">early_stop</td><td>An unsigned integer denoting the number of consecutive loss increases after which the optimization process is to be terminated prematurely. If it is 0, the process is never terminated prematurely. </td></tr>
     <tr><td class="paramname">target_loss</td><td>The target test loss value. If the test loss reaches this value or drops below it, the optimization process is terminated. </td></tr>
-    <tr><td class="paramname">verbose</td><td>Whether the training losses for of the epochs should be printed to the standard out stream. </td></tr>
-  </table>
-  </dd>
-</dl>
-<dl class="section return"><dt>Returns</dt><dd>The training loss of the last epoch. </dd></dl>
-
-</div>
-</div>
-<a id="a205d9b1969f5dac9e7e3366709208a11"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a205d9b1969f5dac9e7e3366709208a11">&#9670;&nbsp;</a></span>train() <span class="overload">[2/2]</span></h2>
-
-<div class="memitem">
-<div class="memproto">
-<div class="memtemplate">
-template&lt;typename Scalar , std::size_t Rank, bool Sequential&gt; </div>
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">Scalar <a class="el" href="classcattle_1_1_optimizer.html">cattle::Optimizer</a>&lt; Scalar, Rank, Sequential &gt;::train </td>
-          <td>(</td>
-          <td class="paramtype"><a class="el" href="classcattle_1_1_neural_network.html">Net</a> &amp;&#160;</td>
-          <td class="paramname"><em>net</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype"><a class="el" href="classcattle_1_1_data_provider.html">Provider</a> &amp;&#160;</td>
-          <td class="paramname"><em>prov</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">unsigned&#160;</td>
-          <td class="paramname"><em>epochs</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">bool&#160;</td>
-          <td class="paramname"><em>verbose</em> = <code>false</code>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>It trains the specified neural network using the given training data provider according to the optimizers loss function for the specified number of epochs. </p>
-<p>It does not fit the optimizer to the network, thus the <a class="el" href="classcattle_1_1_optimizer.html#a5ea3b9b9173bf065c6d3f3978b57b823" title="It fits the optimizer to the neural network. ">fit(Net&amp;)</a> method might need to be invoked beforehand.</p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">net</td><td>A reference to the network whose parameters are to be optimized. </td></tr>
-    <tr><td class="paramname">prov</td><td>A reference to the provider of the training data. </td></tr>
-    <tr><td class="paramname">epochs</td><td>The number of epochs for which the training should proceed. </td></tr>
     <tr><td class="paramname">verbose</td><td>Whether the training losses for of the epochs should be printed to the standard out stream. </td></tr>
   </table>
   </dd>

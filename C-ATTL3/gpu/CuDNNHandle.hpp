@@ -18,8 +18,8 @@
 #include <type_traits>
 #include <vector>
 
-#include "CUDAError.hpp"
 #include "CuDNNError.hpp"
+#include "CUDAError.hpp"
 
 // TODO Pooling
 // TODO Batch norm
@@ -797,6 +797,14 @@ public:
 		pooling2d_bwd(input, output, out_grad, input_dims, output_dims, CUDNN_POOLING_AVERAGE_COUNT_INCLUDE_PADDING, window_height,
 				window_width, vertical_padding, horizontal_padding, vertical_stride, horizontal_stride, prev_out_grad);
 	}
+//	inline void batch_norm_spatial_fwd_training(Scalar* input, Scalar* gamma, Scalar* beta, const Array4& dims, Scalar exp_avg_factor,
+//			Scalar epsilon, /* in/out */ Scalar* mean, /* in/out */ Scalar* inv_var, /* out */ Scalar* output) {
+//		// Setup the tensor descriptors.
+//		cudnnTensorDescriptor_t in_out_tens_desc = setup_tens_desc(dims);
+//		cudnnTensorDescriptor_t mean_var_tens_desc = setup_tens_desc(1, 1, 1, dims[3]);
+//		// Allocate the necessary device memory.
+//
+//	}
 	/**
 	 * It applies the dropout function to the input tensor.
 	 *

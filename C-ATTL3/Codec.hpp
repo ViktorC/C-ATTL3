@@ -202,16 +202,11 @@ private:
 	 */
 	inline static std::string resolve_type_string() {
 		switch (Type) {
-		case P2:
-			return "P2";
-		case P3:
-			return "P3";
-		case P5:
-			return "P5";
-		case P6:
-			return "P6";
-		default:
-			return "";
+			case P2: return "P2";
+			case P3: return "P3";
+			case P5: return "P5";
+			case P6: return "P6";
+			default: return "";
 		}
 	}
 	const std::string type;

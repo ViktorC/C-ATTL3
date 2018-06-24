@@ -372,14 +372,20 @@ inline void batch_norm_layer_grad_test() {
 	auto reg2 = ParamRegSharedPtr<Scalar>(new SquaredParameterRegularization<Scalar>());
 	LayerPtr<Scalar,1> layer1_1(new DenseLayer<Scalar,1>({ 32u }, 16, init));
 	LayerPtr<Scalar,1> layer1_2(new BatchNormLayer<Scalar,1>(layer1_1->get_output_dims(), reg2, reg1));
-	layer_grad_test<Scalar,1>("batch norm layer", std::move(layer1_1), std::move(layer1_2), 5,
+	layer_grad_test<Scalar,1>("per-activation batch norm layer", std::move(layer1_1), std::move(layer1_2), 5,
 			ScalarTraits<Scalar>::step_size, ScalarTraits<float>::abs_epsilon, ScalarTraits<float>::rel_epsilon);
-	LayerPtr<Scalar,2> layer2_1(new BatchNormLayer<Scalar,2>({ 6u, 6u }));
-	LayerPtr<Scalar,2> layer2_2(new IdentityActivationLayer<Scalar,2>(layer2_1->get_output_dims()));
-	layer_grad_test<Scalar,2>("batch norm layer", std::move(layer2_1), std::move(layer2_2));
+	LayerPtr<Scalar,2> layer2_1(new ConvolutionLayer<Scalar,2>({ 6u, 6u }, 2, init));
+	LayerPtr<Scalar,2> layer2_2(new BatchNormLayer<Scalar,2,true>(layer2_1->get_output_dims()));
+	layer_grad_test<Scalar,2>("per-rank batch norm layer", std::move(layer2_1), std::move(layer2_2));
+	LayerPtr<Scalar,2> layer2_3(new BatchNormLayer<Scalar,2>({ 6u, 6u }));
+	LayerPtr<Scalar,2> layer2_4(new IdentityActivationLayer<Scalar,2>(layer2_3->get_output_dims()));
+	layer_grad_test<Scalar,2>("per-activation batch norm layer", std::move(layer2_3), std::move(layer2_4));
 	LayerPtr<Scalar,3> layer3_1(new ConvolutionLayer<Scalar>({ 4u, 4u, 2u }, 2, init));
 	LayerPtr<Scalar,3> layer3_2(new BatchNormLayer<Scalar,3>(layer3_1->get_output_dims(), reg2, reg2));
-	layer_grad_test<Scalar,3>("batch norm layer", std::move(layer3_1), std::move(layer3_2));
+	layer_grad_test<Scalar,3>("per-rank batch norm layer", std::move(layer3_1), std::move(layer3_2));
+	LayerPtr<Scalar,3> layer3_3(new ConvolutionLayer<Scalar>({ 4u, 4u, 2u }, 2, init));
+	LayerPtr<Scalar,3> layer3_4(new BatchNormLayer<Scalar,3,false>(layer3_3->get_output_dims(), reg2, reg2));
+	layer_grad_test<Scalar,3>("per-activation batch norm layer", std::move(layer3_3), std::move(layer3_4));
 }
 
 TEST(GradientTest, BatchNormLayer) {

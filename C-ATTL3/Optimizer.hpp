@@ -200,22 +200,6 @@ public:
 		return prev_test_loss;
 	}
 	/**
-	 * It optimizes the specified neural network using the given data providers according to the
-	 * optimizers loss function. It also fits the optimizer to the network before the otpimization
-	 * begins.
-	 *
-	 * @param net A reference to the network whose parameters are to be optimized.
-	 * @param training_prov A reference to the provider of the training data.
-	 * @param test_prov A reference to the provider of the test data.
-	 * @param epochs The number of epochs for which the optimization should proceed.
-	 * @param verbose Whether the training, test, and regularization losses for each epoch should
-	 * be printed to the standard out stream.
-	 * @return The test loss of the last epoch.
-	 */
-	inline Scalar optimize(Net& net, Provider& training_prov, Provider& test_prov, unsigned epochs, bool verbose = true) {
-		return optimize(net, training_prov, test_prov, epochs, 0, internal::NumericUtils<Scalar>::MIN, verbose);
-	}
-	/**
 	 * It trains the specified neural network using the given training data provider according to
 	 * the optimizers loss function for the specified number of epochs. It does not fit the
 	 * optimizer to the network, thus the #fit(Net&) method might need to be invoked beforehand.
@@ -265,21 +249,6 @@ public:
 		prov.reset();
 		net.empty_caches();
 		return prev_train_loss;
-	}
-	/**
-	 * It trains the specified neural network using the given training data provider according to
-	 * the optimizers loss function for the specified number of epochs. It does not fit the
-	 * optimizer to the network, thus the #fit(Net&) method might need to be invoked beforehand.
-	 *
-	 * @param net A reference to the network whose parameters are to be optimized.
-	 * @param prov A reference to the provider of the training data.
-	 * @param epochs The number of epochs for which the training should proceed.
-	 * @param verbose Whether the training losses for of the epochs should be printed to the
-	 * standard out stream.
-	 * @return The training loss of the last epoch.
-	 */
-	inline Scalar train(Net& net, Provider& prov, unsigned epochs, bool verbose = false) {
-		return train(net, prov, epochs, 0, internal::NumericUtils<Scalar>::MIN, verbose);
 	}
 	/**
 	 * It tests the specified neural network using the given test data provider according to the
