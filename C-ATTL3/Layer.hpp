@@ -2602,13 +2602,13 @@ protected:
 			for (std::size_t j = 0; j <= height_rem; j += vertical_stride, ++out_grad_j) {
 				patch_offsets[1] = j;
 				reduced_patch_offsets[1] = out_grad_j;
-				Tensor<Scalar,4> reduced_patch_grads = out_grad.slice(reduced_patch_offsets, reduced_patch_extents);
+				Tensor<Scalar,4> reduced_patch_grad = out_grad.slice(reduced_patch_offsets, reduced_patch_extents);
 				// Accumulate the gradients where the patches overlap.
 				if (vertical_dilation > 0 || horizontal_dilation > 0)
 					prev_out_grad.slice(patch_offsets, patch_extents).stride(dil_strides) +=
-							_d_reduce(reduced_patch_grads, patch_ind++);
+							_d_reduce(reduced_patch_grad, patch_ind++);
 				else
-					prev_out_grad.slice(patch_offsets, patch_extents) += _d_reduce(reduced_patch_grads, patch_ind++);
+					prev_out_grad.slice(patch_offsets, patch_extents) += _d_reduce(reduced_patch_grad, patch_ind++);
 			}
 		}
 		return prev_out_grad;
@@ -3587,9 +3587,9 @@ private:
 		if (input_layer)
 			return Matrix<Scalar>();
 		std::size_t locations = out_grad.size();
-		Matrix<Scalar> std_in_grads = out_grad * params_ref(i, 0);
-		return (((locations * std_in_grads).array() - std_in_grads.sum()).matrix() -
-				cache.std_in * cache.std_in.cwiseProduct(std_in_grads).sum()) *
+		Matrix<Scalar> std_in_grad = out_grad * params_ref(i, 0);
+		return (((locations * std_in_grad).array() - std_in_grad.sum()).matrix() -
+				cache.std_in * cache.std_in.cwiseProduct(std_in_grad).sum()) *
 				(((Scalar) 1 / locations) * cache.inv_in_sd);
 	}
 	const Dimensions<std::size_t,Rank> dims;
@@ -3788,9 +3788,9 @@ protected:
 		params_grad.col(1) = out_grad_mat.colwise().sum().transpose();
 		if (input_layer)
 			return typename Base::Data();
-		Matrix<Scalar> std_in_grads = out_grad_mat * params_ref.col(0).asDiagonal();
-		Matrix<Scalar> prev_out_grad = (((rows * std_in_grads).rowwise() - std_in_grads.colwise().sum()) -
-				std_in * (std_in.cwiseProduct(std_in_grads).colwise().sum().asDiagonal())) *
+		Matrix<Scalar> std_in_grad = out_grad_mat * params_ref.col(0).asDiagonal();
+		Matrix<Scalar> prev_out_grad = (((rows * std_in_grad).rowwise() - std_in_grad.colwise().sum()) -
+				std_in * (std_in.cwiseProduct(std_in_grad).colwise().sum().asDiagonal())) *
 				(((Scalar) 1 / rows) * inv_in_sd).asDiagonal();
 		return TensorMap<Scalar,Base::DATA_RANK>(prev_out_grad.data(), out_grad.dimensions());
 	}

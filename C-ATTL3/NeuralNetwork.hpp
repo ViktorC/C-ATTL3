@@ -1878,8 +1878,8 @@ protected:
 			prev_out_grad = typename Root::Data(input_extents);
 		}
 		input_extents[1] = 1;
-		TimeStepData state_grads(state.dimensions());
-		state_grads.setZero();
+		TimeStepData state_grad(state.dimensions());
+		state_grad.setZero();
 		Dimensions<std::size_t,Rank + 1> out_time_step_dims = output_dims.template promote<>();
 		out_time_step_dims(0) = batch_size;
 		int output_end = output_seq_length + output_seq_delay;
@@ -1898,48 +1898,48 @@ protected:
 				TimeStepData out_grad_i = Root::pass_back(*cell.output_act,
 						TensorMap<Scalar,Rank + 1>(out_grad_seq_i.data(), out_time_step_dims));
 				Root::empty_cache(*cell.output_act);
-				state_grads += Root::pass_back(*cell.output_kernel, std::move(out_grad_i));
+				state_grad += Root::pass_back(*cell.output_kernel, std::move(out_grad_i));
 				Root::empty_cache(*cell.output_kernel);
 			}
 			// Always back-propagate the state gradient.
-			state_grads = Root::pass_back(*cell.state_act, std::move(state_grads));
+			state_grad = Root::pass_back(*cell.state_act, std::move(state_grad));
 			Root::empty_cache(*cell.state_act);
 			// If there was an input at the time step...
 			if (i < input_seq_length) {
 				// If it is the foremost layer, the gradients do not need to be propagated further back.
 				if (foremost) {
 					if (MulInt) { // Multiplicative integration.
-						Root::pass_back(*cell.input_kernel, cell.state_kernel_cache * state_grads);
+						Root::pass_back(*cell.input_kernel, cell.state_kernel_cache * state_grad);
 						cell.state_kernel_cache = null_tensor;
 					} else // Additive integration.
-						Root::pass_back(*cell.input_kernel, state_grads);
+						Root::pass_back(*cell.input_kernel, state_grad);
 				} else if (input_seq_length == 1) {
 					TimeStepData input_i;
 					if (MulInt) {
-						input_i = Root::pass_back(*cell.input_kernel, cell.state_kernel_cache * state_grads);
+						input_i = Root::pass_back(*cell.input_kernel, cell.state_kernel_cache * state_grad);
 						cell.state_kernel_cache = null_tensor;
 					} else
-						input_i = Root::pass_back(*cell.input_kernel, state_grads);
+						input_i = Root::pass_back(*cell.input_kernel, state_grad);
 					prev_out_grad = TensorMap<Scalar,Root::DATA_RANK>(input_i.data(), input_extents);
 				} else {
 					TimeStepData input_i;
 					if (MulInt) {
-						input_i = Root::pass_back(*cell.input_kernel, cell.state_kernel_cache * state_grads);
+						input_i = Root::pass_back(*cell.input_kernel, cell.state_kernel_cache * state_grad);
 						cell.state_kernel_cache = null_tensor;
 					} else
-						input_i = Root::pass_back(*cell.input_kernel, state_grads);
+						input_i = Root::pass_back(*cell.input_kernel, state_grad);
 					prev_out_grad.slice(input_offsets, input_extents) = TensorMap<Scalar,Root::DATA_RANK>(input_i.data(), input_extents);
 					input_offsets[1] -= 1;
 				}
 				Root::empty_cache(*cell.input_kernel);
 				// Compute the the state kernel's gradient.
 				if (MulInt) {
-					state_grads = Root::pass_back(*cell.state_kernel, cell.input_kernel_cache * state_grads);
+					state_grad = Root::pass_back(*cell.state_kernel, cell.input_kernel_cache * state_grad);
 					cell.input_kernel_cache = null_tensor;
 				} else
-					state_grads = Root::pass_back(*cell.state_kernel, std::move(state_grads));
+					state_grad = Root::pass_back(*cell.state_kernel, std::move(state_grad));
 			} else
-				state_grads = Root::pass_back(*cell.state_kernel, std::move(state_grads));
+				state_grad = Root::pass_back(*cell.state_kernel, std::move(state_grad));
 			Root::empty_cache(*cell.state_kernel);
 		}
 		// Roll the network up and accumulate the gradients.
@@ -2615,9 +2615,9 @@ protected:
 			prev_out_grad = typename Root::Data(input_extents);
 		}
 		input_extents[1] = 1;
-		TimeStepData state_grads(state.dimensions());
+		TimeStepData state_grad(state.dimensions());
 		TimeStepData hidden_out_grad(state.dimensions());
-		state_grads.setZero();
+		state_grad.setZero();
 		hidden_out_grad.setZero();
 		Dimensions<std::size_t,Rank + 1> out_time_step_dims = output_dims.template promote<>();
 		out_time_step_dims(0) = batch_size;
@@ -2635,68 +2635,68 @@ protected:
 					hidden_out_grad += TensorMap<Scalar,Rank + 1>(out_grad_seq.data(), out_time_step_dims);
 				}
 			}
-			state_grads += Root::pass_back(*cell.state_act, cell.read_filter_cache * hidden_out_grad);
+			state_grad += Root::pass_back(*cell.state_act, cell.read_filter_cache * hidden_out_grad);
 			Root::empty_cache(*cell.state_act);
-			TimeStepData weighted_read_grads = Root::pass_back(*cell.read_act, cell.activated_state_cache * hidden_out_grad);
+			TimeStepData weighted_read_grad = Root::pass_back(*cell.read_act, cell.activated_state_cache * hidden_out_grad);
 			Root::empty_cache(*cell.read_act);
-			TimeStepData candidate_grads = Root::pass_back(*cell.candidate_act, cell.write_filter_cache * state_grads);
+			TimeStepData candidate_grad = Root::pass_back(*cell.candidate_act, cell.write_filter_cache * state_grad);
 			Root::empty_cache(*cell.candidate_act);
-			TimeStepData weighted_write_grads = Root::pass_back(*cell.write_act, cell.candidate_cache * state_grads);
+			TimeStepData weighted_write_grad = Root::pass_back(*cell.write_act, cell.candidate_cache * state_grad);
 			Root::empty_cache(*cell.write_act);
-			TimeStepData weighted_forget_grads = Root::pass_back(*cell.forget_act, cell.prev_state_cache * state_grads);
+			TimeStepData weighted_forget_grad = Root::pass_back(*cell.forget_act, cell.prev_state_cache * state_grad);
 			Root::empty_cache(*cell.forget_act);
-			state_grads *= cell.forget_filter_cache;
+			state_grad *= cell.forget_filter_cache;
 			if (i < input_seq_length) {
 				TimeStepData prev_out_grad_i;
 				if (MulInt) {
 					if (i != 0) {
 						// Calculate the previous hidden output gradients.
-						hidden_out_grad = Root::pass_back(*cell.output_read_kernel, cell.weighted_input_read_cache * weighted_read_grads);
+						hidden_out_grad = Root::pass_back(*cell.output_read_kernel, cell.weighted_input_read_cache * weighted_read_grad);
 						Root::empty_cache(*cell.output_read_kernel);
-						hidden_out_grad += Root::pass_back(*cell.output_candidate_kernel, cell.weighted_input_candidate_cache * candidate_grads);
+						hidden_out_grad += Root::pass_back(*cell.output_candidate_kernel, cell.weighted_input_candidate_cache * candidate_grad);
 						Root::empty_cache(*cell.output_candidate_kernel);
-						hidden_out_grad += Root::pass_back(*cell.output_write_kernel, cell.weighted_input_write_cache * weighted_write_grads);
+						hidden_out_grad += Root::pass_back(*cell.output_write_kernel, cell.weighted_input_write_cache * weighted_write_grad);
 						Root::empty_cache(*cell.output_write_kernel);
-						hidden_out_grad += Root::pass_back(*cell.output_forget_kernel, cell.weighted_input_forget_cache * weighted_forget_grads);
+						hidden_out_grad += Root::pass_back(*cell.output_forget_kernel, cell.weighted_input_forget_cache * weighted_forget_grad);
 						Root::empty_cache(*cell.output_forget_kernel);
 						// Calculate the input gradients.
-						prev_out_grad_i = Root::pass_back(*cell.input_read_kernel, cell.weighted_output_read_cache * weighted_read_grads);
+						prev_out_grad_i = Root::pass_back(*cell.input_read_kernel, cell.weighted_output_read_cache * weighted_read_grad);
 						Root::empty_cache(*cell.input_read_kernel);
-						weighted_read_grads = null_tensor;
-						prev_out_grad_i += Root::pass_back(*cell.input_candidate_kernel, cell.weighted_output_candidate_cache * candidate_grads);
+						weighted_read_grad = null_tensor;
+						prev_out_grad_i += Root::pass_back(*cell.input_candidate_kernel, cell.weighted_output_candidate_cache * candidate_grad);
 						Root::empty_cache(*cell.input_candidate_kernel);
-						candidate_grads = null_tensor;
-						prev_out_grad_i += Root::pass_back(*cell.input_write_kernel, cell.weighted_output_write_cache * weighted_write_grads);
+						candidate_grad = null_tensor;
+						prev_out_grad_i += Root::pass_back(*cell.input_write_kernel, cell.weighted_output_write_cache * weighted_write_grad);
 						Root::empty_cache(*cell.input_write_kernel);
-						weighted_write_grads = null_tensor;
-						prev_out_grad_i += Root::pass_back(*cell.input_forget_kernel, cell.weighted_output_forget_cache * weighted_forget_grads);
+						weighted_write_grad = null_tensor;
+						prev_out_grad_i += Root::pass_back(*cell.input_forget_kernel, cell.weighted_output_forget_cache * weighted_forget_grad);
 						Root::empty_cache(*cell.input_forget_kernel);
-						weighted_forget_grads = null_tensor;
+						weighted_forget_grad = null_tensor;
 					} else {
-						prev_out_grad_i = Root::pass_back(*cell.input_read_kernel, std::move(weighted_read_grads));
+						prev_out_grad_i = Root::pass_back(*cell.input_read_kernel, std::move(weighted_read_grad));
 						Root::empty_cache(*cell.input_read_kernel);
-						prev_out_grad_i += Root::pass_back(*cell.input_candidate_kernel, std::move(candidate_grads));
+						prev_out_grad_i += Root::pass_back(*cell.input_candidate_kernel, std::move(candidate_grad));
 						Root::empty_cache(*cell.input_candidate_kernel);
-						prev_out_grad_i += Root::pass_back(*cell.input_write_kernel, std::move(weighted_write_grads));
+						prev_out_grad_i += Root::pass_back(*cell.input_write_kernel, std::move(weighted_write_grad));
 						Root::empty_cache(*cell.input_write_kernel);
-						prev_out_grad_i += Root::pass_back(*cell.input_forget_kernel, std::move(weighted_forget_grads));
+						prev_out_grad_i += Root::pass_back(*cell.input_forget_kernel, std::move(weighted_forget_grad));
 						Root::empty_cache(*cell.input_forget_kernel);
 					}
 				} else {
 					if (i != 0) {
-						hidden_out_grad = Root::pass_back(*cell.output_read_kernel, weighted_read_grads);
+						hidden_out_grad = Root::pass_back(*cell.output_read_kernel, weighted_read_grad);
 						Root::empty_cache(*cell.output_read_kernel);
-						hidden_out_grad += Root::pass_back(*cell.output_candidate_kernel, candidate_grads);
+						hidden_out_grad += Root::pass_back(*cell.output_candidate_kernel, candidate_grad);
 						Root::empty_cache(*cell.output_candidate_kernel);
-						hidden_out_grad += Root::pass_back(*cell.output_write_kernel, weighted_write_grads);
+						hidden_out_grad += Root::pass_back(*cell.output_write_kernel, weighted_write_grad);
 						Root::empty_cache(*cell.output_write_kernel);
-						hidden_out_grad += Root::pass_back(*cell.output_forget_kernel, weighted_forget_grads);
+						hidden_out_grad += Root::pass_back(*cell.output_forget_kernel, weighted_forget_grad);
 						Root::empty_cache(*cell.output_forget_kernel);
 					}
-					prev_out_grad_i = Root::pass_back(*cell.input_read_kernel, std::move(weighted_read_grads)) +
-							Root::pass_back(*cell.input_candidate_kernel, std::move(candidate_grads)) +
-							Root::pass_back(*cell.input_write_kernel, std::move(weighted_write_grads)) +
-							Root::pass_back(*cell.input_forget_kernel, std::move(weighted_forget_grads));
+					prev_out_grad_i = Root::pass_back(*cell.input_read_kernel, std::move(weighted_read_grad)) +
+							Root::pass_back(*cell.input_candidate_kernel, std::move(candidate_grad)) +
+							Root::pass_back(*cell.input_write_kernel, std::move(weighted_write_grad)) +
+							Root::pass_back(*cell.input_forget_kernel, std::move(weighted_forget_grad));
 					Root::empty_cache(*cell.input_read_kernel);
 					Root::empty_cache(*cell.input_candidate_kernel);
 					Root::empty_cache(*cell.input_write_kernel);
@@ -2711,13 +2711,13 @@ protected:
 						prev_out_grad = TensorMap<Scalar,Root::DATA_RANK>(prev_out_grad_i.data(), input_extents);
 				}
 			} else {
-				hidden_out_grad = Root::pass_back(*cell.output_read_kernel, std::move(weighted_read_grads));
+				hidden_out_grad = Root::pass_back(*cell.output_read_kernel, std::move(weighted_read_grad));
 				Root::empty_cache(*cell.output_read_kernel);
-				hidden_out_grad += Root::pass_back(*cell.output_candidate_kernel, std::move(candidate_grads));
+				hidden_out_grad += Root::pass_back(*cell.output_candidate_kernel, std::move(candidate_grad));
 				Root::empty_cache(*cell.output_candidate_kernel);
-				hidden_out_grad += Root::pass_back(*cell.output_write_kernel, std::move(weighted_write_grads));
+				hidden_out_grad += Root::pass_back(*cell.output_write_kernel, std::move(weighted_write_grad));
 				Root::empty_cache(*cell.output_write_kernel);
-				hidden_out_grad += Root::pass_back(*cell.output_forget_kernel, std::move(weighted_forget_grads));
+				hidden_out_grad += Root::pass_back(*cell.output_forget_kernel, std::move(weighted_forget_grad));
 				Root::empty_cache(*cell.output_forget_kernel);
 			}
 		}

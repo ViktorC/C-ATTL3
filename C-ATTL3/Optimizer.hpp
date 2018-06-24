@@ -763,9 +763,9 @@ public:
 		pgus_vec = std::vector<ParamGradAndUpdateSqrs>(layers.size());
 		for (unsigned i = 0; i < pgus_vec.size(); ++i) {
 			Layer<Scalar,Rank>& layer = *(layers[i]);
-			const Matrix<Scalar>& param_grads = Optimizer<Scalar,Rank,Sequential>::get_params_grad(layer);
+			const Matrix<Scalar>& param_grad = Optimizer<Scalar,Rank,Sequential>::get_params_grad(layer);
 			ParamGradAndUpdateSqrs pgus;
-			pgus.params_grad = Matrix<Scalar>::Zero(param_grads.rows(), param_grads.cols());
+			pgus.params_grad = Matrix<Scalar>::Zero(param_grad.rows(), param_grad.cols());
 			pgus.params_update = Matrix<Scalar>::Zero(pgus.params_grad.rows(), pgus.params_grad.cols());
 			pgus_vec[i] = pgus;
 		}
@@ -833,9 +833,9 @@ public:
 		pgn_vec = std::vector<ParamGradNorms>(layers.size());
 		for (unsigned i = 0; i < pgn_vec.size(); ++i) {
 			Layer<Scalar,Rank>& layer = *(layers[i]);
-			const Matrix<Scalar>& param_grads = Optimizer<Scalar,Rank,Sequential>::get_params_grad(layer);
+			const Matrix<Scalar>& param_grad = Optimizer<Scalar,Rank,Sequential>::get_params_grad(layer);
 			ParamGradNorms vel;
-			vel.params_grad_l1 = Matrix<Scalar>::Zero(param_grads.rows(), param_grads.cols());
+			vel.params_grad_l1 = Matrix<Scalar>::Zero(param_grad.rows(), param_grad.cols());
 			vel.params_grad_l2 = Matrix<Scalar>::Zero(vel.params_grad_l1.rows(), vel.params_grad_l1.cols());
 			pgn_vec[i] = vel;
 		}
