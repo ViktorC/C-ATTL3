@@ -12,9 +12,9 @@ The following sub-sections describe the main components of the C-ATTL3 deep lear
 The lowest level building blocks of neural networks in C-ATTL3 are the layers. The library provides a wide selection of them that can be used for the construction of neural network modules. The available layer types are the following:
 * [Layer](https://viktorc.github.io/C-ATTL3/html/classcattle_1_1_layer.html) [A]
   * [KernelLayer](https://viktorc.github.io/C-ATTL3/html/classcattle_1_1_kernel_layer.html) [A]
-    * [DenseLayer](https://viktorc.github.io/C-ATTL3/html/classcattle_1_1_dense_layer.html)
-    * [ConvolutionLayer](https://viktorc.github.io/C-ATTL3/html/classcattle_1_1_convolution_layer.html)
-    * [DeconvolutionLayer](https://viktorc.github.io/C-ATTL3/html/classcattle_1_1_deconvolution_layer.html)
+    * [DenseKernelLayer](https://viktorc.github.io/C-ATTL3/html/classcattle_1_1_dense_kernel_layer.html)
+    * [ConvKernelLayer](https://viktorc.github.io/C-ATTL3/html/classcattle_1_1_conv_kernel_layer.html)
+    * [DeconvKernelLayer](https://viktorc.github.io/C-ATTL3/html/classcattle_1_1_deconv_kernel_layer.html)
   * [ActivationLayer](https://viktorc.github.io/C-ATTL3/html/classcattle_1_1_activation_layer.html) [A]
     * [IdentityActivationLayer](https://viktorc.github.io/C-ATTL3/html/classcattle_1_1_identity_activation_layer.html)
     * [ScaledActivationLayer](https://viktorc.github.io/C-ATTL3/html/classcattle_1_1_scaled_activation_layer.html)
@@ -35,7 +35,7 @@ The lowest level building blocks of neural networks in C-ATTL3 are the layers. T
     * [MaxPoolLayer](https://viktorc.github.io/C-ATTL3/html/classcattle_1_1_max_pool_layer.html)
     * [MeanPoolLayer](https://viktorc.github.io/C-ATTL3/html/classcattle_1_1_mean_pool_layer.html)
   * [BroadcastLayer](https://viktorc.github.io/C-ATTL3/html/classcattle_1_1_broadcast_layer.html)
-  * [BatchNormalizationLayer](https://viktorc.github.io/C-ATTL3/html/classcattle_1_1_batch_normalization_layer.html)
+  * [BatchNormLayer](https://viktorc.github.io/C-ATTL3/html/classcattle_1_1_batch_norm_layer.html)
   * [DropoutLayer](https://viktorc.github.io/C-ATTL3/html/classcattle_1_1_dropout_layer.html)
   * [ReshapeLayer](https://viktorc.github.io/C-ATTL3/html/classcattle_1_1_reshape_layer.html)
 
@@ -165,15 +165,15 @@ The test data provider is created similarly. However, it is important not to re-
 auto init = std::make_shared<HeWeightInitialization<float>>();
 auto reg = std::make_shared<SquaredParameterRegularization<float>>();
 std::vector<LayerPtr<float,3>> layers(9);
-layers[0] = LayerPtr<float,3>(new ConvolutionLayer<float>(train_prov.get_obs_dims(), 10, init, reg, 5, 5, 2, 2));
+layers[0] = LayerPtr<float,3>(new ConvKernelLayer<float>(train_prov.get_obs_dims(), 10, init, reg, 5, 5, 2, 2));
 layers[1] = LayerPtr<float,3>(new ReLUActivationLayer<float,3>(layers[0]->get_output_dims()));
 layers[2] = LayerPtr<float,3>(new MaxPoolLayer<float>(layers[1]->get_output_dims()));
-layers[3] = LayerPtr<float,3>(new ConvolutionLayer<float>(layers[2]->get_output_dims(), 20, init, reg));
+layers[3] = LayerPtr<float,3>(new ConvKernelLayer<float>(layers[2]->get_output_dims(), 20, init, reg));
 layers[4] = LayerPtr<float,3>(new ReLUActivationLayer<float,3>(layers[3]->get_output_dims()));
 layers[5] = LayerPtr<float,3>(new MaxPoolLayer<float>(layers[4]->get_output_dims()));
-layers[6] = LayerPtr<float,3>(new DenseLayer<float,3>(layers[5]->get_output_dims(), 500, init, reg));
+layers[6] = LayerPtr<float,3>(new DenseKernelLayer<float,3>(layers[5]->get_output_dims(), 500, init, reg));
 layers[7] = LayerPtr<float,3>(new ReLUActivationLayer<float,3>(layers[6]->get_output_dims()));
-layers[8] = LayerPtr<float,3>(new DenseLayer<float,3>(layers[7]->get_output_dims(), 1, init, reg));
+layers[8] = LayerPtr<float,3>(new DenseKernelLayer<float,3>(layers[7]->get_output_dims(), 1, init, reg));
 FeedforwardNeuralNetwork<float,3> nn(std::move(layers));
 ```
 The next step is the construction of the neural network. The above snippet demonstrates that of a simple convolutional neural network. The neural network implementation used is `FeedforwardNeuralNetwork` which takes a vector of unique layer pointers. Each layer in the vector must have the same input dimensions as the output dimensions of the preceding layer. Notice how the dimensions of the outputs of the layers do not need to be calculated manually; they can be simply retrieved using the `get_output_dims` members of the previous layers. It should also be noted that all neural networks require their layers to be of the same nominal rank and scalar type as the network itself. The example network consists of convolutional, max pooling, rectified linear unit, and fully connected layers. Convolutional and fully connected layers require weight initialization; due to its well-known compatibility with ReLU activations, He weight initialization is a good choice in our situation. As the `WeightInitialization` class specifies a stateless interface, multiple layers can use the same implementation instance (this is the reason they take a shared pointer). The same can be said about the`ParameterRegularization` abstract type. All layers with learnable parameters, including the fully connected and convolutional ones above, support optional parameter regularization. In our example, the choice fell upon the popular L2 regularization penalty function for all parameteric layers. Similarly to the unique tensor pointer arguments of the data providers, the vector of unique layer pointers required by the network's constructor must be moved as well, as unique smart pointers cannot be copied.

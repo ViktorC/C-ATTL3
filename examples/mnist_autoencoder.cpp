@@ -28,23 +28,23 @@ int main() {
 	// Create the auto-encoder.
 	auto init = std::make_shared<HeWeightInitialization<float>>(1e-1);
 	std::vector<LayerPtr<float,3>> encoder_layers(5);
-	encoder_layers[0] = LayerPtr<float,3>(new ConvolutionLayer<float>(train_prov.get_obs_dims(), 3, init,
-			ConvolutionLayer<float>::NO_PARAM_REG, 4, 4, 0, 0, 2, 2));
+	encoder_layers[0] = LayerPtr<float,3>(new ConvKernelLayer<float>(train_prov.get_obs_dims(), 3, init,
+			ConvKernelLayer<float>::NO_PARAM_REG, 4, 4, 0, 0, 2, 2));
 	encoder_layers[1] = LayerPtr<float,3>(new SoftplusActivationLayer<float,3>(encoder_layers[0]->get_output_dims()));
-	encoder_layers[2] = LayerPtr<float,3>(new ConvolutionLayer<float>(encoder_layers[1]->get_output_dims(), 3, init,
-			ConvolutionLayer<float>::NO_PARAM_REG, 4, 4, 0, 0, 1, 1));
+	encoder_layers[2] = LayerPtr<float,3>(new ConvKernelLayer<float>(encoder_layers[1]->get_output_dims(), 3, init,
+			ConvKernelLayer<float>::NO_PARAM_REG, 4, 4, 0, 0, 1, 1));
 	encoder_layers[3] = LayerPtr<float,3>(new SoftplusActivationLayer<float,3>(encoder_layers[2]->get_output_dims()));
-	encoder_layers[4] = LayerPtr<float,3>(new DenseLayer<float,3>(encoder_layers[2]->get_output_dims(), 100, init));
+	encoder_layers[4] = LayerPtr<float,3>(new DenseKernelLayer<float,3>(encoder_layers[2]->get_output_dims(), 100, init));
 	NeuralNetPtr<float,3,false> encoder(new FeedforwardNeuralNetwork<float,3>(std::move(encoder_layers)));
 	std::vector<LayerPtr<float,3>> decoder_layers(6);
-	decoder_layers[0] = LayerPtr<float,3>(new DenseLayer<float,3>(encoder->get_output_dims(), 300, init));
+	decoder_layers[0] = LayerPtr<float,3>(new DenseKernelLayer<float,3>(encoder->get_output_dims(), 300, init));
 	decoder_layers[1] = LayerPtr<float,3>(new SoftplusActivationLayer<float,3>(decoder_layers[0]->get_output_dims()));
 	decoder_layers[2] = LayerPtr<float,3>(new ReshapeLayer<float,3>(decoder_layers[1]->get_output_dims(), { 10u, 10u, 3u }));
-	decoder_layers[3] = LayerPtr<float,3>(new DeconvolutionLayer<float>(decoder_layers[2]->get_output_dims(), 3, init,
-			DeconvolutionLayer<float>::NO_PARAM_REG, 4, 4, 0, 0, 1, 1));
+	decoder_layers[3] = LayerPtr<float,3>(new DeconvKernelLayer<float>(decoder_layers[2]->get_output_dims(), 3, init,
+			DeconvKernelLayer<float>::NO_PARAM_REG, 4, 4, 0, 0, 1, 1));
 	decoder_layers[4] = LayerPtr<float,3>(new SoftplusActivationLayer<float,3>(decoder_layers[3]->get_output_dims()));
-	decoder_layers[5] = LayerPtr<float,3>(new DeconvolutionLayer<float>(decoder_layers[4]->get_output_dims(), 1, init,
-			DeconvolutionLayer<float>::NO_PARAM_REG, 4, 4, 0, 0, 2, 2));
+	decoder_layers[5] = LayerPtr<float,3>(new DeconvKernelLayer<float>(decoder_layers[4]->get_output_dims(), 1, init,
+			DeconvKernelLayer<float>::NO_PARAM_REG, 4, 4, 0, 0, 2, 2));
 	NeuralNetPtr<float,3,false> decoder(new FeedforwardNeuralNetwork<float,3>(std::move(decoder_layers)));
 	std::vector<NeuralNetPtr<float,3,false>> modules;
 	modules.push_back(std::move(encoder));

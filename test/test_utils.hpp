@@ -172,7 +172,7 @@ template<typename Scalar, std::size_t Rank>
 inline KernelPtr<Scalar,Rank> kernel_layer(const typename std::enable_if<Rank != 1,
 		Dimensions<std::size_t,Rank>>::type& input_dims) {
 	return KernelPtr<Scalar,Rank>(
-			new ConvolutionLayer<Scalar,Rank>(input_dims, input_dims.template extend<3 - Rank>()(2),
+			new ConvKernelLayer<Scalar,Rank>(input_dims, input_dims.template extend<3 - Rank>()(2),
 			WeightInitSharedPtr<Scalar>(new HeWeightInitialization<Scalar>())));
 }
 
@@ -184,7 +184,7 @@ template<typename Scalar, std::size_t Rank>
 inline KernelPtr<Scalar,Rank> kernel_layer(const typename std::enable_if<Rank == 1,
 		Dimensions<std::size_t,Rank>>::type& input_dims) {
 	return KernelPtr<Scalar,Rank>(
-			new DenseLayer<Scalar,Rank>(input_dims, input_dims.get_volume(),
+			new DenseKernelLayer<Scalar,Rank>(input_dims, input_dims.get_volume(),
 			WeightInitSharedPtr<Scalar>(new GlorotWeightInitialization<Scalar>())));
 }
 
@@ -262,7 +262,7 @@ inline NeuralNetPtr<Scalar,Rank,true> single_output_recurrent_neural_net(const D
 		std::function<std::pair<std::size_t,std::size_t>(std::size_t)> seq_schedule_func) {
 	auto init = std::make_shared<GlorotWeightInitialization<Scalar>>();
 	return NeuralNetPtr<Scalar,Rank,true>(new RecurrentNeuralNetwork<Scalar,Rank>(kernel_layer<Scalar,Rank>(input_dims),
-			kernel_layer<Scalar,Rank>(input_dims), KernelPtr<Scalar,Rank>(new DenseLayer<Scalar,Rank>(input_dims, 1, init)),
+			kernel_layer<Scalar,Rank>(input_dims), KernelPtr<Scalar,Rank>(new DenseKernelLayer<Scalar,Rank>(input_dims, 1, init)),
 			ActivationPtr<Scalar,Rank>(new TanhActivationLayer<Scalar,Rank>(input_dims)),
 			ActivationPtr<Scalar,Rank>(new IdentityActivationLayer<Scalar,Rank>(Dimensions<std::size_t,Rank>())),
 			seq_schedule_func));
@@ -278,7 +278,7 @@ inline NeuralNetPtr<Scalar,Rank,false> single_output_net(NeuralNetPtr<Scalar,Ran
 	std::vector<NeuralNetPtr<Scalar,Rank,false>> modules(2);
 	modules[0] = std::move(net);
 	modules[1] = NeuralNetPtr<Scalar,Rank,false>(new FeedforwardNeuralNetwork<Scalar,Rank>(
-			LayerPtr<Scalar,Rank>(new DenseLayer<Scalar,Rank>(modules[0]->get_output_dims(), 1, init))));
+			LayerPtr<Scalar,Rank>(new DenseKernelLayer<Scalar,Rank>(modules[0]->get_output_dims(), 1, init))));
 	return NeuralNetPtr<Scalar,Rank,false>(new StackedNeuralNetwork<Scalar,Rank,false>(std::move(modules)));
 }
 

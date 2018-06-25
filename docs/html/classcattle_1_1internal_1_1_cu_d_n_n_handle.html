@@ -160,6 +160,15 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:aa3f917b0b8c4a6f757528486c647c72b"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1internal_1_1_cu_d_n_n_handle.html#aa3f917b0b8c4a6f757528486c647c72b">mean_pooling2d_bwd</a> (Scalar *input, Scalar *output, Scalar *out_grad, const Array4 &amp;input_dims, const Array4 &amp;output_dims, std::size_t window_height, std::size_t window_width, std::size_t vertical_padding, std::size_t horizontal_padding, std::size_t vertical_stride, std::size_t horizontal_stride, Scalar *prev_out_grad)</td></tr>
 <tr class="memdesc:aa3f917b0b8c4a6f757528486c647c72b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Computes the gradient of the input of the mean pooling layer.  <a href="#aa3f917b0b8c4a6f757528486c647c72b">More...</a><br /></td></tr>
 <tr class="separator:aa3f917b0b8c4a6f757528486c647c72b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a6097fb8deaab54de71d9d8ed5ccf5ea0"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1internal_1_1_cu_d_n_n_handle.html#a6097fb8deaab54de71d9d8ed5ccf5ea0">batch_norm_fwd_training</a> (Scalar *input, Scalar *gamma, Scalar *beta, const Array4 &amp;dims, bool spatial, Scalar exp_avg_factor, Scalar epsilon, Scalar *mean, Scalar *var, Scalar *output, Scalar *mean_cache, Scalar *inv_var_cache)</td></tr>
+<tr class="memdesc:a6097fb8deaab54de71d9d8ed5ccf5ea0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Applies the batch normalization function to the input data and updates the running mean and variance averages.  <a href="#a6097fb8deaab54de71d9d8ed5ccf5ea0">More...</a><br /></td></tr>
+<tr class="separator:a6097fb8deaab54de71d9d8ed5ccf5ea0"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5d0db6d797b66df8aef6e83475aeaf6f"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1internal_1_1_cu_d_n_n_handle.html#a5d0db6d797b66df8aef6e83475aeaf6f">batch_norm_fwd_inference</a> (Scalar *input, Scalar *gamma, Scalar *beta, Scalar *mean, Scalar *var, const Array4 &amp;dims, bool spatial, Scalar epsilon, Scalar *output)</td></tr>
+<tr class="memdesc:a5d0db6d797b66df8aef6e83475aeaf6f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Applies the batch normalization function to the input data for inference using the running mean and variance averages.  <a href="#a5d0db6d797b66df8aef6e83475aeaf6f">More...</a><br /></td></tr>
+<tr class="separator:a5d0db6d797b66df8aef6e83475aeaf6f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a19028a601df3fff1934892bf86f3cdbc"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1internal_1_1_cu_d_n_n_handle.html#a19028a601df3fff1934892bf86f3cdbc">batch_norm_bwd</a> (Scalar *input, Scalar *out_grad, Scalar *gamma, Scalar *mean_cache, Scalar *inv_var_cache, const Array4 &amp;dims, bool spatial, Scalar epsilon, Scalar *prev_out_grad, Scalar *gamma_grad, Scalar *beta_grad)</td></tr>
+<tr class="memdesc:a19028a601df3fff1934892bf86f3cdbc"><td class="mdescLeft">&#160;</td><td class="mdescRight">Performs the backward pass of the batch normalization function and computes the gradients of the function's input, the gamma scaling tensor, and the beta bias tensor.  <a href="#a19028a601df3fff1934892bf86f3cdbc">More...</a><br /></td></tr>
+<tr class="separator:a19028a601df3fff1934892bf86f3cdbc"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a9636e8eb8776b06fd37cb430632743e1"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1internal_1_1_cu_d_n_n_handle.html#a9636e8eb8776b06fd37cb430632743e1">dropout_fwd</a> (Scalar *input, const Array4 &amp;dims, Scalar dropout, Scalar *output, std::vector&lt; Scalar &gt; &amp;reserve)</td></tr>
 <tr class="memdesc:a9636e8eb8776b06fd37cb430632743e1"><td class="mdescLeft">&#160;</td><td class="mdescRight">It applies the dropout function to the input tensor.  <a href="#a9636e8eb8776b06fd37cb430632743e1">More...</a><br /></td></tr>
 <tr class="separator:a9636e8eb8776b06fd37cb430632743e1"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -322,6 +331,329 @@ template&lt;typename Scalar &gt; </div>
     <tr><td class="paramname">act_mode</td><td>The type of activation function to use. </td></tr>
     <tr><td class="paramname">coeff</td><td>The activation function coefficient used by certain activation functions (e.g. ELU). </td></tr>
     <tr><td class="paramname">output</td><td>The activated output tensor. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="a19028a601df3fff1934892bf86f3cdbc"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a19028a601df3fff1934892bf86f3cdbc">&#9670;&nbsp;</a></span>batch_norm_bwd()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename Scalar &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void <a class="el" href="classcattle_1_1internal_1_1_cu_d_n_n_handle.html">cattle::internal::CuDNNHandle</a>&lt; Scalar &gt;::batch_norm_bwd </td>
+          <td>(</td>
+          <td class="paramtype">Scalar *&#160;</td>
+          <td class="paramname"><em>input</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">Scalar *&#160;</td>
+          <td class="paramname"><em>out_grad</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">Scalar *&#160;</td>
+          <td class="paramname"><em>gamma</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">Scalar *&#160;</td>
+          <td class="paramname"><em>mean_cache</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">Scalar *&#160;</td>
+          <td class="paramname"><em>inv_var_cache</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const Array4 &amp;&#160;</td>
+          <td class="paramname"><em>dims</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">bool&#160;</td>
+          <td class="paramname"><em>spatial</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">Scalar&#160;</td>
+          <td class="paramname"><em>epsilon</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">Scalar *&#160;</td>
+          <td class="paramname"><em>prev_out_grad</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">Scalar *&#160;</td>
+          <td class="paramname"><em>gamma_grad</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">Scalar *&#160;</td>
+          <td class="paramname"><em>beta_grad</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Performs the backward pass of the batch normalization function and computes the gradients of the function's input, the gamma scaling tensor, and the beta bias tensor. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">input</td><td>The input tensor used. </td></tr>
+    <tr><td class="paramname">out_grad</td><td>The gradient of the output of the function. </td></tr>
+    <tr><td class="paramname">gamma</td><td>The gamma scaling tensor. </td></tr>
+    <tr><td class="paramname">mean_cache</td><td>The mean cached during the forward pass. </td></tr>
+    <tr><td class="paramname">inv_var_cache</td><td>The inverse variance cached during the forward pass. </td></tr>
+    <tr><td class="paramname">dims</td><td>The dimensions of the input/output tensor (extended by 1s for data of rank lower than 4). </td></tr>
+    <tr><td class="paramname">spatial</td><td>Whether the batch normalization should be performed in spatial or per-activation mode. </td></tr>
+    <tr><td class="paramname">epsilon</td><td>A small constant for numerical stability. </td></tr>
+    <tr><td class="paramname">prev_out_grad</td><td>The gradient of the batch normalization function's input. </td></tr>
+    <tr><td class="paramname">gamma_grad</td><td>The gradient of gamma. </td></tr>
+    <tr><td class="paramname">beta_grad</td><td>The gradient of beta. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="a5d0db6d797b66df8aef6e83475aeaf6f"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a5d0db6d797b66df8aef6e83475aeaf6f">&#9670;&nbsp;</a></span>batch_norm_fwd_inference()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename Scalar &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void <a class="el" href="classcattle_1_1internal_1_1_cu_d_n_n_handle.html">cattle::internal::CuDNNHandle</a>&lt; Scalar &gt;::batch_norm_fwd_inference </td>
+          <td>(</td>
+          <td class="paramtype">Scalar *&#160;</td>
+          <td class="paramname"><em>input</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">Scalar *&#160;</td>
+          <td class="paramname"><em>gamma</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">Scalar *&#160;</td>
+          <td class="paramname"><em>beta</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">Scalar *&#160;</td>
+          <td class="paramname"><em>mean</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">Scalar *&#160;</td>
+          <td class="paramname"><em>var</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const Array4 &amp;&#160;</td>
+          <td class="paramname"><em>dims</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">bool&#160;</td>
+          <td class="paramname"><em>spatial</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">Scalar&#160;</td>
+          <td class="paramname"><em>epsilon</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">Scalar *&#160;</td>
+          <td class="paramname"><em>output</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Applies the batch normalization function to the input data for inference using the running mean and variance averages. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">input</td><td>The input tensor. </td></tr>
+    <tr><td class="paramname">gamma</td><td>The gamma scaling tensor. </td></tr>
+    <tr><td class="paramname">beta</td><td>The beta bias. </td></tr>
+    <tr><td class="paramname">mean</td><td>The running mean average. </td></tr>
+    <tr><td class="paramname">var</td><td>The running variance average. </td></tr>
+    <tr><td class="paramname">dims</td><td>The dimensions of the input/output tensor (extended by 1s for data of rank lower than 4). </td></tr>
+    <tr><td class="paramname">spatial</td><td>Whether the batch normalization should be performed in spatial or per-activation mode. </td></tr>
+    <tr><td class="paramname">epsilon</td><td>A small constant for numerical stability. </td></tr>
+    <tr><td class="paramname">output</td><td>The output tensor. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="a6097fb8deaab54de71d9d8ed5ccf5ea0"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a6097fb8deaab54de71d9d8ed5ccf5ea0">&#9670;&nbsp;</a></span>batch_norm_fwd_training()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename Scalar &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void <a class="el" href="classcattle_1_1internal_1_1_cu_d_n_n_handle.html">cattle::internal::CuDNNHandle</a>&lt; Scalar &gt;::batch_norm_fwd_training </td>
+          <td>(</td>
+          <td class="paramtype">Scalar *&#160;</td>
+          <td class="paramname"><em>input</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">Scalar *&#160;</td>
+          <td class="paramname"><em>gamma</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">Scalar *&#160;</td>
+          <td class="paramname"><em>beta</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const Array4 &amp;&#160;</td>
+          <td class="paramname"><em>dims</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">bool&#160;</td>
+          <td class="paramname"><em>spatial</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">Scalar&#160;</td>
+          <td class="paramname"><em>exp_avg_factor</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">Scalar&#160;</td>
+          <td class="paramname"><em>epsilon</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">Scalar *&#160;</td>
+          <td class="paramname"><em>mean</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">Scalar *&#160;</td>
+          <td class="paramname"><em>var</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">Scalar *&#160;</td>
+          <td class="paramname"><em>output</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">Scalar *&#160;</td>
+          <td class="paramname"><em>mean_cache</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">Scalar *&#160;</td>
+          <td class="paramname"><em>inv_var_cache</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Applies the batch normalization function to the input data and updates the running mean and variance averages. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">input</td><td>The input tensor. </td></tr>
+    <tr><td class="paramname">gamma</td><td>The gamma scaling tensor. </td></tr>
+    <tr><td class="paramname">beta</td><td>The beta bias. </td></tr>
+    <tr><td class="paramname">dims</td><td>The dimensions of the input/output tensor (extended by 1s for data of rank lower than 4). </td></tr>
+    <tr><td class="paramname">spatial</td><td>Whether the batch normalization should be performed in spatial or per-activation mode. </td></tr>
+    <tr><td class="paramname">exp_avg_factor</td><td>The exponential average factor for the running mean and variance averages. </td></tr>
+    <tr><td class="paramname">epsilon</td><td>A small constant for numerical stability. </td></tr>
+    <tr><td class="paramname">mean</td><td>The running mean average (it gets updated by the method). </td></tr>
+    <tr><td class="paramname">var</td><td>The running variance average (it gets updated by the method). </td></tr>
+    <tr><td class="paramname">output</td><td>The output tensor. </td></tr>
+    <tr><td class="paramname">mean_cache</td><td>The cached mean for back-propagation. </td></tr>
+    <tr><td class="paramname">inv_var_cache</td><td>The cached inverse variance for back-propagation. </td></tr>
   </table>
   </dd>
 </dl>
@@ -2427,7 +2759,7 @@ template&lt;typename Scalar &gt; </div>
 </div>
 </div>
 <hr/>The documentation for this class was generated from the following file:<ul>
-<li>C:/Users/Viktor/git/C-ATTL3/C-ATTL3/gpu/<a class="el" href="_cu_d_n_n_handle_8hpp_source.html">CuDNNHandle.hpp</a></li>
+<li>C:/Users/A6714/git/C-ATTL3/C-ATTL3/gpu/<a class="el" href="_cu_d_n_n_handle_8hpp_source.html">CuDNNHandle.hpp</a></li>
 </ul>
 </div><!-- contents -->
 <!-- start footer part -->

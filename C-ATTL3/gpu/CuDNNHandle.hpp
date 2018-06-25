@@ -21,9 +21,6 @@
 #include "CuDNNError.hpp"
 #include "CUDAError.hpp"
 
-// TODO Pooling
-// TODO Batch norm
-
 namespace cattle {
 namespace internal {
 
@@ -797,14 +794,210 @@ public:
 		pooling2d_bwd(input, output, out_grad, input_dims, output_dims, CUDNN_POOLING_AVERAGE_COUNT_INCLUDE_PADDING, window_height,
 				window_width, vertical_padding, horizontal_padding, vertical_stride, horizontal_stride, prev_out_grad);
 	}
-//	inline void batch_norm_spatial_fwd_training(Scalar* input, Scalar* gamma, Scalar* beta, const Array4& dims, Scalar exp_avg_factor,
-//			Scalar epsilon, /* in/out */ Scalar* mean, /* in/out */ Scalar* inv_var, /* out */ Scalar* output) {
-//		// Setup the tensor descriptors.
-//		cudnnTensorDescriptor_t in_out_tens_desc = setup_tens_desc(dims);
-//		cudnnTensorDescriptor_t mean_var_tens_desc = setup_tens_desc(1, 1, 1, dims[3]);
-//		// Allocate the necessary device memory.
-//
-//	}
+	/**
+	 * Applies the batch normalization function to the input data and updates the running mean and
+	 * variance averages.
+	 *
+	 * @param input The input tensor.
+	 * @param gamma The gamma scaling tensor.
+	 * @param beta The beta bias.
+	 * @param dims The dimensions of the input/output tensor (extended by 1s for data of rank lower
+	 * than 4).
+	 * @param spatial Whether the batch normalization should be performed in spatial or per-activation
+	 * mode.
+	 * @param exp_avg_factor The exponential average factor for the running mean and variance averages.
+	 * @param epsilon A small constant for numerical stability.
+	 * @param mean The running mean average (it gets updated by the method).
+	 * @param var The running variance average (it gets updated by the method).
+	 * @param output The output tensor.
+	 * @param mean_cache The cached mean for back-propagation.
+	 * @param inv_var_cache The cached inverse variance for back-propagation.
+	 */
+	inline void batch_norm_fwd_training(Scalar* input, Scalar* gamma, Scalar* beta, const Array4& dims, bool spatial,
+			Scalar exp_avg_factor, Scalar epsilon, /* in/out */ Scalar* mean, /* in/out */ Scalar* var,
+			/* out */ Scalar* output, /* out */ Scalar* mean_cache, /* out */ Scalar* inv_var_cache) {
+		// Setup the tensor descriptors.
+		cudnnTensorDescriptor_t in_out_tens_desc = setup_tens_desc(dims);
+		cudnnTensorDescriptor_t mean_var_tens_desc = spatial ? setup_tens_desc(1, 1, 1, dims[3]) :
+				setup_tens_desc(1, dims[1], dims[2], dims[3]);
+		// Allocate the necessary device memory.
+		Scalar* dev_input;
+		Scalar* dev_output;
+		Scalar* dev_gamma;
+		Scalar* dev_beta;
+		Scalar* dev_mean;
+		Scalar* dev_var;
+		Scalar* dev_mean_cache;
+		Scalar* dev_inv_var_cache;
+		std::size_t in_out_tens_size = dims[0] * dims[1] * dims[2] * dims[3];
+		std::size_t mean_var_tens_size = spatial ? dims[3] : dims[1] * dims[2] * dims[3];
+		cudaAssert(cudaMalloc(&dev_input, in_out_tens_size));
+		cudaAssert(cudaMalloc(&dev_output, in_out_tens_size));
+		cudaAssert(cudaMalloc(&dev_gamma, mean_var_tens_size));
+		cudaAssert(cudaMalloc(&dev_beta, mean_var_tens_size));
+		cudaAssert(cudaMalloc(&dev_mean, mean_var_tens_size));
+		cudaAssert(cudaMalloc(&dev_var, mean_var_tens_size));
+		cudaAssert(cudaMalloc(&dev_mean_cache, mean_var_tens_size));
+		cudaAssert(cudaMalloc(&dev_inv_var_cache, mean_var_tens_size));
+		// Populate the device arrays.
+		cudaAssert(cudaMemcpy(dev_input, input, in_out_tens_size, cudaMemcpyHostToDevice));
+		cudaAssert(cudaMemcpy(dev_gamma, gamma, mean_var_tens_size, cudaMemcpyHostToDevice));
+		cudaAssert(cudaMemcpy(dev_beta, beta, mean_var_tens_size, cudaMemcpyHostToDevice));
+		cudaAssert(cudaMemcpy(dev_mean, mean, mean_var_tens_size, cudaMemcpyHostToDevice));
+		cudaAssert(cudaMemcpy(dev_var, var, mean_var_tens_size, cudaMemcpyHostToDevice));
+		// Perform the batch normalization training pass.
+		cudnnAssert(cudnnBatchNormalizationForwardTraining(handle, spatial ? CUDNN_BATCHNORM_SPATIAL_PERSISTENT :
+				CUDNN_BATCHNORM_PER_ACTIVATION, &alpha, &beta, in_out_tens_desc, dev_input, in_out_tens_desc,
+				dev_output, mean_var_tens_desc, dev_gamma, dev_beta, exp_avg_factor, dev_mean, dev_var, epsilon,
+				dev_mean_cache, dev_inv_var_cache));
+		// Copy the required data back to the host.
+		cudaAssert(cudaMemcpy(mean, dev_mean, mean_var_tens_size, cudaMemcpyDeviceToHost));
+		cudaAssert(cudaMemcpy(var, dev_var, mean_var_tens_size, cudaMemcpyDeviceToHost));
+		cudaAssert(cudaMemcpy(output, dev_output, in_out_tens_size, cudaMemcpyDeviceToHost));
+		cudaAssert(cudaMemcpy(mean_cache, dev_mean_cache, mean_var_tens_size, cudaMemcpyDeviceToHost));
+		cudaAssert(cudaMemcpy(inv_var_cache, dev_inv_var_cache, mean_var_tens_size, cudaMemcpyDeviceToHost));
+		// Free resources.
+		cudnnAssert(cudnnDestroyTensorDescriptor(in_out_tens_size));
+		cudnnAssert(cudnnDestroyTensorDescriptor(mean_var_tens_size));
+		cudaAssert(cudaFree(dev_input));
+		cudaAssert(cudaFree(dev_output));
+		cudaAssert(cudaFree(dev_gamma));
+		cudaAssert(cudaFree(dev_beta));
+		cudaAssert(cudaFree(dev_mean));
+		cudaAssert(cudaFree(dev_var));
+		cudaAssert(cudaFree(dev_mean_cache));
+		cudaAssert(cudaFree(dev_inv_var_cache));
+	}
+	/**
+	 * Applies the batch normalization function to the input data for inference using the running
+	 * mean and variance averages.
+	 *
+	 * @param input The input tensor.
+	 * @param gamma The gamma scaling tensor.
+	 * @param beta The beta bias.
+	 * @param mean The running mean average.
+	 * @param var The running variance average.
+	 * @param dims The dimensions of the input/output tensor (extended by 1s for data of rank lower
+	 * than 4).
+	 * @param spatial Whether the batch normalization should be performed in spatial or per-activation
+	 * mode.
+	 * @param epsilon A small constant for numerical stability.
+	 * @param output The output tensor.
+	 */
+	inline void batch_norm_fwd_inference(Scalar* input, Scalar* gamma, Scalar* beta, Scalar* mean, Scalar* var,
+			const Array4& dims, bool spatial, Scalar epsilon, /* out */ Scalar* output) {
+		// Setup the tensor descriptors.
+		cudnnTensorDescriptor_t in_out_tens_desc = setup_tens_desc(dims);
+		cudnnTensorDescriptor_t mean_var_tens_desc = spatial ? setup_tens_desc(1, 1, 1, dims[3]) :
+				setup_tens_desc(1, dims[1], dims[2], dims[3]);
+		// Allocate the necessary device memory.
+		Scalar* dev_input;
+		Scalar* dev_output;
+		Scalar* dev_gamma;
+		Scalar* dev_beta;
+		Scalar* dev_mean;
+		Scalar* dev_var;
+		std::size_t in_out_tens_size = dims[0] * dims[1] * dims[2] * dims[3];
+		std::size_t mean_var_tens_size = spatial ? dims[3] : dims[1] * dims[2] * dims[3];
+		cudaAssert(cudaMalloc(&dev_input, in_out_tens_size));
+		cudaAssert(cudaMalloc(&dev_output, in_out_tens_size));
+		cudaAssert(cudaMalloc(&dev_gamma, mean_var_tens_size));
+		cudaAssert(cudaMalloc(&dev_beta, mean_var_tens_size));
+		cudaAssert(cudaMalloc(&dev_mean, mean_var_tens_size));
+		cudaAssert(cudaMalloc(&dev_var, mean_var_tens_size));
+		// Populate the device arrays.
+		cudaAssert(cudaMemcpy(dev_input, input, in_out_tens_size, cudaMemcpyHostToDevice));
+		cudaAssert(cudaMemcpy(dev_gamma, gamma, mean_var_tens_size, cudaMemcpyHostToDevice));
+		cudaAssert(cudaMemcpy(dev_beta, beta, mean_var_tens_size, cudaMemcpyHostToDevice));
+		cudaAssert(cudaMemcpy(dev_mean, mean, mean_var_tens_size, cudaMemcpyHostToDevice));
+		cudaAssert(cudaMemcpy(dev_var, var, mean_var_tens_size, cudaMemcpyHostToDevice));
+		// Perform the batch normalization training pass.
+		cudnnAssert(cudnnBatchNormalizationForwardInference(handle, spatial ? CUDNN_BATCHNORM_SPATIAL_PERSISTENT :
+				CUDNN_BATCHNORM_PER_ACTIVATION, &alpha, &beta, in_out_tens_desc, dev_input, in_out_tens_desc,
+				dev_output, mean_var_tens_desc, dev_gamma, dev_beta, dev_mean, dev_var, epsilon));
+		// Copy the required data back to the host.
+		cudaAssert(cudaMemcpy(output, dev_output, in_out_tens_size, cudaMemcpyDeviceToHost));
+		// Free resources.
+		cudnnAssert(cudnnDestroyTensorDescriptor(in_out_tens_size));
+		cudnnAssert(cudnnDestroyTensorDescriptor(mean_var_tens_size));
+		cudaAssert(cudaFree(dev_input));
+		cudaAssert(cudaFree(dev_output));
+		cudaAssert(cudaFree(dev_gamma));
+		cudaAssert(cudaFree(dev_beta));
+		cudaAssert(cudaFree(dev_mean));
+		cudaAssert(cudaFree(dev_var));
+	}
+	/**
+	 * Performs the backward pass of the batch normalization function and computes the gradients
+	 * of the function's input, the gamma scaling tensor, and the beta bias tensor.
+	 *
+	 * @param input The input tensor used.
+	 * @param out_grad The gradient of the output of the function.
+	 * @param gamma The gamma scaling tensor.
+	 * @param mean_cache The mean cached during the forward pass.
+	 * @param inv_var_cache The inverse variance cached during the forward pass.
+	 * @param dims The dimensions of the input/output tensor (extended by 1s for data of rank lower
+	 * than 4).
+	 * @param spatial Whether the batch normalization should be performed in spatial or per-activation
+	 * mode.
+	 * @param epsilon A small constant for numerical stability.
+	 * @param prev_out_grad The gradient of the batch normalization function's input.
+	 * @param gamma_grad The gradient of gamma.
+	 * @param beta_grad The gradient of beta.
+	 */
+	inline void batch_norm_bwd(Scalar* input, Scalar* out_grad, Scalar* gamma, Scalar* mean_cache,
+			Scalar* inv_var_cache, const Array4& dims, bool spatial, Scalar epsilon, /* out */ Scalar* prev_out_grad,
+			/* out */ Scalar* gamma_grad, /* out */ Scalar* beta_grad) {
+		// Setup the tensor descriptors.
+		cudnnTensorDescriptor_t in_out_tens_desc = setup_tens_desc(dims);
+		cudnnTensorDescriptor_t mean_var_tens_desc = spatial ? setup_tens_desc(1, 1, 1, dims[3]) :
+				setup_tens_desc(1, dims[1], dims[2], dims[3]);
+		// Allocate the necessary device memory.
+		Scalar* dev_input;
+		Scalar* dev_out_grad;
+		Scalar* dev_gamma;
+		Scalar* dev_mean_cache;
+		Scalar* dev_inv_var_cache;
+		Scalar* dev_prev_out_grad;
+		Scalar* dev_gamma_grad;
+		Scalar* dev_beta_grad;
+		std::size_t in_out_tens_size = dims[0] * dims[1] * dims[2] * dims[3];
+		std::size_t mean_var_tens_size = spatial ? dims[3] : dims[1] * dims[2] * dims[3];
+		cudaAssert(cudaMalloc(&dev_input, in_out_tens_size));
+		cudaAssert(cudaMalloc(&dev_out_grad, in_out_tens_size));
+		cudaAssert(cudaMalloc(&dev_gamma, mean_var_tens_size));
+		cudaAssert(cudaMalloc(&dev_mean_cache, mean_var_tens_size));
+		cudaAssert(cudaMalloc(&dev_inv_var_cache, mean_var_tens_size));
+		cudaAssert(cudaMalloc(&dev_prev_out_grad, in_out_tens_size));
+		cudaAssert(cudaMalloc(&dev_gamma_grad, mean_var_tens_size));
+		cudaAssert(cudaMalloc(&dev_beta_grad, mean_var_tens_size));
+		// Populate the device arrays.
+		cudaAssert(cudaMemcpy(dev_input, input, in_out_tens_size, cudaMemcpyHostToDevice));
+		cudaAssert(cudaMemcpy(dev_out_grad, out_grad, in_out_tens_size, cudaMemcpyHostToDevice));
+		cudaAssert(cudaMemcpy(dev_gamma, gamma, mean_var_tens_size, cudaMemcpyHostToDevice));
+		cudaAssert(cudaMemcpy(dev_mean, mean, mean_var_tens_size, cudaMemcpyHostToDevice));
+		cudaAssert(cudaMemcpy(dev_var, var, mean_var_tens_size, cudaMemcpyHostToDevice));
+		// Perform the batch normalization training pass.
+		cudnnAssert(cudnnBatchNormalizationBackward(handle, spatial ? CUDNN_BATCHNORM_SPATIAL_PERSISTENT :
+				CUDNN_BATCHNORM_PER_ACTIVATION, &alpha, &beta, in_out_tens_desc, dev_input, in_out_tens_desc,
+				dev_output, mean_var_tens_desc, dev_gamma, dev_beta, exp_avg_factor, dev_mean, dev_var, epsilon,
+				dev_mean_cache, dev_inv_var_cache));
+		// Copy the required data back to the host.
+		cudaAssert(cudaMemcpy(prev_out_grad, dev_prev_out_grad, in_out_tens_size, cudaMemcpyDeviceToHost));
+		cudaAssert(cudaMemcpy(gamma_grad, dev_gamma_grad, mean_var_tens_size, cudaMemcpyDeviceToHost));
+		cudaAssert(cudaMemcpy(beta_grad, dev_beta_grad, mean_var_tens_size, cudaMemcpyDeviceToHost));
+		// Free resources.
+		cudnnAssert(cudnnDestroyTensorDescriptor(in_out_tens_size));
+		cudnnAssert(cudnnDestroyTensorDescriptor(mean_var_tens_size));
+		cudaAssert(cudaFree(dev_input));
+		cudaAssert(cudaFree(dev_out_grad));
+		cudaAssert(cudaFree(dev_gamma));
+		cudaAssert(cudaFree(dev_mean_cache));
+		cudaAssert(cudaFree(dev_inv_var_cache));
+		cudaAssert(cudaFree(dev_prev_out_grad));
+		cudaAssert(cudaFree(dev_gamma_grad));
+		cudaAssert(cudaFree(dev_beta_grad));
+	}
 	/**
 	 * It applies the dropout function to the input tensor.
 	 *

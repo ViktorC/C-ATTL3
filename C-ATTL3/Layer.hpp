@@ -348,7 +348,7 @@ private:
  * A class template representing a fully connected layer.
  */
 template<typename Scalar, std::size_t Rank = 1>
-class DenseLayer : public KernelLayer<Scalar,Rank> {
+class DenseKernelLayer : public KernelLayer<Scalar,Rank> {
 	typedef Layer<Scalar,Rank> Root;
 	typedef KernelLayer<Scalar,Rank> Base;
 	typedef std::array<std::size_t,Root::DATA_RANK> RankwiseArray;
@@ -362,8 +362,9 @@ public:
 	 * @param max_norm_constraint An optional max-norm constraint. If it is 0 or less, no
 	 * constraint is applied.
 	 */
-	inline DenseLayer(const Dimensions<std::size_t,Rank>& input_dims, std::size_t output_size, WeightInitSharedPtr<Scalar> weight_init,
-			ParamRegSharedPtr<Scalar> weight_reg = Root::NO_PARAM_REG, Scalar max_norm_constraint = 0) :
+	inline DenseKernelLayer(const Dimensions<std::size_t,Rank>& input_dims, std::size_t output_size,
+			WeightInitSharedPtr<Scalar> weight_init, ParamRegSharedPtr<Scalar> weight_reg = Root::NO_PARAM_REG,
+			Scalar max_norm_constraint = 0) :
 				Base::KernelLayer(input_dims, Dimensions<std::size_t,Rank>({ output_size }), weight_init, weight_reg,
 						input_dims.get_volume() + 1, output_size, max_norm_constraint),
 				out_conversion_dims(Base::output_dims.template promote<>()),
@@ -372,7 +373,7 @@ public:
 		return new DenseLayer(*this);
 	}
 protected:
-	inline DenseLayer(const DenseLayer<Scalar,Rank>& layer, bool share_params = false) :
+	inline DenseKernelLayer(const DenseKernelLayer<Scalar,Rank>& layer, bool share_params = false) :
 			Base::KernelLayer(layer, share_params),
 			out_conversion_dims(layer.out_conversion_dims),
 			prev_out_conversion_dims(layer.prev_out_conversion_dims),
@@ -444,13 +445,13 @@ private:
  * An abstract base class template for a 2D convolutional layer.
  */
 template<typename Scalar, std::size_t Rank>
-class ConvolutionLayerBase : public KernelLayer<Scalar,Rank> {
+class ConvKernelLayerBase : public KernelLayer<Scalar,Rank> {
 	typedef Layer<Scalar,Rank> Root;
 	typedef KernelLayer<Scalar,Rank> Base;
 	typedef std::array<std::size_t,4> Array4D;
 	typedef std::array<std::pair<std::size_t,std::size_t>,4> PaddingsArray4D;
 protected:
-	inline ConvolutionLayerBase(const Dimensions<std::size_t,Rank>& input_dims, const Dimensions<std::size_t,Rank>& output_dims,
+	inline ConvKernelLayerBase(const Dimensions<std::size_t,Rank>& input_dims, const Dimensions<std::size_t,Rank>& output_dims,
 			std::size_t filters, WeightInitSharedPtr<Scalar> weight_init, ParamRegSharedPtr<Scalar> weight_reg,
 			std::size_t receptor_height, std::size_t receptor_width, std::size_t vertical_padding, std::size_t horizontal_padding,
 			std::size_t vertical_stride, std::size_t horizontal_stride, std::size_t vertical_dilation, std::size_t horizontal_dilation,
@@ -491,7 +492,7 @@ protected:
 		assert(ext_input_dims(0) + 2 * vertical_padding >= dil_receptor_height &&
 				ext_input_dims(1) + 2 * horizontal_padding >= dil_receptor_width);
 	}
-	inline ConvolutionLayerBase(const ConvolutionLayerBase<Scalar,Rank>& layer, bool share_params = false) :
+	inline ConvKernelLayerBase(const ConvKernelLayerBase<Scalar,Rank>& layer, bool share_params = false) :
 			Base::KernelLayer(layer, share_params),
 			ext_input_dims(layer.ext_input_dims),
 			ext_output_dims(layer.ext_output_dims),
@@ -681,10 +682,10 @@ private:
  * output tensor.
  */
 template<typename Scalar, std::size_t Rank = 3>
-class ConvolutionLayer : public ConvolutionLayerBase<Scalar,Rank> {
+class ConvKernelLayer : public ConvKernelLayerBase<Scalar,Rank> {
 	typedef Layer<Scalar,3> Root;
 	typedef KernelLayer<Scalar,3> KernelBase;
-	typedef ConvolutionLayerBase<Scalar,3> ConvBase;
+	typedef ConvKernelLayerBase<Scalar,3> ConvBase;
 public:
 	/**
 	 * @param input_dims The dimensionality of the observations to be processed by the layer.
@@ -708,25 +709,25 @@ public:
 	 * @param max_norm_constraint An optional max-norm constraint. If it is 0 or less, no
 	 * constraint is applied.
 	 */
-	inline ConvolutionLayer(const Dimensions<std::size_t,3>& input_dims, std::size_t filters, WeightInitSharedPtr<Scalar> weight_init,
+	inline ConvKernelLayer(const Dimensions<std::size_t,3>& input_dims, std::size_t filters, WeightInitSharedPtr<Scalar> weight_init,
 			ParamRegSharedPtr<Scalar> weight_reg = Root::NO_PARAM_REG, std::size_t receptor_height = 3, std::size_t receptor_width = 3,
 			std::size_t vertical_padding = 1, std::size_t horizontal_padding = 1, std::size_t vertical_stride = 1,
 			std::size_t horizontal_stride = 1, std::size_t vertical_dilation = 0, std::size_t horizontal_dilation = 0,
 			Scalar max_norm_constraint = 0) :
-				ConvBase::ConvolutionLayerBase(input_dims, {
+				ConvBase::ConvKernelLayerBase(input_dims, {
 						ConvBase::calculate_output_dim(input_dims(0), receptor_height, vertical_padding, vertical_dilation, vertical_stride),
 						ConvBase::calculate_output_dim(input_dims(1), receptor_width, horizontal_padding, horizontal_dilation, horizontal_stride),
 						filters }, filters, weight_init, weight_reg, receptor_height, receptor_width, vertical_padding, horizontal_padding,
 						vertical_stride, horizontal_stride, vertical_dilation, horizontal_dilation, max_norm_constraint) { }
 	inline Root* clone() const {
-		return new ConvolutionLayer(*this);
+		return new ConvKernelLayer(*this);
 	}
 protected:
-	inline ConvolutionLayer(const ConvolutionLayer<Scalar,Rank>& layer, bool share_params = false) :
-			ConvBase::ConvolutionLayerBase(layer, share_params),
+	inline ConvKernelLayer(const ConvKernelLayer<Scalar,Rank>& layer, bool share_params = false) :
+			ConvBase::ConvKernelLayerBase(layer, share_params),
 			batch_size(layer.batch_size) { }
 	inline Root* clone_with_shared_params() const {
-		return new ConvolutionLayer(*this, true);
+		return new ConvKernelLayer(*this, true);
 	}
 	inline typename Root::Data pass_forward(typename Root::Data in, bool training) {
 		assert((Dimensions<std::size_t,4>(in.dimensions()).template demote<>()) == KernelBase::input_dims);
@@ -749,10 +750,10 @@ private:
  * output tensor.
  */
 template<typename Scalar>
-class ConvolutionLayer<Scalar,2> : public ConvolutionLayerBase<Scalar,2> {
+class ConvKernelLayer<Scalar,2> : public ConvKernelLayerBase<Scalar,2> {
 	typedef Layer<Scalar,2> Root;
 	typedef KernelLayer<Scalar,2> KernelBase;
-	typedef ConvolutionLayerBase<Scalar,2> ConvBase;
+	typedef ConvKernelLayerBase<Scalar,2> ConvBase;
 public:
 	/**
 	 * @param input_dims The dimensionality of the observations to be processed by the layer.
@@ -776,25 +777,25 @@ public:
 	 * @param max_norm_constraint An optional max-norm constraint. If it is 0 or less, no
 	 * constraint is applied.
 	 */
-	inline ConvolutionLayer(const Dimensions<std::size_t,2>& input_dims, std::size_t filters, WeightInitSharedPtr<Scalar> weight_init,
+	inline ConvKernelLayer(const Dimensions<std::size_t,2>& input_dims, std::size_t filters, WeightInitSharedPtr<Scalar> weight_init,
 			ParamRegSharedPtr<Scalar> weight_reg = Root::NO_PARAM_REG, std::size_t receptor_height = 3, std::size_t receptor_width = 3,
 			std::size_t vertical_padding = 1, std::size_t horizontal_padding = 1, std::size_t vertical_stride = 1,
 			std::size_t horizontal_stride = 1, std::size_t vertical_dilation = 0, std::size_t horizontal_dilation = 0,
 			Scalar max_norm_constraint = 0) :
-				ConvBase::ConvolutionLayerBase(input_dims, {
+				ConvBase::ConvKernelLayerBase(input_dims, {
 						ConvBase::calculate_output_dim(input_dims(0), receptor_height, vertical_padding, vertical_dilation, vertical_stride),
 						ConvBase::calculate_output_dim(input_dims(1), receptor_width, horizontal_padding, horizontal_dilation, horizontal_stride) *
 						filters  }, filters, weight_init, weight_reg, receptor_height, receptor_width, vertical_padding, horizontal_padding,
 						vertical_stride, horizontal_stride, vertical_dilation, horizontal_dilation, max_norm_constraint) { }
 	inline Root* clone() const {
-		return new ConvolutionLayer(*this);
+		return new ConvKernelLayer(*this);
 	}
 protected:
-	inline ConvolutionLayer(const ConvolutionLayer<Scalar,2>& layer, bool share_params = false) :
-			ConvBase::ConvolutionLayerBase(layer, share_params),
+	inline ConvKernelLayer(const ConvKernelLayer<Scalar,2>& layer, bool share_params = false) :
+			ConvBase::ConvKernelLayerBase(layer, share_params),
 			batch_size(layer.batch_size) { }
 	inline Root* clone_with_shared_params() const {
-		return new ConvolutionLayer(*this, true);
+		return new ConvKernelLayer(*this, true);
 	}
 	inline typename Root::Data pass_forward(typename Root::Data in, bool training) {
 		assert((Dimensions<std::size_t,3>(in.dimensions()).template demote<>()) == KernelBase::input_dims);
@@ -823,10 +824,10 @@ private:
  * output tensor.
  */
 template<typename Scalar>
-class ConvolutionLayer<Scalar,1> : public ConvolutionLayerBase<Scalar,1> {
+class ConvKernelLayer<Scalar,1> : public ConvKernelLayerBase<Scalar,1> {
 	typedef Layer<Scalar,1> Root;
 	typedef KernelLayer<Scalar,1> KernelBase;
-	typedef ConvolutionLayerBase<Scalar,1> ConvBase;
+	typedef ConvKernelLayerBase<Scalar,1> ConvBase;
 public:
 	/**
 	 * @param input_dims The dimensionality of the observations to be processed by the layer.
@@ -843,22 +844,22 @@ public:
 	 * @param max_norm_constraint An optional max-norm constraint. If it is 0 or less, no
 	 * constraint is applied.
 	 */
-	ConvolutionLayer(const Dimensions<std::size_t,1>& input_dims, std::size_t filters, WeightInitSharedPtr<Scalar> weight_init,
+	ConvKernelLayer(const Dimensions<std::size_t,1>& input_dims, std::size_t filters, WeightInitSharedPtr<Scalar> weight_init,
 			ParamRegSharedPtr<Scalar> weight_reg = Root::NO_PARAM_REG, std::size_t receptor_length = 3, std::size_t padding = 1,
 			std::size_t stride = 1, std::size_t dilation = 0, Scalar max_norm_constraint = 0) :
-				ConvBase::ConvolutionLayerBase(input_dims, {
+				ConvBase::ConvKernelLayerBase(input_dims, {
 						ConvBase::calculate_output_dim(input_dims(0), receptor_length, padding, dilation, stride) * filters  },
 						filters, weight_init, weight_reg, receptor_length, 1, padding, 0, stride, 1, dilation, 0,
 						max_norm_constraint) { }
 	inline Root* clone() const {
-		return new ConvolutionLayer(*this);
+		return new ConvKernelLayer(*this);
 	}
 protected:
-	inline ConvolutionLayer(const ConvolutionLayer<Scalar,1>& layer, bool share_params = false) :
-			ConvBase::ConvolutionLayerBase(layer, share_params),
+	inline ConvKernelLayer(const ConvKernelLayer<Scalar,1>& layer, bool share_params = false) :
+			ConvBase::ConvKernelLayerBase(layer, share_params),
 			batch_size(layer.batch_size) { }
 	inline Root* clone_with_shared_params() const {
-		return new ConvolutionLayer(*this, true);
+		return new ConvKernelLayer(*this, true);
 	}
 	inline typename Root::Data pass_forward(typename Root::Data in, bool training) {
 		assert((Dimensions<std::size_t,2>(in.dimensions()).template demote<>()) == KernelBase::input_dims);
@@ -884,13 +885,13 @@ private:
  * An abstract base class template for a transposed 2D convolutional layer.
  */
 template<typename Scalar, std::size_t Rank>
-class DeconvolutionLayerBase : public KernelLayer<Scalar,Rank> {
+class DeconvKernelLayerBase : public KernelLayer<Scalar,Rank> {
 	typedef Layer<Scalar,Rank> Root;
 	typedef KernelLayer<Scalar,Rank> Base;
 	typedef std::array<std::size_t,4> Array4D;
 	typedef std::array<std::pair<std::size_t,std::size_t>,4> PaddingsArray4D;
 public:
-	inline DeconvolutionLayerBase(const Dimensions<std::size_t,Rank>& input_dims, const Dimensions<std::size_t,Rank>& output_dims,
+	inline DeconvKernelLayerBase(const Dimensions<std::size_t,Rank>& input_dims, const Dimensions<std::size_t,Rank>& output_dims,
 			std::size_t filters, WeightInitSharedPtr<Scalar> weight_init, ParamRegSharedPtr<Scalar> weight_reg,
 			std::size_t receptor_height, std::size_t receptor_width, std::size_t vertical_padding, std::size_t horizontal_padding,
 			std::size_t vertical_stride, std::size_t horizontal_stride, std::size_t vertical_dilation, std::size_t horizontal_dilation,
@@ -929,7 +930,7 @@ public:
 				ext_output_dims(1) + 2 * horizontal_padding >= dil_receptor_width);
 	}
 protected:
-	inline DeconvolutionLayerBase(const DeconvolutionLayerBase<Scalar,Rank>& layer, bool share_params = false) :
+	inline DeconvKernelLayerBase(const DeconvKernelLayerBase<Scalar,Rank>& layer, bool share_params = false) :
 			Base::KernelLayer(layer, share_params),
 			filters(layer.filters),
 			receptor_height(layer.receptor_height),
@@ -1117,10 +1118,10 @@ private:
  * \see https://arxiv.org/abs/1603.07285v1
  */
 template<typename Scalar, std::size_t Rank = 3>
-class DeconvolutionLayer : public DeconvolutionLayerBase<Scalar,Rank> {
+class DeconvKernelLayer : public DeconvKernelLayerBase<Scalar,Rank> {
 	typedef Layer<Scalar,3> Root;
 	typedef KernelLayer<Scalar,3> KernelBase;
-	typedef DeconvolutionLayerBase<Scalar,3> DeconvBase;
+	typedef DeconvKernelLayerBase<Scalar,3> DeconvBase;
 public:
 	/**
 	 * @param input_dims The dimensionality of the observations to be processed by the layer.
@@ -1142,25 +1143,25 @@ public:
 	 * @param max_norm_constraint An optional max-norm constraint. If it is 0 or less, no
 	 * constraint is applied.
 	 */
-	inline DeconvolutionLayer(const Dimensions<std::size_t,3>& input_dims, std::size_t filters, WeightInitSharedPtr<Scalar> weight_init,
+	inline DeconvKernelLayer(const Dimensions<std::size_t,3>& input_dims, std::size_t filters, WeightInitSharedPtr<Scalar> weight_init,
 			ParamRegSharedPtr<Scalar> weight_reg = Root::NO_PARAM_REG, std::size_t receptor_height = 3, std::size_t receptor_width = 3,
 			std::size_t vertical_padding = 1, std::size_t horizontal_padding = 1, std::size_t vertical_stride = 1,
 			std::size_t horizontal_stride = 1, std::size_t vertical_dilation = 0, std::size_t horizontal_dilation = 0,
 			Scalar max_norm_constraint = 0) :
-				DeconvBase::DeconvolutionLayerBase(input_dims,{
+				DeconvBase::DeconvKernelLayerBase(input_dims,{
 						DeconvBase::calculate_output_dim(input_dims(0), receptor_height, vertical_padding, vertical_dilation, vertical_stride),
 						DeconvBase::calculate_output_dim(input_dims(1), receptor_width, horizontal_padding, horizontal_dilation, horizontal_stride),
 						filters }, filters, weight_init, weight_reg, receptor_height, receptor_width, vertical_padding, horizontal_padding,
 						vertical_stride, horizontal_stride, vertical_dilation, horizontal_dilation, max_norm_constraint) { }
 	inline Root* clone() const {
-		return new DeconvolutionLayer(*this);
+		return new DeconvKernelLayer(*this);
 	}
 protected:
-	inline DeconvolutionLayer(const DeconvolutionLayer<Scalar,3>& layer, bool share_params = false) :
-			DeconvBase::DeconvolutionLayerBase(layer, share_params),
+	inline DeconvKernelLayer(const DeconvKernelLayer<Scalar,3>& layer, bool share_params = false) :
+			DeconvBase::DeconvKernelLayerBase(layer, share_params),
 			batch_size(layer.batch_size) { }
 	inline Root* clone_with_shared_params() const {
-		return new DeconvolutionLayer(*this, true);
+		return new DeconvKernelLayer(*this, true);
 	}
 	inline typename Root::Data pass_forward(typename Root::Data in, bool training) {
 		assert((Dimensions<std::size_t,4>(in.dimensions()).template demote<>()) == KernelBase::input_dims);
@@ -1185,10 +1186,10 @@ private:
  * \see https://arxiv.org/abs/1603.07285v1
  */
 template<typename Scalar>
-class DeconvolutionLayer<Scalar,2> : public DeconvolutionLayerBase<Scalar,2> {
+class DeconvKernelLayer<Scalar,2> : public DeconvKernelLayerBase<Scalar,2> {
 	typedef Layer<Scalar,2> Root;
 	typedef KernelLayer<Scalar,2> KernelBase;
-	typedef DeconvolutionLayerBase<Scalar,2> DeconvBase;
+	typedef DeconvKernelLayerBase<Scalar,2> DeconvBase;
 public:
 	/**
 	 * @param input_dims The dimensionality of the observations to be processed by the layer.
@@ -1212,25 +1213,25 @@ public:
 	 * @param max_norm_constraint An optional max-norm constraint. If it is 0 or less, no
 	 * constraint is applied.
 	 */
-	DeconvolutionLayer(const Dimensions<std::size_t,2>& input_dims, std::size_t filters, WeightInitSharedPtr<Scalar> weight_init,
+	DeconvKernelLayer(const Dimensions<std::size_t,2>& input_dims, std::size_t filters, WeightInitSharedPtr<Scalar> weight_init,
 			ParamRegSharedPtr<Scalar> weight_reg = Root::NO_PARAM_REG, std::size_t receptor_height = 3, std::size_t receptor_width = 3,
 			std::size_t vertical_padding = 1, std::size_t horizontal_padding = 1, std::size_t vertical_stride = 1,
 			std::size_t horizontal_stride = 1, std::size_t vertical_dilation = 0, std::size_t horizontal_dilation = 0,
 			Scalar max_norm_constraint = 0) :
-				DeconvBase::DeconvolutionLayerBase(input_dims,{
+				DeconvBase::DeconvKernelLayerBase(input_dims,{
 						DeconvBase::calculate_output_dim(input_dims(0), receptor_height, vertical_padding, vertical_dilation, vertical_stride),
 						DeconvBase::calculate_output_dim(input_dims(1), receptor_width, horizontal_padding, horizontal_dilation, horizontal_stride) *
 						filters }, filters, weight_init, weight_reg, receptor_height, receptor_width, vertical_padding, horizontal_padding,
 						vertical_stride, horizontal_stride, vertical_dilation, horizontal_dilation, max_norm_constraint) { }
 	inline Root* clone() const {
-		return new DeconvolutionLayer(*this);
+		return new DeconvKernelLayer(*this);
 	}
 protected:
-	inline DeconvolutionLayer(const DeconvolutionLayer<Scalar,2>& layer, bool share_params = false) :
-			DeconvBase::DeconvolutionLayerBase(layer, share_params),
+	inline DeconvKernelLayer(const DeconvKernelLayer<Scalar,2>& layer, bool share_params = false) :
+			DeconvBase::DeconvKernelLayerBase(layer, share_params),
 			batch_size(layer.batch_size) { }
 	inline Root* clone_with_shared_params() const {
-		return new DeconvolutionLayer(*this, true);
+		return new DeconvKernelLayer(*this, true);
 	}
 	inline typename Root::Data pass_forward(typename Root::Data in, bool training) {
 		assert((Dimensions<std::size_t,3>(in.dimensions()).template demote<>()) == KernelBase::input_dims);
@@ -1260,10 +1261,10 @@ private:
  * \see https://arxiv.org/abs/1603.07285v1
  */
 template<typename Scalar>
-class DeconvolutionLayer<Scalar,1> : public DeconvolutionLayerBase<Scalar,1> {
+class DeconvKernelLayer<Scalar,1> : public DeconvKernelLayerBase<Scalar,1> {
 	typedef Layer<Scalar,1> Root;
 	typedef KernelLayer<Scalar,1> KernelBase;
-	typedef DeconvolutionLayerBase<Scalar,1> DeconvBase;
+	typedef DeconvKernelLayerBase<Scalar,1> DeconvBase;
 public:
 	/**
 	 * @param input_dims The dimensionality of the observations to be processed by the layer.
@@ -1280,22 +1281,22 @@ public:
 	 * @param max_norm_constraint An optional max-norm constraint. If it is 0 or less, no
 	 * constraint is applied.
 	 */
-	DeconvolutionLayer(const Dimensions<std::size_t,1>& input_dims, std::size_t filters, WeightInitSharedPtr<Scalar> weight_init,
+	DeconvKernelLayer(const Dimensions<std::size_t,1>& input_dims, std::size_t filters, WeightInitSharedPtr<Scalar> weight_init,
 			ParamRegSharedPtr<Scalar> weight_reg = Root::NO_PARAM_REG, std::size_t receptor_length = 3, std::size_t padding = 1,
 			std::size_t stride = 1, std::size_t dilation = 0, Scalar max_norm_constraint = 0) :
-				DeconvBase::DeconvolutionLayerBase(input_dims,{
+				DeconvBase::DeconvKernelLayerBase(input_dims,{
 						DeconvBase::calculate_output_dim(input_dims(0), receptor_length, padding, dilation, stride) * filters  },
 						filters, weight_init, weight_reg, receptor_length, 1, padding, 0, stride, 1, dilation, 0,
 						max_norm_constraint) { }
 	inline Root* clone() const {
-		return new DeconvolutionLayer(*this);
+		return new DeconvKernelLayer(*this);
 	}
 protected:
-	inline DeconvolutionLayer(const DeconvolutionLayer<Scalar,1>& layer, bool share_params = false) :
-			DeconvBase::DeconvolutionLayerBase(layer, share_params),
+	inline DeconvKernelLayer(const DeconvKernelLayer<Scalar,1>& layer, bool share_params = false) :
+			DeconvBase::DeconvKernelLayerBase(layer, share_params),
 			batch_size(layer.batch_size) { }
 	inline Root* clone_with_shared_params() const {
-		return new DeconvolutionLayer(*this, true);
+		return new DeconvKernelLayer(*this, true);
 	}
 	inline typename Root::Data pass_forward(typename Root::Data in, bool training) {
 		assert((Dimensions<std::size_t,2>(in.dimensions()).template demote<>()) == KernelBase::input_dims);
@@ -3515,7 +3516,7 @@ protected:
 		return out;
 	}
 	inline typename Base::Data pass_back(typename Base::Data out_grad) {
-		assert((Dimensions<std::size_t,Base::DATA_RANK>(out_grad.dimensions()).template demote<>()) == Base::dims);
+		assert((Dimensions<std::size_t,Base::DATA_RANK>(out_grad.dimensions()).template demote<>()) == dims);
 		assert(out_grad.dimension(0) > 0 && extents[0] == out_grad.dimension(0));
 		std::size_t rows = out_grad.dimension(0);
 		typename Base::Data prev_out_grad;
@@ -3778,7 +3779,7 @@ protected:
 		return TensorMap<Scalar,Base::DATA_RANK>(out.data(), in.dimensions());
 	}
 	inline typename Base::Data pass_back(typename Base::Data out_grad) {
-		assert((Dimensions<std::size_t,Base::DATA_RANK>(out_grad.dimensions()).template demote<>()) == Base::dims);
+		assert((Dimensions<std::size_t,Base::DATA_RANK>(out_grad.dimensions()).template demote<>()) == dims);
 		assert(out_grad.dimension(0) > 0 && std_in.rows() == out_grad.dimension(0));
 		std::size_t rows = out_grad.dimension(0);
 		/* Back-propagate the gradient through the batch normalization 'function' and also calculate the
