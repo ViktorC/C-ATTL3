@@ -53,7 +53,7 @@ public:
  * A class template for a normalization (mean-subtraction) preprocessor that optionally also
  * standardizes the data (divides it by the standard deviation).
  */
-template<typename Scalar, std::size_t Rank, bool Standardize = false, bool PerChannel = (Rank == 3)>
+template<typename Scalar, std::size_t Rank, bool Standardize = false, bool PerLastRank = (Rank == 3)>
 class NormalizationPreprocessor : public Preprocessor<Scalar,Rank,false> {
 public:
 	/**
@@ -171,10 +171,10 @@ protected:
  * An abstract base class template for a principal component analysis (PCA) preprocessor that can also
  * standardize and whiten the data.
  */
-template<typename Scalar, std::size_t Rank, bool Standardize, bool Whiten, bool PerChannel>
-class PCAPreprocessorBase : public NormalizationPreprocessor<Scalar,Rank,Standardize,PerChannel> {
+template<typename Scalar, std::size_t Rank, bool Standardize, bool Whiten, bool PerLastRank>
+class PCAPreprocessorBase : public NormalizationPreprocessor<Scalar,Rank,Standardize,PerLastRank> {
 protected:
-	typedef NormalizationPreprocessor<Scalar,Rank,Standardize,PerChannel> Base;
+	typedef NormalizationPreprocessor<Scalar,Rank,Standardize,PerLastRank> Base;
 	inline PCAPreprocessorBase(Scalar min_rel_var_to_retain, Scalar epsilon) :
 				Base::NormalizationPreprocessor(epsilon),
 				min_rel_var_to_retain(min_rel_var_to_retain),
@@ -245,9 +245,9 @@ protected:
  * multiple channels.
  */
 template<typename Scalar, std::size_t Rank, bool Standardize = false, bool Whiten = false,
-		bool PerChannel = (Rank == 3)>
-class PCAPreprocessor : public PCAPreprocessorBase<Scalar,Rank,Standardize,Whiten,PerChannel> {
-	typedef PCAPreprocessorBase<Scalar,Rank,Standardize,Whiten,PerChannel> Base;
+		bool PerLastRank = (Rank == 3)>
+class PCAPreprocessor : public PCAPreprocessorBase<Scalar,Rank,Standardize,Whiten,PerLastRank> {
+	typedef PCAPreprocessorBase<Scalar,Rank,Standardize,Whiten,PerLastRank> Base;
 	typedef typename Base::Base Root;
 public:
 	/**

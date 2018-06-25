@@ -143,7 +143,7 @@ inline void layer_grad_test(std::string name, LayerPtr<Scalar,Rank> layer1, Laye
  * Performs gradient checks on fully-connected layers.
  */
 template<typename Scalar>
-inline void dense_layer_grad_test() {
+inline void dense_kernel_layer_grad_test() {
 	auto init1 = WeightInitSharedPtr<Scalar>(new GlorotWeightInitialization<Scalar>());
 	auto init2 = WeightInitSharedPtr<Scalar>(new LeCunWeightInitialization<Scalar>());
 	auto reg1 = ParamRegSharedPtr<Scalar>(new AbsoluteParameterRegularization<Scalar>());
@@ -151,72 +151,72 @@ inline void dense_layer_grad_test() {
 	auto reg3 = ParamRegSharedPtr<Scalar>(new ElasticNetParameterRegularization<Scalar>());
 	LayerPtr<Scalar,1> layer1_1(new DenseKernelLayer<Scalar,1>({ 32u }, 16, init1));
 	LayerPtr<Scalar,1> layer1_2(new DenseKernelLayer<Scalar,1>(layer1_1->get_output_dims(), 1, init1, reg3));
-	layer_grad_test<Scalar,1>("fc layer", std::move(layer1_1), std::move(layer1_2), 5, ScalarTraits<Scalar>::step_size,
+	layer_grad_test<Scalar,1>("dense kernel layer", std::move(layer1_1), std::move(layer1_2), 5, ScalarTraits<Scalar>::step_size,
 			ScalarTraits<float>::abs_epsilon, ScalarTraits<float>::rel_epsilon);
 	LayerPtr<Scalar,2> layer2_1(new DenseKernelLayer<Scalar,2>({ 6u, 6u }, 16, init2));
 	LayerPtr<Scalar,2> layer2_2(new DenseKernelLayer<Scalar,2>(layer2_1->get_output_dims(), 2, init2, reg1));
-	layer_grad_test<Scalar,2>("fc layer", std::move(layer2_1), std::move(layer2_2), 5, ScalarTraits<Scalar>::step_size,
+	layer_grad_test<Scalar,2>("dense kernel layer", std::move(layer2_1), std::move(layer2_2), 5, ScalarTraits<Scalar>::step_size,
 			ScalarTraits<float>::abs_epsilon, ScalarTraits<float>::rel_epsilon);
 	LayerPtr<Scalar,3> layer3_1(new DenseKernelLayer<Scalar,3>({ 4u, 4u, 2u }, 16, init1, reg2));
 	LayerPtr<Scalar,3> layer3_2(new DenseKernelLayer<Scalar,3>(layer3_1->get_output_dims(), 4, init1, reg2));
-	layer_grad_test<Scalar,3>("fc layer", std::move(layer3_1), std::move(layer3_2));
+	layer_grad_test<Scalar,3>("dense kernel layer", std::move(layer3_1), std::move(layer3_2));
 }
 
-TEST(GradientTest, DenseLayer) {
-	dense_layer_grad_test<float>();
-	dense_layer_grad_test<double>();
+TEST(GradientTest, DenseKernelLayer) {
+	dense_kernel_layer_grad_test<float>();
+	dense_kernel_layer_grad_test<double>();
 }
 
 /**
  * Performs gradient checks on convolutional layers.
  */
 template<typename Scalar>
-inline void conv_layer_grad_test() {
+inline void conv_kernel_layer_grad_test() {
 	auto init = WeightInitSharedPtr<Scalar>(new HeWeightInitialization<Scalar>());
 	auto reg = ParamRegSharedPtr<Scalar>(new SquaredParameterRegularization<Scalar>());
 	LayerPtr<Scalar,1> layer1_1(new ConvKernelLayer<Scalar,1>({ 32u }, 5, init,
 			ConvKernelLayer<Scalar>::NO_PARAM_REG, 3, 2, 1, 1));
 	LayerPtr<Scalar,1> layer2_1(new ConvKernelLayer<Scalar,1>(layer1_1->get_output_dims(), 1, init, reg, 1, 1));
-	layer_grad_test<Scalar,1>("convolution layer ", std::move(layer1_1), std::move(layer2_1));
+	layer_grad_test<Scalar,1>("convolution kernel layer ", std::move(layer1_1), std::move(layer2_1));
 	LayerPtr<Scalar,2> layer1_2(new ConvKernelLayer<Scalar,2>({ 10u, 10u }, 5, init,
 			ConvKernelLayer<Scalar>::NO_PARAM_REG, 3, 2, 1, 2, 1, 2, 1, 0));
 	LayerPtr<Scalar,2> layer2_2(new ConvKernelLayer<Scalar,2>(layer1_2->get_output_dims(), 1, init, reg, 1, 1));
-	layer_grad_test<Scalar,2>("convolution layer ", std::move(layer1_2), std::move(layer2_2));
+	layer_grad_test<Scalar,2>("convolution kernel layer ", std::move(layer1_2), std::move(layer2_2));
 	LayerPtr<Scalar,3> layer1_3(new ConvKernelLayer<Scalar>({ 8u, 8u, 2u }, 5, init,
 			ConvKernelLayer<Scalar>::NO_PARAM_REG, 3, 2, 1, 2, 1, 2, 1, 0));
 	LayerPtr<Scalar,3> layer2_3(new ConvKernelLayer<Scalar>(layer1_3->get_output_dims(), 1, init, reg, 1, 1));
-	layer_grad_test<Scalar,3>("convolution layer ", std::move(layer1_3), std::move(layer2_3));
+	layer_grad_test<Scalar,3>("convolution kernel layer ", std::move(layer1_3), std::move(layer2_3));
 }
 
-TEST(GradientTest, ConvolutionLayer) {
-	conv_layer_grad_test<float>();
-	conv_layer_grad_test<double>();
+TEST(GradientTest, ConvKernelLayer) {
+	conv_kernel_layer_grad_test<float>();
+	conv_kernel_layer_grad_test<double>();
 }
 
 /**
  * Performs gradient checks on transposed convolutional layers.
  */
 template<typename Scalar>
-inline void deconv_layer_grad_test() {
+inline void deconv_kernel_layer_grad_test() {
 	auto init = WeightInitSharedPtr<Scalar>(new HeWeightInitialization<Scalar>());
 	auto reg = ParamRegSharedPtr<Scalar>(new SquaredParameterRegularization<Scalar>());
 	LayerPtr<Scalar,1> layer1_1(new DeconvKernelLayer<Scalar,1>({ 16u }, 5, init,
 			DeconvKernelLayer<Scalar>::NO_PARAM_REG, 4, 1, 1, 1));
 	LayerPtr<Scalar,1> layer2_1(new DeconvKernelLayer<Scalar,1>(layer1_1->get_output_dims(), 1, init, reg, 1, 1));
-	layer_grad_test<Scalar,1>("deconvolution layer ", std::move(layer1_1), std::move(layer2_1));
+	layer_grad_test<Scalar,1>("deconvolution kernel layer ", std::move(layer1_1), std::move(layer2_1));
 	LayerPtr<Scalar,2> layer1_2(new DeconvKernelLayer<Scalar,2>({ 4u, 5u }, 5, init,
 			DeconvKernelLayer<Scalar>::NO_PARAM_REG, 5, 3, 1, 0, 1, 2, 0, 1));
 	LayerPtr<Scalar,2> layer2_2(new DeconvKernelLayer<Scalar,2>(layer1_2->get_output_dims(), 1, init, reg, 1, 1));
-	layer_grad_test<Scalar,2>("deconvolution layer ", std::move(layer1_2), std::move(layer2_2));
+	layer_grad_test<Scalar,2>("deconvolution kernel layer ", std::move(layer1_2), std::move(layer2_2));
 	LayerPtr<Scalar,3> layer1_3(new DeconvKernelLayer<Scalar>({ 2u, 3u, 2u }, 5, init,
 			DeconvKernelLayer<Scalar>::NO_PARAM_REG, 5, 3, 1, 0, 1, 2, 0, 1));
 	LayerPtr<Scalar,3> layer2_3(new DeconvKernelLayer<Scalar>(layer1_3->get_output_dims(), 1, init, reg, 1, 1));
-	layer_grad_test<Scalar,3>("deconvolution layer ", std::move(layer1_3), std::move(layer2_3));
+	layer_grad_test<Scalar,3>("deconvolution kernel layer ", std::move(layer1_3), std::move(layer2_3));
 }
 
-TEST(GradientTest, DeconvolutionLayer) {
-	deconv_layer_grad_test<float>();
-	deconv_layer_grad_test<double>();
+TEST(GradientTest, DeconvKernelLayer) {
+	deconv_kernel_layer_grad_test<float>();
+	deconv_kernel_layer_grad_test<double>();
 }
 
 /**

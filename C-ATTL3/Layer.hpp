@@ -370,7 +370,7 @@ public:
 				out_conversion_dims(Base::output_dims.template promote<>()),
 				prev_out_conversion_dims(Base::input_dims.template promote<>()) { }
 	inline Root* clone() const {
-		return new DenseLayer(*this);
+		return new DenseKernelLayer(*this);
 	}
 protected:
 	inline DenseKernelLayer(const DenseKernelLayer<Scalar,Rank>& layer, bool share_params = false) :
@@ -379,7 +379,7 @@ protected:
 			prev_out_conversion_dims(layer.prev_out_conversion_dims),
 			biased_in_mat(layer.biased_in_mat) { }
 	inline Layer<Scalar,Rank>* clone_with_shared_params() const {
-		return new DenseLayer(*this, true);
+		return new DenseKernelLayer(*this, true);
 	}
 	inline void empty_cache() {
 		biased_in_mat = Matrix<Scalar>(0, 0);
@@ -3358,10 +3358,10 @@ private:
  *
  * \see https://arxiv.org/abs/1502.03167
  */
-template<typename Scalar, std::size_t Rank, bool PerChannel = (Rank == 3)>
+template<typename Scalar, std::size_t Rank, bool PerLastRank = (Rank == 3)>
 class BatchNormLayer : public Layer<Scalar,Rank> {
 	typedef Layer<Scalar,Rank> Base;
-	typedef BatchNormLayer<Scalar,Rank,PerChannel> Self;
+	typedef BatchNormLayer<Scalar,Rank,PerLastRank> Self;
 public:
 	/**
 	 * @param dims The dimensionality of the input tensor.
