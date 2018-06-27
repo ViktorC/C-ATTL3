@@ -75,7 +75,6 @@ $(function() {
   <div class="summary">
 <a href="#pub-methods">Public Member Functions</a> &#124;
 <a href="#pro-methods">Protected Member Functions</a> &#124;
-<a href="#pro-static-methods">Static Protected Member Functions</a> &#124;
 <a href="classcattle_1_1_pool_layer-members.html">List of all members</a>  </div>
   <div class="headertitle">
 <div class="title">cattle::PoolLayer&lt; Scalar, Rank &gt; Class Template Reference<span class="mlabels"><span class="mlabel">abstract</span></span></div>  </div>
@@ -145,6 +144,9 @@ virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" hr
 <tr class="memitem:a88b451faf349bb303657bc6c6d60abf8"><td class="memItemLeft" align="right" valign="top">virtual <a class="el" href="namespacecattle.html#a8b9323ad928764340e46f0802bf27fbb">Tensor</a>&lt; Scalar, 4 &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_pool_layer.html#a88b451faf349bb303657bc6c6d60abf8">_d_reduce</a> (const <a class="el" href="namespacecattle.html#a8b9323ad928764340e46f0802bf27fbb">Tensor</a>&lt; Scalar, 4 &gt; &amp;grad, std::size_t patch_ind)=0</td></tr>
 <tr class="memdesc:a88b451faf349bb303657bc6c6d60abf8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Differentiates the reduction function and returns the derivative of the loss function w.r.t.  <a href="#a88b451faf349bb303657bc6c6d60abf8">More...</a><br /></td></tr>
 <tr class="separator:a88b451faf349bb303657bc6c6d60abf8"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2197c18cdbc8c8e80bc059d8f36a4d5c"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classcattle_1_1_layer.html">Base</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_pool_layer.html#a2197c18cdbc8c8e80bc059d8f36a4d5c">clone_with_shared_params</a> ()</td></tr>
+<tr class="memdesc:a2197c18cdbc8c8e80bc059d8f36a4d5c"><td class="mdescLeft">&#160;</td><td class="mdescRight">It returns a clone of the layer instance using a reference to the original's parameters.  <a href="#a2197c18cdbc8c8e80bc059d8f36a4d5c">More...</a><br /></td></tr>
+<tr class="separator:a2197c18cdbc8c8e80bc059d8f36a4d5c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a1f08f1fb9ee99afb1a899a38ff12adbf"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_pool_layer.html#a1f08f1fb9ee99afb1a899a38ff12adbf">is_input_layer</a> () const</td></tr>
 <tr class="memdesc:a1f08f1fb9ee99afb1a899a38ff12adbf"><td class="mdescLeft">&#160;</td><td class="mdescRight">A constant method that returns whether this layer functions as an input layer.  <a href="#a1f08f1fb9ee99afb1a899a38ff12adbf">More...</a><br /></td></tr>
 <tr class="separator:a1f08f1fb9ee99afb1a899a38ff12adbf"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -160,17 +162,14 @@ virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" hr
 <tr class="memitem:aa0dcd228d7973b19201ea507146d8b67"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_pool_layer.html#aa0dcd228d7973b19201ea507146d8b67">regularize</a> ()</td></tr>
 <tr class="memdesc:aa0dcd228d7973b19201ea507146d8b67"><td class="mdescLeft">&#160;</td><td class="mdescRight">It computes the derivative of the regularization function w.r.t.  <a href="#aa0dcd228d7973b19201ea507146d8b67">More...</a><br /></td></tr>
 <tr class="separator:aa0dcd228d7973b19201ea507146d8b67"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a9ce31dd7cbb56e364ecb81d8fc1a88c8"><td class="memItemLeft" align="right" valign="top">Scalar&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_pool_layer.html#a9ce31dd7cbb56e364ecb81d8fc1a88c8">get_regularization_penalty</a> ()</td></tr>
-<tr class="memdesc:a9ce31dd7cbb56e364ecb81d8fc1a88c8"><td class="mdescLeft">&#160;</td><td class="mdescRight">It calculates the regularization penalty of the layer's parameters.  <a href="#a9ce31dd7cbb56e364ecb81d8fc1a88c8">More...</a><br /></td></tr>
-<tr class="separator:a9ce31dd7cbb56e364ecb81d8fc1a88c8"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a971e2f47a2e4f46e859b17dc60e07910"><td class="memItemLeft" align="right" valign="top">Scalar&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_pool_layer.html#a971e2f47a2e4f46e859b17dc60e07910">get_regularization_penalty</a> () const</td></tr>
+<tr class="memdesc:a971e2f47a2e4f46e859b17dc60e07910"><td class="mdescLeft">&#160;</td><td class="mdescRight">It calculates the regularization penalty of the layer's parameters.  <a href="#a971e2f47a2e4f46e859b17dc60e07910">More...</a><br /></td></tr>
+<tr class="separator:a971e2f47a2e4f46e859b17dc60e07910"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ae3d67e9ff5577d153ef7ce8ffc7c7e9c"><td class="memItemLeft" align="right" valign="top"><a id="ae3d67e9ff5577d153ef7ce8ffc7c7e9c"></a>
 void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_pool_layer.html#ae3d67e9ff5577d153ef7ce8ffc7c7e9c">enforce_constraints</a> ()</td></tr>
 <tr class="memdesc:ae3d67e9ff5577d153ef7ce8ffc7c7e9c"><td class="mdescLeft">&#160;</td><td class="mdescRight">It applies constraints such as max-norm to the parameters of the layer (if applicable). <br /></td></tr>
 <tr class="separator:ae3d67e9ff5577d153ef7ce8ffc7c7e9c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="inherit_header pro_methods_classcattle_1_1_layer"><td colspan="2" onclick="javascript:toggleInherit('pro_methods_classcattle_1_1_layer')"><img src="closed.png" alt="-"/>&#160;Protected Member Functions inherited from <a class="el" href="classcattle_1_1_layer.html">cattle::Layer&lt; Scalar, Rank &gt;</a></td></tr>
-<tr class="memitem:a725b8784f71f40c162f25a8820c97473 inherit pro_methods_classcattle_1_1_layer"><td class="memItemLeft" align="right" valign="top">virtual <a class="el" href="classcattle_1_1_layer.html">Layer</a>&lt; Scalar, Rank &gt; *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_layer.html#a725b8784f71f40c162f25a8820c97473">clone_with_shared_params</a> () const =0</td></tr>
-<tr class="memdesc:a725b8784f71f40c162f25a8820c97473 inherit pro_methods_classcattle_1_1_layer"><td class="mdescLeft">&#160;</td><td class="mdescRight">It returns a clone of the layer instance using a reference to the original's parameters.  <a href="classcattle_1_1_layer.html#a725b8784f71f40c162f25a8820c97473">More...</a><br /></td></tr>
-<tr class="separator:a725b8784f71f40c162f25a8820c97473 inherit pro_methods_classcattle_1_1_layer"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ae3d00e9fb6079e4b4990b3a14625a93d inherit pro_methods_classcattle_1_1_layer"><td class="memItemLeft" align="right" valign="top"><a id="ae3d00e9fb6079e4b4990b3a14625a93d"></a>
 virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_layer.html#ae3d00e9fb6079e4b4990b3a14625a93d">empty_cache</a> ()=0</td></tr>
 <tr class="memdesc:ae3d00e9fb6079e4b4990b3a14625a93d inherit pro_methods_classcattle_1_1_layer"><td class="mdescLeft">&#160;</td><td class="mdescRight">It empties the layer's caches such as those required for the derivation of the function represented by the layer. <br /></td></tr>
@@ -181,12 +180,6 @@ virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" hr
 <tr class="memitem:a7cb51862ef9b87632b5abb8e3ab36dd9 inherit pro_methods_classcattle_1_1_layer"><td class="memItemLeft" align="right" valign="top">virtual Data&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_layer.html#a7cb51862ef9b87632b5abb8e3ab36dd9">pass_back</a> (Data out_grad)=0</td></tr>
 <tr class="memdesc:a7cb51862ef9b87632b5abb8e3ab36dd9 inherit pro_methods_classcattle_1_1_layer"><td class="mdescLeft">&#160;</td><td class="mdescRight">It back-propagates the derivative of the error function w.r.t.  <a href="classcattle_1_1_layer.html#a7cb51862ef9b87632b5abb8e3ab36dd9">More...</a><br /></td></tr>
 <tr class="separator:a7cb51862ef9b87632b5abb8e3ab36dd9 inherit pro_methods_classcattle_1_1_layer"><td class="memSeparator" colspan="2">&#160;</td></tr>
-</table><table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pro-static-methods"></a>
-Static Protected Member Functions</h2></td></tr>
-<tr class="memitem:a64d00ef4bfdf7c8e589cb1f4c8984d51"><td class="memItemLeft" align="right" valign="top">static std::size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_pool_layer.html#a64d00ef4bfdf7c8e589cb1f4c8984d51">calculate_output_dim</a> (std::size_t input_dim, std::size_t receptor_size, std::size_t dilation, std::size_t stride)</td></tr>
-<tr class="memdesc:a64d00ef4bfdf7c8e589cb1f4c8984d51"><td class="mdescLeft">&#160;</td><td class="mdescRight">It calculates the depth of the tensor output by the layer for all of its ranks except the first one (which denotes the samples in the batch).  <a href="#a64d00ef4bfdf7c8e589cb1f4c8984d51">More...</a><br /></td></tr>
-<tr class="separator:a64d00ef4bfdf7c8e589cb1f4c8984d51"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><h3>template&lt;typename Scalar, std::size_t Rank&gt;<br />
@@ -295,8 +288,8 @@ template&lt;typename Scalar , std::size_t Rank&gt; </div>
 
 </div>
 </div>
-<a id="a64d00ef4bfdf7c8e589cb1f4c8984d51"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a64d00ef4bfdf7c8e589cb1f4c8984d51">&#9670;&nbsp;</a></span>calculate_output_dim()</h2>
+<a id="a2197c18cdbc8c8e80bc059d8f36a4d5c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a2197c18cdbc8c8e80bc059d8f36a4d5c">&#9670;&nbsp;</a></span>clone_with_shared_params()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -307,53 +300,23 @@ template&lt;typename Scalar , std::size_t Rank&gt; </div>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">static std::size_t <a class="el" href="classcattle_1_1_pool_layer.html">cattle::PoolLayer</a>&lt; Scalar, Rank &gt;::calculate_output_dim </td>
+          <td class="memname"><a class="el" href="classcattle_1_1_layer.html">Base</a>* <a class="el" href="classcattle_1_1_pool_layer.html">cattle::PoolLayer</a>&lt; Scalar, Rank &gt;::clone_with_shared_params </td>
           <td>(</td>
-          <td class="paramtype">std::size_t&#160;</td>
-          <td class="paramname"><em>input_dim</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
+          <td class="paramname"></td><td>)</td>
           <td></td>
-          <td class="paramtype">std::size_t&#160;</td>
-          <td class="paramname"><em>receptor_size</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">std::size_t&#160;</td>
-          <td class="paramname"><em>dilation</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">std::size_t&#160;</td>
-          <td class="paramname"><em>stride</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
         </tr>
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span><span class="mlabel">protected</span></span>  </td>
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">protected</span><span class="mlabel">virtual</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
 
-<p>It calculates the depth of the tensor output by the layer for all of its ranks except the first one (which denotes the samples in the batch). </p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">input_dim</td><td>The dimensionality of the input tensor. </td></tr>
-    <tr><td class="paramname">receptor_size</td><td>The spatial extent of the receptor. </td></tr>
-    <tr><td class="paramname">dilation</td><td>The dilation of the receptor. </td></tr>
-    <tr><td class="paramname">stride</td><td>The stride at which the receptor is applied to the input tensor. </td></tr>
-  </table>
-  </dd>
-</dl>
-<dl class="section return"><dt>Returns</dt><dd>The depth of the output tensor. </dd></dl>
+<p>It returns a clone of the layer instance using a reference to the original's parameters. </p>
+<dl class="section return"><dt>Returns</dt><dd>A clone of the original layer instance sharing the same parameters with the original. </dd></dl>
+
+<p>Implements <a class="el" href="classcattle_1_1_layer.html#a074a197df04250449a059d97a4e6e120">cattle::Layer&lt; Scalar, Rank &gt;</a>.</p>
 
 </div>
 </div>
@@ -485,8 +448,8 @@ template&lt;typename Scalar , std::size_t Rank&gt; </div>
 
 </div>
 </div>
-<a id="a9ce31dd7cbb56e364ecb81d8fc1a88c8"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a9ce31dd7cbb56e364ecb81d8fc1a88c8">&#9670;&nbsp;</a></span>get_regularization_penalty()</h2>
+<a id="a971e2f47a2e4f46e859b17dc60e07910"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a971e2f47a2e4f46e859b17dc60e07910">&#9670;&nbsp;</a></span>get_regularization_penalty()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -500,7 +463,7 @@ template&lt;typename Scalar , std::size_t Rank&gt; </div>
           <td class="memname">Scalar <a class="el" href="classcattle_1_1_pool_layer.html">cattle::PoolLayer</a>&lt; Scalar, Rank &gt;::get_regularization_penalty </td>
           <td>(</td>
           <td class="paramname"></td><td>)</td>
-          <td></td>
+          <td> const</td>
         </tr>
       </table>
   </td>
@@ -514,7 +477,7 @@ template&lt;typename Scalar , std::size_t Rank&gt; </div>
 <p>If the layer is not parametric, 0 is returned.</p>
 <dl class="section return"><dt>Returns</dt><dd>A scalar representing the penalty on the magnitude of the layer's parameters. </dd></dl>
 
-<p>Implements <a class="el" href="classcattle_1_1_layer.html#a3dd89c138cfc74ca6e7572337d68e44e">cattle::Layer&lt; Scalar, Rank &gt;</a>.</p>
+<p>Implements <a class="el" href="classcattle_1_1_layer.html#ab3719ffa784c45277252f2fb16b209d5">cattle::Layer&lt; Scalar, Rank &gt;</a>.</p>
 
 </div>
 </div>

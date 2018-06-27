@@ -56,9 +56,9 @@ public:
 			values[i] = dims(i);
 	}
 	/**
-	 * A constant method that returns a copy of the instance with an additional most-significant rank.
+	 * A constant method that returns a copy of the instance with n additional ranks prepended to it.
 	 *
-	 * @return A new Dimensions instance with additional x ranks of size 1 prepended to it.
+	 * @return A new Dimensions instance with additional n ranks of size 1 prepended to it.
 	 */
 	template<std::size_t Ranks = 1>
 	inline Dimensions<IndexType,Rank + Ranks> promote() const {
@@ -67,9 +67,9 @@ public:
 		return promoted;
 	}
 	/**
-	 * A constant method that returns a copy of the instance without the most-significant rank.
+	 * A constant method that returns a copy of the instance without the n most-significant ranks.
 	 *
-	 * @return A new Dimensions instance with the first x ranks removed.
+	 * @return A new Dimensions instance with the first n ranks removed.
 	 */
 	template<std::size_t Ranks = 1>
 	inline Dimensions<IndexType,Rank - Ranks> demote() const {
@@ -79,9 +79,9 @@ public:
 		return demoted;
 	}
 	/**
-	 * A constant method that returns a copy of the instance with an additional least-significant rank.
+	 * A constant method that returns a copy of the instance with n ranks appended to it.
 	 *
-	 * @return A new Dimensions instance with additional x ranks with size 1 appended to it.
+	 * @return A new Dimensions instance with additional n ranks with size 1 appended to it.
 	 */
 	template<std::size_t Ranks = 1>
 	inline Dimensions<IndexType,Rank + Ranks> extend() const {
@@ -90,15 +90,15 @@ public:
 		return extended;
 	}
 	/**
-	 * A constant method that returns a copy of the instance without the least-significant rank.
+	 * A constant method that returns a copy of the instance without the n least-significant ranks.
 	 *
-	 * @return A new Dimensions instance with the last x ranks removed.
+	 * @return A new Dimensions instance with the last n ranks removed.
 	 */
 	template<std::size_t Ranks = 1>
 	inline Dimensions<IndexType,Rank - Ranks> contract() const {
 		static_assert(Rank > Ranks, "rank must be greater than the number of ranks to contract by");
 		Dimensions<IndexType,Rank - Ranks> contracted;
-		std::copy(values.begin() + Ranks, values.end() - Ranks, contracted.values.begin());
+		std::copy(values.begin(), values.end() - Ranks, contracted.values.begin());
 		return contracted;
 	}
 	/**
