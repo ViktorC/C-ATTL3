@@ -846,8 +846,8 @@ private:
 			std::size_t receptor_width, std::size_t vertical_padding, std::size_t horizontal_padding, std::size_t vertical_stride,
 			std::size_t horizontal_stride, std::size_t vertical_dilation, std::size_t horizontal_dilation) {
 		return internal::CuDNNHandle<Scalar>::get_instance().conv2d_output_dims(input_dims, filters, receptor_height,
-				receptor_width, vertical_padding, horizontal_padding, vertical_stride, horizontal_stride, vertical_dilation,
-				horizontal_dilation);
+				receptor_width, vertical_padding, horizontal_padding, vertical_stride, horizontal_stride, vertical_dilation + 1,
+				horizontal_dilation + 1);
 	}
 	inline static Dimensions<std::size_t,Rank> calculate_adjusted_output_dims(const Dimensions<std::size_t,Rank>& input_dims,
 			std::size_t filters, std::size_t receptor_height, std::size_t receptor_width, std::size_t vertical_padding,
