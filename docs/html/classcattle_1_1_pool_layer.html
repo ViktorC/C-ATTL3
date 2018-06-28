@@ -91,16 +91,19 @@ Inheritance diagram for cattle::PoolLayer&lt; Scalar, Rank &gt;:</div>
  <div class="center">
   <img src="classcattle_1_1_pool_layer.png" usemap="#cattle::PoolLayer_3C_20Scalar_2C_20Rank_20_3E_map" alt=""/>
   <map id="cattle::PoolLayer_3C_20Scalar_2C_20Rank_20_3E_map" name="cattle::PoolLayer_3C_20Scalar_2C_20Rank_20_3E_map">
-<area href="classcattle_1_1_layer.html" title="An abstract class template representing layers in a neural network. " alt="cattle::Layer&lt; Scalar, Rank &gt;" shape="rect" coords="0,0,264,24"/>
-<area href="classcattle_1_1_max_pool_layer_base.html" title="An abstract class template representing a pooling layer that reduces patches of the input by taking t..." alt="cattle::MaxPoolLayerBase&lt; Scalar, Rank &gt;" shape="rect" coords="274,112,538,136"/>
-<area href="classcattle_1_1_mean_pool_layer_base.html" title="An abstract class template representing a pooling layer that reduces patches of the input by taking t..." alt="cattle::MeanPoolLayerBase&lt; Scalar, Rank &gt;" shape="rect" coords="274,168,538,192"/>
-<area href="classcattle_1_1_sum_pool_layer_base.html" title="An abstract class template representing a sum pooling layer that reduces patches of the input by taki..." alt="cattle::SumPoolLayerBase&lt; Scalar, Rank &gt;" shape="rect" coords="274,224,538,248"/>
-<area href="classcattle_1_1_max_pool_layer_base.html" alt="cattle::MaxPoolLayerBase&lt; Scalar, 1 &gt;" shape="rect" coords="274,280,538,304"/>
-<area href="classcattle_1_1_max_pool_layer_base.html" alt="cattle::MaxPoolLayerBase&lt; Scalar, 2 &gt;" shape="rect" coords="274,336,538,360"/>
-<area href="classcattle_1_1_mean_pool_layer_base.html" alt="cattle::MeanPoolLayerBase&lt; Scalar, 1 &gt;" shape="rect" coords="274,392,538,416"/>
-<area href="classcattle_1_1_mean_pool_layer_base.html" alt="cattle::MeanPoolLayerBase&lt; Scalar, 2 &gt;" shape="rect" coords="274,448,538,472"/>
-<area href="classcattle_1_1_sum_pool_layer_base.html" alt="cattle::SumPoolLayerBase&lt; Scalar, 1 &gt;" shape="rect" coords="274,504,538,528"/>
-<area href="classcattle_1_1_sum_pool_layer_base.html" alt="cattle::SumPoolLayerBase&lt; Scalar, 2 &gt;" shape="rect" coords="274,560,538,584"/>
+<area href="classcattle_1_1_layer.html" title="An abstract class template representing layers in a neural network. " alt="cattle::Layer&lt; Scalar, Rank &gt;" shape="rect" coords="685,0,949,24"/>
+<area href="classcattle_1_1_max_pool_layer_base.html" title="An abstract class template representing a pooling layer that reduces patches of the input by taking t..." alt="cattle::MaxPoolLayerBase&lt; Scalar, Rank &gt;" shape="rect" coords="0,112,264,136"/>
+<area href="classcattle_1_1_mean_pool_layer_base.html" title="An abstract class template representing a pooling layer that reduces patches of the input by taking t..." alt="cattle::MeanPoolLayerBase&lt; Scalar, Rank &gt;" shape="rect" coords="274,112,538,136"/>
+<area href="classcattle_1_1_max_pool_layer_base.html" alt="cattle::MaxPoolLayerBase&lt; Scalar, 1 &gt;" shape="rect" coords="548,112,812,136"/>
+<area href="classcattle_1_1_max_pool_layer_base.html" alt="cattle::MaxPoolLayerBase&lt; Scalar, 2 &gt;" shape="rect" coords="822,112,1086,136"/>
+<area href="classcattle_1_1_mean_pool_layer_base.html" alt="cattle::MeanPoolLayerBase&lt; Scalar, 1 &gt;" shape="rect" coords="1096,112,1360,136"/>
+<area href="classcattle_1_1_mean_pool_layer_base.html" alt="cattle::MeanPoolLayerBase&lt; Scalar, 2 &gt;" shape="rect" coords="1370,112,1634,136"/>
+<area href="classcattle_1_1_max_pool_layer.html" title="A class template representing a 2D max pooling layer operating on rank-3 data. " alt="cattle::MaxPoolLayer&lt; Scalar, Rank &gt;" shape="rect" coords="0,168,264,192"/>
+<area href="classcattle_1_1_mean_pool_layer.html" title="A class template representing a 2D mean pooling layer operating on rank-3 data. " alt="cattle::MeanPoolLayer&lt; Scalar, Rank &gt;" shape="rect" coords="274,168,538,192"/>
+<area href="classcattle_1_1_max_pool_layer_3_01_scalar_00_011_01_4.html" title="A class template representing a 1D max pooling layer. " alt="cattle::MaxPoolLayer&lt; Scalar, 1 &gt;" shape="rect" coords="548,168,812,192"/>
+<area href="classcattle_1_1_max_pool_layer_3_01_scalar_00_012_01_4.html" title="A class template representing a 2D max pooling layer operating on rank-2 data. " alt="cattle::MaxPoolLayer&lt; Scalar, 2 &gt;" shape="rect" coords="822,168,1086,192"/>
+<area href="classcattle_1_1_mean_pool_layer_3_01_scalar_00_011_01_4.html" title="A class template representing a 1D mean pooling layer. " alt="cattle::MeanPoolLayer&lt; Scalar, 1 &gt;" shape="rect" coords="1096,168,1360,192"/>
+<area href="classcattle_1_1_mean_pool_layer_3_01_scalar_00_012_01_4.html" title="A class template representing a 2D mean pooling layer operating on rank-2 data. " alt="cattle::MeanPoolLayer&lt; Scalar, 2 &gt;" shape="rect" coords="1370,168,1634,192"/>
 </map>
  </div></div>
 <table class="memberdecls">
@@ -234,7 +237,7 @@ template&lt;typename Scalar , std::size_t Rank&gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>The derivative of the loss function w.r.t. the non-reduced patch. </dd></dl>
 
-<p>Implemented in <a class="el" href="classcattle_1_1_max_pool_layer_base.html#af34fe1a2706503a74ef87f2ed8364a6f">cattle::MaxPoolLayerBase&lt; Scalar, Rank &gt;</a>, <a class="el" href="classcattle_1_1_max_pool_layer_base.html#af34fe1a2706503a74ef87f2ed8364a6f">cattle::MaxPoolLayerBase&lt; Scalar, 1 &gt;</a>, <a class="el" href="classcattle_1_1_max_pool_layer_base.html#af34fe1a2706503a74ef87f2ed8364a6f">cattle::MaxPoolLayerBase&lt; Scalar, 2 &gt;</a>, <a class="el" href="classcattle_1_1_mean_pool_layer_base.html#a11d69acda36367bdb1187f7485b90f9e">cattle::MeanPoolLayerBase&lt; Scalar, Rank &gt;</a>, <a class="el" href="classcattle_1_1_mean_pool_layer_base.html#a11d69acda36367bdb1187f7485b90f9e">cattle::MeanPoolLayerBase&lt; Scalar, 1 &gt;</a>, <a class="el" href="classcattle_1_1_mean_pool_layer_base.html#a11d69acda36367bdb1187f7485b90f9e">cattle::MeanPoolLayerBase&lt; Scalar, 2 &gt;</a>, <a class="el" href="classcattle_1_1_sum_pool_layer_base.html#a6eaad5863b6d0e0ba35209d749a5f0df">cattle::SumPoolLayerBase&lt; Scalar, Rank &gt;</a>, <a class="el" href="classcattle_1_1_sum_pool_layer_base.html#a6eaad5863b6d0e0ba35209d749a5f0df">cattle::SumPoolLayerBase&lt; Scalar, 1 &gt;</a>, and <a class="el" href="classcattle_1_1_sum_pool_layer_base.html#a6eaad5863b6d0e0ba35209d749a5f0df">cattle::SumPoolLayerBase&lt; Scalar, 2 &gt;</a>.</p>
+<p>Implemented in <a class="el" href="classcattle_1_1_max_pool_layer_base.html#af34fe1a2706503a74ef87f2ed8364a6f">cattle::MaxPoolLayerBase&lt; Scalar, Rank &gt;</a>, <a class="el" href="classcattle_1_1_max_pool_layer_base.html#af34fe1a2706503a74ef87f2ed8364a6f">cattle::MaxPoolLayerBase&lt; Scalar, 1 &gt;</a>, <a class="el" href="classcattle_1_1_max_pool_layer_base.html#af34fe1a2706503a74ef87f2ed8364a6f">cattle::MaxPoolLayerBase&lt; Scalar, 2 &gt;</a>, <a class="el" href="classcattle_1_1_mean_pool_layer_base.html#a11d69acda36367bdb1187f7485b90f9e">cattle::MeanPoolLayerBase&lt; Scalar, Rank &gt;</a>, <a class="el" href="classcattle_1_1_mean_pool_layer_base.html#a11d69acda36367bdb1187f7485b90f9e">cattle::MeanPoolLayerBase&lt; Scalar, 1 &gt;</a>, and <a class="el" href="classcattle_1_1_mean_pool_layer_base.html#a11d69acda36367bdb1187f7485b90f9e">cattle::MeanPoolLayerBase&lt; Scalar, 2 &gt;</a>.</p>
 
 </div>
 </div>
@@ -284,7 +287,7 @@ template&lt;typename Scalar , std::size_t Rank&gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>The reduced tensor. </dd></dl>
 
-<p>Implemented in <a class="el" href="classcattle_1_1_max_pool_layer_base.html#adba251e3a789c00b852d896e3742f3b4">cattle::MaxPoolLayerBase&lt; Scalar, Rank &gt;</a>, <a class="el" href="classcattle_1_1_max_pool_layer_base.html#adba251e3a789c00b852d896e3742f3b4">cattle::MaxPoolLayerBase&lt; Scalar, 1 &gt;</a>, <a class="el" href="classcattle_1_1_max_pool_layer_base.html#adba251e3a789c00b852d896e3742f3b4">cattle::MaxPoolLayerBase&lt; Scalar, 2 &gt;</a>, <a class="el" href="classcattle_1_1_mean_pool_layer_base.html#a0b9a18aa55e2c5e3653f85950980ab74">cattle::MeanPoolLayerBase&lt; Scalar, Rank &gt;</a>, <a class="el" href="classcattle_1_1_mean_pool_layer_base.html#a0b9a18aa55e2c5e3653f85950980ab74">cattle::MeanPoolLayerBase&lt; Scalar, 1 &gt;</a>, <a class="el" href="classcattle_1_1_mean_pool_layer_base.html#a0b9a18aa55e2c5e3653f85950980ab74">cattle::MeanPoolLayerBase&lt; Scalar, 2 &gt;</a>, <a class="el" href="classcattle_1_1_sum_pool_layer_base.html#ad3c84bad8af9ca65643c8704e76987b2">cattle::SumPoolLayerBase&lt; Scalar, Rank &gt;</a>, <a class="el" href="classcattle_1_1_sum_pool_layer_base.html#ad3c84bad8af9ca65643c8704e76987b2">cattle::SumPoolLayerBase&lt; Scalar, 1 &gt;</a>, and <a class="el" href="classcattle_1_1_sum_pool_layer_base.html#ad3c84bad8af9ca65643c8704e76987b2">cattle::SumPoolLayerBase&lt; Scalar, 2 &gt;</a>.</p>
+<p>Implemented in <a class="el" href="classcattle_1_1_max_pool_layer_base.html#adba251e3a789c00b852d896e3742f3b4">cattle::MaxPoolLayerBase&lt; Scalar, Rank &gt;</a>, <a class="el" href="classcattle_1_1_max_pool_layer_base.html#adba251e3a789c00b852d896e3742f3b4">cattle::MaxPoolLayerBase&lt; Scalar, 1 &gt;</a>, <a class="el" href="classcattle_1_1_max_pool_layer_base.html#adba251e3a789c00b852d896e3742f3b4">cattle::MaxPoolLayerBase&lt; Scalar, 2 &gt;</a>, <a class="el" href="classcattle_1_1_mean_pool_layer_base.html#a0b9a18aa55e2c5e3653f85950980ab74">cattle::MeanPoolLayerBase&lt; Scalar, Rank &gt;</a>, <a class="el" href="classcattle_1_1_mean_pool_layer_base.html#a0b9a18aa55e2c5e3653f85950980ab74">cattle::MeanPoolLayerBase&lt; Scalar, 1 &gt;</a>, and <a class="el" href="classcattle_1_1_mean_pool_layer_base.html#a0b9a18aa55e2c5e3653f85950980ab74">cattle::MeanPoolLayerBase&lt; Scalar, 2 &gt;</a>.</p>
 
 </div>
 </div>
@@ -318,7 +321,7 @@ template&lt;typename Scalar , std::size_t Rank&gt; </div>
 
 <p>Implements <a class="el" href="classcattle_1_1_layer.html#a46db46c62f3d46c6bbef5a482d7fcb00">cattle::Layer&lt; Scalar, Rank &gt;</a>.</p>
 
-<p>Implemented in <a class="el" href="classcattle_1_1_max_pool_layer_3_01_scalar_00_011_01_4.html#a3190763e39f851cf28606dc1b7906f4a">cattle::MaxPoolLayer&lt; Scalar, 1 &gt;</a>, <a class="el" href="classcattle_1_1_max_pool_layer_3_01_scalar_00_012_01_4.html#abf3096d94719bacc657cca0fcad1afb4">cattle::MaxPoolLayer&lt; Scalar, 2 &gt;</a>, <a class="el" href="classcattle_1_1_max_pool_layer.html#a26a24d870ec2b776bc5c229ba01448a7">cattle::MaxPoolLayer&lt; Scalar, Rank &gt;</a>, <a class="el" href="classcattle_1_1_mean_pool_layer_3_01_scalar_00_011_01_4.html#acee10ea9184f727d8734038b2f390bee">cattle::MeanPoolLayer&lt; Scalar, 1 &gt;</a>, <a class="el" href="classcattle_1_1_mean_pool_layer_3_01_scalar_00_012_01_4.html#a624e7117839125b1c67c1178e381064c">cattle::MeanPoolLayer&lt; Scalar, 2 &gt;</a>, <a class="el" href="classcattle_1_1_mean_pool_layer.html#a78fe029b0af419a4a04fd0526e444445">cattle::MeanPoolLayer&lt; Scalar, Rank &gt;</a>, <a class="el" href="classcattle_1_1_sum_pool_layer_3_01_scalar_00_011_01_4.html#a0c44774ab08b5b6d17d945ee1cb1fb4f">cattle::SumPoolLayer&lt; Scalar, 1 &gt;</a>, <a class="el" href="classcattle_1_1_sum_pool_layer_3_01_scalar_00_012_01_4.html#a2207109e7e76d0af7e317652c65a4f6e">cattle::SumPoolLayer&lt; Scalar, 2 &gt;</a>, and <a class="el" href="classcattle_1_1_sum_pool_layer.html#adee341a7f519d7e934c23cecf509643c">cattle::SumPoolLayer&lt; Scalar, Rank &gt;</a>.</p>
+<p>Implemented in <a class="el" href="classcattle_1_1_max_pool_layer_3_01_scalar_00_011_01_4.html#a3190763e39f851cf28606dc1b7906f4a">cattle::MaxPoolLayer&lt; Scalar, 1 &gt;</a>, <a class="el" href="classcattle_1_1_max_pool_layer_3_01_scalar_00_012_01_4.html#abf3096d94719bacc657cca0fcad1afb4">cattle::MaxPoolLayer&lt; Scalar, 2 &gt;</a>, <a class="el" href="classcattle_1_1_max_pool_layer.html#a26a24d870ec2b776bc5c229ba01448a7">cattle::MaxPoolLayer&lt; Scalar, Rank &gt;</a>, <a class="el" href="classcattle_1_1_mean_pool_layer_3_01_scalar_00_011_01_4.html#acee10ea9184f727d8734038b2f390bee">cattle::MeanPoolLayer&lt; Scalar, 1 &gt;</a>, <a class="el" href="classcattle_1_1_mean_pool_layer_3_01_scalar_00_012_01_4.html#a624e7117839125b1c67c1178e381064c">cattle::MeanPoolLayer&lt; Scalar, 2 &gt;</a>, and <a class="el" href="classcattle_1_1_mean_pool_layer.html#a78fe029b0af419a4a04fd0526e444445">cattle::MeanPoolLayer&lt; Scalar, Rank &gt;</a>.</p>
 
 </div>
 </div>
@@ -690,7 +693,7 @@ template&lt;typename Scalar , std::size_t Rank&gt; </div>
 </div>
 </div>
 <hr/>The documentation for this class was generated from the following file:<ul>
-<li>C:/Users/Viktor/git/C-ATTL3/C-ATTL3/<a class="el" href="_layer_8hpp_source.html">Layer.hpp</a></li>
+<li>C:/Users/A6714/git/C-ATTL3/C-ATTL3/<a class="el" href="_layer_8hpp_source.html">Layer.hpp</a></li>
 </ul>
 </div><!-- contents -->
 <!-- start footer part -->

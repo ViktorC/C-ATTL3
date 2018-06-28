@@ -1,7 +1,5 @@
 var searchData=
 [
-  ['tanh_5factivation_5fbwd',['tanh_activation_bwd',['../classcattle_1_1internal_1_1_cu_d_n_n_handle.html#a96ceec4a3446af35666e644d24e2dd9b',1,'cattle::internal::CuDNNHandle']]],
-  ['tanh_5factivation_5ffwd',['tanh_activation_fwd',['../classcattle_1_1internal_1_1_cu_d_n_n_handle.html#af1b8f9f0522f2c1af255b0d993fd682d',1,'cattle::internal::CuDNNHandle']]],
   ['tanhactivationlayer',['TanhActivationLayer',['../classcattle_1_1_tanh_activation_layer.html#a67d44e760962f78b74c182b1b1cf528d',1,'cattle::TanhActivationLayer']]],
   ['test',['test',['../classcattle_1_1_optimizer.html#af7cb73ae3bf774fa84ec25df5fa13528',1,'cattle::Optimizer']]],
   ['to_5fstring',['to_string',['../classcattle_1_1_dim_expression.html#ae51ed9575f019bc86402615cf08e97d8',1,'cattle::DimExpression::to_string()'],['../classcattle_1_1_layer.html#ab7c19156cc41357b221b0b57633eaaca',1,'cattle::Layer::to_string()'],['../classcattle_1_1_neural_network.html#ad216c4f30172a8924e959d103e38a82c',1,'cattle::NeuralNetwork::to_string()']]],

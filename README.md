@@ -31,9 +31,8 @@ The lowest level building blocks of neural networks in C-ATTL3 are the layers. T
     * [SwishActivationLayer](https://viktorc.github.io/C-ATTL3/html/classcattle_1_1_swish_activation_layer.html)
     * [PSwishActivationLayer](https://viktorc.github.io/C-ATTL3/html/classcattle_1_1_p_swish_activation_layer.html)
   * [PoolLayer](https://viktorc.github.io/C-ATTL3/html/classcattle_1_1_pooling_layer.html) [A]
-    * [SumPoolLayer](https://viktorc.github.io/C-ATTL3/html/classcattle_1_1_sum_pool_layer.html)
-    * [MaxPoolLayer](https://viktorc.github.io/C-ATTL3/html/classcattle_1_1_max_pool_layer.html)
     * [MeanPoolLayer](https://viktorc.github.io/C-ATTL3/html/classcattle_1_1_mean_pool_layer.html)
+    * [MaxPoolLayer](https://viktorc.github.io/C-ATTL3/html/classcattle_1_1_max_pool_layer.html)
   * [BroadcastLayer](https://viktorc.github.io/C-ATTL3/html/classcattle_1_1_broadcast_layer.html)
   * [BatchNormLayer](https://viktorc.github.io/C-ATTL3/html/classcattle_1_1_batch_norm_layer.html)
   * [DropoutLayer](https://viktorc.github.io/C-ATTL3/html/classcattle_1_1_dropout_layer.html)

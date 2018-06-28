@@ -99,8 +99,8 @@ Inheritance diagram for cattle::MeanPoolLayer&lt; Scalar, Rank &gt;:</div>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:ac30bf6b5dfe4b764f0e4dd3a9f2ffd3d"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_mean_pool_layer.html#ac30bf6b5dfe4b764f0e4dd3a9f2ffd3d">MeanPoolLayer</a> (const <a class="el" href="classcattle_1_1_dimensions.html">Dimensions</a>&lt; std::size_t, 3 &gt; &amp;input_dims, std::size_t receptor_height=2, std::size_t receptor_width=2, std::size_t vertical_stride=2, std::size_t horizontal_stride=2, std::size_t vertical_dilation=0, std::size_t horizontal_dilation=0)</td></tr>
-<tr class="separator:ac30bf6b5dfe4b764f0e4dd3a9f2ffd3d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af51464d25c72c3495f0f39ca43322134"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_mean_pool_layer.html#af51464d25c72c3495f0f39ca43322134">MeanPoolLayer</a> (const <a class="el" href="classcattle_1_1_dimensions.html">Dimensions</a>&lt; std::size_t, 3 &gt; &amp;input_dims, std::size_t receptor_height=2, std::size_t receptor_width=2, std::size_t vertical_stride=2, std::size_t horizontal_stride=2)</td></tr>
+<tr class="separator:af51464d25c72c3495f0f39ca43322134"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a78fe029b0af419a4a04fd0526e444445"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classcattle_1_1_layer.html">Root</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_mean_pool_layer.html#a78fe029b0af419a4a04fd0526e444445">clone</a> () const</td></tr>
 <tr class="memdesc:a78fe029b0af419a4a04fd0526e444445"><td class="mdescLeft">&#160;</td><td class="mdescRight">A constant method implementing the clone pattern.  <a href="#a78fe029b0af419a4a04fd0526e444445">More...</a><br /></td></tr>
 <tr class="separator:a78fe029b0af419a4a04fd0526e444445"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -184,8 +184,8 @@ class cattle::MeanPoolLayer&lt; Scalar, Rank &gt;</h3>
 
 <p>A class template representing a 2D mean pooling layer operating on rank-3 data. </p>
 </div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
-<a id="ac30bf6b5dfe4b764f0e4dd3a9f2ffd3d"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ac30bf6b5dfe4b764f0e4dd3a9f2ffd3d">&#9670;&nbsp;</a></span>MeanPoolLayer()</h2>
+<a id="af51464d25c72c3495f0f39ca43322134"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af51464d25c72c3495f0f39ca43322134">&#9670;&nbsp;</a></span>MeanPoolLayer()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -223,19 +223,7 @@ template&lt;typename Scalar , std::size_t Rank = 3&gt; </div>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">std::size_t&#160;</td>
-          <td class="paramname"><em>horizontal_stride</em> = <code>2</code>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">std::size_t&#160;</td>
-          <td class="paramname"><em>vertical_dilation</em> = <code>0</code>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">std::size_t&#160;</td>
-          <td class="paramname"><em>horizontal_dilation</em> = <code>0</code>&#160;</td>
+          <td class="paramname"><em>horizontal_stride</em> = <code>2</code>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -256,8 +244,6 @@ template&lt;typename Scalar , std::size_t Rank = 3&gt; </div>
     <tr><td class="paramname">receptor_width</td><td>The width of the pooling receptor. </td></tr>
     <tr><td class="paramname">vertical_stride</td><td>The vertical stride at which the input is to be pooled (i.e. the number of elements by which the receptor is to be shifted along the height of the input tensor). </td></tr>
     <tr><td class="paramname">horizontal_stride</td><td>The horizontal stride at which the input is to be pooled (i.e. the number of elements by which the receptor is to be shifted along the width of the input tensor). </td></tr>
-    <tr><td class="paramname">vertical_dilation</td><td>The extent of vertical dilation to apply to the receptor field. </td></tr>
-    <tr><td class="paramname">horizontal_dilation</td><td>The extent of horizontal dilation to apply to the receptor field. </td></tr>
   </table>
   </dd>
 </dl>
@@ -388,7 +374,7 @@ template&lt;typename Scalar , std::size_t Rank = 3&gt; </div>
 </div>
 </div>
 <hr/>The documentation for this class was generated from the following file:<ul>
-<li>C:/Users/Viktor/git/C-ATTL3/C-ATTL3/<a class="el" href="_layer_8hpp_source.html">Layer.hpp</a></li>
+<li>C:/Users/A6714/git/C-ATTL3/C-ATTL3/<a class="el" href="_layer_8hpp_source.html">Layer.hpp</a></li>
 </ul>
 </div><!-- contents -->
 <!-- start footer part -->

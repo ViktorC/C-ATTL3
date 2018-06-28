@@ -99,8 +99,8 @@ Inheritance diagram for cattle::MaxPoolLayer&lt; Scalar, 2 &gt;:</div>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:af4ff8010aa78c7806f418c9665906bd9"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_max_pool_layer_3_01_scalar_00_012_01_4.html#af4ff8010aa78c7806f418c9665906bd9">MaxPoolLayer</a> (const <a class="el" href="classcattle_1_1_dimensions.html">Dimensions</a>&lt; std::size_t, 2 &gt; &amp;input_dims, std::size_t receptor_height=2, std::size_t receptor_width=2, std::size_t vertical_stride=2, std::size_t horizontal_stride=2, std::size_t vertical_dilation=0, std::size_t horizontal_dilation=0)</td></tr>
-<tr class="separator:af4ff8010aa78c7806f418c9665906bd9"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a21edc93d718d45b36cd574ce8b363ec5"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_max_pool_layer_3_01_scalar_00_012_01_4.html#a21edc93d718d45b36cd574ce8b363ec5">MaxPoolLayer</a> (const <a class="el" href="classcattle_1_1_dimensions.html">Dimensions</a>&lt; std::size_t, 2 &gt; &amp;input_dims, std::size_t receptor_height=2, std::size_t receptor_width=2, std::size_t vertical_stride=2, std::size_t horizontal_stride=2)</td></tr>
+<tr class="separator:a21edc93d718d45b36cd574ce8b363ec5"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:abf3096d94719bacc657cca0fcad1afb4"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classcattle_1_1_layer.html">Root</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_max_pool_layer_3_01_scalar_00_012_01_4.html#abf3096d94719bacc657cca0fcad1afb4">clone</a> () const</td></tr>
 <tr class="memdesc:abf3096d94719bacc657cca0fcad1afb4"><td class="mdescLeft">&#160;</td><td class="mdescRight">A constant method implementing the clone pattern.  <a href="#abf3096d94719bacc657cca0fcad1afb4">More...</a><br /></td></tr>
 <tr class="separator:abf3096d94719bacc657cca0fcad1afb4"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -170,8 +170,8 @@ class cattle::MaxPoolLayer&lt; Scalar, 2 &gt;</h3>
 <p>A class template representing a 2D max pooling layer operating on rank-2 data. </p>
 <dl class="section see"><dt>See also</dt><dd><a href="http://ais.uni-bonn.de/papers/icann2010_maxpool.pdf">http://ais.uni-bonn.de/papers/icann2010_maxpool.pdf</a> </dd></dl>
 </div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
-<a id="af4ff8010aa78c7806f418c9665906bd9"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#af4ff8010aa78c7806f418c9665906bd9">&#9670;&nbsp;</a></span>MaxPoolLayer()</h2>
+<a id="a21edc93d718d45b36cd574ce8b363ec5"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a21edc93d718d45b36cd574ce8b363ec5">&#9670;&nbsp;</a></span>MaxPoolLayer()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -209,19 +209,7 @@ template&lt;typename Scalar &gt; </div>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">std::size_t&#160;</td>
-          <td class="paramname"><em>horizontal_stride</em> = <code>2</code>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">std::size_t&#160;</td>
-          <td class="paramname"><em>vertical_dilation</em> = <code>0</code>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">std::size_t&#160;</td>
-          <td class="paramname"><em>horizontal_dilation</em> = <code>0</code>&#160;</td>
+          <td class="paramname"><em>horizontal_stride</em> = <code>2</code>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -242,8 +230,6 @@ template&lt;typename Scalar &gt; </div>
     <tr><td class="paramname">receptor_width</td><td>The width of the pooling receptor. </td></tr>
     <tr><td class="paramname">vertical_stride</td><td>The vertical stride at which the input is to be pooled (i.e. the number of elements by which the receptor is to be shifted along the height of the input tensor). </td></tr>
     <tr><td class="paramname">horizontal_stride</td><td>The horizontal stride at which the input is to be pooled (i.e. the number of elements by which the receptor is to be shifted along the width of the input tensor). </td></tr>
-    <tr><td class="paramname">vertical_dilation</td><td>The extent of vertical dilation to apply to the receptor field. </td></tr>
-    <tr><td class="paramname">horizontal_dilation</td><td>The extent of horizontal dilation to apply to the receptor field. </td></tr>
   </table>
   </dd>
 </dl>
@@ -374,7 +360,7 @@ template&lt;typename Scalar &gt; </div>
 </div>
 </div>
 <hr/>The documentation for this class was generated from the following file:<ul>
-<li>C:/Users/Viktor/git/C-ATTL3/C-ATTL3/<a class="el" href="_layer_8hpp_source.html">Layer.hpp</a></li>
+<li>C:/Users/A6714/git/C-ATTL3/C-ATTL3/<a class="el" href="_layer_8hpp_source.html">Layer.hpp</a></li>
 </ul>
 </div><!-- contents -->
 <!-- start footer part -->

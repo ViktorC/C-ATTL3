@@ -304,34 +304,25 @@ template<typename Scalar>
 inline void pool_layer_grad_test() {
 	auto init = WeightInitSharedPtr<Scalar>(new HeWeightInitialization<Scalar>());
 	Dimensions<std::size_t,1> dims_1({ 32u });
-	LayerPtr<Scalar,1> sum_layer1_1(new ConvKernelLayer<Scalar,1>(dims_1, 2, init));
-	LayerPtr<Scalar,1> sum_layer2_1(new SumPoolLayer<Scalar,1>(sum_layer1_1->get_output_dims(), 3, 1, 1));
-	layer_grad_test<Scalar,1>("sum pool layer", std::move(sum_layer1_1), std::move(sum_layer2_1));
 	LayerPtr<Scalar,1> mean_layer1_1(new ConvKernelLayer<Scalar,1>(dims_1, 1, init));
-	LayerPtr<Scalar,1> mean_layer2_1(new MeanPoolLayer<Scalar,1>(mean_layer1_1->get_output_dims(), 2, 2, 0));
+	LayerPtr<Scalar,1> mean_layer2_1(new MeanPoolLayer<Scalar,1>(mean_layer1_1->get_output_dims(), 2, 2));
 	layer_grad_test<Scalar,1>("mean pool layer", std::move(mean_layer1_1), std::move(mean_layer2_1));
 	LayerPtr<Scalar,1> max_layer1_1(new ConvKernelLayer<Scalar,1>(dims_1, 2, init));
-	LayerPtr<Scalar,1> max_layer2_1(new MaxPoolLayer<Scalar,1>(max_layer1_1->get_output_dims(), 3, 1, 0));
+	LayerPtr<Scalar,1> max_layer2_1(new MaxPoolLayer<Scalar,1>(max_layer1_1->get_output_dims(), 3, 1));
 	layer_grad_test<Scalar,1>("max pool layer", std::move(max_layer1_1), std::move(max_layer2_1));
 	Dimensions<std::size_t,2> dims_2({ 10u, 10u });
-	LayerPtr<Scalar,2> sum_layer1_2(new ConvKernelLayer<Scalar,2>(dims_2, 1, init));
-	LayerPtr<Scalar,2> sum_layer2_2(new SumPoolLayer<Scalar,2>(sum_layer1_2->get_output_dims(), 3, 1, 1, 2, 0, 1));
-	layer_grad_test<Scalar,2>("sum pool layer", std::move(sum_layer1_2), std::move(sum_layer2_2));
 	LayerPtr<Scalar,2> mean_layer1_2(new ConvKernelLayer<Scalar,2>(dims_2, 2, init));
-	LayerPtr<Scalar,2> mean_layer2_2(new MeanPoolLayer<Scalar,2>(mean_layer1_2->get_output_dims(), 3, 1, 1, 2, 0, 1));
+	LayerPtr<Scalar,2> mean_layer2_2(new MeanPoolLayer<Scalar,2>(mean_layer1_2->get_output_dims(), 3, 2, 1, 2));
 	layer_grad_test<Scalar,2>("mean pool layer", std::move(mean_layer1_2), std::move(mean_layer2_2));
 	LayerPtr<Scalar,2> max_layer1_2(new ConvKernelLayer<Scalar,2>(dims_2, 2, init));
-	LayerPtr<Scalar,2> max_layer2_2(new MaxPoolLayer<Scalar,2>(max_layer1_2->get_output_dims(), 3, 1, 1, 2, 0, 1));
+	LayerPtr<Scalar,2> max_layer2_2(new MaxPoolLayer<Scalar,2>(max_layer1_2->get_output_dims(), 3, 2, 1, 2));
 	layer_grad_test<Scalar,2>("max pool layer", std::move(max_layer1_2), std::move(max_layer2_2));
 	Dimensions<std::size_t,3> dims_3({ 16u, 16u, 2u });
-	LayerPtr<Scalar,3> sum_layer1_3(new ConvKernelLayer<Scalar>(dims_3, 2, init));
-	LayerPtr<Scalar,3> sum_layer2_3(new SumPoolLayer<Scalar>(sum_layer1_3->get_output_dims(), 3, 1, 1, 2, 0, 1));
-	layer_grad_test<Scalar,3>("sum pool layer", std::move(sum_layer1_3), std::move(sum_layer2_3));
 	LayerPtr<Scalar,3> mean_layer1_3(new ConvKernelLayer<Scalar>(dims_3, 2, init));
-	LayerPtr<Scalar,3> mean_layer2_3(new MeanPoolLayer<Scalar>(mean_layer1_3->get_output_dims(), 3, 1, 1, 2, 0, 1));
+	LayerPtr<Scalar,3> mean_layer2_3(new MeanPoolLayer<Scalar>(mean_layer1_3->get_output_dims(), 3, 2, 1, 2));
 	layer_grad_test<Scalar,3>("mean pool layer", std::move(mean_layer1_3), std::move(mean_layer2_3));
 	LayerPtr<Scalar,3> max_layer1_3(new ConvKernelLayer<Scalar>(dims_3, 1, init));
-	LayerPtr<Scalar,3> max_layer2_3(new MaxPoolLayer<Scalar>(max_layer1_3->get_output_dims(), 3, 1, 1, 2, 0, 1));
+	LayerPtr<Scalar,3> max_layer2_3(new MaxPoolLayer<Scalar>(max_layer1_3->get_output_dims(), 3, 2, 1, 2));
 	layer_grad_test<Scalar,3>("max pool layer", std::move(max_layer1_3), std::move(max_layer2_3));
 }
 
