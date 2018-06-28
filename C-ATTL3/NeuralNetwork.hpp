@@ -194,7 +194,7 @@ protected:
 	 * @return A pointer to the clone that uses a reference to the original layer's
 	 * parameters.
 	 */
-	inline static Layer<Scalar,Rank>* clone_with_shared_params(const Layer<Scalar,Rank>& layer) {
+	inline static Layer<Scalar,Rank>* clone_with_shared_params(Layer<Scalar,Rank>& layer) {
 		return layer.clone_with_shared_params();
 	}
 	/**

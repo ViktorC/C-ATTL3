@@ -636,7 +636,7 @@ inline void recurrent_net_grad_test() {
 	ActivationPtr<Scalar,1> state_act1_1(new SigmoidActivationLayer<Scalar,1>(state_kernel1_1->get_output_dims()));
 	ActivationPtr<Scalar,1> output_act1_1(new IdentityActivationLayer<Scalar,1>(output_kernel1_1->get_output_dims()));
 	KernelPtr<Scalar,1> input_kernel2_1((DenseKernelLayer<Scalar,1>*) input_kernel1_1->clone());
-	KernelPtr<Scalar,1> state_kernel2_1((DenseKernelLayer<Scalar,1>*) input_kernel2_1->clone());
+	KernelPtr<Scalar,1> state_kernel2_1((DenseKernelLayer<Scalar,1>*) state_kernel1_1->clone());
 	KernelPtr<Scalar,1> output_kernel2_1((DenseKernelLayer<Scalar,1>*) output_kernel1_1->clone());
 	ActivationPtr<Scalar,1> state_act2_1((SigmoidActivationLayer<Scalar,1>*) state_act1_1->clone());
 	ActivationPtr<Scalar,1> output_act2_1((IdentityActivationLayer<Scalar,1>*) output_act1_1->clone());

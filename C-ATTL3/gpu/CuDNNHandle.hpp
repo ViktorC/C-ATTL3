@@ -70,7 +70,7 @@ public:
 	inline Array4 conv2d_output_dims(const Array4& input_dims, std::size_t filters, std::size_t receptor_height,
 			std::size_t receptor_width, std::size_t vertical_padding, std::size_t horizontal_padding,
 			std::size_t vertical_stride, std::size_t horizontal_stride, std::size_t vertical_dilation,
-			std::size_t horizontal_dilation) {
+			std::size_t horizontal_dilation) const {
 		// Create and set the input tensor descriptor.
 		cudnnTensorDescriptor_t input_desc = setup_tens_desc(input_dims);
 		// Create and set up the filter descriptor.
@@ -115,7 +115,7 @@ public:
 	inline void convolution2d_fwd(Scalar* input, Scalar* filter, Scalar* bias, const Array4& input_dims, const Array4& output_dims,
 			std::size_t receptor_height, std::size_t receptor_width, std::size_t vertical_padding, std::size_t horizontal_padding,
 			std::size_t vertical_stride, std::size_t horizontal_stride, std::size_t vertical_dilation, std::size_t horizontal_dilation,
-			/* out */ Scalar* output) {
+			/* out */ Scalar* output) const {
 		std::size_t depth = input_dims[3];
 		std::size_t filters = output_dims[3];
 		// Create and set up the input tensor descriptor.
@@ -211,7 +211,7 @@ public:
 			const Array4& output_dims, std::size_t receptor_height, std::size_t receptor_width, std::size_t vertical_padding,
 			std::size_t horizontal_padding, std::size_t vertical_stride, std::size_t horizontal_stride,
 			std::size_t vertical_dilation, std::size_t horizontal_dilation, /* out */ Scalar* prev_out_grad,
-			/* out */ Scalar* filter_grad, /* out */ Scalar* bias_grad) {
+			/* out */ Scalar* filter_grad, /* out */ Scalar* bias_grad) const {
 		std::size_t depth = input_dims[3];
 		std::size_t filters = output_dims[3];
 		// Create and set up the input tensor descriptor.
@@ -231,10 +231,10 @@ public:
 		cudnnAssert(cudnnSetConvolution2dDescriptor(dconv_desc, vertical_padding, horizontal_padding, vertical_stride,
 				horizontal_stride, vertical_dilation, horizontal_dilation, CUDNN_CROSS_CORRELATION, DATA_TYPE));
 		// Have cuDNN find the most performant algorithm given the convolution parameters.
-		cudnnConvolutionFwdAlgo_t dconv_data_algo;
+		cudnnConvolutionBwdDataAlgo_t dconv_data_algo;
 		cudnnAssert(cudnnGetConvolutionBackwardDataAlgorithm(handle, filter_desc, out_grad_desc, dconv_desc,
 				input_desc, CUDNN_CONVOLUTION_BWD_DATA_PREFER_FASTEST, 0, &dconv_data_algo));
-		cudnnConvolutionFwdAlgo_t dconv_filter_algo;
+		cudnnConvolutionBwdFilterAlgo_t dconv_filter_algo;
 		cudnnAssert(cudnnGetConvolutionBackwardFilterAlgorithm(handle, input_desc, out_grad_desc, dconv_desc,
 				filter_desc, CUDNN_CONVOLUTION_BWD_FILTER_PREFER_FASTEST, 0, &dconv_filter_algo));
 		/* Have cuDNN compute the workspace memory required for the selected backward convolution algorithms given
@@ -311,7 +311,7 @@ public:
 	 * @param output The activated output tensor.
 	 */
 	inline void activation_fwd(Scalar* input, const Array4& dims, cudnnActivationMode_t act_mode,
-			Scalar coeff, /* out */ Scalar* output) {
+			Scalar coeff, /* out */ Scalar* output) const {
 		// Create and set the activation descriptor.
 		cudnnActivationDescriptor_t act_desc;
 		cudnnAssert(cudnnCreateActivationDescriptor(&act_desc));
@@ -344,7 +344,7 @@ public:
 	 * @param prev_out_grad The gradient of the activation function's input.
 	 */
 	inline void activation_bwd(Scalar* input, Scalar* output, Scalar* out_grad, const Array4& dims,
-			cudnnActivationMode_t act_mode, Scalar coeff, /* out */ Scalar* prev_out_grad) {
+			cudnnActivationMode_t act_mode, Scalar coeff, /* out */ Scalar* prev_out_grad) const {
 		// Create and set the activation and tensor descriptors.
 		cudnnActivationDescriptor_t act_desc;
 		cudnnAssert(cudnnCreateActivationDescriptor(&act_desc));
@@ -380,7 +380,7 @@ public:
 	 * @param dims The dimensions of the input/output tensor (extended by 1s for data of rank lower than 4).
 	 * @param output The sigmoid activated output tensor.
 	 */
-	inline void sigmoid_activation_fwd(Scalar* input, const Array4& dims, /* out */ Scalar* output) {
+	inline void sigmoid_activation_fwd(Scalar* input, const Array4& dims, /* out */ Scalar* output) const {
 		activation_fwd(input, dims, CUDNN_ACTIVATION_SIGMOID, 0, output);
 	}
 	/**
@@ -393,7 +393,7 @@ public:
 	 * @param prev_out_grad The gradient of the sigmoid activation function's input.
 	 */
 	inline void sigmoid_activation_bwd(Scalar* input, Scalar* output, Scalar* out_grad, const Array4& dims,
-			/* out */ Scalar* prev_out_grad) {
+			/* out */ Scalar* prev_out_grad) const {
 		activation_bwd(input, output, out_grad, dims, CUDNN_ACTIVATION_SIGMOID, 0, prev_out_grad);
 	}
 	/**
@@ -403,7 +403,7 @@ public:
 	 * @param dims The dimensions of the input/output tensor (extended by 1s for data of rank lower than 4).
 	 * @param output The hyperbolic tangent activated output tensor.
 	 */
-	inline void tanh_activation_fwd(Scalar* input, const Array4& dims, /* out */ Scalar* output) {
+	inline void tanh_activation_fwd(Scalar* input, const Array4& dims, /* out */ Scalar* output) const {
 		activation_fwd(input, dims, CUDNN_ACTIVATION_TANH, 0, output);
 	}
 	/**
@@ -416,7 +416,7 @@ public:
 	 * @param prev_out_grad The gradient of the hyperbolic tangent activation function's input.
 	 */
 	inline void tanh_activation_bwd(Scalar* input, Scalar* output, Scalar* out_grad, const Array4& dims,
-			/* out */ Scalar* prev_out_grad) {
+			/* out */ Scalar* prev_out_grad) const {
 		activation_bwd(input, output, out_grad, dims, CUDNN_ACTIVATION_TANH, 0, prev_out_grad);
 	}
 	/**
@@ -426,7 +426,7 @@ public:
 	 * @param dims The dimensions of the input/output tensor (extended by 1s for data of rank lower than 4).
 	 * @param output The rectified liner unit activated output tensor.
 	 */
-	inline void relu_activation_fwd(Scalar* input, const Array4& dims, /* out */ Scalar* output) {
+	inline void relu_activation_fwd(Scalar* input, const Array4& dims, /* out */ Scalar* output) const {
 		activation_fwd(input, dims, CUDNN_ACTIVATION_RELU, 0, output);
 	}
 	/**
@@ -439,7 +439,7 @@ public:
 	 * @param prev_out_grad The gradient of the rectified liner unit activation function's input.
 	 */
 	inline void relu_activation_bwd(Scalar* input, Scalar* output, Scalar* out_grad, const Array4& dims,
-			/* out */ Scalar* prev_out_grad) {
+			/* out */ Scalar* prev_out_grad) const {
 		activation_bwd(input, output, out_grad, dims, CUDNN_ACTIVATION_RELU, 0, prev_out_grad);
 	}
 	/**
@@ -450,7 +450,8 @@ public:
 	 * @param alpha The factor by which negative inputs are to be scaled.
 	 * @param output The exponential liner unit activated output tensor.
 	 */
-	inline void elu_activation_fwd(Scalar* input, const Array4& dims, Scalar alpha, /* out */ Scalar* output) {
+	inline void elu_activation_fwd(Scalar* input, const Array4& dims, Scalar alpha,
+			/* out */ Scalar* output) const {
 		activation_fwd(input, dims, CUDNN_ACTIVATION_ELU, alpha, output);
 	}
 	/**
@@ -464,7 +465,7 @@ public:
 	 * @param prev_out_grad The gradient of the exponential liner unit activation function's input.
 	 */
 	inline void elu_activation_bwd(Scalar* input, Scalar* output, Scalar* out_grad, const Array4& dims, Scalar alpha,
-			/* out */ Scalar* prev_out_grad) {
+			/* out */ Scalar* prev_out_grad) const {
 		activation_bwd(input, output, out_grad, dims, CUDNN_ACTIVATION_ELU, alpha, prev_out_grad);
 	}
 	/**
@@ -474,7 +475,7 @@ public:
 	 * @param dims The dimensions of the input/output tensor (extended by 1s for data of rank lower than 4).
 	 * @param output The softmax activated output tensor.
 	 */
-	inline void softmax_fwd(Scalar* input, const Array4& dims, /* out */ Scalar* output) {
+	inline void softmax_fwd(Scalar* input, const Array4& dims, /* out */ Scalar* output) const {
 		// Create and set up the input tensor descriptor.
 		cudnnTensorDescriptor_t tens_desc = setup_tens_desc(dims);
 		// Allocate the necessary memory and move the input tensor from the host to the device.
@@ -499,7 +500,8 @@ public:
 	 * @param dims The dimensions of the input/output tensor (extended by 1s for data of rank lower than 4).
 	 * @param prev_out_grad The gradient of the softmax activation function's input.
 	 */
-	inline void softmax_bwd(Scalar* output, Scalar* out_grad, const Array4& dims, /* out */ Scalar* prev_out_grad) {
+	inline void softmax_bwd(Scalar* output, Scalar* out_grad, const Array4& dims,
+			/* out */ Scalar* prev_out_grad) const {
 		// Create and set up the tensor descriptor.
 		cudnnTensorDescriptor_t tens_desc = setup_tens_desc(dims);
 		// Allocate and populate the memory required for the softmax activation.
@@ -537,7 +539,7 @@ public:
 	 */
 	inline Array4 pooling2d_output_dims(const Array4& input_dims, cudnnPoolingMode_t pool_mode, std::size_t window_height,
 			std::size_t window_width, std::size_t vertical_padding, std::size_t horizontal_padding, std::size_t vertical_stride,
-			std::size_t horizontal_stride) {
+			std::size_t horizontal_stride) const {
 		// Create and set the input tensor descriptor.
 		cudnnTensorDescriptor_t input_desc = setup_tens_desc(input_dims);
 		// Create and set the pooling descriptor.
@@ -569,7 +571,7 @@ public:
 	 */
 	inline Array4 max_pooling2d_output_dims(const Array4& input_dims, std::size_t window_height, std::size_t window_width,
 			std::size_t vertical_padding, std::size_t horizontal_padding, std::size_t vertical_stride,
-			std::size_t horizontal_stride) {
+			std::size_t horizontal_stride) const {
 		return pooling2d_output_dims(input_dims, CUDNN_POOLING_MAX, window_height, window_width, vertical_padding,
 				horizontal_padding, vertical_stride, horizontal_stride);
 	}
@@ -589,7 +591,7 @@ public:
 	 */
 	inline Array4 mean_pooling2d_output_dims(const Array4& input_dims, std::size_t window_height, std::size_t window_width,
 			std::size_t vertical_padding, std::size_t horizontal_padding, std::size_t vertical_stride,
-			std::size_t horizontal_stride) {
+			std::size_t horizontal_stride) const {
 		return pooling2d_output_dims(input_dims, CUDNN_POOLING_AVERAGE_COUNT_INCLUDE_PADDING, window_height, window_width,
 				vertical_padding, horizontal_padding, vertical_stride, horizontal_stride);
 	}
@@ -612,7 +614,7 @@ public:
 	 */
 	inline void pooling2d_fwd(Scalar* input, const Array4& input_dims, const Array4& output_dims, cudnnPoolingMode_t pool_mode,
 			std::size_t window_height, std::size_t window_width, std::size_t vertical_padding, std::size_t horizontal_padding,
-			std::size_t vertical_stride, std::size_t horizontal_stride, /* out */ Scalar* output) {
+			std::size_t vertical_stride, std::size_t horizontal_stride, /* out */ Scalar* output) const {
 		// Create and set the input tensor descriptor.
 		cudnnTensorDescriptor_t input_desc = setup_tens_desc(input_dims);
 		// Create and set the output tensor descriptor.
@@ -663,7 +665,7 @@ public:
 	inline void pooling2d_bwd(Scalar* input, Scalar* output, Scalar* out_grad, const Array4& input_dims, const Array4& output_dims,
 			cudnnPoolingMode_t pool_mode, std::size_t window_height, std::size_t window_width, std::size_t vertical_padding,
 			std::size_t horizontal_padding, std::size_t vertical_stride, std::size_t horizontal_stride,
-			/* out */ Scalar* prev_out_grad) {
+			/* out */ Scalar* prev_out_grad) const {
 		// Create and set the input tensor descriptor.
 		cudnnTensorDescriptor_t input_desc = setup_tens_desc(input_dims);
 		// Create and set the output tensor descriptor.
@@ -720,7 +722,7 @@ public:
 	 */
 	inline void max_pooling2d_fwd(Scalar* input, const Array4& input_dims, const Array4& output_dims, std::size_t window_height,
 			std::size_t window_width, std::size_t vertical_padding, std::size_t horizontal_padding, std::size_t vertical_stride,
-			std::size_t horizontal_stride, /* out */ Scalar* output) {
+			std::size_t horizontal_stride, /* out */ Scalar* output) const {
 		pooling2d_fwd(input, input_dims, output_dims, CUDNN_POOLING_MAX, window_height, window_width, vertical_padding,
 				horizontal_padding, vertical_stride, horizontal_stride, output);
 	}
@@ -744,7 +746,7 @@ public:
 	 */
 	inline void max_pooling2d_bwd(Scalar* input, Scalar* output, Scalar* out_grad, const Array4& input_dims, const Array4& output_dims,
 			std::size_t window_height, std::size_t window_width, std::size_t vertical_padding, std::size_t horizontal_padding,
-			std::size_t vertical_stride, std::size_t horizontal_stride, /* out */ Scalar* prev_out_grad) {
+			std::size_t vertical_stride, std::size_t horizontal_stride, /* out */ Scalar* prev_out_grad) const {
 		pooling2d_bwd(input, output, out_grad, input_dims, output_dims, CUDNN_POOLING_MAX, window_height, window_width,
 				vertical_padding, horizontal_padding, vertical_stride, horizontal_stride, prev_out_grad);
 	}
@@ -766,7 +768,7 @@ public:
 	 */
 	inline void mean_pooling2d_fwd(Scalar* input, const Array4& input_dims, const Array4& output_dims, std::size_t window_height,
 			std::size_t window_width, std::size_t vertical_padding, std::size_t horizontal_padding, std::size_t vertical_stride,
-			std::size_t horizontal_stride, /* out */ Scalar* output) {
+			std::size_t horizontal_stride, /* out */ Scalar* output) const {
 		pooling2d_fwd(input, input_dims, output_dims, CUDNN_POOLING_AVERAGE_COUNT_INCLUDE_PADDING, window_height, window_width,
 				vertical_padding, horizontal_padding, vertical_stride, horizontal_stride, output);
 	}
@@ -790,7 +792,7 @@ public:
 	 */
 	inline void mean_pooling2d_bwd(Scalar* input, Scalar* output, Scalar* out_grad, const Array4& input_dims, const Array4& output_dims,
 			std::size_t window_height, std::size_t window_width, std::size_t vertical_padding, std::size_t horizontal_padding,
-			std::size_t vertical_stride, std::size_t horizontal_stride, /* out */ Scalar* prev_out_grad) {
+			std::size_t vertical_stride, std::size_t horizontal_stride, /* out */ Scalar* prev_out_grad) const {
 		pooling2d_bwd(input, output, out_grad, input_dims, output_dims, CUDNN_POOLING_AVERAGE_COUNT_INCLUDE_PADDING, window_height,
 				window_width, vertical_padding, horizontal_padding, vertical_stride, horizontal_stride, prev_out_grad);
 	}
@@ -815,7 +817,7 @@ public:
 	 */
 	inline void batch_norm_fwd_training(Scalar* input, Scalar* gamma, Scalar* beta, const Array4& dims, bool spatial,
 			Scalar exp_avg_factor, Scalar epsilon, /* in/out */ Scalar* means, /* in/out */ Scalar* vars,
-			/* out */ Scalar* output, /* out */ Scalar* mean_cache, /* out */ Scalar* inv_var_cache) {
+			/* out */ Scalar* output, /* out */ Scalar* mean_cache, /* out */ Scalar* inv_var_cache) const {
 		// Setup the tensor descriptors.
 		cudnnTensorDescriptor_t in_out_tens_desc = setup_tens_desc(dims);
 		cudnnTensorDescriptor_t mean_var_tens_desc = spatial ? setup_tens_desc(1, 1, 1, dims[3]) :
@@ -857,8 +859,8 @@ public:
 		cudaAssert(cudaMemcpy(mean_cache, dev_mean_cache, mean_var_tens_size, cudaMemcpyDeviceToHost));
 		cudaAssert(cudaMemcpy(inv_var_cache, dev_inv_var_cache, mean_var_tens_size, cudaMemcpyDeviceToHost));
 		// Free resources.
-		cudnnAssert(cudnnDestroyTensorDescriptor(in_out_tens_size));
-		cudnnAssert(cudnnDestroyTensorDescriptor(mean_var_tens_size));
+		cudnnAssert(cudnnDestroyTensorDescriptor(in_out_tens_desc));
+		cudnnAssert(cudnnDestroyTensorDescriptor(mean_var_tens_desc));
 		cudaAssert(cudaFree(dev_input));
 		cudaAssert(cudaFree(dev_output));
 		cudaAssert(cudaFree(dev_gamma));
@@ -885,7 +887,7 @@ public:
 	 * @param output The output tensor.
 	 */
 	inline void batch_norm_fwd_inference(Scalar* input, Scalar* gamma, Scalar* beta, Scalar* means, Scalar* vars,
-			const Array4& dims, bool spatial, Scalar epsilon, /* out */ Scalar* output) {
+			const Array4& dims, bool spatial, Scalar epsilon, /* out */ Scalar* output) const {
 		// Setup the tensor descriptors.
 		cudnnTensorDescriptor_t in_out_tens_desc = setup_tens_desc(dims);
 		cudnnTensorDescriptor_t mean_var_tens_desc = spatial ? setup_tens_desc(1, 1, 1, dims[3]) :
@@ -918,8 +920,8 @@ public:
 		// Copy the required data back to the host.
 		cudaAssert(cudaMemcpy(output, dev_output, in_out_tens_size, cudaMemcpyDeviceToHost));
 		// Free resources.
-		cudnnAssert(cudnnDestroyTensorDescriptor(in_out_tens_size));
-		cudnnAssert(cudnnDestroyTensorDescriptor(mean_var_tens_size));
+		cudnnAssert(cudnnDestroyTensorDescriptor(in_out_tens_desc));
+		cudnnAssert(cudnnDestroyTensorDescriptor(mean_var_tens_desc));
 		cudaAssert(cudaFree(dev_input));
 		cudaAssert(cudaFree(dev_output));
 		cudaAssert(cudaFree(dev_gamma));
@@ -947,7 +949,7 @@ public:
 	 */
 	inline void batch_norm_bwd(Scalar* input, Scalar* out_grad, Scalar* gamma, Scalar* mean_cache,
 			Scalar* inv_var_cache, const Array4& dims, bool spatial, Scalar epsilon, /* out */ Scalar* prev_out_grad,
-			/* out */ Scalar* gamma_grad, /* out */ Scalar* beta_grad) {
+			/* out */ Scalar* gamma_grad, /* out */ Scalar* beta_grad) const {
 		// Setup the tensor descriptors.
 		cudnnTensorDescriptor_t in_out_tens_desc = setup_tens_desc(dims);
 		cudnnTensorDescriptor_t mean_var_tens_desc = spatial ? setup_tens_desc(1, 1, 1, dims[3]) :
@@ -975,20 +977,18 @@ public:
 		cudaAssert(cudaMemcpy(dev_input, input, in_out_tens_size, cudaMemcpyHostToDevice));
 		cudaAssert(cudaMemcpy(dev_out_grad, out_grad, in_out_tens_size, cudaMemcpyHostToDevice));
 		cudaAssert(cudaMemcpy(dev_gamma, gamma, mean_var_tens_size, cudaMemcpyHostToDevice));
-		cudaAssert(cudaMemcpy(dev_mean, mean, mean_var_tens_size, cudaMemcpyHostToDevice));
-		cudaAssert(cudaMemcpy(dev_var, var, mean_var_tens_size, cudaMemcpyHostToDevice));
 		// Perform the batch normalization training pass.
 		cudnnAssert(cudnnBatchNormalizationBackward(handle, spatial ? CUDNN_BATCHNORM_SPATIAL_PERSISTENT :
-				CUDNN_BATCHNORM_PER_ACTIVATION, &alpha, &beta, in_out_tens_desc, dev_input, in_out_tens_desc,
-				dev_output, mean_var_tens_desc, dev_gamma, dev_beta, exp_avg_factor, dev_mean, dev_var, epsilon,
-				dev_mean_cache, dev_inv_var_cache));
+				CUDNN_BATCHNORM_PER_ACTIVATION, &alpha, &beta, &alpha, &beta, in_out_tens_desc, dev_input,
+				in_out_tens_desc, dev_out_grad, in_out_tens_desc, dev_prev_out_grad, mean_var_tens_desc,
+				dev_gamma, dev_gamma_grad, dev_beta_grad, epsilon, dev_mean_cache, dev_inv_var_cache));
 		// Copy the required data back to the host.
 		cudaAssert(cudaMemcpy(prev_out_grad, dev_prev_out_grad, in_out_tens_size, cudaMemcpyDeviceToHost));
 		cudaAssert(cudaMemcpy(gamma_grad, dev_gamma_grad, mean_var_tens_size, cudaMemcpyDeviceToHost));
 		cudaAssert(cudaMemcpy(beta_grad, dev_beta_grad, mean_var_tens_size, cudaMemcpyDeviceToHost));
 		// Free resources.
-		cudnnAssert(cudnnDestroyTensorDescriptor(in_out_tens_size));
-		cudnnAssert(cudnnDestroyTensorDescriptor(mean_var_tens_size));
+		cudnnAssert(cudnnDestroyTensorDescriptor(in_out_tens_desc));
+		cudnnAssert(cudnnDestroyTensorDescriptor(mean_var_tens_desc));
 		cudaAssert(cudaFree(dev_input));
 		cudaAssert(cudaFree(dev_out_grad));
 		cudaAssert(cudaFree(dev_gamma));
@@ -1008,7 +1008,7 @@ public:
 	 * @param reserve The reserve used for backpropagation.
 	 */
 	inline void dropout_fwd(Scalar* input, const Array4& dims, Scalar dropout, /* out */ Scalar* output,
-			/* out */ std::vector<Scalar>& reserve) {
+			/* out */ std::vector<Scalar>& reserve) const {
 		// Create and set the input/output/reserve tensor descriptor.
 		cudnnTensorDescriptor_t tens_desc = setup_tens_desc(dims);
 		// Create and set the dropout descriptor.
@@ -1052,7 +1052,7 @@ public:
 	 * @param prev_out_grad The gradient of the input of the dropout function.
 	 */
 	inline void dropout_bwd(Scalar* out_grad, std::vector<Scalar>& reserve, const Array4& dims, Scalar dropout,
-			/* out */ Scalar* prev_out_grad) {
+			/* out */ Scalar* prev_out_grad) const {
 		// Create and set the input/output/reserve tensor descriptor.
 		cudnnTensorDescriptor_t tens_desc = setup_tens_desc(dims);
 		// Create and set the dropout descriptor.
@@ -1099,10 +1099,11 @@ private:
 	 * @param dims The dimensions of the tensor.
 	 * @return The tensor descriptor.
 	 */
-	inline cudnnTensorDescriptor_t setup_tens_desc(const Array4& dims) {
+	inline cudnnTensorDescriptor_t setup_tens_desc(const Array4& dims) const {
 		cudnnTensorDescriptor_t tens_desc;
 		cudnnAssert(cudnnCreateTensorDescriptor(&tens_desc));
-		cudnnAssert(cudnnSetTensor4dDescriptor(tens_desc, TENSOR_FORMAT, DATA_TYPE, dims[0], dims[3], dims[1], dims[2]));
+		cudnnAssert(cudnnSetTensor4dDescriptor(tens_desc, TENSOR_FORMAT, DATA_TYPE, dims[0], dims[3],
+				dims[1], dims[2]));
 		return tens_desc;
 	}
 	/**
@@ -1114,7 +1115,8 @@ private:
 	 * @param c The number of color channels.
 	 * @return The tensor descriptor.
 	 */
-	inline cudnnTensorDescriptor_t setup_tens_desc(std::size_t n, std::size_t h, std::size_t w, std::size_t c) {
+	inline cudnnTensorDescriptor_t setup_tens_desc(std::size_t n, std::size_t h, std::size_t w,
+			std::size_t c) const {
 		cudnnTensorDescriptor_t tens_desc;
 		cudnnAssert(cudnnCreateTensorDescriptor(&tens_desc));
 		cudnnAssert(cudnnSetTensor4dDescriptor(tens_desc, TENSOR_FORMAT, DATA_TYPE, (int) n, (int) c,

@@ -106,6 +106,9 @@ Inheritance diagram for cattle::PoolLayer&lt; Scalar, Rank &gt;:</div>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
+<tr class="memitem:a40d43922450a2d28e36057256905403e"><td class="memItemLeft" align="right" valign="top">virtual <a class="el" href="classcattle_1_1_layer.html">Base</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_pool_layer.html#a40d43922450a2d28e36057256905403e">clone</a> () const =0</td></tr>
+<tr class="memdesc:a40d43922450a2d28e36057256905403e"><td class="mdescLeft">&#160;</td><td class="mdescRight">A constant method implementing the clone pattern.  <a href="#a40d43922450a2d28e36057256905403e">More...</a><br /></td></tr>
+<tr class="separator:a40d43922450a2d28e36057256905403e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a5f6dcc02c8ac98701607ab697951b25f"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="classcattle_1_1_dimensions.html">Dimensions</a>&lt; std::size_t, Rank &gt; &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_pool_layer.html#a5f6dcc02c8ac98701607ab697951b25f">get_input_dims</a> () const</td></tr>
 <tr class="memdesc:a5f6dcc02c8ac98701607ab697951b25f"><td class="mdescLeft">&#160;</td><td class="mdescRight">A simple constant getter method for the input dimensionality of the layer.  <a href="#a5f6dcc02c8ac98701607ab697951b25f">More...</a><br /></td></tr>
 <tr class="separator:a5f6dcc02c8ac98701607ab697951b25f"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -123,9 +126,6 @@ void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="clas
 <tr class="memdesc:a7837c89a4d3ac765c78507da09c35f8b"><td class="mdescLeft">&#160;</td><td class="mdescRight">It initializes the layer and its parameters. <br /></td></tr>
 <tr class="separator:a7837c89a4d3ac765c78507da09c35f8b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="inherit_header pub_methods_classcattle_1_1_layer"><td colspan="2" onclick="javascript:toggleInherit('pub_methods_classcattle_1_1_layer')"><img src="closed.png" alt="-"/>&#160;Public Member Functions inherited from <a class="el" href="classcattle_1_1_layer.html">cattle::Layer&lt; Scalar, Rank &gt;</a></td></tr>
-<tr class="memitem:a46db46c62f3d46c6bbef5a482d7fcb00 inherit pub_methods_classcattle_1_1_layer"><td class="memItemLeft" align="right" valign="top">virtual <a class="el" href="classcattle_1_1_layer.html">Layer</a>&lt; Scalar, Rank &gt; *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_layer.html#a46db46c62f3d46c6bbef5a482d7fcb00">clone</a> () const =0</td></tr>
-<tr class="memdesc:a46db46c62f3d46c6bbef5a482d7fcb00 inherit pub_methods_classcattle_1_1_layer"><td class="mdescLeft">&#160;</td><td class="mdescRight">A constant method implementing the clone pattern.  <a href="classcattle_1_1_layer.html#a46db46c62f3d46c6bbef5a482d7fcb00">More...</a><br /></td></tr>
-<tr class="separator:a46db46c62f3d46c6bbef5a482d7fcb00 inherit pub_methods_classcattle_1_1_layer"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a92963ac4a339d9174a3aef3dbf3c271f inherit pub_methods_classcattle_1_1_layer"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_layer.html#a92963ac4a339d9174a3aef3dbf3c271f">is_parametric</a> ()</td></tr>
 <tr class="memdesc:a92963ac4a339d9174a3aef3dbf3c271f inherit pub_methods_classcattle_1_1_layer"><td class="mdescLeft">&#160;</td><td class="mdescRight">A method that returns whether the layer has parameters that can be learned.  <a href="classcattle_1_1_layer.html#a92963ac4a339d9174a3aef3dbf3c271f">More...</a><br /></td></tr>
 <tr class="separator:a92963ac4a339d9174a3aef3dbf3c271f inherit pub_methods_classcattle_1_1_layer"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -285,6 +285,40 @@ template&lt;typename Scalar , std::size_t Rank&gt; </div>
 <dl class="section return"><dt>Returns</dt><dd>The reduced tensor. </dd></dl>
 
 <p>Implemented in <a class="el" href="classcattle_1_1_max_pool_layer_base.html#adba251e3a789c00b852d896e3742f3b4">cattle::MaxPoolLayerBase&lt; Scalar, Rank &gt;</a>, <a class="el" href="classcattle_1_1_max_pool_layer_base.html#adba251e3a789c00b852d896e3742f3b4">cattle::MaxPoolLayerBase&lt; Scalar, 1 &gt;</a>, <a class="el" href="classcattle_1_1_max_pool_layer_base.html#adba251e3a789c00b852d896e3742f3b4">cattle::MaxPoolLayerBase&lt; Scalar, 2 &gt;</a>, <a class="el" href="classcattle_1_1_mean_pool_layer_base.html#a0b9a18aa55e2c5e3653f85950980ab74">cattle::MeanPoolLayerBase&lt; Scalar, Rank &gt;</a>, <a class="el" href="classcattle_1_1_mean_pool_layer_base.html#a0b9a18aa55e2c5e3653f85950980ab74">cattle::MeanPoolLayerBase&lt; Scalar, 1 &gt;</a>, <a class="el" href="classcattle_1_1_mean_pool_layer_base.html#a0b9a18aa55e2c5e3653f85950980ab74">cattle::MeanPoolLayerBase&lt; Scalar, 2 &gt;</a>, <a class="el" href="classcattle_1_1_sum_pool_layer_base.html#ad3c84bad8af9ca65643c8704e76987b2">cattle::SumPoolLayerBase&lt; Scalar, Rank &gt;</a>, <a class="el" href="classcattle_1_1_sum_pool_layer_base.html#ad3c84bad8af9ca65643c8704e76987b2">cattle::SumPoolLayerBase&lt; Scalar, 1 &gt;</a>, and <a class="el" href="classcattle_1_1_sum_pool_layer_base.html#ad3c84bad8af9ca65643c8704e76987b2">cattle::SumPoolLayerBase&lt; Scalar, 2 &gt;</a>.</p>
+
+</div>
+</div>
+<a id="a40d43922450a2d28e36057256905403e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a40d43922450a2d28e36057256905403e">&#9670;&nbsp;</a></span>clone()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename Scalar , std::size_t Rank&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual <a class="el" href="classcattle_1_1_layer.html">Base</a>* <a class="el" href="classcattle_1_1_pool_layer.html">cattle::PoolLayer</a>&lt; Scalar, Rank &gt;::clone </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">pure virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>A constant method implementing the clone pattern. </p>
+<dl class="section return"><dt>Returns</dt><dd>A pointer to a copy of the instance. The instance does not take ownership of the returned pointer (i.e. the caller is responsible for deleting it). </dd></dl>
+
+<p>Implements <a class="el" href="classcattle_1_1_layer.html#a46db46c62f3d46c6bbef5a482d7fcb00">cattle::Layer&lt; Scalar, Rank &gt;</a>.</p>
+
+<p>Implemented in <a class="el" href="classcattle_1_1_max_pool_layer_3_01_scalar_00_011_01_4.html#a3190763e39f851cf28606dc1b7906f4a">cattle::MaxPoolLayer&lt; Scalar, 1 &gt;</a>, <a class="el" href="classcattle_1_1_max_pool_layer_3_01_scalar_00_012_01_4.html#abf3096d94719bacc657cca0fcad1afb4">cattle::MaxPoolLayer&lt; Scalar, 2 &gt;</a>, <a class="el" href="classcattle_1_1_max_pool_layer.html#a26a24d870ec2b776bc5c229ba01448a7">cattle::MaxPoolLayer&lt; Scalar, Rank &gt;</a>, <a class="el" href="classcattle_1_1_mean_pool_layer_3_01_scalar_00_011_01_4.html#acee10ea9184f727d8734038b2f390bee">cattle::MeanPoolLayer&lt; Scalar, 1 &gt;</a>, <a class="el" href="classcattle_1_1_mean_pool_layer_3_01_scalar_00_012_01_4.html#a624e7117839125b1c67c1178e381064c">cattle::MeanPoolLayer&lt; Scalar, 2 &gt;</a>, <a class="el" href="classcattle_1_1_mean_pool_layer.html#a78fe029b0af419a4a04fd0526e444445">cattle::MeanPoolLayer&lt; Scalar, Rank &gt;</a>, <a class="el" href="classcattle_1_1_sum_pool_layer_3_01_scalar_00_011_01_4.html#a0c44774ab08b5b6d17d945ee1cb1fb4f">cattle::SumPoolLayer&lt; Scalar, 1 &gt;</a>, <a class="el" href="classcattle_1_1_sum_pool_layer_3_01_scalar_00_012_01_4.html#a2207109e7e76d0af7e317652c65a4f6e">cattle::SumPoolLayer&lt; Scalar, 2 &gt;</a>, and <a class="el" href="classcattle_1_1_sum_pool_layer.html#adee341a7f519d7e934c23cecf509643c">cattle::SumPoolLayer&lt; Scalar, Rank &gt;</a>.</p>
 
 </div>
 </div>
@@ -656,7 +690,7 @@ template&lt;typename Scalar , std::size_t Rank&gt; </div>
 </div>
 </div>
 <hr/>The documentation for this class was generated from the following file:<ul>
-<li>C:/Users/A6714/git/C-ATTL3/C-ATTL3/<a class="el" href="_layer_8hpp_source.html">Layer.hpp</a></li>
+<li>C:/Users/Viktor/git/C-ATTL3/C-ATTL3/<a class="el" href="_layer_8hpp_source.html">Layer.hpp</a></li>
 </ul>
 </div><!-- contents -->
 <!-- start footer part -->

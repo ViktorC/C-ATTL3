@@ -77,7 +77,7 @@ public:
 	 */
 	inline void matrix_mul(Scalar* a, std::size_t a_orig_rows, std::size_t a_orig_cols, bool transpose_a,
 			Scalar* b, std::size_t b_orig_rows, std::size_t b_orig_cols, bool transpose_b,
-			/* out */ Scalar* c) {
+			/* out */ Scalar* c) const {
 		std::size_t a_rows, a_cols, b_rows, b_cols;
 		if (transpose_a) {
 			a_rows = a_orig_cols;

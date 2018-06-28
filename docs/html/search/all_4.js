@@ -27,7 +27,7 @@ var searchData=
   ['dimexpression_3c_20unarydimexpression_3c_20indextype_2c_20rank_2c_20lhsexpr_2c_20optype_20_3e_2c_20indextype_2c_20rank_20_3e',['DimExpression&lt; UnaryDimExpression&lt; IndexType, Rank, LhsExpr, OpType &gt;, IndexType, Rank &gt;',['../classcattle_1_1_dim_expression.html',1,'cattle']]],
   ['dimexpression_3c_20unaryrankwisedimexpression_3c_20indextype_2c_20rank_2c_20lhsexpr_2c_20optype_20_3e_2c_20indextype_2c_20rank_20_3e',['DimExpression&lt; UnaryRankWiseDimExpression&lt; IndexType, Rank, LhsExpr, OpType &gt;, IndexType, Rank &gt;',['../classcattle_1_1_dim_expression.html',1,'cattle']]],
   ['divide_5falong_5frank',['divide_along_rank',['../classcattle_1_1_dim_expression.html#aa4651f18fd078bc3a0b60999c463261a',1,'cattle::DimExpression']]],
-  ['dropout_5fbwd',['dropout_bwd',['../classcattle_1_1internal_1_1_cu_d_n_n_handle.html#a7741a636ab0a43365ef4c4a6792311c2',1,'cattle::internal::CuDNNHandle']]],
-  ['dropout_5ffwd',['dropout_fwd',['../classcattle_1_1internal_1_1_cu_d_n_n_handle.html#a9636e8eb8776b06fd37cb430632743e1',1,'cattle::internal::CuDNNHandle']]],
+  ['dropout_5fbwd',['dropout_bwd',['../classcattle_1_1internal_1_1_cu_d_n_n_handle.html#a6ea4fda313544c9078f44e06a2c94402',1,'cattle::internal::CuDNNHandle']]],
+  ['dropout_5ffwd',['dropout_fwd',['../classcattle_1_1internal_1_1_cu_d_n_n_handle.html#aa2f4fba55c7a5b17a66bd44912fe388a',1,'cattle::internal::CuDNNHandle']]],
   ['dropoutlayer',['DropoutLayer',['../classcattle_1_1_dropout_layer.html',1,'cattle::DropoutLayer&lt; Scalar, Rank &gt;'],['../classcattle_1_1_dropout_layer.html#aaa346c955d02369927de664087a32999',1,'cattle::DropoutLayer::DropoutLayer()']]]
 ];

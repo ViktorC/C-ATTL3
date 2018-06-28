@@ -1,7 +1,7 @@
 var searchData=
 [
-  ['tanh_5factivation_5fbwd',['tanh_activation_bwd',['../classcattle_1_1internal_1_1_cu_d_n_n_handle.html#ac3509af8cc0a32442d29863ba852cea3',1,'cattle::internal::CuDNNHandle']]],
-  ['tanh_5factivation_5ffwd',['tanh_activation_fwd',['../classcattle_1_1internal_1_1_cu_d_n_n_handle.html#ad0bf4bf9b3567ce557fdc1c2046ee217',1,'cattle::internal::CuDNNHandle']]],
+  ['tanh_5factivation_5fbwd',['tanh_activation_bwd',['../classcattle_1_1internal_1_1_cu_d_n_n_handle.html#a96ceec4a3446af35666e644d24e2dd9b',1,'cattle::internal::CuDNNHandle']]],
+  ['tanh_5factivation_5ffwd',['tanh_activation_fwd',['../classcattle_1_1internal_1_1_cu_d_n_n_handle.html#af1b8f9f0522f2c1af255b0d993fd682d',1,'cattle::internal::CuDNNHandle']]],
   ['tanhactivationlayer',['TanhActivationLayer',['../classcattle_1_1_tanh_activation_layer.html',1,'cattle::TanhActivationLayer&lt; Scalar, Rank &gt;'],['../classcattle_1_1_tanh_activation_layer.html#a67d44e760962f78b74c182b1b1cf528d',1,'cattle::TanhActivationLayer::TanhActivationLayer()']]],
   ['tensor',['Tensor',['../namespacecattle.html#a8b9323ad928764340e46f0802bf27fbb',1,'cattle']]],
   ['tensormap',['TensorMap',['../namespacecattle.html#a7dfcb4d57e2c5da3170ebd8d13fd0431',1,'cattle']]],

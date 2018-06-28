@@ -290,6 +290,18 @@ protected:
 		assert(weight_init != nullptr);
 		assert(weight_reg != nullptr);
 	}
+	inline KernelLayer(const KernelLayer<Scalar,Rank>& layer) :
+			input_dims(layer.input_dims),
+			output_dims(layer.output_dims),
+			weight_init(layer.weight_init),
+			weight_reg(layer.weight_reg),
+			max_norm_constraint(layer.max_norm_constraint),
+			max_norm(layer.max_norm),
+			input_layer(layer.input_layer),
+			frozen(layer.frozen),
+			weights(layer.weights),
+			weights_grad(layer.weights_grad),
+			weights_ref(weights) { }
 	inline KernelLayer(KernelLayer<Scalar,Rank>& layer, bool share_params) :
 			input_dims(layer.input_dims),
 			output_dims(layer.output_dims),
@@ -766,7 +778,7 @@ protected:
 				horizontal_stride(horizontal_stride),
 				vertical_dilation(vertical_dilation),
 				horizontal_dilation(horizontal_dilation),
-				in_batch_dims(ext_input_dims.template extend<3 - Rank>().template promote<>()),
+				in_batch_dims(input_dims.template extend<3 - Rank>().template promote<>()),
 				out_batch_dims(calculate_output_dims(in_batch_dims, filters, receptor_height, receptor_width,
 						vertical_padding, horizontal_padding, vertical_stride, horizontal_stride,
 						vertical_dilation, horizontal_dilation)) {
@@ -803,7 +815,7 @@ protected:
 		Tensor<Scalar,4> out(out_batch_dims);
 		internal::CuDNNHandle<Scalar>::get_instance().convolution2d_fwd(input.data(), filter.data(), bias.data(),
 				in_batch_dims, out_batch_dims, receptor_height, receptor_width, vertical_padding, horizontal_padding,
-				vertical_stride, horizontal_stride, vertical_dilation, horizontal_dilation, out.data());
+				vertical_stride, horizontal_stride, vertical_dilation + 1, horizontal_dilation + 1, out.data());
 		return out;
 	}
 	inline Tensor<Scalar,4> _pass_back(Tensor<Scalar,4> out_grad) {
@@ -814,7 +826,7 @@ protected:
 		Matrix<Scalar> bias_grad(bias.rows(), bias.cols());
 		internal::CuDNNHandle<Scalar>::get_instance().convolution2d_bwd(input.data(), out_grad.data(), filter.data(),
 				bias.data(), in_batch_dims, out_batch_dims, receptor_height, receptor_width, vertical_padding,
-				horizontal_padding, vertical_stride, horizontal_stride, vertical_dilation, horizontal_dilation,
+				horizontal_padding, vertical_stride, horizontal_stride, vertical_dilation + 1, horizontal_dilation + 1,
 				prev_out_grad.data(), filter_grad.data(), bias_grad.data());
 		Base::weights_grad.topRows(filter_grad.rows()) = filter_grad;
 		Base::weights_grad.bottomRows(bias_grad.rows()) = bias_grad;
@@ -830,7 +842,7 @@ protected:
 	const std::size_t vertical_dilation;
 	const std::size_t horizontal_dilation;
 private:
-	inline static Array4 caclulate_output_dims(const Array4& input_dims, std::size_t filters, std::size_t receptor_height,
+	inline static Array4 calculate_output_dims(const Array4& input_dims, std::size_t filters, std::size_t receptor_height,
 			std::size_t receptor_width, std::size_t vertical_padding, std::size_t horizontal_padding, std::size_t vertical_stride,
 			std::size_t horizontal_stride, std::size_t vertical_dilation, std::size_t horizontal_dilation) {
 		return internal::CuDNNHandle<Scalar>::get_instance().conv2d_output_dims(input_dims, filters, receptor_height,
@@ -841,7 +853,7 @@ private:
 			std::size_t filters, std::size_t receptor_height, std::size_t receptor_width, std::size_t vertical_padding,
 			std::size_t horizontal_padding, std::size_t vertical_stride, std::size_t horizontal_stride,
 			std::size_t vertical_dilation, std::size_t horizontal_dilation) {
-		auto output_dims = caclulate_output_dims(input_dims.template extend<3 - Rank>().template promote<>(), filters,
+		auto output_dims = calculate_output_dims(input_dims.template extend<3 - Rank>().template promote<>(), filters,
 				receptor_height, receptor_width, vertical_padding, horizontal_padding, vertical_stride, horizontal_stride,
 				vertical_dilation, horizontal_dilation);
 		output_dims[3] /= filters;
@@ -1547,6 +1559,7 @@ class ActivationLayer : public Layer<Scalar,Rank> {
 	typedef Layer<Scalar,Rank> Base;
 public:
 	virtual ~ActivationLayer() = default;
+	virtual Base* clone() const = 0;
 	inline const Dimensions<std::size_t,Rank>& get_input_dims() const {
 		return dims;
 	}
@@ -1569,6 +1582,13 @@ protected:
 				params(param_rows, params_cols),
 				params_grad(param_rows, params_cols),
 				params_ref(params) { }
+	inline ActivationLayer(const ActivationLayer<Scalar,Rank>& layer) :
+			dims(layer.dims),
+			input_layer(layer.input_layer),
+			frozen(layer.frozen),
+			params(layer.params),
+			params_grad(layer.params_grad),
+			params_ref(params) { }
 	inline ActivationLayer(ActivationLayer<Scalar,Rank>& layer, bool share_params) :
 			dims(layer.dims),
 			input_layer(layer.input_layer),
@@ -2649,6 +2669,7 @@ template<typename Scalar, std::size_t Rank>
 class PoolLayer : public Layer<Scalar,Rank> {
 	typedef Layer<Scalar,Rank> Base;
 public:
+	virtual Base* clone() const = 0;
 	inline const Dimensions<std::size_t,Rank>& get_input_dims() const {
 		return input_dims;
 	}
@@ -3529,6 +3550,28 @@ public:
 		offsets.fill(0);
 		extents[Rank] = 1;
 	}
+	inline BatchNormLayer(const Self& layer) :
+			dims(layer.dims),
+			gamma_reg(layer.gamma_reg),
+			beta_reg(layer.beta_reg),
+			gamma_max_norm_constraint(layer.gamma_max_norm_constraint),
+			beta_max_norm_constraint(layer.beta_max_norm_constraint),
+			gamma_max_norm(layer.gamma_max_norm),
+			beta_max_norm(layer.beta_max_norm),
+			norm_avg_decay(layer.norm_avg_decay),
+			epsilon(layer.epsilon),
+			channels(layer.channels),
+			input_layer(layer.input_layer),
+			frozen(layer.frozen),
+			offsets(layer.offsets),
+			extents(layer.extents),
+			avg_means(layer.avg_means),
+			avg_inv_sds(layer.avg_inv_sds),
+			avgs_init(layer.avgs_init),
+			params(layer.params),
+			params_grad(layer.params_grad),
+			params_ref(params),
+			cache_vec(layer.cache_vec) { }
 	inline Base* clone() const {
 		return new BatchNormLayer(*this);
 	}
@@ -3781,6 +3824,24 @@ public:
 				"norm avg decay must not be less than 0 or greater than 1");
 		assert(epsilon > 0 && "epsilon must be greater than 0");
 	}
+	inline BatchNormLayer(const Self& layer) :
+			dims(layer.dims),
+			gamma_reg(layer.gamma_reg),
+			beta_reg(layer.beta_reg),
+			gamma_max_norm_constraint(layer.gamma_max_norm_constraint),
+			beta_max_norm_constraint(layer.beta_max_norm_constraint),
+			gamma_max_norm(layer.gamma_max_norm),
+			beta_max_norm(layer.beta_max_norm),
+			norm_avg_decay(layer.norm_avg_decay),
+			epsilon(layer.epsilon),
+			input_layer(layer.input_layer),
+			frozen(layer.frozen),
+			avg_means(layer.avg_means),
+			avg_inv_sds(layer.avg_inv_sds),
+			avgs_init(layer.avgs_init),
+			params(layer.params),
+			params_grad(layer.params_grad),
+			params_ref(params) { }
 	inline Base* clone() const {
 		return new BatchNormLayer(*this);
 	}
@@ -3969,18 +4030,37 @@ public:
 				frozen(false),
 				batch_dims(calculate_extended_batch_dims(dims)),
 				means(channels),
-				vars(channels),,
+				vars(channels),
 				params(channels, 2),
 				params_grad(params.rows(), params.cols()),
-				params_ref(params),
-				mean_cache(channels),
-				inv_var_cache(channels) {
+				params_ref(params), {
 		assert(gamma_reg != nullptr);
 		assert(beta_reg != nullptr);
 		assert(norm_avg_decay >= 0 && norm_avg_decay <= 1 &&
 				"norm avg decay must not be less than 0 or greater than 1");
 		assert(epsilon > 0 && "epsilon must be greater than 0");
 	}
+	inline BatchNormLayer(const Self& layer) :
+			dims(layer.dims),
+			gamma_reg(layer.gamma_reg),
+			beta_reg(layer.beta_reg),
+			gamma_max_norm_constraint(layer.gamma_max_norm_constraint),
+			beta_max_norm_constraint(layer.beta_max_norm_constraint),
+			gamma_max_norm(layer.gamma_max_norm),
+			beta_max_norm(layer.beta_max_norm),
+			norm_avg_decay(layer.norm_avg_decay),
+			epsilon(layer.epsilon),
+			channels(layer.channels),
+			input_layer(layer.input_layer),
+			frozen(layer.frozen),
+			batch_dims(layer.batch_dims),
+			means(layer.means),
+			vars(layer.vars),
+			params(layer.params),
+			params_grad(layer.params_grad),
+			params_ref(params),
+			mean_cache(mean_cache),
+			inv_var_cache(inv_var_cache) { }
 	inline Base* clone() const {
 		return new BatchNormLayer(*this);
 	}
@@ -4000,16 +4080,33 @@ public:
 		params_ref.col(0).setOnes();
 		params_ref.col(1).setZero();
 		params_grad.setZero(params_ref.rows(), params_ref.cols());
-		avg_means.setZero(avg_means.rows(), avg_means.cols());
-		avg_inv_sds.setZero(avg_inv_sds.rows(), avg_inv_sds.cols());
-		avgs_init = false;
+		means.setZero(means.rows(), means.cols());
+		vars.setZero(vars.rows(), vars.cols());
 	}
 protected:
+	inline BatchNormLayer(Self& layer, bool share_params) :
+			dims(layer.dims),
+			gamma_reg(layer.gamma_reg),
+			beta_reg(layer.beta_reg),
+			gamma_max_norm_constraint(layer.gamma_max_norm_constraint),
+			beta_max_norm_constraint(layer.beta_max_norm_constraint),
+			gamma_max_norm(layer.gamma_max_norm),
+			beta_max_norm(layer.beta_max_norm),
+			norm_avg_decay(layer.norm_avg_decay),
+			epsilon(layer.epsilon),
+			channels(layer.channels),
+			input_layer(layer.input_layer),
+			frozen(layer.frozen),
+			batch_dims(layer.batch_dims),
+			means(layer.means),
+			vars(layer.vars),
+			params(share_params ? Matrix<Scalar>(0, 0) : layer.params),
+			params_grad(layer.params_grad),
+			params_ref(share_params ? layer.params : params),
+			mean_cache(mean_cache),
+			inv_var_cache(inv_var_cache) { }
 	inline Base* clone_with_shared_params() {
-		BatchNormLayer* clone = new BatchNormLayer(*this);
-		clone->params = Matrix<Scalar>(0, 0);
-		clone->params_ref = params;
-		return clone;
+		return new BatchNormLayer(*this, true);
 	}
 	inline bool is_input_layer() const {
 		return input_layer;
@@ -4018,6 +4115,7 @@ protected:
 		this->input_layer = input_layer;
 	}
 	inline void empty_cache() {
+		input = typename Base::Data();
 		mean_cache = Matrix<Scalar>(0, 0);
 		inv_var_cache = Matrix<Scalar>(0, 0);
 	}
@@ -4054,16 +4152,30 @@ protected:
 		Matrix<Scalar> gamma = params_ref.col(0);
 		Matrix<Scalar> beta = params_ref.col(1);
 		typename Base::Data out(batch_dims);
-		if (training)
-			batch_norm_fwd_training(in.data(), gamma.data(), beta.data())
-		else
-
+		if (training) {
+			input = std::move(in);
+			mean_cache = RowVector<Scalar>(channels);
+			inv_var_cache = RowVector<Scalar>(channels);
+			batch_norm_fwd_training(input.data(), gamma.data(), beta.data(), batch_dims, true, 1 - norm_avg_decay,
+					epsilon, means.data(), vars.data(), out.data(), mean_cache.data(), inv_var_cache.data());
+		} else {
+			batch_norm_fwd_inference(in.data(), gamma.data(), beta.data(), means.data(), vars.data(),
+					batch_dims, true, epsilon. out.data());
+		}
 		return out;
 	}
 	inline typename Base::Data pass_back(typename Base::Data out_grad) {
 		assert((Dimensions<std::size_t,Base::DATA_RANK>(out_grad.dimensions()).template demote<>()) == dims);
 		assert(out_grad.dimension(0) > 0 && batch_dims[0] == out_grad.dimension(0));
-
+		Matrix<Scalar> gamma = params_ref.col(0);
+		Matrix<Scalar> gamma_grad(channels, 1);
+		Matrix<Scalar> beta_grad(channel, 1);
+		typename Base::Data prev_out_grad(batch_dims);
+		batch_norm_bwd(input.data(), out_grad.data(), gamma.data(), mean_cache.data(), inv_var_cache.data(),
+				batch_dims, true, epsilon, prev_out_grad.data(), gamma_grad.data(), beta_grad.data());
+		params_grad.col(0) = gamma_grad;
+		params_grad.col(1) = beta_grad;
+		return prev_out_grad;
 	}
 private:
 	inline static std::array<std::size_t,4> calculate_extended_batch_dims(const Dimensions<std::size_t,Rank>& dims) {
@@ -4088,11 +4200,12 @@ private:
 	std::array<std::size_t,4> batch_dims;
 	RowVector<Scalar> means;
 	RowVector<Scalar> vars;
+	Matrix<Scalar> params;
+	Matrix<Scalar> params_grad;
+	Matrix<Scalar>& params_ref;
+	typename Base::Data input;
 	RowVector<Scalar> mean_cache;
 	RowVector<Scalar> inv_var_cache;
-	Matrix<Scalar> params;
-	Matrix<Scalar>& params_ref;
-	Matrix<Scalar> params_grad;
 };
 
 /**
@@ -4130,18 +4243,38 @@ public:
 				epsilon(epsilon),
 				input_layer(false),
 				frozen(false),
-				avg_means(dims.get_volume()),
-				avg_inv_sds(avg_means.size()),
-				avgs_init(false),
-				params(avg_means.size(), 2),
+				batch_dims(dims.template extend<3 - Rank>().template promote<>()),
+				means(dims.volume()),
+				vars(means.rows()),
+				params(vars.rows(), 2),
 				params_grad(params.rows(), params.cols()),
-				params_ref(params) {
+				params_ref(params), {
 		assert(gamma_reg != nullptr);
 		assert(beta_reg != nullptr);
 		assert(norm_avg_decay >= 0 && norm_avg_decay <= 1 &&
 				"norm avg decay must not be less than 0 or greater than 1");
 		assert(epsilon > 0 && "epsilon must be greater than 0");
 	}
+	inline BatchNormLayer(const Self& layer) :
+			dims(layer.dims),
+			gamma_reg(layer.gamma_reg),
+			beta_reg(layer.beta_reg),
+			gamma_max_norm_constraint(layer.gamma_max_norm_constraint),
+			beta_max_norm_constraint(layer.beta_max_norm_constraint),
+			gamma_max_norm(layer.gamma_max_norm),
+			beta_max_norm(layer.beta_max_norm),
+			norm_avg_decay(layer.norm_avg_decay),
+			epsilon(layer.epsilon),
+			input_layer(layer.input_layer),
+			frozen(layer.frozen),
+			batch_dims(layer.batch_dims),
+			means(layer.means),
+			vars(layer.vars),
+			params(layer.params),
+			params_grad(layer.params_grad),
+			params_ref(params),
+			mean_cache(mean_cache),
+			inv_var_cache(inv_var_cache) { }
 	inline Base* clone() const {
 		return new BatchNormLayer(*this);
 	}
@@ -4158,21 +4291,35 @@ public:
 		this->frozen = frozen;
 	}
 	inline void init() {
-		// Gamma.
 		params_ref.col(0).setOnes();
-		// Beta.
 		params_ref.col(1).setZero();
 		params_grad.setZero(params_ref.rows(), params_ref.cols());
-		avg_means.setZero(avg_means.rows(), avg_means.cols());
-		avg_inv_sds.setZero(avg_means.rows(), avg_inv_sds.cols());
-		avgs_init = false;
+		means.setZero(means.rows(), means.cols());
+		vars.setZero(vars.rows(), vars.cols());
 	}
 protected:
+	inline BatchNormLayer(Self& layer, bool share_params) :
+			dims(layer.dims),
+			gamma_reg(layer.gamma_reg),
+			beta_reg(layer.beta_reg),
+			gamma_max_norm_constraint(layer.gamma_max_norm_constraint),
+			beta_max_norm_constraint(layer.beta_max_norm_constraint),
+			gamma_max_norm(layer.gamma_max_norm),
+			beta_max_norm(layer.beta_max_norm),
+			norm_avg_decay(layer.norm_avg_decay),
+			epsilon(layer.epsilon),
+			input_layer(layer.input_layer),
+			frozen(layer.frozen),
+			batch_dims(layer.batch_dims),
+			means(layer.means),
+			vars(layer.vars),
+			params(share_params ? Matrix<Scalar>(0, 0) : layer.params),
+			params_grad(layer.params_grad),
+			params_ref(share_params ? layer.params : params),
+			mean_cache(mean_cache),
+			inv_var_cache(inv_var_cache) { }
 	inline Base* clone_with_shared_params() {
-		BatchNormLayer* clone = new BatchNormLayer(*this);
-		clone->params = Matrix<Scalar>(0, 0);
-		clone->params_ref = params;
-		return clone;
+		return new BatchNormLayer(*this, true);
 	}
 	inline bool is_input_layer() const {
 		return input_layer;
@@ -4181,8 +4328,9 @@ protected:
 		this->input_layer = input_layer;
 	}
 	inline void empty_cache() {
-		inv_in_sd = RowVector<Scalar>(0);
-		std_in = Matrix<Scalar>(0, 0);
+		input = typename Base::Data();
+		mean_cache = Matrix<Scalar>(0, 0);
+		inv_var_cache = Matrix<Scalar>(0, 0);
 	}
 	inline Matrix<Scalar>& get_params() {
 		return params_ref;
@@ -4213,44 +4361,34 @@ protected:
 	inline typename Base::Data pass_forward(typename Base::Data in, bool training) {
 		assert((Dimensions<std::size_t,Base::DATA_RANK>(in.dimensions()).template demote<>()) == dims);
 		assert(in.dimension(0) > 0);
-		std::size_t rows = in.dimension(0);
-		MatrixMap<Scalar> in_mat(in.data(), rows, in.size() / rows);
+		batch_dims[0] = in.dimension(0);
+		Matrix<Scalar> gamma = params_ref.col(0);
+		Matrix<Scalar> beta = params_ref.col(1);
+		typename Base::Data out(batch_dims);
 		if (training) {
-			RowVector<Scalar> means = in_mat.colwise().mean();
-			Matrix<Scalar> norm_in = in_mat.rowwise() - means;
-			inv_in_sd = (norm_in.array().square().colwise().mean() + epsilon).sqrt().inverse();
-			std_in = norm_in * inv_in_sd.asDiagonal();
-			in_mat = std_in;
-			// Maintain a moving average of means and variances for testing.
-			if (avgs_init) {
-				avg_means = (1.0 - norm_avg_decay) * avg_means + norm_avg_decay * means;
-				avg_inv_sds = (1.0 - norm_avg_decay) * avg_inv_sds + norm_avg_decay * inv_in_sd;
-			} else {
-				avg_means = means;
-				avg_inv_sds = inv_in_sd;
-				avgs_init = true;
-			}
-		} else // For testing, use the moving averages.
-			in_mat = (in_mat.rowwise() - avg_means) * avg_inv_sds.asDiagonal();
-		Matrix<Scalar> out = (in_mat * params_ref.col(0).asDiagonal()).rowwise() + params_ref.col(1).transpose();
-		return TensorMap<Scalar,Base::DATA_RANK>(out.data(), in.dimensions());
+			input = std::move(in);
+			mean_cache = RowVector<Scalar>(params_ref.rows());
+			inv_var_cache = RowVector<Scalar>(params_ref.rows());
+			batch_norm_fwd_training(input.data(), gamma.data(), beta.data(), batch_dims, false, 1 - norm_avg_decay,
+					epsilon, means.data(), vars.data(), out.data(), mean_cache.data(), inv_var_cache.data());
+		} else {
+			batch_norm_fwd_inference(in.data(), gamma.data(), beta.data(), means.data(), vars.data(),
+					batch_dims, false, epsilon. out.data());
+		}
+		return out;
 	}
 	inline typename Base::Data pass_back(typename Base::Data out_grad) {
 		assert((Dimensions<std::size_t,Base::DATA_RANK>(out_grad.dimensions()).template demote<>()) == dims);
-		assert(out_grad.dimension(0) > 0 && std_in.rows() == out_grad.dimension(0));
-		std::size_t rows = out_grad.dimension(0);
-		/* Back-propagate the gradient through the batch normalization 'function' and also calculate the
-		 * gradients of the betas and gammas. */
-		MatrixMap<Scalar> out_grad_mat(out_grad.data(), rows, out_grad.size() / rows);
-		params_grad.col(0) = out_grad_mat.cwiseProduct(std_in).colwise().sum().transpose();
-		params_grad.col(1) = out_grad_mat.colwise().sum().transpose();
-		if (input_layer)
-			return typename Base::Data();
-		Matrix<Scalar> std_in_grad = out_grad_mat * params_ref.col(0).asDiagonal();
-		Matrix<Scalar> prev_out_grad = (((rows * std_in_grad).rowwise() - std_in_grad.colwise().sum()) -
-				std_in * (std_in.cwiseProduct(std_in_grad).colwise().sum().asDiagonal())) *
-				(((Scalar) 1 / rows) * inv_in_sd).asDiagonal();
-		return TensorMap<Scalar,Base::DATA_RANK>(prev_out_grad.data(), out_grad.dimensions());
+		assert(out_grad.dimension(0) > 0 && batch_dims[0] == out_grad.dimension(0));
+		Matrix<Scalar> gamma = params_ref.col(0);
+		Matrix<Scalar> gamma_grad(params_ref.rows(), 1);
+		Matrix<Scalar> beta_grad(params_ref.rows(), 1);
+		typename Base::Data prev_out_grad(batch_dims);
+		batch_norm_bwd(input.data(), out_grad.data(), gamma.data(), mean_cache.data(), inv_var_cache.data(),
+				batch_dims, false, epsilon, prev_out_grad.data(), gamma_grad.data(), beta_grad.data());
+		params_grad.col(0) = gamma_grad;
+		params_grad.col(1) = beta_grad;
+		return prev_out_grad;
 	}
 private:
 	const Dimensions<std::size_t,Rank> dims;
@@ -4264,17 +4402,15 @@ private:
 	const Scalar epsilon;
 	bool input_layer;
 	bool frozen;
-	// Dynamic batch normalization parameters.
-	RowVector<Scalar> avg_means;
-	RowVector<Scalar> avg_inv_sds;
-	bool avgs_init;
-	// Betas and gammas
+	std::array<std::size_t,4> batch_dims;
+	RowVector<Scalar> means;
+	RowVector<Scalar> vars;
 	Matrix<Scalar> params;
-	Matrix<Scalar>& params_ref;
 	Matrix<Scalar> params_grad;
-	// Staged computation caches.
-	RowVector<Scalar> inv_in_sd;
-	Matrix<Scalar> std_in;
+	Matrix<Scalar>& params_ref;
+	typename Base::Data input;
+	RowVector<Scalar> mean_cache;
+	RowVector<Scalar> inv_var_cache;
 };
 #endif
 

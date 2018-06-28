@@ -1,8 +1,8 @@
 var searchData=
 [
   ['absoluteparameterregularization',['AbsoluteParameterRegularization',['../classcattle_1_1_absolute_parameter_regularization.html#a61c3c0f9721f9dc82e3f11a0b629afc3',1,'cattle::AbsoluteParameterRegularization']]],
-  ['activation_5fbwd',['activation_bwd',['../classcattle_1_1internal_1_1_cu_d_n_n_handle.html#a0982de606f6c0ae2a14334ccb3df205e',1,'cattle::internal::CuDNNHandle']]],
-  ['activation_5ffwd',['activation_fwd',['../classcattle_1_1internal_1_1_cu_d_n_n_handle.html#a548735f0fa8c69cb1136dca23ce9deba',1,'cattle::internal::CuDNNHandle']]],
+  ['activation_5fbwd',['activation_bwd',['../classcattle_1_1internal_1_1_cu_d_n_n_handle.html#ae958103fd306a6ad9c1e0d50d9e13d57',1,'cattle::internal::CuDNNHandle']]],
+  ['activation_5ffwd',['activation_fwd',['../classcattle_1_1internal_1_1_cu_d_n_n_handle.html#a46b5ef9ed5403f8e934dc35038c377c9',1,'cattle::internal::CuDNNHandle']]],
   ['adadeltaoptimizer',['AdaDeltaOptimizer',['../classcattle_1_1_ada_delta_optimizer.html#a3655bde46c25611366d7b200294e0832',1,'cattle::AdaDeltaOptimizer']]],
   ['adagradoptimizer',['AdaGradOptimizer',['../classcattle_1_1_ada_grad_optimizer.html#a120277c7efe742d1861c2512ccc9dd43',1,'cattle::AdaGradOptimizer']]],
   ['adamaxoptimizer',['AdaMaxOptimizer',['../classcattle_1_1_ada_max_optimizer.html#a3303ee97e0c61518c3195b5c3e0c2802',1,'cattle::AdaMaxOptimizer']]],
