@@ -95,6 +95,11 @@ public:
 	 */
 	virtual const Dims& get_output_dims() const = 0;
 	/**
+	 * @return A vector of pointers to constant layers constituting the network. The ownership
+	 * of the layers remains with the network.
+	 */
+	virtual std::vector<const Layer<Scalar,Rank>*> get_layers() const = 0;
+	/**
 	 * @return A vector of pointers to the layers of the network. The ownership of the
 	 * layers remains with the network.
 	 */
@@ -139,15 +144,15 @@ public:
 	/**
 	 * @return A string representation of the neural network.
 	 */
-	inline virtual std::string to_string() {
+	inline virtual std::string to_string() const {
 		std::stringstream strm;
 		strm << "Neural Net <" << typeid(*this).name() << this << ">" << std::endl;
-		std::vector<Layer<Scalar,Rank>*> layers = get_layers();
+		std::vector<const Layer<Scalar,Rank>*> layers = get_layers();
 		for (unsigned i = 0; i < layers.size(); ++i)
 			strm << "Layer " << std::setw(3) << std::to_string(i) << " " << *layers[i];
 		return strm.str();
 	}
-	friend std::ostream& operator<<(std::ostream& os, NeuralNetwork<Scalar,Rank,Sequential>& nn) {
+	friend std::ostream& operator<<(std::ostream& os, const NeuralNetwork<Scalar,Rank,Sequential>& nn) {
 		return os << nn.to_string() << std::endl;
 	}
 protected:
@@ -181,22 +186,6 @@ protected:
 	 * a null tensor if the network is a foremost network.
 	 */
 	virtual Data backpropagate(Data out_grad) = 0;
-	/**
-	 * A method to expose protected methods of the Layer class to subclasses of
-	 * NeuralNetwork that are not friend classes of Layer.
-	 *
-	 * \see Layer#clone_with_shared_params()
-	 *
-	 * It produces a clone of the specified layer that shares the original layer's
-	 * parameters.
-	 *
-	 * @param layer A reference to the layer to clone.
-	 * @return A pointer to the clone that uses a reference to the original layer's
-	 * parameters.
-	 */
-	inline static Layer<Scalar,Rank>* clone_with_shared_params(Layer<Scalar,Rank>& layer) {
-		return layer.clone_with_shared_params();
-	}
 	/**
 	 * A method to expose protected methods of the Layer class to subclasses of
 	 * NeuralNetwork that are not friend classes of Layer.
@@ -357,11 +346,15 @@ public:
 	inline const typename Base::Dims& get_output_dims() const {
 		return output_dims;
 	}
+	inline std::vector<const Layer<Scalar,Rank>*> get_layers() const {
+		std::vector<const Layer<Scalar,Rank>*> layer_ptrs(layers.size());
+		populate_layer_vector<const Layer<Scalar,Rank>*>(layer_ptrs);
+		return layer_ptrs;
+	}
 	inline std::vector<Layer<Scalar,Rank>*> get_layers() {
-		std::vector<Layer<Scalar,Rank>*> layers_raw(layers.size());
-		for (unsigned i = 0; i < layers.size(); ++i)
-			layers_raw[i] = layers[i].get();
-		return layers_raw;
+		std::vector<Layer<Scalar,Rank>*> layer_ptrs(layers.size());
+		populate_layer_vector<Layer<Scalar,Rank>*>(layer_ptrs);
+		return layer_ptrs;
 	}
 	// For the copy-and-swap idiom.
 	inline friend void swap(Self& network1, Self& network2) {
@@ -409,6 +402,11 @@ protected:
 		return out_grad;
 	}
 private:
+	template<typename _LayerPtr>
+	inline void populate_layer_vector(std::vector<_LayerPtr>& layer_ptrs) const {
+		for (unsigned i = 0; i < layers.size(); ++i)
+			layer_ptrs[i] = layers[i].get();
+	}
 	std::vector<LayerPtr<Scalar,Rank>> layers;
 	bool foremost;
 	typename Base::Dims input_dims;
@@ -504,14 +502,15 @@ public:
 	inline const typename Base::Dims& get_output_dims() const {
 		return output_dims;
 	}
+	inline std::vector<const Layer<Scalar,Rank>*> get_layers() const {
+		std::vector<const Layer<Scalar,Rank>*> layer_ptrs;
+		populate_layer_vector<const Layer<Scalar,Rank>*>(layer_ptrs);
+		return layer_ptrs;
+	}
 	inline std::vector<Layer<Scalar,Rank>*> get_layers() {
-		std::vector<Layer<Scalar,Rank>*> layers;
-		for (unsigned i = 0; i < blocks.size(); ++i) {
-			std::vector<Layer<Scalar,Rank>*> internal_layers = blocks[i]->get_layers();
-			for (unsigned j = 0; j < internal_layers.size(); ++j)
-				layers.push_back(internal_layers[j]);
-		}
-		return layers;
+		std::vector<Layer<Scalar,Rank>*> layer_ptrs;
+		populate_layer_vector<Layer<Scalar,Rank>*>(layer_ptrs);
+		return layer_ptrs;
 	}
 	inline std::vector<Base*> get_modules() {
 		std::vector<Base*> modules;
@@ -559,6 +558,14 @@ protected:
 		return vec;
 	}
 private:
+	template<typename _LayerPtr>
+	inline void populate_layer_vector(std::vector<_LayerPtr>& layer_ptrs) const {
+		for (unsigned i = 0; i < blocks.size(); ++i) {
+			std::vector<Layer<Scalar,Rank>*> internal_layer_ptrs = blocks[i]->get_layers();
+			for (unsigned j = 0; j < internal_layer_ptrs.size(); ++j)
+				layer_ptrs.push_back(internal_layer_ptrs[j]);
+		}
+	}
 	std::vector<Block> blocks;
 	bool foremost;
 	typename Base::Dims input_dims;
@@ -654,14 +661,15 @@ public:
 	inline const typename Base::Dims& get_output_dims() const {
 		return output_dims;
 	}
+	inline std::vector<const Layer<Scalar,Rank>*> get_layers() const {
+		std::vector<const Layer<Scalar,Rank>*> layer_ptrs;
+		populate_layer_vector<const Layer<Scalar,Rank>*>(layer_ptrs);
+		return layer_ptrs;
+	}
 	inline std::vector<Layer<Scalar,Rank>*> get_layers() {
-		std::vector<Layer<Scalar,Rank>*> layers;
-		for (unsigned i = 0; i < lanes.size(); ++i) {
-			std::vector<Layer<Scalar,Rank>*> lane_layers = lanes[i]->get_layers();
-			for (unsigned j = 0; j < lane_layers.size(); ++j)
-				layers.push_back(lane_layers[j]);
-		}
-		return layers;
+		std::vector<Layer<Scalar,Rank>*> layer_ptrs;
+		populate_layer_vector<Layer<Scalar,Rank>*>(layer_ptrs);
+		return layer_ptrs;
 	}
 	inline std::vector<Base*> get_modules() {
 		std::vector<Base*> modules;
@@ -812,31 +820,6 @@ protected:
 		return vec;
 	}
 private:
-	std::vector<Lane> lanes;
-	bool foremost;
-	typename Base::Dims input_dims;
-	typename Base::Dims output_dims;
-	std::vector<typename Base::Data> outputs;
-	/**
-	 * A struct containing the data required for propagation.
-	 */
-	struct PropArgs {
-		Self* obj;
-		int lane_id;
-		bool training;
-		typename Base::Data* in;
-		typename Base::Data out;
-	};
-	/**
-	 * A struct containing the data require for back-propagation.
-	 */
-	struct BackpropArgs {
-		Self* obj;
-		int lane_id;
-		int concat_rank_offset;
-		typename Base::Data* out_grad;
-		typename Base::Data prev_out_grad;
-	};
 	/**
 	 * The propagation function executed in a different thread for each lane of a
 	 * parallel network.
@@ -879,6 +862,39 @@ private:
 		}
 		return nullptr;
 	}
+	template<typename _LayerPtr>
+	inline void populate_layer_vector(std::vector<_LayerPtr>& layer_ptrs) const {
+		for (unsigned i = 0; i < lanes.size(); ++i) {
+			std::vector<Layer<Scalar,Rank>*> internal_layer_ptrs = lanes[i]->get_layers();
+			for (unsigned j = 0; j < internal_layer_ptrs.size(); ++j)
+				layer_ptrs.push_back(internal_layer_ptrs[j]);
+		}
+	}
+	std::vector<Lane> lanes;
+	bool foremost;
+	typename Base::Dims input_dims;
+	typename Base::Dims output_dims;
+	std::vector<typename Base::Data> outputs;
+	/**
+	 * A struct containing the data required for propagation.
+	 */
+	struct PropArgs {
+		Self* obj;
+		int lane_id;
+		bool training;
+		typename Base::Data* in;
+		typename Base::Data out;
+	};
+	/**
+	 * A struct containing the data require for back-propagation.
+	 */
+	struct BackpropArgs {
+		Self* obj;
+		int lane_id;
+		int concat_rank_offset;
+		typename Base::Data* out_grad;
+		typename Base::Data prev_out_grad;
+	};
 };
 
 /**
@@ -951,14 +967,15 @@ public:
 	inline const typename Base::Dims& get_output_dims() const {
 		return output_dims;
 	}
+	inline std::vector<const Layer<Scalar,Rank>*> get_layers() const {
+		std::vector<const Layer<Scalar,Rank>*> layer_ptrs;
+		populate_layer_vector<const Layer<Scalar,Rank>*>(layer_ptrs);
+		return layer_ptrs;
+	}
 	inline std::vector<Layer<Scalar,Rank>*> get_layers() {
-		std::vector<Layer<Scalar,Rank>*> layers;
-		for (unsigned i = 0; i < modules.size(); ++i) {
-			std::vector<Layer<Scalar,Rank>*> module_layers = modules[i]->get_layers();
-			for (unsigned j = 0; j < module_layers.size(); ++j)
-				layers.push_back(module_layers[j]);
-		}
-		return layers;
+		std::vector<Layer<Scalar,Rank>*> layer_ptrs;
+		populate_layer_vector<Layer<Scalar,Rank>*>(layer_ptrs);
+		return layer_ptrs;
 	}
 	inline std::vector<Base*> get_modules() {
 		std::vector<Base*> modules;
@@ -1008,6 +1025,14 @@ protected:
 		return out_grad;
 	}
 private:
+	template<typename _LayerPtr>
+	inline void populate_layer_vector(std::vector<_LayerPtr>& layer_ptrs) const {
+		for (unsigned i = 0; i < modules.size(); ++i) {
+			std::vector<Layer<Scalar,Rank>*> internal_layer_ptrs = modules[i]->get_layers();
+			for (unsigned j = 0; j < internal_layer_ptrs.size(); ++j)
+				layer_ptrs.push_back(internal_layer_ptrs[j]);
+		}
+	}
 	std::vector<Module> modules;
 	bool foremost;
 	typename Base::Dims input_dims;
@@ -1096,14 +1121,15 @@ public:
 	inline const typename Base::Dims& get_output_dims() const {
 		return output_dims;
 	}
+	inline std::vector<const Layer<Scalar,Rank>*> get_layers() const {
+		std::vector<const Layer<Scalar,Rank>*> layer_ptrs;
+		populate_layer_vector<const Layer<Scalar,Rank>*>(layer_ptrs);
+		return layer_ptrs;
+	}
 	inline std::vector<Layer<Scalar,Rank>*> get_layers() {
-		std::vector<Layer<Scalar,Rank>*> layers;
-		for (unsigned i = 0; i < modules.size(); ++i) {
-			std::vector<Layer<Scalar,Rank>*> module_layers = modules[i]->get_layers();
-			for (unsigned j = 0; j < module_layers.size(); ++j)
-				layers.push_back(module_layers[j]);
-		}
-		return layers;
+		std::vector<Layer<Scalar,Rank>*> layer_ptrs;
+		populate_layer_vector<Layer<Scalar,Rank>*>(layer_ptrs);
+		return layer_ptrs;
 	}
 	inline std::vector<Base*> get_modules() {
 		std::vector<Base*> modules;
@@ -1166,6 +1192,15 @@ protected:
 						module.backpropagate(std::move(out_grad_i)));
 		}
 		return out_grad;
+	}
+private:
+	template<typename _LayerPtr>
+	inline void populate_layer_vector(std::vector<_LayerPtr>& layer_ptrs) const {
+		for (unsigned i = 0; i < modules.size(); ++i) {
+			std::vector<Layer<Scalar,Rank>*> internal_layer_ptrs = modules[i]->get_layers();
+			for (unsigned j = 0; j < internal_layer_ptrs.size(); ++j)
+				layer_ptrs.push_back(internal_layer_ptrs[j]);
+		}
 	}
 	std::vector<Module> modules;
 	bool foremost;
@@ -1234,6 +1269,9 @@ public:
 	}
 	inline const typename Base::Dims& get_output_dims() const {
 		return output_dims;
+	}
+	inline std::vector<const Layer<Scalar,Rank>*> get_layers() const {
+		return ((const NeuralNetwork<Scalar,Rank,false>&) *net).get_layers();
 	}
 	inline std::vector<Layer<Scalar,Rank>*> get_layers() {
 		return net->get_layers();
@@ -1459,14 +1497,15 @@ public:
 	inline const typename Root::Dims& get_output_dims() const {
 		return output_dims;
 	}
+	inline std::vector<const Layer<Scalar,Rank>*> get_layers() const {
+		std::vector<const Layer<Scalar,Rank>*> layer_ptrs(5);
+		populate_layer_vector<const Layer<Scalar,Rank>*>(layer_ptrs);
+		return layer_ptrs;
+	}
 	inline std::vector<Layer<Scalar,Rank>*> get_layers() {
-		std::vector<Layer<Scalar,Rank>*> layers(5);
-		layers[0] = main_cell.input_kernel.get();
-		layers[1] = main_cell.state_kernel.get();
-		layers[2] = main_cell.output_kernel.get();
-		layers[3] = main_cell.state_act.get();
-		layers[4] = main_cell.output_act.get();
-		return layers;
+		std::vector<Layer<Scalar,Rank>*> layer_ptrs(5);
+		populate_layer_vector<Layer<Scalar,Rank>*>(layer_ptrs);
+		return layer_ptrs;
 	}
 	// For the copy-and-swap idiom.
 	inline friend void swap(Self& network1, Self& network2) {
@@ -1536,18 +1575,18 @@ protected:
 				for (int j = 1; j < time_steps; ++j) {
 					Cell& cell = cells[j - 1];
 					cell.state_kernel = KernelPtr<Scalar,Rank>((KernelLayer<Scalar,Rank>*)
-							Root::clone_with_shared_params(*main_cell.state_kernel));
+							main_cell.state_kernel->clone_with_shared_params());
 					cell.state_act = ActivationPtr<Scalar,Rank>((ActivationLayer<Scalar,Rank>*)
-							Root::clone_with_shared_params(*main_cell.state_act));
+							main_cell.state_act->clone_with_shared_params());
 					// Only copy the kernels and activations that will actually be used.
 					if (j < input_seq_length)
 						cell.input_kernel = KernelPtr<Scalar,Rank>((KernelLayer<Scalar,Rank>*)
-								Root::clone_with_shared_params(*main_cell.input_kernel));
+								main_cell.input_kernel->clone_with_shared_params());
 					if (j >= output_seq_delay && j < output_end) {
 						cell.output_kernel = KernelPtr<Scalar,Rank>((KernelLayer<Scalar,Rank>*)
-								Root::clone_with_shared_params(*main_cell.output_kernel));
+								main_cell.output_kernel->clone_with_shared_params());
 						cell.output_act = ActivationPtr<Scalar,Rank>((ActivationLayer<Scalar,Rank>*)
-								Root::clone_with_shared_params(*main_cell.output_act));
+								main_cell.output_act->clone_with_shared_params());
 					}
 				}
 			} else
@@ -1758,6 +1797,14 @@ protected:
 		return prev_out_grad;
 	}
 private:
+	template<typename _LayerPtr>
+	inline void populate_layer_vector(std::vector<_LayerPtr>& layer_ptrs) const {
+		layer_ptrs[0] = main_cell.input_kernel.get();
+		layer_ptrs[1] = main_cell.state_kernel.get();
+		layer_ptrs[2] = main_cell.output_kernel.get();
+		layer_ptrs[3] = main_cell.state_act.get();
+		layer_ptrs[4] = main_cell.output_act.get();
+	}
 	/**
 	 * A struct representing a cell in the unrolled RNN.
 	 */
@@ -2015,22 +2062,15 @@ public:
 	inline const typename Root::Dims& get_output_dims() const {
 		return output_dims;
 	}
+	inline std::vector<const Layer<Scalar,Rank>*> get_layers() const {
+		std::vector<const Layer<Scalar,Rank>*> layer_ptrs(13);
+		populate_layer_vector<const Layer<Scalar,Rank>*>(layer_ptrs);
+		return layer_ptrs;
+	}
 	inline std::vector<Layer<Scalar,Rank>*> get_layers() {
-		std::vector<Layer<Scalar,Rank>*> layers(13);
-		layers[0] = main_cell.input_forget_kernel.get();
-		layers[1] = main_cell.output_forget_kernel.get();
-		layers[2] = main_cell.input_write_kernel.get();
-		layers[3] = main_cell.output_write_kernel.get();
-		layers[4] = main_cell.input_candidate_kernel.get();
-		layers[5] = main_cell.output_candidate_kernel.get();
-		layers[6] = main_cell.input_read_kernel.get();
-		layers[7] = main_cell.output_read_kernel.get();
-		layers[8] = main_cell.forget_act.get();
-		layers[9] = main_cell.write_act.get();
-		layers[10] = main_cell.candidate_act.get();
-		layers[11] = main_cell.read_act.get();
-		layers[12] = main_cell.state_act.get();
-		return layers;
+		std::vector<Layer<Scalar,Rank>*> layer_ptrs(13);
+		populate_layer_vector<Layer<Scalar,Rank>*>(layer_ptrs);
+		return layer_ptrs;
 	}
 	inline friend void swap(Self& network1, Self& network2) {
 		using std::swap;
@@ -2119,32 +2159,32 @@ protected:
 				for (int j = 1; j < time_steps; ++j) {
 					Cell& cell = cells[j - 1];
 					cell.output_forget_kernel = KernelPtr<Scalar,Rank>((KernelLayer<Scalar,Rank>*)
-							Root::clone_with_shared_params(*main_cell.output_forget_kernel));
+							main_cell.output_forget_kernel->clone_with_shared_params());
 					cell.output_write_kernel = KernelPtr<Scalar,Rank>((KernelLayer<Scalar,Rank>*)
-							Root::clone_with_shared_params(*main_cell.output_write_kernel));
+							main_cell.output_write_kernel->clone_with_shared_params());
 					cell.output_candidate_kernel = KernelPtr<Scalar,Rank>((KernelLayer<Scalar,Rank>*)
-							Root::clone_with_shared_params(*main_cell.output_candidate_kernel));
+							main_cell.output_candidate_kernel->clone_with_shared_params());
 					cell.output_read_kernel = KernelPtr<Scalar,Rank>((KernelLayer<Scalar,Rank>*)
-							Root::clone_with_shared_params(*main_cell.output_read_kernel));
+							main_cell.output_read_kernel->clone_with_shared_params());
 					cell.write_act = ActivationPtr<Scalar,Rank>((ActivationLayer<Scalar,Rank>*)
-							Root::clone_with_shared_params(*main_cell.write_act));
+							main_cell.write_act->clone_with_shared_params());
 					cell.forget_act = ActivationPtr<Scalar,Rank>((ActivationLayer<Scalar,Rank>*)
-							Root::clone_with_shared_params(*main_cell.forget_act));
+							main_cell.forget_act->clone_with_shared_params());
 					cell.candidate_act = ActivationPtr<Scalar,Rank>((ActivationLayer<Scalar,Rank>*)
-							Root::clone_with_shared_params(*main_cell.candidate_act));
+							main_cell.candidate_act->clone_with_shared_params());
 					cell.state_act = ActivationPtr<Scalar,Rank>((ActivationLayer<Scalar,Rank>*)
-							Root::clone_with_shared_params(*main_cell.state_act));
+							main_cell.state_act->clone_with_shared_params());
 					cell.read_act = ActivationPtr<Scalar,Rank>((ActivationLayer<Scalar,Rank>*)
-							Root::clone_with_shared_params(*main_cell.read_act));
+							main_cell.read_act->clone_with_shared_params());
 					if (j < input_seq_length) {
 						cell.input_forget_kernel = KernelPtr<Scalar,Rank>((KernelLayer<Scalar,Rank>*)
-								Root::clone_with_shared_params(*main_cell.input_forget_kernel));
+								main_cell.input_forget_kernel->clone_with_shared_params());
 						cell.input_write_kernel = KernelPtr<Scalar,Rank>((KernelLayer<Scalar,Rank>*)
-								Root::clone_with_shared_params(*main_cell.input_write_kernel));
+								main_cell.input_write_kernel->clone_with_shared_params());
 						cell.input_candidate_kernel = KernelPtr<Scalar,Rank>((KernelLayer<Scalar,Rank>*)
-								Root::clone_with_shared_params(*main_cell.input_candidate_kernel));
+								main_cell.input_candidate_kernel->clone_with_shared_params());
 						cell.input_read_kernel = KernelPtr<Scalar,Rank>((KernelLayer<Scalar,Rank>*)
-								Root::clone_with_shared_params(*main_cell.input_read_kernel));
+								main_cell.input_read_kernel->clone_with_shared_params());
 					}
 				}
 			} else
@@ -2551,6 +2591,22 @@ protected:
 		return prev_out_grad;
 	}
 private:
+	template<typename _LayerPtr>
+	inline void populate_layer_vector(std::vector<_LayerPtr>& layer_ptrs) const {
+		layer_ptrs[0] = main_cell.input_forget_kernel.get();
+		layer_ptrs[1] = main_cell.output_forget_kernel.get();
+		layer_ptrs[2] = main_cell.input_write_kernel.get();
+		layer_ptrs[3] = main_cell.output_write_kernel.get();
+		layer_ptrs[4] = main_cell.input_candidate_kernel.get();
+		layer_ptrs[5] = main_cell.output_candidate_kernel.get();
+		layer_ptrs[6] = main_cell.input_read_kernel.get();
+		layer_ptrs[7] = main_cell.output_read_kernel.get();
+		layer_ptrs[8] = main_cell.forget_act.get();
+		layer_ptrs[9] = main_cell.write_act.get();
+		layer_ptrs[10] = main_cell.candidate_act.get();
+		layer_ptrs[11] = main_cell.read_act.get();
+		layer_ptrs[12] = main_cell.state_act.get();
+	}
 	/**
 	 * A struct representing a cell in the unrolled LSTM.
 	 */
@@ -2670,15 +2726,15 @@ public:
 	inline const typename Base::Dims& get_output_dims() const {
 		return output_dims;
 	}
+	inline std::vector<const Layer<Scalar,Rank>*> get_layers() const {
+		std::vector<const Layer<Scalar,Rank>*> layer_ptrs;
+		populate_layer_vector<const Layer<Scalar,Rank>*>(layer_ptrs);
+		return layer_ptrs;
+	}
 	inline std::vector<Layer<Scalar,Rank>*> get_layers() {
-		std::vector<Layer<Scalar,Rank>*> layers;
-		std::vector<Layer<Scalar,Rank>*> net_layers = net->get_layers();
-		for (std::size_t i = 0; i < net_layers.size(); ++i)
-			layers.push_back(net_layers[i]);
-		std::vector<Layer<Scalar,Rank>*> net_rev_layers = net_rev->get_layers();
-		for (std::size_t i = 0; i < net_rev_layers.size(); ++i)
-			layers.push_back(net_rev_layers[i]);
-		return layers;
+		std::vector<Layer<Scalar,Rank>*> layer_ptrs;
+		populate_layer_vector<Layer<Scalar,Rank>*>(layer_ptrs);
+		return layer_ptrs;
 	}
 	inline std::vector<UnidirectionalNeuralNetwork<Scalar,Rank>*> get_modules() {
 		std::vector<UnidirectionalNeuralNetwork<Scalar,Rank>*> modules;
@@ -2791,30 +2847,6 @@ protected:
 		return forward_prev_out_grad + args.prev_out_grad;
 	}
 private:
-	UnidirNet net;
-	UnidirNet net_rev;
-	bool foremost;
-	typename Base::Dims input_dims;
-	typename Base::Dims output_dims;
-	typename Base::Data output;
-	typename Base::Data output_rev;
-	/**
-	 * A struct containing the data required for propagation.
-	 */
-	struct PropArgs {
-		Self* obj;
-		bool training;
-		typename Base::Data* in;
-		typename Base::Data out;
-	};
-	/**
-	 * A struct containing the data require for back-propagation.
-	 */
-	struct BackpropArgs {
-		Self* obj;
-		typename Base::Data* out_grad;
-		typename Base::Data prev_out_grad;
-	};
 	/**
 	 * The propagation function executed in a different thread for each lane of a
 	 * parallel network.
@@ -2839,6 +2871,39 @@ private:
 		args.prev_out_grad = args.obj->net_rev->backpropagate(*args.out_grad);
 		return nullptr;
 	}
+	template<typename _LayerPtr>
+	inline void populate_layer_vector(std::vector<_LayerPtr>& layer_ptrs) const {
+		std::vector<Layer<Scalar,Rank>*> net_layer_ptrs = net->get_layers();
+		for (std::size_t i = 0; i < net_layer_ptrs.size(); ++i)
+			layer_ptrs.push_back(net_layer_ptrs[i]);
+		std::vector<Layer<Scalar,Rank>*> net_rev_layer_ptrs = net_rev->get_layers();
+		for (std::size_t i = 0; i < net_rev_layer_ptrs.size(); ++i)
+			layer_ptrs.push_back(net_rev_layer_ptrs[i]);
+	}
+	UnidirNet net;
+	UnidirNet net_rev;
+	bool foremost;
+	typename Base::Dims input_dims;
+	typename Base::Dims output_dims;
+	typename Base::Data output;
+	typename Base::Data output_rev;
+	/**
+	 * A struct containing the data required for propagation.
+	 */
+	struct PropArgs {
+		Self* obj;
+		bool training;
+		typename Base::Data* in;
+		typename Base::Data out;
+	};
+	/**
+	 * A struct containing the data require for back-propagation.
+	 */
+	struct BackpropArgs {
+		Self* obj;
+		typename Base::Data* out_grad;
+		typename Base::Data prev_out_grad;
+	};
 };
 
 } /* namespace cattle */

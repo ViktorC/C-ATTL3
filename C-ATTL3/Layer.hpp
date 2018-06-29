@@ -74,12 +74,30 @@ public:
 	static const ParamRegSharedPtr<Scalar> NO_PARAM_REG;
 	virtual ~Layer() = default;
 	/**
-	 * A constant method implementing the clone pattern.
+	 * It returns a clone of the layer instance.
 	 *
 	 * @return A pointer to a copy of the instance. The instance does not take ownership of
 	 * the returned pointer (i.e. the caller is responsible for deleting it).
 	 */
 	virtual Layer<Scalar,Rank>* clone() const = 0;
+	/**
+	 * It returns a clone of the layer instance using a reference to the original's parameters.
+	 * Non-parametric layers do not need to support parameter sharing and thus are just expected
+	 * to return a normal clone.
+	 *
+	 * @return A clone of the original layer instance sharing the same parameters with the
+	 * original.
+	 */
+	virtual Layer<Scalar,Rank>* clone_with_shared_params() = 0;
+	/**
+	 * It returns a reference to the layer owning the parameters used. If this owner goes out
+	 * of scope (in case this one is a clone with shared parameters), the behavior of the clone
+	 * is undefined.
+	 *
+	 * @return A reference to the layer owning the parameters. If this layer is not using
+	 * shared parameters, it returns a reference to itself.
+	 */
+	virtual const Layer<Scalar,Rank>& get_params_owner() const = 0;
 	/**
 	 * A simple constant getter method for the input dimensionality of the layer.
 	 *
@@ -96,15 +114,28 @@ public:
 	 */
 	virtual const Dimensions<std::size_t,Rank>& get_output_dims() const = 0;
 	/**
-	 * A constant method for determining whether the parameters of the layer,
-	 * if there are any, are to be updated during optimization.
+	 * It returns a constant reference to the learnable parameters of the layer.
+	 *
+	 * @return A constant reference to the parameters of the layer that are to be learned.
+	 */
+	virtual const Matrix<Scalar>& get_params() const = 0;
+	/**
+	 * It returns a constant reference to the gradient of the learnable parameters of the
+	 * layer.
+	 *
+	 * @return A constant reference to the gradient of the parameters of the layer.
+	 */
+	virtual const Matrix<Scalar>& get_params_grad() const = 0;
+	/**
+	 * It determines whether the parameters of the layer, if there are any, are to be
+	 * updated during optimization.
 	 *
 	 * @return Whether the parameters should not be updated during optimization.
 	 */
 	virtual bool is_frozen() const = 0;
 	/**
-	 * A method for setting whether the parameters of the layer should not be updated
-	 * during optimization. Frozen layers are not regularized either.
+	 * It sets whether the parameters of the layer should not be updated during optimization.
+	 * Frozen layers are not regularized either.
 	 *
 	 * @param frozen Whether the parameters of the layer are to be frozen, i.e. not
 	 * updatable via optimization.
@@ -115,17 +146,26 @@ public:
 	 */
 	virtual void init() = 0;
 	/**
+	 * It determines whether the layer instance is a clone using the shared parameters of
+	 * another instance.
+	 *
+	 * @return Whether the layer instance is a shared-parameter clone.
+	 */
+	inline bool is_shared_params_clone() const {
+		return this != &get_params_owner();
+	}
+	/**
 	 * A method that returns whether the layer has parameters that can be learned.
 	 *
 	 * @return Whether the layer uses learnable parameters.
 	 */
-	inline bool is_parametric() {
+	inline bool is_parametric() const {
 		return get_params().rows() > 0 && get_params().cols() > 0;
 	}
 	/**
 	 * @return A string representation of the layer.
 	 */
-	inline virtual std::string to_string() {
+	inline virtual std::string to_string() const {
 		static const int header_length = 128;
 		std::stringstream strm;
 		std::stringstream id_num_strm;
@@ -136,7 +176,7 @@ public:
 		strm << "\toutput dims: " << get_output_dims().to_string() << std::endl;
 		if (is_parametric()) {
 			strm << "\tparams:" << std::endl;
-			Matrix<Scalar>& params = get_params();
+			const Matrix<Scalar>& params = get_params();
 			for (int j = 0; j < params.rows(); ++j) {
 				strm << "\t[ ";
 				for (int k = 0; k < params.cols(); ++k) {
@@ -149,7 +189,7 @@ public:
 		}
 		return strm.str();
 	}
-	friend std::ostream& operator<<(std::ostream& os, Layer<Scalar,Rank>& layer) {
+	friend std::ostream& operator<<(std::ostream& os, const Layer<Scalar,Rank>& layer) {
 		return os << layer.to_string() << std::flush;
 	}
 protected:
@@ -158,13 +198,6 @@ protected:
 	typedef Tensor<Scalar,DATA_RANK> Data;
 	/* Only expose methods that allow for the modification of the layer's state to friends and
 	 * sub-classes (except the initialization method). */
-	/**
-	 * It returns a clone of the layer instance using a reference to the original's parameters.
-	 *
-	 * @return A clone of the original layer instance sharing the same parameters with the
-	 * original.
-	 */
-	virtual Layer<Scalar,Rank>* clone_with_shared_params() = 0;
 	/**
 	 * A constant method that returns whether this layer functions as an input layer. An input
 	 * layer does not need to propagate the gradients all the way during the backward pass as
@@ -252,13 +285,23 @@ const ParamRegSharedPtr<Scalar> Layer<Scalar,Rank>::NO_PARAM_REG = std::make_sha
  */
 template<typename Scalar, std::size_t Rank>
 class KernelLayer : public Layer<Scalar,Rank> {
+	typedef Layer<Scalar,Rank> Base;
 public:
 	virtual ~KernelLayer() = default;
+	inline const Base& get_params_owner() const {
+		return owner;
+	}
 	inline const Dimensions<std::size_t,Rank>& get_input_dims() const {
 		return input_dims;
 	}
 	inline const Dimensions<std::size_t,Rank>& get_output_dims() const {
 		return output_dims;
+	}
+	inline const Matrix<Scalar>& get_params() const {
+		return weights_ref;
+	}
+	inline const Matrix<Scalar>& get_params_grad() const {
+		return weights_grad;
 	}
 	inline bool is_frozen() const {
 		return frozen;
@@ -284,7 +327,8 @@ protected:
 				frozen(false),
 				weights(weight_rows, weight_cols),
 				weights_grad(weight_rows, weight_cols),
-				weights_ref(weights) {
+				weights_ref(weights),
+				owner(*this) {
 		assert(weight_init != nullptr);
 		assert(weight_reg != nullptr);
 	}
@@ -299,7 +343,8 @@ protected:
 			frozen(layer.frozen),
 			weights(layer.weights),
 			weights_grad(layer.weights_grad),
-			weights_ref(weights) { }
+			weights_ref(layer.is_shared_params_clone() ? layer.weights_ref : weights),
+			owner(layer.is_shared_params_clone() ? layer.owner : *this) { }
 	inline KernelLayer(KernelLayer<Scalar,Rank>& layer, bool share_params) :
 			input_dims(layer.input_dims),
 			output_dims(layer.output_dims),
@@ -311,7 +356,22 @@ protected:
 			frozen(layer.frozen),
 			weights(share_params ? Matrix<Scalar>(0, 0) : layer.weights),
 			weights_grad(layer.weights_grad),
-			weights_ref(share_params ? layer.weights : weights) { }
+			weights_ref(share_params ? layer.weights_ref : weights),
+			owner(share_params ? layer.owner : *this) { }
+	KernelLayer<Scalar,Rank>* operator=(const KernelLayer<Scalar,Rank>& layer) {
+		input_dims = layer.input_dims;
+		output_dims = layer.output_dims;
+		weight_init = layer.weight_init;
+		weight_reg = layer.weight_reg;
+		max_norm_constraint = layer.max_norm_constraint;
+		max_norm = layer.max_norm;
+		input_layer = layer.input_layer;
+		frozen = layer.frozen;
+		weights = layer.weights;
+		weights_grad = layer.weights_grad;
+		weights_ref = (layer.is_shared_params_clone() ? layer.weights_ref : weights);
+		owner = (layer.is_shared_params_clone() ? layer.owner : *this);
+	}
 	inline bool is_input_layer() const {
 		return input_layer;
 	}
@@ -352,6 +412,7 @@ private:
 	bool input_layer;
 	bool frozen;
 	Matrix<Scalar> weights;
+	const Base& owner;
 };
 
 /**
@@ -382,15 +443,15 @@ public:
 	inline Root* clone() const {
 		return new DenseKernelLayer(*this);
 	}
+	inline Root* clone_with_shared_params() {
+		return new DenseKernelLayer(*this, true);
+	}
 protected:
 	inline DenseKernelLayer(DenseKernelLayer<Scalar,Rank>& layer, bool share_params) :
 			Base::KernelLayer(layer, share_params),
 			out_conversion_dims(layer.out_conversion_dims),
 			prev_out_conversion_dims(layer.prev_out_conversion_dims),
 			biased_in_mat(layer.biased_in_mat) { }
-	inline Root* clone_with_shared_params() {
-		return new DenseKernelLayer(*this, true);
-	}
 	inline void empty_cache() {
 		biased_in_mat = Matrix<Scalar>(0, 0);
 	}
@@ -908,13 +969,13 @@ public:
 	inline Root* clone() const {
 		return new ConvKernelLayer(*this);
 	}
+	inline Root* clone_with_shared_params() {
+		return new ConvKernelLayer(*this, true);
+	}
 protected:
 	inline ConvKernelLayer(ConvKernelLayer<Scalar,Rank>& layer, bool share_params) :
 			ConvBase::ConvKernelLayerBase(layer, share_params),
 			batch_size(layer.batch_size) { }
-	inline Root* clone_with_shared_params() {
-		return new ConvKernelLayer(*this, true);
-	}
 	inline typename Root::Data pass_forward(typename Root::Data in, bool training) {
 		assert((Dimensions<std::size_t,4>(in.dimensions()).template demote<>()) == KernelBase::input_dims);
 		assert(in.dimension(0) > 0);
@@ -974,13 +1035,13 @@ public:
 	inline Root* clone() const {
 		return new ConvKernelLayer(*this);
 	}
+	inline Root* clone_with_shared_params() {
+		return new ConvKernelLayer(*this, true);
+	}
 protected:
 	inline ConvKernelLayer(ConvKernelLayer<Scalar,2>& layer, bool share_params) :
 			ConvBase::ConvKernelLayerBase(layer, share_params),
 			batch_size(layer.batch_size) { }
-	inline Root* clone_with_shared_params() {
-		return new ConvKernelLayer(*this, true);
-	}
 	inline typename Root::Data pass_forward(typename Root::Data in, bool training) {
 		assert((Dimensions<std::size_t,3>(in.dimensions()).template demote<>()) == KernelBase::input_dims);
 		assert(in.dimension(0) > 0);
@@ -1036,13 +1097,13 @@ public:
 	inline Root* clone() const {
 		return new ConvKernelLayer(*this);
 	}
+	inline Root* clone_with_shared_params() {
+		return new ConvKernelLayer(*this, true);
+	}
 protected:
 	inline ConvKernelLayer(ConvKernelLayer<Scalar,1>& layer, bool share_params) :
 			ConvBase::ConvKernelLayerBase(layer, share_params),
 			batch_size(layer.batch_size) { }
-	inline Root* clone_with_shared_params() {
-		return new ConvKernelLayer(*this, true);
-	}
 	inline typename Root::Data pass_forward(typename Root::Data in, bool training) {
 		assert((Dimensions<std::size_t,2>(in.dimensions()).template demote<>()) == KernelBase::input_dims);
 		assert(in.dimension(0) > 0);
@@ -1391,13 +1452,13 @@ public:
 	inline Root* clone() const {
 		return new DeconvKernelLayer(*this);
 	}
+	inline Root* clone_with_shared_params() {
+		return new DeconvKernelLayer(*this, true);
+	}
 protected:
 	inline DeconvKernelLayer(DeconvKernelLayer<Scalar,3>& layer, bool share_params) :
 			DeconvBase::DeconvKernelLayerBase(layer, share_params),
 			batch_size(layer.batch_size) { }
-	inline Root* clone_with_shared_params() {
-		return new DeconvKernelLayer(*this, true);
-	}
 	inline typename Root::Data pass_forward(typename Root::Data in, bool training) {
 		assert((Dimensions<std::size_t,4>(in.dimensions()).template demote<>()) == KernelBase::input_dims);
 		assert(in.dimension(0) > 0);
@@ -1459,13 +1520,13 @@ public:
 	inline Root* clone() const {
 		return new DeconvKernelLayer(*this);
 	}
+	inline Root* clone_with_shared_params() {
+		return new DeconvKernelLayer(*this, true);
+	}
 protected:
 	inline DeconvKernelLayer(DeconvKernelLayer<Scalar,2>& layer, bool share_params) :
 			DeconvBase::DeconvKernelLayerBase(layer, share_params),
 			batch_size(layer.batch_size) { }
-	inline Root* clone_with_shared_params() {
-		return new DeconvKernelLayer(*this, true);
-	}
 	inline typename Root::Data pass_forward(typename Root::Data in, bool training) {
 		assert((Dimensions<std::size_t,3>(in.dimensions()).template demote<>()) == KernelBase::input_dims);
 		assert(in.dimension(0) > 0);
@@ -1522,13 +1583,13 @@ public:
 	inline Root* clone() const {
 		return new DeconvKernelLayer(*this);
 	}
+	inline Root* clone_with_shared_params() {
+		return new DeconvKernelLayer(*this, true);
+	}
 protected:
 	inline DeconvKernelLayer(DeconvKernelLayer<Scalar,1>& layer, bool share_params) :
 			DeconvBase::DeconvKernelLayerBase(layer, share_params),
 			batch_size(layer.batch_size) { }
-	inline Root* clone_with_shared_params() {
-		return new DeconvKernelLayer(*this, true);
-	}
 	inline typename Root::Data pass_forward(typename Root::Data in, bool training) {
 		assert((Dimensions<std::size_t,2>(in.dimensions()).template demote<>()) == KernelBase::input_dims);
 		assert(in.dimension(0) > 0);
@@ -1558,11 +1619,23 @@ class ActivationLayer : public Layer<Scalar,Rank> {
 public:
 	virtual ~ActivationLayer() = default;
 	virtual Base* clone() const = 0;
+	inline Base* clone_with_shared_params() {
+		return clone();
+	}
+	inline const Base& get_params_owner() const {
+		return owner;
+	}
 	inline const Dimensions<std::size_t,Rank>& get_input_dims() const {
 		return dims;
 	}
 	inline const Dimensions<std::size_t,Rank>& get_output_dims() const {
 		return dims;
+	}
+	inline const Matrix<Scalar>& get_params() const {
+		return params_ref;
+	}
+	inline const Matrix<Scalar>& get_params_grad() const {
+		return params_grad;
 	}
 	inline bool is_frozen() const {
 		return frozen;
@@ -1579,23 +1652,32 @@ protected:
 				frozen(false),
 				params(param_rows, params_cols),
 				params_grad(param_rows, params_cols),
-				params_ref(params) { }
+				params_ref(params),
+				owner(*this) { }
 	inline ActivationLayer(const ActivationLayer<Scalar,Rank>& layer) :
 			dims(layer.dims),
 			input_layer(layer.input_layer),
 			frozen(layer.frozen),
 			params(layer.params),
 			params_grad(layer.params_grad),
-			params_ref(params) { }
+			params_ref(layer.is_shared_params_clone() ? layer.params_ref : params),
+			owner(layer.is_shared_params_clone() ? layer.owner : *this) { }
 	inline ActivationLayer(ActivationLayer<Scalar,Rank>& layer, bool share_params) :
 			dims(layer.dims),
 			input_layer(layer.input_layer),
 			frozen(layer.frozen),
 			params(share_params ? Matrix<Scalar>(0, 0) : layer.params),
 			params_grad(layer.params_grad),
-			params_ref(share_params ? layer.params : params) { }
-	inline Base* clone_with_shared_params() {
-		return clone();
+			params_ref(share_params ? layer.params_ref : params),
+			owner(share_params ? layer.owner : *this){ }
+	inline ActivationLayer<Scalar,Rank>& operator=(const ActivationLayer<Scalar,Rank>& layer) {
+		dims = layer.dims;
+		input_layer = layer.input_layer;
+		frozen = layer.frozen;
+		params = layer.params;
+		params_grad = layer.params_grad;
+		params_ref = (layer.is_shared_params_clone() ? layer.params_ref : params);
+		owner = (layer.is_shared_params_clone() ? layer.owner : *this);
 	}
 	inline bool is_input_layer() const {
 		return input_layer;
@@ -1622,6 +1704,7 @@ private:
 	bool input_layer;
 	bool frozen;
 	Matrix<Scalar> params;
+	const Base& owner;
 };
 
 /**
@@ -2440,6 +2523,9 @@ public:
 	inline Layer<Scalar,Rank>* clone() const {
 		return new PReLUActivationLayer(*this);
 	}
+	inline Root* clone_with_shared_params() {
+		return new PReLUActivationLayer(*this, true);
+	}
 	inline void init() {
 		Base::params_ref.setConstant(init_alpha);
 		Base::params_grad.setZero(1, Base::dims.get_volume());
@@ -2452,9 +2538,6 @@ protected:
 			max_norm_constraint(layer.max_norm_constraint),
 			max_norm(layer.max_norm),
 			conversion_dims(layer.conversion_dims) { }
-	inline Root* clone_with_shared_params() {
-		return new PReLUActivationLayer(*this, true);
-	}
 	inline void empty_cache() {
 		in = Matrix<Scalar>(0, 0);
 	}
@@ -2593,8 +2676,11 @@ public:
 				conversion_dims(dims.template promote<>()) {
 		assert(param_reg != nullptr);
 	}
-	inline Layer<Scalar,Rank>* clone() const {
+	inline Root* clone() const {
 		return new PSwishActivationLayer(*this);
+	}
+	inline Root* clone_with_shared_params() {
+		return new PSwishActivationLayer(*this, true);
 	}
 	inline void init() {
 		Base::params_ref.setConstant(init_beta);
@@ -2608,9 +2694,6 @@ protected:
 			max_norm_constraint(layer.max_norm_constraint),
 			max_norm(layer.max_norm),
 			conversion_dims(layer.conversion_dims) { }
-	inline Root* clone_with_shared_params() {
-		return new PSwishActivationLayer(*this, true);
-	}
 	inline void empty_cache() {
 		in = Matrix<Scalar>(0, 0);
 		sig_out = Matrix<Scalar>(0, 0);
@@ -2673,11 +2756,23 @@ class PoolLayer : public Layer<Scalar,Rank> {
 	typedef Layer<Scalar,Rank> Base;
 public:
 	virtual Base* clone() const = 0;
+	inline Base* clone_with_shared_params() {
+		return clone();
+	}
+	inline const Base& get_params_owner() const {
+		return *this;
+	}
 	inline const Dimensions<std::size_t,Rank>& get_input_dims() const {
 		return input_dims;
 	}
 	inline const Dimensions<std::size_t,Rank>& get_output_dims() const {
 		return output_dims;
+	}
+	inline const Matrix<Scalar>& get_params() const {
+		return params;
+	}
+	inline const Matrix<Scalar>& get_params_grad() const {
+		return params_grad;
 	}
 	inline bool is_frozen() const {
 		return frozen;
@@ -2737,9 +2832,6 @@ protected:
 	 * @return The derivative of the loss function w.r.t. the non-reduced patch.
 	 */
 	virtual Tensor<Scalar,4> _d_reduce(const Tensor<Scalar,4>& grad, std::size_t patch_ind) = 0;
-	inline Base* clone_with_shared_params() {
-		return clone();
-	}
 	inline bool is_input_layer() const {
 		return input_layer;
 	}
@@ -3203,11 +3295,23 @@ class PoolLayer : public Layer<Scalar,Rank> {
 	typedef std::array<std::size_t,4> Array4;
 public:
 	virtual Base* clone() const = 0;
+	inline Base* clone_with_shared_params() {
+		return clone();
+	}
+	inline const Base& get_params_owner() const {
+		return *this;
+	}
 	inline const Dimensions<std::size_t,Rank>& get_input_dims() const {
 		return input_dims;
 	}
 	inline const Dimensions<std::size_t,Rank>& get_output_dims() const {
 		return output_dims;
+	}
+	inline const Matrix<Scalar>& get_params() const {
+		return params;
+	}
+	inline const Matrix<Scalar>& get_params_grad() const {
+		return params_grad;
 	}
 	inline bool is_frozen() const {
 		return frozen;
@@ -3240,9 +3344,6 @@ protected:
 		assert(vertical_stride > 0 && horizontal_stride > 0);
 		assert(input_dims.template extend<3 - Rank>()(0) >= receptor_height &&
 				input_dims.template extend<3 - Rank>()(1) >= receptor_width);
-	}
-	inline Base* clone_with_shared_params() {
-		return clone();
 	}
 	inline bool is_input_layer() const {
 		return input_layer;
@@ -3457,11 +3558,23 @@ public:
 	inline Base* clone() const {
 		return new BroadcastLayer(*this);
 	}
+	inline Base* clone_with_shared_params() {
+		return clone();
+	}
+	inline const Base& get_params_owner() const {
+		return *this;
+	}
 	inline const Dimensions<std::size_t,Rank>& get_input_dims() const {
 		return input_dims;
 	}
 	inline const Dimensions<std::size_t,Rank>& get_output_dims() const {
 		return output_dims;
+	}
+	inline const Matrix<Scalar>& get_params() const {
+		return params;
+	}
+	inline const Matrix<Scalar>& get_params_grad() const {
+		return params_grad;
 	}
 	inline bool is_frozen() const {
 		return frozen;
@@ -3471,9 +3584,6 @@ public:
 	}
 	inline void init() { }
 protected:
-	inline Base* clone_with_shared_params() {
-		return clone();
-	}
 	inline bool is_input_layer() const {
 		return input_layer;
 	}
@@ -3578,6 +3688,7 @@ public:
 				params(channels, 2),
 				params_grad(params.rows(), params.cols()),
 				params_ref(params),
+				owner(*this),
 				cache_vec(channels) {
 		assert(gamma_reg != nullptr);
 		assert(beta_reg != nullptr);
@@ -3607,16 +3718,53 @@ public:
 			avgs_init(layer.avgs_init),
 			params(layer.params),
 			params_grad(layer.params_grad),
-			params_ref(params),
+			params_ref(layer.is_shared_params_clone() ? layer.params_ref : params),
+			owner(layer.is_shared_params_clone() ? layer.owner : *this),
 			cache_vec(layer.cache_vec) { }
+	inline Self& operator=(const Self& layer) {
+		dims = layer.dims;
+		gamma_reg = layer.gamma_reg;
+		beta_reg = layer.beta_reg;
+		gamma_max_norm_constraint = layer.gamma_max_norm_constraint;
+		beta_max_norm_constraint = layer.beta_max_norm_constraint;
+		gamma_max_norm = layer.gamma_max_norm;
+		beta_max_norm = layer.beta_max_norm;
+		norm_avg_decay = layer.norm_avg_decay;
+		epsilon = layer.epsilon;
+		channels = layer.channels;
+		input_layer = layer.input_layer;
+		frozen = layer.frozen;
+		offsets = layer.offsets;
+		extents = layer.extents;
+		avg_means = layer.avg_means;
+		avg_inv_sds = layer.avg_inv_sds;
+		avgs_init = layer.avgs_init;
+		params = layer.params;
+		params_grad = layer.params_grad;
+		params_ref = (layer.is_shared_params_clone() ? layer.params_ref : params);
+		owner = (layer.is_shared_params_clone() ? layer.owner : *this);
+		cache_vec = layer.cache_vec;
+	}
 	inline Base* clone() const {
 		return new BatchNormLayer(*this);
+	}
+	inline Base* clone_with_shared_params() {
+		return new BatchNormLayer(*this, true);
+	}
+	inline const Base& get_params_owner() const {
+		return owner;
 	}
 	inline const Dimensions<std::size_t,Rank>& get_input_dims() const {
 		return dims;
 	}
 	inline const Dimensions<std::size_t,Rank>& get_output_dims() const {
 		return dims;
+	}
+	inline const Matrix<Scalar>& get_params() const {
+		return params_ref;
+	}
+	inline const Matrix<Scalar>& get_params_grad() const {
+		return params_grad;
 	}
 	inline bool is_frozen() const {
 		return frozen;
@@ -3655,11 +3803,9 @@ protected:
 			avgs_init(layer.avgs_init),
 			params(share_params ? Matrix<Scalar>(0, 0) : layer.params),
 			params_grad(layer.params_grad),
-			params_ref(share_params ? layer.params : params),
+			params_ref(share_params ? layer.params_ref : params),
+			owner(share_params ? layer.owner : *this),
 			cache_vec(layer.cache_vec) { }
-	inline Base* clone_with_shared_params() {
-		return new BatchNormLayer(*this, true);
-	}
 	inline bool is_input_layer() const {
 		return input_layer;
 	}
@@ -3806,6 +3952,7 @@ private:
 	Matrix<Scalar> params;
 	Matrix<Scalar>& params_ref;
 	Matrix<Scalar> params_grad;
+	const Base& owner;
 	// Staged computation cache vector.
 	struct Cache {
 		Scalar inv_in_sd;
@@ -3854,7 +4001,8 @@ public:
 				avgs_init(false),
 				params(avg_means.size(), 2),
 				params_grad(params.rows(), params.cols()),
-				params_ref(params) {
+				params_ref(params),
+				owner(*this) {
 		assert(gamma_reg != nullptr);
 		assert(beta_reg != nullptr);
 		assert(norm_avg_decay >= 0 && norm_avg_decay <= 1 &&
@@ -3878,15 +4026,52 @@ public:
 			avgs_init(layer.avgs_init),
 			params(layer.params),
 			params_grad(layer.params_grad),
-			params_ref(params) { }
+			params_ref(layer.is_shared_params_clone() ? layer.params_ref : params),
+			owner(layer.is_shared_params_clone() ? layer.owner : *this),
+			inv_in_sd(layer.inv_in_sd),
+			std_in(layer.std_in) { }
+	inline Self& operator=(const Self& layer) {
+		dims = layer.dims;
+		gamma_reg = layer.gamma_reg;
+		beta_reg = layer.beta_reg;
+		gamma_max_norm_constraint = layer.gamma_max_norm_constraint;
+		beta_max_norm_constraint = layer.beta_max_norm_constraint;
+		gamma_max_norm = layer.gamma_max_norm;
+		beta_max_norm = layer.beta_max_norm;
+		norm_avg_decay = layer.norm_avg_decay;
+		epsilon = layer.epsilon;
+		input_layer = layer.input_layer;
+		frozen = layer.frozen;
+		avg_means = layer.avg_means;
+		avg_inv_sds = layer.avg_inv_sds;
+		avgs_init = layer.avgs_init;
+		params = layer.params;
+		params_grad = layer.params_grad;
+		params_ref = (layer.is_shared_params_clone() ? layer.params_ref : params);
+		owner = (layer.is_shared_params_clone() ? layer.owner : *this);
+		inv_in_sd = layer.inv_in_sd;
+		std_in = layer.std_in;
+	}
 	inline Base* clone() const {
 		return new BatchNormLayer(*this);
+	}
+	inline Base* clone_with_shared_params() {
+		return new BatchNormLayer(*this, true);
+	}
+	inline const Base& get_params_owner() const {
+		return owner;
 	}
 	inline const Dimensions<std::size_t,Rank>& get_input_dims() const {
 		return dims;
 	}
 	inline const Dimensions<std::size_t,Rank>& get_output_dims() const {
 		return dims;
+	}
+	inline const Matrix<Scalar>& get_params() const {
+		return params_ref;
+	}
+	inline const Matrix<Scalar>& get_params_grad() const {
+		return params_grad;
 	}
 	inline bool is_frozen() const {
 		return frozen;
@@ -3922,10 +4107,10 @@ protected:
 			avgs_init(layer.avgs_init),
 			params(share_params ? Matrix<Scalar>(0, 0) : layer.params),
 			params_grad(layer.params_grad),
-			params_ref(share_params ? layer.params : params) { }
-	inline Base* clone_with_shared_params() {
-		return new BatchNormLayer(*this, true);
-	}
+			params_ref(share_params ? layer.params : params),
+			owner(share_params ? layer.owner : *this),
+			inv_in_sd(layer.inv_in_sd),
+			std_in(layer.std_in) { }
 	inline bool is_input_layer() const {
 		return input_layer;
 	}
@@ -4024,6 +4209,7 @@ private:
 	Matrix<Scalar> params;
 	Matrix<Scalar>& params_ref;
 	Matrix<Scalar> params_grad;
+	const Base& owner;
 	// Staged computation caches.
 	RowVector<Scalar> inv_in_sd;
 	Matrix<Scalar> std_in;
@@ -4070,7 +4256,8 @@ public:
 				vars(params_vol),
 				params(params_vol, 2),
 				params_grad(params.rows(), params.cols()),
-				params_ref(params), {
+				params_ref(params),
+				owner(*this) {
 		assert(gamma_reg != nullptr);
 		assert(beta_reg != nullptr);
 		assert(norm_avg_decay >= 0 && norm_avg_decay <= 1 &&
@@ -4095,17 +4282,55 @@ public:
 			vars(layer.vars),
 			params(layer.params),
 			params_grad(layer.params_grad),
-			params_ref(params),
-			mean_cache(mean_cache),
-			inv_var_cache(inv_var_cache) { }
+			params_ref(layer.is_shared_params_clone() ? layer.params_ref : params),
+			owner(layer.is_shared_params_clone() ? layer.owner : *this),
+			input(layer.input),
+			mean_cache(layer.mean_cache),
+			inv_var_cache(layer.inv_var_cache) { }
+	inline Self& operator=(const Self& layer) {
+		dims = layer.dims;
+		gamma_reg = layer.gamma_reg;
+		beta_reg = layer.beta_reg;
+		gamma_max_norm_constraint = layer.gamma_max_norm_constraint;
+		beta_max_norm_constraint = layer.beta_max_norm_constraint;
+		gamma_max_norm = layer.gamma_max_norm;
+		beta_max_norm = layer.beta_max_norm;
+		norm_avg_decay = layer.norm_avg_decay;
+		epsilon = layer.epsilon;
+		params_vol = layer.params_vol;
+		input_layer = layer.input_layer;
+		frozen = layer.frozen;
+		batch_dims = layer.batch_dims;
+		means = layer.means;
+		vars = layer.vars;
+		params = layer.params;
+		params_grad = layer.params_grad;
+		params_ref = (layer.is_shared_params_clone() ? layer.params_ref : params);
+		owner = (layer.is_shared_params_clone() ? layer.owner : *this);
+		input = layer.input;
+		mean_cache = layer.mean_cache;
+		inv_var_cache = layer.inv_var_cache;
+	}
 	inline Base* clone() const {
 		return new BatchNormLayer(*this);
+	}
+	inline Base* clone_with_shared_params() {
+		return new BatchNormLayer(*this, true);
+	}
+	inline const Base& get_params_owner() const {
+		return owner;
 	}
 	inline const Dimensions<std::size_t,Rank>& get_input_dims() const {
 		return dims;
 	}
 	inline const Dimensions<std::size_t,Rank>& get_output_dims() const {
 		return dims;
+	}
+	inline const Matrix<Scalar>& get_params() const {
+		return params_ref;
+	}
+	inline const Matrix<Scalar>& get_params_grad() const {
+		return params_grad;
 	}
 	inline bool is_frozen() const {
 		return frozen;
@@ -4139,12 +4364,11 @@ protected:
 			vars(layer.vars),
 			params(share_params ? Matrix<Scalar>(0, 0) : layer.params),
 			params_grad(layer.params_grad),
-			params_ref(share_params ? layer.params : params),
-			mean_cache(mean_cache),
-			inv_var_cache(inv_var_cache) { }
-	inline Base* clone_with_shared_params() {
-		return new BatchNormLayer(*this, true);
-	}
+			params_ref(share_params ? layer.params_ref : params),
+			owner(share_params ? layer.owner : params),
+			input(layer.input),
+			mean_cache(layer.mean_cache),
+			inv_var_cache(layer.inv_var_cache) { }
 	inline bool is_input_layer() const {
 		return input_layer;
 	}
@@ -4241,6 +4465,7 @@ private:
 	Matrix<Scalar> params;
 	Matrix<Scalar> params_grad;
 	Matrix<Scalar>& params_ref;
+	const Base& owner;
 	typename Base::Data input;
 	RowVector<Scalar> mean_cache;
 	RowVector<Scalar> inv_var_cache;
@@ -4279,11 +4504,23 @@ public:
 	inline Base* clone() const {
 		return new DropoutLayer(*this);
 	}
+	inline Base* clone_with_shared_params() {
+		return clone();
+	}
+	inline const Base& get_params_owner() const {
+		return *this;
+	}
 	inline const Dimensions<std::size_t,Rank>& get_input_dims() const {
 		return dims;
 	}
 	inline const Dimensions<std::size_t,Rank>& get_output_dims() const {
 		return dims;
+	}
+	inline const Matrix<Scalar>& get_params() const {
+		return params;
+	}
+	inline const Matrix<Scalar>& get_params_grad() const {
+		return params_grad;
 	}
 	inline bool is_frozen() const {
 		return frozen;
@@ -4293,9 +4530,6 @@ public:
 	}
 	inline void init() { }
 protected:
-	inline Layer<Scalar,Rank>* clone_with_shared_params() {
-		return clone();
-	}
 	inline bool is_input_layer() const {
 		return input_layer;
 	}
@@ -4379,11 +4613,23 @@ public:
 	inline Base* clone() const {
 		return new DropoutLayer(*this);
 	}
+	inline Base* clone_with_shared_params() {
+		return clone();
+	}
+	inline const Base& get_params_owner() const {
+		return *this;
+	}
 	inline const Dimensions<std::size_t,Rank>& get_input_dims() const {
 		return dims;
 	}
 	inline const Dimensions<std::size_t,Rank>& get_output_dims() const {
 		return dims;
+	}
+	inline const Matrix<Scalar>& get_params() const {
+		return params_ref;
+	}
+	inline const Matrix<Scalar>& get_params_grad() const {
+		return params_grad;
 	}
 	inline bool is_frozen() const {
 		return frozen;
@@ -4393,9 +4639,6 @@ public:
 	}
 	inline void init() { }
 protected:
-	inline Layer<Scalar,Rank>* clone_with_shared_params() {
-		return clone();
-	}
 	inline bool is_input_layer() const {
 		return input_layer;
 	}
@@ -4479,11 +4722,23 @@ public:
 	inline Base* clone() const {
 		return new ReshapeLayer(*this);
 	}
+	inline Base* clone_with_shared_params() {
+		return clone();
+	}
+	inline const Base& get_params_owner() const {
+		return *this;
+	}
 	inline const Dimensions<std::size_t,Rank>& get_input_dims() const {
 		return input_dims;
 	}
 	inline const Dimensions<std::size_t,Rank>& get_output_dims() const {
 		return output_dims;
+	}
+	inline const Matrix<Scalar>& get_params() const {
+		return params;
+	}
+	inline const Matrix<Scalar>& get_params_grad() const {
+		return params_grad;
 	}
 	inline bool is_frozen() const {
 		return frozen;
@@ -4493,9 +4748,6 @@ public:
 	}
 	inline void init() { }
 protected:
-	inline Base* clone_with_shared_params() {
-		return clone();
-	}
 	inline bool is_input_layer() const {
 		return input_layer;
 	}
