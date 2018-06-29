@@ -126,7 +126,7 @@ public:
 		cudnnAssert(cudnnSetFilter4dDescriptor(filter_desc, DATA_TYPE, TENSOR_FORMAT, filters, depth,
 				receptor_height, receptor_width));
 		// Create and set up the bias descriptor.
-		cudnnTensorDescriptor_t bias_desc = setup_tens_desc(1, filters, 1, 1);
+		cudnnTensorDescriptor_t bias_desc = setup_tens_desc(1, 1, 1, filters);
 		// Create and set up the convolution descriptor.
 		cudnnConvolutionDescriptor_t conv_desc;
 		cudnnAssert(cudnnCreateConvolutionDescriptor(&conv_desc));
@@ -224,7 +224,7 @@ public:
 		cudnnAssert(cudnnSetFilter4dDescriptor(filter_desc, DATA_TYPE, TENSOR_FORMAT, filters, depth,
 				receptor_height, receptor_width));
 		// Create and set up the bias descriptor.
-		cudnnTensorDescriptor_t bias_desc = setup_tens_desc(1, filters, 1, 1);
+		cudnnTensorDescriptor_t bias_desc = setup_tens_desc(1, 1, 1, filters);
 		// Create and set up the backward convolution descriptor.
 		cudnnConvolutionDescriptor_t dconv_desc;
 		cudnnAssert(cudnnCreateConvolutionDescriptor(&dconv_desc));

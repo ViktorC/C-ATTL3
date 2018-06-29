@@ -1817,7 +1817,7 @@ protected:
 		assert((Dimensions<std::size_t,Base::DATA_RANK>(out_grad.dimensions()).template demote<>()) == Base::dims);
 		assert(out_grad.dimension(0) > 0 && ext_batch_dims[0] == out_grad.dimension(0));
 		typename Root::Data prev_out_grad(in.dimensions());
-		internal::CuDNNHandle<Scalar>::get_instance().sigmoid_activation_bwd(in.data(), out.data(), out_grad.data(),
+		internal::CuDNNHandle<Scalar>::get_instance().activation_bwd(in.data(), out.data(), out_grad.data(),
 				ext_batch_dims, CUDNN_ACTIVATION_SIGMOID, 0, prev_out_grad.data());
 		return prev_out_grad;
 	}
@@ -3200,6 +3200,7 @@ private:
 template<typename Scalar, std::size_t Rank>
 class PoolLayer : public Layer<Scalar,Rank> {
 	typedef Layer<Scalar,Rank> Base;
+	typedef std::array<std::size_t,4> Array4;
 public:
 	virtual Base* clone() const = 0;
 	inline const Dimensions<std::size_t,Rank>& get_input_dims() const {
@@ -3229,8 +3230,8 @@ protected:
 				pool_mode(pool_mode),
 				adj_in_batch_dims(input_dims.template promote<>()),
 				adj_out_batch_dims(output_dims.template promote<>()),
-				in_batch_dims(adj_in_batch_dims.template extend<3 - Rank>()),
-				out_batch_dims(output_dims.template extend<3 - Rank>()),
+				in_batch_dims(input_dims.template promote<>().template extend<3 - Rank>()),
+				out_batch_dims(output_dims.template promote<>().template extend<3 - Rank>()),
 				input_layer(false),
 				frozen(false),
 				params(0, 0),
@@ -3248,6 +3249,10 @@ protected:
 	}
 	inline void set_input_layer(bool input_layer) {
 		this->input_layer = input_layer;
+	}
+	inline void empty_cache() {
+		input = typename Base::Data();
+		output = typename Base::Data();
 	}
 	inline Matrix<Scalar>& get_params() {
 		return params;
