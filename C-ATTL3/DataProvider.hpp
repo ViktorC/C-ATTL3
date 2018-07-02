@@ -10,7 +10,9 @@
 
 #include <algorithm>
 #include <array>
+#include <cctype>
 #include <cstddef>
+#include <dirent.h>
 #include <fstream>
 #include <initializer_list>
 #include <iostream>
@@ -19,6 +21,7 @@
 #include <memory>
 #include <stdexcept>
 #include <string>
+#include <sys/types.h>
 #include <type_traits>
 #include <utility>
 #include <vector>
@@ -237,6 +240,11 @@ private:
 };
 
 /**
+ * An alias for an input file stream paired with file path string.
+ */
+typedef std::pair<std::string,std::ifstream> InputFile;
+
+/**
  * An abstract class template for a data provider backed by data on disk in the form of an arbitrary
  * number of files containing both the observations and the objectives. Implementations are responsible
  * for specifying the dimensions of both the observations and the objectives, for reading batches of
@@ -248,9 +256,9 @@ class JointFileDataProvider : public DataProvider<Scalar,Rank,Sequential> {
 public:
 	virtual ~JointFileDataProvider() = default;
 	inline bool has_more() {
-		for (; current_stream < data_streams.size(); ++current_stream) {
-			std::ifstream& data_stream = data_streams[current_stream];
-			if (data_stream && data_stream.peek() != EOF)
+		for (; current_file < files.size(); ++current_file) {
+			std::ifstream& file_stream = files[current_file].second;
+			if (file_stream && file_stream.peek() != EOF)
 				return true;
 		}
 		return false;
@@ -258,13 +266,13 @@ public:
 	inline DataPair<Scalar,Rank,Sequential> get_data(std::size_t batch_size) {
 		if (!has_more())
 			throw std::out_of_range("no more data left to fetch");
-		DataPair<Scalar,Rank,Sequential> data_pair = _get_data(data_streams[current_stream],
+		DataPair<Scalar,Rank,Sequential> data_pair = _get_data(files[current_file],
 				batch_size);
 		assert(data_pair.first.dimension(0) == data_pair.second.dimension(0));
 		/* If the data contains fewer batches than expected, the end of the file has been reached and the
 		 * rest of the data should be read from the next file. */
 		while (data_pair.first.dimension(0) < batch_size && has_more()) {
-			DataPair<Scalar,Rank,Sequential> add_data_pair = _get_data(data_streams[current_stream],
+			DataPair<Scalar,Rank,Sequential> add_data_pair = _get_data(files[current_file],
 					batch_size - data_pair.first.dimension(0));
 			assert(add_data_pair.first.dimension(0) == add_data_pair.second.dimension(0));
 			// It has to be evaluated into a temporary due to the dimension incompatibility.
@@ -278,22 +286,24 @@ public:
 		return data_pair;
 	}
 	inline void reset() {
-		for (std::size_t i = 0; i < data_streams.size(); ++i) {
-			std::ifstream& data_stream = data_streams[i];
-			data_stream.clear();
-			_set_to_beg(data_stream);
+		for (std::size_t i = 0; i < files.size(); ++i) {
+			std::ifstream& file_stream = files[i].second;
+			file_stream.clear();
+			_set_to_beg(file_stream);
 		}
-		current_stream = 0;
+		current_file = 0;
 	}
 protected:
 	inline JointFileDataProvider(std::vector<std::string> dataset_paths) :
-			data_streams(dataset_paths.size()),
-			current_stream(0) {
+			files(dataset_paths.size()),
+			current_file(0) {
 		assert(!dataset_paths.empty());
 		for (std::size_t i = 0; i < dataset_paths.size(); ++i) {
-			data_streams[i] = std::ifstream(dataset_paths[i], Binary ? std::ios::binary : std::ios::in);
-			std::ifstream& data_stream = data_streams[i];
-			assert(data_stream.is_open());
+			std::string dataset_path = dataset_paths[i];
+			auto file = std::make_pair(dataset_path, std::ifstream(dataset_path,
+					Binary ? std::ios::binary : std::ios::in));
+			assert(file.second.is_open());
+			files[i] = std::move(file);
 		}
 	}
 	inline JointFileDataProvider(std::string dataset_path) :
@@ -301,42 +311,41 @@ protected:
 	/**
 	 * It sets the position of the file stream to the beginning of the data set.
 	 *
-	 * @param data_stream A reference to the file stream of the data set.
+	 * @param file_stream A reference to the file stream of the data set.
 	 */
-	virtual inline void _set_to_beg(std::ifstream& data_stream) {
-		data_stream.seekg(0, std::ios::beg);
+	virtual inline void _set_to_beg(std::ifstream& file_stream) {
+		file_stream.seekg(0, std::ios::beg);
 	}
 	/**
 	 * It reads at most the specified number of observation-objective pairs from the provided
 	 * file stream. The file stream can be expected not to have any of its fail flags set
 	 * initially and to have at least 1 more character left to read.
 	 *
-	 * @param data_stream A reference to the file stream of the data set.
+	 * @param file A reference to the file stream of the data set paired with its file path.
 	 * @param batch_size The number of data points to return.
 	 * @return A pair of tensors containing the data batch.
 	 */
-	virtual DataPair<Scalar,Rank,Sequential> _get_data(std::ifstream& data_stream,
-			std::size_t batch_size) = 0;
+	virtual DataPair<Scalar,Rank,Sequential> _get_data(InputFile& file, std::size_t batch_size) = 0;
 	/**
 	 * Skips at most the specified number of instances in the data stream. The file stream can
 	 * be expected not to have any of its fail flags set initially.
 	 *
-	 * @param data_stream A reference to the file stream of the data set.
+	 * @param file_stream A reference to the file stream of the data set.
 	 * @param instances The number of instances to skip.
 	 * @return The number of instances actually skipped. It may be less than the specified
 	 * amount if there are fewer remaining instances in the data stream.
 	 */
-	virtual std::size_t _skip(std::ifstream& data_stream, std::size_t instances) = 0;
+	virtual std::size_t _skip(std::ifstream& file_stream, std::size_t instances) = 0;
 	inline void skip(std::size_t instances) {
 		if (!has_more())
 			return;
-		std::size_t skipped = _skip(data_streams[current_stream], instances);
+		std::size_t skipped = _skip(files[current_file].second, instances);
 		while (skipped < instances && has_more())
-			skipped += _skip(data_streams[current_stream], instances - skipped);
+			skipped += _skip(files[current_file].second, instances - skipped);
 	}
 private:
-	std::vector<std::ifstream> data_streams;
-	std::size_t current_stream;
+	std::vector<InputFile> files;
+	std::size_t current_file;
 };
 
 /**
@@ -348,13 +357,14 @@ private:
 template<typename Scalar, std::size_t Rank, bool Sequential, bool ObsBinary = false, bool ObjBinary = false>
 class SplitFileDataProvider : public DataProvider<Scalar,Rank,Sequential> {
 	typedef DataProvider<Scalar,Rank,Sequential> Base;
+	typedef std::pair<InputFile,InputFile> InputFilePair;
 public:
 	virtual ~SplitFileDataProvider() = default;
 	inline bool has_more() {
-		for (; current_stream_pair < data_stream_pairs.size(); ++current_stream_pair) {
-			std::pair<std::ifstream,std::ifstream>& stream_pair = data_stream_pairs[current_stream_pair];
-			if (stream_pair.first && (stream_pair.first.peek() != EOF) &&
-					stream_pair.second && (stream_pair.second.peek() != EOF))
+		for (; current_file_pair < file_pairs.size(); ++current_file_pair) {
+			InputFilePair& file_pair = file_pairs[current_file_pair];
+			if (file_pair.first.second && (file_pair.first.second.peek() != EOF) &&
+					file_pair.second.second && (file_pair.second.second.peek() != EOF))
 				return true;
 		}
 		return false;
@@ -362,14 +372,14 @@ public:
 	inline DataPair<Scalar,Rank,Sequential> get_data(std::size_t batch_size) {
 		if (!has_more())
 			throw std::out_of_range("no more data left to fetch");
-		std::pair<std::ifstream,std::ifstream>& first_stream_pair = data_stream_pairs[current_stream_pair];
-		DataPair<Scalar,Rank,Sequential> data_pair = _get_data(first_stream_pair.first,
-				first_stream_pair.second, batch_size);
+		InputFilePair& first_file_pair = file_pairs[current_file_pair];
+		DataPair<Scalar,Rank,Sequential> data_pair = _get_data(first_file_pair.first, first_file_pair.second,
+				batch_size);
 		assert(data_pair.first.dimension(0) == data_pair.second.dimension(0));
 		while (data_pair.first.dimension(0) < batch_size && has_more()) {
-			std::pair<std::ifstream,std::ifstream>& stream_pair = data_stream_pairs[current_stream_pair];
-			DataPair<Scalar,Rank,Sequential> add_data_pair = _get_data(stream_pair.first,
-					stream_pair.second, batch_size - data_pair.first.dimension(0));
+			InputFilePair& file_pair = file_pairs[current_file_pair];
+			DataPair<Scalar,Rank,Sequential> add_data_pair = _get_data(file_pair.first, file_pair.second,
+					batch_size - data_pair.first.dimension(0));
 			assert(add_data_pair.first.dimension(0) == add_data_pair.second.dimension(0));
 			typename Base::Data obs_concat =
 					data_pair.first.concatenate(std::move(add_data_pair.first),0);
@@ -381,18 +391,18 @@ public:
 		return data_pair;
 	}
 	inline void reset() {
-		for (std::size_t i = 0; i < data_stream_pairs.size(); ++i) {
-			std::pair<std::ifstream,std::ifstream>& stream_pair = data_stream_pairs[i];
-			stream_pair.first.clear();
-			stream_pair.second.clear();
-			_set_to_beg(stream_pair.first, stream_pair.second);
+		for (std::size_t i = 0; i < file_pairs.size(); ++i) {
+			InputFilePair& file_pair = file_pairs[i];
+			file_pair.first.second.clear();
+			file_pair.second.second.clear();
+			_set_to_beg(file_pair.first.second, file_pair.second.second);
 		}
-		current_stream_pair = 0;
+		current_file_pair = 0;
 	}
 protected:
 	inline SplitFileDataProvider(std::vector<std::pair<std::string,std::string>> dataset_path_pairs) :
-			data_stream_pairs(dataset_path_pairs.size()),
-			current_stream_pair(0) {
+			file_pairs(dataset_path_pairs.size()),
+			current_file_pair(0) {
 		assert(!dataset_path_pairs.empty());
 		for (std::size_t i = 0; i < dataset_path_pairs.size(); ++i) {
 			std::pair<std::string,std::string>& path_pair = dataset_path_pairs[i];
@@ -400,7 +410,8 @@ protected:
 			assert(obs_stream.is_open());
 			std::ifstream obj_stream(path_pair.second, ObjBinary ? std::ios::binary : std::ios::in);
 			assert(obj_stream.is_open());
-			data_stream_pairs[i] = std::make_pair(std::move(obs_stream), std::move(obj_stream));
+			file_pairs[i] = std::make_pair(std::make_pair(path_pair.first, std::move(obs_stream)),
+					std::make_pair(path_pair.second, std::move(obj_stream)));
 		}
 	}
 	inline SplitFileDataProvider(std::pair<std::string,std::string> dataset_path_pair) :
@@ -409,12 +420,12 @@ protected:
 	 * It sets the positions of the file streams to the beginning of the observation data set and
 	 * the objective data set respectively.
 	 *
-	 * @param obs_input_stream A reference to the file stream to a file containing observations.
-	 * @param obj_input_stream A reference to the file stream to a file containing objectives.
+	 * @param obj_file_stream A reference to the file stream to a file containing observations.
+	 * @param obj_file_stream A reference to the file stream to a file containing objectives.
 	 */
-	virtual inline void _set_to_beg(std::ifstream& obs_input_stream, std::ifstream& obj_input_stream) {
-		obs_input_stream.seekg(0, std::ios::beg);
-		obj_input_stream.seekg(0, std::ios::beg);
+	virtual inline void _set_to_beg(std::ifstream& obs_file_stream, std::ifstream& obj_file_stream) {
+		obs_file_stream.seekg(0, std::ios::beg);
+		obj_file_stream.seekg(0, std::ios::beg);
 	}
 	/**
 	 * It reads at most the specified number of observations from the observation-file and at
@@ -422,38 +433,39 @@ protected:
 	 * be expected not to have any of their fail flags set initially and to have at least 1
 	 * more character left to read in each.
 	 *
-	 * @param obs_input_stream A reference to the file stream to a file containing observations.
-	 * @param obj_input_stream A reference to the file stream to a file containing objectives.
+	 * @param obs_file A reference to the file stream of the data set paired with its file path.
+	 * @param obj_file A reference to the file stream of the data set paired with its file path.
 	 * @param batch_size The number of data points to read.
 	 * @return The paired observations and objectives.
 	 */
-	virtual DataPair<Scalar,Rank,Sequential> _get_data(std::ifstream& obs_input_stream,
-			std::ifstream& obj_input_stream, std::size_t batch_size) = 0;
+	virtual DataPair<Scalar,Rank,Sequential> _get_data(InputFile& obs_file, InputFile& obj_file,
+			std::size_t batch_size) = 0;
 	/**
 	 * Skips at most the specified number of instances in the data streams. The file streams can
 	 * be expected not to have any of their fail flags set initially.
 	 *
-	 * @param obs_input_stream A reference to the file stream to a file containing observations.
-	 * @param obj_input_stream A reference to the file stream to a file containing objectives.
+	 * @param obs_file_stream A reference to the file stream to a file containing observations.
+	 * @param obj_file_stream A reference to the file stream to a file containing objectives.
 	 * @param instances The number of data points to skip.
 	 * @return The number of actual data points skipped. It may be less than the specified
 	 * amount if there are fewer remaining instances in the data streams.
 	 */
-	virtual std::size_t _skip(std::ifstream& obs_input_stream, std::ifstream& obj_input_stream,
+	virtual std::size_t _skip(std::ifstream& obs_file_stream, std::ifstream& obj_file_stream,
 			std::size_t instances) = 0;
 	inline void skip(std::size_t instances) {
 		if (!has_more())
 			return;
-		std::pair<std::ifstream,std::ifstream>& first_stream_pair = data_stream_pairs[current_stream_pair];
-		std::size_t skipped = _skip(first_stream_pair.first, first_stream_pair.second, instances);
+		InputFilePair& first_file_pair = file_pairs[current_file_pair];
+		std::size_t skipped = _skip(first_file_pair.first.second, first_file_pair.second.second,
+				instances);
 		while (skipped < instances && has_more()) {
-			std::pair<std::ifstream,std::ifstream>& stream_pair = data_stream_pairs[current_stream_pair];
-			skipped += _skip(stream_pair.first, stream_pair.second, instances - skipped);
+			InputFilePair& file_pair = file_pairs[current_file_pair];
+			skipped += _skip(file_pair.first.second, file_pair.second.second, instances - skipped);
 		}
 	}
 private:
-	std::vector<std::pair<std::ifstream,std::ifstream>> data_stream_pairs;
-	std::size_t current_stream_pair;
+	std::vector<InputFilePair> file_pairs;
+	std::size_t current_file_pair;
 };
 
 /**
@@ -490,21 +502,21 @@ public:
 		return obj_dims;
 	}
 protected:
-	inline void _set_to_beg(std::ifstream& obs_input_stream, std::ifstream& obj_input_stream) {
-		Base::_set_to_beg(obs_input_stream, obj_input_stream);
-		obs_input_stream.ignore(OBS_OFFSET);
-		obj_input_stream.ignore(LABEL_OFFSET);
+	inline void _set_to_beg(std::ifstream& obs_file_stream, std::ifstream& obj_file_stream) {
+		Base::_set_to_beg(obs_file_stream, obj_file_stream);
+		obs_file_stream.ignore(OBS_OFFSET);
+		obj_file_stream.ignore(LABEL_OFFSET);
 	}
-	inline DataPair<Scalar,3,false> _get_data(std::ifstream& obs_input_stream,
-				std::ifstream& obj_input_stream, std::size_t batch_size) {
+	inline DataPair<Scalar,3,false> _get_data(InputFile& obs_file, InputFile& obj_file,
+			std::size_t batch_size) {
 		Tensor<Scalar,4> obs(batch_size, 28u, 28u, 1u);
 		Tensor<Scalar,4> obj(batch_size, 10u, 1u, 1u);
 		obj.setZero();
 		std::size_t i;
-		for (i = 0; i < batch_size && obs_input_stream.read(obs_buffer, OBS_INSTANCE_LENGTH); ++i) {
+		for (i = 0; i < batch_size && obs_file.second.read(obs_buffer, OBS_INSTANCE_LENGTH); ++i) {
 			// Read and set the label.
 			char label;
-			obj_input_stream.read(&label, LABEL_INSTANCE_LENGTH);
+			obj_file.second.read(&label, LABEL_INSTANCE_LENGTH);
 			obj(i,static_cast<std::size_t>(label),0u,0u) = (Scalar) 1;
 			// Set the image.
 			unsigned char* u_buffer = reinterpret_cast<unsigned char*>(obs_buffer);
@@ -521,21 +533,21 @@ protected:
 		obj_extents[0] = i;
 		return std::make_pair(obs.slice(offsets, obs_extents), obj.slice(offsets, obj_extents));
 	}
-	inline std::size_t _skip(std::ifstream& obs_input_stream, std::ifstream& obj_input_stream,
-				std::size_t instances) {
+	inline std::size_t _skip(std::ifstream& obs_file_stream, std::ifstream& obj_file_stream,
+			std::size_t instances) {
 		// Skip observations.
-		std::streampos curr_obs_pos = obs_input_stream.tellg();
-		obs_input_stream.seekg(0, std::ios::end);
-		std::size_t obs_skip_extent = obs_input_stream.tellg() - curr_obs_pos;
-		obs_input_stream.seekg(curr_obs_pos);
-		obs_input_stream.ignore(instances * OBS_INSTANCE_LENGTH);
+		std::streampos curr_obs_pos = obs_file_stream.tellg();
+		obs_file_stream.seekg(0, std::ios::end);
+		std::size_t obs_skip_extent = obs_file_stream.tellg() - curr_obs_pos;
+		obs_file_stream.seekg(curr_obs_pos);
+		obs_file_stream.ignore(instances * OBS_INSTANCE_LENGTH);
 		std::size_t skipped_obs = std::min(instances, obs_skip_extent / OBS_INSTANCE_LENGTH);
 		// Skip labels.
-		std::streampos curr_label_pos = obj_input_stream.tellg();
-		obj_input_stream.seekg(0, std::ios::end);
-		std::size_t label_skip_extent = obj_input_stream.tellg() - curr_label_pos;
-		obj_input_stream.seekg(curr_label_pos);
-		obj_input_stream.ignore(instances * LABEL_INSTANCE_LENGTH);
+		std::streampos curr_label_pos = obj_file_stream.tellg();
+		obj_file_stream.seekg(0, std::ios::end);
+		std::size_t label_skip_extent = obj_file_stream.tellg() - curr_label_pos;
+		obj_file_stream.seekg(curr_label_pos);
+		obj_file_stream.ignore(instances * LABEL_INSTANCE_LENGTH);
 		std::size_t skipped_labels = std::min(instances, label_skip_extent / LABEL_INSTANCE_LENGTH);
 		assert(skipped_obs == skipped_labels);
 		return skipped_obs;
@@ -591,13 +603,12 @@ public:
 		return obj_dims;
 	}
 protected:
-	inline DataPair<Scalar,3,false> _get_data(std::ifstream& data_stream,
-				std::size_t batch_size) {
+	inline DataPair<Scalar,3,false> _get_data(InputFile& file, std::size_t batch_size) {
 		Tensor<Scalar,4> obs(batch_size, 32u, 32u, 3u);
 		Tensor<Scalar,4> obj(batch_size, NUM_LABELS, 1u, 1u);
 		obj.setZero();
 		std::size_t i;
-		for (i = 0; i < batch_size && data_stream.read(buffer, INSTANCE_LENGTH); ++i) {
+		for (i = 0; i < batch_size && file.second.read(buffer, INSTANCE_LENGTH); ++i) {
 			unsigned char* u_buffer = reinterpret_cast<unsigned char*>(buffer);
 			std::size_t buffer_ind = 0;
 			// Set the label.
@@ -619,12 +630,12 @@ protected:
 		obj_extents[0] = i;
 		return std::make_pair(obs.slice(offsets, obs_extents), obj.slice(offsets, obj_extents));
 	}
-	inline std::size_t _skip(std::ifstream& data_stream, std::size_t instances) {
-		std::streampos curr_pos = data_stream.tellg();
-		data_stream.seekg(0, std::ios::end);
-		std::size_t skip_extent = data_stream.tellg() - curr_pos;
-		data_stream.seekg(curr_pos);
-		data_stream.ignore(instances * INSTANCE_LENGTH);
+	inline std::size_t _skip(std::ifstream& file_stream, std::size_t instances) {
+		std::streampos curr_pos = file_stream.tellg();
+		file_stream.seekg(0, std::ios::end);
+		std::size_t skip_extent = file_stream.tellg() - curr_pos;
+		file_stream.seekg(curr_pos);
+		file_stream.ignore(instances * INSTANCE_LENGTH);
 		return std::min(instances, skip_extent / INSTANCE_LENGTH);
 	}
 private:
@@ -636,36 +647,99 @@ private:
 	std::array<std::size_t,4> obj_extents;
 };
 
-//template<typename Scalar, bool Binary = true>
+///**
+// * An alias for a read-only dictionary mapping words to indices.
+// */
+//typedef std::shared_ptr<const std::map<std::string,std::size_t>> VocabSharedPtr;
+//
+///**
+// * An enumeration for the different objective types to use for the IMDB data set.
+// */
+//enum IMDBObjType { BINARY, SMOOTH_BINARY, CATEGORICAL };
+//
+///**
+// * A data provider template for the IMDB Large Movie Review Dataset.
+// *
+// * \see http://ai.stanford.edu/~amaas/data/sentiment/
+// */
+//template<typename Scalar, IMDBObjType ObjType>
 //class IMDBDataProvider : JointFileDataProvider<Scalar,1,true> {
+//	typedef JointFileDataProvider<Scalar,1,true> Base;
+//	static_assert(ObjType >= BINARY && ObjType <= CATEGORICAL, "invalid IMDB objective type");
 //public:
 //	/**
 //	 * @param file_paths The paths to the data set files.
 //	 */
 //	inline IMDBDataProvider(std::string pos_reviews_folder_path, std::string neg_reviews_folder_path,
-//			const map<std::string,std::size_t>& vocab) :
-//			Base::JointFileDataProvider(file_paths) {
+//			VocabSharedPtr vocab, std::size_t seq_length = 100) :
+//				Base::JointFileDataProvider(resolve_review_files(pos_reviews_folder_path,
+//						neg_reviews_folder_path)),
+//				vocab(vocab),
+//				seq_length(seq_length) {
+//		assert(vocab);
+//		obs_dims = Dimensions<std::size_t,1>({ vocab->size() });
+//		obj_dims = Dimensions<std::size_t,1>({ CATEGORICAL ? 10 : 1 });
 //		Base::reset();
 //	}
-//	inline const Dimensions<std::size_t,3>& get_obs_dims() const {
+//	inline const Dimensions<std::size_t,1>& get_obs_dims() const {
 //		return obs_dims;
 //	}
-//	inline const Dimensions<std::size_t,3>& get_obj_dims() const {
+//	inline const Dimensions<std::size_t,1>& get_obj_dims() const {
 //		return obj_dims;
 //	}
-//protected:
-//	inline DataPair<Scalar,3,false> _get_data(std::ifstream& data_stream,
-//				std::size_t batch_size) {
-//
+//	inline static VocabSharedPtr build_vocab(std::string vocab_path) {
+//		std::ifstream vocab_stream(vocab_path);
+//		assert(vocab_stream.is_open());
+//		std::map<std::string,std::size_t> vocab;
+//		// Reserve the first index for padding.
+//		std::size_t index = 1;
+//		std::string word;
+//		while (std::getline(vocab_stream, word))
+//			vocab.emplace(std::make_pair(word, index++));
+//		return std::make_shared<const std::map<std::string,std::size_t>>(std::move(vocab));
 //	}
-//	inline std::size_t _skip(std::ifstream& data_stream, std::size_t instances) {
-//		data_stream.seekg(0, std::ios::end);
+//protected:
+//	inline static void read_files_in_dir(std::string dir_path, std::vector<std::string>& file_names) {
+//		auto dir_ptr = opendir(dir_path.c_str());
+//		struct dirent* dir_ent_ptr;
+//		while ((dir_ent_ptr = readdir(dir_ptr)))
+//			file_names.push_back(dir_path + std::string(dir_ent_ptr->d_name));
+//		closedir(dir_ptr);
+//	}
+//	inline static std::vector<std::string> resolve_review_files(std::string pos_reviews_folder_path,
+//			std::string neg_reviews_folder_path) {
+//		std::vector<std::string> file_names;
+//		read_files_in_dir(pos_reviews_folder_path, file_names);
+//		read_files_in_dir(neg_reviews_folder_path, file_names);
+//		std::random_shuffle(file_names.begin(), file_names.end());
+//		return file_names;
+//	}
+//	inline DataPair<Scalar,1,true> _get_data(InputFile& file, std::size_t batch_size) {
+//		TensorPtr<Scalar,3> obs_ptr(new Tensor<Scalar,3>(1, seq_length, obs_dims(0u)));
+//		TensorPtr<Scalar,3> obj_ptr(new Tensor<Scalar,3>(1, 1, obj_dims(0u)));
+//		obs_ptr->setZero();
+//		std::size_t time_step = 0;
+//		std::string word;
+//		while (file.second >> word && time_step < seq_length) {
+//			std::transform(word.begin(), word.end(), word.begin(), std::tolower);
+//			auto val = vocab->find(word);
+//			if (val != vocab->end()) {
+//
+//			} else {
+//
+//			}
+//			time_step++;
+//		}
+//	}
+//	inline std::size_t _skip(std::ifstream& file_stream, std::size_t instances) {
+//		file_stream.seekg(0, std::ios::end);
 //		return instances - 1;
 //	}
 //private:
+//	const VocabSharedPtr vocab;
+//	const std::size_t seq_length;
 //	const Dimensions<std::size_t,1> obs_dims;
 //	const Dimensions<std::size_t,1> obj_dims;
-//	std::map<std::string,std::size_t> vocab;
 //};
 
 } /* namespace cattle */

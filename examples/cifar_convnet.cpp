@@ -23,8 +23,8 @@ int main() {
 	// Create a data provider for the test data as well.
 	CIFARDataProvider<float> file_test_prov(cifar_folder + "test_batch.bin");
 	// Specify the weight initializations.
-	WeightInitSharedPtr<float> conv_init(new HeWeightInitialization<float>(1e-1));
-	WeightInitSharedPtr<float> dense_init(new GlorotWeightInitialization<float>(1e-1));
+	auto conv_init = std::make_shared<HeWeightInitialization<float>>(1e-1);
+	auto dense_init = std::make_shared<GlorotWeightInitialization<float>>(1e-1);
 	// Create the network.
 	std::vector<LayerPtr<float,3>> layers(12);
 	layers[0] = LayerPtr<float,3>(new ConvKernelLayer<float>(file_train_prov.get_obs_dims(), 8, conv_init));
@@ -59,7 +59,7 @@ int main() {
 	unsigned wrong = 0;
 	unsigned correct = 0;
 	for (std::size_t i = 0; i < prediction.dimension(0); ++i) {
-		float max = internal::Utils<float>::MIN;
+		float max = internal::NumericUtils<float>::MIN;
 		std::size_t max_ind = 0;
 		for (std::size_t j = 0; j < prediction.dimension(1); ++j) {
 			float val = prediction(i,j,0u,0u);
