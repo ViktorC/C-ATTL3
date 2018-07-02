@@ -4626,7 +4626,7 @@ public:
 		return dims;
 	}
 	inline const Matrix<Scalar>& get_params() const {
-		return params_ref;
+		return params;
 	}
 	inline const Matrix<Scalar>& get_params_grad() const {
 		return params_grad;

@@ -15,6 +15,7 @@
 #include <initializer_list>
 #include <iostream>
 #include <limits>
+#include <map>
 #include <memory>
 #include <stdexcept>
 #include <string>
@@ -475,18 +476,18 @@ public:
 	 */
 	MNISTDataProvider(std::string obs_path, std::string labels_path) :
 			Base::SplitFileDataProvider(std::make_pair(obs_path, labels_path)),
-			obs({ 28u, 28u, 1u }),
-			obj({ 10u, 1u, 1u }),
+			obs_dims({ 28u, 28u, 1u }),
+			obj_dims({ 10u, 1u, 1u }),
 			offsets({ 0u, 0u, 0u, 0u }),
 			obs_extents({ 0u, 28u, 28u, 1u }),
 			obj_extents({ 0u, 10u, 1u, 1u }) {
 		Base::reset();
 	}
 	inline const Dimensions<std::size_t,3>& get_obs_dims() const {
-		return obs;
+		return obs_dims;
 	}
 	inline const Dimensions<std::size_t,3>& get_obj_dims() const {
-		return obj;
+		return obj_dims;
 	}
 protected:
 	inline void _set_to_beg(std::ifstream& obs_input_stream, std::ifstream& obj_input_stream) {
@@ -540,8 +541,8 @@ protected:
 		return skipped_obs;
 	}
 private:
-	const Dimensions<std::size_t,3> obs;
-	const Dimensions<std::size_t,3> obj;
+	const Dimensions<std::size_t,3> obs_dims;
+	const Dimensions<std::size_t,3> obj_dims;
 	char obs_buffer[OBS_INSTANCE_LENGTH];
 	std::array<std::size_t,4> offsets;
 	std::array<std::size_t,4> obs_extents;
@@ -571,8 +572,8 @@ public:
 	 */
 	inline CIFARDataProvider(std::vector<std::string> file_paths) :
 			Base::JointFileDataProvider(file_paths),
-			obs({ 32u, 32u, 3u }),
-			obj({ NUM_LABELS, 1u, 1u }),
+			obs_dims({ 32u, 32u, 3u }),
+			obj_dims({ NUM_LABELS, 1u, 1u }),
 			offsets({ 0u, 0u, 0u, 0u }),
 			obs_extents({ 0u, 32u, 32u, 3u }),
 			obj_extents({ 0u, NUM_LABELS, 1u, 1u }) {
@@ -584,10 +585,10 @@ public:
 	inline CIFARDataProvider(std::string file_path) :
 			CIFARDataProvider(std::vector<std::string>({ file_path })) { }
 	inline const Dimensions<std::size_t,3>& get_obs_dims() const {
-		return obs;
+		return obs_dims;
 	}
 	inline const Dimensions<std::size_t,3>& get_obj_dims() const {
-		return obj;
+		return obj_dims;
 	}
 protected:
 	inline DataPair<Scalar,3,false> _get_data(std::ifstream& data_stream,
@@ -627,13 +628,45 @@ protected:
 		return std::min(instances, skip_extent / INSTANCE_LENGTH);
 	}
 private:
-	const Dimensions<std::size_t,3> obs;
-	const Dimensions<std::size_t,3> obj;
+	const Dimensions<std::size_t,3> obs_dims;
+	const Dimensions<std::size_t,3> obj_dims;
 	char buffer[INSTANCE_LENGTH];
 	std::array<std::size_t,4> offsets;
 	std::array<std::size_t,4> obs_extents;
 	std::array<std::size_t,4> obj_extents;
 };
+
+//template<typename Scalar, bool Binary = true>
+//class IMDBDataProvider : JointFileDataProvider<Scalar,1,true> {
+//public:
+//	/**
+//	 * @param file_paths The paths to the data set files.
+//	 */
+//	inline IMDBDataProvider(std::string pos_reviews_folder_path, std::string neg_reviews_folder_path,
+//			const map<std::string,std::size_t>& vocab) :
+//			Base::JointFileDataProvider(file_paths) {
+//		Base::reset();
+//	}
+//	inline const Dimensions<std::size_t,3>& get_obs_dims() const {
+//		return obs_dims;
+//	}
+//	inline const Dimensions<std::size_t,3>& get_obj_dims() const {
+//		return obj_dims;
+//	}
+//protected:
+//	inline DataPair<Scalar,3,false> _get_data(std::ifstream& data_stream,
+//				std::size_t batch_size) {
+//
+//	}
+//	inline std::size_t _skip(std::ifstream& data_stream, std::size_t instances) {
+//		data_stream.seekg(0, std::ios::end);
+//		return instances - 1;
+//	}
+//private:
+//	const Dimensions<std::size_t,1> obs_dims;
+//	const Dimensions<std::size_t,1> obj_dims;
+//	std::map<std::string,std::size_t> vocab;
+//};
 
 } /* namespace cattle */
 
