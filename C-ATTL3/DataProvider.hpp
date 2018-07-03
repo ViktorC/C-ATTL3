@@ -29,8 +29,6 @@
 #include "Dimensions.hpp"
 #include "utils/EigenProxy.hpp"
 
-// TODO Pre-fetch batches from the files.
-
 namespace cattle {
 
 /**
@@ -655,7 +653,7 @@ private:
 ///**
 // * An enumeration for the different objective types to use for the IMDB data set.
 // */
-//enum IMDBObjType { BINARY, SMOOTH_BINARY, CATEGORICAL };
+//enum IMDBObjType { BINARY, SMOOTH, CATEGORICAL };
 //
 ///**
 // * A data provider template for the IMDB Large Movie Review Dataset.
@@ -687,6 +685,11 @@ private:
 //	inline const Dimensions<std::size_t,1>& get_obj_dims() const {
 //		return obj_dims;
 //	}
+//	/**
+//	 *
+//	 * @param vocab_path
+//	 * @return
+//	 */
 //	inline static VocabSharedPtr build_vocab(std::string vocab_path) {
 //		std::ifstream vocab_stream(vocab_path);
 //		assert(vocab_stream.is_open());
@@ -699,6 +702,11 @@ private:
 //		return std::make_shared<const std::map<std::string,std::size_t>>(std::move(vocab));
 //	}
 //protected:
+//	/**
+//	 *
+//	 * @param dir_path
+//	 * @param file_names
+//	 */
 //	inline static void read_files_in_dir(std::string dir_path, std::vector<std::string>& file_names) {
 //		auto dir_ptr = opendir(dir_path.c_str());
 //		struct dirent* dir_ent_ptr;
@@ -706,6 +714,12 @@ private:
 //			file_names.push_back(dir_path + std::string(dir_ent_ptr->d_name));
 //		closedir(dir_ptr);
 //	}
+//	/**
+//	 *
+//	 * @param pos_reviews_folder_path
+//	 * @param neg_reviews_folder_path
+//	 * @return
+//	 */
 //	inline static std::vector<std::string> resolve_review_files(std::string pos_reviews_folder_path,
 //			std::string neg_reviews_folder_path) {
 //		std::vector<std::string> file_names;
@@ -718,14 +732,31 @@ private:
 //		TensorPtr<Scalar,3> obs_ptr(new Tensor<Scalar,3>(1, seq_length, obs_dims(0u)));
 //		TensorPtr<Scalar,3> obj_ptr(new Tensor<Scalar,3>(1, 1, obj_dims(0u)));
 //		obs_ptr->setZero();
+//		std::size_t last_under_score = file.first.find_last_of('_');
+//		std::size_t last_period = file.first.find_last_of('.');
+//		std::size_t rating_string = file.first.substr(last_under_score + 1,
+//				last_period - last_under_score - 1);
+//		unsigned rating = (unsigned) std::stoi(rating_string);
+//		switch (ObjType) {
+//			case BINARY:
+//				obj_ptr(0u,0u,0u) = (Scalar) (rating > 5);
+//				break;
+//			case SMOOTH:
+//				obj_ptr(0u,0u,0u) = ((Scalar) (rating - 1)) / 9;
+//				break;
+//			case CATEGORICAL:
+//				obj_ptr.setZero();
+//				obj_ptr(0u,0u,rating) = (Scalar) 1;
+//				break;
+//			default:
+//				assert(false);
+//		}
 //		std::size_t time_step = 0;
 //		std::string word;
 //		while (file.second >> word && time_step < seq_length) {
 //			std::transform(word.begin(), word.end(), word.begin(), std::tolower);
 //			auto val = vocab->find(word);
 //			if (val != vocab->end()) {
-//
-//			} else {
 //
 //			}
 //			time_step++;
