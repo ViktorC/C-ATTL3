@@ -131,40 +131,6 @@ inline TensorPtr<Scalar,Rank> random_multi_hot_tensor(const std::array<std::size
 }
 
 /**
- * An alias for a unique pointer to a data provider.
- */
-template<typename Scalar, std::size_t Rank, bool Sequential>
-using DataProviderPtr = std::unique_ptr<DataProvider<Scalar,Rank,Sequential>>;
-
-/**
- * @return A pair of data providers for the MNIST training and test data respectively.
- */
-template<typename Scalar>
-inline std::pair<DataProviderPtr<Scalar,3,false>,DataProviderPtr<Scalar,3,false>> mnist_provs() {
-	std::string mnist_folder = "data/mnist/";
-	DataProviderPtr<Scalar,3,false> train_prov(new MNISTDataProvider<Scalar>(mnist_folder + "train-images.idx3-ubyte",
-			mnist_folder + "train-labels.idx1-ubyte"));
-	DataProviderPtr<Scalar,3,false> test_prov(new MNISTDataProvider<Scalar>(mnist_folder + "t10k-images.idx3-ubyte",
-			mnist_folder + "t10k-labels.idx1-ubyte"));
-	return std::pair<DataProviderPtr<Scalar,3,false>,DataProviderPtr<Scalar,3,false>>(std::move(train_prov),
-			std::move(test_prov));
-}
-
-/**
- * @return A pair of data providers for the CIFAR-10 training and test data respectively.
- */
-template<typename Scalar>
-inline std::pair<DataProviderPtr<Scalar,3,false>,DataProviderPtr<Scalar,3,false>> cifar10_provs() {
-	std::string cifar_folder = "data/cifar10/";
-	DataProviderPtr<Scalar,3,false> train_prov(new CIFARDataProvider<Scalar>({ cifar_folder + "data_batch_1.bin",
-			cifar_folder + "data_batch_2.bin", cifar_folder + "data_batch_3.bin", cifar_folder + "data_batch_4.bin",
-			cifar_folder + "data_batch_5.bin", cifar_folder + "data_batch_6.bin", }));
-	DataProviderPtr<Scalar,3,false> test_prov(new CIFARDataProvider<Scalar>(cifar_folder + "test_batch.bin"));
-	return std::pair<DataProviderPtr<Scalar,3,false>,DataProviderPtr<Scalar,3,false>>(std::move(train_prov),
-			std::move(test_prov));
-}
-
-/**
  * @param input_dims The input dimensions of the layer.
  * @return A fully connected kernel layer.
  */

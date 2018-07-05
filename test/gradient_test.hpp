@@ -653,11 +653,11 @@ inline void recurrent_net_grad_test() {
 	seq_network_grad_test("recurrent net", NeuralNetPtr<Scalar,3,true>(
 			new RecurrentNeuralNetwork<Scalar,3>(std::move(input_kernel1_3), std::move(state_kernel1_3),
 					std::move(output_kernel1_3), std::move(state_act1_3), std::move(output_act1_3),
-					[](int input_seq_length) { return std::make_pair(3, input_seq_length - 3); })), 5, 3);
+					[](std::size_t input_seq_length) { return std::make_pair(3, input_seq_length - 3); })), 5, 3);
 	seq_network_grad_test("recurrent net with multiplicative integration", NeuralNetPtr<Scalar,3,true>(
 			new RecurrentNeuralNetwork<Scalar,3,true>(std::move(input_kernel2_3), std::move(state_kernel2_3),
 					std::move(output_kernel2_3), std::move(state_act2_3), std::move(output_act2_3),
-					[](int input_seq_length) { return std::make_pair(2, input_seq_length); })), 3, 2);
+					[](std::size_t input_seq_length) { return std::make_pair(2, input_seq_length); })), 3, 2);
 }
 
 TEST(GradientTest, RecurrentNet) {
@@ -706,13 +706,13 @@ inline void lstm_net_grad_test() {
 					std::move(write_input_kernel1_1), std::move(write_output_kernel1_1), std::move(candidate_input_kernel1_1),
 					std::move(candidate_output_kernel1_1), std::move(read_input_kernel1_1), std::move(read_output_kernel1_1),
 					std::move(forget_act1_1), std::move(write_act1_1), std::move(candidate_act1_1), std::move(state_act1_1),
-					std::move(read_act1_1), [](int input_seq_length) { return std::make_pair(input_seq_length, 0); })), 3, 3);
+					std::move(read_act1_1), [](std::size_t input_seq_length) { return std::make_pair(input_seq_length, 0); })), 3, 3);
 	seq_network_grad_test("lstm net with multiplicative integration", NeuralNetPtr<Scalar,1,true>(
 			new LSTMNeuralNetwork<Scalar,1,true>(std::move(forget_input_kernel2_1), std::move(forget_output_kernel2_1),
 					std::move(write_input_kernel2_1), std::move(write_output_kernel2_1), std::move(candidate_input_kernel2_1),
 					std::move(candidate_output_kernel2_1), std::move(read_input_kernel2_1), std::move(read_output_kernel2_1),
 					std::move(forget_act2_1), std::move(write_act2_1), std::move(candidate_act2_1), std::move(state_act2_1),
-					std::move(read_act2_1), [](int input_seq_length) { return std::make_pair(1, input_seq_length - 1); })), 5, 1);
+					std::move(read_act2_1), [](std::size_t input_seq_length) { return std::make_pair(1, input_seq_length - 1); })), 5, 1);
 	// Rank 3.
 	Dimensions<std::size_t,3> input_dims_3({ 5u, 3u, 3u });
 	Dimensions<std::size_t,3> output_dims_3({ 3u, 3u, 3u });
@@ -747,13 +747,13 @@ inline void lstm_net_grad_test() {
 					std::move(write_input_kernel1_3), std::move(write_output_kernel1_3), std::move(candidate_input_kernel1_3),
 					std::move(candidate_output_kernel1_3), std::move(read_input_kernel1_3), std::move(read_output_kernel1_3),
 					std::move(forget_act1_3), std::move(write_act1_3), std::move(candidate_act1_3), std::move(state_act1_3),
-					std::move(read_act1_3), [](int input_seq_length) { return std::make_pair(3, input_seq_length - 3); })), 5, 3);
+					std::move(read_act1_3), [](std::size_t input_seq_length) { return std::make_pair(3, input_seq_length - 3); })), 5, 3);
 	seq_network_grad_test("lstm net with multiplicative integration", NeuralNetPtr<Scalar,3,true>(
 			new LSTMNeuralNetwork<Scalar,3,true>(std::move(forget_input_kernel2_3), std::move(forget_output_kernel2_3),
 					std::move(write_input_kernel2_3), std::move(write_output_kernel2_3), std::move(candidate_input_kernel2_3),
 					std::move(candidate_output_kernel2_3), std::move(read_input_kernel2_3), std::move(read_output_kernel2_3),
 					std::move(forget_act2_3), std::move(write_act2_3), std::move(candidate_act2_3), std::move(state_act2_3),
-					std::move(read_act2_3), [](int input_seq_length) { return std::make_pair(2, input_seq_length); })), 3, 2);
+					std::move(read_act2_3), [](std::size_t input_seq_length) { return std::make_pair(2, input_seq_length); })), 3, 2);
 }
 
 TEST(GradientTest, LSTMNet) {
@@ -778,7 +778,7 @@ inline void bidirectional_net_grad_test() {
 			new BidirectionalNeuralNetwork<Scalar,3,CONCAT_HI_RANK>(UnidirNeuralNetPtr<Scalar,3>(
 					new RecurrentNeuralNetwork<Scalar,3,true>(std::move(input_kernel1), std::move(state_kernel1),
 							std::move(output_kernel1), std::move(state_act1), std::move(output_act1),
-							[](int input_seq_length) { return std::make_pair(3, 2); })))), 7, 3);
+							[](std::size_t input_seq_length) { return std::make_pair(3, 2); })))), 7, 3);
 	// 2nd degree LSTM with lowest rank concatenation.
 	Dimensions<std::size_t,2> input_dims({ 6u, 6u });
 	Dimensions<std::size_t,2> output_dims({ 6u, 1u });
@@ -803,7 +803,7 @@ inline void bidirectional_net_grad_test() {
 							std::move(candidate_output_kernel2), std::move(read_input_kernel2),
 							std::move(read_output_kernel2), std::move(forget_act2), std::move(write_act2),
 							std::move(candidate_act2), std::move(state_act2), std::move(read_act2),
-							[](int input_seq_length) { return std::make_pair(1, 2); })))), 5, 1);
+							[](std::size_t input_seq_length) { return std::make_pair(1, 2); })))), 5, 1);
 	// 1st degree RNN with summation.
 	KernelPtr<Scalar,1> input_kernel3(new DenseKernelLayer<Scalar,1>({ 24u }, 8, init, reg));
 	KernelPtr<Scalar,1> state_kernel3(new DenseKernelLayer<Scalar,1>(input_kernel3->get_output_dims(), 8, init, reg));
@@ -814,7 +814,7 @@ inline void bidirectional_net_grad_test() {
 			new BidirectionalNeuralNetwork<Scalar,1,SUM>(UnidirNeuralNetPtr<Scalar,1>(
 					new RecurrentNeuralNetwork<Scalar,1>(std::move(input_kernel3), std::move(state_kernel3),
 							std::move(output_kernel3), std::move(state_act3), std::move(output_act3),
-							[](int input_seq_length) { return std::make_pair(5, 2); })))), 7, 5);
+							[](std::size_t input_seq_length) { return std::make_pair(5, 2); })))), 7, 5);
 	// 3rd degree RNN with multiplication.
 	KernelPtr<Scalar,3> input_kernel4(new ConvKernelLayer<Scalar>({ 4u, 4u, 2u }, 5, init, reg));
 	KernelPtr<Scalar,3> state_kernel4(new ConvKernelLayer<Scalar>(input_kernel4->get_output_dims(), 5, init, reg));
@@ -825,7 +825,7 @@ inline void bidirectional_net_grad_test() {
 			new BidirectionalNeuralNetwork<Scalar,3,MUL>(UnidirNeuralNetPtr<Scalar,3>(
 					new RecurrentNeuralNetwork<Scalar,3,true>(std::move(input_kernel4), std::move(state_kernel4),
 							std::move(output_kernel4), std::move(state_act4), std::move(output_act4),
-							[](int input_seq_length) { return std::make_pair(3, 2); })))), 7, 3);
+							[](std::size_t input_seq_length) { return std::make_pair(3, 2); })))), 7, 3);
 }
 
 TEST(GradientTest, BidirectionalNet) {
