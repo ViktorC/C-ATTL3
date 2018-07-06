@@ -310,23 +310,26 @@ public:
 		this->frozen = frozen;
 	}
 	inline void init() {
+		weights_ref = Matrix<Scalar>(weights_rows, weights_cols);
+		weights_grad = Matrix<Scalar>::Zero(weights_rows, weights_cols);
 		weight_init->apply(weights_ref);
-		weights_grad.setZero(weights_grad.rows(), weights_grad.cols());
 	}
 protected:
 	inline KernelLayer(const Dimensions<std::size_t,Rank>& input_dims, Dimensions<std::size_t,Rank> output_dims,
-			WeightInitSharedPtr<Scalar> weight_init, ParamRegSharedPtr<Scalar> weight_reg, std::size_t weight_rows,
-			std::size_t weight_cols, Scalar max_norm_constraint) :
+			WeightInitSharedPtr<Scalar> weight_init, ParamRegSharedPtr<Scalar> weight_reg, std::size_t weights_rows,
+			std::size_t weights_cols, Scalar max_norm_constraint) :
 				input_dims(input_dims),
 				output_dims(output_dims),
 				weight_init(weight_init),
 				weight_reg(weight_reg),
 				max_norm_constraint(max_norm_constraint),
 				max_norm(internal::NumericUtils<Scalar>::decidedly_greater(max_norm_constraint, (Scalar) 0)),
+				weights_rows(weights_rows),
+				weights_cols(weights_cols),
 				input_layer(false),
 				frozen(false),
-				weights(weight_rows, weight_cols),
-				weights_grad(weight_rows, weight_cols),
+				weights(),
+				weights_grad(),
 				weights_ref(weights),
 				owner(*this) {
 		assert(weight_init != nullptr);
@@ -339,6 +342,8 @@ protected:
 			weight_reg(layer.weight_reg),
 			max_norm_constraint(layer.max_norm_constraint),
 			max_norm(layer.max_norm),
+			weights_rows(layer.weights_rows),
+			weights_cols(layer.weights_cols),
 			input_layer(layer.input_layer),
 			frozen(layer.frozen),
 			weights(layer.weights),
@@ -352,6 +357,8 @@ protected:
 			weight_reg(layer.weight_reg),
 			max_norm_constraint(layer.max_norm_constraint),
 			max_norm(layer.max_norm),
+			weights_rows(layer.weights_rows),
+			weights_cols(layer.weights_cols),
 			input_layer(layer.input_layer),
 			frozen(layer.frozen),
 			weights(share_params ? Matrix<Scalar>(0, 0) : layer.weights),
@@ -365,6 +372,8 @@ protected:
 		weight_reg = layer.weight_reg;
 		max_norm_constraint = layer.max_norm_constraint;
 		max_norm = layer.max_norm;
+		weights_rows = layer.weights_rows;
+		weights_cols = layer.weights_cols;
 		input_layer = layer.input_layer;
 		frozen = layer.frozen;
 		weights = layer.weights;
@@ -404,6 +413,8 @@ protected:
 	const ParamRegSharedPtr<Scalar> weight_reg;
 	const Scalar max_norm_constraint;
 	const bool max_norm;
+	const std::size_t weights_rows;
+	const std::size_t weights_cols;
 	/* Eigen matrices are backed by arrays allocated on the heap, so these
 	 * members do not burden the stack. */
 	Matrix<Scalar> weights_grad;
@@ -1643,19 +1654,26 @@ public:
 	inline void set_frozen(bool frozen) {
 		this->frozen = frozen;
 	}
-	inline void init() { }
+	inline void init() {
+		params_ref = Matrix<Scalar>(params_rows, params_cols);
+		params_grad = Matrix<Scalar>::Zero(params_rows, params_cols);
+	}
 protected:
-	inline ActivationLayer(const Dimensions<std::size_t,Rank>& dims, std::size_t param_rows = 0,
+	inline ActivationLayer(const Dimensions<std::size_t,Rank>& dims, std::size_t params_rows = 0,
 			std::size_t params_cols = 0) :
 				dims(dims),
+				params_rows(params_rows),
+				params_cols(params_cols),
 				input_layer(false),
 				frozen(false),
-				params(param_rows, params_cols),
-				params_grad(param_rows, params_cols),
+				params(),
+				params_grad(),
 				params_ref(params),
 				owner(*this) { }
 	inline ActivationLayer(const ActivationLayer<Scalar,Rank>& layer) :
 			dims(layer.dims),
+			params_rows(layer.params_rows),
+			params_cols(layer.params_cols),
 			input_layer(layer.input_layer),
 			frozen(layer.frozen),
 			params(layer.params),
@@ -1664,6 +1682,8 @@ protected:
 			owner(layer.is_shared_params_clone() ? layer.owner : *this) { }
 	inline ActivationLayer(ActivationLayer<Scalar,Rank>& layer, bool share_params) :
 			dims(layer.dims),
+			params_rows(layer.params_rows),
+			params_cols(layer.params_cols),
 			input_layer(layer.input_layer),
 			frozen(layer.frozen),
 			params(share_params ? Matrix<Scalar>(0, 0) : layer.params),
@@ -1672,6 +1692,8 @@ protected:
 			owner(share_params ? layer.owner : *this){ }
 	inline ActivationLayer<Scalar,Rank>& operator=(const ActivationLayer<Scalar,Rank>& layer) {
 		dims = layer.dims;
+		params_rows = layer.params_rows;
+		params_cols = layer.params_cols;
 		input_layer = layer.input_layer;
 		frozen = layer.frozen;
 		params = layer.params;
@@ -1698,6 +1720,8 @@ protected:
 	inline void enforce_constraints() { }
 	inline void empty_cache() { }
 	const Dimensions<std::size_t,Rank> dims;
+	const std::size_t params_rows;
+	const std::size_t params_cols;
 	Matrix<Scalar> params_grad;
 	Matrix<Scalar>& params_ref;
 private:
@@ -2527,8 +2551,8 @@ public:
 		return new PReLUActivationLayer(*this, true);
 	}
 	inline void init() {
+		Base::init();
 		Base::params_ref.setConstant(init_alpha);
-		Base::params_grad.setZero(1, Base::dims.get_volume());
 	}
 protected:
 	inline PReLUActivationLayer(PReLUActivationLayer<Scalar,Rank>& layer, bool share_params) :
@@ -2683,8 +2707,8 @@ public:
 		return new PSwishActivationLayer(*this, true);
 	}
 	inline void init() {
+		Base::init();
 		Base::params_ref.setConstant(init_beta);
-		Base::params_grad.setZero(1, Base::dims.get_volume());
 	}
 protected:
 	inline PSwishActivationLayer(PSwishActivationLayer<Scalar,Rank>& layer, bool share_params) :
@@ -2805,8 +2829,8 @@ protected:
 				patch_extents({ 0u, receptor_height, receptor_width, ext_input_dims(2) }),
 				reduced_patch_offsets({ 0u, 0u, 0u, 0u }),
 				reduced_patch_extents({ 0u, 1u, 1u, ext_input_dims(2) }),
-				params(0, 0),
-				params_grad(0, 0) {
+				params(),
+				params_grad() {
 		assert(receptor_height > 0 && receptor_width > 0);
 		assert(vertical_stride > 0 && horizontal_stride > 0);
 		assert(ext_input_dims(0) >= receptor_height && ext_input_dims(1) >= receptor_width);
@@ -3338,8 +3362,8 @@ protected:
 				out_batch_dims(output_dims.template promote<>().template extend<3 - Rank>()),
 				input_layer(false),
 				frozen(false),
-				params(0, 0),
-				params_grad(0, 0) {
+				params(),
+				params_grad() {
 		assert(receptor_height > 0 && receptor_width > 0);
 		assert(vertical_stride > 0 && horizontal_stride > 0);
 		assert(input_dims.template extend<3 - Rank>()(0) >= receptor_height &&
@@ -3549,8 +3573,8 @@ public:
 				input_layer(false),
 				frozen(false),
 				broadcast(broadcast.template promote<>()),
-				params(0, 0),
-				params_grad(0, 0) {
+				params(),
+				params_grad() {
 		slice_offsets.fill(0);
 		for (std::size_t i = 0; i < Rank; ++i)
 			assert(broadcast(i) > 0);
@@ -3682,11 +3706,11 @@ public:
 				frozen(false),
 				offsets(),
 				extents(dims.template promote<>()),
-				avg_means(channels),
-				avg_inv_sds(channels),
+				avg_means(),
+				avg_inv_sds(),
 				avgs_init(false),
-				params(channels, 2),
-				params_grad(params.rows(), params.cols()),
+				params(),
+				params_grad(),
 				params_ref(params),
 				owner(*this),
 				cache_vec(channels) {
@@ -3773,13 +3797,14 @@ public:
 		this->frozen = frozen;
 	}
 	inline void init() {
+		params_ref = Matrix<Scalar>(channels, 2);
 		// Gamma.
 		params_ref.col(0).setOnes();
 		// Beta.
 		params_ref.col(1).setZero();
-		params_grad.setZero(params_ref.rows(), params_ref.cols());
-		avg_means.setZero(avg_means.rows(), avg_means.cols());
-		avg_inv_sds.setZero(avg_inv_sds.rows(), avg_inv_sds.cols());
+		params_grad = Matrix<Scalar>::Zero(channels, 2);
+		avg_means = Matrix<Scalar>(1, channels);
+		avg_inv_sds = Matrix<Scalar>(1, channels);
 		avgs_init = false;
 	}
 protected:
@@ -3914,8 +3939,10 @@ private:
 				avg_inv_sds(i) = cache.inv_in_sd;
 				avgs_init = true;
 			}
-		} else
+		} else {
+			assert(avgs_init);
 			out = (in.array() - avg_means(i)) * avg_inv_sds(i);
+		}
 		return (out * params_ref(i, 0)).array() + params_ref(i, 1);
 	}
 	inline Matrix<Scalar> _pass_back(MatrixMap<Scalar>& out_grad, std::size_t i) {
@@ -3996,11 +4023,11 @@ public:
 				epsilon(epsilon),
 				input_layer(false),
 				frozen(false),
-				avg_means(dims.get_volume()),
-				avg_inv_sds(avg_means.size()),
+				avg_means(),
+				avg_inv_sds(),
 				avgs_init(false),
-				params(avg_means.size(), 2),
-				params_grad(params.rows(), params.cols()),
+				params(),
+				params_grad(),
 				params_ref(params),
 				owner(*this) {
 		assert(gamma_reg != nullptr);
@@ -4080,13 +4107,14 @@ public:
 		this->frozen = frozen;
 	}
 	inline void init() {
+		params_ref = Matrix<Scalar>(dims.get_volume(), 2);
 		// Gamma.
 		params_ref.col(0).setOnes();
 		// Beta.
 		params_ref.col(1).setZero();
-		params_grad.setZero(params_ref.rows(), params_ref.cols());
-		avg_means.setZero(avg_means.rows(), avg_means.cols());
-		avg_inv_sds.setZero(avg_means.rows(), avg_inv_sds.cols());
+		params_grad = Matrix<Scalar>::Zero(params_ref.rows(), params_ref.cols());
+		avg_means = Matrix<Scalar>(1, params_ref.rows());
+		avg_inv_sds = Matrix<Scalar>(1, params_ref.rows());
 		avgs_init = false;
 	}
 protected:
@@ -4167,8 +4195,11 @@ protected:
 				avg_inv_sds = inv_in_sd;
 				avgs_init = true;
 			}
-		} else // For testing, use the moving averages.
+		} else {
+			// For testing, use the moving averages.
+			assert(avgs_init);
 			in_mat = (in_mat.rowwise() - avg_means) * avg_inv_sds.asDiagonal();
+		}
 		Matrix<Scalar> out = (in_mat * params_ref.col(0).asDiagonal()).rowwise() + params_ref.col(1).transpose();
 		return TensorMap<Scalar,Base::DATA_RANK>(out.data(), in.dimensions());
 	}
@@ -4252,10 +4283,10 @@ public:
 				input_layer(false),
 				frozen(false),
 				batch_dims(calculate_extended_batch_dims(dims)),
-				means(params_vol),
-				vars(params_vol),
-				params(params_vol, 2),
-				params_grad(params.rows(), params.cols()),
+				means(),
+				vars(),
+				params(),
+				params_grad(),
 				params_ref(params),
 				owner(*this) {
 		assert(gamma_reg != nullptr);
@@ -4339,11 +4370,12 @@ public:
 		this->frozen = frozen;
 	}
 	inline void init() {
+		params_ref = Matrix<Scalar>(params_vol, 2);
 		params_ref.col(0).setOnes();
 		params_ref.col(1).setZero();
-		params_grad.setZero(params_ref.rows(), params_ref.cols());
-		means.setZero(means.rows(), means.cols());
-		vars.setZero(vars.rows(), vars.cols());
+		params_grad = Matrix<Scalar>::Zero(params_ref.rows(), params_ref.cols());
+		means = Matrix<Scalar>(1, params_vol);
+		vars = Matrix<Scalar>(1, params_vol);
 	}
 protected:
 	inline BatchNormLayer(Self& layer, bool share_params) :
@@ -4495,8 +4527,8 @@ public:
 				epsilon(epsilon),
 				input_layer(false),
 				frozen(false),
-				params(0, 0),
-				params_grad(0, 0) {
+				params(),
+				params_grad() {
 		assert(dropout_prob > 0 && dropout_prob <= 1 &&
 				"dropout probability must be greater than 0 and no greater than 1");
 		assert(epsilon > 0 && "epsilon must be greater than 0");
@@ -4604,8 +4636,8 @@ public:
 				input_layer(false),
 				frozen(false),
 				ext_batch_dims(dims.template extend<3 - Rank>().template promote<>()),
-				params(0, 0),
-				params_grad(0, 0),
+				params(),
+				params_grad(),
 				reserve() {
 		assert(dropout_prob > 0 && dropout_prob <= 1 &&
 				"dropout probability must be greater than 0 and no greater than 1");
@@ -4715,8 +4747,8 @@ public:
 				frozen(false),
 				input_conversion_dims(output_dims.template promote<>()),
 				output_conversion_dims(input_dims.template promote<>()),
-				params(0, 0),
-				params_grad(0, 0) {
+				params(),
+				params_grad() {
 		assert(input_dims.get_volume() == output_dims.get_volume());
 	}
 	inline Base* clone() const {

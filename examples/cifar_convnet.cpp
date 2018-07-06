@@ -6,10 +6,6 @@
  */
 
 #include <chrono>
-#include <iostream>
-#include <memory>
-#include <utility>
-#include <vector>
 
 #include "Cattle.hpp"
 

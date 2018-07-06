@@ -679,7 +679,14 @@ public:
 	static constexpr std::size_t PAD_IND = 0;
 	static constexpr std::size_t UNK_IND = 1;
 	/**
-	 * @param file_paths The paths to the data set files.
+	 * @param pos_reviews_folder_path The path to the folder containing the positive reviews
+	 * (without a trailing path separator).
+	 * @param neg_reviews_folder_path The pathe to the folder containing the negative reveies
+	 * (without a trailing path separator).
+	 * @param vocab A shared pointer to the vocabulary to use.
+	 * @param seq_length The sequence length to trim or pad the data to so as to enable batch
+	 * training. If it is set to 0, no sequence trimming or padding is to be performed (which
+	 * is likely to make batch training impossible).
 	 */
 	inline IMDBDataProvider(std::string pos_reviews_folder_path, std::string neg_reviews_folder_path,
 			VocabSharedPtr vocab, std::size_t seq_length = 100) :
@@ -824,13 +831,13 @@ protected:
 		// Tokenize the document.
 		std::size_t time_step = 0;
 		std::string word;
-		while (doc_stream >> word && time_step < seq_length) {
+		while (doc_stream >> word && (time_step < seq_length || seq_length == 0)) {
 			std::size_t ind;
 			Vocab::const_iterator val = vocab->find(word);
 			ind = (val != vocab->end()) ? val->second : +UNK_IND;
 			obs(0u,time_step++,ind) = (Scalar) 1;
 		}
-		for (; time_step < seq_length; ++time_step)
+		for (; time_step < seq_length && seq_length > 0; ++time_step)
 			obs(0u,time_step,+PAD_IND) = (Scalar) 1;
 		return std::make_pair(std::move(obs), std::move(obj));
 	}

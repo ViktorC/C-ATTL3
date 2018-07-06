@@ -5,8 +5,6 @@
  *      Author: Viktor Csomor
  */
 
-#include <iostream>
-
 #include "Cattle.hpp"
 
 int main() {

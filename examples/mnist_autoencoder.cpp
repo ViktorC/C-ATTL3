@@ -5,10 +5,6 @@
  *      Author: Viktor Csomor
  */
 
-#include <memory>
-#include <utility>
-#include <vector>
-
 #include "Cattle.hpp"
 
 int main() {
