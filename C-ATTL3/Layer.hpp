@@ -2162,7 +2162,7 @@ protected:
 		assert(out_grad.dimension(0) > 0 && out.rows() == out_grad.dimension(0));
 		std::size_t rows = out_grad.dimension(0);
 		MatrixMap<Scalar> out_grad_mat(out_grad.data(), rows, out_grad.size() / rows);
-		Matrix<Scalar> prev_out_grad(out.rows(), out.cols());
+		Matrix<Scalar> prev_out_grad(rows, out.cols());
 		for (int i = 0; i < prev_out_grad.rows(); ++i) {
 			RowVector<Scalar> row_i = out.row(i);
 			// FIXME Do not evaluate the expressions into a temporary variable.

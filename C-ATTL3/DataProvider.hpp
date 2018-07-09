@@ -675,6 +675,7 @@ template<typename Scalar, IMDBObjType ObjType = BINARY>
 class IMDBDataProvider : public JointFileDataProvider<Scalar,1,true> {
 	typedef JointFileDataProvider<Scalar,1,true> Base;
 	static_assert(ObjType >= BINARY && ObjType <= CATEGORICAL, "invalid IMDB objective type");
+	static constexpr std::size_t PREALLOC_SEQ_LENGTH = 100;
 public:
 	static constexpr std::size_t PAD_IND = 0;
 	static constexpr std::size_t UNK_IND = 1;
@@ -689,7 +690,7 @@ public:
 	 * is likely to make batch training impossible).
 	 */
 	inline IMDBDataProvider(std::string pos_reviews_folder_path, std::string neg_reviews_folder_path,
-			VocabSharedPtr vocab, std::size_t seq_length = 100) :
+			VocabSharedPtr vocab, std::size_t seq_length = 0) :
 				Base::JointFileDataProvider(resolve_review_files(pos_reviews_folder_path,
 						neg_reviews_folder_path)),
 				vocab(vocab),
@@ -788,10 +789,11 @@ protected:
 	 * @param document A string stream to the document to clean
 	 */
 	inline static void clean_document(std::stringstream& document) {
-		static std::regex illegal_regex("(<br />)+|([^a-zA-Z-'!\?]+)");
 		std::string doc_string = document.str();
 		std::transform(doc_string.begin(), doc_string.end(), doc_string.begin(),
 				static_cast<int (*)(int)>(std::tolower));
+		// Replace illegal character sequences by white spaces.
+		static std::regex illegal_regex("(<br />)+|([^a-zA-Z-'!\?]+)");
 		doc_string = std::regex_replace(doc_string, illegal_regex, " ");
 		// Add a white space before the supported punctuation marks.
 		static std::regex punct_regex("([!\?]{1})");
@@ -801,7 +803,8 @@ protected:
 	inline DataPair<Scalar,1,true> _get_data(const std::string& file_name, std::ifstream& file_stream,
 			std::size_t batch_size) {
 		assert(batch_size > 0);
-		Tensor<Scalar,3> obs(1, seq_length, obs_dims(0u));
+		const bool fixed_seq_length = seq_length != 0;
+		Tensor<Scalar,3> obs(1, (fixed_seq_length ? seq_length : +PREALLOC_SEQ_LENGTH), obs_dims(0u));
 		Tensor<Scalar,3> obj(1, 1, obj_dims(0u));
 		obs.setZero();
 		// Parse the rating from the name of the file.
@@ -831,14 +834,27 @@ protected:
 		// Tokenize the document.
 		std::size_t time_step = 0;
 		std::string word;
-		while (doc_stream >> word && (time_step < seq_length || seq_length == 0)) {
+		while (doc_stream >> word && (time_step < seq_length || !fixed_seq_length)) {
 			std::size_t ind;
 			Vocab::const_iterator val = vocab->find(word);
 			ind = (val != vocab->end()) ? val->second : +UNK_IND;
+			if (!fixed_seq_length && time_step >= obs.dimension(1)) {
+				Tensor<Scalar,3> extra_obs(1, +PREALLOC_SEQ_LENGTH, obs_dims(0u));
+				extra_obs.setZero();
+				obs = Tensor<Scalar,3>(obs.concatenate(std::move(extra_obs), 1));
+			}
 			obs(0u,time_step++,ind) = (Scalar) 1;
 		}
-		for (; time_step < seq_length && seq_length > 0; ++time_step)
-			obs(0u,time_step,+PAD_IND) = (Scalar) 1;
+		if (fixed_seq_length) {
+			for (; time_step < seq_length; ++time_step)
+				obs(0u,time_step,+PAD_IND) = (Scalar) 1;
+		} else {
+			if (time_step < obs.dimension(1)) {
+				std::array<std::size_t,3> offsets({ 0u, 0u, 0u });
+				std::array<std::size_t,3> extents({ 1u, time_step, obs_dims(0u) });
+				obs = Tensor<Scalar,3>(obs.slice(offsets, extents));
+			}
+		}
 		return std::make_pair(std::move(obs), std::move(obj));
 	}
 	inline std::size_t _skip(std::ifstream& file_stream, std::size_t instances) {

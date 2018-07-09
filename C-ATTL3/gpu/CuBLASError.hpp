@@ -5,8 +5,8 @@
  *      Author: Viktor Csomor
  */
 
-#ifndef C_ATTL3_GPU_CUBLASERROR_HPP_
-#define C_ATTL3_GPU_CUBLASERROR_HPP_
+#ifndef C_ATTL3_GPU_CUBLASERROR_H_
+#define C_ATTL3_GPU_CUBLASERROR_H_
 
 #include <cublas_v2.h>
 #include <cstdlib>
@@ -78,4 +78,4 @@ __inline__ void _cublas_assert(cublasStatus_t status, const char* file, int line
 } /* namespace internal */
 } /* namespace cattle */
 
-#endif /* C_ATTL3_GPU_CUBLASERROR_HPP_ */
+#endif /* C_ATTL3_GPU_CUBLASERROR_H_ */

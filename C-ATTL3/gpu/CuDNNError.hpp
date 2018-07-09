@@ -5,8 +5,8 @@
  *      Author: Viktor Csomor
  */
 
-#ifndef C_ATTL3_GPU_CUDNNERROR_HPP_
-#define C_ATTL3_GPU_CUDNNERROR_HPP_
+#ifndef C_ATTL3_GPU_CUDNNERROR_H_
+#define C_ATTL3_GPU_CUDNNERROR_H_
 
 #include <cudnn.h>
 #include <cstdlib>
@@ -56,4 +56,4 @@ __inline__ void _cudnn_assert(cudnnStatus_t status, const char* file, int line) 
 } /* namespace internal */
 } /* namespace cattle */
 
-#endif /* C_ATTL3_GPU_CUDNNERROR_HPP_ */
+#endif /* C_ATTL3_GPU_CUDNNERROR_H_ */
