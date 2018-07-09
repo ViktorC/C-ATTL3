@@ -21,10 +21,8 @@
 namespace cattle {
 namespace internal {
 
-namespace {
-
 template<bool Filter = false>
-struct CuDNNTensorDescriptor {
+struct CuDNNTensorDescriptorManager {
 	typedef cudnnTensorDescriptor_t Type;
 	__inline__ static Type create_descriptor(cudnnDataType_t data_type, cudnnTensorFormat_t format,
 			std::size_t n, std::size_t h, std::size_t w, std::size_t c) {
@@ -38,7 +36,7 @@ struct CuDNNTensorDescriptor {
 };
 
 template<>
-struct CuDNNTensorDescriptor<true> {
+struct CuDNNTensorDescriptorManager<true> {
 	typedef cudnnFilterDescriptor_t Type;
 	__inline__ static Type create_descriptor(cudnnDataType_t data_type, cudnnTensorFormat_t format,
 			std::size_t n, std::size_t h, std::size_t w, std::size_t c) {
@@ -51,8 +49,6 @@ struct CuDNNTensorDescriptor<true> {
 	}
 };
 
-}
-
 /**
  * A template class for representing cuDNN device tensors of different data types.
  */
@@ -61,9 +57,10 @@ class CuDNNTensor {
 	static constexpr cudnnDataType_t DATA_TYPE = std::is_same<Scalar,float>::value ?
 			CUDNN_DATA_FLOAT : CUDNN_DATA_DOUBLE;
 	typedef CuDNNTensor<Scalar> Self;
-	typedef CuDNNTensorDescriptor<Filter> Descriptor;
+	typedef CuDNNTensorDescriptorManager<Filter> DescriptorManager;
 public:
-	typedef typename Descriptor::Type DescriptorType;
+	typedef typename DescriptorManager::Type DescriptorType;
+	inline CuDNNTensor() { }
 	/**
 	 * @param format The tensor format to use.
 	 * @param n The batch size.
@@ -73,14 +70,13 @@ public:
 	 */
 	inline CuDNNTensor(cudnnTensorFormat_t format, std::size_t n, std::size_t h, std::size_t w,
 			std::size_t c) :
-				data(data),
 				format(format),
 				n(n),
 				h(h),
 				w(w),
 				c(c),
 				size(n * h * w * c),
-				desc(Descriptor::create_descriptor(DATA_TYPE, format, n, h, w, c)) {
+				desc(DescriptorManager::create_descriptor(DATA_TYPE, format, n, h, w, c)) {
 		assert(size > 0);
 		cudaAssert(cudaMalloc(&data, size));
 	}
@@ -93,7 +89,7 @@ public:
 	}
 	inline ~CuDNNTensor() {
 		cudaAssert(cudaFree(data));
-		Descriptor::destroy_descriptor(desc);
+		DescriptorManager::destroy_descriptor(desc);
 	}
 	inline Self& operator=(Self tensor) {
 		swap(*this, tensor);
@@ -131,11 +127,11 @@ public:
 	}
 	inline friend void swap(Self& tensor1, Self& tensor2) {
 		using std::swap;
-		swap(tensor1.data, tensor2.data);
 		swap(tensor1.format, tensor2.format);
 		swap(tensor1.dims, tensor2.dims);
 		swap(tensor1.size, tensor2.size);
 		swap(tensor1.desc, tensor2.desc);
+		swap(tensor1.data, tensor2.data);
 	}
 	const cudnnTensorFormat_t format;
 	const std::size_t n, h, w, c;

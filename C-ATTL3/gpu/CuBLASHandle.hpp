@@ -46,18 +46,18 @@ template<> __inline__ GemmRoutine<float> resolve_gemm_routine() {
 template<typename Scalar>
 class CuBLASHandle {
 	static_assert(std::is_floating_point<Scalar>::value, "non floating-point scalar type");
+	typedef CuBLASHandle<Scalar> Self;
 public:
-	CuBLASHandle(const CuBLASHandle&) = delete;
+	CuBLASHandle(const Self&) = delete;
 	~CuBLASHandle() {
-		// Destroy the cuBLAS handle.
 		cublasAssert(cublasDestroy(handle));
 	}
-	CuBLASHandle& operator=(const CuBLASHandle&) = delete;
+	Self& operator=(const Self&) = delete;
 	/**
 	 * @return A reference to the only instance of the class.
 	 */
-	inline static CuBLASHandle& get_instance() {
-		static CuBLASHandle instance;
+	inline static const Self& get_instance() {
+		static Self instance;
 		return instance;
 	}
 	/**
@@ -127,7 +127,6 @@ private:
 	cublasHandle_t handle;
 	inline CuBLASHandle() :
 			handle() {
-		// Create the cuBLAS handle.
 		cublasAssert(cublasCreate(&handle));
 	}
 };

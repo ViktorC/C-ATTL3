@@ -825,8 +825,7 @@ template<typename Scalar, std::size_t Rank>
 class ConvKernelLayerBase : public KernelLayer<Scalar,Rank> {
 	typedef Layer<Scalar,Rank> Root;
 	typedef KernelLayer<Scalar,Rank> Base;
-	typedef std::array<std::size_t,4> Array4;
-	typedef std::array<std::pair<std::size_t,std::size_t>,4> PaddingsArray4;
+	static constexpr cudnnTensorFormat_t TENSOR_FORMAT = CUDNN_TENSOR_NCHW;
 protected:
 	inline ConvKernelLayerBase(const Dimensions<std::size_t,Rank>& input_dims, std::size_t filters,
 			WeightInitSharedPtr<Scalar> weight_init, ParamRegSharedPtr<Scalar> weight_reg, std::size_t receptor_height,
@@ -848,16 +847,16 @@ protected:
 				horizontal_stride(horizontal_stride),
 				vertical_dilation(vertical_dilation),
 				horizontal_dilation(horizontal_dilation),
-				in_batch_dims(input_dims.template extend<3 - Rank>().template promote<>()),
-				out_batch_dims(calculate_output_dims(in_batch_dims, filters, receptor_height, receptor_width,
+				ext_input_dims(input_dims.template extend<3 - Rank>()),
+				ext_output_dims(calculate_output_dims(ext_input_dims, filters, receptor_height, receptor_width,
 						vertical_padding, horizontal_padding, vertical_stride, horizontal_stride,
 						vertical_dilation, horizontal_dilation)) {
 		assert(filters > 0);
 		assert(receptor_height > 0);
 		assert(receptor_width > 0);
 		assert(vertical_stride > 0 && horizontal_stride > 0);
-		assert(in_batch_dims[1] + 2 * vertical_padding >= dil_receptor_height &&
-				in_batch_dims[2] + 2 * horizontal_padding >= dil_receptor_width);
+		assert(ext_input_dims(0) + 2 * vertical_padding >= dil_receptor_height &&
+				ext_input_dims(1) + 2 * horizontal_padding >= dil_receptor_width);
 	}
 	inline ConvKernelLayerBase(ConvKernelLayerBase<Scalar,Rank>& layer, bool share_params) :
 			Base::KernelLayer(layer, share_params),
@@ -870,16 +869,16 @@ protected:
 			horizontal_stride(layer.horizontal_stride),
 			vertical_dilation(layer.vertical_dilation),
 			horizontal_dilation(layer.horizontal_dilation),
-			in_batch_dims(layer.in_batch_dims),
-			out_batch_dims(layer.out_batch_dims) { }
+			ext_input_dims(layer.ext_input_dims),
+			ext_output_dims(layer.ext_output_dims),
+			input(layer.input) { }
 	inline void empty_cache() {
-		input = Tensor<Scalar,4>();
+		input = CuDNNTensor<Scalar>();
 	}
 	inline Tensor<Scalar,4> _pass_forward(Tensor<Scalar,4> in, bool training) {
-		std::size_t rows = in.dimension(0);
-		in_batch_dims[0] = rows;
-		out_batch_dims[0] = rows;
-		input = std::move(in);
+		input = CuDNNTensor<Scalar>(TENSOR_FORMAT, in.dimension(0), in.dimension(1), in.dimension(2), in.dimension(3));
+		in = in.shuffle({ 0u, 3u, 1u, 2u });
+		input.copy_from_host(in.data());
 		Matrix<Scalar> filter = Base::weights_ref.topRows(Base::weights_ref.rows() - 1);
 		Matrix<Scalar> bias = Base::weights_ref.bottomRows(1);
 		Tensor<Scalar,4> out(out_batch_dims);
@@ -912,27 +911,31 @@ protected:
 	const std::size_t vertical_dilation;
 	const std::size_t horizontal_dilation;
 private:
-	inline static Array4 calculate_output_dims(const Array4& input_dims, std::size_t filters, std::size_t receptor_height,
-			std::size_t receptor_width, std::size_t vertical_padding, std::size_t horizontal_padding, std::size_t vertical_stride,
-			std::size_t horizontal_stride, std::size_t vertical_dilation, std::size_t horizontal_dilation) {
-		return internal::CuDNNHandle<Scalar>::get_instance().conv2d_output_dims(input_dims, filters, receptor_height,
-				receptor_width, vertical_padding, horizontal_padding, vertical_stride, horizontal_stride, vertical_dilation + 1,
-				horizontal_dilation + 1);
+	inline static Dimensions<std::size_t,3> calculate_output_dims(const Dimensions<std::size_t,3>& input_dims, std::size_t filters,
+			std::size_t receptor_height, std::size_t receptor_width, std::size_t vertical_padding, std::size_t horizontal_padding,
+			std::size_t vertical_stride, std::size_t horizontal_stride, std::size_t vertical_dilation,
+			std::size_t horizontal_dilation) {
+		std::size_t h, w, c;
+		internal::CuDNNHandle<Scalar>::get_instance().conv2d_output_dims(input_dims(0), input_dims(1), input_dims(2),
+				CUDNN_TENSOR_NHWC, filters, receptor_height, receptor_width, vertical_padding, horizontal_padding, vertical_stride,
+				horizontal_stride, vertical_dilation + 1, horizontal_dilation + 1, h, w, c);
+		return { h, w, c };
 	}
 	inline static Dimensions<std::size_t,Rank> calculate_adjusted_output_dims(const Dimensions<std::size_t,Rank>& input_dims,
 			std::size_t filters, std::size_t receptor_height, std::size_t receptor_width, std::size_t vertical_padding,
 			std::size_t horizontal_padding, std::size_t vertical_stride, std::size_t horizontal_stride,
 			std::size_t vertical_dilation, std::size_t horizontal_dilation) {
-		auto output_dims = calculate_output_dims(input_dims.template extend<3 - Rank>().template promote<>(), filters,
-				receptor_height, receptor_width, vertical_padding, horizontal_padding, vertical_stride, horizontal_stride,
-				vertical_dilation, horizontal_dilation);
-		output_dims[3] /= filters;
-		output_dims[Rank] *= filters;
-		return Dimensions<std::size_t,4>(output_dims).template demote<>().template contract<3 - Rank>();
+		Dimensions<std::size_t,3> ext_input_dims = input_dims.template extend<3 - Rank>();
+		Dimensions<std::size_t,3> ext_output_dims = calculate_output_dims(ext_input_dims(0), ext_input_dims(1),
+				ext_input_dims(2), filters, receptor_height, receptor_width, vertical_padding, horizontal_padding,
+				vertical_stride, horizontal_stride, vertical_dilation, horizontal_dilation);
+		ext_output_dims(2) /= filters;
+		ext_output_dims(Rank - 1) *= filters;
+		return ext_output_dims.template contract<3 - Rank>();
 	}
-	Array4 in_batch_dims;
-	Array4 out_batch_dims;
-	Tensor<Scalar,4> input;
+	Dimensions<std::size_t,3> ext_input_dims;
+	Dimensions<std::size_t,3> ext_output_dims;
+	CuDNNTensor<Scalar> input;
 };
 #endif
 
