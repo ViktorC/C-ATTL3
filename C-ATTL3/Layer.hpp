@@ -896,7 +896,7 @@ protected:
 		gpu_bias.copy_from_host(bias.data());
 		CuDNNTensor<Scalar> gpu_out(in.dimension(0), ext_output_dims(0), ext_output_dims(1), ext_output_dims(2),
 				TENSOR_FORMAT);
-		internal::CuDNNHandle<Scalar>::get_instance().convolution2d_fwd(gpu_input, gpu_filter, gpu_bias, vertical_padding,
+		CuDNNHandle<Scalar>::get_instance().convolution2d_fwd(gpu_input, gpu_filter, gpu_bias, vertical_padding,
 				horizontal_padding, vertical_stride, horizontal_stride, vertical_dilation + 1, horizontal_dilation + 1,
 				gpu_out);
 		Tensor<Scalar,4> out(in.dimension(0), ext_output_dims(2), ext_output_dims(0), ext_output_dims(1));
@@ -924,7 +924,7 @@ protected:
 				TENSOR_FORMAT);
 		CuDNNTensor<Scalar> gpu_prev_out_grad(out_grad.dimension(0), ext_input_dims(2), ext_input_dims(0),
 				ext_input_dims(1), TENSOR_FORMAT);
-		internal::CuDNNHandle<Scalar>::get_instance().convolution2d_bwd(gpu_input, gpu_out_grad, gpu_filter,
+		CuDNNHandle<Scalar>::get_instance().convolution2d_bwd(gpu_input, gpu_out_grad, gpu_filter,
 				gpu_bias, vertical_padding, horizontal_padding, vertical_stride, horizontal_stride,
 				vertical_dilation + 1, horizontal_dilation + 1, gpu_prev_out_grad, gpu_filter_grad,
 				gpu_bias_grad);
@@ -1777,6 +1777,62 @@ private:
 	const Base& owner;
 };
 
+#ifdef CATLL3_USE_CUDNN
+/**
+ * A class template representing basic, cuDNN accelerated activation layers.
+ */
+template<typename Scalar, std::size_t Rank>
+class CuDNNActivationLayer : public ActivationLayer<Scalar,Rank> {
+	typedef Layer<Scalar,Rank> Root;
+	typedef ActivationLayer<Scalar,Rank> Base;
+protected:
+	inline CuDNNActivationLayer(const Dimensions<std::size_t,Rank>& dims, cudnnActivationMode_t act_mode,
+			Scalar coeff) :
+				ActivationLayer<Scalar,Rank>::ActivationLayer(dims),
+				act_mode(act_mode),
+				coeff(coeff),
+				ext_batch_dims(dims.template extend<3 - Rank>().template promote<>()) { }
+	inline void empty_cache() {
+		gpu_input = internal::CuDNNTensor<Scalar>();
+		gpu_output = internal::CuDNNTensor<Scalar>();
+	}
+	inline typename Root::Data pass_forward(typename Root::Data in, bool training) {
+		using namespace internal;
+		assert((Dimensions<std::size_t,Base::DATA_RANK>(in.dimensions()).template demote<>()) == Base::dims);
+		assert(in.dimension(0) > 0);
+		ext_batch_dims[0] = in.dimension(0);
+		gpu_input = internal::CuDNNTensor<Scalar>(ext_batch_dims[0], ext_batch_dims[1],
+				ext_batch_dims[2], ext_batch_dims[3]);
+		gpu_input.copy_from_host(in.data());
+		gpu_output = internal::CuDNNTensor<Scalar>(ext_batch_dims[0], ext_batch_dims[1],
+				ext_batch_dims[2], ext_batch_dims[3]);
+		CuDNNHandle<Scalar>::get_instance().activation_fwd(gpu_input, act_mode, coeff, gpu_output);
+		typename Root::Data out = std::move(in);
+		gpu_output.copy_to_host(out.data());
+		return out;
+	}
+	inline typename Root::Data pass_back(typename Root::Data out_grad) {
+		using namespace internal;
+		assert((Dimensions<std::size_t,Base::DATA_RANK>(out_grad.dimensions()).template demote<>()) == Base::dims);
+		assert(out_grad.dimension(0) > 0 && ext_batch_dims[0] == out_grad.dimension(0));
+		CuDNNTensor<Scalar> gpu_prev_out_grad(ext_batch_dims[0], ext_batch_dims[1],
+				ext_batch_dims[2], ext_batch_dims[3]);
+		gpu_in_out_grad.copy_from_host(out_grad.data());
+		CuDNNHandle<Scalar>::get_instance().activation_bwd(gpu_input, gpu_output, act_mode,
+				coeff, gpu_prev_out_grad);
+		typename Root::Data prev_out_grad = std::move(out_grad);
+		gpu_in_out_grad.copy_to_host(prev_out_grad.data());
+		return prev_out_grad;
+	}
+private:
+	cudnnActivationMode_t act_mode;
+	Scalar coeff;
+	std::array<std::size_t,4> ext_batch_dims;
+	internal::CuDNNTensor<Scalar> gpu_input;
+	internal::CuDNNTensor<Scalar> gpu_output;
+};
+#endif
+
 /**
  * A class template representing an identity activation layer that merely outputs
  * its input.
@@ -1793,7 +1849,7 @@ public:
 	 */
 	inline IdentityActivationLayer(const Dimensions<std::size_t,Rank>& dims) :
 			ActivationLayer<Scalar,Rank>::ActivationLayer(dims) { }
-	inline Layer<Scalar,Rank>* clone() const {
+	inline Root* clone() const {
 		return new IdentityActivationLayer(*this);
 	}
 protected:
@@ -1829,7 +1885,7 @@ public:
 	inline ScaledActivationLayer(const Dimensions<std::size_t,Rank>& dims, Scalar scale) :
 			ActivationLayer<Scalar,Rank>::ActivationLayer(dims),
 			scale(scale) { }
-	inline Layer<Scalar,Rank>* clone() const {
+	inline Root* clone() const {
 		return new ScaledActivationLayer(*this);
 	}
 protected:
@@ -1870,7 +1926,7 @@ public:
 	 */
 	inline BinaryStepActivationLayer(const Dimensions<std::size_t,Rank>& dims) :
 			ActivationLayer<Scalar,Rank>::ActivationLayer(dims) { }
-	inline Layer<Scalar,Rank>* clone() const {
+	inline Root* clone() const {
 		return new BinaryStepActivationLayer(*this);
 	}
 protected:
@@ -1905,7 +1961,7 @@ public:
 	 */
 	inline SigmoidActivationLayer(const Dimensions<std::size_t,Rank>& dims) :
 			ActivationLayer<Scalar,Rank>::ActivationLayer(dims) { }
-	inline Layer<Scalar,Rank>* clone() const {
+	inline Root* clone() const {
 		return new SigmoidActivationLayer(*this);
 	}
 protected:
@@ -1938,47 +1994,16 @@ private:
  * \f$f(x) = \sigma(x) = \frac{1}{1 + e^{-x}}\f$
  */
 template<typename Scalar, std::size_t Rank>
-class SigmoidActivationLayer : public ActivationLayer<Scalar,Rank> {
-	typedef Layer<Scalar,Rank> Root;
-	typedef ActivationLayer<Scalar,Rank> Base;
+class SigmoidActivationLayer : public CuDNNActivationLayer<Scalar,Rank> {
 public:
 	/**
 	 * @param dims The dimensionality of the input tensor.
 	 */
 	inline SigmoidActivationLayer(const Dimensions<std::size_t,Rank>& dims) :
-			ActivationLayer<Scalar,Rank>::ActivationLayer(dims),
-			ext_batch_dims(dims.template extend<3 - Rank>().template promote<>()) { }
+			CuDNNActivationLayer<Scalar,Rank>::CuDNNActivationLayer(dims, CUDNN_ACTIVATION_SIGMOID, 0) { }
 	inline Layer<Scalar,Rank>* clone() const {
 		return new SigmoidActivationLayer(*this);
 	}
-protected:
-	inline void empty_cache() {
-		in = typename Root::Data();
-		out = typename Root::Data();
-	}
-	inline typename Root::Data pass_forward(typename Root::Data in, bool training) {
-		assert((Dimensions<std::size_t,Base::DATA_RANK>(in.dimensions()).template demote<>()) == Base::dims);
-		assert(in.dimension(0) > 0);
-		ext_batch_dims[0] = in.dimension(0);
-		this->in = std::move(in);
-		out = typename Root::Data(this->in.dimensions());
-		internal::CuDNNHandle<Scalar>::get_instance().activation_fwd(this->in.data(), ext_batch_dims,
-				CUDNN_ACTIVATION_SIGMOID, 0, out.data());
-		return out;
-	}
-	inline typename Root::Data pass_back(typename Root::Data out_grad) {
-		assert((Dimensions<std::size_t,Base::DATA_RANK>(out_grad.dimensions()).template demote<>()) == Base::dims);
-		assert(out_grad.dimension(0) > 0 && ext_batch_dims[0] == out_grad.dimension(0));
-		typename Root::Data prev_out_grad(in.dimensions());
-		internal::CuDNNHandle<Scalar>::get_instance().activation_bwd(in.data(), out.data(), out_grad.data(),
-				ext_batch_dims, CUDNN_ACTIVATION_SIGMOID, 0, prev_out_grad.data());
-		return prev_out_grad;
-	}
-private:
-	std::array<std::size_t,4> ext_batch_dims;
-	typename Root::Data in;
-	typename Root::Data out;
-};
 #endif
 
 #ifndef CATTL3_USE_CUDNN
@@ -2029,46 +2054,16 @@ private:
  * \f$f(x) = \text{tanh}(x)\f$
  */
 template<typename Scalar, std::size_t Rank>
-class TanhActivationLayer : public ActivationLayer<Scalar,Rank> {
-	typedef Layer<Scalar,Rank> Root;
-	typedef ActivationLayer<Scalar,Rank> Base;
+class TanhActivationLayer : public CuDNNActivationLayer<Scalar,Rank> {
 public:
 	/**
 	 * @param dims The dimensionality of the input tensor.
 	 */
 	inline TanhActivationLayer(const Dimensions<std::size_t,Rank>& dims) :
-			ActivationLayer<Scalar,Rank>::ActivationLayer(dims),
-			ext_batch_dims(dims.template extend<3 - Rank>().template promote<>()) { }
+			CuDNNActivationLayer<Scalar,Rank>::CuDNNActivationLayer(dims, CUDNN_ACTIVATION_TANH, 0) { }
 	inline Layer<Scalar,Rank>* clone() const {
 		return new TanhActivationLayer(*this);
 	}
-protected:
-	inline void empty_cache() {
-		in = typename Root::Data();
-		out = typename Root::Data();
-	}
-	inline typename Root::Data pass_forward(typename Root::Data in, bool training) {
-		assert((Dimensions<std::size_t,Base::DATA_RANK>(in.dimensions()).template demote<>()) == Base::dims);
-		assert(in.dimension(0) > 0);
-		ext_batch_dims[0] = in.dimension(0);
-		this->in = std::move(in);
-		out = typename Root::Data(this->in.dimensions());
-		internal::CuDNNHandle<Scalar>::get_instance().activation_fwd(this->in.data(), ext_batch_dims,
-				CUDNN_ACTIVATION_TANH, 0, out.data());
-		return out;
-	}
-	inline typename Root::Data pass_back(typename Root::Data out_grad) {
-		assert((Dimensions<std::size_t,Base::DATA_RANK>(out_grad.dimensions()).template demote<>()) == Base::dims);
-		assert(out_grad.dimension(0) > 0 && ext_batch_dims[0] == out_grad.dimension(0));
-		typename Root::Data prev_out_grad(in.dimensions());
-		internal::CuDNNHandle<Scalar>::get_instance().activation_bwd(in.data(), out.data(), out_grad.data(),
-				ext_batch_dims, CUDNN_ACTIVATION_TANH, 0, prev_out_grad.data());
-		return prev_out_grad;
-	}
-private:
-	std::array<std::size_t,4> ext_batch_dims;
-	typename Root::Data in;
-	typename Root::Data out;
 };
 #endif
 
@@ -2249,17 +2244,25 @@ public:
 	}
 protected:
 	inline void empty_cache() {
-		out = typename Root::Data();
+		gpu_output = internal::CuDNNTensor<Scalar>();
 	}
 	inline typename Root::Data pass_forward(typename Root::Data in, bool training) {
+		using namespace internal;
 		assert((Dimensions<std::size_t,Base::DATA_RANK>(in.dimensions()).template demote<>()) == Base::dims);
 		assert(in.dimension(0) > 0);
 		ext_batch_dims[0] = in.dimension(0);
-		out = typename Root::Data(in.dimensions());
-		internal::CuDNNHandle<Scalar>::get_instance().softmax_fwd(in.data(), ext_batch_dims, out.data());
+		CuDNNTensor<Scalar> gpu_input(ext_batch_dims[0], ext_batch_dims[1],
+				ext_batch_dims[2], ext_batch_dims[3]);
+		gpu_input.copy_from_host(in.data());
+		gpu_output = CuDNNTensor<Scalar>(ext_batch_dims[0], ext_batch_dims[1],
+				ext_batch_dims[2], ext_batch_dims[3]);
+		CuDNNHandle<Scalar>::get_instance().softmax_fwd(gpu_input, gpu_output);
+		typename Root::Data out = std::move(in);
+		gpu_output.copy_to_host(out.data());
 		return out;
 	}
 	inline typename Root::Data pass_back(typename Root::Data out_grad) {
+		using namespace internal;
 		assert((Dimensions<std::size_t,Base::DATA_RANK>(out_grad.dimensions()).template demote<>()) == Base::dims);
 		assert(out_grad.dimension(0) > 0 && ext_batch_dims[0] == out_grad.dimension(0));
 		typename Root::Data prev_out_grad(out_grad.dimensions());
@@ -2269,7 +2272,7 @@ protected:
 	}
 private:
 	std::array<std::size_t,4> ext_batch_dims;
-	typename Root::Data out;
+	internal::CuDNNTensor<Scalar> gpu_output;
 };
 #endif
 
@@ -2330,46 +2333,16 @@ private:
  * \f]
  */
 template<typename Scalar, std::size_t Rank>
-class ReLUActivationLayer : public ActivationLayer<Scalar,Rank> {
-	typedef Layer<Scalar,Rank> Root;
-	typedef ActivationLayer<Scalar,Rank> Base;
+class ReLUActivationLayer : public CuDNNActivationLayer<Scalar,Rank> {
 public:
 	/**
 	 * @param dims The dimensionality of the input tensor.
 	 */
 	inline ReLUActivationLayer(const Dimensions<std::size_t,Rank>& dims) :
-			ActivationLayer<Scalar,Rank>::ActivationLayer(dims),
-			ext_batch_dims(dims.template extend<3 - Rank>().template promote<>()) { }
+			CuDNNActivationLayer<Scalar,Rank>::CuDNNActivationLayer(dims, CUDNN_ACTIVATION_RELU, 0) { }
 	inline Layer<Scalar,Rank>* clone() const {
 		return new ReLUActivationLayer(*this);
 	}
-protected:
-	inline void empty_cache() {
-		in = typename Root::Data();
-		out = typename Root::Data();
-	}
-	inline typename Root::Data pass_forward(typename Root::Data in, bool training) {
-		assert((Dimensions<std::size_t,Base::DATA_RANK>(in.dimensions()).template demote<>()) == Base::dims);
-		assert(in.dimension(0) > 0);
-		ext_batch_dims[0] = in.dimension(0);
-		this->in = std::move(in);
-		out = typename Root::Data(this->in.dimensions());
-		internal::CuDNNHandle<Scalar>::get_instance().activation_fwd(this->in.data(), ext_batch_dims,
-				CUDNN_ACTIVATION_RELU, 0, out.data());
-		return out;
-	}
-	inline typename Root::Data pass_back(typename Root::Data out_grad) {
-		assert((Dimensions<std::size_t,Base::DATA_RANK>(out_grad.dimensions()).template demote<>()) == Base::dims);
-		assert(out_grad.dimension(0) > 0 && ext_batch_dims[0] == out_grad.dimension(0));
-		typename Root::Data prev_out_grad(in.dimensions());
-		internal::CuDNNHandle<Scalar>::get_instance().activation_bwd(in.data(), out.data(), out_grad.data(),
-				ext_batch_dims, CUDNN_ACTIVATION_RELU, 0, prev_out_grad.data());
-		return prev_out_grad;
-	}
-private:
-	std::array<std::size_t,4> ext_batch_dims;
-	typename Root::Data in;
-	typename Root::Data out;
 };
 #endif
 
@@ -2507,49 +2480,17 @@ private:
  * \see https://arxiv.org/abs/1511.07289
  */
 template<typename Scalar, std::size_t Rank>
-class ELUActivationLayer : public ActivationLayer<Scalar,Rank> {
-	typedef Layer<Scalar,Rank> Root;
-	typedef ActivationLayer<Scalar,Rank> Base;
+class ELUActivationLayer : public CuDNNActivationLayer<Scalar,Rank> {
 public:
 	/**
 	 * @param dims The dimensionality of the input tensor.
 	 * @param alpha The factor by which negative inputs are to be scaled.
 	 */
 	inline ELUActivationLayer(const Dimensions<std::size_t,Rank>& dims, Scalar alpha = 1e-1) :
-			ActivationLayer<Scalar,Rank>::ActivationLayer(dims),
-			alpha(alpha),
-			ext_batch_dims(dims.template extend<3 - Rank>().template promote<>()) { }
+			CuDNNActivationLayer<Scalar,Rank>::CuDNNActivationLayer(dims, CUDNN_ACTIVATION_ELU, alpha) { }
 	inline Layer<Scalar,Rank>* clone() const {
 		return new ELUActivationLayer(*this);
 	}
-protected:
-	inline void empty_cache() {
-		in = typename Root::Data();
-		out = typename Root::Data();
-	}
-	inline typename Root::Data pass_forward(typename Root::Data in, bool training) {
-		assert((Dimensions<std::size_t,Base::DATA_RANK>(in.dimensions()).template demote<>()) == Base::dims);
-		assert(in.dimension(0) > 0);
-		ext_batch_dims[0] = in.dimension(0);
-		this->in = std::move(in);
-		out = typename Root::Data(this->in.dimensions());
-		internal::CuDNNHandle<Scalar>::get_instance().activation_fwd(this->in.data(), ext_batch_dims,
-				CUDNN_ACTIVATION_ELU, alpha, out.data());
-		return out;
-	}
-	inline typename Root::Data pass_back(typename Root::Data out_grad) {
-		assert((Dimensions<std::size_t,Base::DATA_RANK>(out_grad.dimensions()).template demote<>()) == Base::dims);
-		assert(out_grad.dimension(0) > 0 && ext_batch_dims[0] == out_grad.dimension(0));
-		typename Root::Data prev_out_grad(in.dimensions());
-		internal::CuDNNHandle<Scalar>::get_instance().activation_bwd(in.data(), out.data(), out_grad.data(),
-				ext_batch_dims, CUDNN_ACTIVATION_ELU, alpha, prev_out_grad.data());
-		return prev_out_grad;
-	}
-private:
-	const Scalar alpha;
-	std::array<std::size_t,4> ext_batch_dims;
-	typename Root::Data in;
-	typename Root::Data out;
 };
 #endif
 
