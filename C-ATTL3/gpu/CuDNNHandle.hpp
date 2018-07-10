@@ -1,5 +1,5 @@
 /*
- * CuDNNHandle.hpp
+ * CuDNNHandle.get_h()pp
  *
  *  Created on: 28 May 2018
  *      Author: Viktor Csomor
@@ -34,7 +34,6 @@ class CuDNNHandle {
 	static_assert(std::is_floating_point<Scalar>::value, "non floating-point scalar type");
 	typedef CuDNNHandle<Scalar> Self;
 	typedef std::array<std::size_t,4> Array4;
-	static constexpr cudnnDataType_t DATA_TYPE = std::is_same<Scalar,float>::value ? CUDNN_DATA_FLOAT : CUDNN_DATA_DOUBLE;
 	static constexpr cudnnNanPropagation_t NAN_PROP = CUDNN_PROPAGATE_NAN;
 	static constexpr std::size_t SCALAR_SIZE = sizeof(Scalar);
 public:
@@ -75,31 +74,29 @@ public:
 	inline void conv2d_output_dims(std::size_t input_height, std::size_t input_width, std::size_t input_channels,
 			cudnnTensorFormat_t tensor_format, std::size_t filters, std::size_t receptor_height,
 			std::size_t receptor_width, std::size_t vertical_padding, std::size_t horizontal_padding,
-			std::size_t vertical_stride, std::size_t vertical_dilation, std::size_t horizontal_dilation,
-			/* out */ std::size_t& output_height, /* out */ std::size_t& output_width,
+			std::size_t vertical_stride, std::size_t horizontal_stride, std::size_t vertical_dilation,
+			std::size_t horizontal_dilation, /* out */ std::size_t& output_height, /* out */ std::size_t& output_width,
 			/* out */ std::size_t& output_channels) const {
 		// Create and set the input tensor descriptor.
-		cudnnTensorDescriptor_t input_desc;
-		cudnnAssert(cudnnCreateTensorDescriptor(&input_desc));
-		cudnnAssert(cudnnSetTensor4dDescriptor(input_desc, TENSOR_FORMAT, DATA_TYPE, 1, input_channels, input_height,
-				input_width));
+		cudnnTensorDescriptor_t input_desc = CuDNNTensorDescriptorManager<>::create_descriptor(
+				CuDNNTensor<Scalar>::DATA_TYPE, tensor_format, 1, input_height, input_width, input_channels);
 		// Create and set up the filter descriptor.
-		cudnnFilterDescriptor_t filter_desc;
-		cudnnAssert(cudnnCreateFilterDescriptor(&filter_desc));
-		cudnnAssert(cudnnSetFilter4dDescriptor(filter_desc, DATA_TYPE, TENSOR_FORMAT, filters, input_channels,
-				receptor_height, receptor_width));
+		cudnnFilterDescriptor_t filter_desc = CuDNNTensorDescriptorManager<true>::create_descriptor(
+				CuDNNTensor<Scalar>::DATA_TYPE, tensor_format, filters, receptor_height, receptor_width,
+				input_channels);
 		// Create and set up the convolution descriptor.
 		cudnnConvolutionDescriptor_t conv_desc;
 		cudnnAssert(cudnnCreateConvolutionDescriptor(&conv_desc));
 		cudnnAssert(cudnnSetConvolution2dDescriptor(conv_desc, vertical_padding, horizontal_padding, vertical_stride,
-				horizontal_stride, vertical_dilation, horizontal_dilation, CUDNN_CROSS_CORRELATION, DATA_TYPE));
+				horizontal_stride, vertical_dilation, horizontal_dilation, CUDNN_CROSS_CORRELATION,
+				CuDNNTensor<Scalar>::DATA_TYPE));
 		// Compute the dimensions.
 		int n, h, w, c;
 		cudnnAssert(cudnnGetConvolution2dForwardOutputDim(conv_desc, input_desc, filter_desc, &n, &c, &h, &w));
 		// Free the resources.
-		cudnnAssert(cudnnDestroyTensorDescriptor(input_desc));
-		cudnnAssert(cudnnDestroyFilterDescriptor(filter_desc));
 		cudnnAssert(cudnnDestroyConvolutionDescriptor(conv_desc));
+		CuDNNTensorDescriptorManager<>::destroy_descriptor(input_desc);
+		CuDNNTensorDescriptorManager<true>::destroy_descriptor(filter_desc);
 		output_height = (std::size_t) h;
 		output_width = (std::size_t) w;
 		output_channels = (std::size_t) c;
@@ -124,33 +121,32 @@ public:
 			const CuDNNTensor<Scalar>& bias, std::size_t vertical_padding, std::size_t horizontal_padding,
 			std::size_t vertical_stride, std::size_t horizontal_stride, std::size_t vertical_dilation,
 			std::size_t horizontal_dilation, /* out */ CuDNNTensor<Scalar>& output) const {
-		std::size_t depth = input_dims[3];
-		std::size_t filters = output_dims[3];
 		// Create and set up the convolution descriptor.
 		cudnnConvolutionDescriptor_t conv_desc;
 		cudnnAssert(cudnnCreateConvolutionDescriptor(&conv_desc));
 		cudnnAssert(cudnnSetConvolution2dDescriptor(conv_desc, vertical_padding, horizontal_padding, vertical_stride,
-				horizontal_stride, vertical_dilation, horizontal_dilation, CUDNN_CROSS_CORRELATION, DATA_TYPE));
+				horizontal_stride, vertical_dilation, horizontal_dilation, CUDNN_CROSS_CORRELATION,
+				CuDNNTensor<Scalar>::DATA_TYPE));
 		// Have cuDNN find the most performant algorithm given the convolution parameters.
 		cudnnConvolutionFwdAlgo_t conv_algo;
-		cudnnAssert(cudnnGetConvolutionForwardAlgorithm(handle, input.desc, filter.desc, conv_desc, output.desc,
+		cudnnAssert(cudnnGetConvolutionForwardAlgorithm(handle, input.get_desc(), filter.get_desc(), conv_desc, output.get_desc(),
 				CUDNN_CONVOLUTION_FWD_PREFER_FASTEST, 0, &conv_algo));
 		/* Have cuDNN compute the workspace memory required for the selected convolution algorithm given
 		 * the convolution parameters. */
 		std::size_t workspace_size;
-		cudnnAssert(cudnnGetConvolutionForwardWorkspaceSize(handle, input.desc, filter.desc, conv_desc, output.desc,
+		cudnnAssert(cudnnGetConvolutionForwardWorkspaceSize(handle, input.get_desc(), filter.get_desc(), conv_desc, output.get_desc(),
 				conv_algo, &workspace_size));
 		// Allocate the memory for the workspace required for the convolution.
 		Scalar* workspace;
 		cudaAssert(cudaMalloc(&workspace, workspace_size));
 		// Perform the convolution.
-		cudnnAssert(cudnnConvolutionForward(handle, &alpha, input.desc, input.get_data(), filter.desc, filter.get_data(),
-				conv_desc, conv_algo, workspace, workspace_size, &beta, output.desc, output.get_data()));
+		cudnnAssert(cudnnConvolutionForward(handle, &alpha, input.get_desc(), input.get_data(), filter.get_desc(), filter.get_data(),
+				conv_desc, conv_algo, workspace, workspace_size, &beta, output.get_desc(), output.get_data()));
 		// Free the convolution resources.
 		cudnnAssert(cudnnDestroyConvolutionDescriptor(conv_desc));
 		cudaAssert(cudaFree(workspace));
 		// Apply the bias to the output tensor.
-		cudnnAssert(cudnnAddTensor(handle, &alpha, bias.desc, bias.get_data(), &beta, output.desc, output.get_data()));
+		cudnnAssert(cudnnAddTensor(handle, &alpha, bias.get_desc(), bias.get_data(), &beta, output.get_desc(), output.get_data()));
 	}
 	/**
 	 * Performs a backward 2D convolution on a rank 4 tensor to compute the gradients of
@@ -181,44 +177,45 @@ public:
 		cudnnConvolutionDescriptor_t dconv_desc;
 		cudnnAssert(cudnnCreateConvolutionDescriptor(&dconv_desc));
 		cudnnAssert(cudnnSetConvolution2dDescriptor(dconv_desc, vertical_padding, horizontal_padding, vertical_stride,
-				horizontal_stride, vertical_dilation, horizontal_dilation, CUDNN_CROSS_CORRELATION, DATA_TYPE));
+				horizontal_stride, vertical_dilation, horizontal_dilation, CUDNN_CROSS_CORRELATION,
+				CuDNNTensor<Scalar>::DATA_TYPE));
 		// Have cuDNN find the most performant algorithm given the convolution parameters.
 		cudnnConvolutionBwdDataAlgo_t dconv_data_algo;
-		cudnnAssert(cudnnGetConvolutionBackwardDataAlgorithm(handle, filter.desc, out_grad.desc, dconv_desc,
-				input.desc, CUDNN_CONVOLUTION_BWD_DATA_PREFER_FASTEST, 0, &dconv_data_algo));
+		cudnnAssert(cudnnGetConvolutionBackwardDataAlgorithm(handle, filter.get_desc(), out_grad.get_desc(), dconv_desc,
+				input.get_desc(), CUDNN_CONVOLUTION_BWD_DATA_PREFER_FASTEST, 0, &dconv_data_algo));
 		cudnnConvolutionBwdFilterAlgo_t dconv_filter_algo;
-		cudnnAssert(cudnnGetConvolutionBackwardFilterAlgorithm(handle, input.desc, out_grad.desc, dconv_desc,
-				filter.desc, CUDNN_CONVOLUTION_BWD_FILTER_PREFER_FASTEST, 0, &dconv_filter_algo));
+		cudnnAssert(cudnnGetConvolutionBackwardFilterAlgorithm(handle, input.get_desc(), out_grad.get_desc(), dconv_desc,
+				filter.get_desc(), CUDNN_CONVOLUTION_BWD_FILTER_PREFER_FASTEST, 0, &dconv_filter_algo));
 		/* Have cuDNN compute the data_workspace memory required for the selected backward convolution algorithms given
 		 * the convolution parameters. */
 		std::size_t data_workspace_size;
-		cudnnAssert(cudnnGetConvolutionBackwardDataWorkspaceSize(handle, filter.desc, out_grad.desc, dconv_desc,
-				input.desc, dconv_data_algo, &data_workspace_size));
+		cudnnAssert(cudnnGetConvolutionBackwardDataWorkspaceSize(handle, filter.get_desc(), out_grad.get_desc(), dconv_desc,
+				input.get_desc(), dconv_data_algo, &data_workspace_size));
 		std::size_t filter_workspace_size;
-		cudnnAssert(cudnnGetConvolutionBackwardFilterWorkspaceSize(handle, input.desc, out_grad.desc, dconv_desc,
-				filter.desc, dconv_filter_algo, &filter_workspace_size));
+		cudnnAssert(cudnnGetConvolutionBackwardFilterWorkspaceSize(handle, input.get_desc(), out_grad.get_desc(), dconv_desc,
+				filter.get_desc(), dconv_filter_algo, &filter_workspace_size));
 		// Allocate the memory required for the backwards data convolution on the device.
 		Scalar* data_workspace;
 		cudaAssert(cudaMalloc(&data_workspace, data_workspace_size));
 		// Perform the backwards data convolution.
-		cudnnAssert(cudnnConvolutionBackwardData(handle, &alpha, filter.desc, filter.get_data(), out_grad.desc,
+		cudnnAssert(cudnnConvolutionBackwardData(handle, &alpha, filter.get_desc(), filter.get_data(), out_grad.get_desc(),
 				out_grad.get_data(), dconv_desc, dconv_data_algo, data_workspace, data_workspace_size, &beta,
-				prev_out_grad.desc, prev_out_grad.get_data()));
+				prev_out_grad.get_desc(), prev_out_grad.get_data()));
 		// Free the resources.
 		cudaAssert(cudaFree(data_workspace));
 		// Allocate the memory required for the backwards filter convolution on the device.
 		Scalar* filter_workspace;
 		cudaAssert(cudaMalloc(&filter_workspace, filter_workspace_size));
 		// Perform the backwards filter convolution.
-		cudnnAssert(cudnnConvolutionBackwardFilter(handle, &alpha, input.desc, input.get_data(), out_grad.desc,
+		cudnnAssert(cudnnConvolutionBackwardFilter(handle, &alpha, input.get_desc(), input.get_data(), out_grad.get_desc(),
 				out_grad.get_data(), dconv_desc, dconv_filter_algo, filter_workspace, filter_workspace_size, &beta,
-				filter_grad.desc, filter_grad.get_data()));
+				filter_grad.get_desc(), filter_grad.get_data()));
 		// Free up resources.
 		cudnnAssert(cudnnDestroyConvolutionDescriptor(dconv_desc));
 		cudaAssert(cudaFree(filter_workspace));
 		// Perform the backwards bias convolution.
-		cudnnAssert(cudnnConvolutionBackwardBias(handle, &alpha, out_grad.desc, out_grad.get_data(), &beta,
-				bias_grad.desc, bias_grad.get_data()));
+		cudnnAssert(cudnnConvolutionBackwardBias(handle, &alpha, out_grad.get_desc(), out_grad.get_data(), &beta,
+				bias_grad.get_desc(), bias_grad.get_data()));
 	}
 	/**
 	 * It applies the specified activation function the the input tensor.
@@ -233,8 +230,8 @@ public:
 		cudnnActivationDescriptor_t act_desc;
 		cudnnAssert(cudnnCreateActivationDescriptor(&act_desc));
 		cudnnAssert(cudnnSetActivationDescriptor(act_desc, act_mode, NAN_PROP, (double) coeff));
-		cudnnAssert(cudnnActivationForward(handle, act_desc, &alpha, input.desc, input.get_data(), &beta,
-				output.desc, output.get_data()));
+		cudnnAssert(cudnnActivationForward(handle, act_desc, &alpha, input.get_desc(), input.get_data(), &beta,
+				output.get_desc(), output.get_data()));
 		cudnnAssert(cudnnDestroyActivationDescriptor(act_desc));
 	}
 	/**
@@ -252,8 +249,8 @@ public:
 		cudnnActivationDescriptor_t act_desc;
 		cudnnAssert(cudnnCreateActivationDescriptor(&act_desc));
 		cudnnAssert(cudnnSetActivationDescriptor(act_desc, act_mode, NAN_PROP, (double) coeff));
-		cudnnAssert(cudnnActivationBackward(handle, act_desc, &alpha, output.desc, output.get_data(), in_out_grad.desc,
-				in_out_grad.get_data(), input.desc, input.get_data(), &beta, in_out_grad.desc, in_out_grad.get_data()));
+		cudnnAssert(cudnnActivationBackward(handle, act_desc, &alpha, output.get_desc(), output.get_data(), in_out_grad.get_desc(),
+				in_out_grad.get_data(), input.get_desc(), input.get_data(), &beta, in_out_grad.get_desc(), in_out_grad.get_data()));
 		cudnnAssert(cudnnDestroyActivationDescriptor(act_desc));
 	}
 	/**
@@ -264,7 +261,7 @@ public:
 	 */
 	inline void softmax_fwd(const CuDNNTensor<Scalar>& input, /* out */ CuDNNTensor<Scalar>& output) const {
 		cudnnAssert(cudnnSoftmaxForward(handle, CUDNN_SOFTMAX_ACCURATE, CUDNN_SOFTMAX_MODE_INSTANCE, &alpha,
-				input.desc, input.get_data(), &beta, output.desc, output.get_data()));
+				input.get_desc(), input.get_data(), &beta, output.get_desc(), output.get_data()));
 	}
 	/**
 	 * It computes the gradient of the input of the softmax activation function.
@@ -275,7 +272,7 @@ public:
 	 */
 	inline void softmax_bwd(const CuDNNTensor<Scalar>& output, /* in/out */ CuDNNTensor<Scalar>& in_out_grad) const {
 		cudnnAssert(cudnnSoftmaxBackward(handle, CUDNN_SOFTMAX_ACCURATE, CUDNN_SOFTMAX_MODE_INSTANCE, &alpha,
-				output.desc, output.get_data(), in_out_grad.desc, in_out_grad.get_data(), &beta, in_out_grad.desc,
+				output.get_desc(), output.get_data(), in_out_grad.get_desc(), in_out_grad.get_data(), &beta, in_out_grad.get_desc(),
 				in_out_grad.get_data()));
 	}
 	/**
@@ -298,16 +295,14 @@ public:
 	 * @param output_width The output width.
 	 * @param output_channels The number of output channels.
 	 */
-	inline void pooling2d_output_dims(std::size_t input_height, std::size_t input_height, std::size_t input_channels,
+	inline void pooling2d_output_dims(std::size_t input_height, std::size_t input_width, std::size_t input_channels,
 			cudnnTensorFormat_t tensor_format, cudnnPoolingMode_t pool_mode, std::size_t window_height,
 			std::size_t window_width, std::size_t vertical_padding, std::size_t horizontal_padding,
 			std::size_t vertical_stride, std::size_t horizontal_stride, /* out */ std::size_t& output_height,
 			/* out */ std::size_t& output_width, /* out */ std::size_t& output_channels) const {
 		// Create and set the input tensor descriptor.
-		cudnnTensorDescriptor_t input_desc;
-		cudnnAssert(cudnnCreateTensorDescriptor(&input_desc));
-		cudnnAssert(cudnnSetTensor4dDescriptor(input_desc, tensor_format, DATA_TYPE, 1, input_channels,
-				input_height, input_width));
+		cudnnTensorDescriptor_t input_desc = CuDNNTensorDescriptorManager<>::create_descriptor(
+				CuDNNTensor<Scalar>::DATA_TYPE, tensor_format, 1, input_height, input_width, input_channels);
 		// Create and set the pooling descriptor.
 		cudnnPoolingDescriptor_t pool_desc;
 		cudnnAssert(cudnnCreatePoolingDescriptor(&pool_desc));
@@ -316,7 +311,9 @@ public:
 		// Compute the dimensions.
 		int n, h, w, c;
 		cudnnAssert(cudnnGetPooling2dForwardOutputDim(pool_desc, input_desc, &n, &c, &h, &w));
+		// Free the resources.
 		cudnnAssert(cudnnDestroyPoolingDescriptor(pool_desc));
+		CuDNNTensorDescriptorManager<>::destroy_descriptor(input_desc);
 		output_height = (std::size_t) h;
 		output_width = (std::size_t) w;
 		output_channels = (std::size_t) c;
@@ -344,8 +341,8 @@ public:
 		cudnnAssert(cudnnCreatePoolingDescriptor(&pool_desc));
 		cudnnAssert(cudnnSetPooling2dDescriptor(pool_desc, pool_mode, NAN_PROP, window_height, window_width,
 				vertical_padding, horizontal_padding, vertical_stride, horizontal_stride));
-		cudnnAssert(cudnnPoolingForward(handle, pool_desc, &alpha, input.desc, input.get_data(), &beta,
-				output.desc, output.get_data()));
+		cudnnAssert(cudnnPoolingForward(handle, pool_desc, &alpha, input.get_desc(), input.get_data(), &beta,
+				output.get_desc(), output.get_data()));
 		cudnnAssert(cudnnDestroyPoolingDescriptor(pool_desc));
 	}
 	/**
@@ -374,8 +371,8 @@ public:
 		cudnnAssert(cudnnCreatePoolingDescriptor(&pool_desc));
 		cudnnAssert(cudnnSetPooling2dDescriptor(pool_desc, pool_mode, NAN_PROP, window_height, window_width,
 				vertical_padding, horizontal_padding, vertical_stride, horizontal_stride));
-		cudnnAssert(cudnnPoolingBackward(handle, pool_desc, &alpha, output.desc, output.get_data(),
-				out_grad.desc, out_grad.get_data(), input.desc, input.get_data(), &beta, prev_out_grad.desc,
+		cudnnAssert(cudnnPoolingBackward(handle, pool_desc, &alpha, output.get_desc(), output.get_data(),
+				out_grad.get_desc(), out_grad.get_data(), input.get_desc(), input.get_data(), &beta, prev_out_grad.get_desc(),
 				prev_out_grad.get_data()));
 		cudnnAssert(cudnnDestroyPoolingDescriptor(pool_desc));
 	}
@@ -402,8 +399,8 @@ public:
 			/* out */ CuDNNTensor<Scalar>& output, /* out */ CuDNNTensor<Scalar>& mean_cache,
 			/* out */ CuDNNTensor<Scalar>& inv_var_cache) const {
 		cudnnAssert(cudnnBatchNormalizationForwardTraining(handle, spatial ? CUDNN_BATCHNORM_SPATIAL_PERSISTENT :
-				CUDNN_BATCHNORM_PER_ACTIVATION, &alpha, &this->beta, input.desc, input.get_data(), output.desc,
-				output.get_data(), gamma.desc, gamma.get_data(), beta.get_data(), exp_avg_factor, means.get_data(),
+				CUDNN_BATCHNORM_PER_ACTIVATION, &alpha, &this->beta, input.get_desc(), input.get_data(), output.get_desc(),
+				output.get_data(), gamma.get_desc(), gamma.get_data(), beta.get_data(), exp_avg_factor, means.get_data(),
 				vars.get_data(), epsilon, mean_cache.get_data(), inv_var_cache.get_data()));
 	}
 	/**
@@ -424,8 +421,8 @@ public:
 			const CuDNNTensor<Scalar>& beta, const CuDNNTensor<Scalar>& means, const CuDNNTensor<Scalar>& vars,
 			bool spatial, Scalar epsilon, /* out */ CuDNNTensor<Scalar>& output) const {
 		cudnnAssert(cudnnBatchNormalizationForwardInference(handle, spatial ? CUDNN_BATCHNORM_SPATIAL_PERSISTENT :
-				CUDNN_BATCHNORM_PER_ACTIVATION, &alpha, &this->beta, input.desc, input.get_data(), output.desc,
-				output.get_data(), gamma.desc, gamma.get_data(), beta.get_data(), means.get_data(),
+				CUDNN_BATCHNORM_PER_ACTIVATION, &alpha, &this->beta, input.get_desc(), input.get_data(), output.get_desc(),
+				output.get_data(), gamma.get_desc(), gamma.get_data(), beta.get_data(), means.get_data(),
 				vars.get_data(), epsilon));
 	}
 	/**
@@ -450,8 +447,8 @@ public:
 			/* out */ CuDNNTensor<Scalar>& prev_out_grad, /* out */ CuDNNTensor<Scalar>& gamma_grad,
 			/* out */ CuDNNTensor<Scalar>& beta_grad) const {
 		cudnnAssert(cudnnBatchNormalizationBackward(handle, spatial ? CUDNN_BATCHNORM_SPATIAL_PERSISTENT :
-				CUDNN_BATCHNORM_PER_ACTIVATION, &alpha, &beta, &alpha, &beta, input.desc, input.get_data(),
-				out_grad.desc, out_grad.get_data(), prev_out_grad.desc, prev_out_grad.get_data(), gamma.desc,
+				CUDNN_BATCHNORM_PER_ACTIVATION, &alpha, &beta, &alpha, &beta, input.get_desc(), input.get_data(),
+				out_grad.get_desc(), out_grad.get_data(), prev_out_grad.get_desc(), prev_out_grad.get_data(), gamma.get_desc(),
 				gamma.get_data(), gamma_grad.get_data(), beta_grad.get_data(), epsilon, mean_cache.get_data(),
 				inv_var_cache.get_data()));
 	}
@@ -463,7 +460,7 @@ public:
 	 */
 	inline void dropout_reserve_size(const CuDNNTensor<Scalar>& input,
 			/* out */ std::size_t& reserve_size) const {
-		cudnnAssert(cudnnDropoutGetReserveSpaceSize(input.desc, &reserve_size));
+		cudnnAssert(cudnnDropoutGetReserveSpaceSize(input.get_desc(), &reserve_size));
 		reserve_size /= SCALAR_SIZE;
 	}
 	/**
@@ -479,8 +476,8 @@ public:
 		cudnnDropoutDescriptor_t dropout_desc;
 		cudnnAssert(cudnnCreateDropoutDescriptor(&dropout_desc));
 		cudnnAssert(cudnnSetDropoutDescriptor(dropout_desc, handle, (float) dropout, nullptr, 0, 0));
-		cudnnAssert(cudnnDropoutForward(handle, dropout_desc, input.desc, input.get_data(), output.desc,
-				output.get_data(), reserve.get_data(), reserve.size));
+		cudnnAssert(cudnnDropoutForward(handle, dropout_desc, input.get_desc(), input.get_data(), output.get_desc(),
+				output.get_data(), reserve.get_data(), reserve.get_size()));
 		cudnnAssert(cudnnDestroyDropoutDescriptor(dropout_desc));
 	}
 	/**
@@ -496,8 +493,8 @@ public:
 		cudnnDropoutDescriptor_t dropout_desc;
 		cudnnAssert(cudnnCreateDropoutDescriptor(&dropout_desc));
 		cudnnAssert(cudnnSetDropoutDescriptor(dropout_desc, handle, (float) dropout, nullptr, 0, 0));
-		cudnnAssert(cudnnDropoutBackward(handle, dropout_desc, out_grad.desc, out_grad.get_data(),
-				prev_out_grad.desc, prev_out_grad.get_data(), reserve.get_data(), reserve.size * SCALAR_SIZE));
+		cudnnAssert(cudnnDropoutBackward(handle, dropout_desc, out_grad.get_desc(), out_grad.get_data(),
+				prev_out_grad.get_desc(), prev_out_grad.get_data(), reserve.get_data(), reserve.get_size() * SCALAR_SIZE));
 		cudnnAssert(cudnnDestroyDropoutDescriptor(dropout_desc));
 	}
 private:

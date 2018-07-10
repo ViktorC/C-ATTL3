@@ -850,7 +850,9 @@ protected:
 				ext_input_dims(input_dims.template extend<3 - Rank>()),
 				ext_output_dims(calculate_output_dims(ext_input_dims, filters, receptor_height, receptor_width,
 						vertical_padding, horizontal_padding, vertical_stride, horizontal_stride,
-						vertical_dilation, horizontal_dilation)) {
+						vertical_dilation, horizontal_dilation)),
+				nhwc_to_nchw({ 0u, 3u, 1u, 2u }),
+				nchw_to_nhwc({ 0u, 2u, 3u, 1u }) {
 		assert(filters > 0);
 		assert(receptor_height > 0);
 		assert(receptor_width > 0);
@@ -871,35 +873,74 @@ protected:
 			horizontal_dilation(layer.horizontal_dilation),
 			ext_input_dims(layer.ext_input_dims),
 			ext_output_dims(layer.ext_output_dims),
-			input(layer.input) { }
+			nhwc_to_nchw(layer.nhwc_to_nchw),
+			nchw_to_nhwc(layer.nchw_to_nhwc),
+			gpu_input(layer.gpu_input) { }
 	inline void empty_cache() {
-		input = CuDNNTensor<Scalar>();
+		gpu_input = internal::CuDNNTensor<Scalar>();
 	}
 	inline Tensor<Scalar,4> _pass_forward(Tensor<Scalar,4> in, bool training) {
-		input = CuDNNTensor<Scalar>(TENSOR_FORMAT, in.dimension(0), in.dimension(1), in.dimension(2), in.dimension(3));
-		in = in.shuffle({ 0u, 3u, 1u, 2u });
-		input.copy_from_host(in.data());
+		using namespace internal;
+		gpu_input = CuDNNTensor<Scalar>(in.dimension(0), in.dimension(1), in.dimension(2), in.dimension(3),
+				TENSOR_FORMAT);
+		in = in.shuffle(nhwc_to_nchw);
+		gpu_input.copy_from_host(in.data());
 		Matrix<Scalar> filter = Base::weights_ref.topRows(Base::weights_ref.rows() - 1);
+		TensorMap<Scalar,4> filter_tensor(filter.data(), filters, receptor_height, receptor_width, in.dimension(3));
+		CuDNNTensor<Scalar,true> gpu_filter(filter_tensor.dimension(0), filter_tensor.dimension(1),
+				filter_tensor.dimension(2), filter_tensor.dimension(3), TENSOR_FORMAT);
+		filter_tensor = filter_tensor.shuffle(nhwc_to_nchw);
+		gpu_filter.copy_from_host(filter_tensor.data());
 		Matrix<Scalar> bias = Base::weights_ref.bottomRows(1);
-		Tensor<Scalar,4> out(out_batch_dims);
-		internal::CuDNNHandle<Scalar>::get_instance().convolution2d_fwd(input.data(), filter.data(), bias.data(),
-				in_batch_dims, out_batch_dims, receptor_height, receptor_width, vertical_padding, horizontal_padding,
-				vertical_stride, horizontal_stride, vertical_dilation + 1, horizontal_dilation + 1, out.data());
-		return out;
+		CuDNNTensor<Scalar> gpu_bias(1, 1, 1, filters, TENSOR_FORMAT);
+		gpu_bias.copy_from_host(bias.data());
+		CuDNNTensor<Scalar> gpu_out(in.dimension(0), ext_output_dims(0), ext_output_dims(1), ext_output_dims(2),
+				TENSOR_FORMAT);
+		internal::CuDNNHandle<Scalar>::get_instance().convolution2d_fwd(gpu_input, gpu_filter, gpu_bias, vertical_padding,
+				horizontal_padding, vertical_stride, horizontal_stride, vertical_dilation + 1, horizontal_dilation + 1,
+				gpu_out);
+		Tensor<Scalar,4> out(in.dimension(0), ext_output_dims(2), ext_output_dims(0), ext_output_dims(1));
+		gpu_out.copy_to_host(out.data());
+		return out.shuffle(nchw_to_nhwc);
 	}
 	inline Tensor<Scalar,4> _pass_back(Tensor<Scalar,4> out_grad) {
-		Tensor<Scalar,4> prev_out_grad(in_batch_dims);
+		using namespace internal;
+		CuDNNTensor<Scalar> gpu_out_grad(out_grad.dimension(0), out_grad.dimension(1), out_grad.dimension(2),
+				out_grad.dimension(3), TENSOR_FORMAT);
+		out_grad = out_grad.shuffle(nhwc_to_nchw);
+		gpu_out_grad.copy_from_host(out_grad.data());
 		Matrix<Scalar> filter = Base::weights_ref.topRows(Base::weights_ref.rows() - 1);
+		TensorMap<Scalar,4> filter_tensor(filter.data(), filters, receptor_height, receptor_width, ext_input_dims(2));
+		CuDNNTensor<Scalar,true> gpu_filter(filter_tensor.dimension(0), filter_tensor.dimension(1),
+				filter_tensor.dimension(2), filter_tensor.dimension(3), TENSOR_FORMAT);
+		filter_tensor = filter_tensor.shuffle(nhwc_to_nchw);
+		gpu_filter.copy_from_host(filter_tensor.data());
 		Matrix<Scalar> bias = Base::weights_ref.bottomRows(1);
-		Matrix<Scalar> filter_grad(filter.rows(), filter.cols());
+		CuDNNTensor<Scalar> gpu_bias(1, 1, 1, filters, TENSOR_FORMAT);
+		gpu_bias.copy_from_host(bias.data());
+		CuDNNTensor<Scalar,true> gpu_filter_grad(gpu_filter.get_n(), gpu_filter.get_h(), gpu_filter.get_w(),
+				gpu_filter.get_c(), TENSOR_FORMAT);
+		CuDNNTensor<Scalar> gpu_bias_grad(gpu_bias.get_n(), gpu_bias.get_h(), gpu_bias.get_w(), gpu_bias.get_c(),
+				TENSOR_FORMAT);
+		CuDNNTensor<Scalar> gpu_prev_out_grad(out_grad.dimension(0), ext_input_dims(2), ext_input_dims(0),
+				ext_input_dims(1), TENSOR_FORMAT);
+		internal::CuDNNHandle<Scalar>::get_instance().convolution2d_bwd(gpu_input, gpu_out_grad, gpu_filter,
+				gpu_bias, vertical_padding, horizontal_padding, vertical_stride, horizontal_stride,
+				vertical_dilation + 1, horizontal_dilation + 1, gpu_prev_out_grad, gpu_filter_grad,
+				gpu_bias_grad);
+		Tensor<Scalar,4> filter_grad(gpu_filter.get_n(), gpu_filter.get_c(), gpu_filter.get_h(), gpu_filter.get_w());
+		gpu_filter_grad.copy_to_host(filter_grad.data());
+		filter_grad = filter_grad.shuffle(nchw_to_nhwc);
+		MatrixMap<Scalar> filter_grad_matrix(filter_grad.data(), gpu_filter.get_size() / gpu_filter.get_n(),
+				gpu_filter.get_n());
 		Matrix<Scalar> bias_grad(bias.rows(), bias.cols());
-		internal::CuDNNHandle<Scalar>::get_instance().convolution2d_bwd(input.data(), out_grad.data(), filter.data(),
-				bias.data(), in_batch_dims, out_batch_dims, receptor_height, receptor_width, vertical_padding,
-				horizontal_padding, vertical_stride, horizontal_stride, vertical_dilation + 1, horizontal_dilation + 1,
-				prev_out_grad.data(), filter_grad.data(), bias_grad.data());
-		Base::weights_grad.topRows(filter_grad.rows()) = filter_grad;
+		gpu_bias_grad.copy_to_host(bias_grad.data());
+		Base::weights_grad.topRows(filter_grad_matrix.rows()) = filter_grad_matrix;
 		Base::weights_grad.bottomRows(bias_grad.rows()) = bias_grad;
-		return prev_out_grad;
+		Tensor<Scalar,4> prev_out_grad(gpu_prev_out_grad.get_n(), gpu_prev_out_grad.get_c(),
+				gpu_prev_out_grad.get_h(), gpu_prev_out_grad.get_w());
+		gpu_prev_out_grad.copy_to_host(prev_out_grad.data());
+		return prev_out_grad.shuffle(nchw_to_nhwc);
 	}
 	const std::size_t filters;
 	const std::size_t receptor_height;
@@ -926,16 +967,18 @@ private:
 			std::size_t horizontal_padding, std::size_t vertical_stride, std::size_t horizontal_stride,
 			std::size_t vertical_dilation, std::size_t horizontal_dilation) {
 		Dimensions<std::size_t,3> ext_input_dims = input_dims.template extend<3 - Rank>();
-		Dimensions<std::size_t,3> ext_output_dims = calculate_output_dims(ext_input_dims(0), ext_input_dims(1),
-				ext_input_dims(2), filters, receptor_height, receptor_width, vertical_padding, horizontal_padding,
-				vertical_stride, horizontal_stride, vertical_dilation, horizontal_dilation);
+		Dimensions<std::size_t,3> ext_output_dims = calculate_output_dims(ext_input_dims, filters, receptor_height,
+				receptor_width, vertical_padding, horizontal_padding, vertical_stride, horizontal_stride, vertical_dilation,
+				horizontal_dilation);
 		ext_output_dims(2) /= filters;
 		ext_output_dims(Rank - 1) *= filters;
 		return ext_output_dims.template contract<3 - Rank>();
 	}
 	Dimensions<std::size_t,3> ext_input_dims;
 	Dimensions<std::size_t,3> ext_output_dims;
-	CuDNNTensor<Scalar> input;
+	std::array<std::size_t,4> nhwc_to_nchw;
+	std::array<std::size_t,4> nchw_to_nhwc;
+	internal::CuDNNTensor<Scalar> gpu_input;
 };
 #endif
 

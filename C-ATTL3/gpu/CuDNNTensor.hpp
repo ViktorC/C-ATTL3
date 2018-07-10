@@ -29,8 +29,9 @@ struct CuDNNTensorDescriptorManager {
 		Type desc;
 		cudnnAssert(cudnnCreateTensorDescriptor(&desc));
 		cudnnAssert(cudnnSetTensor4dDescriptor(desc, format, data_type, n, c, h, w));
+		return desc;
 	}
-	__inline__ static void destroy_descriptor(Type& desc) {
+	__inline__ static void destroy_descriptor(const Type& desc) {
 		cudnnAssert(cudnnDestroyTensorDescriptor(desc));
 	}
 };
@@ -43,8 +44,9 @@ struct CuDNNTensorDescriptorManager<true> {
 		Type desc;
 		cudnnAssert(cudnnCreateFilterDescriptor(&desc));
 		cudnnAssert(cudnnSetFilter4dDescriptor(desc, data_type, format, n, c, h, w));
+		return desc;
 	}
-	__inline__ static void destroy_descriptor(Type& desc) {
+	__inline__ static void destroy_descriptor(const Type& desc) {
 		cudnnAssert(cudnnDestroyFilterDescriptor(desc));
 	}
 };
@@ -54,13 +56,12 @@ struct CuDNNTensorDescriptorManager<true> {
  */
 template<typename Scalar, bool Filter = false>
 class CuDNNTensor {
-	static constexpr cudnnDataType_t DATA_TYPE = std::is_same<Scalar,float>::value ?
-			CUDNN_DATA_FLOAT : CUDNN_DATA_DOUBLE;
-	typedef CuDNNTensor<Scalar> Self;
+	typedef CuDNNTensor<Scalar,Filter> Self;
 	typedef CuDNNTensorDescriptorManager<Filter> DescriptorManager;
 public:
 	typedef typename DescriptorManager::Type DescriptorType;
-	inline CuDNNTensor() { }
+	static constexpr cudnnDataType_t DATA_TYPE = std::is_same<Scalar,float>::value ?
+			CUDNN_DATA_FLOAT : CUDNN_DATA_DOUBLE;
 	/**
 	 * @param format The tensor format to use.
 	 * @param n The batch size.
@@ -68,23 +69,25 @@ public:
 	 * @param w The width.
 	 * @param c The number of channels.
 	 */
-	inline CuDNNTensor(cudnnTensorFormat_t format, std::size_t n, std::size_t h, std::size_t w,
-			std::size_t c) :
-				format(format),
+	inline CuDNNTensor(std::size_t n, std::size_t h, std::size_t w,
+			std::size_t c, cudnnTensorFormat_t format = CUDNN_TENSOR_NHWC) :
 				n(n),
 				h(h),
 				w(w),
 				c(c),
 				size(n * h * w * c),
+				format(format),
 				desc(DescriptorManager::create_descriptor(DATA_TYPE, format, n, h, w, c)) {
-		assert(size > 0);
 		cudaAssert(cudaMalloc(&data, size));
 	}
+	inline CuDNNTensor() :
+		CuDNNTensor(0u, 0u, 0u, 0u) { }
 	inline CuDNNTensor(const Self& tensor) :
-			CuDNNTensor(tensor.format, tensor.n, tensor.h, tensor.w, tensor.c) {
+			CuDNNTensor(tensor.n, tensor.h, tensor.w, tensor.c, tensor.format) {
 		cudaAssert(cudaMemcpy(data, tensor.data, size, cudaMemcpyDeviceToDevice));
 	}
-	inline CuDNNTensor(Self&& tensor) {
+	inline CuDNNTensor(Self&& tensor) :
+			CuDNNTensor() {
 		swap(*this, tensor);
 	}
 	inline ~CuDNNTensor() {
@@ -94,6 +97,48 @@ public:
 	inline Self& operator=(Self tensor) {
 		swap(*this, tensor);
 		return *this;
+	}
+	/**
+	 * @return The batch size of the tensor.
+	 */
+	inline std::size_t get_n() const {
+		return n;
+	}
+	/**
+	 * @return The height of the tensor.
+	 */
+	inline std::size_t get_h() const {
+		return h;
+	}
+	/**
+	 * @return The width of the tensor.
+	 */
+	inline std::size_t get_w() const {
+		return w;
+	}
+	/**
+	 * @return The depth/number of channels of the tensor.
+	 */
+	inline std::size_t get_c() const {
+		return c;
+	}
+	/**
+	 * @return The total size of the tensor.
+	 */
+	inline std::size_t get_size() const {
+		return size;
+	}
+	/**
+	 * @return The format of the tensor.
+	 */
+	inline cudnnTensorFormat_t get_format() const {
+		return format;
+	}
+	/**
+	 * @return A constant reference to the tensor descriptor.
+	 */
+	inline const DescriptorType& get_desc() const {
+		return desc;
 	}
 	/**
 	 * @return A device memory address pointer pointing to the (constant) first element of
@@ -127,17 +172,20 @@ public:
 	}
 	inline friend void swap(Self& tensor1, Self& tensor2) {
 		using std::swap;
-		swap(tensor1.format, tensor2.format);
-		swap(tensor1.dims, tensor2.dims);
+		swap(tensor1.n, tensor2.n);
+		swap(tensor1.h, tensor2.h);
+		swap(tensor1.w, tensor2.w);
+		swap(tensor1.c, tensor2.c);
 		swap(tensor1.size, tensor2.size);
+		swap(tensor1.format, tensor2.format);
 		swap(tensor1.desc, tensor2.desc);
 		swap(tensor1.data, tensor2.data);
 	}
-	const cudnnTensorFormat_t format;
-	const std::size_t n, h, w, c;
-	const std::size_t size;
-	const DescriptorType desc;
 private:
+	std::size_t n, h, w, c;
+	std::size_t size;
+	cudnnTensorFormat_t format;
+	DescriptorType desc;
 	Scalar* data;
 };
 
