@@ -458,8 +458,7 @@ public:
 	 * @param input The input tensor.
 	 * @param reserve_size The reserve size.
 	 */
-	inline void dropout_reserve_size(const CuDNNTensor<Scalar>& input,
-			/* out */ std::size_t& reserve_size) const {
+	inline void dropout_reserve_size(const CuDNNTensor<Scalar>& input, /* out */ std::size_t& reserve_size) const {
 		cudnnAssert(cudnnDropoutGetReserveSpaceSize(input.get_desc(), &reserve_size));
 		reserve_size /= SCALAR_SIZE;
 	}

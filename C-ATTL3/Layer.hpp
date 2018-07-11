@@ -365,22 +365,6 @@ protected:
 			weights_grad(layer.weights_grad),
 			weights_ref(share_params ? layer.weights_ref : weights),
 			owner(share_params ? layer.owner : *this) { }
-	KernelLayer<Scalar,Rank>* operator=(const KernelLayer<Scalar,Rank>& layer) {
-		input_dims = layer.input_dims;
-		output_dims = layer.output_dims;
-		weight_init = layer.weight_init;
-		weight_reg = layer.weight_reg;
-		max_norm_constraint = layer.max_norm_constraint;
-		max_norm = layer.max_norm;
-		weights_rows = layer.weights_rows;
-		weights_cols = layer.weights_cols;
-		input_layer = layer.input_layer;
-		frozen = layer.frozen;
-		weights = layer.weights;
-		weights_grad = layer.weights_grad;
-		weights_ref = (layer.is_shared_params_clone() ? layer.weights_ref : weights);
-		owner = (layer.is_shared_params_clone() ? layer.owner : *this);
-	}
 	inline bool is_input_layer() const {
 		return input_layer;
 	}
@@ -1735,17 +1719,6 @@ protected:
 			params_grad(layer.params_grad),
 			params_ref(share_params ? layer.params_ref : params),
 			owner(share_params ? layer.owner : *this){ }
-	inline ActivationLayer<Scalar,Rank>& operator=(const ActivationLayer<Scalar,Rank>& layer) {
-		dims = layer.dims;
-		params_rows = layer.params_rows;
-		params_cols = layer.params_cols;
-		input_layer = layer.input_layer;
-		frozen = layer.frozen;
-		params = layer.params;
-		params_grad = layer.params_grad;
-		params_ref = (layer.is_shared_params_clone() ? layer.params_ref : params);
-		owner = (layer.is_shared_params_clone() ? layer.owner : *this);
-	}
 	inline bool is_input_layer() const {
 		return input_layer;
 	}
@@ -1794,8 +1767,9 @@ protected:
 				coeff(coeff),
 				ext_batch_dims(dims.template extend<3 - Rank>().template promote<>()) { }
 	inline void empty_cache() {
-		gpu_input = internal::CuDNNTensor<Scalar>();
-		gpu_output = internal::CuDNNTensor<Scalar>();
+		using namespace internal;
+		gpu_input = CuDNNTensor<Scalar>();
+		gpu_output = CuDNNTensor<Scalar>();
 	}
 	inline typename Root::Data pass_forward(typename Root::Data in, bool training) {
 		assert((Dimensions<std::size_t,Base::DATA_RANK>(in.dimensions()).template demote<>()) == Base::dims);
@@ -3742,30 +3716,6 @@ public:
 			params_ref(layer.is_shared_params_clone() ? layer.params_ref : params),
 			owner(layer.is_shared_params_clone() ? layer.owner : *this),
 			cache_vec(layer.cache_vec) { }
-	inline Self& operator=(const Self& layer) {
-		dims = layer.dims;
-		gamma_reg = layer.gamma_reg;
-		beta_reg = layer.beta_reg;
-		gamma_max_norm_constraint = layer.gamma_max_norm_constraint;
-		beta_max_norm_constraint = layer.beta_max_norm_constraint;
-		gamma_max_norm = layer.gamma_max_norm;
-		beta_max_norm = layer.beta_max_norm;
-		norm_avg_decay = layer.norm_avg_decay;
-		epsilon = layer.epsilon;
-		channels = layer.channels;
-		input_layer = layer.input_layer;
-		frozen = layer.frozen;
-		offsets = layer.offsets;
-		extents = layer.extents;
-		avg_means = layer.avg_means;
-		avg_inv_sds = layer.avg_inv_sds;
-		avgs_init = layer.avgs_init;
-		params = layer.params;
-		params_grad = layer.params_grad;
-		params_ref = (layer.is_shared_params_clone() ? layer.params_ref : params);
-		owner = (layer.is_shared_params_clone() ? layer.owner : *this);
-		cache_vec = layer.cache_vec;
-	}
 	inline Base* clone() const {
 		return new BatchNormLayer(*this);
 	}
@@ -4054,28 +4004,6 @@ public:
 			owner(layer.is_shared_params_clone() ? layer.owner : *this),
 			inv_in_sd(layer.inv_in_sd),
 			std_in(layer.std_in) { }
-	inline Self& operator=(const Self& layer) {
-		dims = layer.dims;
-		gamma_reg = layer.gamma_reg;
-		beta_reg = layer.beta_reg;
-		gamma_max_norm_constraint = layer.gamma_max_norm_constraint;
-		beta_max_norm_constraint = layer.beta_max_norm_constraint;
-		gamma_max_norm = layer.gamma_max_norm;
-		beta_max_norm = layer.beta_max_norm;
-		norm_avg_decay = layer.norm_avg_decay;
-		epsilon = layer.epsilon;
-		input_layer = layer.input_layer;
-		frozen = layer.frozen;
-		avg_means = layer.avg_means;
-		avg_inv_sds = layer.avg_inv_sds;
-		avgs_init = layer.avgs_init;
-		params = layer.params;
-		params_grad = layer.params_grad;
-		params_ref = (layer.is_shared_params_clone() ? layer.params_ref : params);
-		owner = (layer.is_shared_params_clone() ? layer.owner : *this);
-		inv_in_sd = layer.inv_in_sd;
-		std_in = layer.std_in;
-	}
 	inline Base* clone() const {
 		return new BatchNormLayer(*this);
 	}
@@ -4280,8 +4208,6 @@ public:
 				input_layer(false),
 				frozen(false),
 				batch_dims(calculate_extended_batch_dims(dims)),
-				means(),
-				vars(),
 				params(),
 				params_grad(),
 				params_ref(params),
@@ -4306,39 +4232,15 @@ public:
 			input_layer(layer.input_layer),
 			frozen(layer.frozen),
 			batch_dims(layer.batch_dims),
-			means(layer.means),
-			vars(layer.vars),
+			gpu_means(layer.gpu_means),
+			gpu_vars(layer.gpu_vars),
 			params(layer.params),
 			params_grad(layer.params_grad),
 			params_ref(layer.is_shared_params_clone() ? layer.params_ref : params),
 			owner(layer.is_shared_params_clone() ? layer.owner : *this),
-			input(layer.input),
-			mean_cache(layer.mean_cache),
-			inv_var_cache(layer.inv_var_cache) { }
-	inline Self& operator=(const Self& layer) {
-		dims = layer.dims;
-		gamma_reg = layer.gamma_reg;
-		beta_reg = layer.beta_reg;
-		gamma_max_norm_constraint = layer.gamma_max_norm_constraint;
-		beta_max_norm_constraint = layer.beta_max_norm_constraint;
-		gamma_max_norm = layer.gamma_max_norm;
-		beta_max_norm = layer.beta_max_norm;
-		norm_avg_decay = layer.norm_avg_decay;
-		epsilon = layer.epsilon;
-		params_vol = layer.params_vol;
-		input_layer = layer.input_layer;
-		frozen = layer.frozen;
-		batch_dims = layer.batch_dims;
-		means = layer.means;
-		vars = layer.vars;
-		params = layer.params;
-		params_grad = layer.params_grad;
-		params_ref = (layer.is_shared_params_clone() ? layer.params_ref : params);
-		owner = (layer.is_shared_params_clone() ? layer.owner : *this);
-		input = layer.input;
-		mean_cache = layer.mean_cache;
-		inv_var_cache = layer.inv_var_cache;
-	}
+			gpu_input(layer.gpu_input),
+			gpu_mean_cache(layer.gpu_mean_cache),
+			gpu_inv_var_cache(layer.gpu_inv_var_cache) { }
 	inline Base* clone() const {
 		return new BatchNormLayer(*this);
 	}
@@ -4371,8 +4273,10 @@ public:
 		params_ref.col(0).setOnes();
 		params_ref.col(1).setZero();
 		params_grad = Matrix<Scalar>::Zero(params_ref.rows(), params_ref.cols());
-		means = Matrix<Scalar>(1, params_vol);
-		vars = Matrix<Scalar>(1, params_vol);
+		using namespace internal;
+		gpu_means = CuDNNTensor<Scalar>(1u, PerLastRank ? 1u : batch_dims[1],
+				PerLastRank ? 1u : batch_dims[2], batch_dims[3]);
+		gpu_vars = CuDNNTensor<Scalar>(1u, means.get_h(), means.get_w(), means.get_c());
 	}
 protected:
 	inline BatchNormLayer(Self& layer, bool share_params) :
@@ -4389,15 +4293,15 @@ protected:
 			input_layer(layer.input_layer),
 			frozen(layer.frozen),
 			batch_dims(layer.batch_dims),
-			means(layer.means),
-			vars(layer.vars),
+			gpu_means(layer.gpu_means),
+			gpu_vars(layer.gpu_vars),
 			params(share_params ? Matrix<Scalar>(0, 0) : layer.params),
 			params_grad(layer.params_grad),
 			params_ref(share_params ? layer.params_ref : params),
 			owner(share_params ? layer.owner : params),
 			input(layer.input),
-			mean_cache(layer.mean_cache),
-			inv_var_cache(layer.inv_var_cache) { }
+			gpu_mean_cache(layer.gpu_mean_cache),
+			gpu_inv_var_cache(layer.gpu_inv_var_cache) { }
 	inline bool is_input_layer() const {
 		return input_layer;
 	}
@@ -4405,9 +4309,10 @@ protected:
 		this->input_layer = input_layer;
 	}
 	inline void empty_cache() {
-		input = typename Base::Data();
-		mean_cache = Matrix<Scalar>(0, 0);
-		inv_var_cache = Matrix<Scalar>(0, 0);
+		using namespace internal;
+		gpu_input = CuDNNTensor<Scalar>();
+		gpu_mean_cache = CuDNNTensor<Scalar>();
+		gpu_inv_var_cache = CuDNNTensor<Scalar>();
 	}
 	inline Matrix<Scalar>& get_params() {
 		return params_ref;
@@ -4438,40 +4343,59 @@ protected:
 	inline typename Base::Data pass_forward(typename Base::Data in, bool training) {
 		assert((Dimensions<std::size_t,Base::DATA_RANK>(in.dimensions()).template demote<>()) == dims);
 		assert(in.dimension(0) > 0);
+		using namespace internal;
 		batch_dims[0] = in.dimension(0);
+		gpu_input = CuDNNTensor<Scalar>(batch_dims[0], batch_dims[1], batch_dims[2], batch_dims[3]);
+		gpu_input.copy_from_host(in.data());
 		Matrix<Scalar> gamma = params_ref.col(0);
 		Matrix<Scalar> beta = params_ref.col(1);
-		typename Base::Data out(in.dimensions());
+		CuDNNTensor<Scalar> gpu_gamma(means.get_n(), means.get_h(), means.get_w(), means.get_c());
+		gpu_gamma.copy_from_host(gamma.data());
+		CuDNNTensor<Scalar> gpu_beta(means.get_n(), means.get_h(), means.get_w(), means.get_c());
+		gpu_beta.copy_from_host(beta.data());
+		CuDNNTensor<Scalar> gpu_output(batch_dims[0], batch_dims[1], batch_dims[2], batch_dims[3]);
 		if (training) {
-			input = std::move(in);
-			mean_cache = RowVector<Scalar>(params_vol);
-			inv_var_cache = RowVector<Scalar>(params_vol);
-			batch_norm_fwd_training(input.data(), gamma.data(), beta.data(), batch_dims, PerLastRank,
-					1 - norm_avg_decay, epsilon, means.data(), vars.data(), out.data(), mean_cache.data(),
-					inv_var_cache.data());
+			mean_cache = CuDNNTensor<Scalar>(means.get_n(), means.get_h(), means.get_w(), means.get_c());
+			inv_var_cache = CuDNNTensor<Scalar>(means.get_n(), means.get_h(), means.get_w(), means.get_c());
+			CuDNNHandle<Scalar>::get_instance().batch_norm_fwd_training(gpu_input, gpu_gamma, gpu_beta,
+					PerLastRank, (Scalar) 1 - norm_avg_decay, epsilon, gpu_means, gpu_vars, gpu_output,
+					gpu_mean_cache, gpu_inv_var_cache);
 		} else {
-			batch_norm_fwd_inference(in.data(), gamma.data(), beta.data(), means.data(), vars.data(),
-					batch_dims, PerLastRank, epsilon. out.data());
+			CuDNNHandle<Scalar>::get_instance().batch_norm_fwd_inference(gpu_input, gpu_gamma, gpu_beta,
+					gpu_means, gpu_vars, PerLastRank, epsilon, gpu_output);
 		}
+		typename Base::Data out = std::move(in);
+		gpu_output.copy_to_host(out.data());
 		return out;
 	}
 	inline typename Base::Data pass_back(typename Base::Data out_grad) {
 		assert((Dimensions<std::size_t,Base::DATA_RANK>(out_grad.dimensions()).template demote<>()) == dims);
 		assert(out_grad.dimension(0) > 0 && batch_dims[0] == out_grad.dimension(0));
+		using namespace internal;
+		CuDNNTensor<Scalar> gpu_out_grad(batch_dims[0], batch_dims[1], batch_dims[2], batch_dims[3]);
+		gpu_out_grad.copy_from_host(out_grad.data());
 		Matrix<Scalar> gamma = params_ref.col(0);
+		CuDNNTensor<Scalar> gpu_gamma(means.get_n(), means.get_h(), means.get_w(), means.get_c());
+		gpu_gamma.copy_from_host(gamma.data());
+		CuDNNTensor<Scalar> gpu_gamma_grad(means.get_n(), means.get_h(), means.get_w(), means.get_c());
+		CuDNNTensor<Scalar> gpu_beta_grad(means.get_n(), means.get_h(), means.get_w(), means.get_c());
+		CuDNNTensor<Scalar> gpu_prev_out_grad(batch_dims[0], batch_dims[1], batch_dims[2], batch_dims[3]);
+		CuDNNHandle<Scalar>::get_instance().batch_norm_bwd(gpu_input, gpu_out_grad, gpu_gamma, gpu_mean_cache,
+				gpu_inv_var_cache, PerLastRank, epsilon, gpu_prev_out_grad, gpu_gamma_grad, gpu_beta_grad);
 		Matrix<Scalar> gamma_grad(params_vol, 1);
+		gpu_gamma_grad.copy_to_host(gamma_grad.data());
 		Matrix<Scalar> beta_grad(params_vol, 1);
-		typename Base::Data prev_out_grad(out_grad.dimensions());
-		batch_norm_bwd(input.data(), out_grad.data(), gamma.data(), mean_cache.data(), inv_var_cache.data(),
-				batch_dims, PerLastRank, epsilon, prev_out_grad.data(), gamma_grad.data(), beta_grad.data());
+		gpu_beta_grad.copy_to_host(beta_grad.data());
 		params_grad.col(0) = gamma_grad;
 		params_grad.col(1) = beta_grad;
+		typename Base::Data prev_out_grad = std::move(out_grad);
+		gpu_prev_out_grad.copy_to_host(prev_out_grad.data());
 		return prev_out_grad;
 	}
 private:
 	inline static std::array<std::size_t,4> calculate_extended_batch_dims(const Dimensions<std::size_t,Rank>& dims) {
 		std::size_t params_vol = dims(Rank - 1);
-		Dimensions<std::size_t,3> adjusted_dims = dims.template extend<3 - Rank>();
+		auto adjusted_dims = dims.template extend<3 - Rank>();
 		adjusted_dims(Rank - 1) = 1;
 		adjusted_dims(2) = params_vol;
 		return adjusted_dims.template promote<>();
@@ -4489,15 +4413,15 @@ private:
 	bool input_layer;
 	bool frozen;
 	std::array<std::size_t,4> batch_dims;
-	RowVector<Scalar> means;
-	RowVector<Scalar> vars;
+	internal::CuDNNTensor<Scalar> gpu_means;
+	internal::CuDNNTensor<Scalar> gpu_vars;
 	Matrix<Scalar> params;
 	Matrix<Scalar> params_grad;
 	Matrix<Scalar>& params_ref;
 	const Base& owner;
-	typename Base::Data input;
-	RowVector<Scalar> mean_cache;
-	RowVector<Scalar> inv_var_cache;
+	internal::CuDNNTensor<Scalar> gpu_input;
+	internal::CuDNNTensor<Scalar> gpu_mean_cache;
+	internal::CuDNNTensor<Scalar> gpu_inv_var_cache;
 };
 #endif
 
@@ -4675,7 +4599,7 @@ protected:
 		this->input_layer = input_layer;
 	}
 	inline void empty_cache() {
-		reserve = std::vector<Scalar>(0);
+		reserve = internal::CuDNNTensor<Scalar>();
 	}
 	inline Matrix<Scalar>& get_params() {
 		return params;
@@ -4692,10 +4616,20 @@ protected:
 		assert((Dimensions<std::size_t,Base::DATA_RANK>(in.dimensions()).template demote<>()) == dims);
 		assert(in.dimension(0) > 0);
 		if (training) {
+			using namespace internal;
 			ext_batch_dims[0] = in.dimension(0);
-			typename Base::Data out(in.dimensions());
-			internal::CuDNNHandle<Scalar>::get_instance().dropout_fwd(in.data(), ext_batch_dims, dropout_prob,
-					out.data(), reserve);
+			CuDNNTensor<Scalar> gpu_input(ext_batch_dims[0], ext_batch_dims[1],
+					ext_batch_dims[2], ext_batch_dims[3]);
+			gpu_input.copy_from_host(in.data());
+			std::size_t reserve_size;
+			auto cudnn_handle = CuDNNHandle<Scalar>::get_instance();
+			cudnn_handle.dropout_reserve_size(gpu_input, reserve_size);
+			gpu_reserve = CuDNNTensor<Scalar>(reserve_size, 1u, 1u, 1u);
+			CuDNNTensor<Scalar> gpu_output(ext_batch_dims[0], ext_batch_dims[1],
+					ext_batch_dims[2], ext_batch_dims[3]);
+			cudnn_handle.dropout_fwd(gpu_input, dropout_prob, gpu_reserve, gpu_output);
+			typename Base::Data out = std::move(in);
+			gpu_output.copy_to_host(out.data());
 			return out;
 		}
 		return in;
@@ -4705,9 +4639,15 @@ protected:
 		assert(out_grad.dimension(0) > 0 && ext_batch_dims[0] == out_grad.dimension(0));
 		if (input_layer)
 			return typename Base::Data();
-		typename Base::Data prev_out_grad(out_grad.dimensions());
-		internal::CuDNNHandle<Scalar>::get_instance().dropout_bwd(out_grad.data(), reserve, ext_batch_dims,
-				dropout_prob, prev_out_grad.data());
+		using namespace internal;
+		CuDNNTensor<Scalar> gpu_out_grad(ext_batch_dims[0], ext_batch_dims[1],
+				ext_batch_dims[2], ext_batch_dims[3]);
+		gpu_out_grad.copy_from_host(out_grad.data());
+		CuDNNTensor<Scalar> gpu_prev_out_grad(ext_batch_dims[0], ext_batch_dims[1],
+				ext_batch_dims[2], ext_batch_dims[3]);
+		CuDNNTensor<Scalar>::get_instance().dropout_bwd(gpu_out_grad, gpu_reserve, dropout_prob, gpu_prev_out_grad);
+		typename Base::Data prev_out_grad = std::move(out_grad);
+		gpu_prev_out_grad.copy_to_host(prev_out_grad.data());
 		return prev_out_grad;
 	}
 private:
@@ -4718,7 +4658,7 @@ private:
 	Matrix<Scalar> params;
 	Matrix<Scalar> params_grad;
 	std::array<std::size_t,4> ext_batch_dims;
-	std::vector<Scalar> reserve;
+	internal::CuDNNTensor<Scalar> gpu_reserve;
 };
 #endif
 
