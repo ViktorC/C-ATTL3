@@ -295,7 +295,7 @@ public:
 	 * @param output_width The output width.
 	 * @param output_channels The number of output channels.
 	 */
-	inline void pooling2d_output_dims(std::size_t input_height, std::size_t input_width, std::size_t input_channels,
+	inline void pool2d_output_dims(std::size_t input_height, std::size_t input_width, std::size_t input_channels,
 			cudnnTensorFormat_t tensor_format, cudnnPoolingMode_t pool_mode, std::size_t window_height,
 			std::size_t window_width, std::size_t vertical_padding, std::size_t horizontal_padding,
 			std::size_t vertical_stride, std::size_t horizontal_stride, /* out */ std::size_t& output_height,
@@ -333,7 +333,7 @@ public:
 	 * @param horizontal_stride The horizontal stride of the pooling.
 	 * @param output The output tensor of the pooling operation.
 	 */
-	inline void pooling2d_fwd(const CuDNNTensor<Scalar>& input, cudnnPoolingMode_t pool_mode,
+	inline void pool2d_fwd(const CuDNNTensor<Scalar>& input, cudnnPoolingMode_t pool_mode,
 			std::size_t window_height, std::size_t window_width, std::size_t vertical_padding,
 			std::size_t horizontal_padding, std::size_t vertical_stride, std::size_t horizontal_stride,
 			/* out */ CuDNNTensor<Scalar>& output) const {
@@ -362,7 +362,7 @@ public:
 	 * @param horizontal_stride The horizontal stride of the pooling.
 	 * @param prev_out_grad The gradient of the input of the pooling layer.
 	 */
-	inline void pooling2d_bwd(const CuDNNTensor<Scalar>& input, const CuDNNTensor<Scalar>& output,
+	inline void pool2d_bwd(const CuDNNTensor<Scalar>& input, const CuDNNTensor<Scalar>& output,
 			const CuDNNTensor<Scalar>& out_grad, cudnnPoolingMode_t pool_mode, std::size_t window_height,
 			std::size_t window_width, std::size_t vertical_padding, std::size_t horizontal_padding,
 			std::size_t vertical_stride, std::size_t horizontal_stride,

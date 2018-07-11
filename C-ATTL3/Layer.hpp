@@ -966,10 +966,9 @@ private:
 			std::size_t filters, std::size_t receptor_height, std::size_t receptor_width, std::size_t vertical_padding,
 			std::size_t horizontal_padding, std::size_t vertical_stride, std::size_t horizontal_stride,
 			std::size_t vertical_dilation, std::size_t horizontal_dilation) {
-		Dimensions<std::size_t,3> ext_input_dims = input_dims.template extend<3 - Rank>();
-		Dimensions<std::size_t,3> ext_output_dims = calculate_output_dims(ext_input_dims, filters, receptor_height,
-				receptor_width, vertical_padding, horizontal_padding, vertical_stride, horizontal_stride, vertical_dilation,
-				horizontal_dilation);
+		auto ext_input_dims = input_dims.template extend<3 - Rank>();
+		auto ext_output_dims = calculate_output_dims(ext_input_dims, filters, receptor_height, receptor_width, vertical_padding,
+				horizontal_padding, vertical_stride, horizontal_stride, vertical_dilation, horizontal_dilation);
 		ext_output_dims(2) /= filters;
 		ext_output_dims(Rank - 1) *= filters;
 		return ext_output_dims.template contract<3 - Rank>();
@@ -1777,7 +1776,9 @@ private:
 	const Base& owner;
 };
 
-#ifdef CATLL3_USE_CUDNN
+#ifdef CATTL3_USE_CUDNN
+namespace {
+
 /**
  * A class template representing basic, cuDNN accelerated activation layers.
  */
@@ -1797,9 +1798,9 @@ protected:
 		gpu_output = internal::CuDNNTensor<Scalar>();
 	}
 	inline typename Root::Data pass_forward(typename Root::Data in, bool training) {
-		using namespace internal;
 		assert((Dimensions<std::size_t,Base::DATA_RANK>(in.dimensions()).template demote<>()) == Base::dims);
 		assert(in.dimension(0) > 0);
+		using namespace internal;
 		ext_batch_dims[0] = in.dimension(0);
 		gpu_input = internal::CuDNNTensor<Scalar>(ext_batch_dims[0], ext_batch_dims[1],
 				ext_batch_dims[2], ext_batch_dims[3]);
@@ -1812,14 +1813,13 @@ protected:
 		return out;
 	}
 	inline typename Root::Data pass_back(typename Root::Data out_grad) {
-		using namespace internal;
 		assert((Dimensions<std::size_t,Base::DATA_RANK>(out_grad.dimensions()).template demote<>()) == Base::dims);
 		assert(out_grad.dimension(0) > 0 && ext_batch_dims[0] == out_grad.dimension(0));
-		CuDNNTensor<Scalar> gpu_prev_out_grad(ext_batch_dims[0], ext_batch_dims[1],
+		using namespace internal;
+		CuDNNTensor<Scalar> gpu_in_out_grad(ext_batch_dims[0], ext_batch_dims[1],
 				ext_batch_dims[2], ext_batch_dims[3]);
 		gpu_in_out_grad.copy_from_host(out_grad.data());
-		CuDNNHandle<Scalar>::get_instance().activation_bwd(gpu_input, gpu_output, act_mode,
-				coeff, gpu_prev_out_grad);
+		CuDNNHandle<Scalar>::get_instance().activation_bwd(gpu_input, gpu_output, act_mode, coeff, gpu_in_out_grad);
 		typename Root::Data prev_out_grad = std::move(out_grad);
 		gpu_in_out_grad.copy_to_host(prev_out_grad.data());
 		return prev_out_grad;
@@ -1831,6 +1831,8 @@ private:
 	internal::CuDNNTensor<Scalar> gpu_input;
 	internal::CuDNNTensor<Scalar> gpu_output;
 };
+
+}
 #endif
 
 /**
@@ -2004,6 +2006,7 @@ public:
 	inline Layer<Scalar,Rank>* clone() const {
 		return new SigmoidActivationLayer(*this);
 	}
+};
 #endif
 
 #ifndef CATTL3_USE_CUDNN
@@ -2247,9 +2250,9 @@ protected:
 		gpu_output = internal::CuDNNTensor<Scalar>();
 	}
 	inline typename Root::Data pass_forward(typename Root::Data in, bool training) {
-		using namespace internal;
 		assert((Dimensions<std::size_t,Base::DATA_RANK>(in.dimensions()).template demote<>()) == Base::dims);
 		assert(in.dimension(0) > 0);
+		using namespace internal;
 		ext_batch_dims[0] = in.dimension(0);
 		CuDNNTensor<Scalar> gpu_input(ext_batch_dims[0], ext_batch_dims[1],
 				ext_batch_dims[2], ext_batch_dims[3]);
@@ -2262,12 +2265,14 @@ protected:
 		return out;
 	}
 	inline typename Root::Data pass_back(typename Root::Data out_grad) {
-		using namespace internal;
 		assert((Dimensions<std::size_t,Base::DATA_RANK>(out_grad.dimensions()).template demote<>()) == Base::dims);
 		assert(out_grad.dimension(0) > 0 && ext_batch_dims[0] == out_grad.dimension(0));
-		typename Root::Data prev_out_grad(out_grad.dimensions());
-		internal::CuDNNHandle<Scalar>::get_instance().softmax_bwd(out.data(), out_grad.data(), ext_batch_dims,
-				prev_out_grad.data());
+		using namespace internal;
+		CuDNNTensor<Scalar> gpu_in_out_grad(ext_batch_dims[0], ext_batch_dims[1],
+				ext_batch_dims[2], ext_batch_dims[3]);
+		CuDNNHandle<Scalar>::get_instance().softmax_bwd(gpu_output, gpu_in_out_grad);
+		typename Root::Data prev_out_grad = std::move(out_grad);
+		gpu_in_out_grad.copy_to_host(prev_out_grad.data());
 		return prev_out_grad;
 	}
 private:
@@ -2937,6 +2942,8 @@ private:
 	Matrix<Scalar> params_grad;
 };
 
+namespace {
+
 /**
  * An abstract class template representing a pooling layer that reduces patches of the input by taking their
  * means.
@@ -2964,6 +2971,8 @@ protected:
 private:
 	std::size_t receptor_area;
 };
+
+}
 
 /**
  * A class template representing a 2D mean pooling layer operating on rank-3 data.
@@ -3094,6 +3103,8 @@ private:
 	std::size_t batch_size;
 };
 
+namespace {
+
 /**
  * An abstract class template representing a pooling layer that reduces patches of the input by taking their
  * maxima.
@@ -3161,6 +3172,8 @@ private:
 	// Cache
 	std::vector<std::vector<unsigned>> max_inds;
 };
+
+}
 
 /**
  * A class template representing a 2D max pooling layer operating on rank-3 data.
@@ -3335,26 +3348,25 @@ protected:
 	inline PoolLayer(const Dimensions<std::size_t,Rank>& input_dims, cudnnPoolingMode_t pool_mode,
 			std::size_t receptor_height, std::size_t receptor_width, std::size_t vertical_stride,
 			std::size_t horizontal_stride) :
-				input_dims(input_dims),
-				output_dims(calculate_adjusted_output_dims(input_dims, pool_mode, receptor_height,
+				ext_input_dims(input_dims.template promote<3 - Rank>()),
+				ext_output_dims(calculate_output_dims(ext_input_dims, pool_mode, receptor_height,
 						receptor_width, vertical_stride, horizontal_stride)),
+				input_dims(input_dims),
+				output_dims(ext_output_dims.template contract<3 - Rank>()),
+				batch_input_dims(input_dims.template promote<>()),
+				batch_output_dims(output_dims.template promote<>()),
 				receptor_height(receptor_height),
 				receptor_width(receptor_width),
 				vertical_stride(vertical_stride),
 				horizontal_stride(horizontal_stride),
 				pool_mode(pool_mode),
-				adj_in_batch_dims(input_dims.template promote<>()),
-				adj_out_batch_dims(output_dims.template promote<>()),
-				in_batch_dims(input_dims.template promote<>().template extend<3 - Rank>()),
-				out_batch_dims(output_dims.template promote<>().template extend<3 - Rank>()),
 				input_layer(false),
 				frozen(false),
 				params(),
 				params_grad() {
 		assert(receptor_height > 0 && receptor_width > 0);
 		assert(vertical_stride > 0 && horizontal_stride > 0);
-		assert(input_dims.template extend<3 - Rank>()(0) >= receptor_height &&
-				input_dims.template extend<3 - Rank>()(1) >= receptor_width);
+		assert(ext_input_dims(0) >= receptor_height && ext_input_dims(1) >= receptor_width);
 	}
 	inline bool is_input_layer() const {
 		return input_layer;
@@ -3363,8 +3375,8 @@ protected:
 		this->input_layer = input_layer;
 	}
 	inline void empty_cache() {
-		input = typename Base::Data();
-		output = typename Base::Data();
+		gpu_input = internal::CuDNNTensor<Scalar>();
+		gpu_output = internal::CuDNNTensor<Scalar>();
 	}
 	inline Matrix<Scalar>& get_params() {
 		return params;
@@ -3380,30 +3392,34 @@ protected:
 	inline typename Base::Data pass_forward(typename Base::Data in, bool training) {
 		assert((Dimensions<std::size_t,Rank + 1>(in.dimensions()).template demote<>()) == input_dims);
 		assert(in.dimension(0) > 0);
+		using namespace internal;
 		std::size_t rows = in.dimension(0);
-		in_batch_dims[0] = rows;
-		out_batch_dims[0] = rows;
-		adj_in_batch_dims[0] = rows;
-		adj_out_batch_dims[0] = rows;
-		typename Base::Data out(adj_out_batch_dims);
-		internal::CuDNNHandle<Scalar>::get_instance().pooling2d_fwd(in.data(), in_batch_dims,
-				out_batch_dims, pool_mode, receptor_height, receptor_width, 0, 0, vertical_stride,
-				horizontal_stride, out.data());
-		if (training) {
-			input = std::move(in);
-			output = out;
-		}
+		batch_input_dims[0] = rows;
+		batch_output_dims[0] = rows;
+		gpu_input = CuDNNTensor<Scalar>(rows, ext_input_dims(0), ext_input_dims(1), ext_input_dims(2));
+		gpu_output = CuDNNTensor<Scalar>(rows, ext_output_dims(0), ext_output_dims(1), ext_output_dims(2));
+		CuDNNHandle<Scalar>::get_instance().pool2d_fwd(gpu_input, pool_mode, receptor_height, receptor_width,
+				0, 0, vertical_stride, horizontal_stride, gpu_output);
+		typename Base::Data out(batch_output_dims);
+		gpu_output.copy_to_host(out.data());
 		return out;
 	}
 	inline typename Base::Data pass_back(typename Base::Data out_grad) {
 		assert((Dimensions<std::size_t,Rank + 1>(out_grad.dimensions()).template demote<>()) == output_dims);
-		assert(out_grad.dimension(0) > 0 && out_batch_dims[0] == out_grad.dimension(0));
-		typename Base::Data prev_out_grad(adj_in_batch_dims);
-		internal::CuDNNHandle<Scalar>::get_instance().pooling2d_bwd(input.data(), output.data(), out_grad.data(),
-				in_batch_dims, out_batch_dims, pool_mode, receptor_height, receptor_width, 0, 0, vertical_stride,
-				horizontal_stride, prev_out_grad.data());
+		assert(out_grad.dimension(0) > 0 && batch_output_dims[0] == out_grad.dimension(0));
+		using namespace internal;
+		std::size_t rows = out_grad.dimension(0);
+		CuDNNTensor<Scalar> gpu_out_grad(rows, ext_output_dims(0), ext_output_dims(1), ext_output_dims(2));
+		gpu_out_grad.copy_from_host(out_grad.data());
+		CuDNNTensor<Scalar> gpu_prev_out_grad(rows, ext_input_dims(0), ext_input_dims(1), ext_input_dims(2));
+		CuDNNHandle<Scalar>::get_instance().pool2d_bwd(gpu_input, gpu_output, gpu_out_grad, pool_mode,
+				receptor_height, receptor_width, 0, 0, vertical_stride, horizontal_stride, gpu_prev_out_grad);
+		typename Base::Data prev_out_grad(batch_input_dims);
+		gpu_prev_out_grad.copy_to_host(prev_out_grad.data());
 		return prev_out_grad;
 	}
+	const Dimensions<std::size_t,3> ext_input_dims;
+	const Dimensions<std::size_t,3> ext_output_dims;
 	const Dimensions<std::size_t,Rank> input_dims;
 	const Dimensions<std::size_t,Rank> output_dims;
 	const std::size_t receptor_height;
@@ -3412,29 +3428,23 @@ protected:
 	const std::size_t horizontal_stride;
 	const cudnnPoolingMode_t pool_mode;
 private:
-	inline static Array4 calculate_output_dims(const Array4& input_dims, cudnnPoolingMode_t pool_mode,
-			std::size_t receptor_height, std::size_t receptor_width, std::size_t vertical_stride,
-			std::size_t horizontal_stride) {
-		return internal::CuDNNHandle<Scalar>::get_instance().pooling2d_output_dims(input_dims, pool_mode, receptor_height,
-				receptor_width, 0, 0, vertical_stride, horizontal_stride);
-	}
-	inline static Dimensions<std::size_t,Rank> calculate_adjusted_output_dims(const Dimensions<std::size_t,Rank>& input_dims,
+	inline static Dimensions<std::size_t,3> calculate_output_dims(const Dimensions<std::size_t,3>& input_dims,
 			cudnnPoolingMode_t pool_mode, std::size_t receptor_height, std::size_t receptor_width, std::size_t vertical_stride,
 			std::size_t horizontal_stride) {
-		auto output_dims = calculate_output_dims(input_dims.template extend<3 - Rank>().template promote<>(), pool_mode,
-				receptor_height, receptor_width, vertical_stride, horizontal_stride);
-		return Dimensions<std::size_t,4>(output_dims).template demote<>().template contract<3 - Rank>();
+		std::size_t h, w, c;
+		internal::CuDNNHandle<Scalar>::get_instance().pool2d_output_dims(input_dims(0), input_dims(1), input_dims(2),
+				CUDNN_TENSOR_NHWC, pool_mode, receptor_height, receptor_width, 0, 0, vertical_stride, horizontal_stride,
+				h, w, c);
+		return { h, w, c };
 	}
-	std::array<std::size_t,Rank + 1> adj_in_batch_dims;
-	std::array<std::size_t,Rank + 1> adj_out_batch_dims;
-	std::array<std::size_t,4> in_batch_dims;
-	std::array<std::size_t,4> out_batch_dims;
+	std::array<std::size_t,Base::DATA_RANK> batch_input_dims;
+	std::array<std::size_t,Base::DATA_RANK> batch_output_dims;
 	bool input_layer;
 	bool frozen;
 	Matrix<Scalar> params;
 	Matrix<Scalar> params_grad;
-	typename Base::Data input;
-	typename Base::Data output;
+	internal::CuDNNTensor<Scalar> gpu_input;
+	internal::CuDNNTensor<Scalar> gpu_output;
 };
 
 /**
