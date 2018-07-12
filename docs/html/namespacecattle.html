@@ -215,6 +215,9 @@ Classes</h2></td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_identity_activation_layer.html">IdentityActivationLayer</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">A class template representing an identity activation layer that merely outputs its input.  <a href="classcattle_1_1_identity_activation_layer.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_i_m_d_b_data_provider.html">IMDBDataProvider</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">A data provider template for the IMDB Large Movie Review Dataset.  <a href="classcattle_1_1_i_m_d_b_data_provider.html#details">More...</a><br /></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_joint_file_data_provider.html">JointFileDataProvider</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">An abstract class template for a data provider backed by data on disk in the form of an arbitrary number of files containing both the observations and the objectives.  <a href="classcattle_1_1_joint_file_data_provider.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -248,9 +251,6 @@ Classes</h2></td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_max_pool_layer_3_01_scalar_00_012_01_4.html">MaxPoolLayer&lt; Scalar, 2 &gt;</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">A class template representing a 2D max pooling layer operating on rank-2 data.  <a href="classcattle_1_1_max_pool_layer_3_01_scalar_00_012_01_4.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_max_pool_layer_base.html">MaxPoolLayerBase</a></td></tr>
-<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">An abstract class template representing a pooling layer that reduces patches of the input by taking their maxima.  <a href="classcattle_1_1_max_pool_layer_base.html#details">More...</a><br /></td></tr>
-<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_mean_pool_layer.html">MeanPoolLayer</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">A class template representing a 2D mean pooling layer operating on rank-3 data.  <a href="classcattle_1_1_mean_pool_layer.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -259,9 +259,6 @@ Classes</h2></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_mean_pool_layer_3_01_scalar_00_012_01_4.html">MeanPoolLayer&lt; Scalar, 2 &gt;</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">A class template representing a 2D mean pooling layer operating on rank-2 data.  <a href="classcattle_1_1_mean_pool_layer_3_01_scalar_00_012_01_4.html#details">More...</a><br /></td></tr>
-<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_mean_pool_layer_base.html">MeanPoolLayerBase</a></td></tr>
-<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">An abstract class template representing a pooling layer that reduces patches of the input by taking their means.  <a href="classcattle_1_1_mean_pool_layer_base.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_memory_data_provider.html">MemoryDataProvider</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">A data provider that reads from the memory.  <a href="classcattle_1_1_memory_data_provider.html#details">More...</a><br /></td></tr>
@@ -434,6 +431,14 @@ template&lt;typename Scalar , std::size_t Rank&gt; </td></tr>
 <tr class="memitem:aaf234deaf1504300126fed57912a132e"><td class="memTemplItemLeft" align="right" valign="top">using&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespacecattle.html#aaf234deaf1504300126fed57912a132e">DataPair</a> = std::pair&lt; <a class="el" href="namespacecattle.html#a8b9323ad928764340e46f0802bf27fbb">Tensor</a>&lt; Scalar, Rank+Sequential+1 &gt;, <a class="el" href="namespacecattle.html#a8b9323ad928764340e46f0802bf27fbb">Tensor</a>&lt; Scalar, Rank+Sequential+1 &gt; &gt;</td></tr>
 <tr class="memdesc:aaf234deaf1504300126fed57912a132e"><td class="mdescLeft">&#160;</td><td class="mdescRight">An alias for a pair of two tensors of the same rank.  <a href="#aaf234deaf1504300126fed57912a132e">More...</a><br /></td></tr>
 <tr class="separator:aaf234deaf1504300126fed57912a132e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1063ee44e85c65350112d8b6379c081f"><td class="memItemLeft" align="right" valign="top"><a id="a1063ee44e85c65350112d8b6379c081f"></a>
+typedef const std::map&lt; std::string, std::size_t &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacecattle.html#a1063ee44e85c65350112d8b6379c081f">Vocab</a></td></tr>
+<tr class="memdesc:a1063ee44e85c65350112d8b6379c081f"><td class="mdescLeft">&#160;</td><td class="mdescRight">An alias for a read-only dictionary mapping words to indices. <br /></td></tr>
+<tr class="separator:a1063ee44e85c65350112d8b6379c081f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab83dc53a6ce7d48a5ec75509683397ad"><td class="memItemLeft" align="right" valign="top"><a id="ab83dc53a6ce7d48a5ec75509683397ad"></a>
+typedef std::shared_ptr&lt; <a class="el" href="namespacecattle.html#a1063ee44e85c65350112d8b6379c081f">Vocab</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacecattle.html#ab83dc53a6ce7d48a5ec75509683397ad">VocabSharedPtr</a></td></tr>
+<tr class="memdesc:ab83dc53a6ce7d48a5ec75509683397ad"><td class="mdescLeft">&#160;</td><td class="mdescRight">An alias for a shared pointer to a vocabulary. <br /></td></tr>
+<tr class="separator:ab83dc53a6ce7d48a5ec75509683397ad"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a96574a467e593e2c62c432b0c8ec8349"><td class="memTemplParams" colspan="2"><a id="a96574a467e593e2c62c432b0c8ec8349"></a>
 template&lt;typename Scalar &gt; </td></tr>
 <tr class="memitem:a96574a467e593e2c62c432b0c8ec8349"><td class="memTemplItemLeft" align="right" valign="top">using&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespacecattle.html#a96574a467e593e2c62c432b0c8ec8349">WeightInitSharedPtr</a> = std::shared_ptr&lt; <a class="el" href="classcattle_1_1_weight_initialization.html">WeightInitialization</a>&lt; Scalar &gt; &gt;</td></tr>
@@ -513,6 +518,9 @@ Enumerations</h2></td></tr>
 <tr class="memitem:a3aba4c1d42028d369dfb60a0507d3785"><td class="memItemLeft" align="right" valign="top"><a id="a3aba4c1d42028d369dfb60a0507d3785"></a>enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacecattle.html#a3aba4c1d42028d369dfb60a0507d3785">CIFARType</a> </td></tr>
 <tr class="memdesc:a3aba4c1d42028d369dfb60a0507d3785"><td class="mdescLeft">&#160;</td><td class="mdescRight">An enum denoting different CIFAR data set types. <br /></td></tr>
 <tr class="separator:a3aba4c1d42028d369dfb60a0507d3785"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a63e81f333116ee5d70c1e71258a3ac5a"><td class="memItemLeft" align="right" valign="top"><a id="a63e81f333116ee5d70c1e71258a3ac5a"></a>enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacecattle.html#a63e81f333116ee5d70c1e71258a3ac5a">IMDBObjType</a> </td></tr>
+<tr class="memdesc:a63e81f333116ee5d70c1e71258a3ac5a"><td class="mdescLeft">&#160;</td><td class="mdescRight">An enumeration for the different objective types to use for the IMDB data set. <br /></td></tr>
+<tr class="separator:a63e81f333116ee5d70c1e71258a3ac5a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:adf6ad5e38e7c96e1d70ac1f180c71c42"><td class="memItemLeft" align="right" valign="top"><a id="adf6ad5e38e7c96e1d70ac1f180c71c42"></a>enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacecattle.html#adf6ad5e38e7c96e1d70ac1f180c71c42">OutputMergeType</a> </td></tr>
 <tr class="memdesc:adf6ad5e38e7c96e1d70ac1f180c71c42"><td class="mdescLeft">&#160;</td><td class="mdescRight">An enumeration type for the different ways the outputs of sub-modules of neural networks may be merged. <br /></td></tr>
 <tr class="separator:adf6ad5e38e7c96e1d70ac1f180c71c42"><td class="memSeparator" colspan="2">&#160;</td></tr>

@@ -15,6 +15,7 @@
 #include <functional>
 #include <iomanip>
 #include <memory>
+#include <ostream>
 #include <pthread.h>
 #include <sstream>
 #include <string>

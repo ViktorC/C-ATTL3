@@ -81,72 +81,75 @@ $(function() {
 </div><!--header-->
 <div class="contents">
 
-<p>A singleton utility class providing methods for GPU accelerated deep neural network operations on rank 4 data of [N,H,W,C] orientation.  
+<p>A singleton utility class providing methods for GPU accelerated deep neural network operations on rank 4 data.  
  <a href="classcattle_1_1internal_1_1_cu_d_n_n_handle.html#details">More...</a></p>
 
 <p><code>#include &lt;<a class="el" href="_cu_d_n_n_handle_8hpp_source.html">CuDNNHandle.hpp</a>&gt;</code></p>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:acd5781e6e3acdcb1a6d888cddf616843"><td class="memItemLeft" align="right" valign="top">Array4&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1internal_1_1_cu_d_n_n_handle.html#acd5781e6e3acdcb1a6d888cddf616843">conv2d_output_dims</a> (const Array4 &amp;input_dims, std::size_t filters, std::size_t receptor_height, std::size_t receptor_width, std::size_t vertical_padding, std::size_t horizontal_padding, std::size_t vertical_stride, std::size_t horizontal_stride, std::size_t vertical_dilation, std::size_t horizontal_dilation) const</td></tr>
-<tr class="memdesc:acd5781e6e3acdcb1a6d888cddf616843"><td class="mdescLeft">&#160;</td><td class="mdescRight">Computes the dimensions of the output of the convolution.  <a href="#acd5781e6e3acdcb1a6d888cddf616843">More...</a><br /></td></tr>
-<tr class="separator:acd5781e6e3acdcb1a6d888cddf616843"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a11d9ff0d2bf96e04b13e142fd57fb99e"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1internal_1_1_cu_d_n_n_handle.html#a11d9ff0d2bf96e04b13e142fd57fb99e">convolution2d_fwd</a> (Scalar *input, Scalar *filter, Scalar *bias, const Array4 &amp;input_dims, const Array4 &amp;output_dims, std::size_t receptor_height, std::size_t receptor_width, std::size_t vertical_padding, std::size_t horizontal_padding, std::size_t vertical_stride, std::size_t horizontal_stride, std::size_t vertical_dilation, std::size_t horizontal_dilation, Scalar *output) const</td></tr>
-<tr class="memdesc:a11d9ff0d2bf96e04b13e142fd57fb99e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Performs a GPU accelerated 2D convolution on a rank 4 tensor of [N,H,W,C] orientation.  <a href="#a11d9ff0d2bf96e04b13e142fd57fb99e">More...</a><br /></td></tr>
-<tr class="separator:a11d9ff0d2bf96e04b13e142fd57fb99e"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a39f10a0e8df9b93dd041d23100d49c57"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1internal_1_1_cu_d_n_n_handle.html#a39f10a0e8df9b93dd041d23100d49c57">convolution2d_bwd</a> (Scalar *input, Scalar *out_grad, Scalar *filter, Scalar *bias, const Array4 &amp;input_dims, const Array4 &amp;output_dims, std::size_t receptor_height, std::size_t receptor_width, std::size_t vertical_padding, std::size_t horizontal_padding, std::size_t vertical_stride, std::size_t horizontal_stride, std::size_t vertical_dilation, std::size_t horizontal_dilation, Scalar *prev_out_grad, Scalar *filter_grad, Scalar *bias_grad) const</td></tr>
-<tr class="memdesc:a39f10a0e8df9b93dd041d23100d49c57"><td class="mdescLeft">&#160;</td><td class="mdescRight">Performs a backward 2D convolution on a rank 4 tensor to compute the gradients of the output of the previous layer, the convolution filter, and the bias.  <a href="#a39f10a0e8df9b93dd041d23100d49c57">More...</a><br /></td></tr>
-<tr class="separator:a39f10a0e8df9b93dd041d23100d49c57"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a46b5ef9ed5403f8e934dc35038c377c9"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1internal_1_1_cu_d_n_n_handle.html#a46b5ef9ed5403f8e934dc35038c377c9">activation_fwd</a> (Scalar *input, const Array4 &amp;dims, cudnnActivationMode_t act_mode, Scalar coeff, Scalar *output) const</td></tr>
-<tr class="memdesc:a46b5ef9ed5403f8e934dc35038c377c9"><td class="mdescLeft">&#160;</td><td class="mdescRight">It applies the specified activation function the the input tensor.  <a href="#a46b5ef9ed5403f8e934dc35038c377c9">More...</a><br /></td></tr>
-<tr class="separator:a46b5ef9ed5403f8e934dc35038c377c9"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ae958103fd306a6ad9c1e0d50d9e13d57"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1internal_1_1_cu_d_n_n_handle.html#ae958103fd306a6ad9c1e0d50d9e13d57">activation_bwd</a> (Scalar *input, Scalar *output, Scalar *out_grad, const Array4 &amp;dims, cudnnActivationMode_t act_mode, Scalar coeff, Scalar *prev_out_grad) const</td></tr>
-<tr class="memdesc:ae958103fd306a6ad9c1e0d50d9e13d57"><td class="mdescLeft">&#160;</td><td class="mdescRight">It computes the gradient of the input of the activation function.  <a href="#ae958103fd306a6ad9c1e0d50d9e13d57">More...</a><br /></td></tr>
-<tr class="separator:ae958103fd306a6ad9c1e0d50d9e13d57"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ae6ca224fc2b1b651fa8076e95b477cad"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1internal_1_1_cu_d_n_n_handle.html#ae6ca224fc2b1b651fa8076e95b477cad">softmax_fwd</a> (Scalar *input, const Array4 &amp;dims, Scalar *output) const</td></tr>
-<tr class="memdesc:ae6ca224fc2b1b651fa8076e95b477cad"><td class="mdescLeft">&#160;</td><td class="mdescRight">It applies the softmax activation function the the input tensor.  <a href="#ae6ca224fc2b1b651fa8076e95b477cad">More...</a><br /></td></tr>
-<tr class="separator:ae6ca224fc2b1b651fa8076e95b477cad"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a2da9235cdf411aa8c37c6a5554bc415d"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1internal_1_1_cu_d_n_n_handle.html#a2da9235cdf411aa8c37c6a5554bc415d">softmax_bwd</a> (Scalar *output, Scalar *out_grad, const Array4 &amp;dims, Scalar *prev_out_grad) const</td></tr>
-<tr class="memdesc:a2da9235cdf411aa8c37c6a5554bc415d"><td class="mdescLeft">&#160;</td><td class="mdescRight">It computes the gradient of the input of the softmax activation function.  <a href="#a2da9235cdf411aa8c37c6a5554bc415d">More...</a><br /></td></tr>
-<tr class="separator:a2da9235cdf411aa8c37c6a5554bc415d"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a96fab0b5d093978af1813c12f597192f"><td class="memItemLeft" align="right" valign="top">Array4&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1internal_1_1_cu_d_n_n_handle.html#a96fab0b5d093978af1813c12f597192f">pooling2d_output_dims</a> (const Array4 &amp;input_dims, cudnnPoolingMode_t pool_mode, std::size_t window_height, std::size_t window_width, std::size_t vertical_padding, std::size_t horizontal_padding, std::size_t vertical_stride, std::size_t horizontal_stride) const</td></tr>
-<tr class="memdesc:a96fab0b5d093978af1813c12f597192f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Computes the dimensions of the output of the 2D pooling operation.  <a href="#a96fab0b5d093978af1813c12f597192f">More...</a><br /></td></tr>
-<tr class="separator:a96fab0b5d093978af1813c12f597192f"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a82c4dac7a96422dd4372e3f6e936d40e"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1internal_1_1_cu_d_n_n_handle.html#a82c4dac7a96422dd4372e3f6e936d40e">pooling2d_fwd</a> (Scalar *input, const Array4 &amp;input_dims, const Array4 &amp;output_dims, cudnnPoolingMode_t pool_mode, std::size_t window_height, std::size_t window_width, std::size_t vertical_padding, std::size_t horizontal_padding, std::size_t vertical_stride, std::size_t horizontal_stride, Scalar *output) const</td></tr>
-<tr class="memdesc:a82c4dac7a96422dd4372e3f6e936d40e"><td class="mdescLeft">&#160;</td><td class="mdescRight">It performs a 2D pooling operation on the input tensor.  <a href="#a82c4dac7a96422dd4372e3f6e936d40e">More...</a><br /></td></tr>
-<tr class="separator:a82c4dac7a96422dd4372e3f6e936d40e"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aa9f83600e06cd769e65776e38e025656"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1internal_1_1_cu_d_n_n_handle.html#aa9f83600e06cd769e65776e38e025656">pooling2d_bwd</a> (Scalar *input, Scalar *output, Scalar *out_grad, const Array4 &amp;input_dims, const Array4 &amp;output_dims, cudnnPoolingMode_t pool_mode, std::size_t window_height, std::size_t window_width, std::size_t vertical_padding, std::size_t horizontal_padding, std::size_t vertical_stride, std::size_t horizontal_stride, Scalar *prev_out_grad) const</td></tr>
-<tr class="memdesc:aa9f83600e06cd769e65776e38e025656"><td class="mdescLeft">&#160;</td><td class="mdescRight">Computes the gradient of the input of the pooling layer.  <a href="#aa9f83600e06cd769e65776e38e025656">More...</a><br /></td></tr>
-<tr class="separator:aa9f83600e06cd769e65776e38e025656"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a5e3bc20f4a0d4ecc849cb4c2c326508e"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1internal_1_1_cu_d_n_n_handle.html#a5e3bc20f4a0d4ecc849cb4c2c326508e">batch_norm_fwd_training</a> (Scalar *input, Scalar *gamma, Scalar *beta, const Array4 &amp;dims, bool spatial, Scalar exp_avg_factor, Scalar epsilon, Scalar *means, Scalar *vars, Scalar *output, Scalar *mean_cache, Scalar *inv_var_cache) const</td></tr>
-<tr class="memdesc:a5e3bc20f4a0d4ecc849cb4c2c326508e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Applies the batch normalization function to the input data and updates the running mean and variance averages.  <a href="#a5e3bc20f4a0d4ecc849cb4c2c326508e">More...</a><br /></td></tr>
-<tr class="separator:a5e3bc20f4a0d4ecc849cb4c2c326508e"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a387e53b8328502dd284ef8a1083e4545"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1internal_1_1_cu_d_n_n_handle.html#a387e53b8328502dd284ef8a1083e4545">batch_norm_fwd_inference</a> (Scalar *input, Scalar *gamma, Scalar *beta, Scalar *means, Scalar *vars, const Array4 &amp;dims, bool spatial, Scalar epsilon, Scalar *output) const</td></tr>
-<tr class="memdesc:a387e53b8328502dd284ef8a1083e4545"><td class="mdescLeft">&#160;</td><td class="mdescRight">Applies the batch normalization function to the input data for inference using the running mean and variance averages.  <a href="#a387e53b8328502dd284ef8a1083e4545">More...</a><br /></td></tr>
-<tr class="separator:a387e53b8328502dd284ef8a1083e4545"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aef678ece1cd9918512de16cf74ac492c"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1internal_1_1_cu_d_n_n_handle.html#aef678ece1cd9918512de16cf74ac492c">batch_norm_bwd</a> (Scalar *input, Scalar *out_grad, Scalar *gamma, Scalar *mean_cache, Scalar *inv_var_cache, const Array4 &amp;dims, bool spatial, Scalar epsilon, Scalar *prev_out_grad, Scalar *gamma_grad, Scalar *beta_grad) const</td></tr>
-<tr class="memdesc:aef678ece1cd9918512de16cf74ac492c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Performs the backward pass of the batch normalization function and computes the gradients of the function's input, the gamma scaling tensor, and the beta bias tensor.  <a href="#aef678ece1cd9918512de16cf74ac492c">More...</a><br /></td></tr>
-<tr class="separator:aef678ece1cd9918512de16cf74ac492c"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aa2f4fba55c7a5b17a66bd44912fe388a"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1internal_1_1_cu_d_n_n_handle.html#aa2f4fba55c7a5b17a66bd44912fe388a">dropout_fwd</a> (Scalar *input, const Array4 &amp;dims, Scalar dropout, Scalar *output, std::vector&lt; Scalar &gt; &amp;reserve) const</td></tr>
-<tr class="memdesc:aa2f4fba55c7a5b17a66bd44912fe388a"><td class="mdescLeft">&#160;</td><td class="mdescRight">It applies the dropout function to the input tensor.  <a href="#aa2f4fba55c7a5b17a66bd44912fe388a">More...</a><br /></td></tr>
-<tr class="separator:aa2f4fba55c7a5b17a66bd44912fe388a"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a6ea4fda313544c9078f44e06a2c94402"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1internal_1_1_cu_d_n_n_handle.html#a6ea4fda313544c9078f44e06a2c94402">dropout_bwd</a> (Scalar *out_grad, std::vector&lt; Scalar &gt; &amp;reserve, const Array4 &amp;dims, Scalar dropout, Scalar *prev_out_grad) const</td></tr>
-<tr class="memdesc:a6ea4fda313544c9078f44e06a2c94402"><td class="mdescLeft">&#160;</td><td class="mdescRight">It computes the gradient of the input of the dropout function.  <a href="#a6ea4fda313544c9078f44e06a2c94402">More...</a><br /></td></tr>
-<tr class="separator:a6ea4fda313544c9078f44e06a2c94402"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad09f433ff17128829cbb1614351ada1f"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1internal_1_1_cu_d_n_n_handle.html#ad09f433ff17128829cbb1614351ada1f">conv2d_output_dims</a> (std::size_t input_height, std::size_t input_width, std::size_t input_channels, cudnnTensorFormat_t tensor_format, std::size_t filters, std::size_t receptor_height, std::size_t receptor_width, std::size_t vertical_padding, std::size_t horizontal_padding, std::size_t vertical_stride, std::size_t horizontal_stride, std::size_t vertical_dilation, std::size_t horizontal_dilation, std::size_t &amp;output_height, std::size_t &amp;output_width, std::size_t &amp;output_channels) const</td></tr>
+<tr class="memdesc:ad09f433ff17128829cbb1614351ada1f"><td class="mdescLeft">&#160;</td><td class="mdescRight">It computes the dimensions of the output tensor of the convolution.  <a href="#ad09f433ff17128829cbb1614351ada1f">More...</a><br /></td></tr>
+<tr class="separator:ad09f433ff17128829cbb1614351ada1f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa70ea0feb72e78b1d0f209692acf67bd"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1internal_1_1_cu_d_n_n_handle.html#aa70ea0feb72e78b1d0f209692acf67bd">convolution2d_fwd</a> (const <a class="el" href="classcattle_1_1internal_1_1_cu_d_n_n_tensor.html">CuDNNTensor</a>&lt; Scalar &gt; &amp;input, const <a class="el" href="classcattle_1_1internal_1_1_cu_d_n_n_tensor.html">CuDNNTensor</a>&lt; Scalar, true &gt; &amp;filter, const <a class="el" href="classcattle_1_1internal_1_1_cu_d_n_n_tensor.html">CuDNNTensor</a>&lt; Scalar &gt; &amp;bias, std::size_t vertical_padding, std::size_t horizontal_padding, std::size_t vertical_stride, std::size_t horizontal_stride, std::size_t vertical_dilation, std::size_t horizontal_dilation, <a class="el" href="classcattle_1_1internal_1_1_cu_d_n_n_tensor.html">CuDNNTensor</a>&lt; Scalar &gt; &amp;output) const</td></tr>
+<tr class="memdesc:aa70ea0feb72e78b1d0f209692acf67bd"><td class="mdescLeft">&#160;</td><td class="mdescRight">Performs a GPU accelerated 2D convolution on a rank 4 tensor.  <a href="#aa70ea0feb72e78b1d0f209692acf67bd">More...</a><br /></td></tr>
+<tr class="separator:aa70ea0feb72e78b1d0f209692acf67bd"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a79ac548344b6f983d444686a8d98b4e9"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1internal_1_1_cu_d_n_n_handle.html#a79ac548344b6f983d444686a8d98b4e9">convolution2d_bwd</a> (const <a class="el" href="classcattle_1_1internal_1_1_cu_d_n_n_tensor.html">CuDNNTensor</a>&lt; Scalar &gt; &amp;input, const <a class="el" href="classcattle_1_1internal_1_1_cu_d_n_n_tensor.html">CuDNNTensor</a>&lt; Scalar &gt; &amp;out_grad, const <a class="el" href="classcattle_1_1internal_1_1_cu_d_n_n_tensor.html">CuDNNTensor</a>&lt; Scalar, true &gt; &amp;filter, const <a class="el" href="classcattle_1_1internal_1_1_cu_d_n_n_tensor.html">CuDNNTensor</a>&lt; Scalar &gt; &amp;bias, std::size_t vertical_padding, std::size_t horizontal_padding, std::size_t vertical_stride, std::size_t horizontal_stride, std::size_t vertical_dilation, std::size_t horizontal_dilation, <a class="el" href="classcattle_1_1internal_1_1_cu_d_n_n_tensor.html">CuDNNTensor</a>&lt; Scalar &gt; &amp;prev_out_grad, <a class="el" href="classcattle_1_1internal_1_1_cu_d_n_n_tensor.html">CuDNNTensor</a>&lt; Scalar, true &gt; &amp;filter_grad, <a class="el" href="classcattle_1_1internal_1_1_cu_d_n_n_tensor.html">CuDNNTensor</a>&lt; Scalar &gt; &amp;bias_grad) const</td></tr>
+<tr class="memdesc:a79ac548344b6f983d444686a8d98b4e9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Performs a backward 2D convolution on a rank 4 tensor to compute the gradients of the output of the previous layer, the convolution filter, and the bias.  <a href="#a79ac548344b6f983d444686a8d98b4e9">More...</a><br /></td></tr>
+<tr class="separator:a79ac548344b6f983d444686a8d98b4e9"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a55b831a2eb7cbc840f5cae8ee89a5570"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1internal_1_1_cu_d_n_n_handle.html#a55b831a2eb7cbc840f5cae8ee89a5570">activation_fwd</a> (const <a class="el" href="classcattle_1_1internal_1_1_cu_d_n_n_tensor.html">CuDNNTensor</a>&lt; Scalar &gt; &amp;input, cudnnActivationMode_t act_mode, Scalar coeff, <a class="el" href="classcattle_1_1internal_1_1_cu_d_n_n_tensor.html">CuDNNTensor</a>&lt; Scalar &gt; &amp;output) const</td></tr>
+<tr class="memdesc:a55b831a2eb7cbc840f5cae8ee89a5570"><td class="mdescLeft">&#160;</td><td class="mdescRight">It applies the specified activation function the the input tensor.  <a href="#a55b831a2eb7cbc840f5cae8ee89a5570">More...</a><br /></td></tr>
+<tr class="separator:a55b831a2eb7cbc840f5cae8ee89a5570"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2d6df977da77c67928f92b474dc1a285"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1internal_1_1_cu_d_n_n_handle.html#a2d6df977da77c67928f92b474dc1a285">activation_bwd</a> (const <a class="el" href="classcattle_1_1internal_1_1_cu_d_n_n_tensor.html">CuDNNTensor</a>&lt; Scalar &gt; &amp;input, const <a class="el" href="classcattle_1_1internal_1_1_cu_d_n_n_tensor.html">CuDNNTensor</a>&lt; Scalar &gt; &amp;output, cudnnActivationMode_t act_mode, Scalar coeff, <a class="el" href="classcattle_1_1internal_1_1_cu_d_n_n_tensor.html">CuDNNTensor</a>&lt; Scalar &gt; &amp;in_out_grad) const</td></tr>
+<tr class="memdesc:a2d6df977da77c67928f92b474dc1a285"><td class="mdescLeft">&#160;</td><td class="mdescRight">It computes the gradient of the input of the activation function.  <a href="#a2d6df977da77c67928f92b474dc1a285">More...</a><br /></td></tr>
+<tr class="separator:a2d6df977da77c67928f92b474dc1a285"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a992cae7a1c58ef7bb4e8460072632530"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1internal_1_1_cu_d_n_n_handle.html#a992cae7a1c58ef7bb4e8460072632530">softmax_fwd</a> (const <a class="el" href="classcattle_1_1internal_1_1_cu_d_n_n_tensor.html">CuDNNTensor</a>&lt; Scalar &gt; &amp;input, <a class="el" href="classcattle_1_1internal_1_1_cu_d_n_n_tensor.html">CuDNNTensor</a>&lt; Scalar &gt; &amp;output) const</td></tr>
+<tr class="memdesc:a992cae7a1c58ef7bb4e8460072632530"><td class="mdescLeft">&#160;</td><td class="mdescRight">It applies the softmax activation function the the input tensor.  <a href="#a992cae7a1c58ef7bb4e8460072632530">More...</a><br /></td></tr>
+<tr class="separator:a992cae7a1c58ef7bb4e8460072632530"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa593cec63c9a1f53fa222a667462fe8c"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1internal_1_1_cu_d_n_n_handle.html#aa593cec63c9a1f53fa222a667462fe8c">softmax_bwd</a> (const <a class="el" href="classcattle_1_1internal_1_1_cu_d_n_n_tensor.html">CuDNNTensor</a>&lt; Scalar &gt; &amp;output, <a class="el" href="classcattle_1_1internal_1_1_cu_d_n_n_tensor.html">CuDNNTensor</a>&lt; Scalar &gt; &amp;in_out_grad) const</td></tr>
+<tr class="memdesc:aa593cec63c9a1f53fa222a667462fe8c"><td class="mdescLeft">&#160;</td><td class="mdescRight">It computes the gradient of the input of the softmax activation function.  <a href="#aa593cec63c9a1f53fa222a667462fe8c">More...</a><br /></td></tr>
+<tr class="separator:aa593cec63c9a1f53fa222a667462fe8c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aefb1530f6eb2613450b699818487fe5d"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1internal_1_1_cu_d_n_n_handle.html#aefb1530f6eb2613450b699818487fe5d">pool2d_output_dims</a> (std::size_t input_height, std::size_t input_width, std::size_t input_channels, cudnnTensorFormat_t tensor_format, cudnnPoolingMode_t pool_mode, std::size_t window_height, std::size_t window_width, std::size_t vertical_padding, std::size_t horizontal_padding, std::size_t vertical_stride, std::size_t horizontal_stride, std::size_t &amp;output_height, std::size_t &amp;output_width, std::size_t &amp;output_channels) const</td></tr>
+<tr class="memdesc:aefb1530f6eb2613450b699818487fe5d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Computes the dimensions of the output of the 2D pooling operation.  <a href="#aefb1530f6eb2613450b699818487fe5d">More...</a><br /></td></tr>
+<tr class="separator:aefb1530f6eb2613450b699818487fe5d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9dc3603f13b1f318e228691c32bafe13"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1internal_1_1_cu_d_n_n_handle.html#a9dc3603f13b1f318e228691c32bafe13">pool2d_fwd</a> (const <a class="el" href="classcattle_1_1internal_1_1_cu_d_n_n_tensor.html">CuDNNTensor</a>&lt; Scalar &gt; &amp;input, cudnnPoolingMode_t pool_mode, std::size_t window_height, std::size_t window_width, std::size_t vertical_padding, std::size_t horizontal_padding, std::size_t vertical_stride, std::size_t horizontal_stride, <a class="el" href="classcattle_1_1internal_1_1_cu_d_n_n_tensor.html">CuDNNTensor</a>&lt; Scalar &gt; &amp;output) const</td></tr>
+<tr class="memdesc:a9dc3603f13b1f318e228691c32bafe13"><td class="mdescLeft">&#160;</td><td class="mdescRight">It performs a 2D pooling operation on the input tensor.  <a href="#a9dc3603f13b1f318e228691c32bafe13">More...</a><br /></td></tr>
+<tr class="separator:a9dc3603f13b1f318e228691c32bafe13"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae950696a0abb68c382586d99ffc99711"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1internal_1_1_cu_d_n_n_handle.html#ae950696a0abb68c382586d99ffc99711">pool2d_bwd</a> (const <a class="el" href="classcattle_1_1internal_1_1_cu_d_n_n_tensor.html">CuDNNTensor</a>&lt; Scalar &gt; &amp;input, const <a class="el" href="classcattle_1_1internal_1_1_cu_d_n_n_tensor.html">CuDNNTensor</a>&lt; Scalar &gt; &amp;output, const <a class="el" href="classcattle_1_1internal_1_1_cu_d_n_n_tensor.html">CuDNNTensor</a>&lt; Scalar &gt; &amp;out_grad, cudnnPoolingMode_t pool_mode, std::size_t window_height, std::size_t window_width, std::size_t vertical_padding, std::size_t horizontal_padding, std::size_t vertical_stride, std::size_t horizontal_stride, <a class="el" href="classcattle_1_1internal_1_1_cu_d_n_n_tensor.html">CuDNNTensor</a>&lt; Scalar &gt; &amp;prev_out_grad) const</td></tr>
+<tr class="memdesc:ae950696a0abb68c382586d99ffc99711"><td class="mdescLeft">&#160;</td><td class="mdescRight">Computes the gradient of the input of the pooling layer.  <a href="#ae950696a0abb68c382586d99ffc99711">More...</a><br /></td></tr>
+<tr class="separator:ae950696a0abb68c382586d99ffc99711"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:afde3ec8e42cf81996320995d1b037cff"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1internal_1_1_cu_d_n_n_handle.html#afde3ec8e42cf81996320995d1b037cff">batch_norm_fwd_training</a> (const <a class="el" href="classcattle_1_1internal_1_1_cu_d_n_n_tensor.html">CuDNNTensor</a>&lt; Scalar &gt; &amp;input, const <a class="el" href="classcattle_1_1internal_1_1_cu_d_n_n_tensor.html">CuDNNTensor</a>&lt; Scalar &gt; &amp;gamma, const <a class="el" href="classcattle_1_1internal_1_1_cu_d_n_n_tensor.html">CuDNNTensor</a>&lt; Scalar &gt; &amp;beta, bool spatial, Scalar exp_avg_factor, Scalar epsilon, <a class="el" href="classcattle_1_1internal_1_1_cu_d_n_n_tensor.html">CuDNNTensor</a>&lt; Scalar &gt; &amp;means, <a class="el" href="classcattle_1_1internal_1_1_cu_d_n_n_tensor.html">CuDNNTensor</a>&lt; Scalar &gt; &amp;vars, <a class="el" href="classcattle_1_1internal_1_1_cu_d_n_n_tensor.html">CuDNNTensor</a>&lt; Scalar &gt; &amp;output, <a class="el" href="classcattle_1_1internal_1_1_cu_d_n_n_tensor.html">CuDNNTensor</a>&lt; Scalar &gt; &amp;mean_cache, <a class="el" href="classcattle_1_1internal_1_1_cu_d_n_n_tensor.html">CuDNNTensor</a>&lt; Scalar &gt; &amp;inv_var_cache) const</td></tr>
+<tr class="memdesc:afde3ec8e42cf81996320995d1b037cff"><td class="mdescLeft">&#160;</td><td class="mdescRight">Applies the batch normalization function to the input data and updates the running mean and variance averages.  <a href="#afde3ec8e42cf81996320995d1b037cff">More...</a><br /></td></tr>
+<tr class="separator:afde3ec8e42cf81996320995d1b037cff"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3094b231c417426b06f0e84dc8832994"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1internal_1_1_cu_d_n_n_handle.html#a3094b231c417426b06f0e84dc8832994">batch_norm_fwd_inference</a> (const <a class="el" href="classcattle_1_1internal_1_1_cu_d_n_n_tensor.html">CuDNNTensor</a>&lt; Scalar &gt; &amp;input, const <a class="el" href="classcattle_1_1internal_1_1_cu_d_n_n_tensor.html">CuDNNTensor</a>&lt; Scalar &gt; &amp;gamma, const <a class="el" href="classcattle_1_1internal_1_1_cu_d_n_n_tensor.html">CuDNNTensor</a>&lt; Scalar &gt; &amp;beta, const <a class="el" href="classcattle_1_1internal_1_1_cu_d_n_n_tensor.html">CuDNNTensor</a>&lt; Scalar &gt; &amp;means, const <a class="el" href="classcattle_1_1internal_1_1_cu_d_n_n_tensor.html">CuDNNTensor</a>&lt; Scalar &gt; &amp;vars, bool spatial, Scalar epsilon, <a class="el" href="classcattle_1_1internal_1_1_cu_d_n_n_tensor.html">CuDNNTensor</a>&lt; Scalar &gt; &amp;output) const</td></tr>
+<tr class="memdesc:a3094b231c417426b06f0e84dc8832994"><td class="mdescLeft">&#160;</td><td class="mdescRight">Applies the batch normalization function to the input data for inference using the running mean and variance averages.  <a href="#a3094b231c417426b06f0e84dc8832994">More...</a><br /></td></tr>
+<tr class="separator:a3094b231c417426b06f0e84dc8832994"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af2f42cc9e92ed9c8255f3790af4d0e4b"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1internal_1_1_cu_d_n_n_handle.html#af2f42cc9e92ed9c8255f3790af4d0e4b">batch_norm_bwd</a> (const <a class="el" href="classcattle_1_1internal_1_1_cu_d_n_n_tensor.html">CuDNNTensor</a>&lt; Scalar &gt; &amp;input, const <a class="el" href="classcattle_1_1internal_1_1_cu_d_n_n_tensor.html">CuDNNTensor</a>&lt; Scalar &gt; &amp;out_grad, const <a class="el" href="classcattle_1_1internal_1_1_cu_d_n_n_tensor.html">CuDNNTensor</a>&lt; Scalar &gt; &amp;gamma, const <a class="el" href="classcattle_1_1internal_1_1_cu_d_n_n_tensor.html">CuDNNTensor</a>&lt; Scalar &gt; &amp;mean_cache, const <a class="el" href="classcattle_1_1internal_1_1_cu_d_n_n_tensor.html">CuDNNTensor</a>&lt; Scalar &gt; &amp;inv_var_cache, bool spatial, Scalar epsilon, <a class="el" href="classcattle_1_1internal_1_1_cu_d_n_n_tensor.html">CuDNNTensor</a>&lt; Scalar &gt; &amp;prev_out_grad, <a class="el" href="classcattle_1_1internal_1_1_cu_d_n_n_tensor.html">CuDNNTensor</a>&lt; Scalar &gt; &amp;gamma_grad, <a class="el" href="classcattle_1_1internal_1_1_cu_d_n_n_tensor.html">CuDNNTensor</a>&lt; Scalar &gt; &amp;beta_grad) const</td></tr>
+<tr class="memdesc:af2f42cc9e92ed9c8255f3790af4d0e4b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Performs the backward pass of the batch normalization function and computes the gradients of the function's input, the gamma scaling tensor, and the beta bias tensor.  <a href="#af2f42cc9e92ed9c8255f3790af4d0e4b">More...</a><br /></td></tr>
+<tr class="separator:af2f42cc9e92ed9c8255f3790af4d0e4b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7e55aa4c437ddcbe0fe32c81cf511555"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1internal_1_1_cu_d_n_n_handle.html#a7e55aa4c437ddcbe0fe32c81cf511555">dropout_reserve_size</a> (const <a class="el" href="classcattle_1_1internal_1_1_cu_d_n_n_tensor.html">CuDNNTensor</a>&lt; Scalar &gt; &amp;input, std::size_t &amp;reserve_size) const</td></tr>
+<tr class="memdesc:a7e55aa4c437ddcbe0fe32c81cf511555"><td class="mdescLeft">&#160;</td><td class="mdescRight">It computes the necessary reserve size for the dropout.  <a href="#a7e55aa4c437ddcbe0fe32c81cf511555">More...</a><br /></td></tr>
+<tr class="separator:a7e55aa4c437ddcbe0fe32c81cf511555"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a548f05edbf2a5cf86b7eccf29b2e9604"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1internal_1_1_cu_d_n_n_handle.html#a548f05edbf2a5cf86b7eccf29b2e9604">dropout_fwd</a> (const <a class="el" href="classcattle_1_1internal_1_1_cu_d_n_n_tensor.html">CuDNNTensor</a>&lt; Scalar &gt; &amp;input, Scalar dropout, <a class="el" href="classcattle_1_1internal_1_1_cu_d_n_n_tensor.html">CuDNNTensor</a>&lt; Scalar &gt; &amp;reserve, <a class="el" href="classcattle_1_1internal_1_1_cu_d_n_n_tensor.html">CuDNNTensor</a>&lt; Scalar &gt; &amp;output) const</td></tr>
+<tr class="memdesc:a548f05edbf2a5cf86b7eccf29b2e9604"><td class="mdescLeft">&#160;</td><td class="mdescRight">It applies the dropout function to the input tensor.  <a href="#a548f05edbf2a5cf86b7eccf29b2e9604">More...</a><br /></td></tr>
+<tr class="separator:a548f05edbf2a5cf86b7eccf29b2e9604"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab7e31be3c57472af5e28b27f4a580d0a"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1internal_1_1_cu_d_n_n_handle.html#ab7e31be3c57472af5e28b27f4a580d0a">dropout_bwd</a> (const <a class="el" href="classcattle_1_1internal_1_1_cu_d_n_n_tensor.html">CuDNNTensor</a>&lt; Scalar &gt; &amp;out_grad, const <a class="el" href="classcattle_1_1internal_1_1_cu_d_n_n_tensor.html">CuDNNTensor</a>&lt; Scalar &gt; &amp;reserve, Scalar dropout, <a class="el" href="classcattle_1_1internal_1_1_cu_d_n_n_tensor.html">CuDNNTensor</a>&lt; Scalar &gt; &amp;prev_out_grad) const</td></tr>
+<tr class="memdesc:ab7e31be3c57472af5e28b27f4a580d0a"><td class="mdescLeft">&#160;</td><td class="mdescRight">It computes the gradient of the input of the dropout function.  <a href="#ab7e31be3c57472af5e28b27f4a580d0a">More...</a><br /></td></tr>
+<tr class="separator:ab7e31be3c57472af5e28b27f4a580d0a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-static-methods"></a>
 Static Public Member Functions</h2></td></tr>
-<tr class="memitem:a66ff49f3b34f05a1043f22d5d0275575"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="classcattle_1_1internal_1_1_cu_d_n_n_handle.html">CuDNNHandle</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1internal_1_1_cu_d_n_n_handle.html#a66ff49f3b34f05a1043f22d5d0275575">get_instance</a> ()</td></tr>
-<tr class="separator:a66ff49f3b34f05a1043f22d5d0275575"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9b27fe08963ff261ffb0e1b3ba288b40"><td class="memItemLeft" align="right" valign="top">static const <a class="el" href="classcattle_1_1internal_1_1_cu_d_n_n_handle.html">Self</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1internal_1_1_cu_d_n_n_handle.html#a9b27fe08963ff261ffb0e1b3ba288b40">get_instance</a> ()</td></tr>
+<tr class="separator:a9b27fe08963ff261ffb0e1b3ba288b40"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><h3>template&lt;typename Scalar&gt;<br />
 class cattle::internal::CuDNNHandle&lt; Scalar &gt;</h3>
 
-<p>A singleton utility class providing methods for GPU accelerated deep neural network operations on rank 4 data of [N,H,W,C] orientation. </p>
+<p>A singleton utility class providing methods for GPU accelerated deep neural network operations on rank 4 data. </p>
 </div><h2 class="groupheader">Member Function Documentation</h2>
-<a id="ae958103fd306a6ad9c1e0d50d9e13d57"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ae958103fd306a6ad9c1e0d50d9e13d57">&#9670;&nbsp;</a></span>activation_bwd()</h2>
+<a id="a2d6df977da77c67928f92b474dc1a285"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a2d6df977da77c67928f92b474dc1a285">&#9670;&nbsp;</a></span>activation_bwd()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -159,26 +162,14 @@ template&lt;typename Scalar &gt; </div>
         <tr>
           <td class="memname">void <a class="el" href="classcattle_1_1internal_1_1_cu_d_n_n_handle.html">cattle::internal::CuDNNHandle</a>&lt; Scalar &gt;::activation_bwd </td>
           <td>(</td>
-          <td class="paramtype">Scalar *&#160;</td>
+          <td class="paramtype">const <a class="el" href="classcattle_1_1internal_1_1_cu_d_n_n_tensor.html">CuDNNTensor</a>&lt; Scalar &gt; &amp;&#160;</td>
           <td class="paramname"><em>input</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">Scalar *&#160;</td>
+          <td class="paramtype">const <a class="el" href="classcattle_1_1internal_1_1_cu_d_n_n_tensor.html">CuDNNTensor</a>&lt; Scalar &gt; &amp;&#160;</td>
           <td class="paramname"><em>output</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">Scalar *&#160;</td>
-          <td class="paramname"><em>out_grad</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">const Array4 &amp;&#160;</td>
-          <td class="paramname"><em>dims</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -195,8 +186,8 @@ template&lt;typename Scalar &gt; </div>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">Scalar *&#160;</td>
-          <td class="paramname"><em>prev_out_grad</em>&#160;</td>
+          <td class="paramtype"><a class="el" href="classcattle_1_1internal_1_1_cu_d_n_n_tensor.html">CuDNNTensor</a>&lt; Scalar &gt; &amp;&#160;</td>
+          <td class="paramname"><em>in_out_grad</em>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -216,19 +207,17 @@ template&lt;typename Scalar &gt; </div>
   <table class="params">
     <tr><td class="paramname">input</td><td>The input tensor. </td></tr>
     <tr><td class="paramname">output</td><td>The output tensor. </td></tr>
-    <tr><td class="paramname">out_grad</td><td>The gradient of the output of the activation function. </td></tr>
-    <tr><td class="paramname">dims</td><td>The dimensions of the input/output tensor (extended by 1s for data of rank lower than 4). </td></tr>
     <tr><td class="paramname">act_mode</td><td>The type of activation function used. </td></tr>
     <tr><td class="paramname">coeff</td><td>The activation function coefficient used by certain activation functions (e.g. ELU). </td></tr>
-    <tr><td class="paramname">prev_out_grad</td><td>The gradient of the activation function's input. </td></tr>
+    <tr><td class="paramname">in_out_grad</td><td>The gradient of the output of the activation function and after the method finishes execution, the gradient of the input of the activation function. </td></tr>
   </table>
   </dd>
 </dl>
 
 </div>
 </div>
-<a id="a46b5ef9ed5403f8e934dc35038c377c9"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a46b5ef9ed5403f8e934dc35038c377c9">&#9670;&nbsp;</a></span>activation_fwd()</h2>
+<a id="a55b831a2eb7cbc840f5cae8ee89a5570"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a55b831a2eb7cbc840f5cae8ee89a5570">&#9670;&nbsp;</a></span>activation_fwd()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -241,14 +230,8 @@ template&lt;typename Scalar &gt; </div>
         <tr>
           <td class="memname">void <a class="el" href="classcattle_1_1internal_1_1_cu_d_n_n_handle.html">cattle::internal::CuDNNHandle</a>&lt; Scalar &gt;::activation_fwd </td>
           <td>(</td>
-          <td class="paramtype">Scalar *&#160;</td>
+          <td class="paramtype">const <a class="el" href="classcattle_1_1internal_1_1_cu_d_n_n_tensor.html">CuDNNTensor</a>&lt; Scalar &gt; &amp;&#160;</td>
           <td class="paramname"><em>input</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">const Array4 &amp;&#160;</td>
-          <td class="paramname"><em>dims</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -265,7 +248,7 @@ template&lt;typename Scalar &gt; </div>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">Scalar *&#160;</td>
+          <td class="paramtype"><a class="el" href="classcattle_1_1internal_1_1_cu_d_n_n_tensor.html">CuDNNTensor</a>&lt; Scalar &gt; &amp;&#160;</td>
           <td class="paramname"><em>output</em>&#160;</td>
         </tr>
         <tr>
@@ -285,7 +268,6 @@ template&lt;typename Scalar &gt; </div>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">input</td><td>The input tensor. </td></tr>
-    <tr><td class="paramname">dims</td><td>The dimensions of the input/output tensor (extended by 1s for data of rank lower than 4). </td></tr>
     <tr><td class="paramname">act_mode</td><td>The type of activation function to use. </td></tr>
     <tr><td class="paramname">coeff</td><td>The activation function coefficient used by certain activation functions (e.g. ELU). </td></tr>
     <tr><td class="paramname">output</td><td>The activated output tensor. </td></tr>
@@ -295,8 +277,8 @@ template&lt;typename Scalar &gt; </div>
 
 </div>
 </div>
-<a id="aef678ece1cd9918512de16cf74ac492c"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aef678ece1cd9918512de16cf74ac492c">&#9670;&nbsp;</a></span>batch_norm_bwd()</h2>
+<a id="af2f42cc9e92ed9c8255f3790af4d0e4b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af2f42cc9e92ed9c8255f3790af4d0e4b">&#9670;&nbsp;</a></span>batch_norm_bwd()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -309,38 +291,32 @@ template&lt;typename Scalar &gt; </div>
         <tr>
           <td class="memname">void <a class="el" href="classcattle_1_1internal_1_1_cu_d_n_n_handle.html">cattle::internal::CuDNNHandle</a>&lt; Scalar &gt;::batch_norm_bwd </td>
           <td>(</td>
-          <td class="paramtype">Scalar *&#160;</td>
+          <td class="paramtype">const <a class="el" href="classcattle_1_1internal_1_1_cu_d_n_n_tensor.html">CuDNNTensor</a>&lt; Scalar &gt; &amp;&#160;</td>
           <td class="paramname"><em>input</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">Scalar *&#160;</td>
+          <td class="paramtype">const <a class="el" href="classcattle_1_1internal_1_1_cu_d_n_n_tensor.html">CuDNNTensor</a>&lt; Scalar &gt; &amp;&#160;</td>
           <td class="paramname"><em>out_grad</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">Scalar *&#160;</td>
+          <td class="paramtype">const <a class="el" href="classcattle_1_1internal_1_1_cu_d_n_n_tensor.html">CuDNNTensor</a>&lt; Scalar &gt; &amp;&#160;</td>
           <td class="paramname"><em>gamma</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">Scalar *&#160;</td>
+          <td class="paramtype">const <a class="el" href="classcattle_1_1internal_1_1_cu_d_n_n_tensor.html">CuDNNTensor</a>&lt; Scalar &gt; &amp;&#160;</td>
           <td class="paramname"><em>mean_cache</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">Scalar *&#160;</td>
+          <td class="paramtype">const <a class="el" href="classcattle_1_1internal_1_1_cu_d_n_n_tensor.html">CuDNNTensor</a>&lt; Scalar &gt; &amp;&#160;</td>
           <td class="paramname"><em>inv_var_cache</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">const Array4 &amp;&#160;</td>
-          <td class="paramname"><em>dims</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -357,19 +333,19 @@ template&lt;typename Scalar &gt; </div>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">Scalar *&#160;</td>
+          <td class="paramtype"><a class="el" href="classcattle_1_1internal_1_1_cu_d_n_n_tensor.html">CuDNNTensor</a>&lt; Scalar &gt; &amp;&#160;</td>
           <td class="paramname"><em>prev_out_grad</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">Scalar *&#160;</td>
+          <td class="paramtype"><a class="el" href="classcattle_1_1internal_1_1_cu_d_n_n_tensor.html">CuDNNTensor</a>&lt; Scalar &gt; &amp;&#160;</td>
           <td class="paramname"><em>gamma_grad</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">Scalar *&#160;</td>
+          <td class="paramtype"><a class="el" href="classcattle_1_1internal_1_1_cu_d_n_n_tensor.html">CuDNNTensor</a>&lt; Scalar &gt; &amp;&#160;</td>
           <td class="paramname"><em>beta_grad</em>&#160;</td>
         </tr>
         <tr>
@@ -393,7 +369,6 @@ template&lt;typename Scalar &gt; </div>
     <tr><td class="paramname">gamma</td><td>The gamma scaling tensor. </td></tr>
     <tr><td class="paramname">mean_cache</td><td>The mean cached during the forward pass. </td></tr>
     <tr><td class="paramname">inv_var_cache</td><td>The inverse variance cached during the forward pass. </td></tr>
-    <tr><td class="paramname">dims</td><td>The dimensions of the input/output tensor (extended by 1s for data of rank lower than 4). </td></tr>
     <tr><td class="paramname">spatial</td><td>Whether the batch normalization should be performed in spatial or per-activation mode. </td></tr>
     <tr><td class="paramname">epsilon</td><td>A small constant for numerical stability. </td></tr>
     <tr><td class="paramname">prev_out_grad</td><td>The gradient of the batch normalization function's input. </td></tr>
@@ -405,8 +380,8 @@ template&lt;typename Scalar &gt; </div>
 
 </div>
 </div>
-<a id="a387e53b8328502dd284ef8a1083e4545"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a387e53b8328502dd284ef8a1083e4545">&#9670;&nbsp;</a></span>batch_norm_fwd_inference()</h2>
+<a id="a3094b231c417426b06f0e84dc8832994"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a3094b231c417426b06f0e84dc8832994">&#9670;&nbsp;</a></span>batch_norm_fwd_inference()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -419,38 +394,32 @@ template&lt;typename Scalar &gt; </div>
         <tr>
           <td class="memname">void <a class="el" href="classcattle_1_1internal_1_1_cu_d_n_n_handle.html">cattle::internal::CuDNNHandle</a>&lt; Scalar &gt;::batch_norm_fwd_inference </td>
           <td>(</td>
-          <td class="paramtype">Scalar *&#160;</td>
+          <td class="paramtype">const <a class="el" href="classcattle_1_1internal_1_1_cu_d_n_n_tensor.html">CuDNNTensor</a>&lt; Scalar &gt; &amp;&#160;</td>
           <td class="paramname"><em>input</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">Scalar *&#160;</td>
+          <td class="paramtype">const <a class="el" href="classcattle_1_1internal_1_1_cu_d_n_n_tensor.html">CuDNNTensor</a>&lt; Scalar &gt; &amp;&#160;</td>
           <td class="paramname"><em>gamma</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">Scalar *&#160;</td>
+          <td class="paramtype">const <a class="el" href="classcattle_1_1internal_1_1_cu_d_n_n_tensor.html">CuDNNTensor</a>&lt; Scalar &gt; &amp;&#160;</td>
           <td class="paramname"><em>beta</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">Scalar *&#160;</td>
+          <td class="paramtype">const <a class="el" href="classcattle_1_1internal_1_1_cu_d_n_n_tensor.html">CuDNNTensor</a>&lt; Scalar &gt; &amp;&#160;</td>
           <td class="paramname"><em>means</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">Scalar *&#160;</td>
+          <td class="paramtype">const <a class="el" href="classcattle_1_1internal_1_1_cu_d_n_n_tensor.html">CuDNNTensor</a>&lt; Scalar &gt; &amp;&#160;</td>
           <td class="paramname"><em>vars</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">const Array4 &amp;&#160;</td>
-          <td class="paramname"><em>dims</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -467,7 +436,7 @@ template&lt;typename Scalar &gt; </div>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">Scalar *&#160;</td>
+          <td class="paramtype"><a class="el" href="classcattle_1_1internal_1_1_cu_d_n_n_tensor.html">CuDNNTensor</a>&lt; Scalar &gt; &amp;&#160;</td>
           <td class="paramname"><em>output</em>&#160;</td>
         </tr>
         <tr>
@@ -491,7 +460,6 @@ template&lt;typename Scalar &gt; </div>
     <tr><td class="paramname">beta</td><td>The beta bias. </td></tr>
     <tr><td class="paramname">means</td><td>The running mean average. </td></tr>
     <tr><td class="paramname">vars</td><td>The running variance average. </td></tr>
-    <tr><td class="paramname">dims</td><td>The dimensions of the input/output tensor (extended by 1s for data of rank lower than 4). </td></tr>
     <tr><td class="paramname">spatial</td><td>Whether the batch normalization should be performed in spatial or per-activation mode. </td></tr>
     <tr><td class="paramname">epsilon</td><td>A small constant for numerical stability. </td></tr>
     <tr><td class="paramname">output</td><td>The output tensor. </td></tr>
@@ -501,8 +469,8 @@ template&lt;typename Scalar &gt; </div>
 
 </div>
 </div>
-<a id="a5e3bc20f4a0d4ecc849cb4c2c326508e"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a5e3bc20f4a0d4ecc849cb4c2c326508e">&#9670;&nbsp;</a></span>batch_norm_fwd_training()</h2>
+<a id="afde3ec8e42cf81996320995d1b037cff"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#afde3ec8e42cf81996320995d1b037cff">&#9670;&nbsp;</a></span>batch_norm_fwd_training()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -515,26 +483,20 @@ template&lt;typename Scalar &gt; </div>
         <tr>
           <td class="memname">void <a class="el" href="classcattle_1_1internal_1_1_cu_d_n_n_handle.html">cattle::internal::CuDNNHandle</a>&lt; Scalar &gt;::batch_norm_fwd_training </td>
           <td>(</td>
-          <td class="paramtype">Scalar *&#160;</td>
+          <td class="paramtype">const <a class="el" href="classcattle_1_1internal_1_1_cu_d_n_n_tensor.html">CuDNNTensor</a>&lt; Scalar &gt; &amp;&#160;</td>
           <td class="paramname"><em>input</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">Scalar *&#160;</td>
+          <td class="paramtype">const <a class="el" href="classcattle_1_1internal_1_1_cu_d_n_n_tensor.html">CuDNNTensor</a>&lt; Scalar &gt; &amp;&#160;</td>
           <td class="paramname"><em>gamma</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">Scalar *&#160;</td>
+          <td class="paramtype">const <a class="el" href="classcattle_1_1internal_1_1_cu_d_n_n_tensor.html">CuDNNTensor</a>&lt; Scalar &gt; &amp;&#160;</td>
           <td class="paramname"><em>beta</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">const Array4 &amp;&#160;</td>
-          <td class="paramname"><em>dims</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -557,31 +519,31 @@ template&lt;typename Scalar &gt; </div>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">Scalar *&#160;</td>
+          <td class="paramtype"><a class="el" href="classcattle_1_1internal_1_1_cu_d_n_n_tensor.html">CuDNNTensor</a>&lt; Scalar &gt; &amp;&#160;</td>
           <td class="paramname"><em>means</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">Scalar *&#160;</td>
+          <td class="paramtype"><a class="el" href="classcattle_1_1internal_1_1_cu_d_n_n_tensor.html">CuDNNTensor</a>&lt; Scalar &gt; &amp;&#160;</td>
           <td class="paramname"><em>vars</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">Scalar *&#160;</td>
+          <td class="paramtype"><a class="el" href="classcattle_1_1internal_1_1_cu_d_n_n_tensor.html">CuDNNTensor</a>&lt; Scalar &gt; &amp;&#160;</td>
           <td class="paramname"><em>output</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">Scalar *&#160;</td>
+          <td class="paramtype"><a class="el" href="classcattle_1_1internal_1_1_cu_d_n_n_tensor.html">CuDNNTensor</a>&lt; Scalar &gt; &amp;&#160;</td>
           <td class="paramname"><em>mean_cache</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">Scalar *&#160;</td>
+          <td class="paramtype"><a class="el" href="classcattle_1_1internal_1_1_cu_d_n_n_tensor.html">CuDNNTensor</a>&lt; Scalar &gt; &amp;&#160;</td>
           <td class="paramname"><em>inv_var_cache</em>&#160;</td>
         </tr>
         <tr>
@@ -603,7 +565,6 @@ template&lt;typename Scalar &gt; </div>
     <tr><td class="paramname">input</td><td>The input tensor. </td></tr>
     <tr><td class="paramname">gamma</td><td>The gamma scaling tensor. </td></tr>
     <tr><td class="paramname">beta</td><td>The beta bias. </td></tr>
-    <tr><td class="paramname">dims</td><td>The dimensions of the input/output tensor (extended by 1s for data of rank lower than 4). </td></tr>
     <tr><td class="paramname">spatial</td><td>Whether the batch normalization should be performed in spatial or per-activation mode. </td></tr>
     <tr><td class="paramname">exp_avg_factor</td><td>The exponential average factor for the running mean and variance averages. </td></tr>
     <tr><td class="paramname">epsilon</td><td>A small constant for numerical stability. </td></tr>
@@ -618,8 +579,8 @@ template&lt;typename Scalar &gt; </div>
 
 </div>
 </div>
-<a id="acd5781e6e3acdcb1a6d888cddf616843"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#acd5781e6e3acdcb1a6d888cddf616843">&#9670;&nbsp;</a></span>conv2d_output_dims()</h2>
+<a id="ad09f433ff17128829cbb1614351ada1f"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad09f433ff17128829cbb1614351ada1f">&#9670;&nbsp;</a></span>conv2d_output_dims()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -630,10 +591,28 @@ template&lt;typename Scalar &gt; </div>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">Array4 <a class="el" href="classcattle_1_1internal_1_1_cu_d_n_n_handle.html">cattle::internal::CuDNNHandle</a>&lt; Scalar &gt;::conv2d_output_dims </td>
+          <td class="memname">void <a class="el" href="classcattle_1_1internal_1_1_cu_d_n_n_handle.html">cattle::internal::CuDNNHandle</a>&lt; Scalar &gt;::conv2d_output_dims </td>
           <td>(</td>
-          <td class="paramtype">const Array4 &amp;&#160;</td>
-          <td class="paramname"><em>input_dims</em>, </td>
+          <td class="paramtype">std::size_t&#160;</td>
+          <td class="paramname"><em>input_height</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">std::size_t&#160;</td>
+          <td class="paramname"><em>input_width</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">std::size_t&#160;</td>
+          <td class="paramname"><em>input_channels</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">cudnnTensorFormat_t&#160;</td>
+          <td class="paramname"><em>tensor_format</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -687,7 +666,25 @@ template&lt;typename Scalar &gt; </div>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">std::size_t&#160;</td>
-          <td class="paramname"><em>horizontal_dilation</em>&#160;</td>
+          <td class="paramname"><em>horizontal_dilation</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">std::size_t &amp;&#160;</td>
+          <td class="paramname"><em>output_height</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">std::size_t &amp;&#160;</td>
+          <td class="paramname"><em>output_width</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">std::size_t &amp;&#160;</td>
+          <td class="paramname"><em>output_channels</em>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -702,10 +699,13 @@ template&lt;typename Scalar &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p>Computes the dimensions of the output of the convolution. </p>
+<p>It computes the dimensions of the output tensor of the convolution. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">input_dims</td><td>The dimensions of the input tensor. </td></tr>
+    <tr><td class="paramname">input_height</td><td>The input height. </td></tr>
+    <tr><td class="paramname">input_width</td><td>The input width. </td></tr>
+    <tr><td class="paramname">input_channels</td><td>The number of input channels. </td></tr>
+    <tr><td class="paramname">tensor_format</td><td>The tensor format to use. </td></tr>
     <tr><td class="paramname">filters</td><td>The number of convolution filters. </td></tr>
     <tr><td class="paramname">receptor_height</td><td>The height of the receptor. </td></tr>
     <tr><td class="paramname">receptor_width</td><td>The width of the receptor. </td></tr>
@@ -715,15 +715,17 @@ template&lt;typename Scalar &gt; </div>
     <tr><td class="paramname">horizontal_stride</td><td>The horizontal stride of the convolution. </td></tr>
     <tr><td class="paramname">vertical_dilation</td><td>The vertical dilation to apply to the receptor. </td></tr>
     <tr><td class="paramname">horizontal_dilation</td><td>The horizontal dilation to apply to the receptor. </td></tr>
+    <tr><td class="paramname">output_height</td><td>The output height. </td></tr>
+    <tr><td class="paramname">output_width</td><td>The output width. </td></tr>
+    <tr><td class="paramname">output_channels</td><td>The number of output channels. </td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>The output dimensions. </dd></dl>
 
 </div>
 </div>
-<a id="a39f10a0e8df9b93dd041d23100d49c57"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a39f10a0e8df9b93dd041d23100d49c57">&#9670;&nbsp;</a></span>convolution2d_bwd()</h2>
+<a id="a79ac548344b6f983d444686a8d98b4e9"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a79ac548344b6f983d444686a8d98b4e9">&#9670;&nbsp;</a></span>convolution2d_bwd()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -736,50 +738,26 @@ template&lt;typename Scalar &gt; </div>
         <tr>
           <td class="memname">void <a class="el" href="classcattle_1_1internal_1_1_cu_d_n_n_handle.html">cattle::internal::CuDNNHandle</a>&lt; Scalar &gt;::convolution2d_bwd </td>
           <td>(</td>
-          <td class="paramtype">Scalar *&#160;</td>
+          <td class="paramtype">const <a class="el" href="classcattle_1_1internal_1_1_cu_d_n_n_tensor.html">CuDNNTensor</a>&lt; Scalar &gt; &amp;&#160;</td>
           <td class="paramname"><em>input</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">Scalar *&#160;</td>
+          <td class="paramtype">const <a class="el" href="classcattle_1_1internal_1_1_cu_d_n_n_tensor.html">CuDNNTensor</a>&lt; Scalar &gt; &amp;&#160;</td>
           <td class="paramname"><em>out_grad</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">Scalar *&#160;</td>
+          <td class="paramtype">const <a class="el" href="classcattle_1_1internal_1_1_cu_d_n_n_tensor.html">CuDNNTensor</a>&lt; Scalar, true &gt; &amp;&#160;</td>
           <td class="paramname"><em>filter</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">Scalar *&#160;</td>
+          <td class="paramtype">const <a class="el" href="classcattle_1_1internal_1_1_cu_d_n_n_tensor.html">CuDNNTensor</a>&lt; Scalar &gt; &amp;&#160;</td>
           <td class="paramname"><em>bias</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">const Array4 &amp;&#160;</td>
-          <td class="paramname"><em>input_dims</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">const Array4 &amp;&#160;</td>
-          <td class="paramname"><em>output_dims</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">std::size_t&#160;</td>
-          <td class="paramname"><em>receptor_height</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">std::size_t&#160;</td>
-          <td class="paramname"><em>receptor_width</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -820,19 +798,19 @@ template&lt;typename Scalar &gt; </div>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">Scalar *&#160;</td>
+          <td class="paramtype"><a class="el" href="classcattle_1_1internal_1_1_cu_d_n_n_tensor.html">CuDNNTensor</a>&lt; Scalar &gt; &amp;&#160;</td>
           <td class="paramname"><em>prev_out_grad</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">Scalar *&#160;</td>
+          <td class="paramtype"><a class="el" href="classcattle_1_1internal_1_1_cu_d_n_n_tensor.html">CuDNNTensor</a>&lt; Scalar, true &gt; &amp;&#160;</td>
           <td class="paramname"><em>filter_grad</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">Scalar *&#160;</td>
+          <td class="paramtype"><a class="el" href="classcattle_1_1internal_1_1_cu_d_n_n_tensor.html">CuDNNTensor</a>&lt; Scalar &gt; &amp;&#160;</td>
           <td class="paramname"><em>bias_grad</em>&#160;</td>
         </tr>
         <tr>
@@ -852,30 +830,26 @@ template&lt;typename Scalar &gt; </div>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">input</td><td>The input tensor. </td></tr>
-    <tr><td class="paramname">out_grad</td><td>The gradient of the output. </td></tr>
+    <tr><td class="paramname">out_grad</td><td>The gradient of the output tensor. </td></tr>
     <tr><td class="paramname">filter</td><td>The convolution filter. </td></tr>
-    <tr><td class="paramname">bias</td><td>The bias applied to the output of the convolution. </td></tr>
-    <tr><td class="paramname">input_dims</td><td>The dimensions of the input tensor. </td></tr>
-    <tr><td class="paramname">output_dims</td><td>The dimensions of the output tensor of the convolution. </td></tr>
-    <tr><td class="paramname">receptor_height</td><td>The height of the receptor. </td></tr>
-    <tr><td class="paramname">receptor_width</td><td>The width of the receptor. </td></tr>
+    <tr><td class="paramname">bias</td><td>The bias tensor applied to the output of the convolution. </td></tr>
     <tr><td class="paramname">vertical_padding</td><td>The padding to apply to both the top and the bottom of the input tensor along the height rank. </td></tr>
     <tr><td class="paramname">horizontal_padding</td><td>The padding to apply to both the top and the bottom of the input tensor along the width rank. </td></tr>
     <tr><td class="paramname">vertical_stride</td><td>The vertical stride of the convolution. </td></tr>
     <tr><td class="paramname">horizontal_stride</td><td>The horizontal stride of the convolution. </td></tr>
     <tr><td class="paramname">vertical_dilation</td><td>The vertical dilation to apply to the receptor. </td></tr>
     <tr><td class="paramname">horizontal_dilation</td><td>The horizontal dilation to apply to the receptor. </td></tr>
-    <tr><td class="paramname">prev_out_grad</td><td>The gradient of the previous layer's output. </td></tr>
+    <tr><td class="paramname">prev_out_grad</td><td>The gradient of the previous layer's output tensor. </td></tr>
     <tr><td class="paramname">filter_grad</td><td>The gradient of the convolution filter. </td></tr>
-    <tr><td class="paramname">bias_grad</td><td>The gradient of the bias. </td></tr>
+    <tr><td class="paramname">bias_grad</td><td>The gradient of the bias tensor. </td></tr>
   </table>
   </dd>
 </dl>
 
 </div>
 </div>
-<a id="a11d9ff0d2bf96e04b13e142fd57fb99e"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a11d9ff0d2bf96e04b13e142fd57fb99e">&#9670;&nbsp;</a></span>convolution2d_fwd()</h2>
+<a id="aa70ea0feb72e78b1d0f209692acf67bd"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa70ea0feb72e78b1d0f209692acf67bd">&#9670;&nbsp;</a></span>convolution2d_fwd()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -888,44 +862,20 @@ template&lt;typename Scalar &gt; </div>
         <tr>
           <td class="memname">void <a class="el" href="classcattle_1_1internal_1_1_cu_d_n_n_handle.html">cattle::internal::CuDNNHandle</a>&lt; Scalar &gt;::convolution2d_fwd </td>
           <td>(</td>
-          <td class="paramtype">Scalar *&#160;</td>
+          <td class="paramtype">const <a class="el" href="classcattle_1_1internal_1_1_cu_d_n_n_tensor.html">CuDNNTensor</a>&lt; Scalar &gt; &amp;&#160;</td>
           <td class="paramname"><em>input</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">Scalar *&#160;</td>
+          <td class="paramtype">const <a class="el" href="classcattle_1_1internal_1_1_cu_d_n_n_tensor.html">CuDNNTensor</a>&lt; Scalar, true &gt; &amp;&#160;</td>
           <td class="paramname"><em>filter</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">Scalar *&#160;</td>
+          <td class="paramtype">const <a class="el" href="classcattle_1_1internal_1_1_cu_d_n_n_tensor.html">CuDNNTensor</a>&lt; Scalar &gt; &amp;&#160;</td>
           <td class="paramname"><em>bias</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">const Array4 &amp;&#160;</td>
-          <td class="paramname"><em>input_dims</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">const Array4 &amp;&#160;</td>
-          <td class="paramname"><em>output_dims</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">std::size_t&#160;</td>
-          <td class="paramname"><em>receptor_height</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">std::size_t&#160;</td>
-          <td class="paramname"><em>receptor_width</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -966,7 +916,7 @@ template&lt;typename Scalar &gt; </div>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">Scalar *&#160;</td>
+          <td class="paramtype"><a class="el" href="classcattle_1_1internal_1_1_cu_d_n_n_tensor.html">CuDNNTensor</a>&lt; Scalar &gt; &amp;&#160;</td>
           <td class="paramname"><em>output</em>&#160;</td>
         </tr>
         <tr>
@@ -982,16 +932,12 @@ template&lt;typename Scalar &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p>Performs a GPU accelerated 2D convolution on a rank 4 tensor of [N,H,W,C] orientation. </p>
+<p>Performs a GPU accelerated 2D convolution on a rank 4 tensor. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">input</td><td>The input tensor. </td></tr>
     <tr><td class="paramname">filter</td><td>The convolution filter. </td></tr>
-    <tr><td class="paramname">bias</td><td>The bias to apply to the output of the convolution. </td></tr>
-    <tr><td class="paramname">input_dims</td><td>The dimensions of the input tensor. </td></tr>
-    <tr><td class="paramname">output_dims</td><td>The dimensions of the output tensor of the convolution. </td></tr>
-    <tr><td class="paramname">receptor_height</td><td>The height of the receptor. </td></tr>
-    <tr><td class="paramname">receptor_width</td><td>The width of the receptor. </td></tr>
+    <tr><td class="paramname">bias</td><td>The bias tensor to apply to the output of the convolution. </td></tr>
     <tr><td class="paramname">vertical_padding</td><td>The padding to apply to both the top and the bottom of the input tensor along the height rank. </td></tr>
     <tr><td class="paramname">horizontal_padding</td><td>The padding to apply to both the top and the bottom of the input tensor along the width rank. </td></tr>
     <tr><td class="paramname">vertical_stride</td><td>The vertical stride of the convolution. </td></tr>
@@ -1005,8 +951,8 @@ template&lt;typename Scalar &gt; </div>
 
 </div>
 </div>
-<a id="a6ea4fda313544c9078f44e06a2c94402"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a6ea4fda313544c9078f44e06a2c94402">&#9670;&nbsp;</a></span>dropout_bwd()</h2>
+<a id="ab7e31be3c57472af5e28b27f4a580d0a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab7e31be3c57472af5e28b27f4a580d0a">&#9670;&nbsp;</a></span>dropout_bwd()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -1019,20 +965,14 @@ template&lt;typename Scalar &gt; </div>
         <tr>
           <td class="memname">void <a class="el" href="classcattle_1_1internal_1_1_cu_d_n_n_handle.html">cattle::internal::CuDNNHandle</a>&lt; Scalar &gt;::dropout_bwd </td>
           <td>(</td>
-          <td class="paramtype">Scalar *&#160;</td>
+          <td class="paramtype">const <a class="el" href="classcattle_1_1internal_1_1_cu_d_n_n_tensor.html">CuDNNTensor</a>&lt; Scalar &gt; &amp;&#160;</td>
           <td class="paramname"><em>out_grad</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">std::vector&lt; Scalar &gt; &amp;&#160;</td>
+          <td class="paramtype">const <a class="el" href="classcattle_1_1internal_1_1_cu_d_n_n_tensor.html">CuDNNTensor</a>&lt; Scalar &gt; &amp;&#160;</td>
           <td class="paramname"><em>reserve</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">const Array4 &amp;&#160;</td>
-          <td class="paramname"><em>dims</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -1043,7 +983,7 @@ template&lt;typename Scalar &gt; </div>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">Scalar *&#160;</td>
+          <td class="paramtype"><a class="el" href="classcattle_1_1internal_1_1_cu_d_n_n_tensor.html">CuDNNTensor</a>&lt; Scalar &gt; &amp;&#160;</td>
           <td class="paramname"><em>prev_out_grad</em>&#160;</td>
         </tr>
         <tr>
@@ -1064,7 +1004,6 @@ template&lt;typename Scalar &gt; </div>
   <table class="params">
     <tr><td class="paramname">out_grad</td><td>The gradient of the output of the dropout function. </td></tr>
     <tr><td class="paramname">reserve</td><td>The reserve filled during the forward pass. </td></tr>
-    <tr><td class="paramname">dims</td><td>The dimensions of the input/output tensor (extended by 1s for data of rank lower than 4). </td></tr>
     <tr><td class="paramname">dropout</td><td>The average factor of elements set to 0 in the input tensor. </td></tr>
     <tr><td class="paramname">prev_out_grad</td><td>The gradient of the input of the dropout function. </td></tr>
   </table>
@@ -1073,8 +1012,8 @@ template&lt;typename Scalar &gt; </div>
 
 </div>
 </div>
-<a id="aa2f4fba55c7a5b17a66bd44912fe388a"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aa2f4fba55c7a5b17a66bd44912fe388a">&#9670;&nbsp;</a></span>dropout_fwd()</h2>
+<a id="a548f05edbf2a5cf86b7eccf29b2e9604"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a548f05edbf2a5cf86b7eccf29b2e9604">&#9670;&nbsp;</a></span>dropout_fwd()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -1087,14 +1026,8 @@ template&lt;typename Scalar &gt; </div>
         <tr>
           <td class="memname">void <a class="el" href="classcattle_1_1internal_1_1_cu_d_n_n_handle.html">cattle::internal::CuDNNHandle</a>&lt; Scalar &gt;::dropout_fwd </td>
           <td>(</td>
-          <td class="paramtype">Scalar *&#160;</td>
+          <td class="paramtype">const <a class="el" href="classcattle_1_1internal_1_1_cu_d_n_n_tensor.html">CuDNNTensor</a>&lt; Scalar &gt; &amp;&#160;</td>
           <td class="paramname"><em>input</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">const Array4 &amp;&#160;</td>
-          <td class="paramname"><em>dims</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -1105,14 +1038,14 @@ template&lt;typename Scalar &gt; </div>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">Scalar *&#160;</td>
-          <td class="paramname"><em>output</em>, </td>
+          <td class="paramtype"><a class="el" href="classcattle_1_1internal_1_1_cu_d_n_n_tensor.html">CuDNNTensor</a>&lt; Scalar &gt; &amp;&#160;</td>
+          <td class="paramname"><em>reserve</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">std::vector&lt; Scalar &gt; &amp;&#160;</td>
-          <td class="paramname"><em>reserve</em>&#160;</td>
+          <td class="paramtype"><a class="el" href="classcattle_1_1internal_1_1_cu_d_n_n_tensor.html">CuDNNTensor</a>&lt; Scalar &gt; &amp;&#160;</td>
+          <td class="paramname"><em>output</em>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -1130,19 +1063,18 @@ template&lt;typename Scalar &gt; </div>
 <p>It applies the dropout function to the input tensor. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">input</td><td>The input tensor </td></tr>
-    <tr><td class="paramname">dims</td><td>The dimensions of the input/output tensor (extended by 1s for data of rank lower than 4). </td></tr>
+    <tr><td class="paramname">input</td><td>The input tensor. </td></tr>
     <tr><td class="paramname">dropout</td><td>The average factor of elements to set to 0 in the input tensor. </td></tr>
-    <tr><td class="paramname">output</td><td>The output tensor. </td></tr>
     <tr><td class="paramname">reserve</td><td>The reserve used for backpropagation. </td></tr>
+    <tr><td class="paramname">output</td><td>The output tensor. </td></tr>
   </table>
   </dd>
 </dl>
 
 </div>
 </div>
-<a id="a66ff49f3b34f05a1043f22d5d0275575"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a66ff49f3b34f05a1043f22d5d0275575">&#9670;&nbsp;</a></span>get_instance()</h2>
+<a id="a7e55aa4c437ddcbe0fe32c81cf511555"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a7e55aa4c437ddcbe0fe32c81cf511555">&#9670;&nbsp;</a></span>dropout_reserve_size()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -1153,7 +1085,54 @@ template&lt;typename Scalar &gt; </div>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">static <a class="el" href="classcattle_1_1internal_1_1_cu_d_n_n_handle.html">CuDNNHandle</a>&amp; <a class="el" href="classcattle_1_1internal_1_1_cu_d_n_n_handle.html">cattle::internal::CuDNNHandle</a>&lt; Scalar &gt;::get_instance </td>
+          <td class="memname">void <a class="el" href="classcattle_1_1internal_1_1_cu_d_n_n_handle.html">cattle::internal::CuDNNHandle</a>&lt; Scalar &gt;::dropout_reserve_size </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="classcattle_1_1internal_1_1_cu_d_n_n_tensor.html">CuDNNTensor</a>&lt; Scalar &gt; &amp;&#160;</td>
+          <td class="paramname"><em>input</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">std::size_t &amp;&#160;</td>
+          <td class="paramname"><em>reserve_size</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>It computes the necessary reserve size for the dropout. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">input</td><td>The input tensor. </td></tr>
+    <tr><td class="paramname">reserve_size</td><td>The reserve size. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="a9b27fe08963ff261ffb0e1b3ba288b40"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a9b27fe08963ff261ffb0e1b3ba288b40">&#9670;&nbsp;</a></span>get_instance()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename Scalar &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static const <a class="el" href="classcattle_1_1internal_1_1_cu_d_n_n_handle.html">Self</a>&amp; <a class="el" href="classcattle_1_1internal_1_1_cu_d_n_n_handle.html">cattle::internal::CuDNNHandle</a>&lt; Scalar &gt;::get_instance </td>
           <td>(</td>
           <td class="paramname"></td><td>)</td>
           <td></td>
@@ -1169,8 +1148,8 @@ template&lt;typename Scalar &gt; </div>
 
 </div>
 </div>
-<a id="aa9f83600e06cd769e65776e38e025656"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aa9f83600e06cd769e65776e38e025656">&#9670;&nbsp;</a></span>pooling2d_bwd()</h2>
+<a id="ae950696a0abb68c382586d99ffc99711"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae950696a0abb68c382586d99ffc99711">&#9670;&nbsp;</a></span>pool2d_bwd()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -1181,34 +1160,22 @@ template&lt;typename Scalar &gt; </div>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">void <a class="el" href="classcattle_1_1internal_1_1_cu_d_n_n_handle.html">cattle::internal::CuDNNHandle</a>&lt; Scalar &gt;::pooling2d_bwd </td>
+          <td class="memname">void <a class="el" href="classcattle_1_1internal_1_1_cu_d_n_n_handle.html">cattle::internal::CuDNNHandle</a>&lt; Scalar &gt;::pool2d_bwd </td>
           <td>(</td>
-          <td class="paramtype">Scalar *&#160;</td>
+          <td class="paramtype">const <a class="el" href="classcattle_1_1internal_1_1_cu_d_n_n_tensor.html">CuDNNTensor</a>&lt; Scalar &gt; &amp;&#160;</td>
           <td class="paramname"><em>input</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">Scalar *&#160;</td>
+          <td class="paramtype">const <a class="el" href="classcattle_1_1internal_1_1_cu_d_n_n_tensor.html">CuDNNTensor</a>&lt; Scalar &gt; &amp;&#160;</td>
           <td class="paramname"><em>output</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">Scalar *&#160;</td>
+          <td class="paramtype">const <a class="el" href="classcattle_1_1internal_1_1_cu_d_n_n_tensor.html">CuDNNTensor</a>&lt; Scalar &gt; &amp;&#160;</td>
           <td class="paramname"><em>out_grad</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">const Array4 &amp;&#160;</td>
-          <td class="paramname"><em>input_dims</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">const Array4 &amp;&#160;</td>
-          <td class="paramname"><em>output_dims</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -1255,7 +1222,7 @@ template&lt;typename Scalar &gt; </div>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">Scalar *&#160;</td>
+          <td class="paramtype"><a class="el" href="classcattle_1_1internal_1_1_cu_d_n_n_tensor.html">CuDNNTensor</a>&lt; Scalar &gt; &amp;&#160;</td>
           <td class="paramname"><em>prev_out_grad</em>&#160;</td>
         </tr>
         <tr>
@@ -1277,8 +1244,6 @@ template&lt;typename Scalar &gt; </div>
     <tr><td class="paramname">input</td><td>The input tensor. </td></tr>
     <tr><td class="paramname">output</td><td>The output tensor. </td></tr>
     <tr><td class="paramname">out_grad</td><td>The gradient of the output. </td></tr>
-    <tr><td class="paramname">input_dims</td><td>The input dimensions. </td></tr>
-    <tr><td class="paramname">output_dims</td><td>The output dimensions. </td></tr>
     <tr><td class="paramname">pool_mode</td><td>The pooling mode. </td></tr>
     <tr><td class="paramname">window_height</td><td>The height of the pooling window. </td></tr>
     <tr><td class="paramname">window_width</td><td>The width of the pooling window. </td></tr>
@@ -1293,8 +1258,8 @@ template&lt;typename Scalar &gt; </div>
 
 </div>
 </div>
-<a id="a82c4dac7a96422dd4372e3f6e936d40e"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a82c4dac7a96422dd4372e3f6e936d40e">&#9670;&nbsp;</a></span>pooling2d_fwd()</h2>
+<a id="a9dc3603f13b1f318e228691c32bafe13"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a9dc3603f13b1f318e228691c32bafe13">&#9670;&nbsp;</a></span>pool2d_fwd()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -1305,22 +1270,10 @@ template&lt;typename Scalar &gt; </div>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">void <a class="el" href="classcattle_1_1internal_1_1_cu_d_n_n_handle.html">cattle::internal::CuDNNHandle</a>&lt; Scalar &gt;::pooling2d_fwd </td>
+          <td class="memname">void <a class="el" href="classcattle_1_1internal_1_1_cu_d_n_n_handle.html">cattle::internal::CuDNNHandle</a>&lt; Scalar &gt;::pool2d_fwd </td>
           <td>(</td>
-          <td class="paramtype">Scalar *&#160;</td>
+          <td class="paramtype">const <a class="el" href="classcattle_1_1internal_1_1_cu_d_n_n_tensor.html">CuDNNTensor</a>&lt; Scalar &gt; &amp;&#160;</td>
           <td class="paramname"><em>input</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">const Array4 &amp;&#160;</td>
-          <td class="paramname"><em>input_dims</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">const Array4 &amp;&#160;</td>
-          <td class="paramname"><em>output_dims</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -1367,7 +1320,7 @@ template&lt;typename Scalar &gt; </div>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">Scalar *&#160;</td>
+          <td class="paramtype"><a class="el" href="classcattle_1_1internal_1_1_cu_d_n_n_tensor.html">CuDNNTensor</a>&lt; Scalar &gt; &amp;&#160;</td>
           <td class="paramname"><em>output</em>&#160;</td>
         </tr>
         <tr>
@@ -1387,8 +1340,6 @@ template&lt;typename Scalar &gt; </div>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">input</td><td>The input tensor. </td></tr>
-    <tr><td class="paramname">input_dims</td><td>The input dimensions. </td></tr>
-    <tr><td class="paramname">output_dims</td><td>The output dimensions. </td></tr>
     <tr><td class="paramname">pool_mode</td><td>The pooling mode. </td></tr>
     <tr><td class="paramname">window_height</td><td>The height of the pooling window. </td></tr>
     <tr><td class="paramname">window_width</td><td>The width of the pooling window. </td></tr>
@@ -1396,15 +1347,15 @@ template&lt;typename Scalar &gt; </div>
     <tr><td class="paramname">horizontal_padding</td><td>The padding to apply to both the top and the bottom of the input tensor along the width rank. </td></tr>
     <tr><td class="paramname">vertical_stride</td><td>The vertical stride of the pooling. </td></tr>
     <tr><td class="paramname">horizontal_stride</td><td>The horizontal stride of the pooling. </td></tr>
-    <tr><td class="paramname">output</td><td>The output of the pooling operation. </td></tr>
+    <tr><td class="paramname">output</td><td>The output tensor of the pooling operation. </td></tr>
   </table>
   </dd>
 </dl>
 
 </div>
 </div>
-<a id="a96fab0b5d093978af1813c12f597192f"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a96fab0b5d093978af1813c12f597192f">&#9670;&nbsp;</a></span>pooling2d_output_dims()</h2>
+<a id="aefb1530f6eb2613450b699818487fe5d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aefb1530f6eb2613450b699818487fe5d">&#9670;&nbsp;</a></span>pool2d_output_dims()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -1415,10 +1366,28 @@ template&lt;typename Scalar &gt; </div>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">Array4 <a class="el" href="classcattle_1_1internal_1_1_cu_d_n_n_handle.html">cattle::internal::CuDNNHandle</a>&lt; Scalar &gt;::pooling2d_output_dims </td>
+          <td class="memname">void <a class="el" href="classcattle_1_1internal_1_1_cu_d_n_n_handle.html">cattle::internal::CuDNNHandle</a>&lt; Scalar &gt;::pool2d_output_dims </td>
           <td>(</td>
-          <td class="paramtype">const Array4 &amp;&#160;</td>
-          <td class="paramname"><em>input_dims</em>, </td>
+          <td class="paramtype">std::size_t&#160;</td>
+          <td class="paramname"><em>input_height</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">std::size_t&#160;</td>
+          <td class="paramname"><em>input_width</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">std::size_t&#160;</td>
+          <td class="paramname"><em>input_channels</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">cudnnTensorFormat_t&#160;</td>
+          <td class="paramname"><em>tensor_format</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -1460,7 +1429,25 @@ template&lt;typename Scalar &gt; </div>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">std::size_t&#160;</td>
-          <td class="paramname"><em>horizontal_stride</em>&#160;</td>
+          <td class="paramname"><em>horizontal_stride</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">std::size_t &amp;&#160;</td>
+          <td class="paramname"><em>output_height</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">std::size_t &amp;&#160;</td>
+          <td class="paramname"><em>output_width</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">std::size_t &amp;&#160;</td>
+          <td class="paramname"><em>output_channels</em>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -1478,7 +1465,10 @@ template&lt;typename Scalar &gt; </div>
 <p>Computes the dimensions of the output of the 2D pooling operation. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">input_dims</td><td>The input dimensions. </td></tr>
+    <tr><td class="paramname">input_height</td><td>The input height. </td></tr>
+    <tr><td class="paramname">input_width</td><td>The input width. </td></tr>
+    <tr><td class="paramname">input_channels</td><td>The number of input channels. </td></tr>
+    <tr><td class="paramname">tensor_format</td><td>The tensor format to use. </td></tr>
     <tr><td class="paramname">pool_mode</td><td>The pooling mode. </td></tr>
     <tr><td class="paramname">window_height</td><td>The height of the pooling window. </td></tr>
     <tr><td class="paramname">window_width</td><td>The width of the pooling window. </td></tr>
@@ -1486,15 +1476,17 @@ template&lt;typename Scalar &gt; </div>
     <tr><td class="paramname">horizontal_padding</td><td>The padding to apply to both the top and the bottom of the input tensor along the width rank. </td></tr>
     <tr><td class="paramname">vertical_stride</td><td>The vertical stride of the pooling. </td></tr>
     <tr><td class="paramname">horizontal_stride</td><td>The horizontal stride of the pooling. </td></tr>
+    <tr><td class="paramname">output_height</td><td>The output height. </td></tr>
+    <tr><td class="paramname">output_width</td><td>The output width. </td></tr>
+    <tr><td class="paramname">output_channels</td><td>The number of output channels. </td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>The output dimensions. </dd></dl>
 
 </div>
 </div>
-<a id="a2da9235cdf411aa8c37c6a5554bc415d"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a2da9235cdf411aa8c37c6a5554bc415d">&#9670;&nbsp;</a></span>softmax_bwd()</h2>
+<a id="aa593cec63c9a1f53fa222a667462fe8c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa593cec63c9a1f53fa222a667462fe8c">&#9670;&nbsp;</a></span>softmax_bwd()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -1507,26 +1499,14 @@ template&lt;typename Scalar &gt; </div>
         <tr>
           <td class="memname">void <a class="el" href="classcattle_1_1internal_1_1_cu_d_n_n_handle.html">cattle::internal::CuDNNHandle</a>&lt; Scalar &gt;::softmax_bwd </td>
           <td>(</td>
-          <td class="paramtype">Scalar *&#160;</td>
+          <td class="paramtype">const <a class="el" href="classcattle_1_1internal_1_1_cu_d_n_n_tensor.html">CuDNNTensor</a>&lt; Scalar &gt; &amp;&#160;</td>
           <td class="paramname"><em>output</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">Scalar *&#160;</td>
-          <td class="paramname"><em>out_grad</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">const Array4 &amp;&#160;</td>
-          <td class="paramname"><em>dims</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">Scalar *&#160;</td>
-          <td class="paramname"><em>prev_out_grad</em>&#160;</td>
+          <td class="paramtype"><a class="el" href="classcattle_1_1internal_1_1_cu_d_n_n_tensor.html">CuDNNTensor</a>&lt; Scalar &gt; &amp;&#160;</td>
+          <td class="paramname"><em>in_out_grad</em>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -1545,17 +1525,15 @@ template&lt;typename Scalar &gt; </div>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">output</td><td>The output tensor. </td></tr>
-    <tr><td class="paramname">out_grad</td><td>The gradient of the output of the activation function. </td></tr>
-    <tr><td class="paramname">dims</td><td>The dimensions of the input/output tensor (extended by 1s for data of rank lower than 4). </td></tr>
-    <tr><td class="paramname">prev_out_grad</td><td>The gradient of the softmax activation function's input. </td></tr>
+    <tr><td class="paramname">in_out_grad</td><td>The gradient of the output of the activation function and after the method finishes execution, the gradient of the softmax activation function's input. </td></tr>
   </table>
   </dd>
 </dl>
 
 </div>
 </div>
-<a id="ae6ca224fc2b1b651fa8076e95b477cad"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ae6ca224fc2b1b651fa8076e95b477cad">&#9670;&nbsp;</a></span>softmax_fwd()</h2>
+<a id="a992cae7a1c58ef7bb4e8460072632530"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a992cae7a1c58ef7bb4e8460072632530">&#9670;&nbsp;</a></span>softmax_fwd()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -1568,19 +1546,13 @@ template&lt;typename Scalar &gt; </div>
         <tr>
           <td class="memname">void <a class="el" href="classcattle_1_1internal_1_1_cu_d_n_n_handle.html">cattle::internal::CuDNNHandle</a>&lt; Scalar &gt;::softmax_fwd </td>
           <td>(</td>
-          <td class="paramtype">Scalar *&#160;</td>
+          <td class="paramtype">const <a class="el" href="classcattle_1_1internal_1_1_cu_d_n_n_tensor.html">CuDNNTensor</a>&lt; Scalar &gt; &amp;&#160;</td>
           <td class="paramname"><em>input</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const Array4 &amp;&#160;</td>
-          <td class="paramname"><em>dims</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">Scalar *&#160;</td>
+          <td class="paramtype"><a class="el" href="classcattle_1_1internal_1_1_cu_d_n_n_tensor.html">CuDNNTensor</a>&lt; Scalar &gt; &amp;&#160;</td>
           <td class="paramname"><em>output</em>&#160;</td>
         </tr>
         <tr>
@@ -1600,7 +1572,6 @@ template&lt;typename Scalar &gt; </div>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">input</td><td>The input tensor. </td></tr>
-    <tr><td class="paramname">dims</td><td>The dimensions of the input/output tensor (extended by 1s for data of rank lower than 4). </td></tr>
     <tr><td class="paramname">output</td><td>The softmax activated output tensor. </td></tr>
   </table>
   </dd>
@@ -1609,7 +1580,7 @@ template&lt;typename Scalar &gt; </div>
 </div>
 </div>
 <hr/>The documentation for this class was generated from the following file:<ul>
-<li>C:/Users/A6714/git/C-ATTL3/C-ATTL3/gpu/<a class="el" href="_cu_d_n_n_handle_8hpp_source.html">CuDNNHandle.hpp</a></li>
+<li>C:/Users/Viktor/git/C-ATTL3/C-ATTL3/gpu/<a class="el" href="_cu_d_n_n_handle_8hpp_source.html">CuDNNHandle.hpp</a></li>
 </ul>
 </div><!-- contents -->
 <!-- start footer part -->

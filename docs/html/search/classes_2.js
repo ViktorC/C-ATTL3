@@ -19,5 +19,6 @@ var searchData=
   ['cublashandle',['CuBLASHandle',['../classcattle_1_1internal_1_1_cu_b_l_a_s_handle.html',1,'cattle::internal']]],
   ['cudaerror',['CUDAError',['../classcattle_1_1internal_1_1_c_u_d_a_error.html',1,'cattle::internal']]],
   ['cudnnerror',['CuDNNError',['../classcattle_1_1internal_1_1_cu_d_n_n_error.html',1,'cattle::internal']]],
-  ['cudnnhandle',['CuDNNHandle',['../classcattle_1_1internal_1_1_cu_d_n_n_handle.html',1,'cattle::internal']]]
+  ['cudnnhandle',['CuDNNHandle',['../classcattle_1_1internal_1_1_cu_d_n_n_handle.html',1,'cattle::internal']]],
+  ['cudnntensor',['CuDNNTensor',['../classcattle_1_1internal_1_1_cu_d_n_n_tensor.html',1,'cattle::internal']]]
 ];

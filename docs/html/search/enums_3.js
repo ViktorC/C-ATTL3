@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['ppmformattype',['PPMFormatType',['../namespacecattle.html#a8ac8a938d166ae3b376b47b6020922ab',1,'cattle']]]
+  ['outputmergetype',['OutputMergeType',['../namespacecattle.html#adf6ad5e38e7c96e1d70ac1f180c71c42',1,'cattle']]]
 ];

@@ -408,7 +408,7 @@ protected:
 	 * It sets the positions of the file streams to the beginning of the observation data set and
 	 * the objective data set respectively.
 	 *
-	 * @param obj_file_stream A reference to the file stream to a file containing observations.
+	 * @param obs_file_stream A reference to the file stream to a file containing observations.
 	 * @param obj_file_stream A reference to the file stream to a file containing objectives.
 	 */
 	virtual inline void _set_to_beg(std::ifstream& obs_file_stream, std::ifstream& obj_file_stream) {
@@ -421,9 +421,9 @@ protected:
 	 * be expected not to have any of their fail flags set initially and to have at least 1
 	 * more character left to read in each.
 	 *
-	 * @param obs_file_name The name of the observation source file.
+	 * @param obs_file The name of the observation source file.
 	 * @param obs_file_stream The input stream of the observation file.
-	 * @param obj_file_name The name of the objective source file.
+	 * @param obj_file The name of the objective source file.
 	 * @param obj_file_stream The input stream of the objective file.
 	 * @param batch_size The number of data points to read.
 	 * @return The paired observations and objectives.

@@ -241,7 +241,7 @@ public:
 	 * @param output The output tensor.
 	 * @param act_mode The type of activation function used.
 	 * @param coeff The activation function coefficient used by certain activation functions (e.g. ELU).
-	 * @param out_grad The gradient of the output of the activation function and after the method
+	 * @param in_out_grad The gradient of the output of the activation function and after the method
 	 * finishes execution, the gradient of the input of the activation function.
 	 */
 	inline void activation_bwd(const CuDNNTensor<Scalar>& input, const CuDNNTensor<Scalar>& output,

@@ -9,7 +9,8 @@ var searchData=
   ['densekernellayer',['DenseKernelLayer',['../classcattle_1_1_dense_kernel_layer.html#a131a2e0c7b6ae0faf070555bda0d39a6',1,'cattle::DenseKernelLayer']]],
   ['denseneuralnetwork',['DenseNeuralNetwork',['../classcattle_1_1_dense_neural_network.html#ae1f29fc3b643d61d125fc082eed9ec89',1,'cattle::DenseNeuralNetwork::DenseNeuralNetwork(std::vector&lt; Module &gt; &amp;&amp;modules, bool foremost=true)'],['../classcattle_1_1_dense_neural_network.html#a714633b6ad63253ca1baf7d1716d414a',1,'cattle::DenseNeuralNetwork::DenseNeuralNetwork(Module &amp;&amp;module, bool foremost=true)']]],
   ['divide_5falong_5frank',['divide_along_rank',['../classcattle_1_1_dim_expression.html#aa4651f18fd078bc3a0b60999c463261a',1,'cattle::DimExpression']]],
-  ['dropout_5fbwd',['dropout_bwd',['../classcattle_1_1internal_1_1_cu_d_n_n_handle.html#a6ea4fda313544c9078f44e06a2c94402',1,'cattle::internal::CuDNNHandle']]],
-  ['dropout_5ffwd',['dropout_fwd',['../classcattle_1_1internal_1_1_cu_d_n_n_handle.html#aa2f4fba55c7a5b17a66bd44912fe388a',1,'cattle::internal::CuDNNHandle']]],
+  ['dropout_5fbwd',['dropout_bwd',['../classcattle_1_1internal_1_1_cu_d_n_n_handle.html#ab7e31be3c57472af5e28b27f4a580d0a',1,'cattle::internal::CuDNNHandle']]],
+  ['dropout_5ffwd',['dropout_fwd',['../classcattle_1_1internal_1_1_cu_d_n_n_handle.html#a548f05edbf2a5cf86b7eccf29b2e9604',1,'cattle::internal::CuDNNHandle']]],
+  ['dropout_5freserve_5fsize',['dropout_reserve_size',['../classcattle_1_1internal_1_1_cu_d_n_n_handle.html#a7e55aa4c437ddcbe0fe32c81cf511555',1,'cattle::internal::CuDNNHandle']]],
   ['dropoutlayer',['DropoutLayer',['../classcattle_1_1_dropout_layer.html#aaa346c955d02369927de664087a32999',1,'cattle::DropoutLayer']]]
 ];

@@ -117,15 +117,15 @@ void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="clas
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pro-methods"></a>
 Protected Member Functions</h2></td></tr>
-<tr class="memitem:a1a52a24f7f4fd4dcb9dbcb2965d7b748"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_joint_file_data_provider.html#a1a52a24f7f4fd4dcb9dbcb2965d7b748">_set_to_beg</a> (std::ifstream &amp;data_stream)</td></tr>
-<tr class="memdesc:a1a52a24f7f4fd4dcb9dbcb2965d7b748"><td class="mdescLeft">&#160;</td><td class="mdescRight">It sets the position of the file stream to the beginning of the data set.  <a href="#a1a52a24f7f4fd4dcb9dbcb2965d7b748">More...</a><br /></td></tr>
-<tr class="separator:a1a52a24f7f4fd4dcb9dbcb2965d7b748"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ae0d3b0e021b5aaea695f618ea16340c7"><td class="memItemLeft" align="right" valign="top">virtual <a class="el" href="namespacecattle.html#aaf234deaf1504300126fed57912a132e">DataPair</a>&lt; Scalar, Rank, Sequential &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_joint_file_data_provider.html#ae0d3b0e021b5aaea695f618ea16340c7">_get_data</a> (std::ifstream &amp;data_stream, std::size_t batch_size)=0</td></tr>
-<tr class="memdesc:ae0d3b0e021b5aaea695f618ea16340c7"><td class="mdescLeft">&#160;</td><td class="mdescRight">It reads at most the specified number of observation-objective pairs from the provided file stream.  <a href="#ae0d3b0e021b5aaea695f618ea16340c7">More...</a><br /></td></tr>
-<tr class="separator:ae0d3b0e021b5aaea695f618ea16340c7"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a7ce2d5bb46a3daf620de9a39bd146b4f"><td class="memItemLeft" align="right" valign="top">virtual std::size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_joint_file_data_provider.html#a7ce2d5bb46a3daf620de9a39bd146b4f">_skip</a> (std::ifstream &amp;data_stream, std::size_t instances)=0</td></tr>
-<tr class="memdesc:a7ce2d5bb46a3daf620de9a39bd146b4f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Skips at most the specified number of instances in the data stream.  <a href="#a7ce2d5bb46a3daf620de9a39bd146b4f">More...</a><br /></td></tr>
-<tr class="separator:a7ce2d5bb46a3daf620de9a39bd146b4f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab7f245fc6c0596e3751c26a5448f4175"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_joint_file_data_provider.html#ab7f245fc6c0596e3751c26a5448f4175">_set_to_beg</a> (std::ifstream &amp;file_stream)</td></tr>
+<tr class="memdesc:ab7f245fc6c0596e3751c26a5448f4175"><td class="mdescLeft">&#160;</td><td class="mdescRight">It sets the position of the file stream to the beginning of the data set.  <a href="#ab7f245fc6c0596e3751c26a5448f4175">More...</a><br /></td></tr>
+<tr class="separator:ab7f245fc6c0596e3751c26a5448f4175"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae8c93dbc7bc21806d0fb973ff637415a"><td class="memItemLeft" align="right" valign="top">virtual <a class="el" href="namespacecattle.html#aaf234deaf1504300126fed57912a132e">DataPair</a>&lt; Scalar, Rank, Sequential &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_joint_file_data_provider.html#ae8c93dbc7bc21806d0fb973ff637415a">_get_data</a> (const std::string &amp;file_name, std::ifstream &amp;file_stream, std::size_t batch_size)=0</td></tr>
+<tr class="memdesc:ae8c93dbc7bc21806d0fb973ff637415a"><td class="mdescLeft">&#160;</td><td class="mdescRight">It reads at most the specified number of observation-objective pairs from the provided file stream.  <a href="#ae8c93dbc7bc21806d0fb973ff637415a">More...</a><br /></td></tr>
+<tr class="separator:ae8c93dbc7bc21806d0fb973ff637415a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a143ad64c8685cf2ce458272d015edabf"><td class="memItemLeft" align="right" valign="top">virtual std::size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_joint_file_data_provider.html#a143ad64c8685cf2ce458272d015edabf">_skip</a> (std::ifstream &amp;file_stream, std::size_t instances)=0</td></tr>
+<tr class="memdesc:a143ad64c8685cf2ce458272d015edabf"><td class="mdescLeft">&#160;</td><td class="mdescRight">Skips at most the specified number of instances in the data stream.  <a href="#a143ad64c8685cf2ce458272d015edabf">More...</a><br /></td></tr>
+<tr class="separator:a143ad64c8685cf2ce458272d015edabf"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ad359e74f03d5fdef0aa624f1d026f7e6"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_joint_file_data_provider.html#ad359e74f03d5fdef0aa624f1d026f7e6">skip</a> (std::size_t instances)</td></tr>
 <tr class="memdesc:ad359e74f03d5fdef0aa624f1d026f7e6"><td class="mdescLeft">&#160;</td><td class="mdescRight">It skips the specified number of data points.  <a href="#ad359e74f03d5fdef0aa624f1d026f7e6">More...</a><br /></td></tr>
 <tr class="separator:ad359e74f03d5fdef0aa624f1d026f7e6"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -137,8 +137,8 @@ class cattle::JointFileDataProvider&lt; Scalar, Rank, Sequential, Binary &gt;</h
 <p>An abstract class template for a data provider backed by data on disk in the form of an arbitrary number of files containing both the observations and the objectives. </p>
 <p>Implementations are responsible for specifying the dimensions of both the observations and the objectives, for reading batches of observation-objective pairs from the file, and for skipping arbitrary number of data instances. </p>
 </div><h2 class="groupheader">Member Function Documentation</h2>
-<a id="ae0d3b0e021b5aaea695f618ea16340c7"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ae0d3b0e021b5aaea695f618ea16340c7">&#9670;&nbsp;</a></span>_get_data()</h2>
+<a id="ae8c93dbc7bc21806d0fb973ff637415a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae8c93dbc7bc21806d0fb973ff637415a">&#9670;&nbsp;</a></span>_get_data()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -151,8 +151,14 @@ template&lt;typename Scalar, std::size_t Rank, bool Sequential, bool Binary = fa
         <tr>
           <td class="memname">virtual <a class="el" href="namespacecattle.html#aaf234deaf1504300126fed57912a132e">DataPair</a>&lt;Scalar,Rank,Sequential&gt; <a class="el" href="classcattle_1_1_joint_file_data_provider.html">cattle::JointFileDataProvider</a>&lt; Scalar, Rank, Sequential, Binary &gt;::_get_data </td>
           <td>(</td>
+          <td class="paramtype">const std::string &amp;&#160;</td>
+          <td class="paramname"><em>file_name</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
           <td class="paramtype">std::ifstream &amp;&#160;</td>
-          <td class="paramname"><em>data_stream</em>, </td>
+          <td class="paramname"><em>file_stream</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -177,19 +183,20 @@ template&lt;typename Scalar, std::size_t Rank, bool Sequential, bool Binary = fa
 <p>The file stream can be expected not to have any of its fail flags set initially and to have at least 1 more character left to read.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">data_stream</td><td>A reference to the file stream of the data set. </td></tr>
+    <tr><td class="paramname">file_name</td><td>The name of the data source file. </td></tr>
+    <tr><td class="paramname">file_stream</td><td>The input stream of the file. </td></tr>
     <tr><td class="paramname">batch_size</td><td>The number of data points to return. </td></tr>
   </table>
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>A pair of tensors containing the data batch. </dd></dl>
 
-<p>Implemented in <a class="el" href="classcattle_1_1_c_i_f_a_r_data_provider.html#a8c5b73c553f06a7dbfeff57d87e9d5d9">cattle::CIFARDataProvider&lt; Scalar, CIFARType &gt;</a>.</p>
+<p>Implemented in <a class="el" href="classcattle_1_1_i_m_d_b_data_provider.html#a53ee3c702496b86de955bf21de1e73d5">cattle::IMDBDataProvider&lt; Scalar, ObjType &gt;</a>, and <a class="el" href="classcattle_1_1_c_i_f_a_r_data_provider.html#a6201aecb60881d576267902057f3868f">cattle::CIFARDataProvider&lt; Scalar, CIFARType &gt;</a>.</p>
 
 </div>
 </div>
-<a id="a1a52a24f7f4fd4dcb9dbcb2965d7b748"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a1a52a24f7f4fd4dcb9dbcb2965d7b748">&#9670;&nbsp;</a></span>_set_to_beg()</h2>
+<a id="ab7f245fc6c0596e3751c26a5448f4175"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab7f245fc6c0596e3751c26a5448f4175">&#9670;&nbsp;</a></span>_set_to_beg()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -203,7 +210,7 @@ template&lt;typename Scalar, std::size_t Rank, bool Sequential, bool Binary = fa
           <td class="memname">virtual void <a class="el" href="classcattle_1_1_joint_file_data_provider.html">cattle::JointFileDataProvider</a>&lt; Scalar, Rank, Sequential, Binary &gt;::_set_to_beg </td>
           <td>(</td>
           <td class="paramtype">std::ifstream &amp;&#160;</td>
-          <td class="paramname"><em>data_stream</em></td><td>)</td>
+          <td class="paramname"><em>file_stream</em></td><td>)</td>
           <td></td>
         </tr>
       </table>
@@ -217,15 +224,15 @@ template&lt;typename Scalar, std::size_t Rank, bool Sequential, bool Binary = fa
 <p>It sets the position of the file stream to the beginning of the data set. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">data_stream</td><td>A reference to the file stream of the data set. </td></tr>
+    <tr><td class="paramname">file_stream</td><td>A reference to the file stream of the data set. </td></tr>
   </table>
   </dd>
 </dl>
 
 </div>
 </div>
-<a id="a7ce2d5bb46a3daf620de9a39bd146b4f"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a7ce2d5bb46a3daf620de9a39bd146b4f">&#9670;&nbsp;</a></span>_skip()</h2>
+<a id="a143ad64c8685cf2ce458272d015edabf"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a143ad64c8685cf2ce458272d015edabf">&#9670;&nbsp;</a></span>_skip()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -239,7 +246,7 @@ template&lt;typename Scalar, std::size_t Rank, bool Sequential, bool Binary = fa
           <td class="memname">virtual std::size_t <a class="el" href="classcattle_1_1_joint_file_data_provider.html">cattle::JointFileDataProvider</a>&lt; Scalar, Rank, Sequential, Binary &gt;::_skip </td>
           <td>(</td>
           <td class="paramtype">std::ifstream &amp;&#160;</td>
-          <td class="paramname"><em>data_stream</em>, </td>
+          <td class="paramname"><em>file_stream</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -264,14 +271,14 @@ template&lt;typename Scalar, std::size_t Rank, bool Sequential, bool Binary = fa
 <p>The file stream can be expected not to have any of its fail flags set initially.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">data_stream</td><td>A reference to the file stream of the data set. </td></tr>
+    <tr><td class="paramname">file_stream</td><td>A reference to the file stream of the data set. </td></tr>
     <tr><td class="paramname">instances</td><td>The number of instances to skip. </td></tr>
   </table>
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>The number of instances actually skipped. It may be less than the specified amount if there are fewer remaining instances in the data stream. </dd></dl>
 
-<p>Implemented in <a class="el" href="classcattle_1_1_c_i_f_a_r_data_provider.html#a739f67300be83feea721a755d8d6e091">cattle::CIFARDataProvider&lt; Scalar, CIFARType &gt;</a>.</p>
+<p>Implemented in <a class="el" href="classcattle_1_1_i_m_d_b_data_provider.html#a319d9cbef19ea7067dc139b61b0525be">cattle::IMDBDataProvider&lt; Scalar, ObjType &gt;</a>, and <a class="el" href="classcattle_1_1_c_i_f_a_r_data_provider.html#a418d1105df5bc49eaa26cfba86e13252">cattle::CIFARDataProvider&lt; Scalar, CIFARType &gt;</a>.</p>
 
 </div>
 </div>
@@ -388,7 +395,7 @@ template&lt;typename Scalar, std::size_t Rank, bool Sequential, bool Binary = fa
 </div>
 </div>
 <hr/>The documentation for this class was generated from the following file:<ul>
-<li>C:/Users/A6714/git/C-ATTL3/C-ATTL3/<a class="el" href="_data_provider_8hpp_source.html">DataProvider.hpp</a></li>
+<li>C:/Users/Viktor/git/C-ATTL3/C-ATTL3/<a class="el" href="_data_provider_8hpp_source.html">DataProvider.hpp</a></li>
 </ul>
 </div><!-- contents -->
 <!-- start footer part -->

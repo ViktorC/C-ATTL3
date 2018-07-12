@@ -71,12 +71,25 @@ $(function() {
 &#160;
 
 <h3><a id="index_g"></a>- g -</h3><ul>
+<li>get_c()
+: <a class="el" href="classcattle_1_1internal_1_1_cu_d_n_n_tensor.html#aee2a365a86be0a12ef5b0e3f6cefbb7d">cattle::internal::CuDNNTensor&lt; Scalar, Filter &gt;</a>
+</li>
 <li>get_data()
 : <a class="el" href="classcattle_1_1_data_provider.html#a2545442faef51fda5466054df0ae929a">cattle::DataProvider&lt; Scalar, Rank, Sequential &gt;</a>
+, <a class="el" href="classcattle_1_1internal_1_1_cu_d_n_n_tensor.html#abdef929e62ee7408f1b582a6008bdec4">cattle::internal::CuDNNTensor&lt; Scalar, Filter &gt;</a>
 , <a class="el" href="classcattle_1_1_joint_file_data_provider.html#a170363709c78616ccb5844524fe98c03">cattle::JointFileDataProvider&lt; Scalar, Rank, Sequential, Binary &gt;</a>
 , <a class="el" href="classcattle_1_1_memory_data_provider.html#a887e4721068db4b9854df41851c0867b">cattle::MemoryDataProvider&lt; Scalar, Rank, Sequential, Shuffle &gt;</a>
 , <a class="el" href="classcattle_1_1_partition_data_provider.html#a70fcceb9f194d09ec53cb92b4c323eea">cattle::PartitionDataProvider&lt; Scalar, Rank, Sequential &gt;</a>
 , <a class="el" href="classcattle_1_1_split_file_data_provider.html#ab8895891e254bbc0b4c96dd8eb150756">cattle::SplitFileDataProvider&lt; Scalar, Rank, Sequential, ObsBinary, ObjBinary &gt;</a>
+</li>
+<li>get_desc()
+: <a class="el" href="classcattle_1_1internal_1_1_cu_d_n_n_tensor.html#a57d2ae96678ff643b9052f69d10f534b">cattle::internal::CuDNNTensor&lt; Scalar, Filter &gt;</a>
+</li>
+<li>get_format()
+: <a class="el" href="classcattle_1_1internal_1_1_cu_d_n_n_tensor.html#ad0fe3e22ecd8b83c81bf900a5c943a64">cattle::internal::CuDNNTensor&lt; Scalar, Filter &gt;</a>
+</li>
+<li>get_h()
+: <a class="el" href="classcattle_1_1internal_1_1_cu_d_n_n_tensor.html#a397532e107b16f3d40b00ac82dc73265">cattle::internal::CuDNNTensor&lt; Scalar, Filter &gt;</a>
 </li>
 <li>get_input_dims()
 : <a class="el" href="classcattle_1_1_activation_layer.html#a4550c77e6341cd77a62a751eb129e44e">cattle::ActivationLayer&lt; Scalar, Rank &gt;</a>
@@ -100,8 +113,8 @@ $(function() {
 , <a class="el" href="classcattle_1_1_stacked_neural_network.html#ac251af758479538ce72fc29847b66243">cattle::StackedNeuralNetwork&lt; Scalar, Rank, Sequential &gt;</a>
 </li>
 <li>get_instance()
-: <a class="el" href="classcattle_1_1internal_1_1_cu_b_l_a_s_handle.html#aeed972c3e81eab21836a014787d8baf6">cattle::internal::CuBLASHandle&lt; Scalar &gt;</a>
-, <a class="el" href="classcattle_1_1internal_1_1_cu_d_n_n_handle.html#a66ff49f3b34f05a1043f22d5d0275575">cattle::internal::CuDNNHandle&lt; Scalar &gt;</a>
+: <a class="el" href="classcattle_1_1internal_1_1_cu_b_l_a_s_handle.html#afdb90334046932fda1220d7e8f9cc0db">cattle::internal::CuBLASHandle&lt; Scalar &gt;</a>
+, <a class="el" href="classcattle_1_1internal_1_1_cu_d_n_n_handle.html#a9b27fe08963ff261ffb0e1b3ba288b40">cattle::internal::CuDNNHandle&lt; Scalar &gt;</a>
 </li>
 <li>get_layers()
 : <a class="el" href="classcattle_1_1_bidirectional_neural_network.html#ac882ffb4e50ed675dc1cae9f2bbd2d18">cattle::BidirectionalNeuralNetwork&lt; Scalar, Rank, MergeType &gt;</a>
@@ -114,7 +127,7 @@ $(function() {
 , <a class="el" href="classcattle_1_1_recurrent_neural_network.html#ae18e6bd4e095d74d13c0e42fd24f0635">cattle::RecurrentNeuralNetwork&lt; Scalar, Rank, MulInt, Stateful &gt;</a>
 , <a class="el" href="classcattle_1_1_residual_neural_network.html#a763fd16e630ba56fe53c06889345b969">cattle::ResidualNeuralNetwork&lt; Scalar, Rank &gt;</a>
 , <a class="el" href="classcattle_1_1_sequential_neural_network.html#ab28a3537a83a760a258c312c3e07802c">cattle::SequentialNeuralNetwork&lt; Scalar, Rank &gt;</a>
-, <a class="el" href="classcattle_1_1_stacked_neural_network.html#accddb2bca5e1f6cc139c48d6e7717742">cattle::StackedNeuralNetwork&lt; Scalar, Rank, Sequential &gt;</a>
+, <a class="el" href="classcattle_1_1_stacked_neural_network.html#aa79f2f36041fb2a9d8e57a16c9abcdd8">cattle::StackedNeuralNetwork&lt; Scalar, Rank, Sequential &gt;</a>
 </li>
 <li>get_modules()
 : <a class="el" href="classcattle_1_1_bidirectional_neural_network.html#ae9249dbef2dc0bf7955af7a2bd2bc794">cattle::BidirectionalNeuralNetwork&lt; Scalar, Rank, MergeType &gt;</a>
@@ -125,9 +138,13 @@ $(function() {
 , <a class="el" href="classcattle_1_1_sequential_neural_network.html#a3e53b10d9a4686707f714f517482dc3d">cattle::SequentialNeuralNetwork&lt; Scalar, Rank &gt;</a>
 , <a class="el" href="classcattle_1_1_stacked_neural_network.html#aa874687394079a5f18527eb08455e893">cattle::StackedNeuralNetwork&lt; Scalar, Rank, Sequential &gt;</a>
 </li>
+<li>get_n()
+: <a class="el" href="classcattle_1_1internal_1_1_cu_d_n_n_tensor.html#a6d4132a7480062c7466d84dec098f3fc">cattle::internal::CuDNNTensor&lt; Scalar, Filter &gt;</a>
+</li>
 <li>get_obj_dims()
 : <a class="el" href="classcattle_1_1_c_i_f_a_r_data_provider.html#af60eefbce63dbbfb982807c160768f61">cattle::CIFARDataProvider&lt; Scalar, CIFARType &gt;</a>
 , <a class="el" href="classcattle_1_1_data_provider.html#a797875a230c677d448455d87ee00ff78">cattle::DataProvider&lt; Scalar, Rank, Sequential &gt;</a>
+, <a class="el" href="classcattle_1_1_i_m_d_b_data_provider.html#af88a1af25204d331cee01af8ba4d903f">cattle::IMDBDataProvider&lt; Scalar, ObjType &gt;</a>
 , <a class="el" href="classcattle_1_1_memory_data_provider.html#ae5ca8e3e35775c1f118d9c8029b7b507">cattle::MemoryDataProvider&lt; Scalar, Rank, Sequential, Shuffle &gt;</a>
 , <a class="el" href="classcattle_1_1_m_n_i_s_t_data_provider.html#a979b4d19ecb48e3ea5be7887819b4658">cattle::MNISTDataProvider&lt; Scalar &gt;</a>
 , <a class="el" href="classcattle_1_1_partition_data_provider.html#af9402bd795c770fc8fdcc5249a3b9f2f">cattle::PartitionDataProvider&lt; Scalar, Rank, Sequential &gt;</a>
@@ -135,6 +152,7 @@ $(function() {
 <li>get_obs_dims()
 : <a class="el" href="classcattle_1_1_c_i_f_a_r_data_provider.html#ab8c86d2e8a78146b84e070b879c9ab85">cattle::CIFARDataProvider&lt; Scalar, CIFARType &gt;</a>
 , <a class="el" href="classcattle_1_1_data_provider.html#a8f877a9733373af4c29e86eb5235d00e">cattle::DataProvider&lt; Scalar, Rank, Sequential &gt;</a>
+, <a class="el" href="classcattle_1_1_i_m_d_b_data_provider.html#a2812022195762ad6bcfe5494171ae2e1">cattle::IMDBDataProvider&lt; Scalar, ObjType &gt;</a>
 , <a class="el" href="classcattle_1_1_memory_data_provider.html#acca261042393126d0c6b0fb7ed1b025e">cattle::MemoryDataProvider&lt; Scalar, Rank, Sequential, Shuffle &gt;</a>
 , <a class="el" href="classcattle_1_1_m_n_i_s_t_data_provider.html#a372ff8d80ed8d3a50e6fa2dccf866592">cattle::MNISTDataProvider&lt; Scalar &gt;</a>
 , <a class="el" href="classcattle_1_1_partition_data_provider.html#aab3579161e485a3f2776f2939eec692e">cattle::PartitionDataProvider&lt; Scalar, Rank, Sequential &gt;</a>
@@ -169,20 +187,20 @@ $(function() {
 , <a class="el" href="classcattle_1_1_kernel_layer.html#a9120bb46be48a022463aa07a35801074">cattle::KernelLayer&lt; Scalar, Rank &gt;</a>
 , <a class="el" href="classcattle_1_1_layer.html#ab67312e1fc860a8a246f6f9aeadffbb4">cattle::Layer&lt; Scalar, Rank &gt;</a>
 , <a class="el" href="classcattle_1_1_optimizer.html#a03a788c5ce15f611d5c6007d43550ef5">cattle::Optimizer&lt; Scalar, Rank, Sequential &gt;</a>
-, <a class="el" href="classcattle_1_1_pool_layer.html#a872d8b4156c8a7e719e4ae1dafd763f1">cattle::PoolLayer&lt; Scalar, Rank &gt;</a>
-, <a class="el" href="classcattle_1_1_reshape_layer.html#af7d261c1deedb980914a51c20070af32">cattle::ReshapeLayer&lt; Scalar, Rank &gt;</a>
+, <a class="el" href="classcattle_1_1_pool_layer.html#aeb164eb34a28a3109b1713f50980286e">cattle::PoolLayer&lt; Scalar, Rank &gt;</a>
+, <a class="el" href="classcattle_1_1_reshape_layer.html#a464493846ede7742da92224914855d24">cattle::ReshapeLayer&lt; Scalar, Rank &gt;</a>
 </li>
 <li>get_params_grad()
-: <a class="el" href="classcattle_1_1_activation_layer.html#a08946304d56287db036990d9d890f18e">cattle::ActivationLayer&lt; Scalar, Rank &gt;</a>
-, <a class="el" href="classcattle_1_1_batch_norm_layer.html#afea25117f93e8ca72fd4538251dd7f01">cattle::BatchNormLayer&lt; Scalar, Rank, PerLastRank &gt;</a>
-, <a class="el" href="classcattle_1_1_batch_norm_layer_3_01_scalar_00_01_rank_00_01false_01_4.html#a7db2cae21bd26cc571114fe817e72577">cattle::BatchNormLayer&lt; Scalar, Rank, false &gt;</a>
+: <a class="el" href="classcattle_1_1_activation_layer.html#af9822a94073cb72e2db4de62c2126d54">cattle::ActivationLayer&lt; Scalar, Rank &gt;</a>
+, <a class="el" href="classcattle_1_1_batch_norm_layer.html#acc3ea38bc71f210553babfe66e48e370">cattle::BatchNormLayer&lt; Scalar, Rank, PerLastRank &gt;</a>
+, <a class="el" href="classcattle_1_1_batch_norm_layer_3_01_scalar_00_01_rank_00_01false_01_4.html#a3d9cb8a20f6fd062aa52b41f8534f5af">cattle::BatchNormLayer&lt; Scalar, Rank, false &gt;</a>
 , <a class="el" href="classcattle_1_1_broadcast_layer.html#a3e97c445cb968e46fa032db7639f0177">cattle::BroadcastLayer&lt; Scalar, Rank &gt;</a>
-, <a class="el" href="classcattle_1_1_dropout_layer.html#a046463edd1e0b4b335cefeae6bf5b614">cattle::DropoutLayer&lt; Scalar, Rank &gt;</a>
+, <a class="el" href="classcattle_1_1_dropout_layer.html#ac72ed377cf408274f15e280de3266044">cattle::DropoutLayer&lt; Scalar, Rank &gt;</a>
 , <a class="el" href="classcattle_1_1_kernel_layer.html#aa2956ff7c87760f05d4e0d906ed16b10">cattle::KernelLayer&lt; Scalar, Rank &gt;</a>
-, <a class="el" href="classcattle_1_1_layer.html#a60fbc161deece174499e4be12b730255">cattle::Layer&lt; Scalar, Rank &gt;</a>
+, <a class="el" href="classcattle_1_1_layer.html#a6e2e726f9677758ea61c6916a5c88b92">cattle::Layer&lt; Scalar, Rank &gt;</a>
 , <a class="el" href="classcattle_1_1_neural_network.html#a64b361839ba75dd77dd4f5cc02323d7d">cattle::NeuralNetwork&lt; Scalar, Rank, Sequential &gt;</a>
 , <a class="el" href="classcattle_1_1_optimizer.html#a4697c3e95df8ae818471c5734b6f5ef6">cattle::Optimizer&lt; Scalar, Rank, Sequential &gt;</a>
-, <a class="el" href="classcattle_1_1_pool_layer.html#ac554223ce79c3d18511c5ad9c3c95101">cattle::PoolLayer&lt; Scalar, Rank &gt;</a>
+, <a class="el" href="classcattle_1_1_pool_layer.html#a560c5f9614ad83cbc4429cc99a36d9b6">cattle::PoolLayer&lt; Scalar, Rank &gt;</a>
 , <a class="el" href="classcattle_1_1_reshape_layer.html#a26863f25c7ee95558db07defb108e672">cattle::ReshapeLayer&lt; Scalar, Rank &gt;</a>
 </li>
 <li>get_params_owner()
@@ -210,8 +228,14 @@ $(function() {
 , <a class="el" href="classcattle_1_1_p_swish_activation_layer.html#a8b8ff178771ca116934695127ed9ade8">cattle::PSwishActivationLayer&lt; Scalar, Rank &gt;</a>
 , <a class="el" href="classcattle_1_1_reshape_layer.html#ac7e767125736b077d6d225cfb3ab1c5d">cattle::ReshapeLayer&lt; Scalar, Rank &gt;</a>
 </li>
+<li>get_size()
+: <a class="el" href="classcattle_1_1internal_1_1_cu_d_n_n_tensor.html#abf87da574ba5a39e24e0cb9d0b378a97">cattle::internal::CuDNNTensor&lt; Scalar, Filter &gt;</a>
+</li>
 <li>get_volume()
 : <a class="el" href="classcattle_1_1_dim_expression.html#adae8f2ea4e6a29d65b85ea0aa2d48bd1">cattle::DimExpression&lt; Derived, IndexType, Rank &gt;</a>
+</li>
+<li>get_w()
+: <a class="el" href="classcattle_1_1internal_1_1_cu_d_n_n_tensor.html#aba6616928c649da24e247029e01e44ea">cattle::internal::CuDNNTensor&lt; Scalar, Filter &gt;</a>
 </li>
 <li>GlorotWeightInitialization()
 : <a class="el" href="classcattle_1_1_glorot_weight_initialization.html#a234fb09106e93532b47452da89296a56">cattle::GlorotWeightInitialization&lt; Scalar &gt;</a>

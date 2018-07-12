@@ -9,6 +9,9 @@
 #include <cstddef>
 #include <cuda_runtime.h>
 #include <cudnn.h>
+#include <ostream>
+#include <sstream>
+#include <string>
 #include <type_traits>
 #include <utility>
 
@@ -81,18 +84,28 @@ public:
 		cudaAssert(cudaMalloc(&data, size));
 	}
 	inline CuDNNTensor() :
-		CuDNNTensor(0u, 0u, 0u, 0u) { }
+			n(0),
+			h(0),
+			w(0),
+			c(0),
+			size(0),
+			format(CUDNN_TENSOR_NHWC),
+			desc(),
+			data(nullptr) { }
 	inline CuDNNTensor(const Self& tensor) :
 			CuDNNTensor(tensor.n, tensor.h, tensor.w, tensor.c, tensor.format) {
-		cudaAssert(cudaMemcpy(data, tensor.data, size, cudaMemcpyDeviceToDevice));
+		if (size > 0)
+			cudaAssert(cudaMemcpy(data, tensor.data, size, cudaMemcpyDeviceToDevice));
 	}
 	inline CuDNNTensor(Self&& tensor) :
 			CuDNNTensor() {
 		swap(*this, tensor);
 	}
 	inline ~CuDNNTensor() {
-		cudaAssert(cudaFree(data));
-		DescriptorManager::destroy_descriptor(desc);
+		if (size > 0) {
+			cudaAssert(cudaFree(data));
+			DescriptorManager::destroy_descriptor(desc);
+		}
 	}
 	inline Self& operator=(Self tensor) {
 		swap(*this, tensor);
@@ -159,7 +172,8 @@ public:
 	 * @param host_data A pointer to the first element of the host tensor.
 	 */
 	inline void copy_from_host(const Scalar* host_data) {
-		cudaAssert(cudaMemcpy(data, host_data, size, cudaMemcpyHostToDevice));
+		if (size > 0)
+			cudaAssert(cudaMemcpy(data, host_data, size, cudaMemcpyHostToDevice));
 	}
 	/**
 	 * It copies the entire device tensor to the host memory.
@@ -168,7 +182,20 @@ public:
 	 * block to which the device tensor is to be copied.
 	 */
 	inline void copy_to_host(Scalar* host_data) const {
-		cudaAssert(cudaMemcpy(host_data, data, size, cudaMemcpyDeviceToHost));
+		if (size > 0)
+			cudaAssert(cudaMemcpy(host_data, data, size, cudaMemcpyDeviceToHost));
+	}
+	/**
+	 * @return A string representation of the tensor.
+	 */
+	std::string to_string() const {
+		std::stringstream strm;
+		strm << "data type: " << DATA_TYPE << "; format: " << format << "; " <<
+				"[N:" << n << ", H:" << h << ", W:" << w << ", C:" << c << "]";
+		return strm.str();
+	}
+	inline friend std::ostream& operator<<(std::ostream& os, const Self& tensor) {
+		return os << tensor.to_string() << std::endl;
 	}
 	inline friend void swap(Self& tensor1, Self& tensor2) {
 		using std::swap;

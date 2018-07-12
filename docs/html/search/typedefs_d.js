@@ -1,4 +1,5 @@
 var searchData=
 [
-  ['weightinitsharedptr',['WeightInitSharedPtr',['../namespacecattle.html#a96574a467e593e2c62c432b0c8ec8349',1,'cattle']]]
+  ['vocab',['Vocab',['../namespacecattle.html#a1063ee44e85c65350112d8b6379c081f',1,'cattle']]],
+  ['vocabsharedptr',['VocabSharedPtr',['../namespacecattle.html#ab83dc53a6ce7d48a5ec75509683397ad',1,'cattle']]]
 ];
