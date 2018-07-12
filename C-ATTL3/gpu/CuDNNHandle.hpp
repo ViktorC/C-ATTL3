@@ -182,18 +182,18 @@ public:
 		// Have cuDNN find the most performant algorithm given the convolution parameters.
 		cudnnConvolutionBwdDataAlgo_t dconv_data_algo;
 		cudnnAssert(cudnnGetConvolutionBackwardDataAlgorithm(handle, filter.get_desc(), out_grad.get_desc(), dconv_desc,
-				input.get_desc(), CUDNN_CONVOLUTION_BWD_DATA_PREFER_FASTEST, 0, &dconv_data_algo));
+				prev_out_grad.get_desc(), CUDNN_CONVOLUTION_BWD_DATA_PREFER_FASTEST, 0, &dconv_data_algo));
 		cudnnConvolutionBwdFilterAlgo_t dconv_filter_algo;
 		cudnnAssert(cudnnGetConvolutionBackwardFilterAlgorithm(handle, input.get_desc(), out_grad.get_desc(), dconv_desc,
-				filter.get_desc(), CUDNN_CONVOLUTION_BWD_FILTER_PREFER_FASTEST, 0, &dconv_filter_algo));
+				filter_grad.get_desc(), CUDNN_CONVOLUTION_BWD_FILTER_PREFER_FASTEST, 0, &dconv_filter_algo));
 		/* Have cuDNN compute the data_workspace memory required for the selected backward convolution algorithms given
 		 * the convolution parameters. */
 		std::size_t data_workspace_size;
 		cudnnAssert(cudnnGetConvolutionBackwardDataWorkspaceSize(handle, filter.get_desc(), out_grad.get_desc(), dconv_desc,
-				input.get_desc(), dconv_data_algo, &data_workspace_size));
+				prev_out_grad.get_desc(), dconv_data_algo, &data_workspace_size));
 		std::size_t filter_workspace_size;
 		cudnnAssert(cudnnGetConvolutionBackwardFilterWorkspaceSize(handle, input.get_desc(), out_grad.get_desc(), dconv_desc,
-				filter.get_desc(), dconv_filter_algo, &filter_workspace_size));
+				filter_grad.get_desc(), dconv_filter_algo, &filter_workspace_size));
 		// Allocate the memory required for the backwards data convolution on the device.
 		Scalar* data_workspace;
 		cudaAssert(cudaMalloc(&data_workspace, data_workspace_size));
@@ -211,8 +211,8 @@ public:
 				out_grad.get_data(), dconv_desc, dconv_filter_algo, filter_workspace, filter_workspace_size, &beta,
 				filter_grad.get_desc(), filter_grad.get_data()));
 		// Free up resources.
-		cudnnAssert(cudnnDestroyConvolutionDescriptor(dconv_desc));
 		cudaAssert(cudaFree(filter_workspace));
+		cudnnAssert(cudnnDestroyConvolutionDescriptor(dconv_desc));
 		// Perform the backwards bias convolution.
 		cudnnAssert(cudnnConvolutionBackwardBias(handle, &alpha, out_grad.get_desc(), out_grad.get_data(), &beta,
 				bias_grad.get_desc(), bias_grad.get_data()));
