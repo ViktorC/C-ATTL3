@@ -75,6 +75,45 @@ private:
 };
 
 /**
+ * A weight initializer that assigns linearly increasing values to the elements
+ * of the weight matrix. It is meant to be used for testing.
+ */
+template<typename Scalar>
+class IncrementalWeightInitialization : public WeightInitialization<Scalar> {
+public:
+	/**
+	 * @param min The starting value.
+	 * @param max The value to assign to the last element.
+	 * @param bias The value to which the elements of the bias row are to be
+	 * set.
+	 */
+	inline IncrementalWeightInitialization(Scalar min = 0, Scalar max = .5, Scalar bias = 0) :
+			bias(bias),
+			min(min),
+			max(max) {
+		assert(max > min);
+	}
+	inline void apply(Matrix<Scalar>& weights) const {
+		std::size_t rows = weights.rows() - 1;
+		std::size_t cols = weights.cols();
+		std::size_t elements = (weights.rows() - 1) * weights.cols();
+		Scalar step_size = (max - min) / elements;
+		Scalar val = min;
+		for (std::size_t i = 0; i < cols; ++i) {
+			for (std::size_t j = 0; j < rows; ++j) {
+				weights(j,i) = val;
+				val += step_size;
+			}
+		}
+		weights.row(rows).setConstant(bias);
+	}
+private:
+	const Scalar min;
+	const Scalar max;
+	const Scalar bias;
+};
+
+/**
  * An abstract class template representing a random weight initialization method
  * that samples from a Gaussian distribution.
  */

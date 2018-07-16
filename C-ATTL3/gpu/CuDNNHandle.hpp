@@ -10,6 +10,7 @@
 
 #include <array>
 #include <cassert>
+#include <cmath>
 #include <cstddef>
 #include <cuda_runtime.h>
 #include <cudnn.h>
@@ -35,7 +36,6 @@ class CuDNNHandle {
 	typedef CuDNNHandle<Scalar> Self;
 	typedef std::array<std::size_t,4> Array4;
 	static constexpr cudnnNanPropagation_t NAN_PROP = CUDNN_PROPAGATE_NAN;
-	static constexpr std::size_t SCALAR_SIZE = sizeof(Scalar);
 public:
 	CuDNNHandle(const Self&) = delete;
 	~CuDNNHandle() {
@@ -78,12 +78,13 @@ public:
 			std::size_t horizontal_dilation, /* out */ std::size_t& output_height, /* out */ std::size_t& output_width,
 			/* out */ std::size_t& output_channels) const {
 		// Create and set the input tensor descriptor.
-		cudnnTensorDescriptor_t input_desc = CuDNNTensorDescriptorManager<>::create_descriptor(
-				CuDNNTensor<Scalar>::DATA_TYPE, tensor_format, 1, input_height, input_width, input_channels);
+		cudnnTensorDescriptor_t input_desc;
+		CuDNNTensorDescriptorManager<>::create_descriptor(input_desc, CuDNNTensor<Scalar>::DATA_TYPE, tensor_format,
+				1, input_height, input_width, input_channels);
 		// Create and set up the filter descriptor.
-		cudnnFilterDescriptor_t filter_desc = CuDNNTensorDescriptorManager<true>::create_descriptor(
-				CuDNNTensor<Scalar>::DATA_TYPE, tensor_format, filters, receptor_height, receptor_width,
-				input_channels);
+		cudnnFilterDescriptor_t filter_desc;
+		CuDNNTensorDescriptorManager<true>::create_descriptor(filter_desc, CuDNNTensor<Scalar>::DATA_TYPE, tensor_format,
+				filters, receptor_height, receptor_width, input_channels);
 		// Create and set up the convolution descriptor.
 		cudnnConvolutionDescriptor_t conv_desc;
 		cudnnAssert(cudnnCreateConvolutionDescriptor(&conv_desc));
@@ -146,7 +147,7 @@ public:
 		cudnnAssert(cudnnDestroyConvolutionDescriptor(conv_desc));
 		cudaAssert(cudaFree(workspace));
 		// Apply the bias to the output tensor.
-		cudnnAssert(cudnnAddTensor(handle, &alpha, bias.get_desc(), bias.get_data(), &beta, output.get_desc(), output.get_data()));
+//		cudnnAssert(cudnnAddTensor(handle, &alpha, bias.get_desc(), bias.get_data(), &alpha, output.get_desc(), output.get_data()));
 	}
 	/**
 	 * Performs a backward 2D convolution on a rank 4 tensor to compute the gradients of
@@ -301,8 +302,9 @@ public:
 			std::size_t vertical_stride, std::size_t horizontal_stride, /* out */ std::size_t& output_height,
 			/* out */ std::size_t& output_width, /* out */ std::size_t& output_channels) const {
 		// Create and set the input tensor descriptor.
-		cudnnTensorDescriptor_t input_desc = CuDNNTensorDescriptorManager<>::create_descriptor(
-				CuDNNTensor<Scalar>::DATA_TYPE, tensor_format, 1, input_height, input_width, input_channels);
+		cudnnTensorDescriptor_t input_desc;
+		CuDNNTensorDescriptorManager<>::create_descriptor(input_desc, CuDNNTensor<Scalar>::DATA_TYPE, tensor_format,
+				1, input_height, input_width, input_channels);
 		// Create and set the pooling descriptor.
 		cudnnPoolingDescriptor_t pool_desc;
 		cudnnAssert(cudnnCreatePoolingDescriptor(&pool_desc));
@@ -453,6 +455,15 @@ public:
 				inv_var_cache.get_data()));
 	}
 	/**
+	 * It computes the necessary state size required for the RNG used by the dropout function.
+	 *
+	 * @param state_size The state size.
+	 */
+	inline void dropout_state_size(/* out */ std::size_t& state_size) const {
+		cudnnAssert(cudnnDropoutGetStatesSize(handle, &state_size));
+		state_size = (std::size_t) ceil(((Scalar) state_size) / sizeof(Scalar));
+	}
+	/**
 	 * It computes the necessary reserve size for the dropout.
 	 *
 	 * @param input The input tensor.
@@ -460,40 +471,46 @@ public:
 	 */
 	inline void dropout_reserve_size(const CuDNNTensor<Scalar>& input, /* out */ std::size_t& reserve_size) const {
 		cudnnAssert(cudnnDropoutGetReserveSpaceSize(input.get_desc(), &reserve_size));
-		reserve_size /= SCALAR_SIZE;
+		reserve_size = (std::size_t) ceil(((Scalar) reserve_size) / sizeof(Scalar));
 	}
 	/**
 	 * It applies the dropout function to the input tensor.
 	 *
 	 * @param input The input tensor.
 	 * @param dropout The average factor of elements to set to 0 in the input tensor.
+	 * @param state The memory used by the RNG.
 	 * @param reserve The reserve used for backpropagation.
 	 * @param output The output tensor.
 	 */
 	inline void dropout_fwd(const CuDNNTensor<Scalar>& input, Scalar dropout,
-			/* in/out */ CuDNNTensor<Scalar>& reserve, /* out */ CuDNNTensor<Scalar>& output) const {
+			CuDNNTensor<Scalar>& state, /* in/out */ CuDNNTensor<Scalar>& reserve,
+			/* out */ CuDNNTensor<Scalar>& output) const {
 		cudnnDropoutDescriptor_t dropout_desc;
 		cudnnAssert(cudnnCreateDropoutDescriptor(&dropout_desc));
-		cudnnAssert(cudnnSetDropoutDescriptor(dropout_desc, handle, (float) dropout, nullptr, 0, 0));
+		cudnnAssert(cudnnSetDropoutDescriptor(dropout_desc, handle, (float) dropout, state.get_data(),
+				state.get_size() * sizeof(Scalar), 0));
 		cudnnAssert(cudnnDropoutForward(handle, dropout_desc, input.get_desc(), input.get_data(), output.get_desc(),
-				output.get_data(), reserve.get_data(), reserve.get_size()));
+				output.get_data(), reserve.get_data(), reserve.get_size() * sizeof(Scalar)));
 		cudnnAssert(cudnnDestroyDropoutDescriptor(dropout_desc));
 	}
 	/**
 	 * It computes the gradient of the input of the dropout function.
 	 *
 	 * @param out_grad The gradient of the output of the dropout function.
+	 * @param state The memory used by the RNG.
 	 * @param reserve The reserve filled during the forward pass.
 	 * @param dropout The average factor of elements set to 0 in the input tensor.
 	 * @param prev_out_grad The gradient of the input of the dropout function.
 	 */
-	inline void dropout_bwd(const CuDNNTensor<Scalar>& out_grad, const CuDNNTensor<Scalar>& reserve,
-			Scalar dropout, /* out */ CuDNNTensor<Scalar>& prev_out_grad) const {
+	inline void dropout_bwd(const CuDNNTensor<Scalar>& out_grad, Scalar dropout, CuDNNTensor<Scalar>& state,
+			CuDNNTensor<Scalar>& reserve, /* out */ CuDNNTensor<Scalar>& prev_out_grad) const {
 		cudnnDropoutDescriptor_t dropout_desc;
 		cudnnAssert(cudnnCreateDropoutDescriptor(&dropout_desc));
-		cudnnAssert(cudnnSetDropoutDescriptor(dropout_desc, handle, (float) dropout, nullptr, 0, 0));
+		cudnnAssert(cudnnSetDropoutDescriptor(dropout_desc, handle, (float) dropout, state.get_data(),
+				state.get_size() * sizeof(Scalar), 0));
 		cudnnAssert(cudnnDropoutBackward(handle, dropout_desc, out_grad.get_desc(), out_grad.get_data(),
-				prev_out_grad.get_desc(), prev_out_grad.get_data(), reserve.get_data(), reserve.get_size() * SCALAR_SIZE));
+				prev_out_grad.get_desc(), prev_out_grad.get_data(), reserve.get_data(),
+				reserve.get_size() * sizeof(Scalar)));
 		cudnnAssert(cudnnDestroyDropoutDescriptor(dropout_desc));
 	}
 private:

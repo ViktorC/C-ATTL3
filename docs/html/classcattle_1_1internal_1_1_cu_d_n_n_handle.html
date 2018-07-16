@@ -127,15 +127,18 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:af2f42cc9e92ed9c8255f3790af4d0e4b"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1internal_1_1_cu_d_n_n_handle.html#af2f42cc9e92ed9c8255f3790af4d0e4b">batch_norm_bwd</a> (const <a class="el" href="classcattle_1_1internal_1_1_cu_d_n_n_tensor.html">CuDNNTensor</a>&lt; Scalar &gt; &amp;input, const <a class="el" href="classcattle_1_1internal_1_1_cu_d_n_n_tensor.html">CuDNNTensor</a>&lt; Scalar &gt; &amp;out_grad, const <a class="el" href="classcattle_1_1internal_1_1_cu_d_n_n_tensor.html">CuDNNTensor</a>&lt; Scalar &gt; &amp;gamma, const <a class="el" href="classcattle_1_1internal_1_1_cu_d_n_n_tensor.html">CuDNNTensor</a>&lt; Scalar &gt; &amp;mean_cache, const <a class="el" href="classcattle_1_1internal_1_1_cu_d_n_n_tensor.html">CuDNNTensor</a>&lt; Scalar &gt; &amp;inv_var_cache, bool spatial, Scalar epsilon, <a class="el" href="classcattle_1_1internal_1_1_cu_d_n_n_tensor.html">CuDNNTensor</a>&lt; Scalar &gt; &amp;prev_out_grad, <a class="el" href="classcattle_1_1internal_1_1_cu_d_n_n_tensor.html">CuDNNTensor</a>&lt; Scalar &gt; &amp;gamma_grad, <a class="el" href="classcattle_1_1internal_1_1_cu_d_n_n_tensor.html">CuDNNTensor</a>&lt; Scalar &gt; &amp;beta_grad) const</td></tr>
 <tr class="memdesc:af2f42cc9e92ed9c8255f3790af4d0e4b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Performs the backward pass of the batch normalization function and computes the gradients of the function's input, the gamma scaling tensor, and the beta bias tensor.  <a href="#af2f42cc9e92ed9c8255f3790af4d0e4b">More...</a><br /></td></tr>
 <tr class="separator:af2f42cc9e92ed9c8255f3790af4d0e4b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa832a112b2c4f51291749a4de7116f54"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1internal_1_1_cu_d_n_n_handle.html#aa832a112b2c4f51291749a4de7116f54">dropout_state_size</a> (std::size_t &amp;state_size) const</td></tr>
+<tr class="memdesc:aa832a112b2c4f51291749a4de7116f54"><td class="mdescLeft">&#160;</td><td class="mdescRight">It computes the necessary state size required for the RNG used by the dropout function.  <a href="#aa832a112b2c4f51291749a4de7116f54">More...</a><br /></td></tr>
+<tr class="separator:aa832a112b2c4f51291749a4de7116f54"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a7e55aa4c437ddcbe0fe32c81cf511555"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1internal_1_1_cu_d_n_n_handle.html#a7e55aa4c437ddcbe0fe32c81cf511555">dropout_reserve_size</a> (const <a class="el" href="classcattle_1_1internal_1_1_cu_d_n_n_tensor.html">CuDNNTensor</a>&lt; Scalar &gt; &amp;input, std::size_t &amp;reserve_size) const</td></tr>
 <tr class="memdesc:a7e55aa4c437ddcbe0fe32c81cf511555"><td class="mdescLeft">&#160;</td><td class="mdescRight">It computes the necessary reserve size for the dropout.  <a href="#a7e55aa4c437ddcbe0fe32c81cf511555">More...</a><br /></td></tr>
 <tr class="separator:a7e55aa4c437ddcbe0fe32c81cf511555"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a548f05edbf2a5cf86b7eccf29b2e9604"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1internal_1_1_cu_d_n_n_handle.html#a548f05edbf2a5cf86b7eccf29b2e9604">dropout_fwd</a> (const <a class="el" href="classcattle_1_1internal_1_1_cu_d_n_n_tensor.html">CuDNNTensor</a>&lt; Scalar &gt; &amp;input, Scalar dropout, <a class="el" href="classcattle_1_1internal_1_1_cu_d_n_n_tensor.html">CuDNNTensor</a>&lt; Scalar &gt; &amp;reserve, <a class="el" href="classcattle_1_1internal_1_1_cu_d_n_n_tensor.html">CuDNNTensor</a>&lt; Scalar &gt; &amp;output) const</td></tr>
-<tr class="memdesc:a548f05edbf2a5cf86b7eccf29b2e9604"><td class="mdescLeft">&#160;</td><td class="mdescRight">It applies the dropout function to the input tensor.  <a href="#a548f05edbf2a5cf86b7eccf29b2e9604">More...</a><br /></td></tr>
-<tr class="separator:a548f05edbf2a5cf86b7eccf29b2e9604"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ab7e31be3c57472af5e28b27f4a580d0a"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1internal_1_1_cu_d_n_n_handle.html#ab7e31be3c57472af5e28b27f4a580d0a">dropout_bwd</a> (const <a class="el" href="classcattle_1_1internal_1_1_cu_d_n_n_tensor.html">CuDNNTensor</a>&lt; Scalar &gt; &amp;out_grad, const <a class="el" href="classcattle_1_1internal_1_1_cu_d_n_n_tensor.html">CuDNNTensor</a>&lt; Scalar &gt; &amp;reserve, Scalar dropout, <a class="el" href="classcattle_1_1internal_1_1_cu_d_n_n_tensor.html">CuDNNTensor</a>&lt; Scalar &gt; &amp;prev_out_grad) const</td></tr>
-<tr class="memdesc:ab7e31be3c57472af5e28b27f4a580d0a"><td class="mdescLeft">&#160;</td><td class="mdescRight">It computes the gradient of the input of the dropout function.  <a href="#ab7e31be3c57472af5e28b27f4a580d0a">More...</a><br /></td></tr>
-<tr class="separator:ab7e31be3c57472af5e28b27f4a580d0a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a02d1da9583070b2b02db099b1e5f2ab3"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1internal_1_1_cu_d_n_n_handle.html#a02d1da9583070b2b02db099b1e5f2ab3">dropout_fwd</a> (const <a class="el" href="classcattle_1_1internal_1_1_cu_d_n_n_tensor.html">CuDNNTensor</a>&lt; Scalar &gt; &amp;input, Scalar dropout, <a class="el" href="classcattle_1_1internal_1_1_cu_d_n_n_tensor.html">CuDNNTensor</a>&lt; Scalar &gt; &amp;state, <a class="el" href="classcattle_1_1internal_1_1_cu_d_n_n_tensor.html">CuDNNTensor</a>&lt; Scalar &gt; &amp;reserve, <a class="el" href="classcattle_1_1internal_1_1_cu_d_n_n_tensor.html">CuDNNTensor</a>&lt; Scalar &gt; &amp;output) const</td></tr>
+<tr class="memdesc:a02d1da9583070b2b02db099b1e5f2ab3"><td class="mdescLeft">&#160;</td><td class="mdescRight">It applies the dropout function to the input tensor.  <a href="#a02d1da9583070b2b02db099b1e5f2ab3">More...</a><br /></td></tr>
+<tr class="separator:a02d1da9583070b2b02db099b1e5f2ab3"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab3dcf87e328ad64c5604767ee25ca192"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1internal_1_1_cu_d_n_n_handle.html#ab3dcf87e328ad64c5604767ee25ca192">dropout_bwd</a> (const <a class="el" href="classcattle_1_1internal_1_1_cu_d_n_n_tensor.html">CuDNNTensor</a>&lt; Scalar &gt; &amp;out_grad, Scalar dropout, <a class="el" href="classcattle_1_1internal_1_1_cu_d_n_n_tensor.html">CuDNNTensor</a>&lt; Scalar &gt; &amp;state, <a class="el" href="classcattle_1_1internal_1_1_cu_d_n_n_tensor.html">CuDNNTensor</a>&lt; Scalar &gt; &amp;reserve, <a class="el" href="classcattle_1_1internal_1_1_cu_d_n_n_tensor.html">CuDNNTensor</a>&lt; Scalar &gt; &amp;prev_out_grad) const</td></tr>
+<tr class="memdesc:ab3dcf87e328ad64c5604767ee25ca192"><td class="mdescLeft">&#160;</td><td class="mdescRight">It computes the gradient of the input of the dropout function.  <a href="#ab3dcf87e328ad64c5604767ee25ca192">More...</a><br /></td></tr>
+<tr class="separator:ab3dcf87e328ad64c5604767ee25ca192"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-static-methods"></a>
 Static Public Member Functions</h2></td></tr>
@@ -951,8 +954,8 @@ template&lt;typename Scalar &gt; </div>
 
 </div>
 </div>
-<a id="ab7e31be3c57472af5e28b27f4a580d0a"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ab7e31be3c57472af5e28b27f4a580d0a">&#9670;&nbsp;</a></span>dropout_bwd()</h2>
+<a id="ab3dcf87e328ad64c5604767ee25ca192"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab3dcf87e328ad64c5604767ee25ca192">&#9670;&nbsp;</a></span>dropout_bwd()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -971,14 +974,20 @@ template&lt;typename Scalar &gt; </div>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const <a class="el" href="classcattle_1_1internal_1_1_cu_d_n_n_tensor.html">CuDNNTensor</a>&lt; Scalar &gt; &amp;&#160;</td>
-          <td class="paramname"><em>reserve</em>, </td>
+          <td class="paramtype">Scalar&#160;</td>
+          <td class="paramname"><em>dropout</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">Scalar&#160;</td>
-          <td class="paramname"><em>dropout</em>, </td>
+          <td class="paramtype"><a class="el" href="classcattle_1_1internal_1_1_cu_d_n_n_tensor.html">CuDNNTensor</a>&lt; Scalar &gt; &amp;&#160;</td>
+          <td class="paramname"><em>state</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="classcattle_1_1internal_1_1_cu_d_n_n_tensor.html">CuDNNTensor</a>&lt; Scalar &gt; &amp;&#160;</td>
+          <td class="paramname"><em>reserve</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -1003,6 +1012,7 @@ template&lt;typename Scalar &gt; </div>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">out_grad</td><td>The gradient of the output of the dropout function. </td></tr>
+    <tr><td class="paramname">state</td><td>The memory used by the RNG. </td></tr>
     <tr><td class="paramname">reserve</td><td>The reserve filled during the forward pass. </td></tr>
     <tr><td class="paramname">dropout</td><td>The average factor of elements set to 0 in the input tensor. </td></tr>
     <tr><td class="paramname">prev_out_grad</td><td>The gradient of the input of the dropout function. </td></tr>
@@ -1012,8 +1022,8 @@ template&lt;typename Scalar &gt; </div>
 
 </div>
 </div>
-<a id="a548f05edbf2a5cf86b7eccf29b2e9604"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a548f05edbf2a5cf86b7eccf29b2e9604">&#9670;&nbsp;</a></span>dropout_fwd()</h2>
+<a id="a02d1da9583070b2b02db099b1e5f2ab3"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a02d1da9583070b2b02db099b1e5f2ab3">&#9670;&nbsp;</a></span>dropout_fwd()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -1034,6 +1044,12 @@ template&lt;typename Scalar &gt; </div>
           <td></td>
           <td class="paramtype">Scalar&#160;</td>
           <td class="paramname"><em>dropout</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="classcattle_1_1internal_1_1_cu_d_n_n_tensor.html">CuDNNTensor</a>&lt; Scalar &gt; &amp;&#160;</td>
+          <td class="paramname"><em>state</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -1065,6 +1081,7 @@ template&lt;typename Scalar &gt; </div>
   <table class="params">
     <tr><td class="paramname">input</td><td>The input tensor. </td></tr>
     <tr><td class="paramname">dropout</td><td>The average factor of elements to set to 0 in the input tensor. </td></tr>
+    <tr><td class="paramname">state</td><td>The memory used by the RNG. </td></tr>
     <tr><td class="paramname">reserve</td><td>The reserve used for backpropagation. </td></tr>
     <tr><td class="paramname">output</td><td>The output tensor. </td></tr>
   </table>
@@ -1114,6 +1131,42 @@ template&lt;typename Scalar &gt; </div>
   <table class="params">
     <tr><td class="paramname">input</td><td>The input tensor. </td></tr>
     <tr><td class="paramname">reserve_size</td><td>The reserve size. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="aa832a112b2c4f51291749a4de7116f54"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa832a112b2c4f51291749a4de7116f54">&#9670;&nbsp;</a></span>dropout_state_size()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename Scalar &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void <a class="el" href="classcattle_1_1internal_1_1_cu_d_n_n_handle.html">cattle::internal::CuDNNHandle</a>&lt; Scalar &gt;::dropout_state_size </td>
+          <td>(</td>
+          <td class="paramtype">std::size_t &amp;&#160;</td>
+          <td class="paramname"><em>state_size</em></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>It computes the necessary state size required for the RNG used by the dropout function. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">state_size</td><td>The state size. </td></tr>
   </table>
   </dd>
 </dl>

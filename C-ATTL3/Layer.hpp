@@ -878,13 +878,13 @@ protected:
 		Matrix<Scalar> bias = Base::weights_ref.bottomRows(1);
 		CuDNNTensor<Scalar> gpu_bias(1, 1, 1, filters, TENSOR_FORMAT);
 		gpu_bias.copy_from_host(bias.data());
-		CuDNNTensor<Scalar> gpu_out(in.dimension(0), ext_output_dims(0), ext_output_dims(1), ext_output_dims(2),
+		CuDNNTensor<Scalar> gpu_output(in.dimension(0), ext_output_dims(0), ext_output_dims(1), ext_output_dims(2),
 				TENSOR_FORMAT);
 		CuDNNHandle<Scalar>::get_instance().convolution2d_fwd(gpu_input, gpu_filter, gpu_bias, vertical_padding,
 				horizontal_padding, vertical_stride, horizontal_stride, vertical_dilation + 1, horizontal_dilation + 1,
-				gpu_out);
+				gpu_output);
 		Tensor<Scalar,4> out(in.dimension(0), ext_output_dims(2), ext_output_dims(0), ext_output_dims(1));
-		gpu_out.copy_to_host(out.data());
+		gpu_output.copy_to_host(out.data());
 		return out.shuffle(nchw_to_nhwc);
 	}
 	inline Tensor<Scalar,4> _pass_back(Tensor<Scalar,4> out_grad) {
@@ -1776,11 +1776,9 @@ protected:
 		assert(in.dimension(0) > 0);
 		using namespace internal;
 		ext_batch_dims[0] = in.dimension(0);
-		gpu_input = internal::CuDNNTensor<Scalar>(ext_batch_dims[0], ext_batch_dims[1],
-				ext_batch_dims[2], ext_batch_dims[3]);
+		gpu_input = CuDNNTensor<Scalar>(ext_batch_dims[0], ext_batch_dims[1], ext_batch_dims[2], ext_batch_dims[3]);
 		gpu_input.copy_from_host(in.data());
-		gpu_output = internal::CuDNNTensor<Scalar>(ext_batch_dims[0], ext_batch_dims[1],
-				ext_batch_dims[2], ext_batch_dims[3]);
+		gpu_output = CuDNNTensor<Scalar>(ext_batch_dims[0], ext_batch_dims[1], ext_batch_dims[2], ext_batch_dims[3]);
 		CuDNNHandle<Scalar>::get_instance().activation_fwd(gpu_input, act_mode, coeff, gpu_output);
 		typename Root::Data out = std::move(in);
 		gpu_output.copy_to_host(out.data());
@@ -2244,6 +2242,7 @@ protected:
 		using namespace internal;
 		CuDNNTensor<Scalar> gpu_in_out_grad(ext_batch_dims[0], ext_batch_dims[1],
 				ext_batch_dims[2], ext_batch_dims[3]);
+		gpu_in_out_grad.copy_from_host(out_grad.data());
 		CuDNNHandle<Scalar>::get_instance().softmax_bwd(gpu_output, gpu_in_out_grad);
 		typename Root::Data prev_out_grad = std::move(out_grad);
 		gpu_in_out_grad.copy_to_host(prev_out_grad.data());
@@ -3322,7 +3321,7 @@ protected:
 	inline PoolLayer(const Dimensions<std::size_t,Rank>& input_dims, cudnnPoolingMode_t pool_mode,
 			std::size_t receptor_height, std::size_t receptor_width, std::size_t vertical_stride,
 			std::size_t horizontal_stride) :
-				ext_input_dims(input_dims.template promote<3 - Rank>()),
+				ext_input_dims(input_dims.template extend<3 - Rank>()),
 				ext_output_dims(calculate_output_dims(ext_input_dims, pool_mode, receptor_height,
 						receptor_width, vertical_stride, horizontal_stride)),
 				input_dims(input_dims),
@@ -3371,6 +3370,7 @@ protected:
 		batch_input_dims[0] = rows;
 		batch_output_dims[0] = rows;
 		gpu_input = CuDNNTensor<Scalar>(rows, ext_input_dims(0), ext_input_dims(1), ext_input_dims(2));
+		gpu_input.copy_from_host(in.data());
 		gpu_output = CuDNNTensor<Scalar>(rows, ext_output_dims(0), ext_output_dims(1), ext_output_dims(2));
 		CuDNNHandle<Scalar>::get_instance().pool2d_fwd(gpu_input, pool_mode, receptor_height, receptor_width,
 				0, 0, vertical_stride, horizontal_stride, gpu_output);
@@ -4276,7 +4276,8 @@ public:
 		using namespace internal;
 		gpu_means = CuDNNTensor<Scalar>(1u, PerLastRank ? 1u : batch_dims[1],
 				PerLastRank ? 1u : batch_dims[2], batch_dims[3]);
-		gpu_vars = CuDNNTensor<Scalar>(1u, means.get_h(), means.get_w(), means.get_c());
+		gpu_vars = CuDNNTensor<Scalar>(1u, gpu_means.get_h(), gpu_means.get_w(),
+				gpu_means.get_c());
 	}
 protected:
 	inline BatchNormLayer(Self& layer, bool share_params) :
@@ -4349,14 +4350,14 @@ protected:
 		gpu_input.copy_from_host(in.data());
 		Matrix<Scalar> gamma = params_ref.col(0);
 		Matrix<Scalar> beta = params_ref.col(1);
-		CuDNNTensor<Scalar> gpu_gamma(means.get_n(), means.get_h(), means.get_w(), means.get_c());
+		CuDNNTensor<Scalar> gpu_gamma(gpu_means.get_n(), gpu_means.get_h(), gpu_means.get_w(), gpu_means.get_c());
 		gpu_gamma.copy_from_host(gamma.data());
-		CuDNNTensor<Scalar> gpu_beta(means.get_n(), means.get_h(), means.get_w(), means.get_c());
+		CuDNNTensor<Scalar> gpu_beta(gpu_means.get_n(), gpu_means.get_h(), gpu_means.get_w(), gpu_means.get_c());
 		gpu_beta.copy_from_host(beta.data());
 		CuDNNTensor<Scalar> gpu_output(batch_dims[0], batch_dims[1], batch_dims[2], batch_dims[3]);
 		if (training) {
-			mean_cache = CuDNNTensor<Scalar>(means.get_n(), means.get_h(), means.get_w(), means.get_c());
-			inv_var_cache = CuDNNTensor<Scalar>(means.get_n(), means.get_h(), means.get_w(), means.get_c());
+			mean_cache = CuDNNTensor<Scalar>(gpu_means.get_n(), gpu_means.get_h(), gpu_means.get_w(), gpu_means.get_c());
+			inv_var_cache = CuDNNTensor<Scalar>(gpu_means.get_n(), gpu_means.get_h(), gpu_means.get_w(), gpu_means.get_c());
 			CuDNNHandle<Scalar>::get_instance().batch_norm_fwd_training(gpu_input, gpu_gamma, gpu_beta,
 					PerLastRank, (Scalar) 1 - norm_avg_decay, epsilon, gpu_means, gpu_vars, gpu_output,
 					gpu_mean_cache, gpu_inv_var_cache);
@@ -4375,10 +4376,10 @@ protected:
 		CuDNNTensor<Scalar> gpu_out_grad(batch_dims[0], batch_dims[1], batch_dims[2], batch_dims[3]);
 		gpu_out_grad.copy_from_host(out_grad.data());
 		Matrix<Scalar> gamma = params_ref.col(0);
-		CuDNNTensor<Scalar> gpu_gamma(means.get_n(), means.get_h(), means.get_w(), means.get_c());
+		CuDNNTensor<Scalar> gpu_gamma(gpu_means.get_n(), gpu_means.get_h(), gpu_means.get_w(), gpu_means.get_c());
 		gpu_gamma.copy_from_host(gamma.data());
-		CuDNNTensor<Scalar> gpu_gamma_grad(means.get_n(), means.get_h(), means.get_w(), means.get_c());
-		CuDNNTensor<Scalar> gpu_beta_grad(means.get_n(), means.get_h(), means.get_w(), means.get_c());
+		CuDNNTensor<Scalar> gpu_gamma_grad(gpu_means.get_n(), gpu_means.get_h(), gpu_means.get_w(), gpu_means.get_c());
+		CuDNNTensor<Scalar> gpu_beta_grad(gpu_means.get_n(), gpu_means.get_h(), gpu_means.get_w(), gpu_means.get_c());
 		CuDNNTensor<Scalar> gpu_prev_out_grad(batch_dims[0], batch_dims[1], batch_dims[2], batch_dims[3]);
 		CuDNNHandle<Scalar>::get_instance().batch_norm_bwd(gpu_input, gpu_out_grad, gpu_gamma, gpu_mean_cache,
 				gpu_inv_var_cache, PerLastRank, epsilon, gpu_prev_out_grad, gpu_gamma_grad, gpu_beta_grad);
@@ -4509,7 +4510,7 @@ protected:
 		if (training) {
 			// Inverted dropout.
 			Scalar scaling_factor = (Scalar) 1 / (1 - dropout_prob + epsilon);
-			dropout_mask = ((in.random() + in.constant(1)) / (Scalar) 2).unaryExpr([this,scaling_factor](Scalar i) {
+			dropout_mask = in.random().unaryExpr([this,scaling_factor](Scalar i) {
 				return (Scalar) (i <= dropout_prob ? 0 : scaling_factor);
 			});
 			return in * dropout_mask;
@@ -4589,7 +4590,12 @@ public:
 	inline void set_frozen(bool frozen) {
 		this->frozen = frozen;
 	}
-	inline void init() { }
+	inline void init() {
+		using namespace internal;
+		std::size_t state_size;
+		CuDNNHandle<Scalar>::get_instance().dropout_state_size(state_size);
+		gpu_state = CuDNNTensor<Scalar>(state_size, 1u, 1u, 1u);
+	}
 protected:
 	inline bool is_input_layer() const {
 		return input_layer;
@@ -4621,12 +4627,12 @@ protected:
 					ext_batch_dims[2], ext_batch_dims[3]);
 			gpu_input.copy_from_host(in.data());
 			std::size_t reserve_size;
-			auto cudnn_handle = CuDNNHandle<Scalar>::get_instance();
-			cudnn_handle.dropout_reserve_size(gpu_input, reserve_size);
+			CuDNNHandle<Scalar>::get_instance().dropout_reserve_size(gpu_input, reserve_size);
 			gpu_reserve = CuDNNTensor<Scalar>(reserve_size, 1u, 1u, 1u);
 			CuDNNTensor<Scalar> gpu_output(ext_batch_dims[0], ext_batch_dims[1],
 					ext_batch_dims[2], ext_batch_dims[3]);
-			cudnn_handle.dropout_fwd(gpu_input, dropout_prob, gpu_reserve, gpu_output);
+			CuDNNHandle<Scalar>::get_instance().dropout_fwd(gpu_input, dropout_prob, gpu_state, gpu_reserve,
+					gpu_output);
 			typename Base::Data out = std::move(in);
 			gpu_output.copy_to_host(out.data());
 			return out;
@@ -4644,7 +4650,8 @@ protected:
 		gpu_out_grad.copy_from_host(out_grad.data());
 		CuDNNTensor<Scalar> gpu_prev_out_grad(ext_batch_dims[0], ext_batch_dims[1],
 				ext_batch_dims[2], ext_batch_dims[3]);
-		CuDNNTensor<Scalar>::get_instance().dropout_bwd(gpu_out_grad, gpu_reserve, dropout_prob, gpu_prev_out_grad);
+		CuDNNHandle<Scalar>::get_instance().dropout_bwd(gpu_out_grad, dropout_prob, gpu_state, gpu_reserve,
+				gpu_prev_out_grad);
 		typename Base::Data prev_out_grad = std::move(out_grad);
 		gpu_prev_out_grad.copy_to_host(prev_out_grad.data());
 		return prev_out_grad;
@@ -4657,6 +4664,7 @@ private:
 	Matrix<Scalar> params;
 	Matrix<Scalar> params_grad;
 	std::array<std::size_t,4> ext_batch_dims;
+	internal::CuDNNTensor<Scalar> gpu_state;
 	internal::CuDNNTensor<Scalar> gpu_reserve;
 };
 #endif

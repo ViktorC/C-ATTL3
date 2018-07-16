@@ -239,7 +239,7 @@ inline void activation_layer_grad_test(const Dimensions<std::size_t,Rank>& dims)
 			LayerPtr<Scalar,Rank>(new BinaryStepActivationLayer<Scalar,Rank>(dims_3)));
 	LayerPtr<Scalar,Rank> kernel_layer_4 = kernel_layer<Scalar,Rank>(dims);
 	Dimensions<std::size_t,Rank> dims_4 = kernel_layer_4->get_output_dims();
-	layer_grad_test<Scalar,Rank>("sigmoid activation layer rank", std::move(kernel_layer_4),
+	layer_grad_test<Scalar,Rank>("sigmoid activation layer", std::move(kernel_layer_4),
 			LayerPtr<Scalar,Rank>(new SigmoidActivationLayer<Scalar,Rank>(dims_4)));
 	LayerPtr<Scalar,Rank> kernel_layer_5 = kernel_layer<Scalar,Rank>(dims);
 	Dimensions<std::size_t,Rank> dims_5 = kernel_layer_5->get_output_dims();
@@ -247,27 +247,27 @@ inline void activation_layer_grad_test(const Dimensions<std::size_t,Rank>& dims)
 			LayerPtr<Scalar,Rank>(new TanhActivationLayer<Scalar,Rank>(dims_5)));
 	LayerPtr<Scalar,Rank> kernel_layer_6 = kernel_layer<Scalar,Rank>(dims);
 	Dimensions<std::size_t,Rank> dims_6 = kernel_layer_6->get_output_dims();
-	layer_grad_test<Scalar,Rank>("softsign activation layer rank", std::move(kernel_layer_6),
+	layer_grad_test<Scalar,Rank>("softsign activation layer", std::move(kernel_layer_6),
 			LayerPtr<Scalar,Rank>(new SoftsignActivationLayer<Scalar,Rank>(dims_6)));
 	LayerPtr<Scalar,Rank> kernel_layer_7 = kernel_layer<Scalar,Rank>(dims);
 	Dimensions<std::size_t,Rank> dims_7 = kernel_layer_7->get_output_dims();
-	layer_grad_test<Scalar,Rank>("softplus activation layer rank", std::move(kernel_layer_7),
+	layer_grad_test<Scalar,Rank>("softplus activation layer", std::move(kernel_layer_7),
 			LayerPtr<Scalar,Rank>(new SoftplusActivationLayer<Scalar,Rank>(dims_7)));
 	LayerPtr<Scalar,Rank> kernel_layer_8 = kernel_layer<Scalar,Rank>(dims);
 	Dimensions<std::size_t,Rank> dims_8 = kernel_layer_8->get_output_dims();
-	layer_grad_test<Scalar,Rank>("softmax activation layer rank", std::move(kernel_layer_8),
+	layer_grad_test<Scalar,Rank>("softmax activation layer", std::move(kernel_layer_8),
 			LayerPtr<Scalar,Rank>(new SoftmaxActivationLayer<Scalar,Rank>(dims_8)));
 	LayerPtr<Scalar,Rank> kernel_layer_9 = kernel_layer<Scalar,Rank>(dims);
 	Dimensions<std::size_t,Rank> dims_9 = kernel_layer_9->get_output_dims();
-	layer_grad_test<Scalar,Rank>("relu activation layer rank", std::move(kernel_layer_9),
+	layer_grad_test<Scalar,Rank>("relu activation layer", std::move(kernel_layer_9),
 			LayerPtr<Scalar,Rank>(new ReLUActivationLayer<Scalar,Rank>(dims_9)));
 	LayerPtr<Scalar,Rank> kernel_layer_10 = kernel_layer<Scalar,Rank>(dims);
 	Dimensions<std::size_t,Rank> dims_10 = kernel_layer_10->get_output_dims();
-	layer_grad_test<Scalar,Rank>("leaky relu activation layer rank", std::move(kernel_layer_10),
+	layer_grad_test<Scalar,Rank>("leaky relu activation layer", std::move(kernel_layer_10),
 			LayerPtr<Scalar,Rank>(new LeakyReLUActivationLayer<Scalar,Rank>(dims_10, 2e-1)));
 	LayerPtr<Scalar,Rank> kernel_layer_11 = kernel_layer<Scalar,Rank>(dims);
 	Dimensions<std::size_t,Rank> dims_11 = kernel_layer_11->get_output_dims();
-	layer_grad_test<Scalar,Rank>("elu activation layer rank", std::move(kernel_layer_11),
+	layer_grad_test<Scalar,Rank>("elu activation layer", std::move(kernel_layer_11),
 			LayerPtr<Scalar,Rank>(new ELUActivationLayer<Scalar,Rank>(dims_11, 2e-1)));
 	auto reg = ParamRegSharedPtr<Scalar>(new SquaredParameterRegularization<Scalar>());
 	layer_grad_test<Scalar,Rank>("prelu activation layer rank",
@@ -275,9 +275,9 @@ inline void activation_layer_grad_test(const Dimensions<std::size_t,Rank>& dims)
 			LayerPtr<Scalar,Rank>(new PReLUActivationLayer<Scalar,Rank>(dims)));
 	LayerPtr<Scalar,Rank> kernel_layer_12 = kernel_layer<Scalar,Rank>(dims);
 	Dimensions<std::size_t,Rank> dims_12 = kernel_layer_12->get_output_dims();
-	layer_grad_test<Scalar,Rank>("swish activation layer rank", std::move(kernel_layer_12),
+	layer_grad_test<Scalar,Rank>("swish activation layer", std::move(kernel_layer_12),
 			LayerPtr<Scalar,Rank>(new SwishActivationLayer<Scalar,Rank>(dims_12, 1.2)));
-	layer_grad_test<Scalar,Rank>("pswish activation layer rank",
+	layer_grad_test<Scalar,Rank>("pswish activation layer",
 			LayerPtr<Scalar,Rank>(new PSwishActivationLayer<Scalar,Rank>(dims)),
 			LayerPtr<Scalar,Rank>(new PSwishActivationLayer<Scalar,Rank>(dims, reg, 1.2)));
 }
@@ -624,12 +624,12 @@ inline void recurrent_net_grad_test() {
 	KernelPtr<Scalar,1> input_kernel1_1(new DenseKernelLayer<Scalar,1>({ 12u }, 12, init, reg));
 	KernelPtr<Scalar,1> state_kernel1_1(new DenseKernelLayer<Scalar,1>(input_kernel1_1->get_output_dims(), 12, init, reg));
 	KernelPtr<Scalar,1> output_kernel1_1(new DenseKernelLayer<Scalar,1>(state_kernel1_1->get_output_dims(), 4, init, reg));
-	ActivationPtr<Scalar,1> state_act1_1(new SigmoidActivationLayer<Scalar,1>(state_kernel1_1->get_output_dims()));
+	ActivationPtr<Scalar,1> state_act1_1(new TanhActivationLayer<Scalar,1>(state_kernel1_1->get_output_dims()));
 	ActivationPtr<Scalar,1> output_act1_1(new IdentityActivationLayer<Scalar,1>(output_kernel1_1->get_output_dims()));
 	KernelPtr<Scalar,1> input_kernel2_1((DenseKernelLayer<Scalar,1>*) input_kernel1_1->clone());
 	KernelPtr<Scalar,1> state_kernel2_1((DenseKernelLayer<Scalar,1>*) state_kernel1_1->clone());
 	KernelPtr<Scalar,1> output_kernel2_1((DenseKernelLayer<Scalar,1>*) output_kernel1_1->clone());
-	ActivationPtr<Scalar,1> state_act2_1((SigmoidActivationLayer<Scalar,1>*) state_act1_1->clone());
+	ActivationPtr<Scalar,1> state_act2_1((TanhActivationLayer<Scalar,1>*) state_act1_1->clone());
 	ActivationPtr<Scalar,1> output_act2_1((IdentityActivationLayer<Scalar,1>*) output_act1_1->clone());
 	seq_network_grad_test("recurrent net", NeuralNetPtr<Scalar,1,true>(
 			new RecurrentNeuralNetwork<Scalar,1>(std::move(input_kernel1_1), std::move(state_kernel1_1),
@@ -643,12 +643,12 @@ inline void recurrent_net_grad_test() {
 	KernelPtr<Scalar,3> input_kernel1_3(new ConvKernelLayer<Scalar>({ 4u, 4u, 2u }, 5, init, reg));
 	KernelPtr<Scalar,3> state_kernel1_3(new ConvKernelLayer<Scalar>(input_kernel1_3->get_output_dims(), 5, init, reg));
 	KernelPtr<Scalar,3> output_kernel1_3(new DenseKernelLayer<Scalar,3>(state_kernel1_3->get_output_dims(), 2, init, reg));
-	ActivationPtr<Scalar,3> state_act1_3(new SoftplusActivationLayer<Scalar,3>(state_kernel1_3->get_output_dims()));
+	ActivationPtr<Scalar,3> state_act1_3(new SoftsignActivationLayer<Scalar,3>(state_kernel1_3->get_output_dims()));
 	ActivationPtr<Scalar,3> output_act1_3(new IdentityActivationLayer<Scalar,3>(output_kernel1_3->get_output_dims()));
 	KernelPtr<Scalar,3> input_kernel2_3((ConvKernelLayer<Scalar>*) input_kernel1_3->clone());
 	KernelPtr<Scalar,3> state_kernel2_3((ConvKernelLayer<Scalar>*) state_kernel1_3->clone());
 	KernelPtr<Scalar,3> output_kernel2_3((DenseKernelLayer<Scalar,3>*) output_kernel1_3->clone());
-	ActivationPtr<Scalar,3> state_act2_3((SoftplusActivationLayer<Scalar,3>*) state_act1_3->clone());
+	ActivationPtr<Scalar,3> state_act2_3((SoftsignActivationLayer<Scalar,3>*) state_act1_3->clone());
 	ActivationPtr<Scalar,3> output_act2_3((IdentityActivationLayer<Scalar,3>*) output_act1_3->clone());
 	seq_network_grad_test("recurrent net", NeuralNetPtr<Scalar,3,true>(
 			new RecurrentNeuralNetwork<Scalar,3>(std::move(input_kernel1_3), std::move(state_kernel1_3),

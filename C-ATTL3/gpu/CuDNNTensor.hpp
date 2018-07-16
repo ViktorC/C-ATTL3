@@ -27,12 +27,10 @@ namespace internal {
 template<bool Filter = false>
 struct CuDNNTensorDescriptorManager {
 	typedef cudnnTensorDescriptor_t Type;
-	__inline__ static Type create_descriptor(cudnnDataType_t data_type, cudnnTensorFormat_t format,
+	__inline__ static void create_descriptor(Type& desc, cudnnDataType_t data_type, cudnnTensorFormat_t format,
 			std::size_t n, std::size_t h, std::size_t w, std::size_t c) {
-		Type desc;
 		cudnnAssert(cudnnCreateTensorDescriptor(&desc));
 		cudnnAssert(cudnnSetTensor4dDescriptor(desc, format, data_type, n, c, h, w));
-		return desc;
 	}
 	__inline__ static void destroy_descriptor(const Type& desc) {
 		cudnnAssert(cudnnDestroyTensorDescriptor(desc));
@@ -42,12 +40,10 @@ struct CuDNNTensorDescriptorManager {
 template<>
 struct CuDNNTensorDescriptorManager<true> {
 	typedef cudnnFilterDescriptor_t Type;
-	__inline__ static Type create_descriptor(cudnnDataType_t data_type, cudnnTensorFormat_t format,
+	__inline__ static void create_descriptor(Type& desc, cudnnDataType_t data_type, cudnnTensorFormat_t format,
 			std::size_t n, std::size_t h, std::size_t w, std::size_t c) {
-		Type desc;
 		cudnnAssert(cudnnCreateFilterDescriptor(&desc));
 		cudnnAssert(cudnnSetFilter4dDescriptor(desc, data_type, format, n, c, h, w));
-		return desc;
 	}
 	__inline__ static void destroy_descriptor(const Type& desc) {
 		cudnnAssert(cudnnDestroyFilterDescriptor(desc));
@@ -80,22 +76,19 @@ public:
 				c(c),
 				size(n * h * w * c),
 				format(format),
-				desc(DescriptorManager::create_descriptor(DATA_TYPE, format, n, h, w, c)) {
-		cudaAssert(cudaMalloc(&data, size));
+				desc(),
+				data(nullptr) {
+		if (size > 0) {
+			DescriptorManager::create_descriptor(desc, DATA_TYPE, format, n, h, w, c);
+			cudaAssert(cudaMalloc(&data, size * sizeof(Scalar)));
+		}
 	}
 	inline CuDNNTensor() :
-			n(0),
-			h(0),
-			w(0),
-			c(0),
-			size(0),
-			format(CUDNN_TENSOR_NHWC),
-			desc(),
-			data(nullptr) { }
+			CuDNNTensor(0u, 0u, 0u, 0u) { }
 	inline CuDNNTensor(const Self& tensor) :
 			CuDNNTensor(tensor.n, tensor.h, tensor.w, tensor.c, tensor.format) {
 		if (size > 0)
-			cudaAssert(cudaMemcpy(data, tensor.data, size, cudaMemcpyDeviceToDevice));
+			cudaAssert(cudaMemcpy(data, tensor.data, size * sizeof(Scalar), cudaMemcpyDeviceToDevice));
 	}
 	inline CuDNNTensor(Self&& tensor) :
 			CuDNNTensor() {
@@ -173,7 +166,7 @@ public:
 	 */
 	inline void copy_from_host(const Scalar* host_data) {
 		if (size > 0)
-			cudaAssert(cudaMemcpy(data, host_data, size, cudaMemcpyHostToDevice));
+			cudaAssert(cudaMemcpy(data, host_data, size * sizeof(Scalar), cudaMemcpyHostToDevice));
 	}
 	/**
 	 * It copies the entire device tensor to the host memory.
@@ -183,7 +176,7 @@ public:
 	 */
 	inline void copy_to_host(Scalar* host_data) const {
 		if (size > 0)
-			cudaAssert(cudaMemcpy(host_data, data, size, cudaMemcpyDeviceToHost));
+			cudaAssert(cudaMemcpy(host_data, data, size * sizeof(Scalar), cudaMemcpyDeviceToHost));
 	}
 	/**
 	 * @return A string representation of the tensor.

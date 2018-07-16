@@ -45,6 +45,7 @@ The kernel layers (fully-connected and convolutional) also require weight initia
 * [WeightInitialization](https://viktorc.github.io/C-ATTL3/html/classcattle_1_1_weight_initialization.html) [A]
   * [ZeroWeightInitialization](https://viktorc.github.io/C-ATTL3/html/classcattle_1_1_zero_weight_initialization.html)
   * [OneWeightInitialization](https://viktorc.github.io/C-ATTL3/html/classcattle_1_1_one_weight_initialization.html)
+  * [IncrementalWeightInitialization](https://viktorc.github.io/C-ATTL3/html/classcattle_1_1_incremental_weight_initialization.html)
   * [GaussianWeightInitialization](https://viktorc.github.io/C-ATTL3/html/classcattle_1_1_gaussian_weight_initialization.html)
     * [LeCunWeightInitialization](https://viktorc.github.io/C-ATTL3/html/classcattle_1_1_le_cun_weight_initialization.html)
     * [GlorotWeightInitialization](https://viktorc.github.io/C-ATTL3/html/classcattle_1_1_glorot_weight_initialization.html)
@@ -133,7 +134,7 @@ The partition data provider maps to a continuous segment of the data backing ano
 C-ATTL3 also contains a few preporcessors that can be used to transform the input data. They are:
 * [Preprocessor](https://viktorc.github.io/C-ATTL3/html/classcattle_1_1_preprocessor.html) [A]
   * [NormalizationPreprocessor](https://viktorc.github.io/C-ATTL3/html/classcattle_1_1_normalization_preprocessor.html) (NS)
-  * [PCAPreprocessor](https://viktorc.github.io/C-ATTL3/html/classcattle_1_1_p_c_a_preprocessor.html) (NS)
+    * [PCAPreprocessor](https://viktorc.github.io/C-ATTL3/html/classcattle_1_1_p_c_a_preprocessor.html) (NS)
 
 Both normalization preprocessors and PCA preprocessors support the centering and optionally the standardization of data. PCA preprocessors can also utilize whitening and, in case of single-channel data, dimensionality reduction.
 

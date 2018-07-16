@@ -8,7 +8,7 @@ GCC_CXXFLAGS := $(CXXFLAGS) -Wno-ignored-attributes -fopenmp
 GCC_CUDA_CXXFLAGS := $(GCC_CXXFLAGS) -DCATTL3_USE_CUDA
 # Clang does not actually utilize OpenMP on Windows; no libomp or libiomp5.
 CLANG_CXXFLAGS := $(CXXFLAGS) -march=native
-CLANG_CUDA_CXXFLAGS := $(CLANG_CXXFLAGS) -DCATTL3_USE_CUDA
+CLANG_CUDA_CXXFLAGS := $(CLANG_CXXFLAGS) -DCATTL3_USE_CUDNN
 RELEASE_OPT_FLAGS := -O3 -DNDEBUG
 # Without level 1 optimization, the object file is too big.
 DEBUG_OPT_FLAGS := -O1 -g

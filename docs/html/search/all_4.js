@@ -28,8 +28,9 @@ var searchData=
   ['dimexpression_3c_20unarydimexpression_3c_20indextype_2c_20rank_2c_20lhsexpr_2c_20optype_20_3e_2c_20indextype_2c_20rank_20_3e',['DimExpression&lt; UnaryDimExpression&lt; IndexType, Rank, LhsExpr, OpType &gt;, IndexType, Rank &gt;',['../classcattle_1_1_dim_expression.html',1,'cattle']]],
   ['dimexpression_3c_20unaryrankwisedimexpression_3c_20indextype_2c_20rank_2c_20lhsexpr_2c_20optype_20_3e_2c_20indextype_2c_20rank_20_3e',['DimExpression&lt; UnaryRankWiseDimExpression&lt; IndexType, Rank, LhsExpr, OpType &gt;, IndexType, Rank &gt;',['../classcattle_1_1_dim_expression.html',1,'cattle']]],
   ['divide_5falong_5frank',['divide_along_rank',['../classcattle_1_1_dim_expression.html#aa4651f18fd078bc3a0b60999c463261a',1,'cattle::DimExpression']]],
-  ['dropout_5fbwd',['dropout_bwd',['../classcattle_1_1internal_1_1_cu_d_n_n_handle.html#ab7e31be3c57472af5e28b27f4a580d0a',1,'cattle::internal::CuDNNHandle']]],
-  ['dropout_5ffwd',['dropout_fwd',['../classcattle_1_1internal_1_1_cu_d_n_n_handle.html#a548f05edbf2a5cf86b7eccf29b2e9604',1,'cattle::internal::CuDNNHandle']]],
+  ['dropout_5fbwd',['dropout_bwd',['../classcattle_1_1internal_1_1_cu_d_n_n_handle.html#ab3dcf87e328ad64c5604767ee25ca192',1,'cattle::internal::CuDNNHandle']]],
+  ['dropout_5ffwd',['dropout_fwd',['../classcattle_1_1internal_1_1_cu_d_n_n_handle.html#a02d1da9583070b2b02db099b1e5f2ab3',1,'cattle::internal::CuDNNHandle']]],
   ['dropout_5freserve_5fsize',['dropout_reserve_size',['../classcattle_1_1internal_1_1_cu_d_n_n_handle.html#a7e55aa4c437ddcbe0fe32c81cf511555',1,'cattle::internal::CuDNNHandle']]],
+  ['dropout_5fstate_5fsize',['dropout_state_size',['../classcattle_1_1internal_1_1_cu_d_n_n_handle.html#aa832a112b2c4f51291749a4de7116f54',1,'cattle::internal::CuDNNHandle']]],
   ['dropoutlayer',['DropoutLayer',['../classcattle_1_1_dropout_layer.html',1,'cattle::DropoutLayer&lt; Scalar, Rank &gt;'],['../classcattle_1_1_dropout_layer.html#aaa346c955d02369927de664087a32999',1,'cattle::DropoutLayer::DropoutLayer()']]]
 ];
