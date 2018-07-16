@@ -153,7 +153,7 @@ public:
 			strm << "Layer " << std::setw(3) << std::to_string(i) << " " << *layers[i];
 		return strm.str();
 	}
-	friend std::ostream& operator<<(std::ostream& os, const NeuralNetwork<Scalar,Rank,Sequential>& nn) {
+	inline friend std::ostream& operator<<(std::ostream& os, const NeuralNetwork<Scalar,Rank,Sequential>& nn) {
 		return os << nn.to_string() << std::endl;
 	}
 protected:

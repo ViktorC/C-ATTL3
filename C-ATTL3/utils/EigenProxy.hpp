@@ -91,7 +91,8 @@ using SVDOptions = Eigen::DecompositionOptions;
  * A struct for retrieving and setting the number of threads Eigen should use
  * for matrix multiplication and other parallelized operations.
  */
-struct EigenProxy {
+class EigenProxy {
+public:
 	EigenProxy() = delete;
 	/**
 	 * @return The number of threads used by Eigen to accelerate operations

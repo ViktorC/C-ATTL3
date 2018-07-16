@@ -189,7 +189,7 @@ public:
 		}
 		return strm.str();
 	}
-	friend std::ostream& operator<<(std::ostream& os, const Layer<Scalar,Rank>& layer) {
+	inline friend std::ostream& operator<<(std::ostream& os, const Layer<Scalar,Rank>& layer) {
 		return os << layer.to_string() << std::flush;
 	}
 protected:
