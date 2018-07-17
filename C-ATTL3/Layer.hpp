@@ -3289,7 +3289,7 @@ private:
 template<typename Scalar, std::size_t Rank>
 class PoolLayer : public Layer<Scalar,Rank> {
 	typedef Layer<Scalar,Rank> Base;
-	typedef std::array<std::size_t,4> Array4;
+	static constexpr cudnnTensorFormat_t TENSOR_FORMAT = CUDNN_TENSOR_NCHW;
 public:
 	virtual Base* clone() const = 0;
 	inline Base* clone_with_shared_params() {
@@ -3326,13 +3326,12 @@ protected:
 						receptor_width, vertical_stride, horizontal_stride)),
 				input_dims(input_dims),
 				output_dims(ext_output_dims.template contract<3 - Rank>()),
-				batch_input_dims(input_dims.template promote<>()),
-				batch_output_dims(output_dims.template promote<>()),
 				receptor_height(receptor_height),
 				receptor_width(receptor_width),
 				vertical_stride(vertical_stride),
 				horizontal_stride(horizontal_stride),
 				pool_mode(pool_mode),
+				nchw_to_nhwc({ 0u, 2u, 3u, 1u }),
 				input_layer(false),
 				frozen(false),
 				params(),
@@ -3348,8 +3347,9 @@ protected:
 		this->input_layer = input_layer;
 	}
 	inline void empty_cache() {
-		gpu_input = internal::CuDNNTensor<Scalar>();
-		gpu_output = internal::CuDNNTensor<Scalar>();
+		using namespace internal;
+		gpu_input = CuDNNTensor<Scalar>();
+		gpu_output = CuDNNTensor<Scalar>();
 	}
 	inline Matrix<Scalar>& get_params() {
 		return params;
@@ -3366,31 +3366,28 @@ protected:
 		assert((Dimensions<std::size_t,Rank + 1>(in.dimensions()).template demote<>()) == input_dims);
 		assert(in.dimension(0) > 0);
 		using namespace internal;
-		std::size_t rows = in.dimension(0);
-		batch_input_dims[0] = rows;
-		batch_output_dims[0] = rows;
-		gpu_input = CuDNNTensor<Scalar>(rows, ext_input_dims(0), ext_input_dims(1), ext_input_dims(2));
+		rows = in.dimension(0);
+		gpu_input = CuDNNTensor<Scalar>(rows, ext_input_dims(0), ext_input_dims(1), ext_input_dims(2), TENSOR_FORMAT);
 		gpu_input.copy_from_host(in.data());
 		gpu_output = CuDNNTensor<Scalar>(rows, ext_output_dims(0), ext_output_dims(1), ext_output_dims(2));
 		CuDNNHandle<Scalar>::get_instance().pool2d_fwd(gpu_input, pool_mode, receptor_height, receptor_width,
 				0, 0, vertical_stride, horizontal_stride, gpu_output);
-		typename Base::Data out(batch_output_dims);
+		typename Base::Data out(rows, ext_output_dims(2), ext_output_dims(0), ext_output_dims(1));
 		gpu_output.copy_to_host(out.data());
-		return out;
+		return out.shuffle(nchw_to_nhwc);
 	}
 	inline typename Base::Data pass_back(typename Base::Data out_grad) {
 		assert((Dimensions<std::size_t,Rank + 1>(out_grad.dimensions()).template demote<>()) == output_dims);
-		assert(out_grad.dimension(0) > 0 && batch_output_dims[0] == out_grad.dimension(0));
+		assert(out_grad.dimension(0) > 0 && rows == out_grad.dimension(0));
 		using namespace internal;
-		std::size_t rows = out_grad.dimension(0);
-		CuDNNTensor<Scalar> gpu_out_grad(rows, ext_output_dims(0), ext_output_dims(1), ext_output_dims(2));
+		CuDNNTensor<Scalar> gpu_out_grad(rows, ext_output_dims(0), ext_output_dims(1), ext_output_dims(2), TENSOR_FORMAT);
 		gpu_out_grad.copy_from_host(out_grad.data());
 		CuDNNTensor<Scalar> gpu_prev_out_grad(rows, ext_input_dims(0), ext_input_dims(1), ext_input_dims(2));
 		CuDNNHandle<Scalar>::get_instance().pool2d_bwd(gpu_input, gpu_output, gpu_out_grad, pool_mode,
 				receptor_height, receptor_width, 0, 0, vertical_stride, horizontal_stride, gpu_prev_out_grad);
-		typename Base::Data prev_out_grad(batch_input_dims);
+		typename Base::Data prev_out_grad(rows, ext_input_dims(2), ext_input_dims(0), ext_input_dims(1));
 		gpu_prev_out_grad.copy_to_host(prev_out_grad.data());
-		return prev_out_grad;
+		return prev_out_grad.shuffle(nchw_to_nhwc);
 	}
 	const Dimensions<std::size_t,3> ext_input_dims;
 	const Dimensions<std::size_t,3> ext_output_dims;
@@ -3411,10 +3408,10 @@ private:
 				h, w, c);
 		return { h, w, c };
 	}
-	std::array<std::size_t,Base::DATA_RANK> batch_input_dims;
-	std::array<std::size_t,Base::DATA_RANK> batch_output_dims;
+	const std::array<std::size_t,4> nchw_to_nhwc;
 	bool input_layer;
 	bool frozen;
+	std::size_t rows;
 	Matrix<Scalar> params;
 	Matrix<Scalar> params_grad;
 	internal::CuDNNTensor<Scalar> gpu_input;

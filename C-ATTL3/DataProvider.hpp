@@ -378,9 +378,9 @@ public:
 				batch_size);
 		assert(data_pair.first.dimension(0) == data_pair.second.dimension(0));
 		while (data_pair.first.dimension(0) < batch_size && has_more()) {
-			current_file_pair = file_pairs[current_file_pair_ind];
-			DataPair<Scalar,Rank,Sequential> add_data_pair = _get_data(current_file_pair.first,
-					current_file_stream_pair.first, current_file_pair.second, current_file_stream_pair.second,
+			const FilePair& new_current_file_pair = file_pairs[current_file_pair_ind];
+			DataPair<Scalar,Rank,Sequential> add_data_pair = _get_data(new_current_file_pair.first,
+					current_file_stream_pair.first, new_current_file_pair.second, current_file_stream_pair.second,
 					batch_size - data_pair.first.dimension(0));
 			assert(add_data_pair.first.dimension(0) == add_data_pair.second.dimension(0));
 			typename Base::Data obs_concat = data_pair.first.concatenate(std::move(add_data_pair.first), 0);
@@ -393,7 +393,7 @@ public:
 	inline void reset() {
 		current_file_pair_ind = 0;
 		init_current_file_stream_pair();
-		_set_to_beg(current_file_stream_pair);
+		_set_to_beg(current_file_stream_pair.first, current_file_stream_pair.second);
 	}
 protected:
 	inline SplitFileDataProvider(const std::vector<std::pair<std::string,std::string>>& dataset_path_pairs) :
