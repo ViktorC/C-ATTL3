@@ -3331,7 +3331,6 @@ protected:
 				vertical_stride(vertical_stride),
 				horizontal_stride(horizontal_stride),
 				pool_mode(pool_mode),
-				nchw_to_nhwc({ 0u, 2u, 3u, 1u }),
 				input_layer(false),
 				frozen(false),
 				params(),
@@ -3369,12 +3368,12 @@ protected:
 		rows = in.dimension(0);
 		gpu_input = CuDNNTensor<Scalar>(rows, ext_input_dims(0), ext_input_dims(1), ext_input_dims(2), TENSOR_FORMAT);
 		gpu_input.copy_from_host(in.data());
-		gpu_output = CuDNNTensor<Scalar>(rows, ext_output_dims(0), ext_output_dims(1), ext_output_dims(2));
+		gpu_output = CuDNNTensor<Scalar>(rows, ext_output_dims(0), ext_output_dims(1), ext_output_dims(2), TENSOR_FORMAT);
 		CuDNNHandle<Scalar>::get_instance().pool2d_fwd(gpu_input, pool_mode, receptor_height, receptor_width,
 				0, 0, vertical_stride, horizontal_stride, gpu_output);
-		typename Base::Data out(rows, ext_output_dims(2), ext_output_dims(0), ext_output_dims(1));
+		typename Base::Data out(rows, ext_output_dims(0), ext_output_dims(1), ext_output_dims(2));
 		gpu_output.copy_to_host(out.data());
-		return out.shuffle(nchw_to_nhwc);
+		return out;
 	}
 	inline typename Base::Data pass_back(typename Base::Data out_grad) {
 		assert((Dimensions<std::size_t,Rank + 1>(out_grad.dimensions()).template demote<>()) == output_dims);
@@ -3382,12 +3381,12 @@ protected:
 		using namespace internal;
 		CuDNNTensor<Scalar> gpu_out_grad(rows, ext_output_dims(0), ext_output_dims(1), ext_output_dims(2), TENSOR_FORMAT);
 		gpu_out_grad.copy_from_host(out_grad.data());
-		CuDNNTensor<Scalar> gpu_prev_out_grad(rows, ext_input_dims(0), ext_input_dims(1), ext_input_dims(2));
+		CuDNNTensor<Scalar> gpu_prev_out_grad(rows, ext_input_dims(0), ext_input_dims(1), ext_input_dims(2), TENSOR_FORMAT);
 		CuDNNHandle<Scalar>::get_instance().pool2d_bwd(gpu_input, gpu_output, gpu_out_grad, pool_mode,
 				receptor_height, receptor_width, 0, 0, vertical_stride, horizontal_stride, gpu_prev_out_grad);
-		typename Base::Data prev_out_grad(rows, ext_input_dims(2), ext_input_dims(0), ext_input_dims(1));
+		typename Base::Data prev_out_grad(rows, ext_input_dims(0), ext_input_dims(1), ext_input_dims(2));
 		gpu_prev_out_grad.copy_to_host(prev_out_grad.data());
-		return prev_out_grad.shuffle(nchw_to_nhwc);
+		return prev_out_grad;
 	}
 	const Dimensions<std::size_t,3> ext_input_dims;
 	const Dimensions<std::size_t,3> ext_output_dims;
@@ -3408,7 +3407,6 @@ private:
 				h, w, c);
 		return { h, w, c };
 	}
-	const std::array<std::size_t,4> nchw_to_nhwc;
 	bool input_layer;
 	bool frozen;
 	std::size_t rows;
