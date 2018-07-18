@@ -97,7 +97,7 @@ public:
 		std::size_t rows = weights.rows() - 1;
 		std::size_t cols = weights.cols();
 		std::size_t elements = (weights.rows() - 1) * weights.cols();
-		Scalar step_size = (max - min) / elements;
+		Scalar step_size = (max - min) / (rows * cols);
 		Scalar val = min;
 		for (std::size_t i = 0; i < cols; ++i) {
 			for (std::size_t j = 0; j < rows; ++j) {
