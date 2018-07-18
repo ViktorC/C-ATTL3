@@ -410,6 +410,7 @@ private:
 	const Base& owner;
 };
 
+#ifndef CATTL3_USE_CUBLAS
 /**
  * A class template representing a fully connected layer.
  */
@@ -450,7 +451,6 @@ protected:
 	inline void empty_cache() {
 		biased_in_mat = Matrix<Scalar>(0, 0);
 	}
-#ifndef CATTL3_USE_CUBLAS
 	inline typename Root::Data pass_forward(typename Root::Data in, bool training) {
 		assert((Dimensions<std::size_t,Root::DATA_RANK>(in.dimensions()).template demote<>()) == Base::input_dims);
 		assert(in.dimension(0) > 0);
@@ -477,7 +477,53 @@ protected:
 		prev_out_conversion_dims[0] = prev_out_grad_mat.rows();
 		return TensorMap<Scalar,Root::DATA_RANK>(prev_out_grad_mat.data(), prev_out_conversion_dims);
 	}
+private:
+	RankwiseArray out_conversion_dims;
+	RankwiseArray prev_out_conversion_dims;
+	// Staged computation caches
+	Matrix<Scalar> biased_in_mat;
+};
 #else
+/**
+ * A class template representing a fully connected layer.
+ */
+template<typename Scalar, std::size_t Rank = 1>
+class DenseKernelLayer : public KernelLayer<Scalar,Rank> {
+	typedef Layer<Scalar,Rank> Root;
+	typedef KernelLayer<Scalar,Rank> Base;
+	typedef std::array<std::size_t,Root::DATA_RANK> RankwiseArray;
+public:
+	/**
+	 * @param input_dims The dimensionality of the observations to be processed by the layer.
+	 * @param output_size The length of the vector output for each sample.
+	 * @param weight_init A shared pointer to a weight initialization used to initialize the
+	 * values of the parametric kernel backing the layer.
+	 * @param weight_reg The regularization function to apply to the layer's parameters.
+	 * @param max_norm_constraint An optional max-norm constraint. If it is 0 or less, no
+	 * constraint is applied.
+	 */
+	inline DenseKernelLayer(const Dimensions<std::size_t,Rank>& input_dims, std::size_t output_size,
+			WeightInitSharedPtr<Scalar> weight_init, ParamRegSharedPtr<Scalar> weight_reg = Root::NO_PARAM_REG,
+			Scalar max_norm_constraint = 0) :
+				Base::KernelLayer(input_dims, Dimensions<std::size_t,Rank>({ output_size }), weight_init, weight_reg,
+						input_dims.get_volume() + 1, output_size, max_norm_constraint),
+				out_conversion_dims(Base::output_dims.template promote<>()),
+				prev_out_conversion_dims(Base::input_dims.template promote<>()) { }
+	inline Root* clone() const {
+		return new DenseKernelLayer(*this);
+	}
+	inline Root* clone_with_shared_params() {
+		return new DenseKernelLayer(*this, true);
+	}
+protected:
+	inline DenseKernelLayer(DenseKernelLayer<Scalar,Rank>& layer, bool share_params) :
+			Base::KernelLayer(layer, share_params),
+			out_conversion_dims(layer.out_conversion_dims),
+			prev_out_conversion_dims(layer.prev_out_conversion_dims),
+			biased_in_mat(layer.biased_in_mat) { }
+	inline void empty_cache() {
+		biased_in_mat = Matrix<Scalar>(0, 0);
+	}
 	inline typename Root::Data pass_forward(typename Root::Data in, bool training) {
 		assert((Dimensions<std::size_t,Root::DATA_RANK>(in.dimensions()).template demote<>()) == Base::input_dims);
 		assert(in.dimension(0) > 0);
@@ -486,9 +532,11 @@ protected:
 		biased_in_mat.leftCols(input_size) = MatrixMap<Scalar>(in.data(), in.dimension(0), input_size);
 		biased_in_mat.col(input_size).setOnes();
 		out_conversion_dims[0] = biased_in_mat.rows();
-		typename Root::Data out(out_conversion_dims);
+		CUDAArray<Scalar> gpu_biased_in(biased_in_mat.size());
+		gpu_biased_in.copy_from_host(biased_in.data());
 		internal::CuBLASHandle<Scalar>::get_instance().matrix_mul(biased_in_mat.data(), biased_in_mat.rows(), biased_in_mat.cols(),
 				false, Base::weights_ref.data(), Base::weights_ref.rows(), Base::weights_ref.cols(), false, out.data());
+		typename Root::Data out(out_conversion_dims);
 		return out;
 	}
 	inline typename Root::Data pass_back(typename Root::Data out_grad) {
@@ -508,13 +556,12 @@ protected:
 				prev_out_grad.data());
 		return prev_out_grad;
 	}
-#endif
 private:
 	RankwiseArray out_conversion_dims;
 	RankwiseArray prev_out_conversion_dims;
-	// Staged computation caches
 	Matrix<Scalar> biased_in_mat;
 };
+#endif
 
 #ifndef CATTL3_USE_CUDNN
 /**
@@ -626,9 +673,7 @@ protected:
 					patch = in.slice(patch_offsets, patch_extents).stride(dil_strides);
 				else
 					patch = in.slice(patch_offsets, patch_extents);
-				MatrixMap<Scalar> patch_mat(patch.data(), rows, receptor_vol);
-				std::cout << "patch: " << patch_mat << std::endl;
-				biased_in_conv_mat.block(patch_ind, 0, rows, receptor_vol) = patch_mat;
+				biased_in_conv_mat.block(patch_ind, 0, rows, receptor_vol) = MatrixMap<Scalar>(patch.data(), rows, receptor_vol);
 				patch_ind += rows;
 			}
 		}

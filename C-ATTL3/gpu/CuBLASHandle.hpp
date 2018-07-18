@@ -17,6 +17,7 @@
 #include <type_traits>
 
 #include "CuBLASError.hpp"
+#include "CUDAArray.hpp"
 #include "CUDAError.hpp"
 
 namespace cattle {
@@ -75,9 +76,9 @@ public:
 	 * @param transpose_b
 	 * @param c The product of the matrix multiplication.
 	 */
-	inline void matrix_mul(Scalar* a, std::size_t a_orig_rows, std::size_t a_orig_cols, bool transpose_a,
-			Scalar* b, std::size_t b_orig_rows, std::size_t b_orig_cols, bool transpose_b,
-			/* out */ Scalar* c) const {
+	inline void gemm(const CUDAArray<Scalar>& a, std::size_t a_orig_rows, std::size_t a_orig_cols,
+			bool transpose_a, const CUDAArray<Scalar>& b, std::size_t b_orig_rows, std::size_t b_orig_cols,
+			bool transpose_b, /* out */ CUDAArray<Scalar>& c) const {
 		std::size_t a_rows, a_cols, b_rows, b_cols;
 		if (transpose_a) {
 			a_rows = a_orig_cols;
@@ -94,34 +95,15 @@ public:
 			b_cols = b_orig_cols;
 		}
 		assert(a_cols == b_rows);
-		// Device arrays.
-		Scalar* d_a;
-		Scalar* d_b;
-		Scalar* d_c;
-		// Allocate the memory for the arrays on the device.
-		cudaAssert(cudaMalloc(&d_a, a_rows * a_cols * sizeof(Scalar)));
-		cudaAssert(cudaMalloc(&d_b, b_rows * b_cols * sizeof(Scalar)));
-		cudaAssert(cudaMalloc(&d_c, a_rows * b_cols * sizeof(Scalar)));
-		// Copy the contents of the host arrays to the device arrays.
-		cublasAssert(cublasSetMatrix(a_orig_rows, a_orig_cols, sizeof(Scalar), a, a_orig_rows,
-				d_a, a_orig_rows));
-		cublasAssert(cublasSetMatrix(b_orig_rows, b_orig_cols, sizeof(Scalar), b, b_orig_rows,
-				d_b, b_orig_rows));
 		cublasOperation_t a_op = transpose_a ? CUBLAS_OP_T : CUBLAS_OP_N;
 		cublasOperation_t b_op = transpose_b ? CUBLAS_OP_T : CUBLAS_OP_N;
-		Scalar alpha = 1;
-		Scalar beta = 0;
+		static Scalar alpha = 1;
+		static Scalar beta = 0;
 		// Resolve the GEMM precision based on the scalar type.
 		GemmRoutine<Scalar> gemm = resolve_gemm_routine<Scalar>();
 		// Perform the matrix multiplication.
-		cublasAssert(gemm(handle, a_op, b_op, a_rows, b_cols, a_cols, &alpha, d_a, a_orig_rows,
-				d_b, b_orig_rows, &beta, d_c, a_rows));
-		/* Copy the contents of the device array holding the results of the matrix
-		 * multiplication back to the host. */
-		cublasAssert(cublasGetMatrix(a_rows, b_cols, sizeof(Scalar), d_c, a_rows, c, a_rows));
-		cudaAssert(cudaFree(d_a));
-		cudaAssert(cudaFree(d_b));
-		cudaAssert(cudaFree(d_c));
+		cublasAssert(gemm(handle, a_op, b_op, a_rows, b_cols, a_cols, &alpha, a.data(), a_orig_rows,
+				b.data(), b_orig_rows, &beta, c.data(), a_rows));
 	}
 private:
 	cublasHandle_t handle;
