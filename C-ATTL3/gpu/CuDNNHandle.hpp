@@ -34,7 +34,6 @@ template<typename Scalar>
 class CuDNNHandle {
 	static_assert(std::is_floating_point<Scalar>::value, "non floating-point scalar type");
 	typedef CuDNNHandle<Scalar> Self;
-	typedef std::array<std::size_t,4> Array4;
 	static constexpr cudnnNanPropagation_t NAN_PROP = CUDNN_PROPAGATE_NAN;
 public:
 	CuDNNHandle(const Self&) = delete;
@@ -48,6 +47,29 @@ public:
 	inline static const Self& get_instance() {
 		static Self instance;
 		return instance;
+	}
+	/**
+	 * It performs the specified operation on tensors a and b and saves the result in c.
+	 *
+	 * \f$C = op(\alpha * A, \beta * B) + \gamma * C\f$
+	 *
+	 * @param a The first operand.
+	 * @param alpha The scaling factor of the first operand.
+	 * @param b The second operand.
+	 * @param beta The scaling factor of the second operand.
+	 * @param op_type The operation type.
+	 * @param gamma The scaling factor of the result tensor.
+	 * @param c The resutl tensor.
+	 */
+	inline void op(const CuDNNTensor<Scalar>& a, Scalar alpha, const CuDNNTensor<Scalar>& b, Scalar beta,
+			cudnnOpTensorOp_t op_type, Scalar gamma, /* in/out */ CuDNNTensor<Scalar>& c) const {
+		cudnnOpTensorDescriptor_t op_desc;
+		cudnnAssert(cudnnCreateOpTensorDescriptor(&op_desc));
+		cudnnAssert(cudnnSetOpTensorDescriptor(op_desc, op_type, CuDNNTensor<Scalar>::DATA_TYPE,
+				CUDNN_PROPAGATE_NAN));
+		cudnnAssert(cudnnOpTensor(op_desc, alpha, a.desc(), a.data(), beta, b.desc(), b.data(),
+				gamma, c.desc(), c.data()));
+		cudnnAssert(cudnnDestroyOpTensorDescriptor(op_desc));
 	}
 	/**
 	 * Adds a bias tensor to another tensor.
@@ -532,6 +554,45 @@ private:
 	const Scalar alpha;
 	const Scalar beta;
 };
+
+template<typename Scalar>
+inline CuDNNTensor<Scalar> operator+(const CuDNNTensor<Scalar>& a, const CuDNNTensor<Scalar>& b) {
+	CuDNNTensor<Scalar> c(a.samples(), a.height(), a.width(), a.channels());
+	CuDNNHandle<Scalar>::get_instance().op(a, 1, b, 1, CUDNN_OP_TENSOR_ADD, 0, c);
+	return c;
+}
+
+template<typename Scalar>
+inline CuDNNTensor<Scalar> operator-(const CuDNNTensor<Scalar>& a, const CuDNNTensor<Scalar>& b) {
+	CuDNNTensor<Scalar> c(a.samples(), a.height(), a.width(), a.channels());
+	CuDNNHandle<Scalar>::get_instance().op(a, 1, b, 1, CUDNN_OP_TENSOR_MIN, 0, c);
+	return c;
+}
+
+template<typename Scalar>
+inline CuDNNTensor<Scalar> operator*(const CuDNNTensor<Scalar>& a, const CuDNNTensor<Scalar>& b) {
+	CuDNNTensor<Scalar> c(a.samples(), a.height(), a.width(), a.channels());
+	CuDNNHandle<Scalar>::get_instance().op(a, 1, b, 1, CUDNN_OP_TENSOR_MUL, 0, c);
+	return c;
+}
+
+template<typename Scalar>
+inline CuDNNTensor<Scalar>& operator+=(CuDNNTensor<Scalar>& a, const CuDNNTensor<Scalar>& b) {
+	CuDNNHandle<Scalar>::get_instance().op(a, 1, b, 1, CUDNN_OP_TENSOR_ADD, 1, a);
+	return a;
+}
+
+template<typename Scalar>
+inline CuDNNTensor<Scalar>& operator-=(CuDNNTensor<Scalar>& a, const CuDNNTensor<Scalar>& b) {
+	CuDNNHandle<Scalar>::get_instance().op(a, 1, b, 1, CUDNN_OP_TENSOR_MIN, 1, a);
+	return a;
+}
+
+template<typename Scalar>
+inline CuDNNTensor<Scalar>& operator*=(CuDNNTensor<Scalar>& a, const CuDNNTensor<Scalar>& b) {
+	CuDNNHandle<Scalar>::get_instance().op(a, 1, b, 1, CUDNN_OP_TENSOR_MUL, 1, a);
+	return a;
+}
 
 }
 } /* namespace cattle */

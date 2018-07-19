@@ -1,6 +1,6 @@
 var searchData=
 [
-  ['eigenproxy',['EigenProxy',['../structcattle_1_1internal_1_1_eigen_proxy.html',1,'cattle::internal']]],
+  ['eigenproxy',['EigenProxy',['../classcattle_1_1internal_1_1_eigen_proxy.html',1,'cattle::internal']]],
   ['eigensolver',['EigenSolver',['../namespacecattle_1_1internal.html#a06111765fdc27ecdc122889ac6f0d3d0',1,'cattle::internal']]],
   ['elasticnetparameterregularization',['ElasticNetParameterRegularization',['../classcattle_1_1_elastic_net_parameter_regularization.html',1,'cattle::ElasticNetParameterRegularization&lt; Scalar &gt;'],['../classcattle_1_1_elastic_net_parameter_regularization.html#a86ddcfde14ec8649730653f362290821',1,'cattle::ElasticNetParameterRegularization::ElasticNetParameterRegularization()']]],
   ['eluactivationlayer',['ELUActivationLayer',['../classcattle_1_1_e_l_u_activation_layer.html',1,'cattle::ELUActivationLayer&lt; Scalar, Rank &gt;'],['../classcattle_1_1_e_l_u_activation_layer.html#a4f95c5a7dab61b50bf2c55304a253f14',1,'cattle::ELUActivationLayer::ELUActivationLayer()']]],

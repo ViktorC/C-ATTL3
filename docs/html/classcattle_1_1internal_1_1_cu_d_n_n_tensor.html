@@ -84,37 +84,39 @@ $(function() {
  <a href="classcattle_1_1internal_1_1_cu_d_n_n_tensor.html#details">More...</a></p>
 
 <p><code>#include &lt;<a class="el" href="_cu_d_n_n_tensor_8hpp_source.html">CuDNNTensor.hpp</a>&gt;</code></p>
+<div class="dynheader">
+Inheritance diagram for cattle::internal::CuDNNTensor&lt; Scalar, Filter &gt;:</div>
+<div class="dyncontent">
+ <div class="center">
+  <img src="classcattle_1_1internal_1_1_cu_d_n_n_tensor.png" usemap="#cattle::internal::CuDNNTensor_3C_20Scalar_2C_20Filter_20_3E_map" alt=""/>
+  <map id="cattle::internal::CuDNNTensor_3C_20Scalar_2C_20Filter_20_3E_map" name="cattle::internal::CuDNNTensor_3C_20Scalar_2C_20Filter_20_3E_map">
+<area href="classcattle_1_1internal_1_1_c_u_d_a_array.html" title="A template class for CUDA device arrays of different data types. " alt="cattle::internal::CUDAArray&lt; Scalar &gt;" shape="rect" coords="0,0,277,24"/>
+</map>
+ </div></div>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:a24a451766b74bd0291cb459f090e172c"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1internal_1_1_cu_d_n_n_tensor.html#a24a451766b74bd0291cb459f090e172c">CuDNNTensor</a> (std::size_t n, std::size_t h, std::size_t w, std::size_t c, cudnnTensorFormat_t format=CUDNN_TENSOR_NHWC)</td></tr>
-<tr class="separator:a24a451766b74bd0291cb459f090e172c"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a6d4132a7480062c7466d84dec098f3fc"><td class="memItemLeft" align="right" valign="top">std::size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1internal_1_1_cu_d_n_n_tensor.html#a6d4132a7480062c7466d84dec098f3fc">get_n</a> () const</td></tr>
-<tr class="separator:a6d4132a7480062c7466d84dec098f3fc"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a397532e107b16f3d40b00ac82dc73265"><td class="memItemLeft" align="right" valign="top">std::size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1internal_1_1_cu_d_n_n_tensor.html#a397532e107b16f3d40b00ac82dc73265">get_h</a> () const</td></tr>
-<tr class="separator:a397532e107b16f3d40b00ac82dc73265"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aba6616928c649da24e247029e01e44ea"><td class="memItemLeft" align="right" valign="top">std::size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1internal_1_1_cu_d_n_n_tensor.html#aba6616928c649da24e247029e01e44ea">get_w</a> () const</td></tr>
-<tr class="separator:aba6616928c649da24e247029e01e44ea"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aee2a365a86be0a12ef5b0e3f6cefbb7d"><td class="memItemLeft" align="right" valign="top">std::size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1internal_1_1_cu_d_n_n_tensor.html#aee2a365a86be0a12ef5b0e3f6cefbb7d">get_c</a> () const</td></tr>
-<tr class="separator:aee2a365a86be0a12ef5b0e3f6cefbb7d"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:abf87da574ba5a39e24e0cb9d0b378a97"><td class="memItemLeft" align="right" valign="top">std::size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1internal_1_1_cu_d_n_n_tensor.html#abf87da574ba5a39e24e0cb9d0b378a97">get_size</a> () const</td></tr>
-<tr class="separator:abf87da574ba5a39e24e0cb9d0b378a97"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ad0fe3e22ecd8b83c81bf900a5c943a64"><td class="memItemLeft" align="right" valign="top">cudnnTensorFormat_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1internal_1_1_cu_d_n_n_tensor.html#ad0fe3e22ecd8b83c81bf900a5c943a64">get_format</a> () const</td></tr>
-<tr class="separator:ad0fe3e22ecd8b83c81bf900a5c943a64"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a57d2ae96678ff643b9052f69d10f534b"><td class="memItemLeft" align="right" valign="top">const DescriptorType &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1internal_1_1_cu_d_n_n_tensor.html#a57d2ae96678ff643b9052f69d10f534b">get_desc</a> () const</td></tr>
-<tr class="separator:a57d2ae96678ff643b9052f69d10f534b"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a282e3dc7f9374ce94126689a3fcaf061"><td class="memItemLeft" align="right" valign="top">const Scalar *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1internal_1_1_cu_d_n_n_tensor.html#a282e3dc7f9374ce94126689a3fcaf061">get_data</a> () const</td></tr>
-<tr class="separator:a282e3dc7f9374ce94126689a3fcaf061"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:abdef929e62ee7408f1b582a6008bdec4"><td class="memItemLeft" align="right" valign="top">Scalar *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1internal_1_1_cu_d_n_n_tensor.html#abdef929e62ee7408f1b582a6008bdec4">get_data</a> ()</td></tr>
-<tr class="separator:abdef929e62ee7408f1b582a6008bdec4"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a7138730ae6b6b4403cc9631ea9b11d09"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1internal_1_1_cu_d_n_n_tensor.html#a7138730ae6b6b4403cc9631ea9b11d09">copy_from_host</a> (const Scalar *host_data)</td></tr>
-<tr class="memdesc:a7138730ae6b6b4403cc9631ea9b11d09"><td class="mdescLeft">&#160;</td><td class="mdescRight">It populates the entire device tensor with data from the host memory.  <a href="#a7138730ae6b6b4403cc9631ea9b11d09">More...</a><br /></td></tr>
-<tr class="separator:a7138730ae6b6b4403cc9631ea9b11d09"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aa22cc2d110443617933376e429fb8461"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1internal_1_1_cu_d_n_n_tensor.html#aa22cc2d110443617933376e429fb8461">copy_to_host</a> (Scalar *host_data) const</td></tr>
-<tr class="memdesc:aa22cc2d110443617933376e429fb8461"><td class="mdescLeft">&#160;</td><td class="mdescRight">It copies the entire device tensor to the host memory.  <a href="#aa22cc2d110443617933376e429fb8461">More...</a><br /></td></tr>
-<tr class="separator:aa22cc2d110443617933376e429fb8461"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a86c1e037f2985a4e35681784f116715b"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1internal_1_1_cu_d_n_n_tensor.html#a86c1e037f2985a4e35681784f116715b">CuDNNTensor</a> (std::size_t samples, std::size_t height, std::size_t width, std::size_t channels)</td></tr>
+<tr class="separator:a86c1e037f2985a4e35681784f116715b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab592df66fb9b9f02a20f2db749a0f3b3"><td class="memItemLeft" align="right" valign="top">const DescriptorType &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1internal_1_1_cu_d_n_n_tensor.html#ab592df66fb9b9f02a20f2db749a0f3b3">desc</a> () const</td></tr>
+<tr class="separator:ab592df66fb9b9f02a20f2db749a0f3b3"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a97242eef53812d35f77265de8063d4a5"><td class="memItemLeft" align="right" valign="top">std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1internal_1_1_cu_d_n_n_tensor.html#a97242eef53812d35f77265de8063d4a5">to_string</a> () const</td></tr>
 <tr class="separator:a97242eef53812d35f77265de8063d4a5"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="inherit_header pub_methods_classcattle_1_1internal_1_1_c_u_d_a_array"><td colspan="2" onclick="javascript:toggleInherit('pub_methods_classcattle_1_1internal_1_1_c_u_d_a_array')"><img src="closed.png" alt="-"/>&#160;Public Member Functions inherited from <a class="el" href="classcattle_1_1internal_1_1_c_u_d_a_array.html">cattle::internal::CUDAArray&lt; Scalar &gt;</a></td></tr>
+<tr class="memitem:ada5b4f2e8849379e690c295009e42286 inherit pub_methods_classcattle_1_1internal_1_1_c_u_d_a_array"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1internal_1_1_c_u_d_a_array.html#ada5b4f2e8849379e690c295009e42286">CUDAArray</a> (std::size_t <a class="el" href="classcattle_1_1internal_1_1_c_u_d_a_array.html#a9d0057e6794d6c7684a3dbd11b25b73d">size</a>)</td></tr>
+<tr class="separator:ada5b4f2e8849379e690c295009e42286 inherit pub_methods_classcattle_1_1internal_1_1_c_u_d_a_array"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9d0057e6794d6c7684a3dbd11b25b73d inherit pub_methods_classcattle_1_1internal_1_1_c_u_d_a_array"><td class="memItemLeft" align="right" valign="top">std::size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1internal_1_1_c_u_d_a_array.html#a9d0057e6794d6c7684a3dbd11b25b73d">size</a> () const</td></tr>
+<tr class="separator:a9d0057e6794d6c7684a3dbd11b25b73d inherit pub_methods_classcattle_1_1internal_1_1_c_u_d_a_array"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a8ed5585c46b8c13b0bdf857f5bdfcb32 inherit pub_methods_classcattle_1_1internal_1_1_c_u_d_a_array"><td class="memItemLeft" align="right" valign="top">const Scalar *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1internal_1_1_c_u_d_a_array.html#a8ed5585c46b8c13b0bdf857f5bdfcb32">data</a> () const</td></tr>
+<tr class="separator:a8ed5585c46b8c13b0bdf857f5bdfcb32 inherit pub_methods_classcattle_1_1internal_1_1_c_u_d_a_array"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a70da1b8c77ae30ca13ba5401070e5fbc inherit pub_methods_classcattle_1_1internal_1_1_c_u_d_a_array"><td class="memItemLeft" align="right" valign="top">Scalar *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1internal_1_1_c_u_d_a_array.html#a70da1b8c77ae30ca13ba5401070e5fbc">data</a> ()</td></tr>
+<tr class="separator:a70da1b8c77ae30ca13ba5401070e5fbc inherit pub_methods_classcattle_1_1internal_1_1_c_u_d_a_array"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2fa9b7d1f7339b9831f8d434f62d89cb inherit pub_methods_classcattle_1_1internal_1_1_c_u_d_a_array"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1internal_1_1_c_u_d_a_array.html#a2fa9b7d1f7339b9831f8d434f62d89cb">copy_from_host</a> (const Scalar *host_array)</td></tr>
+<tr class="memdesc:a2fa9b7d1f7339b9831f8d434f62d89cb inherit pub_methods_classcattle_1_1internal_1_1_c_u_d_a_array"><td class="mdescLeft">&#160;</td><td class="mdescRight">It populates the entire device array with data from the host memory.  <a href="classcattle_1_1internal_1_1_c_u_d_a_array.html#a2fa9b7d1f7339b9831f8d434f62d89cb">More...</a><br /></td></tr>
+<tr class="separator:a2fa9b7d1f7339b9831f8d434f62d89cb inherit pub_methods_classcattle_1_1internal_1_1_c_u_d_a_array"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad7d697c221e64330d3af58097d27774c inherit pub_methods_classcattle_1_1internal_1_1_c_u_d_a_array"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1internal_1_1_c_u_d_a_array.html#ad7d697c221e64330d3af58097d27774c">copy_to_host</a> (Scalar *host_array) const</td></tr>
+<tr class="memdesc:ad7d697c221e64330d3af58097d27774c inherit pub_methods_classcattle_1_1internal_1_1_c_u_d_a_array"><td class="mdescLeft">&#160;</td><td class="mdescRight">It copies the entire device array to the host memory.  <a href="classcattle_1_1internal_1_1_c_u_d_a_array.html#ad7d697c221e64330d3af58097d27774c">More...</a><br /></td></tr>
+<tr class="separator:ad7d697c221e64330d3af58097d27774c inherit pub_methods_classcattle_1_1internal_1_1_c_u_d_a_array"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><h3>template&lt;typename Scalar, bool Filter = false&gt;<br />
@@ -122,8 +124,8 @@ class cattle::internal::CuDNNTensor&lt; Scalar, Filter &gt;</h3>
 
 <p>A template class for representing cuDNN device tensors of different data types. </p>
 </div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
-<a id="a24a451766b74bd0291cb459f090e172c"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a24a451766b74bd0291cb459f090e172c">&#9670;&nbsp;</a></span>CuDNNTensor()</h2>
+<a id="a86c1e037f2985a4e35681784f116715b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a86c1e037f2985a4e35681784f116715b">&#9670;&nbsp;</a></span>CuDNNTensor()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -137,31 +139,25 @@ template&lt;typename Scalar, bool Filter = false&gt; </div>
           <td class="memname"><a class="el" href="classcattle_1_1internal_1_1_cu_d_n_n_tensor.html">cattle::internal::CuDNNTensor</a>&lt; Scalar, Filter &gt;::<a class="el" href="classcattle_1_1internal_1_1_cu_d_n_n_tensor.html">CuDNNTensor</a> </td>
           <td>(</td>
           <td class="paramtype">std::size_t&#160;</td>
-          <td class="paramname"><em>n</em>, </td>
+          <td class="paramname"><em>samples</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">std::size_t&#160;</td>
-          <td class="paramname"><em>h</em>, </td>
+          <td class="paramname"><em>height</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">std::size_t&#160;</td>
-          <td class="paramname"><em>w</em>, </td>
+          <td class="paramname"><em>width</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">std::size_t&#160;</td>
-          <td class="paramname"><em>c</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">cudnnTensorFormat_t&#160;</td>
-          <td class="paramname"><em>format</em> = <code>CUDNN_TENSOR_NHWC</code>&#160;</td>
+          <td class="paramname"><em>channels</em>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -177,11 +173,10 @@ template&lt;typename Scalar, bool Filter = false&gt; </div>
 </div><div class="memdoc">
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">format</td><td>The tensor format to use. </td></tr>
-    <tr><td class="paramname">n</td><td>The batch size. </td></tr>
-    <tr><td class="paramname">h</td><td>The height. </td></tr>
-    <tr><td class="paramname">w</td><td>The width. </td></tr>
-    <tr><td class="paramname">c</td><td>The number of channels. </td></tr>
+    <tr><td class="paramname">samples</td><td>The batch size. </td></tr>
+    <tr><td class="paramname">height</td><td>The height. </td></tr>
+    <tr><td class="paramname">width</td><td>The width. </td></tr>
+    <tr><td class="paramname">channels</td><td>The number of channels. </td></tr>
   </table>
   </dd>
 </dl>
@@ -189,8 +184,8 @@ template&lt;typename Scalar, bool Filter = false&gt; </div>
 </div>
 </div>
 <h2 class="groupheader">Member Function Documentation</h2>
-<a id="a7138730ae6b6b4403cc9631ea9b11d09"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a7138730ae6b6b4403cc9631ea9b11d09">&#9670;&nbsp;</a></span>copy_from_host()</h2>
+<a id="ab592df66fb9b9f02a20f2db749a0f3b3"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab592df66fb9b9f02a20f2db749a0f3b3">&#9670;&nbsp;</a></span>desc()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -201,163 +196,7 @@ template&lt;typename Scalar, bool Filter = false&gt; </div>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">void <a class="el" href="classcattle_1_1internal_1_1_cu_d_n_n_tensor.html">cattle::internal::CuDNNTensor</a>&lt; Scalar, Filter &gt;::copy_from_host </td>
-          <td>(</td>
-          <td class="paramtype">const Scalar *&#160;</td>
-          <td class="paramname"><em>host_data</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>It populates the entire device tensor with data from the host memory. </p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">host_data</td><td>A pointer to the first element of the host tensor. </td></tr>
-  </table>
-  </dd>
-</dl>
-
-</div>
-</div>
-<a id="aa22cc2d110443617933376e429fb8461"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aa22cc2d110443617933376e429fb8461">&#9670;&nbsp;</a></span>copy_to_host()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<div class="memtemplate">
-template&lt;typename Scalar, bool Filter = false&gt; </div>
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">void <a class="el" href="classcattle_1_1internal_1_1_cu_d_n_n_tensor.html">cattle::internal::CuDNNTensor</a>&lt; Scalar, Filter &gt;::copy_to_host </td>
-          <td>(</td>
-          <td class="paramtype">Scalar *&#160;</td>
-          <td class="paramname"><em>host_data</em></td><td>)</td>
-          <td> const</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>It copies the entire device tensor to the host memory. </p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">host_data</td><td>A pointer pointing to the beginning of a contiguous host memory block to which the device tensor is to be copied. </td></tr>
-  </table>
-  </dd>
-</dl>
-
-</div>
-</div>
-<a id="aee2a365a86be0a12ef5b0e3f6cefbb7d"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aee2a365a86be0a12ef5b0e3f6cefbb7d">&#9670;&nbsp;</a></span>get_c()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<div class="memtemplate">
-template&lt;typename Scalar, bool Filter = false&gt; </div>
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">std::size_t <a class="el" href="classcattle_1_1internal_1_1_cu_d_n_n_tensor.html">cattle::internal::CuDNNTensor</a>&lt; Scalar, Filter &gt;::get_c </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td> const</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-<dl class="section return"><dt>Returns</dt><dd>The depth/number of channels of the tensor. </dd></dl>
-
-</div>
-</div>
-<a id="a282e3dc7f9374ce94126689a3fcaf061"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a282e3dc7f9374ce94126689a3fcaf061">&#9670;&nbsp;</a></span>get_data() <span class="overload">[1/2]</span></h2>
-
-<div class="memitem">
-<div class="memproto">
-<div class="memtemplate">
-template&lt;typename Scalar, bool Filter = false&gt; </div>
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">const Scalar* <a class="el" href="classcattle_1_1internal_1_1_cu_d_n_n_tensor.html">cattle::internal::CuDNNTensor</a>&lt; Scalar, Filter &gt;::get_data </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td> const</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-<dl class="section return"><dt>Returns</dt><dd>A device memory address pointer pointing to the (constant) first element of the tensor. </dd></dl>
-
-</div>
-</div>
-<a id="abdef929e62ee7408f1b582a6008bdec4"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#abdef929e62ee7408f1b582a6008bdec4">&#9670;&nbsp;</a></span>get_data() <span class="overload">[2/2]</span></h2>
-
-<div class="memitem">
-<div class="memproto">
-<div class="memtemplate">
-template&lt;typename Scalar, bool Filter = false&gt; </div>
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">Scalar* <a class="el" href="classcattle_1_1internal_1_1_cu_d_n_n_tensor.html">cattle::internal::CuDNNTensor</a>&lt; Scalar, Filter &gt;::get_data </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-<dl class="section return"><dt>Returns</dt><dd>A device memory address pointer pointing to the first element of the tensor. </dd></dl>
-
-</div>
-</div>
-<a id="a57d2ae96678ff643b9052f69d10f534b"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a57d2ae96678ff643b9052f69d10f534b">&#9670;&nbsp;</a></span>get_desc()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<div class="memtemplate">
-template&lt;typename Scalar, bool Filter = false&gt; </div>
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">const DescriptorType&amp; <a class="el" href="classcattle_1_1internal_1_1_cu_d_n_n_tensor.html">cattle::internal::CuDNNTensor</a>&lt; Scalar, Filter &gt;::get_desc </td>
+          <td class="memname">const DescriptorType&amp; <a class="el" href="classcattle_1_1internal_1_1_cu_d_n_n_tensor.html">cattle::internal::CuDNNTensor</a>&lt; Scalar, Filter &gt;::desc </td>
           <td>(</td>
           <td class="paramname"></td><td>)</td>
           <td> const</td>
@@ -370,146 +209,6 @@ template&lt;typename Scalar, bool Filter = false&gt; </div>
 </table>
 </div><div class="memdoc">
 <dl class="section return"><dt>Returns</dt><dd>A constant reference to the tensor descriptor. </dd></dl>
-
-</div>
-</div>
-<a id="ad0fe3e22ecd8b83c81bf900a5c943a64"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ad0fe3e22ecd8b83c81bf900a5c943a64">&#9670;&nbsp;</a></span>get_format()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<div class="memtemplate">
-template&lt;typename Scalar, bool Filter = false&gt; </div>
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">cudnnTensorFormat_t <a class="el" href="classcattle_1_1internal_1_1_cu_d_n_n_tensor.html">cattle::internal::CuDNNTensor</a>&lt; Scalar, Filter &gt;::get_format </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td> const</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-<dl class="section return"><dt>Returns</dt><dd>The format of the tensor. </dd></dl>
-
-</div>
-</div>
-<a id="a397532e107b16f3d40b00ac82dc73265"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a397532e107b16f3d40b00ac82dc73265">&#9670;&nbsp;</a></span>get_h()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<div class="memtemplate">
-template&lt;typename Scalar, bool Filter = false&gt; </div>
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">std::size_t <a class="el" href="classcattle_1_1internal_1_1_cu_d_n_n_tensor.html">cattle::internal::CuDNNTensor</a>&lt; Scalar, Filter &gt;::get_h </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td> const</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-<dl class="section return"><dt>Returns</dt><dd>The height of the tensor. </dd></dl>
-
-</div>
-</div>
-<a id="a6d4132a7480062c7466d84dec098f3fc"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a6d4132a7480062c7466d84dec098f3fc">&#9670;&nbsp;</a></span>get_n()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<div class="memtemplate">
-template&lt;typename Scalar, bool Filter = false&gt; </div>
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">std::size_t <a class="el" href="classcattle_1_1internal_1_1_cu_d_n_n_tensor.html">cattle::internal::CuDNNTensor</a>&lt; Scalar, Filter &gt;::get_n </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td> const</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-<dl class="section return"><dt>Returns</dt><dd>The batch size of the tensor. </dd></dl>
-
-</div>
-</div>
-<a id="abf87da574ba5a39e24e0cb9d0b378a97"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#abf87da574ba5a39e24e0cb9d0b378a97">&#9670;&nbsp;</a></span>get_size()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<div class="memtemplate">
-template&lt;typename Scalar, bool Filter = false&gt; </div>
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">std::size_t <a class="el" href="classcattle_1_1internal_1_1_cu_d_n_n_tensor.html">cattle::internal::CuDNNTensor</a>&lt; Scalar, Filter &gt;::get_size </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td> const</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-<dl class="section return"><dt>Returns</dt><dd>The total size of the tensor. </dd></dl>
-
-</div>
-</div>
-<a id="aba6616928c649da24e247029e01e44ea"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aba6616928c649da24e247029e01e44ea">&#9670;&nbsp;</a></span>get_w()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<div class="memtemplate">
-template&lt;typename Scalar, bool Filter = false&gt; </div>
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">std::size_t <a class="el" href="classcattle_1_1internal_1_1_cu_d_n_n_tensor.html">cattle::internal::CuDNNTensor</a>&lt; Scalar, Filter &gt;::get_w </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td> const</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-<dl class="section return"><dt>Returns</dt><dd>The width of the tensor. </dd></dl>
 
 </div>
 </div>

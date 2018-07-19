@@ -28,8 +28,10 @@ public:
 	 * @param size The number of elements the array is to have.
 	 */
 	inline CUDAArray(std::size_t size) :
-			_size(size) {
-		cudaAssert(cudaMalloc(&_data, size * sizeof(Scalar)));
+			_size(size),
+			_data(nullptr) {
+		if (size > 0)
+			cudaAssert(cudaMalloc(&_data, size * sizeof(Scalar)));
 	}
 	inline CUDAArray(const Self& array) :
 			CUDAArray(array._size) {
@@ -41,7 +43,8 @@ public:
 		swap(*this, array);
 	}
 	inline virtual ~CUDAArray() {
-		cudaAssert(cudaFree(_data));
+		if (_size > 0)
+			cudaAssert(cudaFree(_data));
 	}
 	inline Self& operator=(Self array) {
 		swap(*this, array);

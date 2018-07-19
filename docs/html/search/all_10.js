@@ -15,7 +15,7 @@ var searchData=
   ['permmatrix',['PermMatrix',['../namespacecattle_1_1internal.html#a7091932f25b7326f10fc49f79d38ca76',1,'cattle::internal']]],
   ['pool2d_5fbwd',['pool2d_bwd',['../classcattle_1_1internal_1_1_cu_d_n_n_handle.html#ae950696a0abb68c382586d99ffc99711',1,'cattle::internal::CuDNNHandle']]],
   ['pool2d_5ffwd',['pool2d_fwd',['../classcattle_1_1internal_1_1_cu_d_n_n_handle.html#a9dc3603f13b1f318e228691c32bafe13',1,'cattle::internal::CuDNNHandle']]],
-  ['pool2d_5foutput_5fdims',['pool2d_output_dims',['../classcattle_1_1internal_1_1_cu_d_n_n_handle.html#aefb1530f6eb2613450b699818487fe5d',1,'cattle::internal::CuDNNHandle']]],
+  ['pool2d_5foutput_5fdims',['pool2d_output_dims',['../classcattle_1_1internal_1_1_cu_d_n_n_handle.html#a63f47c31ba65badd22da7ce3c0aa07d0',1,'cattle::internal::CuDNNHandle']]],
   ['poollayer',['PoolLayer',['../classcattle_1_1_pool_layer.html',1,'cattle']]],
   ['ppmcodec',['PPMCodec',['../classcattle_1_1_p_p_m_codec.html',1,'cattle']]],
   ['ppmformattype',['PPMFormatType',['../namespacecattle.html#a8ac8a938d166ae3b376b47b6020922ab',1,'cattle']]],

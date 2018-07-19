@@ -64,7 +64,6 @@ public:
 			CUDNN_DATA_FLOAT : CUDNN_DATA_DOUBLE;
 	static constexpr cudnnTensorFormat_t TENSOR_FORMAT = CUDNN_TENSOR_NCHW;
 	/**
-	 * @param format The tensor format to use.
 	 * @param samples The batch size.
 	 * @param height The height.
 	 * @param width The width.
@@ -99,6 +98,30 @@ public:
 	inline Self& operator=(Self tensor) {
 		swap(*this, tensor);
 		return *this;
+	}
+	/**
+	 * @return The batch size of the tensor.
+	 */
+	inline std::size_t samples() {
+		return _samples;
+	}
+	/**
+	 * @return The height of the tensor.
+	 */
+	inline std::size_t height() {
+		return _height;
+	}
+	/**
+	 * @return The width of the tensor.
+	 */
+	inline std::size_t width() {
+		return _width;
+	}
+	/**
+	 * @return The number of channels of the tensor.
+	 */
+	inline std::size_t channels() {
+		return _channels;
 	}
 	/**
 	 * @return A constant reference to the tensor descriptor.
