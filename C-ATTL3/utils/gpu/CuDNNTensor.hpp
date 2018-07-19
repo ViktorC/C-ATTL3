@@ -14,15 +14,15 @@
 #include <type_traits>
 #include <utility>
 
+#include "CuDNNError.hpp"
 #include "CUDAArray.hpp"
 #include "CUDAError.hpp"
-#include "CuDNNError.hpp"
 
 #ifndef C_ATTL3_GPU_CUDNNTENSOR_H_
 #define C_ATTL3_GPU_CUDNNTENSOR_H_
 
 namespace cattle {
-namespace internal {
+namespace gpu {
 
 template<bool Filter = false>
 struct CuDNNTensorDescriptorManager {
@@ -102,25 +102,25 @@ public:
 	/**
 	 * @return The batch size of the tensor.
 	 */
-	inline std::size_t samples() {
+	inline std::size_t samples() const {
 		return _samples;
 	}
 	/**
 	 * @return The height of the tensor.
 	 */
-	inline std::size_t height() {
+	inline std::size_t height() const {
 		return _height;
 	}
 	/**
 	 * @return The width of the tensor.
 	 */
-	inline std::size_t width() {
+	inline std::size_t width() const {
 		return _width;
 	}
 	/**
 	 * @return The number of channels of the tensor.
 	 */
-	inline std::size_t channels() {
+	inline std::size_t channels() const {
 		return _channels;
 	}
 	/**
@@ -155,7 +155,7 @@ private:
 	DescriptorType _desc;
 };
 
-} /* namespace internal */
+} /* namespace gpu */
 } /* namespace cattle */
 
 #endif /* C_ATTL3_GPU_CUDNNTENSOR_H_ */

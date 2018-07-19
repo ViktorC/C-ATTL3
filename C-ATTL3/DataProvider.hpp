@@ -220,7 +220,7 @@ protected:
 		MatrixMap<Scalar> obs_mat(obs->data(), rows, obs->size() / rows);
 		MatrixMap<Scalar> obj_mat(obj->data(), rows, obj->size() / rows);
 		// Create an identity matrix.
-		internal::PermMatrix perm(rows);
+		PermMatrix perm(rows);
 		perm.setIdentity();
 		// Shuffle its indices.
 		std::random_shuffle(perm.indices().data(), perm.indices().data() + perm.indices().size());

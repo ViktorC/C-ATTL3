@@ -19,12 +19,12 @@
 #include <type_traits>
 #include <vector>
 
-#include "CUDAError.hpp"
 #include "CuDNNError.hpp"
 #include "CuDNNTensor.hpp"
+#include "CUDAError.hpp"
 
 namespace cattle {
-namespace internal {
+namespace gpu {
 
 /**
  * A singleton utility class providing methods for GPU accelerated deep neural network
@@ -555,6 +555,8 @@ private:
 	const Scalar beta;
 };
 
+// Arithmetic operator overloads.
+
 template<typename Scalar>
 inline CuDNNTensor<Scalar> operator+(const CuDNNTensor<Scalar>& a, const CuDNNTensor<Scalar>& b) {
 	CuDNNTensor<Scalar> c(a.samples(), a.height(), a.width(), a.channels());
@@ -591,6 +593,57 @@ inline CuDNNTensor<Scalar>& operator-=(CuDNNTensor<Scalar>& a, const CuDNNTensor
 template<typename Scalar>
 inline CuDNNTensor<Scalar>& operator*=(CuDNNTensor<Scalar>& a, const CuDNNTensor<Scalar>& b) {
 	CuDNNHandle<Scalar>::get_instance().op(a, 1, b, 1, CUDNN_OP_TENSOR_MUL, 1, a);
+	return a;
+}
+
+template<typename Scalar>
+inline CuDNNTensor<Scalar> operator+(const CuDNNTensor<Scalar>& a, Scalar b) {
+	CuDNNTensor<Scalar> b_tensor(1u, 1u, 1u, 1u);
+	b_tensor.copy_from_host(&b);
+	CuDNNTensor<Scalar> c(a.samples(), a.height(), a.width(), a.channels());
+	CuDNNHandle<Scalar>::get_instance().op(a, 1, b_tensor, 1, CUDNN_OP_TENSOR_ADD, 0, c);
+	return c;
+}
+
+template<typename Scalar>
+inline CuDNNTensor<Scalar> operator-(const CuDNNTensor<Scalar>& a, Scalar b) {
+	CuDNNTensor<Scalar> b_tensor(1u, 1u, 1u, 1u);
+	b_tensor.copy_from_host(&b);
+	CuDNNTensor<Scalar> c(a.samples(), a.height(), a.width(), a.channels());
+	CuDNNHandle<Scalar>::get_instance().op(a, 1, b_tensor, 1, CUDNN_OP_TENSOR_MIN, 0, c);
+	return c;
+}
+
+template<typename Scalar>
+inline CuDNNTensor<Scalar> operator*(const CuDNNTensor<Scalar>& a, Scalar b) {
+	CuDNNTensor<Scalar> b_tensor(1u, 1u, 1u, 1u);
+	b_tensor.copy_from_host(&b);
+	CuDNNTensor<Scalar> c(a.samples(), a.height(), a.width(), a.channels());
+	CuDNNHandle<Scalar>::get_instance().op(a, 1, b_tensor, 1, CUDNN_OP_TENSOR_MUL, 0, c);
+	return c;
+}
+
+template<typename Scalar>
+inline CuDNNTensor<Scalar>& operator+=(CuDNNTensor<Scalar>& a, Scalar b) {
+	CuDNNTensor<Scalar> b_tensor(1u, 1u, 1u, 1u);
+	b_tensor.copy_from_host(&b);
+	CuDNNHandle<Scalar>::get_instance().op(a, 1, b_tensor, 1, CUDNN_OP_TENSOR_ADD, 1, a);
+	return a;
+}
+
+template<typename Scalar>
+inline CuDNNTensor<Scalar>& operator-=(CuDNNTensor<Scalar>& a, Scalar b) {
+	CuDNNTensor<Scalar> b_tensor(1u, 1u, 1u, 1u);
+	b_tensor.copy_from_host(&b);
+	CuDNNHandle<Scalar>::get_instance().op(a, 1, b_tensor, 1, CUDNN_OP_TENSOR_MIN, 1, a);
+	return a;
+}
+
+template<typename Scalar>
+inline CuDNNTensor<Scalar>& operator*=(CuDNNTensor<Scalar>& a, Scalar b) {
+	CuDNNTensor<Scalar> b_tensor(1u, 1u, 1u, 1u);
+	b_tensor.copy_from_host(&b);
+	CuDNNHandle<Scalar>::get_instance().op(a, 1, b_tensor, 1, CUDNN_OP_TENSOR_MUL, 1, a);
 	return a;
 }
 

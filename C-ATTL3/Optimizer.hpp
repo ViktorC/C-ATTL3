@@ -69,9 +69,9 @@ public:
 	 * @return Whether the gradient check has been passed or failed.
 	 */
 	inline bool verify_gradients(Net& net, Provider& provider, bool verbose = true,
-			Scalar step_size = internal::NumericUtils<Scalar>::EPSILON2 / 2,
-			Scalar abs_epsilon = internal::NumericUtils<Scalar>::EPSILON2,
-			Scalar rel_epsilon = internal::NumericUtils<Scalar>::EPSILON2) const {
+			Scalar step_size = NumericUtils<Scalar>::EPSILON2 / 2,
+			Scalar abs_epsilon = NumericUtils<Scalar>::EPSILON2,
+			Scalar rel_epsilon = NumericUtils<Scalar>::EPSILON2) const {
 		assert(net.get_input_dims() == provider.get_obs_dims());
 		assert(net.get_output_dims() == provider.get_obj_dims());
 		assert(step_size > 0);
@@ -118,7 +118,7 @@ public:
 						Scalar num_grad = (loss_inc + reg_pen_inc - (loss_dec + reg_pen_dec)) / (2 * step_size);
 						if (verbose)
 							std::cout << "\t\tNumerical gradient = " << num_grad;
-						if (!internal::NumericUtils<Scalar>::almost_equal(ana_grad, num_grad, abs_epsilon, rel_epsilon)) {
+						if (!NumericUtils<Scalar>::almost_equal(ana_grad, num_grad, abs_epsilon, rel_epsilon)) {
 							if (verbose)
 								std::cout << " *****FAIL*****";
 							failure = true;
@@ -152,14 +152,14 @@ public:
 	 * @return The test loss of the last epoch.
 	 */
 	inline Scalar optimize(Net& net, Provider& training_prov, Provider& test_prov, unsigned epochs, unsigned early_stop = 0,
-			Scalar target_loss = internal::NumericUtils<Scalar>::MIN, bool verbose = true) {
+			Scalar target_loss = NumericUtils<Scalar>::MIN, bool verbose = true) {
 		assert(net.get_input_dims() == training_prov.get_obs_dims());
 		assert(net.get_output_dims() == training_prov.get_obj_dims());
 		assert(training_prov.get_obs_dims() == test_prov.get_obs_dims());
 		assert(training_prov.get_obj_dims() == test_prov.get_obj_dims());
 		// Fit the optimizer parameters to the network.
 		fit(net);
-		Scalar prev_test_loss = internal::NumericUtils<Scalar>::MAX;
+		Scalar prev_test_loss = NumericUtils<Scalar>::MAX;
 		unsigned cons_loss_inc = 0;
 		if (verbose)
 			std::cout << "<Optimization>" << std::endl;
@@ -217,11 +217,11 @@ public:
 	 * @return The training loss of the last epoch.
 	 */
 	inline Scalar train(Net& net, Provider& prov, unsigned epochs, unsigned early_stop = 0,
-			Scalar target_loss = internal::NumericUtils<Scalar>::MIN, bool verbose = false) {
+			Scalar target_loss = NumericUtils<Scalar>::MIN, bool verbose = false) {
 		assert(net.get_input_dims() == prov.get_obs_dims());
 		assert(net.get_output_dims() == prov.get_obj_dims());
 		Scalar train_loss;
-		Scalar prev_train_loss = internal::NumericUtils<Scalar>::MAX;
+		Scalar prev_train_loss = NumericUtils<Scalar>::MAX;
 		unsigned cons_loss_inc = 0;
 		if (verbose)
 			std::cout << "<Training>" << std::endl;
@@ -661,7 +661,7 @@ public:
 	 * @param epsilon A small constant used to maintain numerical stability.
 	 */
 	inline AdaGradOptimizer(LossSharedPtr<Scalar,Rank,Sequential> loss, unsigned batch_size = 1,
-			Scalar learning_rate = 1e-2, Scalar epsilon = internal::NumericUtils<Scalar>::EPSILON2) :
+			Scalar learning_rate = 1e-2, Scalar epsilon = NumericUtils<Scalar>::EPSILON2) :
 				SGDOptimizer<Scalar,Rank,Sequential>::SGDOptimizer(loss, batch_size),
 				learning_rate(learning_rate),
 				epsilon(epsilon) {
@@ -724,7 +724,7 @@ public:
 	 * @param epsilon A small constant used to maintain numerical stability.
 	 */
 	inline RMSPropOptimizer(LossSharedPtr<Scalar,Rank,Sequential> loss, unsigned batch_size = 1, Scalar learning_rate = 1e-3,
-			Scalar l2_decay = 1e-1, Scalar epsilon = internal::NumericUtils<Scalar>::EPSILON2) :
+			Scalar l2_decay = 1e-1, Scalar epsilon = NumericUtils<Scalar>::EPSILON2) :
 				AdaGradOptimizer<Scalar,Rank,Sequential>::AdaGradOptimizer(loss, batch_size, learning_rate, epsilon),
 				l2_decay(l2_decay) {
 		assert(l2_decay >= 0 && l2_decay <= 1);
@@ -756,7 +756,7 @@ public:
 	 * @param epsilon A small constant used to maintain numerical stability.
 	 */
 	inline AdaDeltaOptimizer(LossSharedPtr<Scalar,Rank,Sequential> loss, unsigned batch_size = 1,
-			Scalar decay = 5e-2, Scalar epsilon = internal::NumericUtils<Scalar>::EPSILON2) :
+			Scalar decay = 5e-2, Scalar epsilon = NumericUtils<Scalar>::EPSILON2) :
 				SGDOptimizer<Scalar,Rank,Sequential>::SGDOptimizer(loss, batch_size),
 				decay(decay),
 				epsilon(epsilon) {
@@ -822,7 +822,7 @@ public:
 	 * @param epsilon A small constant used to maintain numerical stability.
 	 */
 	inline AdamOptimizer(LossSharedPtr<Scalar,Rank,Sequential> loss, unsigned batch_size = 1, Scalar learning_rate = 1e-3,
-			Scalar l1_decay = 1e-1, Scalar l2_decay = 1e-3, Scalar epsilon = internal::NumericUtils<Scalar>::EPSILON2) :
+			Scalar l1_decay = 1e-1, Scalar l2_decay = 1e-3, Scalar epsilon = NumericUtils<Scalar>::EPSILON2) :
 				SGDOptimizer<Scalar,Rank,Sequential>::SGDOptimizer(loss, batch_size),
 				learning_rate(learning_rate),
 				l1_decay(l1_decay),
@@ -899,7 +899,7 @@ public:
 	 * @param epsilon A small constant used to maintain numerical stability.
 	 */
 	inline AdaMaxOptimizer(LossSharedPtr<Scalar,Rank,Sequential> loss, unsigned batch_size = 1, Scalar learning_rate = 1e-3,
-			Scalar l1_decay = 1e-1, Scalar l2_decay = 1e-3, Scalar epsilon = internal::NumericUtils<Scalar>::EPSILON2) :
+			Scalar l1_decay = 1e-1, Scalar l2_decay = 1e-3, Scalar epsilon = NumericUtils<Scalar>::EPSILON2) :
 				Base::AdamOptimizer(loss, batch_size, learning_rate, l1_decay, l2_decay, epsilon) { }
 protected:
 	inline void _update_params(Layer<Scalar,Rank>& layer, unsigned i, unsigned epoch) {
@@ -939,7 +939,7 @@ public:
 	 * @param epsilon A small constant used to maintain numerical stability.
 	 */
 	inline NadamOptimizer(LossSharedPtr<Scalar,Rank,Sequential> loss, unsigned batch_size = 1, Scalar learning_rate = 1e-3,
-			Scalar l1_decay = 1e-1, Scalar l2_decay = 1e-3, Scalar epsilon = internal::NumericUtils<Scalar>::EPSILON2) :
+			Scalar l1_decay = 1e-1, Scalar l2_decay = 1e-3, Scalar epsilon = NumericUtils<Scalar>::EPSILON2) :
 				Base::AdamOptimizer(loss, batch_size, learning_rate, l1_decay, l2_decay, epsilon) { }
 protected:
 	inline void _update_params(Layer<Scalar,Rank>& layer, unsigned i, unsigned epoch) {
@@ -983,7 +983,7 @@ public:
 	 * @param epsilon A small constant used to maintain numerical stability.
 	 */
 	inline AMSGradOptimizer(LossSharedPtr<Scalar,Rank,Sequential> loss, unsigned batch_size = 1, Scalar learning_rate = 1e-3,
-			Scalar l1_decay = 1e-1, Scalar l2_decay = 1e-3, Scalar epsilon = internal::NumericUtils<Scalar>::EPSILON2) :
+			Scalar l1_decay = 1e-1, Scalar l2_decay = 1e-3, Scalar epsilon = NumericUtils<Scalar>::EPSILON2) :
 				Base::AdamOptimizer(loss, batch_size, learning_rate, l1_decay, l2_decay, epsilon) { }
 	inline void fit(NeuralNetwork<Scalar,Rank,Sequential>& net) {
 		Base::fit(net);

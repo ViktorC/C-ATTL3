@@ -12,10 +12,10 @@
 #include <cuda_runtime.h>
 #include <utility>
 
-#include <CUDAError.hpp>
+#include "CUDAError.hpp"
 
 namespace cattle {
-namespace internal {
+namespace gpu {
 
 /**
  * A template class for CUDA device arrays of different data types.
@@ -98,7 +98,7 @@ private:
 	Scalar* _data;
 };
 
-} /* namespace internal */
+} /* namespace gpu */
 } /* namespace cattle */
 
 #endif /* C_ATTL3_GPU_CUDAARRAY_H_ */

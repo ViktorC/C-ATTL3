@@ -13,7 +13,6 @@
 #include <type_traits>
 
 namespace cattle {
-namespace internal {
 
 /**
  * A utility class template containing static methods and variables to help with
@@ -116,7 +115,6 @@ public:
 	}
 };
 
-}
 }
 
 #endif /* CATTL3_UTILS_NUMERICUTILS_H_ */

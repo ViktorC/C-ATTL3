@@ -18,7 +18,7 @@
 #define cudnnAssert(status) { _cudnn_assert(status, __FILE__, __LINE__); }
 
 namespace cattle {
-namespace internal {
+namespace gpu {
 
 /**
  * A class representing a cuDNN runtime error.
@@ -53,7 +53,7 @@ __inline__ void _cudnn_assert(cudnnStatus_t status, const char* file, int line) 
 
 }
 
-} /* namespace internal */
+} /* namespace gpu */
 } /* namespace cattle */
 
 #endif /* C_ATTL3_GPU_CUDNNERROR_H_ */

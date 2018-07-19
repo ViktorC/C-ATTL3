@@ -247,10 +247,10 @@ public:
 		int rows = weights.rows() - 1;
 		int cols = weights.cols();
 		bool more_rows = rows > cols;
-		internal::SVD<Scalar> svd;
+		SVD<Scalar> svd;
 		weights.block(0, 0, rows, cols) = more_rows ?
-				svd.compute(weights, internal::SVDOptions::ComputeFullU).matrixU().block(0, 0, rows, cols) :
-				svd.compute(weights, internal::SVDOptions::ComputeFullV).matrixV().block(0, 0, rows, cols);
+				svd.compute(weights, SVDOptions::ComputeFullU).matrixU().block(0, 0, rows, cols) :
+				svd.compute(weights, SVDOptions::ComputeFullV).matrixV().block(0, 0, rows, cols);
 	}
 protected:
 	Scalar _sd(unsigned fan_ins, unsigned fan_outs) const {

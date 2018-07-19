@@ -45,6 +45,8 @@ public:
 		assert(values.size() <= Rank);
 		std::copy(values.begin(), values.end(), this->values.begin());
 	}
+	inline Dimensions(IndexType... values) :
+			Dimensions({ values... }) { }
 	inline Dimensions(const std::array<IndexType,Rank>& array) :
 			Dimensions() {
 		std::copy(array.begin(), array.end(), values.begin());

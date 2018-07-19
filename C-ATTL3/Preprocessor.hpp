@@ -59,7 +59,7 @@ public:
 	/**
 	 * @param epsilon A small constant used to maintain numerical stability.
 	 */
-	inline NormalizationPreprocessor(Scalar epsilon = internal::NumericUtils<Scalar>::EPSILON2) :
+	inline NormalizationPreprocessor(Scalar epsilon = NumericUtils<Scalar>::EPSILON2) :
 			epsilon(epsilon) {
 		assert(epsilon > 0 && "epsilon must be greater than 0");
 	}
@@ -135,7 +135,7 @@ public:
 	/**
 	 * @param epsilon A small constant used to maintain numerical stability.
 	 */
-	inline NormalizationPreprocessor(Scalar epsilon = internal::NumericUtils<Scalar>::EPSILON2) :
+	inline NormalizationPreprocessor(Scalar epsilon = NumericUtils<Scalar>::EPSILON2) :
 			epsilon(epsilon) {
 		assert(epsilon > 0 && "epsilon must be greater than 0");
 	}
@@ -178,7 +178,7 @@ protected:
 	inline PCAPreprocessorBase(Scalar min_rel_var_to_retain, Scalar epsilon) :
 				Base::NormalizationPreprocessor(epsilon),
 				min_rel_var_to_retain(min_rel_var_to_retain),
-				reduce_dims(internal::NumericUtils<Scalar>::decidedly_lesser(min_rel_var_to_retain, (Scalar) 1)) {
+				reduce_dims(NumericUtils<Scalar>::decidedly_lesser(min_rel_var_to_retain, (Scalar) 1)) {
 		assert(min_rel_var_to_retain > 0 && min_rel_var_to_retain <= 1 &&
 				"the minimum relative variance to be retained must be greater "
 				"then 0 and less than or equal to 1");
@@ -192,7 +192,7 @@ protected:
 		// Compute the covariance matrix.
 		Matrix<Scalar> cov = normalized_data.transpose() * normalized_data / normalized_data.rows();
 		// Eigen decomposition.
-		internal::EigenSolver<Scalar> eigen_solver(cov);
+		EigenSolver<Scalar> eigen_solver(cov);
 		// Determine the number of components to retain.
 		const ColVector<Scalar>& eigen_values = eigen_solver.eigenvalues();
 		int dims_to_retain = 0;
@@ -202,7 +202,7 @@ protected:
 			for (; dims_to_retain < eigen_values.rows(); ++dims_to_retain) {
 				// The eigen values are in ascending order.
 				var += eigen_values(eigen_values.rows() - (1 + dims_to_retain));
-				if (internal::NumericUtils<Scalar>::decidedly_greater(var, min_var_to_retain))
+				if (NumericUtils<Scalar>::decidedly_greater(var, min_var_to_retain))
 					break;
 			}
 		} else
@@ -258,7 +258,7 @@ public:
 	 * tensor.
 	 * @param epsilon A small consant used to maintain numerical stability.
 	 */
-	inline PCAPreprocessor(Scalar min_rel_var_to_retain = 1, Scalar epsilon = internal::NumericUtils<Scalar>::EPSILON2) :
+	inline PCAPreprocessor(Scalar min_rel_var_to_retain = 1, Scalar epsilon = NumericUtils<Scalar>::EPSILON2) :
 				Base::PCAPreprocessorBase(min_rel_var_to_retain, epsilon) { }
 	inline void fit(const Tensor<Scalar,Rank + 1>& data) {
 		assert((!Base::reduce_dims || data.dimension(Rank) == 1) && "cannot reduce the dimensionality of multi-channel data");
@@ -315,7 +315,7 @@ public:
 	 * reduced.
 	 * @param epsilon A small consant used to maintain numerical stability.
 	 */
-	inline PCAPreprocessor(Scalar min_rel_var_to_retain = 1, Scalar epsilon = internal::NumericUtils<Scalar>::EPSILON2) :
+	inline PCAPreprocessor(Scalar min_rel_var_to_retain = 1, Scalar epsilon = NumericUtils<Scalar>::EPSILON2) :
 				Base::PCAPreprocessorBase(min_rel_var_to_retain, epsilon) { }
 	inline void fit(const Tensor<Scalar,Rank + 1>& data) {
 		Root::fit(data);

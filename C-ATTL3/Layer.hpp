@@ -31,11 +31,11 @@
 #include "WeightInitialization.hpp"
 
 #ifdef CATTL3_USE_CUBLAS
-#include "gpu/CuBLASHandle.hpp"
+#include "utils/gpu/CuBLASHandle.hpp"
 #endif
 
 #ifdef CATTL3_USE_CUDNN
-#include "gpu/CuDNNHandle.hpp"
+#include "utils/gpu/CuDNNHandle.hpp"
 #endif
 
 namespace cattle {
@@ -323,7 +323,7 @@ protected:
 				weight_init(weight_init),
 				weight_reg(weight_reg),
 				max_norm_constraint(max_norm_constraint),
-				max_norm(internal::NumericUtils<Scalar>::decidedly_greater(max_norm_constraint, (Scalar) 0)),
+				max_norm(NumericUtils<Scalar>::decidedly_greater(max_norm_constraint, (Scalar) 0)),
 				weights_rows(weights_rows),
 				weights_cols(weights_cols),
 				input_layer(false),
@@ -534,7 +534,7 @@ protected:
 		out_conversion_dims[0] = biased_in_mat.rows();
 		CUDAArray<Scalar> gpu_biased_in(biased_in_mat.size());
 		gpu_biased_in.copy_from_host(biased_in.data());
-		internal::CuBLASHandle<Scalar>::get_instance().matrix_mul(biased_in_mat.data(), biased_in_mat.rows(), biased_in_mat.cols(),
+		gpu::CuBLASHandle<Scalar>::get_instance().matrix_mul(biased_in_mat.data(), biased_in_mat.rows(), biased_in_mat.cols(),
 				false, Base::weights_ref.data(), Base::weights_ref.rows(), Base::weights_ref.cols(), false, out.data());
 		typename Root::Data out(out_conversion_dims);
 		return out;
@@ -544,14 +544,14 @@ protected:
 		assert(out_grad.dimension(0) > 0 && biased_in_mat.rows() == out_grad.dimension(0));
 		std::size_t out_grad_rows = out_grad.dimension(0);
 		std::size_t out_grad_cols = out_grad.size() / out_grad_rows;
-		internal::CuBLASHandle<Scalar>::get_instance().matrix_mul(biased_in_mat.data(), biased_in_mat.rows(), biased_in_mat.cols(),
+		gpu::CuBLASHandle<Scalar>::get_instance().matrix_mul(biased_in_mat.data(), biased_in_mat.rows(), biased_in_mat.cols(),
 				true, out_grad.data(), out_grad_rows, out_grad_cols, false, Base::weights_grad.data());
 		if (Base::is_input_layer())
 			return typename Root::Data();
 		Matrix<Scalar> weights_without_bias = Base::weights_ref.topRows(Base::input_dims.get_volume());
 		prev_out_conversion_dims[0] = out_grad_rows;
 		typename Root::Data prev_out_grad(prev_out_conversion_dims);
-		internal::CuBLASHandle<Scalar>::get_instance().matrix_mul(out_grad.data(), out_grad_rows, out_grad_cols, false,
+		gpu::CuBLASHandle<Scalar>::get_instance().matrix_mul(out_grad.data(), out_grad_rows, out_grad_cols, false,
 				weights_without_bias.data(), weights_without_bias.rows(), weights_without_bias.cols(), true,
 				prev_out_grad.data());
 		return prev_out_grad;
@@ -752,7 +752,7 @@ protected:
 		biased_in_conv_mat.col(receptor_vol).setOnes();
 		out_conversion_dims[0] = rows;
 		Tensor<Scalar,4> out(out_conversion_dims);
-		internal::CuBLASHandle<Scalar>::get_instance().matrix_mul(biased_in_conv_mat.data(), biased_in_conv_mat.rows(),
+		gpu::CuBLASHandle<Scalar>::get_instance().matrix_mul(biased_in_conv_mat.data(), biased_in_conv_mat.rows(),
 				biased_in_conv_mat.cols(), false, Base::weights_ref.data(), Base::weights_ref.rows(), Base::weights_ref.cols(),
 				false, out.data());
 		return out;
@@ -761,14 +761,14 @@ protected:
 		std::size_t rows = out_grad.dimension(0);
 		std::size_t total_patches = rows * patches_per_sample;
 		std::size_t receptor_vol = Base::weights_ref.rows() - 1;
-		internal::CuBLASHandle<Scalar>::get_instance().matrix_mul(biased_in_conv_mat.data(), biased_in_conv_mat.rows(),
+		gpu::CuBLASHandle<Scalar>::get_instance().matrix_mul(biased_in_conv_mat.data(), biased_in_conv_mat.rows(),
 				biased_in_conv_mat.cols(), true, out_grad.data(), total_patches, filters, false, Base::weights_grad.data());
 		if (Base::is_input_layer())
 			return Tensor<Scalar,4>();
 		Matrix<Scalar> prev_out_grad_conv_mat(total_patches, receptor_vol);
 		{
 			Matrix<Scalar> weights_without_bias = Base::weights_ref.topRows(receptor_vol);
-			internal::CuBLASHandle<Scalar>::get_instance().matrix_mul(out_grad.data(), total_patches, filters, false,
+			gpu::CuBLASHandle<Scalar>::get_instance().matrix_mul(out_grad.data(), total_patches, filters, false,
 					weights_without_bias.data(), receptor_vol, filters, true, prev_out_grad_conv_mat.data());
 		}
 		Tensor<Scalar,4> prev_out_grad(rows, padded_height, padded_width, ext_input_dims(2));
@@ -906,10 +906,10 @@ protected:
 			ext_output_dims(layer.ext_output_dims),
 			gpu_input(layer.gpu_input) { }
 	inline void empty_cache() {
-		gpu_input = internal::CuDNNTensor<Scalar>();
+		gpu_input = gpu::CuDNNTensor<Scalar>();
 	}
 	inline Tensor<Scalar,4> _pass_forward(Tensor<Scalar,4> in, bool training) {
-		using namespace internal;
+		using namespace gpu;
 		gpu_input = CuDNNTensor<Scalar>(in.dimension(0), in.dimension(1), in.dimension(2), in.dimension(3), TENSOR_FORMAT);
 		gpu_input.copy_from_host(in.data());
 		Matrix<Scalar> filter = Base::weights_ref.topRows(Base::weights_ref.rows() - 1);
@@ -927,7 +927,7 @@ protected:
 		return out;
 	}
 	inline Tensor<Scalar,4> _pass_back(Tensor<Scalar,4> out_grad) {
-		using namespace internal;
+		using namespace gpu;
 		CuDNNTensor<Scalar> gpu_out_grad(out_grad.dimension(0), out_grad.dimension(1), out_grad.dimension(2),
 				out_grad.dimension(3), TENSOR_FORMAT);
 		gpu_out_grad.copy_from_host(out_grad.data());
@@ -973,7 +973,7 @@ private:
 			std::size_t vertical_stride, std::size_t horizontal_stride, std::size_t vertical_dilation,
 			std::size_t horizontal_dilation) {
 		std::size_t h, w, c;
-		internal::CuDNNHandle<Scalar>::get_instance().conv2d_output_dims(input_dims(0), input_dims(1), input_dims(2),
+		gpu::CuDNNHandle<Scalar>::get_instance().conv2d_output_dims(input_dims(0), input_dims(1), input_dims(2),
 				CUDNN_TENSOR_NHWC, filters, receptor_height, receptor_width, vertical_padding, horizontal_padding, vertical_stride,
 				horizontal_stride, vertical_dilation + 1, horizontal_dilation + 1, h, w, c);
 		return { h, w, c };
@@ -991,7 +991,7 @@ private:
 	}
 	Dimensions<std::size_t,3> ext_input_dims;
 	Dimensions<std::size_t,3> ext_output_dims;
-	internal::CuDNNTensor<Scalar> gpu_input;
+	gpu::CuDNNTensor<Scalar> gpu_input;
 };
 #endif
 
@@ -1358,7 +1358,7 @@ protected:
 		biased_in_mat.block(0, 0, total_patches, depth) = MatrixMap<Scalar>(in.data(), total_patches, depth);
 		biased_in_mat.col(depth).setOnes();
 		Matrix<Scalar> out_conv_mat(total_patches, Base::weights_ref.cols());
-		internal::CuBLASHandle<Scalar>::get_instance().matrix_mul(biased_in_mat.data(), biased_in_mat.rows(),
+		gpu::CuBLASHandle<Scalar>::get_instance().matrix_mul(biased_in_mat.data(), biased_in_mat.rows(),
 				biased_in_mat.cols(), false, Base::weights_ref.data(), Base::weights_ref.rows(),
 				Base::weights_ref.cols(), false, out_conv_mat.data());
 		Tensor<Scalar,4> out(rows, padded_height, padded_width, ext_output_dims(2));
@@ -1411,7 +1411,7 @@ protected:
 			}
 		}
 		assert(patch_ind == total_patches);
-		internal::CuBLASHandle<Scalar>::get_instance().matrix_mul(biased_in_mat.data(), biased_in_mat.rows(),
+		gpu::CuBLASHandle<Scalar>::get_instance().matrix_mul(biased_in_mat.data(), biased_in_mat.rows(),
 				biased_in_mat.cols(), true, out_grad_conv_mat.data(), total_patches, receptor_vol, false,
 				Base::weights_grad.data());
 		if (Base::is_input_layer())
@@ -1420,7 +1420,7 @@ protected:
 		Tensor<Scalar,4> prev_out(prev_out_conversion_dims);
 		{
 			Matrix<Scalar> weights_without_bias = Base::weights_ref.topRows(depth);
-			internal::CuBLASHandle<Scalar>::get_instance().matrix_mul(out_grad_conv_mat.data(), total_patches,
+			gpu::CuBLASHandle<Scalar>::get_instance().matrix_mul(out_grad_conv_mat.data(), total_patches,
 					receptor_vol, false, weights_without_bias.data(), depth, weights_without_bias.cols(),
 					true, prev_out.data());
 		}
@@ -1797,14 +1797,14 @@ protected:
 				coeff(coeff),
 				ext_batch_dims(dims.template extend<3 - Rank>().template promote<>()) { }
 	inline void empty_cache() {
-		using namespace internal;
+		using namespace gpu;
 		gpu_input = CuDNNTensor<Scalar>();
 		gpu_output = CuDNNTensor<Scalar>();
 	}
 	inline typename Root::Data pass_forward(typename Root::Data in, bool training) {
 		assert((Dimensions<std::size_t,Base::DATA_RANK>(in.dimensions()).template demote<>()) == Base::dims);
 		assert(in.dimension(0) > 0);
-		using namespace internal;
+		using namespace gpu;
 		ext_batch_dims[0] = in.dimension(0);
 		gpu_input = CuDNNTensor<Scalar>(ext_batch_dims[0], ext_batch_dims[1], ext_batch_dims[2], ext_batch_dims[3]);
 		gpu_input.copy_from_host(in.data());
@@ -1817,7 +1817,7 @@ protected:
 	inline typename Root::Data pass_back(typename Root::Data out_grad) {
 		assert((Dimensions<std::size_t,Base::DATA_RANK>(out_grad.dimensions()).template demote<>()) == Base::dims);
 		assert(out_grad.dimension(0) > 0 && ext_batch_dims[0] == out_grad.dimension(0));
-		using namespace internal;
+		using namespace gpu;
 		CuDNNTensor<Scalar> gpu_in_out_grad(ext_batch_dims[0], ext_batch_dims[1],
 				ext_batch_dims[2], ext_batch_dims[3]);
 		gpu_in_out_grad.copy_from_host(out_grad.data());
@@ -1830,8 +1830,8 @@ private:
 	cudnnActivationMode_t act_mode;
 	Scalar coeff;
 	std::array<std::size_t,4> ext_batch_dims;
-	internal::CuDNNTensor<Scalar> gpu_input;
-	internal::CuDNNTensor<Scalar> gpu_output;
+	gpu::CuDNNTensor<Scalar> gpu_input;
+	gpu::CuDNNTensor<Scalar> gpu_output;
 };
 
 }
@@ -2176,7 +2176,7 @@ public:
 	 * @param dims The dimensionality of the input tensor.
 	 * @param epsilon A small constant to maintain numerical stability.
 	 */
-	inline SoftmaxActivationLayer(const Dimensions<std::size_t,Rank>& dims, Scalar epsilon = internal::NumericUtils<Scalar>::EPSILON2) :
+	inline SoftmaxActivationLayer(const Dimensions<std::size_t,Rank>& dims, Scalar epsilon = NumericUtils<Scalar>::EPSILON2) :
 			ActivationLayer<Scalar,Rank>::ActivationLayer(dims),
 			epsilon(epsilon),
 			conversion_dims(dims.template promote<>()) { }
@@ -2249,12 +2249,12 @@ public:
 	}
 protected:
 	inline void empty_cache() {
-		gpu_output = internal::CuDNNTensor<Scalar>();
+		gpu_output = gpu::CuDNNTensor<Scalar>();
 	}
 	inline typename Root::Data pass_forward(typename Root::Data in, bool training) {
 		assert((Dimensions<std::size_t,Base::DATA_RANK>(in.dimensions()).template demote<>()) == Base::dims);
 		assert(in.dimension(0) > 0);
-		using namespace internal;
+		using namespace gpu;
 		ext_batch_dims[0] = in.dimension(0);
 		CuDNNTensor<Scalar> gpu_input(ext_batch_dims[0], ext_batch_dims[1],
 				ext_batch_dims[2], ext_batch_dims[3]);
@@ -2269,7 +2269,7 @@ protected:
 	inline typename Root::Data pass_back(typename Root::Data out_grad) {
 		assert((Dimensions<std::size_t,Base::DATA_RANK>(out_grad.dimensions()).template demote<>()) == Base::dims);
 		assert(out_grad.dimension(0) > 0 && ext_batch_dims[0] == out_grad.dimension(0));
-		using namespace internal;
+		using namespace gpu;
 		CuDNNTensor<Scalar> gpu_in_out_grad(ext_batch_dims[0], ext_batch_dims[1],
 				ext_batch_dims[2], ext_batch_dims[3]);
 		gpu_in_out_grad.copy_from_host(out_grad.data());
@@ -2280,7 +2280,7 @@ protected:
 	}
 private:
 	std::array<std::size_t,4> ext_batch_dims;
-	internal::CuDNNTensor<Scalar> gpu_output;
+	gpu::CuDNNTensor<Scalar> gpu_output;
 };
 #endif
 
@@ -2535,7 +2535,7 @@ public:
 				param_reg(param_reg),
 				init_alpha(init_alpha),
 				max_norm_constraint(max_norm_constraint),
-				max_norm(internal::NumericUtils<Scalar>::decidedly_greater(max_norm_constraint, (Scalar) 0)),
+				max_norm(NumericUtils<Scalar>::decidedly_greater(max_norm_constraint, (Scalar) 0)),
 				conversion_dims(dims.template promote<>()) {
 		assert(param_reg != nullptr);
 	}
@@ -2691,7 +2691,7 @@ public:
 				param_reg(param_reg),
 				init_beta(init_beta),
 				max_norm_constraint(max_norm_constraint),
-				max_norm(internal::NumericUtils<Scalar>::decidedly_greater(max_norm_constraint, (Scalar) 0)),
+				max_norm(NumericUtils<Scalar>::decidedly_greater(max_norm_constraint, (Scalar) 0)),
 				conversion_dims(dims.template promote<>()) {
 		assert(param_reg != nullptr);
 	}
@@ -3135,7 +3135,7 @@ protected:
 		Tensor<Scalar,4> reduced_patch(rows, 1u, 1u, depth);
 		for (std::size_t i = 0; i < depth; ++i) {
 			for (std::size_t j = 0; j < rows; ++j) {
-				Scalar max = internal::NumericUtils<Scalar>::MIN;
+				Scalar max = NumericUtils<Scalar>::MIN;
 				unsigned max_height = 0;
 				unsigned max_width = 0;
 				for (std::size_t k = 0; k < Base::receptor_width; ++k) {
@@ -3376,7 +3376,7 @@ protected:
 		this->input_layer = input_layer;
 	}
 	inline void empty_cache() {
-		using namespace internal;
+		using namespace gpu;
 		gpu_input = CuDNNTensor<Scalar>();
 		gpu_output = CuDNNTensor<Scalar>();
 	}
@@ -3394,7 +3394,7 @@ protected:
 	inline typename Base::Data pass_forward(typename Base::Data in, bool training) {
 		assert((Dimensions<std::size_t,Rank + 1>(in.dimensions()).template demote<>()) == input_dims);
 		assert(in.dimension(0) > 0);
-		using namespace internal;
+		using namespace gpu;
 		rows = in.dimension(0);
 		gpu_input = CuDNNTensor<Scalar>(rows, ext_input_dims(0), ext_input_dims(1), ext_input_dims(2), TENSOR_FORMAT);
 		gpu_input.copy_from_host(in.data());
@@ -3408,7 +3408,7 @@ protected:
 	inline typename Base::Data pass_back(typename Base::Data out_grad) {
 		assert((Dimensions<std::size_t,Rank + 1>(out_grad.dimensions()).template demote<>()) == output_dims);
 		assert(out_grad.dimension(0) > 0 && rows == out_grad.dimension(0));
-		using namespace internal;
+		using namespace gpu;
 		CuDNNTensor<Scalar> gpu_out_grad(rows, ext_output_dims(0), ext_output_dims(1), ext_output_dims(2), TENSOR_FORMAT);
 		gpu_out_grad.copy_from_host(out_grad.data());
 		CuDNNTensor<Scalar> gpu_prev_out_grad(rows, ext_input_dims(0), ext_input_dims(1), ext_input_dims(2), TENSOR_FORMAT);
@@ -3432,7 +3432,7 @@ private:
 			cudnnPoolingMode_t pool_mode, std::size_t receptor_height, std::size_t receptor_width, std::size_t vertical_stride,
 			std::size_t horizontal_stride) {
 		std::size_t h, w, c;
-		internal::CuDNNHandle<Scalar>::get_instance().pool2d_output_dims(input_dims(0), input_dims(1), input_dims(2),
+		gpu::CuDNNHandle<Scalar>::get_instance().pool2d_output_dims(input_dims(0), input_dims(1), input_dims(2),
 				CUDNN_TENSOR_NHWC, pool_mode, receptor_height, receptor_width, 0, 0, vertical_stride, horizontal_stride,
 				h, w, c);
 		return { h, w, c };
@@ -3442,8 +3442,8 @@ private:
 	std::size_t rows;
 	Matrix<Scalar> params;
 	Matrix<Scalar> params_grad;
-	internal::CuDNNTensor<Scalar> gpu_input;
-	internal::CuDNNTensor<Scalar> gpu_output;
+	gpu::CuDNNTensor<Scalar> gpu_input;
+	gpu::CuDNNTensor<Scalar> gpu_output;
 };
 
 /**
@@ -3687,14 +3687,14 @@ public:
 	 */
 	inline BatchNormLayer(const Dimensions<std::size_t,Rank>& dims, ParamRegSharedPtr<Scalar> gamma_reg = Base::NO_PARAM_REG,
 			ParamRegSharedPtr<Scalar> beta_reg = Base::NO_PARAM_REG, Scalar gamma_max_norm_constraint = 0,
-			Scalar beta_max_norm_constraint = 0, Scalar norm_avg_decay = .1, Scalar epsilon = internal::NumericUtils<Scalar>::EPSILON2) :
+			Scalar beta_max_norm_constraint = 0, Scalar norm_avg_decay = .1, Scalar epsilon = NumericUtils<Scalar>::EPSILON2) :
 				dims(dims),
 				gamma_reg(gamma_reg),
 				beta_reg(beta_reg),
 				gamma_max_norm_constraint(gamma_max_norm_constraint),
 				beta_max_norm_constraint(beta_max_norm_constraint),
-				gamma_max_norm(internal::NumericUtils<Scalar>::decidedly_greater(gamma_max_norm_constraint, (Scalar) 0)),
-				beta_max_norm(internal::NumericUtils<Scalar>::decidedly_greater(beta_max_norm_constraint, (Scalar) 0)),
+				gamma_max_norm(NumericUtils<Scalar>::decidedly_greater(gamma_max_norm_constraint, (Scalar) 0)),
+				beta_max_norm(NumericUtils<Scalar>::decidedly_greater(beta_max_norm_constraint, (Scalar) 0)),
 				norm_avg_decay(norm_avg_decay),
 				epsilon(epsilon),
 				channels(dims(Rank - 1)),
@@ -3983,14 +3983,14 @@ public:
 	 */
 	inline BatchNormLayer(const Dimensions<std::size_t,Rank>& dims, ParamRegSharedPtr<Scalar> gamma_reg = Base::NO_PARAM_REG,
 			ParamRegSharedPtr<Scalar> beta_reg = Base::NO_PARAM_REG, Scalar gamma_max_norm_constraint = 0,
-			Scalar beta_max_norm_constraint = 0, Scalar norm_avg_decay = .1, Scalar epsilon = internal::NumericUtils<Scalar>::EPSILON2) :
+			Scalar beta_max_norm_constraint = 0, Scalar norm_avg_decay = .1, Scalar epsilon = NumericUtils<Scalar>::EPSILON2) :
 				dims(dims),
 				gamma_reg(gamma_reg),
 				beta_reg(beta_reg),
 				gamma_max_norm_constraint(gamma_max_norm_constraint),
 				beta_max_norm_constraint(beta_max_norm_constraint),
-				gamma_max_norm(internal::NumericUtils<Scalar>::decidedly_greater(gamma_max_norm_constraint, (Scalar) 0)),
-				beta_max_norm(internal::NumericUtils<Scalar>::decidedly_greater(beta_max_norm_constraint, (Scalar) 0)),
+				gamma_max_norm(NumericUtils<Scalar>::decidedly_greater(gamma_max_norm_constraint, (Scalar) 0)),
+				beta_max_norm(NumericUtils<Scalar>::decidedly_greater(beta_max_norm_constraint, (Scalar) 0)),
 				norm_avg_decay(norm_avg_decay),
 				epsilon(epsilon),
 				input_layer(false),
@@ -4219,14 +4219,14 @@ public:
 	 */
 	inline BatchNormLayer(const Dimensions<std::size_t,Rank>& dims, ParamRegSharedPtr<Scalar> gamma_reg = Base::NO_PARAM_REG,
 			ParamRegSharedPtr<Scalar> beta_reg = Base::NO_PARAM_REG, Scalar gamma_max_norm_constraint = 0,
-			Scalar beta_max_norm_constraint = 0, Scalar norm_avg_decay = .1, Scalar epsilon = internal::NumericUtils<Scalar>::EPSILON2) :
+			Scalar beta_max_norm_constraint = 0, Scalar norm_avg_decay = .1, Scalar epsilon = NumericUtils<Scalar>::EPSILON2) :
 				dims(dims),
 				gamma_reg(gamma_reg),
 				beta_reg(beta_reg),
 				gamma_max_norm_constraint(gamma_max_norm_constraint),
 				beta_max_norm_constraint(beta_max_norm_constraint),
-				gamma_max_norm(internal::NumericUtils<Scalar>::decidedly_greater(gamma_max_norm_constraint, (Scalar) 0)),
-				beta_max_norm(internal::NumericUtils<Scalar>::decidedly_greater(beta_max_norm_constraint, (Scalar) 0)),
+				gamma_max_norm(NumericUtils<Scalar>::decidedly_greater(gamma_max_norm_constraint, (Scalar) 0)),
+				beta_max_norm(NumericUtils<Scalar>::decidedly_greater(beta_max_norm_constraint, (Scalar) 0)),
 				norm_avg_decay(norm_avg_decay),
 				epsilon(epsilon),
 				params_vol(PerLastRank ? dims(Rank - 1) : dims.get_volume()),
@@ -4298,7 +4298,7 @@ public:
 		params_ref.col(0).setOnes();
 		params_ref.col(1).setZero();
 		params_grad = Matrix<Scalar>::Zero(params_ref.rows(), params_ref.cols());
-		using namespace internal;
+		using namespace gpu;
 		gpu_means = CuDNNTensor<Scalar>(1u, PerLastRank ? 1u : batch_dims[1],
 				PerLastRank ? 1u : batch_dims[2], batch_dims[3]);
 		gpu_vars = CuDNNTensor<Scalar>(1u, gpu_means.get_h(), gpu_means.get_w(),
@@ -4335,7 +4335,7 @@ protected:
 		this->input_layer = input_layer;
 	}
 	inline void empty_cache() {
-		using namespace internal;
+		using namespace gpu;
 		gpu_input = CuDNNTensor<Scalar>();
 		gpu_mean_cache = CuDNNTensor<Scalar>();
 		gpu_inv_var_cache = CuDNNTensor<Scalar>();
@@ -4369,7 +4369,7 @@ protected:
 	inline typename Base::Data pass_forward(typename Base::Data in, bool training) {
 		assert((Dimensions<std::size_t,Base::DATA_RANK>(in.dimensions()).template demote<>()) == dims);
 		assert(in.dimension(0) > 0);
-		using namespace internal;
+		using namespace gpu;
 		batch_dims[0] = in.dimension(0);
 		gpu_input = CuDNNTensor<Scalar>(batch_dims[0], batch_dims[1], batch_dims[2], batch_dims[3]);
 		gpu_input.copy_from_host(in.data());
@@ -4397,7 +4397,7 @@ protected:
 	inline typename Base::Data pass_back(typename Base::Data out_grad) {
 		assert((Dimensions<std::size_t,Base::DATA_RANK>(out_grad.dimensions()).template demote<>()) == dims);
 		assert(out_grad.dimension(0) > 0 && batch_dims[0] == out_grad.dimension(0));
-		using namespace internal;
+		using namespace gpu;
 		CuDNNTensor<Scalar> gpu_out_grad(batch_dims[0], batch_dims[1], batch_dims[2], batch_dims[3]);
 		gpu_out_grad.copy_from_host(out_grad.data());
 		Matrix<Scalar> gamma = params_ref.col(0);
@@ -4439,15 +4439,15 @@ private:
 	bool input_layer;
 	bool frozen;
 	std::array<std::size_t,4> batch_dims;
-	internal::CuDNNTensor<Scalar> gpu_means;
-	internal::CuDNNTensor<Scalar> gpu_vars;
+	gpu::CuDNNTensor<Scalar> gpu_means;
+	gpu::CuDNNTensor<Scalar> gpu_vars;
 	Matrix<Scalar> params;
 	Matrix<Scalar> params_grad;
 	Matrix<Scalar>& params_ref;
 	const Base& owner;
-	internal::CuDNNTensor<Scalar> gpu_input;
-	internal::CuDNNTensor<Scalar> gpu_mean_cache;
-	internal::CuDNNTensor<Scalar> gpu_inv_var_cache;
+	gpu::CuDNNTensor<Scalar> gpu_input;
+	gpu::CuDNNTensor<Scalar> gpu_mean_cache;
+	gpu::CuDNNTensor<Scalar> gpu_inv_var_cache;
 };
 #endif
 
@@ -4468,7 +4468,7 @@ public:
 	 * @param epsilon A small constant used to maintain numerical stability.
 	 */
 	inline DropoutLayer(const Dimensions<std::size_t,Rank>& dims, Scalar dropout_prob,
-			Scalar epsilon = internal::NumericUtils<Scalar>::EPSILON2) :
+			Scalar epsilon = NumericUtils<Scalar>::EPSILON2) :
 				dims(dims),
 				dropout_prob(dropout_prob),
 				epsilon(epsilon),
@@ -4616,7 +4616,7 @@ public:
 		this->frozen = frozen;
 	}
 	inline void init() {
-		using namespace internal;
+		using namespace gpu;
 		std::size_t state_size;
 		CuDNNHandle<Scalar>::get_instance().dropout_state_size(state_size);
 		gpu_state = CuDNNTensor<Scalar>(state_size, 1u, 1u, 1u);
@@ -4629,7 +4629,7 @@ protected:
 		this->input_layer = input_layer;
 	}
 	inline void empty_cache() {
-		gpu_reserve = internal::CuDNNTensor<Scalar>();
+		gpu_reserve = gpu::CuDNNTensor<Scalar>();
 	}
 	inline Matrix<Scalar>& get_params() {
 		return params;
@@ -4646,7 +4646,7 @@ protected:
 		assert((Dimensions<std::size_t,Base::DATA_RANK>(in.dimensions()).template demote<>()) == dims);
 		assert(in.dimension(0) > 0);
 		if (training) {
-			using namespace internal;
+			using namespace gpu;
 			ext_batch_dims[0] = in.dimension(0);
 			CuDNNTensor<Scalar> gpu_input(ext_batch_dims[0], ext_batch_dims[1],
 					ext_batch_dims[2], ext_batch_dims[3]);
@@ -4669,7 +4669,7 @@ protected:
 		assert(out_grad.dimension(0) > 0 && ext_batch_dims[0] == out_grad.dimension(0));
 		if (input_layer)
 			return typename Base::Data();
-		using namespace internal;
+		using namespace gpu;
 		CuDNNTensor<Scalar> gpu_out_grad(ext_batch_dims[0], ext_batch_dims[1],
 				ext_batch_dims[2], ext_batch_dims[3]);
 		gpu_out_grad.copy_from_host(out_grad.data());
@@ -4689,8 +4689,8 @@ private:
 	Matrix<Scalar> params;
 	Matrix<Scalar> params_grad;
 	std::array<std::size_t,4> ext_batch_dims;
-	internal::CuDNNTensor<Scalar> gpu_state;
-	internal::CuDNNTensor<Scalar> gpu_reserve;
+	gpu::CuDNNTensor<Scalar> gpu_state;
+	gpu::CuDNNTensor<Scalar> gpu_reserve;
 };
 #endif
 

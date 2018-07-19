@@ -18,7 +18,7 @@
 #define cublasAssert(status) { _cublas_assert(status, __FILE__, __LINE__); }
 
 namespace cattle {
-namespace internal {
+namespace gpu {
 
 /**
  * A class representing a cuBLAS runtime error.
@@ -75,7 +75,7 @@ __inline__ void _cublas_assert(cublasStatus_t status, const char* file, int line
 
 }
 
-} /* namespace internal */
+} /* namespace gpu */
 } /* namespace cattle */
 
 #endif /* C_ATTL3_GPU_CUBLASERROR_H_ */

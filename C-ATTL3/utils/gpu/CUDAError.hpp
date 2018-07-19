@@ -18,7 +18,7 @@
 #define cudaAssert(code) { _cuda_assert(__FILE__, __LINE__, code); }
 
 namespace cattle {
-namespace internal {
+namespace gpu {
 
 /**
  * A class representing a CUDA runtime error.
@@ -53,7 +53,7 @@ __inline__ void _cuda_assert(const char* file, int line, cudaError_t code = cuda
 
 }
 
-} /* namespace internal */
+} /* namespace gpu */
 } /* namespace cattle */
 
 #endif /* C_ATTL3_GPU_CUDAERROR_H_ */

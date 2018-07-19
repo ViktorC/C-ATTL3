@@ -21,7 +21,7 @@
 #include "CUDAError.hpp"
 
 namespace cattle {
-namespace internal {
+namespace gpu {
 
 namespace {
 

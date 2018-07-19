@@ -61,11 +61,6 @@ template<typename Scalar, std::size_t Rank>
 using TensorMap = Eigen::TensorMap<Tensor<Scalar,Rank>>;
 
 /**
- * A namespace for utilities used by C-ATTL3 internally.
- */
-namespace internal {
-
-/**
  * An alias for permutation matrices.
  */
 using PermMatrix = Eigen::PermutationMatrix<Eigen::Dynamic,Eigen::Dynamic>;
@@ -112,8 +107,6 @@ public:
 		Eigen::setNbThreads(std::max(1, std::min(num_of_threads, max)));
 	}
 };
-
-}
 
 }
 
