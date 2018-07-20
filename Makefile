@@ -5,10 +5,8 @@ COV := gcov
 CXXFLAGS := -std=c++11 -fmessage-length=0 -ftemplate-backtrace-limit=0
 # AVX instructions are problematic with GCC 64 bit on Windows due to its lack of support for 32 byte stack alignment.
 GCC_CXXFLAGS := $(CXXFLAGS) -Wno-ignored-attributes -fopenmp
-GCC_CUDA_CXXFLAGS := $(GCC_CXXFLAGS) -DCATTL3_USE_CUDA
 # Clang does not actually utilize OpenMP on Windows; no libomp or libiomp5.
 CLANG_CXXFLAGS := $(CXXFLAGS) -march=native
-CLANG_CUDA_CXXFLAGS := $(CLANG_CXXFLAGS) -DCATTL3_USE_CUDNN
 RELEASE_OPT_FLAGS := -O3 -DNDEBUG
 # Without level 1 optimization, the object file is too big.
 DEBUG_OPT_FLAGS := -O1 -g
@@ -17,12 +15,10 @@ COVERAGE_OPT_FLAGS := $(DEBUG_OPT_FLAGS) -fprofile-arcs -ftest-coverage
 GTEST_DIR := test/gtest
 # For Clang on Windows, omp.h must be copied from GCC.
 INCLUDES := -IC-ATTL3 -IEigen -I$(GTEST_DIR)/include -Itest/
-CUDA_INCLUDES := -I"$(CUDA_INC_PATH)" $(INCLUDES)
 LIBS := -lpthread -lgomp
-CUDA_LIBS := $(LIBS) -L"$(CUDA_LIB_PATH)" -lcudart -lcublas -lcudnn
-HEADERS := Codec.hpp DataProvider.hpp Dimensions.hpp Layer.hpp Loss.hpp \
-	NeuralNetwork.hpp Optimizer.hpp ParameterRegularization.hpp \
-	Preprocessor.hpp WeightInitialization.hpp
+HEADERS := Codec.hpp DataProvider.hpp Dimensions.hpp EigenProxy.hpp Layer.hpp Loss.hpp \
+	NeuralNetwork.hpp NumericUtils.hpp Optimizer.hpp ParameterInitialization.hpp \
+	ParameterRegularization.hpp Parameters.hpp Preprocessor.hpp
 SOURCE_DIR := test
 SOURCES := test.cpp
 BUILD_DIR := build
@@ -58,20 +54,6 @@ coverage:
 		CXX='$(GCC_CXX)' \
 		CXXFLAGS='$(GCC_CXXFLAGS)' \
 		OPT_FLAGS='$(COVERAGE_OPT_FLAGS)'
-cuda_all:
-	$(MAKE) $(TARGET) \
-		CXX='$(GCC_CXX)' \
-		CXXFLAGS='$(GCC_CUDA_CXXFLAGS)' \
-		OPT_FLAGS='$(RELEASE_OPT_FLAGS)' \
-		INCLUDES='$(CUDA_INCLUDES)' \
-		LIBS='$(CUDA_LIBS)'
-cuda_debug:
-	$(MAKE) $(TARGET) \
-		CXX='$(GCC_CXX)' \
-		CXXFLAGS='$(GCC_CUDA_CXXFLAGS)' \
-		OPT_FLAGS='$(DEBUG_OPT_FLAGS)' \
-		INCLUDES='$(CUDA_INCLUDES)' \
-		LIBS='$(CUDA_LIBS)'
 clang_all:
 	$(MAKE) $(TARGET) \
 		CXX='$(CLANG_CXX)' \
@@ -82,20 +64,6 @@ clang_debug:
 		CXX='$(CLANG_CXX)' \
 		CXXFLAGS='$(CLANG_CXXFLAGS)' \
 		OPT_FLAGS='$(DEBUG_OPT_FLAGS)'
-clang_cuda_all:
-	$(MAKE) $(TARGET) \
-		CXX='$(CLANG_CXX)' \
-		CXXFLAGS='$(CLANG_CUDA_CXXFLAGS)' \
-		OPT_FLAGS='$(RELEASE_OPT_FLAGS)' \
-		INCLUDES='$(CUDA_INCLUDES)' \
-		LIBS='$(CUDA_LIBS)'
-clang_cuda_debug:
-	$(MAKE) $(TARGET) \
-		CXX='$(CLANG_CXX)' \
-		CXXFLAGS='$(CLANG_CUDA_CXXFLAGS)' \
-		OPT_FLAGS='$(DEBUG_OPT_FLAGS)' \
-		INCLUDES='$(CUDA_INCLUDES)' \
-		LIBS='$(CUDA_LIBS)'
 check:
 	@bin/cattle_test.exe
 report:

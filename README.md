@@ -3,7 +3,7 @@
 |---|---|
 | [![Clang](https://travis-matrix-badges.herokuapp.com/repos/ViktorC/C-ATTL3/branches/master/1)](https://travis-ci.org/ViktorC/C-ATTL3) | [![GCC](https://travis-matrix-badges.herokuapp.com/repos/ViktorC/C-ATTL3/branches/master/2)](https://travis-ci.org/ViktorC/C-ATTL3) |
 
-A header-only neural network template library written in C++11. C-ATTL3 uses [Eigen](http://eigen.tuxfamily.org), the popular linear algebra library. It can also utilize either or both of the [cuBLAS](https://developer.nvidia.com/cublas) library of NVIDIA's CUDA toolkit and [cuDNN](https://developer.nvidia.com/cudnn) for GPU acceleration. C-ATTL3 allows for the easy construction and training of both feed-forward and recurrent neural networks ranging from simple MLPs and RNNs to state-of-the-art InceptionNets, ResNets, DenseNets, and convolutional LSTMs. The library can handle data of different ranks and different floating point scalar types such as `float` and `double`.
+A header-only neural network template library written in C++11. C-ATTL3 uses [Eigen](http://eigen.tuxfamily.org), the popular linear algebra library. C-ATTL3 allows for the easy construction and training of both feed-forward and recurrent neural networks ranging from simple MLPs and RNNs to state-of-the-art InceptionNets, ResNets, DenseNets, and convolutional LSTMs. The library can handle data of different ranks and different floating point scalar types such as `float` and `double`.
 
 ## Components
 The following sub-sections describe the main components of the C-ATTL3 deep learning library. Knowledge of these components and their relations is required for the effective usage of the library.
