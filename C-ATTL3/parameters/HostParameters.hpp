@@ -58,8 +58,8 @@ public:
 	 * @param grad_max_l2_norm The maximum allowed L2 parameter gradient norm. If it
 	 * is 0 or less, no L2 gradient max norm constraint is enforced.
 	 */
-	HostParameters(std::size_t rows, std::size_t cols, ParamInitSharedPtr init, bool optimizable = true,
-			ParamRegSharedPtr reg = nullptr, Scalar value_clip = 0, Scalar value_max_l1_norm = 0,
+	HostParameters(std::size_t rows, std::size_t cols, ParamInitSharedPtr<Scalar> init, bool optimizable = true,
+			ParamRegSharedPtr<Scalar> reg = nullptr, Scalar value_clip = 0, Scalar value_max_l1_norm = 0,
 			Scalar value_max_l2_norm = 0, Scalar grad_clip = 0, Scalar grad_max_l1_norm = 0,
 			Scalar grad_max_l2_norm = 0) :
 				rows(rows),
@@ -170,9 +170,9 @@ protected:
 	}
 	std::size_t rows, cols;
 	Matrix<Scalar> values, grad;
-	ParamInitSharedPtr param_init;
+	ParamInitSharedPtr<Scalar> param_init;
 	bool optimizable;
-	ParamRegSharedPtr param_reg;
+	ParamRegSharedPtr<Scalar> param_reg;
 	Scalar value_clip, value_max_l1_norm, value_max_l2_norm;
 	Scalar grad_clip, grad_max_l1_norm, grad_max_l2_norm;
 	bool frozen;

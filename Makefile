@@ -16,9 +16,7 @@ GTEST_DIR := test/gtest
 # For Clang on Windows, omp.h must be copied from GCC.
 INCLUDES := -IC-ATTL3 -IEigen -I$(GTEST_DIR)/include -Itest/
 LIBS := -lpthread -lgomp
-HEADERS := Codec.hpp DataProvider.hpp Dimensions.hpp EigenProxy.hpp Layer.hpp Loss.hpp \
-	NeuralNetwork.hpp NumericUtils.hpp Optimizer.hpp ParameterInitialization.hpp \
-	ParameterRegularization.hpp Parameters.hpp Preprocessor.hpp
+HEADERS := $(shell find C-ATTL3 -name '*.hpp')
 SOURCE_DIR := test
 SOURCES := test.cpp
 BUILD_DIR := build

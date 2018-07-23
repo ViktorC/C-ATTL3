@@ -38,19 +38,17 @@ class Dimensions : public DimExpression<Dimensions<IndexType,Rank>,IndexType,Ran
 	template<typename OtherIndexType, std::size_t OtherRank>
 	friend class Dimensions;
 public:
-	inline Dimensions() :
-			values(Rank, 1) { }
+	inline Dimensions(const std::array<IndexType,Rank>& array) :
+			values(Rank) {
+		std::copy(array.begin(), array.end(), values.begin());
+	}
 	inline Dimensions(const std::initializer_list<IndexType>& values) :
-			Dimensions() {
+			values(Rank, 1) {
 		assert(values.size() <= Rank);
 		std::copy(values.begin(), values.end(), this->values.begin());
 	}
-	inline Dimensions(IndexType... values) :
-			Dimensions({ values... }) { }
-	inline Dimensions(const std::array<IndexType,Rank>& array) :
-			Dimensions() {
-		std::copy(array.begin(), array.end(), values.begin());
-	}
+	inline Dimensions(IndexType values...) :
+			Dimensions({ values }) { }
 	template<typename OtherDerived>
 	inline Dimensions(const DimExpression<OtherDerived,IndexType,Rank>& dims) :
 			Dimensions() {
