@@ -20,31 +20,11 @@
 #include <utility>
 
 #include "Dimensions.hpp"
-#include "ParameterInitialization.hpp"
-#include "ParameterRegularization.hpp"
-#include "utils/EigenProxy.hpp"
-#include "utils/NumericUtils.hpp"
+#include "EigenProxy.hpp"
+#include "NumericUtils.hpp"
+#include "Parameters.hpp"
 
 namespace cattle {
-
-// TODO FFT and/or Winograd filtering for CPU convolution.
-
-/**
- * An alias for a shared pointer to a WeightInitialization implementation instance of
- * an arbitrary scalar type.
- */
-template<typename Scalar>
-using ParamInitSharedPtr = std::shared_ptr<ParameterInitialization<Scalar>>;
-
-/**
- * An alias for a shared pointer to a regularization penalty of an arbitrary scalar type.
- */
-template<typename Scalar>
-using ParamRegSharedPtr = std::shared_ptr<ParamaterRegularization<Scalar>>;
-
-// Forward declarations to NeuralNetwork and Optimizer so they can be friended.
-template<typename Scalar, std::size_t Rank, bool Sequential> class NeuralNetwork;
-template<typename Scalar, std::size_t Rank, bool Sequential> class Optimizer;
 
 /**
  * An abstract class template representing layers in a neural network.
@@ -53,12 +33,10 @@ template<typename Scalar, std::size_t Rank>
 class Layer {
 	static_assert(std::is_floating_point<Scalar>::value, "non floating-point scalar type");
 	static_assert(Rank > 0 && Rank < 4, "illegal rank");
-	friend class NeuralNetwork<Scalar,Rank,true>;
-	friend class NeuralNetwork<Scalar,Rank,false>;
-	friend class Optimizer<Scalar,Rank,true>;
-	friend class Optimizer<Scalar,Rank,false>;
 public:
-	static const ParamRegSharedPtr<Scalar> NO_PARAM_REG;
+	// Rank is increased by one to allow for batch training.
+	static constexpr std::size_t DATA_RANK = Rank + 1;
+	typedef Tensor<Scalar,DATA_RANK> Data;
 	virtual ~Layer() = default;
 	/**
 	 * It returns a clone of the layer instance.
@@ -78,7 +56,7 @@ public:
 	virtual Layer<Scalar,Rank>* clone_with_shared_params() = 0;
 	/**
 	 * It returns a reference to the layer owning the parameters used. If this owner goes out
-	 * of scope (in case this one is a clone with shared parameters), the behavior of the clone
+	 * of scope (in case this one is a clone with shared parameters), the behaviour of the clone
 	 * is undefined.
 	 *
 	 * @return A reference to the layer owning the parameters. If this layer is not using
@@ -101,91 +79,6 @@ public:
 	 */
 	virtual const Dimensions<std::size_t,Rank>& get_output_dims() const = 0;
 	/**
-	 * It returns a constant reference to the learnable parameters of the layer.
-	 *
-	 * @return A constant reference to the parameters of the layer that are to be learned.
-	 */
-	virtual const Matrix<Scalar>& get_params() const = 0;
-	/**
-	 * It returns a constant reference to the gradient of the learnable parameters of the
-	 * layer.
-	 *
-	 * @return A constant reference to the gradient of the parameters of the layer.
-	 */
-	virtual const Matrix<Scalar>& get_params_grad() const = 0;
-	/**
-	 * It determines whether the parameters of the layer, if there are any, are to be
-	 * updated during optimization.
-	 *
-	 * @return Whether the parameters should not be updated during optimization.
-	 */
-	virtual bool is_frozen() const = 0;
-	/**
-	 * It sets whether the parameters of the layer should not be updated during optimization.
-	 * Frozen layers are not regularized either.
-	 *
-	 * @param frozen Whether the parameters of the layer are to be frozen, i.e. not
-	 * updatable via optimization.
-	 */
-	virtual void set_frozen(bool frozen) = 0;
-	/**
-	 * It initializes the layer and its parameters.
-	 */
-	virtual void init() = 0;
-	/**
-	 * It determines whether the layer instance is a clone using the shared parameters of
-	 * another instance.
-	 *
-	 * @return Whether the layer instance is a shared-parameter clone.
-	 */
-	inline bool is_shared_params_clone() const {
-		return this != &get_params_owner();
-	}
-	/**
-	 * A method that returns whether the layer has parameters that can be learned.
-	 *
-	 * @return Whether the layer uses learnable parameters.
-	 */
-	inline bool is_parametric() const {
-		return get_params().rows() > 0 && get_params().cols() > 0;
-	}
-	/**
-	 * @return A string representation of the layer.
-	 */
-	inline virtual std::string to_string() const {
-		static const int header_length = 128;
-		std::stringstream strm;
-		std::stringstream id_num_strm;
-		id_num_strm << this;
-		std::string id = "<" + std::string(typeid(*this).name()) + id_num_strm.str() + ">";
-		strm << id << std::string(std::max(0, (int) (header_length - id.length())), '-') << std::endl;
-		strm << "\tinput dims: " << get_input_dims().to_string() << std::endl;
-		strm << "\toutput dims: " << get_output_dims().to_string() << std::endl;
-		if (is_parametric()) {
-			strm << "\tparams:" << std::endl;
-			const Matrix<Scalar>& params = get_params();
-			for (int j = 0; j < params.rows(); ++j) {
-				strm << "\t[ ";
-				for (int k = 0; k < params.cols(); ++k) {
-					strm << std::setw(11) << std::setprecision(4) << params(j,k);
-					if (k != params.cols() - 1)
-						strm << ", ";
-				}
-				strm << " ]" << std::endl;
-			}
-		}
-		return strm.str();
-	}
-	inline friend std::ostream& operator<<(std::ostream& os, const Layer<Scalar,Rank>& layer) {
-		return os << layer.to_string() << std::flush;
-	}
-protected:
-	// Rank is increased by one to allow for batch training.
-	static constexpr std::size_t DATA_RANK = Rank + 1;
-	typedef Tensor<Scalar,DATA_RANK> Data;
-	/* Only expose methods that allow for the modification of the layer's state to friends and
-	 * sub-classes (except the initialization method). */
-	/**
 	 * A constant method that returns whether this layer functions as an input layer. An input
 	 * layer does not need to propagate the gradients all the way during the backward pass as
 	 * it is assumed that no other layer needs them derive the gradient on its parameters. It
@@ -207,34 +100,17 @@ protected:
 	 */
 	virtual void empty_cache() = 0;
 	/**
-	 * It returns a reference to the learnable parameters of the layer.
+	 * It returns a constant reference to the parameters of the layer.
 	 *
-	 * @return A non-constant reference to the parameters of the layer that are to be learned.
+	 * @return A constant reference to the parameters of the layer.
 	 */
-	virtual Matrix<Scalar>& get_params() = 0;
+	virtual std::vector<const Parameters<Scalar>*>& get_params() const = 0;
 	/**
-	 * It returns a reference to the gradient of the learnable parameters of the layer.
+	 * It returns a reference to the parameters of the layer.
 	 *
-	 * @return A non-constant reference to the gradient of the parameters of the layer.
+	 * @return A non-constant reference to the parameters of the layer.
 	 */
-	virtual Matrix<Scalar>& get_params_grad() = 0;
-	/**
-	 * It computes the derivative of the regularization function w.r.t. the parameters of the
-	 * layer and adds it to their gradient. If the layer is not parametric, calling this
-	 * method has no effect.
-	 */
-	virtual void regularize() = 0;
-	/**
-	 * It calculates the regularization penalty of the layer's parameters. If the layer is not
-	 * parametric, 0 is returned.
-	 *
-	 * @return A scalar representing the penalty on the magnitude of the layer's parameters.
-	 */
-	virtual Scalar get_regularization_penalty() const = 0;
-	/**
-	 * It applies constraints such as max-norm to the parameters of the layer (if applicable).
-	 */
-	virtual void enforce_constraints() = 0;
+	virtual std::vector<Parameters<Scalar>*>& get_params() = 0;
 	/**
 	 * It has the function represented by the layer applied to the input tensor.
 	 *
@@ -251,8 +127,7 @@ protected:
 	/**
 	 * It back-propagates the derivative of the error function w.r.t. the output of the
 	 * layer updating the gradient of its learnable parameters along the way if there are
-	 * any. If there are, it also calculates the derivative of the regularization penalty
-	 * w.r.t. to the layer's parameters and adds it to their gradient.
+	 * any.
 	 *
 	 * @param out_grad The derivative of the loss function w.r.t. the output of the
 	 * layer
@@ -260,141 +135,23 @@ protected:
 	 * or a null tensor if the layer is an input layer.
 	 */
 	virtual Data pass_back(Data out_grad) = 0;
-};
-
-// Initialize the static default regularization penalty.
-template<typename Scalar, std::size_t Rank>
-const ParamRegSharedPtr<Scalar> Layer<Scalar,Rank>::NO_PARAM_REG = std::make_shared<NoParameterRegularization<Scalar>>();
-
-/**
- * An abstract base class template for layers representing linear kernel-based operations
- * such as matrix multiplication or convolution.
- */
-template<typename Scalar, std::size_t Rank>
-class KernelLayer : public Layer<Scalar,Rank> {
-	typedef Layer<Scalar,Rank> Base;
-public:
-	virtual ~KernelLayer() = default;
-	inline const Base& get_params_owner() const {
-		return owner;
+	/**
+	 * It determines whether the layer instance is a clone using the shared parameters of
+	 * another instance.
+	 *
+	 * @return Whether the layer instance is a shared-parameter clone.
+	 */
+	inline bool is_shared_params_clone() const {
+		return this != &get_params_owner();
 	}
-	inline const Dimensions<std::size_t,Rank>& get_input_dims() const {
-		return input_dims;
+	/**
+	 * A method that returns whether the layer has parameters.
+	 *
+	 * @return Whether the layer uses parameters.
+	 */
+	inline bool is_parametric() const {
+		return get_params().size() > 0;
 	}
-	inline const Dimensions<std::size_t,Rank>& get_output_dims() const {
-		return output_dims;
-	}
-	inline const Matrix<Scalar>& get_params() const {
-		return weights_ref;
-	}
-	inline const Matrix<Scalar>& get_params_grad() const {
-		return weights_grad;
-	}
-	inline bool is_frozen() const {
-		return frozen;
-	}
-	inline void set_frozen(bool frozen) {
-		this->frozen = frozen;
-	}
-	inline void init() {
-		weights_ref = Matrix<Scalar>(weights_rows, weights_cols);
-		weights_grad = Matrix<Scalar>::Zero(weights_rows, weights_cols);
-		weight_init->apply(weights_ref);
-	}
-protected:
-	inline KernelLayer(const Dimensions<std::size_t,Rank>& input_dims, Dimensions<std::size_t,Rank> output_dims,
-			ParamInitSharedPtr<Scalar> weight_init, ParamRegSharedPtr<Scalar> weight_reg, std::size_t weights_rows,
-			std::size_t weights_cols, Scalar max_norm_constraint) :
-				input_dims(input_dims),
-				output_dims(output_dims),
-				weight_init(weight_init),
-				weight_reg(weight_reg),
-				max_norm_constraint(max_norm_constraint),
-				max_norm(NumericUtils<Scalar>::decidedly_greater(max_norm_constraint, (Scalar) 0)),
-				weights_rows(weights_rows),
-				weights_cols(weights_cols),
-				input_layer(false),
-				frozen(false),
-				weights(),
-				weights_grad(),
-				weights_ref(weights),
-				owner(*this) {
-		assert(weight_init != nullptr);
-		assert(weight_reg != nullptr);
-	}
-	inline KernelLayer(const KernelLayer<Scalar,Rank>& layer) :
-			input_dims(layer.input_dims),
-			output_dims(layer.output_dims),
-			weight_init(layer.weight_init),
-			weight_reg(layer.weight_reg),
-			max_norm_constraint(layer.max_norm_constraint),
-			max_norm(layer.max_norm),
-			weights_rows(layer.weights_rows),
-			weights_cols(layer.weights_cols),
-			input_layer(layer.input_layer),
-			frozen(layer.frozen),
-			weights(layer.weights),
-			weights_grad(layer.weights_grad),
-			weights_ref(layer.is_shared_params_clone() ? layer.weights_ref : weights),
-			owner(layer.is_shared_params_clone() ? layer.owner : *this) { }
-	inline KernelLayer(KernelLayer<Scalar,Rank>& layer, bool share_params) :
-			input_dims(layer.input_dims),
-			output_dims(layer.output_dims),
-			weight_init(layer.weight_init),
-			weight_reg(layer.weight_reg),
-			max_norm_constraint(layer.max_norm_constraint),
-			max_norm(layer.max_norm),
-			weights_rows(layer.weights_rows),
-			weights_cols(layer.weights_cols),
-			input_layer(layer.input_layer),
-			frozen(layer.frozen),
-			weights(share_params ? Matrix<Scalar>(0, 0) : layer.weights),
-			weights_grad(layer.weights_grad),
-			weights_ref(share_params ? layer.weights_ref : weights),
-			owner(share_params ? layer.owner : *this) { }
-	inline bool is_input_layer() const {
-		return input_layer;
-	}
-	inline void set_input_layer(bool input_layer) {
-		this->input_layer = input_layer;
-	}
-	inline Matrix<Scalar>& get_params() {
-		return weights_ref;
-	}
-	inline Matrix<Scalar>& get_params_grad() {
-		return weights_grad;
-	}
-	inline void regularize() {
-		weights_grad.topRows(weights_grad.rows() - 1) +=
-				weight_reg->d_function(weights_ref.topRows(weights_ref.rows() - 1));
-	}
-	inline Scalar get_regularization_penalty() const {
-		return weight_reg->function(weights_ref.topRows(weights_ref.rows() - 1));
-	}
-	inline void enforce_constraints() {
-		if (max_norm) {
-			Scalar l2_norm = weights_ref.topRows(weights_ref.rows() - 1).squaredNorm();
-			if (l2_norm > max_norm_constraint)
-				weights_ref.topRows(weights_ref.rows() - 1) *= (max_norm_constraint / l2_norm);
-		}
-	}
-	const Dimensions<std::size_t,Rank> input_dims;
-	const Dimensions<std::size_t,Rank> output_dims;
-	const ParamInitSharedPtr<Scalar> weight_init;
-	const ParamRegSharedPtr<Scalar> weight_reg;
-	const Scalar max_norm_constraint;
-	const bool max_norm;
-	const std::size_t weights_rows;
-	const std::size_t weights_cols;
-	/* Eigen matrices are backed by arrays allocated on the heap, so these
-	 * members do not burden the stack. */
-	Matrix<Scalar> weights_grad;
-	Matrix<Scalar>& weights_ref;
-private:
-	bool input_layer;
-	bool frozen;
-	Matrix<Scalar> weights;
-	const Base& owner;
 };
 
 /**

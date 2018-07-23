@@ -21,11 +21,11 @@
 
 #include "DataProvider.hpp"
 #include "Loss.hpp"
+#include "EigenProxy.hpp"
 #include "NeuralNetwork.hpp"
+#include "NumericUtils.hpp"
 #include "ParameterInitialization.hpp"
 #include "ParameterRegularization.hpp"
-#include "utils/EigenProxy.hpp"
-#include "utils/NumericUtils.hpp"
 
 namespace cattle {
 

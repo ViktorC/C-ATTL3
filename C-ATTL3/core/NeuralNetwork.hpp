@@ -25,8 +25,8 @@
 #include <vector>
 
 #include "Dimensions.hpp"
+#include "EigenProxy.hpp"
 #include "Layer.hpp"
-#include "utils/EigenProxy.hpp"
 
 // TODO Serialization.
 // TODO GRU network.
