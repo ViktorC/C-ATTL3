@@ -10,7 +10,6 @@
 
 #include <array>
 #include <cassert>
-#include <utility>
 
 #include "layer/KernelLayer.hpp"
 #include "parameter_initialization/ZeroParameterInitialization.hpp"

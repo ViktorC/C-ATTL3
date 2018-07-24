@@ -10,7 +10,6 @@
 
 #include <array>
 #include <cassert>
-#include <utility>
 
 #include "layer/KernelLayer.hpp"
 #include "parameter_initialization/ZeroParameterInitialization.hpp"
@@ -251,42 +250,70 @@ class TransConvKernelLayer : public TransConvKernelLayerBase<Scalar,Rank> {
 public:
 	/**
 	 * @param input_dims The dimensionality of the observations to be processed by the layer.
-	 * The ranks of the input tensors denote the sample, height, width, and channel (N,H,W,C).
 	 * @param filters The number of filters to use.
-	 * @param weight_init A shared pointer to a weight initialization used to initialize the
-	 * values of the parametric kernel backing the layer.
-	 * @param weight_reg The regularization function to apply to the layer's parameters.
+	 * @param weight_init A shared pointer to a weight initialization used to initialize the weights of
+	 * the layer.
 	 * @param receptor_height The height of the base of the receptor cuboid.
 	 * @param receptor_width The width of the base of the receptor cuboid.
-	 * @param vertical_padding The extent of vertical padding to use for the transposed convolution.
-	 * @param horizontal_padding The extent of horizontal padding to use for the transposed convolution.
-	 * @param vertical_stride The vertical convolution stride i.e. the number of elements by which the
-	 * receptor is to be shifted along the height of the output tensor.
-	 * @param horizontal_stride The horizonzal convolution stride i.e. the number of elements by which the
-	 * receptor is to be shifted along the width of the output tensor.
+	 * @param vertical_padding The extent of padding to apply to the input tensor along its height (both
+	 * at the top and at the bottom).
+	 * @param horizontal_padding The extent of padding to apply to the input tensor along its width (both
+	 * at the left and at the right).
+	 * @param vertical_stride The vertical transposed convolution stride i.e. the number of elements by
+	 * which the receptor is to be shifted along the height of the input tensor.
+	 * @param horizontal_stride The horizonzal transposed convolution stride i.e. the number of elements
+	 * by which the receptor is to be shifted along the width of the input tensor.
 	 * @param vertical_dilation The extent of vertical dilation to apply to the receptor.
 	 * @param horizontal_dilation The extent of horizontal dilation to apply to the receptor.
-	 * @param max_norm_constraint An optional max-norm constraint. If it is 0 or less, no
-	 * constraint is applied.
+	 * @param weight_reg An optional regularization function to apply to the weights.
+	 * @param weight_clip The maximum allowed absolute weight value. If it is 0 or less, no less, no
+	 * L1 max norm constraint is enforced.
+	 * @param weight_max_l2_norm The maximum allowed L2 weight value norm. If it is 0 or less, no L2
+	 * max norm constraint is enforced.
+	 * @param weight_grad_clip The maximum allowed absolute weight gradient. If it is 0 or less, no
+	 * gradient clipping is performed.
+	 * @param weight_grad_max_l1_norm The maximum allowed L1 weight gradient norm. If it is 0 or less,
+	 * no L1 gradient max norm constraint is enforced.
+	 * @param weight_grad_max_l2_norm The maximum allowed L2 weight gradient norm. If it is 0 or less,
+	 * no L2 gradient max norm constraint is enforced.
+	 * @param bias_reg An optional regularization function to apply to the bias.
+	 * @param bias_clip The maximum allowed absolute bias value. If it is 0 or less, no value clipping
+	 * is performed.
+	 * @param bias_max_l1_norm The maximum allowed L1 bias value norm. If it is 0 or less, no bias L1
+	 * max norm constraint is enforced.
+	 * @param bias_max_l2_norm The maximum allowed L2 bias value norm. If it is 0 or less, no bias L2
+	 * max norm constraint is enforced.
+	 * @param bias_grad_clip The maximum allowed absolute bias gradient. If it is 0 or less, no
+	 * gradient clipping is performed.
+	 * @param bias_grad_max_l1_norm The maximum allowed L1 bias gradient norm. If it is 0 or less, no
+	 * bias L1 gradient max norm constraint is enforced.
+	 * @param bias_grad_max_l2_norm The maximum allowed L2 bias gradient norm. If it is 0 or less, no
+	 * bias L2 gradient max norm constraint is enforced.
 	 */
-	inline TransConvKernelLayer(const Dimensions<std::size_t,3>& input_dims, std::size_t filters, ParamInitSharedPtr<Scalar> weight_init,
-			ParamRegSharedPtr<Scalar> weight_reg = Root::NO_PARAM_REG, std::size_t receptor_height = 3, std::size_t receptor_width = 3,
+	inline TransConvKernelLayer(const Dimensions<std::size_t,3>& input_dims, std::size_t filters,
+			ParamInitSharedPtr<Scalar> weight_init, std::size_t receptor_height = 3, std::size_t receptor_width = 3,
 			std::size_t vertical_padding = 1, std::size_t horizontal_padding = 1, std::size_t vertical_stride = 1,
 			std::size_t horizontal_stride = 1, std::size_t vertical_dilation = 0, std::size_t horizontal_dilation = 0,
-			Scalar max_norm_constraint = 0) :
-				TransConvBase::TransConvKernelLayerBase(input_dims, filters, weight_init, weight_reg, receptor_height, receptor_width,
-						vertical_padding, horizontal_padding, vertical_stride, horizontal_stride, vertical_dilation, horizontal_dilation,
-						max_norm_constraint) { }
+			ParamRegSharedPtr<Scalar> weight_reg = nullptr, Scalar weight_clip = 0, Scalar weight_max_l1_norm = 0,
+			Scalar weight_max_l2_norm = 0, Scalar weight_grad_clip = 0, Scalar weight_grad_max_l1_norm = 0,
+			Scalar weight_grad_max_l2_norm = 0, ParamRegSharedPtr<Scalar> bias_reg = nullptr, Scalar bias_clip = 0,
+			Scalar bias_max_l1_norm = 0, Scalar bias_max_l2_norm = 0, Scalar bias_grad_clip = 0,
+			Scalar bias_grad_max_l1_norm = 0, Scalar bias_grad_max_l2_norm = 0) :
+				TransConvBase::TransConvKernelLayerBase(input_dims, filters, weight_init, receptor_height,
+						receptor_width, vertical_padding, horizontal_padding, vertical_stride, horizontal_stride,
+						vertical_dilation, horizontal_dilation, weight_reg, weight_clip, weight_max_l1_norm,
+						weight_max_l2_norm, weight_grad_clip, weight_grad_max_l1_norm, weight_grad_max_l2_norm,
+						bias_reg, bias_clip, bias_max_l1_norm, bias_max_l2_norm, bias_grad_clip,
+						bias_grad_max_l1_norm, bias_grad_max_l2_norm) { }
+	inline TransConvKernelLayer(const TransConvKernelLayer<Scalar,3>& layer, bool share_params = false) :
+			TransConvBase::TransConvKernelLayerBase(layer, share_params),
+			batch_size(layer.batch_size) { }
 	inline Root* clone() const {
 		return new TransConvKernelLayer(*this);
 	}
 	inline Root* clone_with_shared_params() {
 		return new TransConvKernelLayer(*this, true);
 	}
-protected:
-	inline TransConvKernelLayer(TransConvKernelLayer<Scalar,3>& layer, bool share_params) :
-			TransConvBase::TransConvKernelLayerBase(layer, share_params),
-			batch_size(layer.batch_size) { }
 	inline typename Root::Data pass_forward(typename Root::Data in, bool training) {
 		assert((Dimensions<std::size_t,4>(in.dimensions()).template demote<>()) == KernelBase::input_dims);
 		assert(in.dimension(0) > 0);
@@ -317,59 +344,88 @@ class TransConvKernelLayer<Scalar,2> : public TransConvKernelLayerBase<Scalar,2>
 public:
 	/**
 	 * @param input_dims The dimensionality of the observations to be processed by the layer.
-	 * The ranks of the input tensors denote the sample, height, and width (N,H,W).
 	 * @param filters The number of filters to use.
-	 * @param weight_init A shared pointer to a weight initialization used to initialize the
-	 * values of the parametric kernel backing the layer.
-	 * @param weight_reg The regularization function to apply to the layer's parameters.
-	 * @param receptor_height The height of the receptor field.
-	 * @param receptor_width The width of the receptor field.
+	 * @param weight_init A shared pointer to a weight initialization used to initialize the weights of
+	 * the layer.
+	 * @param receptor_height The height of the base of the receptor cuboid.
+	 * @param receptor_width The width of the base of the receptor cuboid.
 	 * @param vertical_padding The extent of padding to apply to the input tensor along its height (both
 	 * at the top and at the bottom).
 	 * @param horizontal_padding The extent of padding to apply to the input tensor along its width (both
 	 * at the left and at the right).
-	 * @param vertical_stride The vertical convolution stride i.e. the number of elements by which the
-	 * receptor is to be shifted along the height of the input tensor.
-	 * @param horizontal_stride The horizonzal convolution stride i.e. the number of elements by which the
-	 * receptor is to be shifted along the width of the input tensor.
+	 * @param vertical_stride The vertical transposed convolution stride i.e. the number of elements by
+	 * which the receptor is to be shifted along the height of the input tensor.
+	 * @param horizontal_stride The horizonzal transposed convolution stride i.e. the number of elements
+	 * by which the receptor is to be shifted along the width of the input tensor.
 	 * @param vertical_dilation The extent of vertical dilation to apply to the receptor.
 	 * @param horizontal_dilation The extent of horizontal dilation to apply to the receptor.
-	 * @param max_norm_constraint An optional max-norm constraint. If it is 0 or less, no
-	 * constraint is applied.
+	 * @param weight_reg An optional regularization function to apply to the weights.
+	 * @param weight_clip The maximum allowed absolute weight value. If it is 0 or less, no less, no
+	 * L1 max norm constraint is enforced.
+	 * @param weight_max_l2_norm The maximum allowed L2 weight value norm. If it is 0 or less, no L2
+	 * max norm constraint is enforced.
+	 * @param weight_grad_clip The maximum allowed absolute weight gradient. If it is 0 or less, no
+	 * gradient clipping is performed.
+	 * @param weight_grad_max_l1_norm The maximum allowed L1 weight gradient norm. If it is 0 or less,
+	 * no L1 gradient max norm constraint is enforced.
+	 * @param weight_grad_max_l2_norm The maximum allowed L2 weight gradient norm. If it is 0 or less,
+	 * no L2 gradient max norm constraint is enforced.
+	 * @param bias_reg An optional regularization function to apply to the bias.
+	 * @param bias_clip The maximum allowed absolute bias value. If it is 0 or less, no value clipping
+	 * is performed.
+	 * @param bias_max_l1_norm The maximum allowed L1 bias value norm. If it is 0 or less, no bias L1
+	 * max norm constraint is enforced.
+	 * @param bias_max_l2_norm The maximum allowed L2 bias value norm. If it is 0 or less, no bias L2
+	 * max norm constraint is enforced.
+	 * @param bias_grad_clip The maximum allowed absolute bias gradient. If it is 0 or less, no
+	 * gradient clipping is performed.
+	 * @param bias_grad_max_l1_norm The maximum allowed L1 bias gradient norm. If it is 0 or less, no
+	 * bias L1 gradient max norm constraint is enforced.
+	 * @param bias_grad_max_l2_norm The maximum allowed L2 bias gradient norm. If it is 0 or less, no
+	 * bias L2 gradient max norm constraint is enforced.
 	 */
-	TransConvKernelLayer(const Dimensions<std::size_t,2>& input_dims, std::size_t filters, ParamInitSharedPtr<Scalar> weight_init,
-			ParamRegSharedPtr<Scalar> weight_reg = Root::NO_PARAM_REG, std::size_t receptor_height = 3, std::size_t receptor_width = 3,
+	inline TransConvKernelLayer(const Dimensions<std::size_t,2>& input_dims, std::size_t filters,
+			ParamInitSharedPtr<Scalar> weight_init, std::size_t receptor_height = 3, std::size_t receptor_width = 3,
 			std::size_t vertical_padding = 1, std::size_t horizontal_padding = 1, std::size_t vertical_stride = 1,
 			std::size_t horizontal_stride = 1, std::size_t vertical_dilation = 0, std::size_t horizontal_dilation = 0,
-			Scalar max_norm_constraint = 0) :
-				TransConvBase::TransConvKernelLayerBase(input_dims, filters, weight_init, weight_reg, receptor_height, receptor_width,
-						vertical_padding, horizontal_padding, vertical_stride, horizontal_stride, vertical_dilation, horizontal_dilation,
-						max_norm_constraint) { }
+			ParamRegSharedPtr<Scalar> weight_reg = nullptr, Scalar weight_clip = 0, Scalar weight_max_l1_norm = 0,
+			Scalar weight_max_l2_norm = 0, Scalar weight_grad_clip = 0, Scalar weight_grad_max_l1_norm = 0,
+			Scalar weight_grad_max_l2_norm = 0, ParamRegSharedPtr<Scalar> bias_reg = nullptr, Scalar bias_clip = 0,
+			Scalar bias_max_l1_norm = 0, Scalar bias_max_l2_norm = 0, Scalar bias_grad_clip = 0,
+			Scalar bias_grad_max_l1_norm = 0, Scalar bias_grad_max_l2_norm = 0) :
+				TransConvBase::TransConvKernelLayerBase(input_dims, filters, weight_init, receptor_height,
+						receptor_width, vertical_padding, horizontal_padding, vertical_stride, horizontal_stride,
+						vertical_dilation, horizontal_dilation, weight_reg, weight_clip, weight_max_l1_norm,
+						weight_max_l2_norm, weight_grad_clip, weight_grad_max_l1_norm, weight_grad_max_l2_norm,
+						bias_reg, bias_clip, bias_max_l1_norm, bias_max_l2_norm, bias_grad_clip,
+						bias_grad_max_l1_norm, bias_grad_max_l2_norm) { }
+	inline TransConvKernelLayer(const TransConvKernelLayer<Scalar,2>& layer, bool share_params = false) :
+			TransConvBase::TransConvKernelLayerBase(layer, share_params),
+			batch_size(layer.batch_size) { }
 	inline Root* clone() const {
 		return new TransConvKernelLayer(*this);
 	}
 	inline Root* clone_with_shared_params() {
 		return new TransConvKernelLayer(*this, true);
 	}
-protected:
-	inline TransConvKernelLayer(const TransConvKernelLayer<Scalar,2>& layer, bool share_params = false) :
-			TransConvBase::TransConvKernelLayerBase(layer, share_params),
-			batch_size(layer.batch_size) { }
 	inline typename Root::Data pass_forward(typename Root::Data in, bool training) {
 		assert((Dimensions<std::size_t,3>(in.dimensions()).template demote<>()) == KernelBase::input_dims);
 		assert(in.dimension(0) > 0);
 		batch_size = in.dimension(0);
-		return TransConvBase::_pass_forward(TensorMap<Scalar,4>(in.data(), { batch_size, in.dimension(1), in.dimension(2), 1u }), training)
-				.reshape(std::array<std::size_t,3>({ batch_size, KernelBase::output_dims(0), KernelBase::output_dims(1) }));
+		return TransConvBase::_pass_forward(TensorMap<Scalar,4>(in.data(), { batch_size, in.dimension(1),
+				in.dimension(2), 1u }), training).reshape(std::array<std::size_t,3>({ batch_size,
+					KernelBase::output_dims(0), KernelBase::output_dims(1) }));
 	}
 	inline typename Root::Data pass_back(typename Root::Data out_grad) {
 		assert((Dimensions<std::size_t,3>(out_grad.dimensions()).template demote<>()) == KernelBase::output_dims);
 		assert(out_grad.dimension(0) > 0 && batch_size == out_grad.dimension(0));
 		Tensor<Scalar,4> prev_out_grad = TransConvBase::_pass_back(TensorMap<Scalar,4>(out_grad.data(),
-				{ batch_size, KernelBase::output_dims(0), KernelBase::output_dims(1) / TransConvBase::filters, TransConvBase::filters }));
+				{ batch_size, KernelBase::output_dims(0), KernelBase::output_dims(1) / TransConvBase::filters,
+						TransConvBase::filters }));
 		if (KernelBase::is_input_layer())
 			return Tensor<Scalar,3>();
-		return TensorMap<Scalar,3>(prev_out_grad.data(), { batch_size, KernelBase::input_dims(0), KernelBase::input_dims(1) });
+		return TensorMap<Scalar,3>(prev_out_grad.data(), { batch_size, KernelBase::input_dims(0),
+				KernelBase::input_dims(1) });
 	}
 private:
 	std::size_t batch_size;
@@ -390,40 +446,67 @@ class TransConvKernelLayer<Scalar,1> : public TransConvKernelLayerBase<Scalar,1>
 public:
 	/**
 	 * @param input_dims The dimensionality of the observations to be processed by the layer.
-	 * The ranks of the input tensors denote the sample and the length (N,L).
 	 * @param filters The number of filters to use.
-	 * @param weight_init A shared pointer to a weight initialization used to initialize the
-	 * values of the parametric kernel backing the layer.
-	 * @param weight_reg The regularization function to apply to the layer's parameters.
+	 * @param weight_init A shared pointer to a weight initialization used to initialize the weights of
+	 * the layer.
 	 * @param receptor_length The length of the receptor.
 	 * @param padding The extent of padding to apply to the input tensor along its length on both ends.
 	 * @param stride The convolution stride i.e. the number of elements by which the receptor is to be
 	 * shifted along the length of the input tensor.
 	 * @param dilation The extent of dilation to apply to the receptor.
-	 * @param max_norm_constraint An optional max-norm constraint. If it is 0 or less, no
-	 * constraint is applied.
+	 * @param weight_reg An optional regularization function to apply to the weights.
+	 * @param weight_clip The maximum allowed absolute weight value. If it is 0 or less, no less, no
+	 * L1 max norm constraint is enforced.
+	 * @param weight_max_l2_norm The maximum allowed L2 weight value norm. If it is 0 or less, no L2
+	 * max norm constraint is enforced.
+	 * @param weight_grad_clip The maximum allowed absolute weight gradient. If it is 0 or less, no
+	 * gradient clipping is performed.
+	 * @param weight_grad_max_l1_norm The maximum allowed L1 weight gradient norm. If it is 0 or less,
+	 * no L1 gradient max norm constraint is enforced.
+	 * @param weight_grad_max_l2_norm The maximum allowed L2 weight gradient norm. If it is 0 or less,
+	 * no L2 gradient max norm constraint is enforced.
+	 * @param bias_reg An optional regularization function to apply to the bias.
+	 * @param bias_clip The maximum allowed absolute bias value. If it is 0 or less, no value clipping
+	 * is performed.
+	 * @param bias_max_l1_norm The maximum allowed L1 bias value norm. If it is 0 or less, no bias L1
+	 * max norm constraint is enforced.
+	 * @param bias_max_l2_norm The maximum allowed L2 bias value norm. If it is 0 or less, no bias L2
+	 * max norm constraint is enforced.
+	 * @param bias_grad_clip The maximum allowed absolute bias gradient. If it is 0 or less, no
+	 * gradient clipping is performed.
+	 * @param bias_grad_max_l1_norm The maximum allowed L1 bias gradient norm. If it is 0 or less, no
+	 * bias L1 gradient max norm constraint is enforced.
+	 * @param bias_grad_max_l2_norm The maximum allowed L2 bias gradient norm. If it is 0 or less, no
+	 * bias L2 gradient max norm constraint is enforced.
 	 */
-	TransConvKernelLayer(const Dimensions<std::size_t,1>& input_dims, std::size_t filters, ParamInitSharedPtr<Scalar> weight_init,
-			ParamRegSharedPtr<Scalar> weight_reg = Root::NO_PARAM_REG, std::size_t receptor_length = 3, std::size_t padding = 1,
-			std::size_t stride = 1, std::size_t dilation = 0, Scalar max_norm_constraint = 0) :
-				TransConvBase::TransConvKernelLayerBase(input_dims, filters, weight_init, weight_reg, receptor_length, 1, padding, 0,
-						stride, 1, dilation, 0, max_norm_constraint) { }
+	TransConvKernelLayer(const Dimensions<std::size_t,1>& input_dims, std::size_t filters,
+			ParamInitSharedPtr<Scalar> weight_init, std::size_t receptor_length = 3, std::size_t padding = 1,
+			std::size_t stride = 1, std::size_t dilation = 0, ParamRegSharedPtr<Scalar> weight_reg = nullptr,
+			Scalar weight_clip = 0, Scalar weight_max_l1_norm = 0, Scalar weight_max_l2_norm = 0,
+			Scalar weight_grad_clip = 0, Scalar weight_grad_max_l1_norm = 0, Scalar weight_grad_max_l2_norm = 0,
+			ParamRegSharedPtr<Scalar> bias_reg = nullptr, Scalar bias_clip = 0, Scalar bias_max_l1_norm = 0,
+			Scalar bias_max_l2_norm = 0, Scalar bias_grad_clip = 0, Scalar bias_grad_max_l1_norm = 0,
+			Scalar bias_grad_max_l2_norm = 0) :
+				TransConvBase::TransConvKernelLayerBase(input_dims, filters, weight_init, receptor_length, 1,
+						padding, 0, stride, 1, dilation, 0, weight_reg, weight_clip, weight_max_l1_norm,
+						weight_max_l2_norm, weight_grad_clip, weight_grad_max_l1_norm, weight_grad_max_l2_norm,
+						bias_reg, bias_clip, bias_max_l1_norm, bias_max_l2_norm, bias_grad_clip,
+						bias_grad_max_l1_norm, bias_grad_max_l2_norm) { }
+	inline TransConvKernelLayer(const TransConvKernelLayer<Scalar,1>& layer, bool share_params = false) :
+			TransConvBase::TransConvKernelLayerBase(layer, share_params),
+			batch_size(layer.batch_size) { }
 	inline Root* clone() const {
 		return new TransConvKernelLayer(*this);
 	}
 	inline Root* clone_with_shared_params() {
 		return new TransConvKernelLayer(*this, true);
 	}
-protected:
-	inline TransConvKernelLayer(const TransConvKernelLayer<Scalar,1>& layer, bool share_params = false) :
-			TransConvBase::TransConvKernelLayerBase(layer, share_params),
-			batch_size(layer.batch_size) { }
 	inline typename Root::Data pass_forward(typename Root::Data in, bool training) {
 		assert((Dimensions<std::size_t,2>(in.dimensions()).template demote<>()) == KernelBase::input_dims);
 		assert(in.dimension(0) > 0);
 		batch_size = in.dimension(0);
-		return TransConvBase::_pass_forward(TensorMap<Scalar,4>(in.data(), { batch_size, in.dimension(1), 1u, 1u }), training)
-				.reshape(std::array<std::size_t,2>({ batch_size, KernelBase::output_dims(0) }));
+		return TransConvBase::_pass_forward(TensorMap<Scalar,4>(in.data(), { batch_size, in.dimension(1), 1u, 1u }),
+				training).reshape(std::array<std::size_t,2>({ batch_size, KernelBase::output_dims(0) }));
 	}
 	inline typename Root::Data pass_back(typename Root::Data out_grad) {
 		assert((Dimensions<std::size_t,2>(out_grad.dimensions()).template demote<>()) == KernelBase::output_dims);

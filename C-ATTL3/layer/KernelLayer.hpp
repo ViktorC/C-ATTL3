@@ -10,7 +10,6 @@
 
 #include <cassert>
 #include <memory>
-#include <utility>
 
 #include "core/Layer.hpp"
 
@@ -28,23 +27,6 @@ class KernelLayer : public Layer<Scalar,Rank> {
 	typedef KernelLayer<Scalar,Rank> Self;
 	typedef Dimensions<std::size_t,Rank> Dims;
 public:
-	inline KernelLayer(const Dims& input_dims, const Dims& output_dims, ParamsSharedPtr<Scalar> weights,
-			ParamsSharedPtr<Scalar> bias) :
-				owner(*this),
-				input_dims(input_dims),
-				output_dims(output_dims),
-				weights(weights),
-				bias(bias),
-				input_layer(false) {
-		assert(weights && bias);
-	}
-	inline KernelLayer(const Self& layer, bool share_params = false) :
-			owner(share_params || layer.is_shared_params_clone() ? layer.owner : *this),
-			input_dims(layer.input_dims),
-			output_dims(layer.output_dims),
-			weights(share_params || layer.is_shared_params_clone() ? layer.weights : ParamsSharedPtr<Scalar>(layer.weights.clone())),
-			bias(share_params || layer.is_shared_params_clone() ? layer.bias : ParamsSharedPtr<Scalar>(layer.bias.clone())),
-			input_layer(layer.input_layer) { }
 	virtual ~KernelLayer() = default;
 	inline const Base& get_params_owner() const {
 		return owner;
@@ -62,12 +44,29 @@ public:
 		this->input_layer = input_layer;
 	}
 	inline std::vector<const Parameters<Scalar>*>& get_params() const {
-		return std::vector<const Parameters<Scalar>*>({ weights.get(), bias.get()});
+		return std::vector<const Parameters<Scalar>*>({ weights.get(), bias.get() });
 	}
 	inline std::vector<Parameters<Scalar>*>& get_params() {
-		return std::vector<Parameters<Scalar>*>({ weights.get(), bias.get()});
+		return std::vector<Parameters<Scalar>*>({ weights.get(), bias.get() });
 	}
 protected:
+	inline KernelLayer(const Dims& input_dims, const Dims& output_dims, ParamsSharedPtr<Scalar> weights,
+			ParamsSharedPtr<Scalar> bias) :
+				owner(*this),
+				input_dims(input_dims),
+				output_dims(output_dims),
+				weights(weights),
+				bias(bias),
+				input_layer(false) {
+		assert(weights && bias);
+	}
+	inline KernelLayer(const Self& layer, bool share_params = false) :
+			owner(share_params || layer.is_shared_params_clone() ? layer.owner : *this),
+			input_dims(layer.input_dims),
+			output_dims(layer.output_dims),
+			weights(share_params || layer.is_shared_params_clone() ? layer.weights : ParamsSharedPtr<Scalar>(layer.weights.clone())),
+			bias(share_params || layer.is_shared_params_clone() ? layer.bias : ParamsSharedPtr<Scalar>(layer.bias.clone())),
+			input_layer(layer.input_layer) { }
 	const Self& owner;
 	const Dims input_dims, output_dims;
 	ParamsSharedPtr<Scalar> weights, bias;
