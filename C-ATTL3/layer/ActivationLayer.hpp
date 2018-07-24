@@ -13,25 +13,30 @@
 namespace cattle {
 
 /**
+ * An alias for a shared pointer to a Parameters instance.
+ */
+template<typename Scalar>
+using ParamsSharedPtr = std::shared_ptr<Parameters<Scalar>>;
+
+/**
  * An abstract class template that represents an activation function layer.
  */
 template<typename Scalar, std::size_t Rank>
 class ActivationLayer : public Layer<Scalar,Rank> {
 	typedef Layer<Scalar,Rank> Base;
 	typedef ActivationLayer<Scalar,Rank> Self;
-	typedef Dimensions<std::size_t,Rank> Dims;
 public:
 	virtual ~ActivationLayer() = default;
 	inline Base* clone_with_shared_params() {
 		return Base::clone();
 	}
 	inline const Base& get_params_owner() const {
-		return *this;
+		return owner;
 	}
-	inline const Dims& get_input_dims() const {
+	inline const typename Base::Dims& get_input_dims() const {
 		return dims;
 	}
-	inline const Dims& get_output_dims() const {
+	inline const typename Base::Dims& get_output_dims() const {
 		return dims;
 	}
 	inline bool is_input_layer() const {
@@ -41,16 +46,34 @@ public:
 		this->input_layer = input_layer;
 	}
 	inline std::vector<const Parameters<Scalar>*>& get_params() const {
-		return std::vector<const Parameters<Scalar>*>(0);
+		std::vector<const Parameters<Scalar>*> params_vec;
+		if (params)
+			params_vec.push_back(params.get());
 	}
 	inline std::vector<Parameters<Scalar>*>& get_params() {
-		return std::vector<Parameters<Scalar>*>(0);
+		std::vector<Parameters<Scalar>*> params_vec;
+		if (params)
+			params_vec.push_back(params.get());
 	}
 protected:
-	inline ActivationLayer(const Dimensions<std::size_t,Rank>& dims) :
+	/**
+	 * @param dims The input and output dimensions of the layer.
+	 * @param params The parameters of the layer; it can be null if the layer is not parametric.
+	 */
+	inline ActivationLayer(const typename Base::Dims& dims, ParamsSharedPtr<Scalar> params = nullptr) :
+			owner(*this),
 			dims(dims),
+			params(params),
 			input_layer(false) { }
-	const Dims dims;
+	inline ActivationLayer(const Self& layer, bool share_params = false) :
+			owner((share_params || layer.is_shared_params_clone()) && layer.params ? layer.owner : *this),
+			dims(layer.dims),
+			params(layer.params ? (share_params || layer.is_shared_params_clone() ?
+					layer.params : ParamsSharedPtr<Scalar>(layer.params.clone())) : nullptr),
+			input_layer(layer.input_layer) { }
+	const Self& owner;
+	const typename Base::Dims dims;
+	ParamsSharedPtr<Scalar> params;
 	bool input_layer;
 };
 

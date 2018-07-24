@@ -39,7 +39,8 @@ public:
 	/**
 	 * @param rows The number of rows of the parameter matrix.
 	 * @param cols The number of columns of the parameter matrix.
-	 * @param init The parameter value initialization. It cannot be a null pointer.
+	 * @param init The parameter value initialization. If it is a null pointer, the
+	 * values will not be initialized.
 	 * @param optimizable Whether the parameters are optimizable. Non-optimizable
 	 * parameters do not maintain gradient information and are thus not regularizable
 	 * (but can still incur a regularization penalty).
@@ -58,10 +59,10 @@ public:
 	 * @param grad_max_l2_norm The maximum allowed L2 parameter gradient norm. If it
 	 * is 0 or less, no L2 gradient max norm constraint is enforced.
 	 */
-	HostParameters(std::size_t rows, std::size_t cols, ParamInitSharedPtr<Scalar> init, bool optimizable = true,
-			ParamRegSharedPtr<Scalar> reg = nullptr, Scalar value_clip = 0, Scalar value_max_l1_norm = 0,
-			Scalar value_max_l2_norm = 0, Scalar grad_clip = 0, Scalar grad_max_l1_norm = 0,
-			Scalar grad_max_l2_norm = 0) :
+	inline HostParameters(std::size_t rows, std::size_t cols, ParamInitSharedPtr<Scalar> init,
+			bool optimizable = true, ParamRegSharedPtr<Scalar> reg = nullptr, Scalar value_clip = 0,
+			Scalar value_max_l1_norm = 0, Scalar value_max_l2_norm = 0, Scalar grad_clip = 0,
+			Scalar grad_max_l1_norm = 0, Scalar grad_max_l2_norm = 0) :
 				rows(rows),
 				cols(cols),
 				param_init(init),
@@ -74,7 +75,6 @@ public:
 				grad_max_l1_norm(grad_max_l1_norm),
 				grad_max_l2_norm(grad_max_l2_norm) {
 		assert(rows > 0 && cols > 0);
-		assert(init);
 	}
 	inline Parameters<Scalar>* clone() const {
 		return new HostParameters<Scalar>(*this);
@@ -84,7 +84,8 @@ public:
 	}
 	inline void init() {
 		values = Matrix<Scalar>(rows, cols);
-		param_init->apply(values);
+		if (param_init)
+			param_init->apply(values);
 		reset_grad();
 	}
 	inline const Matrix<Scalar>& get_values() const {
@@ -120,7 +121,7 @@ public:
 	}
 	inline void regularize() {
 		if (optimizable && param_reg)
-			grad += param_reg->d_function(values);
+			update_grad(param_reg->d_function(values));
 	}
 	inline bool are_frozen() const {
 		return frozen;

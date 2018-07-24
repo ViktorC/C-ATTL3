@@ -13,6 +13,20 @@
 //
 //bool cattle::test::verbose;
 
+#include "layer/activation/BinaryStepActivationLayer.hpp"
+#include "layer/activation/ELUActivationLayer.hpp"
+#include "layer/activation/IdentityActivationLayer.hpp"
+#include "layer/activation/LeakyReLUActivationLayer.hpp"
+#include "layer/activation/PReLUActivationLayer.hpp"
+#include "layer/activation/PSwishActivationLayer.hpp"
+#include "layer/activation/ReLUActivationLayer.hpp"
+#include "layer/activation/ScaledActivationLayer.hpp"
+#include "layer/activation/SigmoidActivationLayer.hpp"
+#include "layer/activation/SoftmaxActivationLayer.hpp"
+#include "layer/activation/SoftplusActivationLayer.hpp"
+#include "layer/activation/SoftsignActivationLayer.hpp"
+#include "layer/activation/SwishActivationLayer.hpp"
+#include "layer/activation/TanhActivationLayer.hpp"
 #include "layer/kernel/ConvKernelLayer.hpp"
 #include "layer/kernel/DenseKernelLayer.hpp"
 #include "layer/kernel/TransConvKernelLayer.hpp"

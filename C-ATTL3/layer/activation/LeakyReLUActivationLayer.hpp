@@ -38,7 +38,7 @@ public:
 	 * @param dims The dimensionality of the input tensor.
 	 * @param alpha The factor by which negative inputs are to be scaled.
 	 */
-	inline LeakyReLUActivationLayer(const Dimensions<std::size_t,Rank>& dims, Scalar alpha = 1e-1) :
+	inline LeakyReLUActivationLayer(const typename Root::Dims& dims, Scalar alpha = 1e-1) :
 			Base::ActivationLayer(dims),
 			alpha(alpha) { }
 	inline Root* clone() const {
@@ -56,7 +56,9 @@ public:
 	inline typename Root::Data pass_back(typename Root::Data out_grad) {
 		assert((Dimensions<std::size_t,Base::DATA_RANK>(out_grad.dimensions()).template demote<>()) == Base::dims);
 		assert(out_grad.dimension(0) > 0 && in_cache.dimension(0) == out_grad.dimension(0));
-		return in_cache.unaryExpr([alpha](Scalar e) { return (Scalar) (e >= 0 ? 1 : alpha); }) * out_grad;
+		if (Base::is_input_layer())
+			return typename Root::Data();
+		return in_cache.unaryExpr([this](Scalar e) { return (Scalar) (e >= 0 ? 1 : alpha); }) * out_grad;
 	}
 private:
 	const Scalar alpha;

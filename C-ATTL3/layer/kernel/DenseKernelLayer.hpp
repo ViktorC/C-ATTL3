@@ -58,7 +58,7 @@ public:
 	 * @param bias_grad_max_l2_norm The maximum allowed L2 bias gradient norm. If it is 0
 	 * or less, no bias L2 gradient max norm constraint is enforced.
 	 */
-	inline DenseKernelLayer(const Dimensions<std::size_t,Rank>& input_dims, std::size_t output_size,
+	inline DenseKernelLayer(const typename Root::Dims& input_dims, std::size_t output_size,
 			ParamInitSharedPtr<Scalar> weight_init, ParamRegSharedPtr<Scalar> weight_reg = nullptr,
 			Scalar weight_clip = 0, Scalar weight_max_l1_norm = 0, Scalar weight_max_l2_norm = 0,
 			Scalar weight_grad_clip = 0, Scalar weight_grad_max_l1_norm = 0, Scalar weight_grad_max_l2_norm = 0,
@@ -113,8 +113,7 @@ public:
 		return TensorMap<Scalar,Root::DATA_RANK>(prev_out_grad_mat.data(), prev_out_conversion_dims);
 	}
 private:
-	RankwiseArray out_conversion_dims;
-	RankwiseArray prev_out_conversion_dims;
+	RankwiseArray out_conversion_dims, prev_out_conversion_dims;
 	// Staged computation caches
 	Matrix<Scalar> in_mat_cache;
 };

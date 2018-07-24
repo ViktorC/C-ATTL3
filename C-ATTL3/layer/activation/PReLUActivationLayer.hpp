@@ -1,7 +1,7 @@
 /*
- * ReLUActivationLayer.hpp
+ * PReLUActivationLayer.hpp
  *
- *  Created on: 23 Jul 2018
+ *  Created on: 24 Jul 2018
  *      Author: Viktor Csomor
  */
 
@@ -13,6 +13,8 @@
 #include <utility>
 
 #include "layer/ActivationLayer.hpp"
+#include "parameter_initialization/ConstantParameterInitialization.hpp"
+#include "parameters/HostParameters.hpp"
 
 namespace cattle {
 
@@ -38,72 +40,77 @@ class PReLUActivationLayer : public ActivationLayer<Scalar,Rank> {
 public:
 	/**
 	 * @param dims The dimensionality of the input tensor.
-	 * @param param_reg The regularization function to apply to the layer's parameters.
 	 * @param init_alpha The initial factor by which negative inputs are to be scaled.
-	 * @param max_norm_constraint An optional max-norm constraint. If it is 0 or less, no
-	 * constraint is applied.
+	 * @param alpha_reg An optional regularization function to apply to the parameters.
+	 * @param alpha_clip The maximum allowed absolute parameter value. If it is 0 or less, no
+	 * value clipping is performed.
+	 * @param alpha_max_l1_norm The maximum allowed L1 alpha value norm. If it is 0 or
+	 * less, no L1 max norm constraint is enforced.
+	 * @param alpha_max_l2_norm The maximum allowed L2 alpha value norm. If it is 0 or
+	 * less, no L2 max norm constraint is enforced.
+	 * @param alpha_grad_clip The maximum allowed absolute parameter gradient. If it is 0
+	 * or less, no gradient clipping is performed.
+	 * @param alpha_grad_max_l1_norm The maximum allowed L1 alpha gradient norm. If it
+	 * is 0 or less, no L1 gradient max norm constraint is enforced.
+	 * @param alpha_grad_max_l2_norm The maximum allowed L2 alpha gradient norm. If it
+	 * is 0 or less, no L2 gradient max norm constraint is enforced.
 	 */
-	inline PReLUActivationLayer(const Dimensions<std::size_t,Rank>& dims, Scalar init_alpha = 1e-1,
-			ParamRegSharedPtr<Scalar> param_reg = Root::NO_PARAM_REG,
-			Scalar init_alpha = 1e-1, Scalar max_norm_constraint = 0) :
-				Base::ActivationLayer(dims, 1, dims.get_volume()),
+	inline PReLUActivationLayer(const typename Root::Dims& dims, Scalar init_alpha = 1e-1,
+			ParamRegSharedPtr<Scalar> alpha_reg = nullptr, Scalar alpha_clip = 0, Scalar alpha_max_l1_norm = 0,
+			Scalar alpha_max_l2_norm = 0, Scalar alpha_grad_clip = 0, Scalar alpha_grad_max_l1_norm = 0,
+			Scalar alpha_grad_max_l2_norm = 0) :
+				Base::ActivationLayer(dims, std::make_shared<HostParameters<Scalar>>(1, dims.get_volume(),
+						std::make_shared<ConstantParameterInitialization<Scalar>>(init_alpha), true,
+						alpha_reg, alpha_clip, alpha_max_l1_norm, alpha_max_l2_norm, alpha_grad_clip,
+						alpha_grad_max_l1_norm, alpha_grad_max_l2_norm)),
 				conversion_dims(dims.template promote<>()) { }
-	inline PReLUActivationLayer(PReLUActivationLayer<Scalar,Rank>& layer, bool share_params) :
+	inline PReLUActivationLayer(const PReLUActivationLayer<Scalar,Rank>& layer, bool share_params = false) :
 			Base::ActivationLayer(layer, share_params),
-			param_reg(layer.param_reg),
-			init_alpha(layer.init_alpha),
-			max_norm_constraint(layer.max_norm_constraint),
-			max_norm(layer.max_norm),
-			conversion_dims(layer.conversion_dims) { }
+			conversion_dims(layer.conversion_dims),
+			in_mat_cache(layer.in_mat_cache) { }
 	inline Root* clone() const {
 		return new PReLUActivationLayer(*this);
 	}
 	inline Root* clone_with_shared_params() {
 		return new PReLUActivationLayer(*this, true);
 	}
-	inline std::vector<const Parameters<Scalar>*>& get_params() const {
-		return std::vector<const Parameters<Scalar>*>({ weights.get(), bias.get() });
-	}
-	inline std::vector<Parameters<Scalar>*>& get_params() {
-		return std::vector<Parameters<Scalar>*>({ weights.get(), bias.get() });
-	}
 	inline void empty_cache() {
-		in_cache = Matrix<Scalar>();
+		in_mat_cache = Matrix<Scalar>();
 	}
 	inline typename Root::Data pass_forward(typename Root::Data in, bool training) {
 		assert((Dimensions<std::size_t,Base::DATA_RANK>(in.dimensions()).template demote<>()) == Base::dims);
 		assert(in.dimension(0) > 0);
-		std::size_t rows = in.dimension(0);
-		in_cache = MatrixMap<Scalar>(in.data(), rows, Base::dims.get_volume());
-		Matrix<Scalar> out = in_cache.cwiseMax(in_cache * Base::params_ref.row(0).asDiagonal());
-		conversion_dims[0] = rows;
-		return TensorMap<Scalar,Root::DATA_RANK>(out.data(), conversion_dims);
+		conversion_dims[0] = in.dimension(0);
+		in_mat_cache = MatrixMap<Scalar>(in.data(), conversion_dims[0], in.size() / conversion_dims[0]);
+		Matrix<Scalar> out_mat = in_mat_cache.cwiseMax(in_mat_cache * Base::params->get_values().asDiagonal());
+		return TensorMap<Scalar,Root::DATA_RANK>(out_mat.data(), conversion_dims);
 	}
 	inline typename Root::Data pass_back(typename Root::Data out_grad) {
 		assert((Dimensions<std::size_t,Base::DATA_RANK>(out_grad.dimensions()).template demote<>()) == Base::dims);
 		assert(out_grad.dimension(0) > 0 && conversion_dims[0] == out_grad.dimension(0));
-		Base::params_grad.row(0).setZero();
-		MatrixMap<Scalar> out_grad_map(out_grad.data(), conversion_dims[0], Base::dims.get_volume());
-		Matrix<Scalar> prev_out_grad = Matrix<Scalar>(in_cache.rows(), in_cache.cols());
-		Matrix<Scalar> grad = Matrix<Scalar>::Zero()
-		for (int i = 0; i < in_cache.cols(); ++i) {
-			for (int j = 0; j < in_cache.rows(); ++j) {
-				Scalar in_ji = in_cache(j,i);
-				if (in_ji >= 0)
-					prev_out_grad(j,i) = out_grad_map(j,i);
+		MatrixMap<Scalar> out_grad_mat(out_grad.data(), conversion_dims[0], out_grad.size() / conversion_dims[0]);
+		Matrix<Scalar> prev_out_grad_mat = Matrix<Scalar>(in_mat_cache.rows(), in_mat_cache.cols());
+		const Matrix<Scalar>& alpha = Base::params->get_values();
+		Matrix<Scalar> alpha_grad = Matrix<Scalar>::Zero(1, out_grad_mat.cols());
+		for (int i = 0; i < in_mat_cache.cols(); ++i) {
+			for (int j = 0; j < in_mat_cache.rows(); ++j) {
+				Scalar in_mat_ji = in_mat_cache(j,i);
+				Scalar out_mat_ji = out_grad_mat(j,i);
+				if (in_mat_ji >= 0)
+					prev_out_grad_mat(j,i) = out_mat_ji;
 				else {
-					Scalar out_ji = out_grad_map(j,i);
-					prev_out_grad(j,i) = Base::params_ref(0,i) * out_ji;
-					Base::params_grad(0,i) += in_ji * out_ji;
+					prev_out_grad_mat(j,i) = alpha(0,i) * out_mat_ji;
+					alpha_grad(0,i) += in_mat_ji * out_mat_ji;
 				}
 			}
 		}
-		return TensorMap<Scalar,Root::DATA_RANK>(prev_out_grad.data(), conversion_dims);
+		Base::params->update_grad(alpha_grad);
+		return TensorMap<Scalar,Root::DATA_RANK>(prev_out_grad_mat.data(), conversion_dims);
 	}
 private:
 	RankwiseArray conversion_dims;
-	// Staged computation caches.
-	Matrix<Scalar> in_cache;
+	// Staged computation cache.
+	Matrix<Scalar> in_mat_cache;
 };
 
 } /* namespace cattle */

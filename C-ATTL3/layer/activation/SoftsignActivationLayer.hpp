@@ -28,7 +28,7 @@ public:
 	/**
 	 * @param dims The dimensionality of the input tensor.
 	 */
-	inline SoftsignActivationLayer(const Dimensions<std::size_t,Rank>& dims) :
+	inline SoftsignActivationLayer(const typename Root::Dims& dims) :
 			Base::ActivationLayer(dims) { }
 	inline Root* clone() const {
 		return new SoftsignActivationLayer(*this);
@@ -45,6 +45,8 @@ public:
 	inline typename Root::Data pass_back(typename Root::Data out_grad) {
 		assert((Dimensions<std::size_t,Base::DATA_RANK>(out_grad.dimensions()).template demote<>()) == Base::dims);
 		assert(out_grad.dimension(0) > 0 && denom_cache.dimension(0) == out_grad.dimension(0));
+		if (Base::is_input_layer())
+			return typename Root::Data();
 		return denom_cache.square().inverse() * out_grad;
 	}
 private:

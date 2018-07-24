@@ -32,7 +32,7 @@ public:
 	 * @param beta The factor by which the input of the sigmoid factor of the Swish
 	 * function is to be scaled.
 	 */
-	inline SwishActivationLayer(const Dimensions<std::size_t,Rank>& dims, Scalar beta = 1) :
+	inline SwishActivationLayer(const typename Root::Dims& dims, Scalar beta = 1) :
 			Base::ActivationLayer(dims),
 			beta(beta) { }
 	inline Root* clone() const {
@@ -52,14 +52,15 @@ public:
 	inline typename Root::Data pass_back(typename Root::Data out_grad) {
 		assert((Dimensions<std::size_t,Base::DATA_RANK>(out_grad.dimensions()).template demote<>()) == Base::dims);
 		assert(out_grad.dimension(0) > 0 && sig_out_cache.dimension(0) == out_grad.dimension(0));
+		if (Base::is_input_layer())
+			return typename Root::Data();
 		return sig_out_cache * ((sig_out_cache.constant(1) - sig_out_cache) * beta * in_cache +
 				sig_out_cache.constant(1)) * out_grad;
 	}
 private:
 	const Scalar beta;
 	// Staged computation cache.
-	typename Root::Data in_cache;
-	typename Root::Data sig_out_cache;
+	typename Root::Data in_cache, sig_out_cache;
 };
 
 } /* namespace cattle */

@@ -34,7 +34,7 @@ public:
 	/**
 	 * @param dims The dimensionality of the input tensor.
 	 */
-	inline ReLUActivationLayer(const Dimensions<std::size_t,Rank>& dims) :
+	inline ReLUActivationLayer(const typename Root::Dims& dims) :
 			Base::ActivationLayer(dims) { }
 	inline Root* clone() const {
 		return new ReLUActivationLayer(*this);
@@ -51,6 +51,8 @@ public:
 	inline typename Root::Data pass_back(typename Root::Data out_grad) {
 		assert((Dimensions<std::size_t,Base::DATA_RANK>(out_grad.dimensions()).template demote<>()) == Base::dims);
 		assert(out_grad.dimension(0) > 0 && in_cache.dimension(0) == out_grad.dimension(0));
+		if (Base::is_input_layer())
+			return typename Root::Data();
 		return in_cache.unaryExpr([](Scalar e) { return (Scalar) (e >= 0); }) * out_grad;
 	}
 private:

@@ -29,7 +29,7 @@ public:
 	/**
 	 * @param dims The dimensionality of the input tensor.
 	 */
-	inline SoftplusActivationLayer(const Dimensions<std::size_t,Rank>& dims) :
+	inline SoftplusActivationLayer(const typename Root::Dims& dims) :
 			Base::ActivationLayer(dims) { }
 	inline Root* clone() const {
 		return new SoftplusActivationLayer(*this);
@@ -45,11 +45,12 @@ public:
 	}
 	inline typename Root::Data pass_back(typename Root::Data out_grad) {
 		assert((Dimensions<std::size_t,Base::DATA_RANK>(out_grad.dimensions()).template demote<>()) == Base::dims);
-		assert(out_grad.dimension(0) > 0 && in.dimension(0) == out_grad.dimension(0));
+		assert(out_grad.dimension(0) > 0 && in_cache.dimension(0) == out_grad.dimension(0));
+		if (Base::is_input_layer())
+			return typename Root::Data();
 		return ((-in_cache).exp() + in_cache.constant(1)).inverse() * out_grad;
 	}
 private:
-	// Staged computation cache.
 	typename Root::Data in_cache;
 };
 

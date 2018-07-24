@@ -28,7 +28,7 @@ public:
 	 * @param dims The dimensionality of the input tensor.
 	 * @param scale The factor by which the input is to be scaled.
 	 */
-	inline ScaledActivationLayer(const Dimensions<std::size_t,Rank>& dims, Scalar scale) :
+	inline ScaledActivationLayer(const typename Root::Dims& dims, Scalar scale) :
 			Base::ActivationLayer(dims),
 			scale(scale) { }
 	inline Root* clone() const {
@@ -43,6 +43,8 @@ public:
 	inline typename Root::Data pass_back(typename Root::Data out_grad) {
 		assert((Dimensions<std::size_t,Base::DATA_RANK>(out_grad.dimensions()).template demote<>()) == Base::dims);
 		assert(out_grad.dimension(0) > 0 && batch_size == out_grad.dimension(0));
+		if (Base::is_input_layer())
+			return typename Root::Data();
 		return out_grad * scale;
 	}
 private:

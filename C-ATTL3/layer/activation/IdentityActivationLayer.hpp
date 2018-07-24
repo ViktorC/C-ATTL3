@@ -28,7 +28,7 @@ public:
 	/**
 	 * @param dims The dimensionality of the input tensor.
 	 */
-	inline IdentityActivationLayer(const Dimensions<std::size_t,Rank>& dims) :
+	inline IdentityActivationLayer(const typename Root::Dims& dims) :
 			Base::ActivationLayer(dims) { }
 	inline Root* clone() const {
 		return new IdentityActivationLayer(*this);
@@ -43,6 +43,8 @@ public:
 	inline typename Root::Data pass_back(typename Root::Data out_grad) {
 		assert((Dimensions<std::size_t,Base::DATA_RANK>(out_grad.dimensions()).template demote<>()) == Base::dims);
 		assert(out_grad.dimension(0) > 0 && batch_size == out_grad.dimension(0));
+		if (Base::is_input_layer())
+			return typename Root::Data();
 		return out_grad;
 	}
 private:
