@@ -32,9 +32,10 @@ enum CIFARType { CIFAR_10, CIFAR_100 };
  */
 template<typename Scalar, CIFARType CIFARType = CIFAR_10>
 class CIFARDataProvider : public JointFileDataProvider<Scalar,3,false,true> {
+	static_assert(CIFARType == CIFAR_10 || CIFARType == CIFAR_100, "invalid CIFAR type");
 	typedef DataProvider<Scalar,3,false> Root;
 	typedef JointFileDataProvider<Scalar,3,false,true> Base;
-	static_assert(CIFARType == CIFAR_10 || CIFARType == CIFAR_100, "invalid CIFAR type");
+	typedef std::array<std::size_t,4> RankwiseArray;
 	static constexpr std::size_t INSTANCE_LENGTH = CIFARType == CIFAR_10 ? 3073 : 3074;
 	static constexpr std::size_t NUM_LABELS = CIFARType == CIFAR_10 ? 10 : 100;
 public:
@@ -42,12 +43,10 @@ public:
 	 * @param file_paths The paths to the data set files.
 	 */
 	inline CIFARDataProvider(std::vector<std::string> file_paths) :
-			Base::JointFileDataProvider(file_paths),
-			obs_dims({ 32u, 32u, 3u }),
-			obj_dims({ NUM_LABELS, 1u, 1u }),
+			Base::JointFileDataProvider({ 32u, 32u, 3u }, { NUM_LABELS, 1u, 1u }, file_paths),
 			offsets({ 0u, 0u, 0u, 0u }),
-			obs_extents({ 0u, 32u, 32u, 3u }),
-			obj_extents({ 0u, NUM_LABELS, 1u, 1u }) {
+			obs_extents(Base::obs_dims.template promote<>()),
+			obj_extents(Base::obj_dims.template promote<>()) {
 		Base::reset();
 	}
 	/**
@@ -55,17 +54,11 @@ public:
 	 */
 	inline CIFARDataProvider(std::string file_path) :
 			CIFARDataProvider(std::vector<std::string>({ file_path })) { }
-	inline const Dimensions<std::size_t,3>& get_obs_dims() const {
-		return obs_dims;
-	}
-	inline const Dimensions<std::size_t,3>& get_obj_dims() const {
-		return obj_dims;
-	}
 protected:
 	inline DataPair<Scalar,3,false> _get_data(const std::string& file_name, std::ifstream& file_stream,
 			std::size_t batch_size) {
-		Tensor<Scalar,4> obs(batch_size, 32u, 32u, 3u);
-		Tensor<Scalar,4> obj(batch_size, NUM_LABELS, 1u, 1u);
+		Tensor<Scalar,4> obs(batch_size, Base::obs_dims(0), Base::obs_dims(1), Base::obs_dims(2));
+		Tensor<Scalar,4> obj(batch_size, Base::obj_dims(0), Base::obj_dims(1), Base::obj_dims(2));
 		obj.setZero();
 		std::size_t i;
 		for (i = 0; i < batch_size && file_stream.read(buffer, INSTANCE_LENGTH); ++i) {
@@ -76,9 +69,9 @@ protected:
 				buffer_ind++;
 			obj(i,u_buffer[buffer_ind++],0u,0u) = (Scalar) 1;
 			// Set the image.
-			for (std::size_t channel = 0; channel < 3; ++channel) {
-				for (std::size_t height = 0; height < 32; ++height) {
-					for (std::size_t width = 0; width < 32; ++width)
+			for (std::size_t channel = 0; channel < Base::obs_dims(2); ++channel) {
+				for (std::size_t height = 0; height < Base::obs_dims(1); ++height) {
+					for (std::size_t width = 0; width < Base::obj_dims(0); ++width)
 						obs(i,height,width,channel) = (Scalar) u_buffer[buffer_ind++];
 				}
 			}
@@ -99,12 +92,8 @@ protected:
 		return std::min(instances, skip_extent / INSTANCE_LENGTH);
 	}
 private:
-	const Dimensions<std::size_t,3> obs_dims;
-	const Dimensions<std::size_t,3> obj_dims;
 	char buffer[INSTANCE_LENGTH];
-	std::array<std::size_t,4> offsets;
-	std::array<std::size_t,4> obs_extents;
-	std::array<std::size_t,4> obj_extents;
+	RankwiseArray offsets, obs_extents, obj_extents;
 };
 
 }

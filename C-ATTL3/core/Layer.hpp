@@ -8,6 +8,7 @@
 #ifndef CATTL3_LAYER_H_
 #define CATTL3_LAYER_H_
 
+#include <memory>
 #include <type_traits>
 #include <vector>
 
@@ -18,17 +19,24 @@
 namespace cattle {
 
 /**
+ * An alias for a shared pointer to a Parameters instance.
+ */
+template<typename Scalar>
+using ParamsSharedPtr = std::shared_ptr<Parameters<Scalar>>;
+
+/**
  * An abstract class template representing layers in a neural network.
  */
 template<typename Scalar, std::size_t Rank>
 class Layer {
 	static_assert(std::is_floating_point<Scalar>::value, "non floating-point scalar type");
 	static_assert(Rank > 0 && Rank < 4, "illegal rank");
-public:
+protected:
 	// Rank is increased by one to allow for batch training.
 	static constexpr std::size_t DATA_RANK = Rank + 1;
 	typedef Tensor<Scalar,DATA_RANK> Data;
 	typedef Dimensions<std::size_t,Rank> Dims;
+public:
 	virtual ~Layer() = default;
 	/**
 	 * It returns a clone of the layer instance.
@@ -92,15 +100,15 @@ public:
 	 */
 	virtual void empty_cache() = 0;
 	/**
-	 * It returns a constant reference to the parameters of the layer.
+	 * It returns a vector of constant non-owning pointers to the parameters of the layer.
 	 *
-	 * @return A constant reference to the parameters of the layer.
+	 * @return A vector of constant pointers to the parameters of the layer.
 	 */
 	virtual std::vector<const Parameters<Scalar>*>& get_params() const = 0;
 	/**
-	 * It returns a reference to the parameters of the layer.
+	 * It returns a vector of non-owning pointers to the parameters of the layer.
 	 *
-	 * @return A non-constant reference to the parameters of the layer.
+	 * @return A vector of pointers to the parameters of the layer.
 	 */
 	virtual std::vector<Parameters<Scalar>*>& get_params() = 0;
 	/**

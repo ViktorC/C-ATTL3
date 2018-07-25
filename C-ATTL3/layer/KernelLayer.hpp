@@ -15,12 +15,6 @@
 
 namespace cattle {
 
-/**
- * An alias for a shared pointer to a Parameters instance.
- */
-template<typename Scalar>
-using ParamsSharedPtr = std::shared_ptr<Parameters<Scalar>>;
-
 template<typename Scalar, std::size_t Rank>
 class KernelLayer : public Layer<Scalar,Rank> {
 	typedef Layer<Scalar,Rank> Base;
@@ -55,7 +49,7 @@ protected:
 	 * @param weights The weight parameters; cannot be null.
 	 * @param bias The bias parameters; cannot be null.
 	 */
-	inline KernelLayer(const typename Base::Dims& input_dims, const Base::Dims& output_dims,
+	inline KernelLayer(const typename Base::Dims& input_dims, const typename Base::Dims& output_dims,
 			ParamsSharedPtr<Scalar> weights, ParamsSharedPtr<Scalar> bias) :
 				owner(*this),
 				input_dims(input_dims),
@@ -66,13 +60,11 @@ protected:
 		assert(weights && bias);
 	}
 	inline KernelLayer(const Self& layer, bool share_params = false) :
-			owner(share_params || layer.is_shared_params_clone() ? layer.owner : *this),
+			owner(share_params ? layer.owner : *this),
 			input_dims(layer.input_dims),
 			output_dims(layer.output_dims),
-			weights(share_params || layer.is_shared_params_clone() ?
-					layer.weights : ParamsSharedPtr<Scalar>(layer.weights.clone())),
-			bias(share_params || layer.is_shared_params_clone() ?
-					layer.bias : ParamsSharedPtr<Scalar>(layer.bias.clone())),
+			weights(share_params ? layer.weights : ParamsSharedPtr<Scalar>(layer.weights.clone())),
+			bias(share_params ? layer.bias : ParamsSharedPtr<Scalar>(layer.bias.clone())),
 			input_layer(layer.input_layer) { }
 	const Self& owner;
 	const typename Base::Dims input_dims, output_dims;

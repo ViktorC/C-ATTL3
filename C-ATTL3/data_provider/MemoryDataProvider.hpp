@@ -11,6 +11,7 @@
 #include <algorithm>
 #include <array>
 #include <cassert>
+#include <memory>
 #include <stdexcept>
 #include <utility>
 
@@ -25,6 +26,8 @@ namespace cattle {
 template<typename Scalar, std::size_t Rank, bool Sequential, bool Shuffle = true>
 class MemoryDataProvider : public DataProvider<Scalar,Rank,Sequential> {
 	typedef DataProvider<Scalar,Rank,Sequential> Base;
+	typedef std::unique_ptr<Tensor<Scalar,Rank>> DataPtr;
+	typedef std::array<std::size_t,Base::DATA_RANK> RankwiseArray;
 public:
 	/**
 	 * It constructs a data provider backed by the specified tensors.
@@ -33,7 +36,7 @@ public:
 	 * @param obj A unique pointer to the tensor containing the objectives.
 	 * shuffled.
 	 */
-	inline MemoryDataProvider(typename Base::DataPtr obs, typename Base::DataPtr obj) :
+	inline MemoryDataProvider(DataPtr obs, DataPtr obj) :
 			obs(std::move(obs)),
 			obj(std::move(obj)),
 			offsets() {
@@ -52,10 +55,10 @@ public:
 		if (Shuffle)
 			shuffle_tensor_rows();
 	}
-	inline const Dimensions<std::size_t,Rank>& get_obs_dims() const {
+	inline const typename Base::Dims& get_obs_dims() const {
 		return obs_dims;
 	}
-	inline const Dimensions<std::size_t,Rank>& get_obj_dims() const {
+	inline const typename Base::Dims& get_obj_dims() const {
 		return obj_dims;
 	}
 	inline bool has_more() {
@@ -93,14 +96,10 @@ protected:
 		obj_mat = perm * obj_mat;
 	}
 private:
-	typename Base::DataPtr obs;
-	typename Base::DataPtr obj;
-	Dimensions<std::size_t,Rank> obs_dims;
-	Dimensions<std::size_t,Rank> obj_dims;
+	DataPtr obs, obj;
+	typename Base::Dims obs_dims, obj_dims;
 	std::size_t instances;
-	std::array<std::size_t,Base::DATA_RANK> offsets;
-	std::array<std::size_t,Base::DATA_RANK> data_extents;
-	std::array<std::size_t,Base::DATA_RANK> obj_extents;
+	RankwiseArray offsets, data_extents, obj_extents;
 };
 
 } /* namespace cattle */

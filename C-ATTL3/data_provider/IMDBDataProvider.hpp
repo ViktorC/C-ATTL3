@@ -68,20 +68,11 @@ public:
 	 */
 	inline IMDBDataProvider(std::string pos_reviews_folder_path, std::string neg_reviews_folder_path,
 			VocabSharedPtr vocab, std::size_t seq_length = 0) :
-				Base::JointFileDataProvider(resolve_review_files(pos_reviews_folder_path,
-						neg_reviews_folder_path)),
+				Base::JointFileDataProvider({ vocab->size() }, { ObjType == CATEGORICAL ? 10 : 1 },
+						resolve_review_files(pos_reviews_folder_path, neg_reviews_folder_path)),
 				vocab(vocab),
 				seq_length(seq_length) {
-		assert(vocab);
-		obs_dims = Dimensions<std::size_t,1>({ vocab->size() });
-		obj_dims = Dimensions<std::size_t,1>({ ObjType == CATEGORICAL ? 10 : 1 });
 		Base::reset();
-	}
-	inline const Dimensions<std::size_t,1>& get_obs_dims() const {
-		return obs_dims;
-	}
-	inline const Dimensions<std::size_t,1>& get_obj_dims() const {
-		return obj_dims;
 	}
 	/**
 	 * It populates a dictionary mapping words to indices given the path to a
@@ -181,8 +172,8 @@ protected:
 			std::size_t batch_size) {
 		assert(batch_size > 0);
 		const bool fixed_seq_length = seq_length != 0;
-		Tensor<Scalar,3> obs(1, (fixed_seq_length ? seq_length : +PREALLOC_SEQ_LENGTH), obs_dims(0u));
-		Tensor<Scalar,3> obj(1, 1, obj_dims(0u));
+		Tensor<Scalar,3> obs(1, (fixed_seq_length ? seq_length : +PREALLOC_SEQ_LENGTH), Base::obs_dims(0u));
+		Tensor<Scalar,3> obj(1, 1, Base::obj_dims(0u));
 		obs.setZero();
 		// Parse the rating from the name of the file.
 		std::size_t last_under_score = file_name.find_last_of('_');
@@ -216,7 +207,7 @@ protected:
 			Vocab::const_iterator val = vocab->find(word);
 			ind = (val != vocab->end()) ? val->second : +UNK_IND;
 			if (!fixed_seq_length && time_step >= obs.dimension(1)) {
-				Tensor<Scalar,3> extra_obs(1, +PREALLOC_SEQ_LENGTH, obs_dims(0u));
+				Tensor<Scalar,3> extra_obs(1, +PREALLOC_SEQ_LENGTH, Base::obs_dims(0u));
 				extra_obs.setZero();
 				obs = Tensor<Scalar,3>(obs.concatenate(std::move(extra_obs), 1));
 			}
@@ -228,7 +219,7 @@ protected:
 		} else {
 			if (time_step < obs.dimension(1)) {
 				std::array<std::size_t,3> offsets({ 0u, 0u, 0u });
-				std::array<std::size_t,3> extents({ 1u, time_step, obs_dims(0u) });
+				std::array<std::size_t,3> extents({ 1u, time_step, Base::obs_dims(0u) });
 				obs = Tensor<Scalar,3>(obs.slice(offsets, extents));
 			}
 		}
@@ -241,8 +232,6 @@ protected:
 private:
 	const VocabSharedPtr vocab;
 	const std::size_t seq_length;
-	Dimensions<std::size_t,1> obs_dims;
-	Dimensions<std::size_t,1> obj_dims;
 };
 
 }

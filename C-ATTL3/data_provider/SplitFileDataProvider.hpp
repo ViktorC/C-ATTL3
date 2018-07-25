@@ -32,6 +32,12 @@ class SplitFileDataProvider : public DataProvider<Scalar,Rank,Sequential> {
 	typedef std::pair<std::ifstream,std::ifstream> FileStreamPair;
 public:
 	virtual ~SplitFileDataProvider() = default;
+	inline const typename Base::Dims& get_obs_dims() const {
+		return obs_dims;
+	}
+	inline const typename Base::Dims& get_obj_dims() const {
+		return obj_dims;
+	}
 	inline bool has_more() {
 		if (current_file_stream_pair_has_more())
 			return true;
@@ -79,14 +85,18 @@ public:
 					instances - skipped);
 	}
 protected:
-	inline SplitFileDataProvider(const std::vector<FilePair>& dataset_path_pairs) :
-			file_pairs(dataset_path_pairs),
-			current_file_pair_ind(0) {
+	inline SplitFileDataProvider(const typename Base::Dims& obs_dims, const typename Base::Dims& obj_dims,
+			const std::vector<FilePair>& dataset_path_pairs) :
+				obs_dims(obs_dims),
+				obj_dims(obj_dims),
+				file_pairs(dataset_path_pairs),
+				current_file_pair_ind(0) {
 		assert(!dataset_path_pairs.empty());
 		init_current_file_stream_pair();
 	}
-	inline SplitFileDataProvider(FilePair dataset_path_pair) :
-			SplitFileDataProvider(std::vector<FilePair>({ dataset_path_pair })) { }
+	inline SplitFileDataProvider(const typename Base::Dims& obs_dims, const typename Base::Dims& obj_dims,
+			FilePair dataset_path_pair) :
+				SplitFileDataProvider(obs_dims, obj_dims, std::vector<FilePair>({ dataset_path_pair })) { }
 	/**
 	 * It sets the positions of the file streams to the beginning of the observation data set and
 	 * the objective data set respectively.
@@ -126,6 +136,7 @@ protected:
 	 */
 	virtual std::size_t _skip(std::ifstream& obs_file_stream, std::ifstream& obj_file_stream,
 			std::size_t instances) = 0;
+	const typename Base::Dims obj_dims, obs_dims;
 private:
 	bool current_file_stream_pair_has_more() {
 		return current_file_stream_pair.first && current_file_stream_pair.first.peek() != EOF &&

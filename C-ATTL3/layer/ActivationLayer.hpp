@@ -13,12 +13,6 @@
 namespace cattle {
 
 /**
- * An alias for a shared pointer to a Parameters instance.
- */
-template<typename Scalar>
-using ParamsSharedPtr = std::shared_ptr<Parameters<Scalar>>;
-
-/**
  * An abstract class template that represents an activation function layer.
  */
 template<typename Scalar, std::size_t Rank>
@@ -66,10 +60,10 @@ protected:
 			params(params),
 			input_layer(false) { }
 	inline ActivationLayer(const Self& layer, bool share_params = false) :
-			owner((share_params || layer.is_shared_params_clone()) && layer.params ? layer.owner : *this),
+			owner(share_params && layer.params ? layer.owner : *this),
 			dims(layer.dims),
-			params(layer.params ? (share_params || layer.is_shared_params_clone() ?
-					layer.params : ParamsSharedPtr<Scalar>(layer.params.clone())) : nullptr),
+			params(share_params ? layer.params : (!layer.params ? nullptr :
+					ParamsSharedPtr<Scalar>(layer.params.clone()))),
 			input_layer(layer.input_layer) { }
 	const Self& owner;
 	const typename Base::Dims dims;

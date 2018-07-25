@@ -28,6 +28,7 @@ template<typename Scalar>
 class MNISTDataProvider : public SplitFileDataProvider<Scalar,3,false,true,true> {
 	typedef DataProvider<Scalar,3,false> Root;
 	typedef SplitFileDataProvider<Scalar,3,false,true,true> Base;
+	typedef std::array<std::size_t,4> RankwiseArray;
 	static constexpr std::size_t OBS_OFFSET = 16;
 	static constexpr std::size_t LABEL_OFFSET = 8;
 	static constexpr std::size_t OBS_INSTANCE_LENGTH = 784;
@@ -38,19 +39,11 @@ public:
 	 * @param labels_path The path to the file containing the corresponding labels.
 	 */
 	MNISTDataProvider(std::string obs_path, std::string labels_path) :
-			Base::SplitFileDataProvider(std::make_pair(obs_path, labels_path)),
-			obs_dims({ 28u, 28u, 1u }),
-			obj_dims({ 10u, 1u, 1u }),
+			Base::SplitFileDataProvider({ 28u, 28u, 1u }, { 10u, 1u, 1u }, std::make_pair(obs_path, labels_path)),
 			offsets({ 0u, 0u, 0u, 0u }),
-			obs_extents({ 0u, 28u, 28u, 1u }),
-			obj_extents({ 0u, 10u, 1u, 1u }) {
+			obs_extents(Base::obs_dims.template promote<>()),
+			obj_extents(Base::obs_dims.template promote<>()) {
 		Base::reset();
-	}
-	inline const Dimensions<std::size_t,3>& get_obs_dims() const {
-		return obs_dims;
-	}
-	inline const Dimensions<std::size_t,3>& get_obj_dims() const {
-		return obj_dims;
 	}
 protected:
 	inline void _set_to_beg(std::ifstream& obs_file_stream, std::ifstream& obj_file_stream) {
@@ -61,8 +54,8 @@ protected:
 	inline DataPair<Scalar,3,false> _get_data(const std::string& obs_file,
 			std::ifstream& obs_file_stream, const std::string& obj_file,
 			std::ifstream& obj_file_stream, std::size_t batch_size) {
-		Tensor<Scalar,4> obs(batch_size, 28u, 28u, 1u);
-		Tensor<Scalar,4> obj(batch_size, 10u, 1u, 1u);
+		Tensor<Scalar,4> obs(batch_size, Base::obs_dims(0), Base::obs_dims(1), Base::obs_dims(2));
+		Tensor<Scalar,4> obj(batch_size, Base::obj_dims(0), Base::obj_dims(1), Base::obj_dims(2));
 		obj.setZero();
 		std::size_t i;
 		for (i = 0; i < batch_size && obs_file_stream.read(obs_buffer, OBS_INSTANCE_LENGTH); ++i) {
@@ -73,8 +66,8 @@ protected:
 			// Set the image.
 			unsigned char* u_buffer = reinterpret_cast<unsigned char*>(obs_buffer);
 			std::size_t buffer_ind = 0;
-			for (std::size_t height = 0; height < 28; ++height) {
-				for (std::size_t width = 0; width < 28; ++width)
+			for (std::size_t height = 0; height < Base::obs_dims(0); ++height) {
+				for (std::size_t width = 0; width < Base::obs_dims(1); ++width)
 					obs(i,height,width,0u) = (Scalar) u_buffer[buffer_ind++];
 			}
 			assert(buffer_ind == OBS_INSTANCE_LENGTH);
@@ -105,12 +98,8 @@ protected:
 		return skipped_obs;
 	}
 private:
-	const Dimensions<std::size_t,3> obs_dims;
-	const Dimensions<std::size_t,3> obj_dims;
 	char obs_buffer[OBS_INSTANCE_LENGTH];
-	std::array<std::size_t,4> offsets;
-	std::array<std::size_t,4> obs_extents;
-	std::array<std::size_t,4> obj_extents;
+	RankwiseArray offsets, obs_extents, obj_extents;
 };
 
 }

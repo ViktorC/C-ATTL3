@@ -30,6 +30,12 @@ class JointFileDataProvider : public DataProvider<Scalar,Rank,Sequential> {
 	typedef DataProvider<Scalar,Rank,Sequential> Base;
 public:
 	virtual ~JointFileDataProvider() = default;
+	inline const typename Base::Dims& get_obs_dims() const {
+		return obs_dims;
+	}
+	inline const typename Base::Dims& get_obj_dims() const {
+		return obj_dims;
+	}
 	inline bool has_more() {
 		if (current_file_stream_has_more())
 			return true;
@@ -74,14 +80,18 @@ public:
 			skipped += _skip(current_file_stream, instances - skipped);
 	}
 protected:
-	inline JointFileDataProvider(const std::vector<std::string>& dataset_paths) :
-			files(dataset_paths),
-			current_file_ind(0) {
+	inline JointFileDataProvider(const typename Base::Dims& obs_dims, const typename Base::Dims& obj_dims,
+			const std::vector<std::string>& dataset_paths) :
+				obs_dims(obs_dims),
+				obj_dims(obj_dims),
+				files(dataset_paths),
+				current_file_ind(0) {
 		assert(!files.empty());
 		init_current_file_stream();
 	}
-	inline JointFileDataProvider(std::string dataset_path) :
-			JointFileDataProvider({ dataset_path }) { }
+	inline JointFileDataProvider(const typename Base::Dims& obs_dims, const typename Base::Dims& obj_dims,
+			std::string dataset_path) :
+				JointFileDataProvider(obs_dims, obj_dims, { dataset_path }) { }
 	/**
 	 * It sets the position of the file stream to the beginning of the data set.
 	 *
@@ -112,6 +122,7 @@ protected:
 	 * amount if there are fewer remaining instances in the data stream.
 	 */
 	virtual std::size_t _skip(std::ifstream& file_stream, std::size_t instances) = 0;
+	const typename Base::Dims obj_dims, obs_dims;
 private:
 	bool current_file_stream_has_more() {
 		return current_file_stream && current_file_stream.peek() != EOF;

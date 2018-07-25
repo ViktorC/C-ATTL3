@@ -1,12 +1,12 @@
 /*
- * MatrixParameters.hpp
+ * HostParameters.hpp
  *
  *  Created on: 20 Jul 2018
  *      Author: Viktor Csomor
  */
 
-#ifndef C_ATTL3_PARAMETERS_MATRIXPARAMETERS_H_
-#define C_ATTL3_PARAMETERS_MATRIXPARAMETERS_H_
+#ifndef C_ATTL3_PARAMETERS_HOSTPARAMETERS_H_
+#define C_ATTL3_PARAMETERS_HOSTPARAMETERS_H_
 
 #include <cassert>
 #include <cstddef>
@@ -39,11 +39,10 @@ public:
 	/**
 	 * @param rows The number of rows of the parameter matrix.
 	 * @param cols The number of columns of the parameter matrix.
+	 * @param optimizable Whether the parameters are optimizable. Non-optimizable
+	 * parameters do not maintain gradient information and are thus not regularizable.
 	 * @param init The parameter value initialization. If it is a null pointer, the
 	 * values will not be initialized.
-	 * @param optimizable Whether the parameters are optimizable. Non-optimizable
-	 * parameters do not maintain gradient information and are thus not regularizable
-	 * (but can still incur a regularization penalty).
 	 * @param reg The optional regularization to use on the values of the parameter
 	 * matrix. If it is a null pointer, no regularization is applied.
 	 * @param value_clip The maximum allowed absolute parameter value. If it is 0
@@ -59,21 +58,22 @@ public:
 	 * @param grad_max_l2_norm The maximum allowed L2 parameter gradient norm. If it
 	 * is 0 or less, no L2 gradient max norm constraint is enforced.
 	 */
-	inline HostParameters(std::size_t rows, std::size_t cols, ParamInitSharedPtr<Scalar> init,
-			bool optimizable = true, ParamRegSharedPtr<Scalar> reg = nullptr, Scalar value_clip = 0,
-			Scalar value_max_l1_norm = 0, Scalar value_max_l2_norm = 0, Scalar grad_clip = 0,
-			Scalar grad_max_l1_norm = 0, Scalar grad_max_l2_norm = 0) :
+	inline HostParameters(std::size_t rows, std::size_t cols, bool optimizable = true,
+			ParamInitSharedPtr<Scalar> init = nullptr, ParamRegSharedPtr<Scalar> reg = nullptr,
+			Scalar value_clip = 0, Scalar value_max_l1_norm = 0, Scalar value_max_l2_norm = 0,
+			Scalar grad_clip = 0, Scalar grad_max_l1_norm = 0, Scalar grad_max_l2_norm = 0) :
 				rows(rows),
 				cols(cols),
-				param_init(init),
 				optimizable(optimizable),
+				param_init(init),
 				param_reg(reg),
 				value_clip(value_clip),
 				value_max_l1_norm(value_max_l1_norm),
 				value_max_l2_norm(value_max_l2_norm),
 				grad_clip(grad_clip),
 				grad_max_l1_norm(grad_max_l1_norm),
-				grad_max_l2_norm(grad_max_l2_norm) {
+				grad_max_l2_norm(grad_max_l2_norm),
+				frozen(false) {
 		assert(rows > 0 && cols > 0);
 	}
 	inline Parameters<Scalar>* clone() const {
@@ -115,9 +115,9 @@ public:
 			grad = Matrix<Scalar>::Zero(rows, cols);
 	}
 	inline Scalar get_regularization_penalty() const {
-		if (!param_reg)
-			return 0;
-		return param_reg->function(values);
+		if (optimizable && param_reg)
+			return param_reg->function(values);
+		return 0;
 	}
 	inline void regularize() {
 		if (optimizable && param_reg)
@@ -169,16 +169,16 @@ protected:
 				matrix *= (max_l2_norm / l2_norm);
 		}
 	}
-	std::size_t rows, cols;
+	const std::size_t rows, cols;
+	const bool optimizable;
+	const ParamInitSharedPtr<Scalar> param_init;
+	const ParamRegSharedPtr<Scalar> param_reg;
+	const Scalar value_clip, value_max_l1_norm, value_max_l2_norm;
+	const Scalar grad_clip, grad_max_l1_norm, grad_max_l2_norm;
 	Matrix<Scalar> values, grad;
-	ParamInitSharedPtr<Scalar> param_init;
-	bool optimizable;
-	ParamRegSharedPtr<Scalar> param_reg;
-	Scalar value_clip, value_max_l1_norm, value_max_l2_norm;
-	Scalar grad_clip, grad_max_l1_norm, grad_max_l2_norm;
 	bool frozen;
 };
 
 } /* namespace cattle */
 
-#endif /* C_ATTL3_PARAMETERS_MATRIXPARAMETERS_H_ */
+#endif /* C_ATTL3_PARAMETERS_HOSTPARAMETERS_H_ */

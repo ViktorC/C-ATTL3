@@ -32,10 +32,10 @@ public:
 		assert(length > 0);
 		reset();
 	}
-	inline const Dimensions<std::size_t,Rank>& get_obs_dims() const {
+	inline const typename Base::Dims& get_obs_dims() const {
 		return orig_provider.get_obs_dims();
 	}
-	inline const Dimensions<std::size_t,Rank>& get_obj_dims() const {
+	inline const typename Base::Dims& get_obj_dims() const {
 		return orig_provider.get_obj_dims();
 	}
 	inline bool has_more() {
@@ -56,8 +56,7 @@ public:
 	}
 private:
 	Base& orig_provider;
-	const std::size_t offset;
-	const std::size_t length;
+	const std::size_t offset, length;
 	std::size_t instances_read;
 };
 

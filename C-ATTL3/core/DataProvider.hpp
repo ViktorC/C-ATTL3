@@ -19,12 +19,6 @@
 namespace cattle {
 
 /**
- * An alias for a unique tensor pointer.
- */
-template<typename Scalar, std::size_t Rank>
-using TensorPtr = std::unique_ptr<Tensor<Scalar,Rank>>;
-
-/**
  * An alias for a pair of two tensors of the same rank. It represents observation-objective pairs.
  */
 template<typename Scalar, std::size_t Rank, bool Sequential>
@@ -37,6 +31,9 @@ template<typename Scalar, std::size_t Rank, bool Sequential>
 class DataProvider {
 	static_assert(std::is_floating_point<Scalar>::value, "non floating-point scalar type");
 	static_assert(Rank > 0 && Rank < 4, "illegal data provider rank");
+	static constexpr std::size_t DATA_RANK = Rank + Sequential + 1;
+	typedef Tensor<Scalar,DATA_RANK> Data;
+	typedef Dimensions<std::size_t,Rank> Dims;
 public:
 	virtual ~DataProvider() = default;
 	/**
@@ -44,13 +41,13 @@ public:
 	 *
 	 * @return A constant reference to the dimensions of the observations.
 	 */
-	virtual const Dimensions<std::size_t,Rank>& get_obs_dims() const = 0;
+	virtual const Dims& get_obs_dims() const = 0;
 	/**
 	 * A simple constant getter method for the dimensions of the objectives.
 	 *
 	 * @return A constant reference to the dimensions of the objectives.
 	 */
-	virtual const Dimensions<std::size_t,Rank>& get_obj_dims() const = 0;
+	virtual const Dims& get_obj_dims() const = 0;
 	/**
 	 * A method that returns whether the data provider instance has more data to provide.
 	 * It should always be called before calling get_data(std::size_t).
@@ -82,10 +79,6 @@ public:
 	 * @param instances The number of instances to skip.
 	 */
 	virtual void skip(std::size_t instances) = 0;
-protected:
-	static constexpr std::size_t DATA_RANK = Rank + Sequential + 1;
-	typedef Tensor<Scalar,DATA_RANK> Data;
-	typedef TensorPtr<Scalar,DATA_RANK> DataPtr;
 };
 
 } /* namespace cattle */

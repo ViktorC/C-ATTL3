@@ -60,7 +60,7 @@ public:
 			Scalar alpha_max_l2_norm = 0, Scalar alpha_grad_clip = 0, Scalar alpha_grad_max_l1_norm = 0,
 			Scalar alpha_grad_max_l2_norm = 0) :
 				Base::ActivationLayer(dims, std::make_shared<HostParameters<Scalar>>(1, dims.get_volume(),
-						std::make_shared<ConstantParameterInitialization<Scalar>>(init_alpha), true,
+						true, std::make_shared<ConstantParameterInitialization<Scalar>>(init_alpha),
 						alpha_reg, alpha_clip, alpha_max_l1_norm, alpha_max_l2_norm, alpha_grad_clip,
 						alpha_grad_max_l1_norm, alpha_grad_max_l2_norm)),
 				conversion_dims(dims.template promote<>()) { }

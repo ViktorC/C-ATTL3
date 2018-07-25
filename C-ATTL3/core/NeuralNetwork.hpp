@@ -28,24 +28,7 @@
 #include "EigenProxy.hpp"
 #include "Layer.hpp"
 
-// TODO Serialization.
-// TODO GRU network.
-
 namespace cattle {
-
-template<typename Scalar, std::size_t Rank, bool Sequential> class Optimizer;
-
-/**
- * An enumeration type for the different ways the outputs of sub-modules of neural networks
- * may be merged.
- */
-enum OutputMergeType { CONCAT_LO_RANK, CONCAT_HI_RANK, SUM, MUL };
-
-/**
- * An enumeration type for the different ways the input of a layer in a dense network may be concatenated
- * to its output.
- */
-enum DenseConcatType { LOWEST_RANK, HIGHEST_RANK };
 
 /**
  * An abstract neural network class template. It allows for inference and training via
@@ -55,19 +38,6 @@ template<typename Scalar, std::size_t Rank, bool Sequential>
 class NeuralNetwork {
 	static_assert(std::is_floating_point<Scalar>::value, "non floating-point scalar type");
 	static_assert(Rank > 0 && Rank < 4, "illegal neural network rank");
-	friend class Optimizer<Scalar,Rank,Sequential>;
-	template<typename _Scalar, std::size_t _Rank, bool _Sequential>
-	friend class StackedNeuralNetwork;
-	template<typename _Scalar, std::size_t _Rank, OutputMergeType MergeType>
-	friend class ParallelNeuralNetwork;
-	template<typename _Scalar, std::size_t _Rank>
-	friend class ResidualNeuralNetwork;
-	template<typename _Scalar, std::size_t _Rank, DenseConcatType ConcatType>
-	friend class DenseNeuralNetwork;
-	template<typename _Scalar, std::size_t _Rank>
-	friend class SequentialNeuralNetwork;
-	template<typename _Scalar, std::size_t _Rank>
-	friend class TemporalNeuralNetwork;
 protected:
 	static constexpr std::size_t DATA_RANK = Rank + Sequential + 1;
 	typedef Tensor<Scalar,DATA_RANK> Data;
@@ -113,51 +83,6 @@ public:
 	 */
 	virtual bool is_foremost() const = 0;
 	/**
-	 * Invokes the Layer#set_frozen(bool) method of all layers of the network with the
-	 * provided argument. A frozen networks parameters are not regularized.
-	 *
-	 * @param frozen Whether the parameters of all layers should be frozen (i.e. not updatable
-	 * via optimization) or active.
-	 */
-	inline virtual void set_frozen(bool frozen) {
-		std::vector<Layer<Scalar,Rank>*> layers = get_layers();
-		for (unsigned i = 0; i < layers.size(); ++i)
-			layers[i]->set_frozen(frozen);
-	}
-	/**
-	 * Initializes all layers of the network.
-	 */
-	inline virtual void init() {
-		std::vector<Layer<Scalar,Rank>*> layers = get_layers();
-		for (unsigned i = 0; i < layers.size(); ++i)
-			layers[i]->init();
-	}
-	/**
-	 * It propagates the input through the neural network and outputs its prediction
-	 * according to its current parameters.
-	 *
-	 * @param input The input to be mapped.
-	 * @return The inference/prediction of the neural network.
-	 */
-	inline virtual Data infer(Data input) {
-		return propagate(std::move(input), false);
-	}
-	/**
-	 * @return A string representation of the neural network.
-	 */
-	inline virtual std::string to_string() const {
-		std::stringstream strm;
-		strm << "Neural Net <" << typeid(*this).name() << this << ">" << std::endl;
-		std::vector<const Layer<Scalar,Rank>*> layers = get_layers();
-		for (unsigned i = 0; i < layers.size(); ++i)
-			strm << "Layer " << std::setw(3) << std::to_string(i) << " " << *layers[i];
-		return strm.str();
-	}
-	inline friend std::ostream& operator<<(std::ostream& os, const NeuralNetwork<Scalar,Rank,Sequential>& nn) {
-		return os << nn.to_string() << std::endl;
-	}
-protected:
-	/**
 	 * Sets the foremost status of the network.
 	 *
 	 * @param foremost Whether the network is to function as a foremost network.
@@ -188,86 +113,54 @@ protected:
 	 */
 	virtual Data backpropagate(Data out_grad) = 0;
 	/**
-	 * A method to expose protected methods of the Layer class to subclasses of
-	 * NeuralNetwork that are not friend classes of Layer.
+	 * Invokes the Layer#set_frozen(bool) method of all layers of the network with the
+	 * provided argument. A frozen networks parameters are not regularized.
 	 *
-	 * \see Layer#set_input_layer(bool)
-	 *
-	 * It sets the specified layer's input-layer-status.
-	 *
-	 * @param layer The layer to modify.
-	 * @param on Whether the layer is to function as an input layer.
+	 * @param frozen Whether the parameters of all layers should be frozen (i.e. not updatable
+	 * via optimization) or active.
 	 */
-	inline static void set_input_layer(Layer<Scalar,Rank>& layer, bool on) {
-		layer.set_input_layer(on);
+	inline void set_frozen(bool frozen) {
+		std::vector<Layer<Scalar,Rank>*> layers = get_layers();
+		for (std::size_t i = 0; i < layers.size(); ++i) {
+			std::vector<Parameters<Scalar>*> params = layers[i]->get_params();
+			for (std::size_t j = 0; j < params.size(); ++j)
+				params[j]->set_frozen(frozen);
+		}
 	}
 	/**
-	 * A method to expose protected methods of the Layer class to subclasses of
-	 * NeuralNetwork that are not friend classes of Layer.
-	 *
-	 * \see Layer#empty_cache()
-	 *
-	 * It empties the cache of the layer.
-	 *
-	 * @param layer The layer whose cache is to be emptied.
+	 * Initializes all parameters of the network.
 	 */
-	inline static void empty_cache(Layer<Scalar,Rank>& layer) {
-		layer.empty_cache();
+	inline void init() {
+		std::vector<Layer<Scalar,Rank>*> layers = get_layers();
+		for (std::size_t i = 0; i < layers.size(); ++i) {
+			std::vector<Parameters<Scalar>*> params = layers[i]->get_params();
+			for (std::size_t j = 0; j < params.size(); ++j)
+				params[j]->init();
+		}
 	}
 	/**
-	 * A method to expose protected methods of the Layer class to subclasses of
-	 * NeuralNetwork that are not friend classes of Layer.
+	 * It propagates the input through the neural network and outputs its prediction
+	 * according to its current parameters.
 	 *
-	 * \see Layer#pass_forward(Tensor<Scalar,Rank + 1>,bool)
-	 *
-	 * It propagates the input through the specified layer.
-	 *
-	 * @param layer The layer to which the input is to be fed.
-	 * @param prev_out The input tensor.
-	 * @param training Whether the input is to propagated through the layer in
-	 * training mode.
-	 * @return The output of the layer in response to the input.
+	 * @param input The input to be mapped.
+	 * @return The inference/prediction of the neural network.
 	 */
-	inline static Tensor<Scalar,Rank + 1> pass_forward(Layer<Scalar,Rank>& layer, Tensor<Scalar,Rank + 1> prev_out,
-			bool training) {
-		return layer.pass_forward(std::move(prev_out), training);
-	}
-	/**
-	 * A method to expose protected methods of the Layer class to subclasses of
-	 * NeuralNetwork that are not friend classes of Layer.
-	 *
-	 * \see Layer#pass_back(Tensor<Scalar,Rank + 1>)
-	 *
-	 * It back-propagates the derivative of the loss function w.r.t. the output of
-	 * the layer through the layer updating the gradients on its parameters along
-	 * the way.
-	 *
-	 * @param layer The layer through which the gradients are to be back-propagated.
-	 * @param out_grad The derivative of the loss function w.r.t. the output of
-	 * the layer
-	 * @return The derivative of the loss function w.r.t. the input of the layer or
-	 * a null tensor if the layer is an input layer.
-	 */
-	inline static Tensor<Scalar,Rank + 1> pass_back(Layer<Scalar,Rank>& layer, Tensor<Scalar,Rank + 1> out_grad) {
-		return layer.pass_back(std::move(out_grad));
-	}
-	/**
-	 * A method to expose protected methods of the Layer class to subclasses of
-	 * NeuralNetwork that are not friend classes of Layer.
-	 *
-	 * \see Layer#get_params_grad()
-	 *
-	 * It returns a non-constant reference to the gradient of the specified
-	 * layer's parameters.
-	 *
-	 * @param layer The layer whose parameters' gradient is to be fetched.
-	 * @return A non-constant reference to the gradient of the layer's
-	 * parameters.
-	 */
-	inline static Matrix<Scalar>& get_params_grad(Layer<Scalar,Rank>& layer) {
-		return layer.get_params_grad();
+	inline Data infer(Data input) {
+		return propagate(std::move(input), false);
 	}
 };
+
+/**
+ * An enumeration type for the different ways the outputs of sub-modules of neural networks
+ * may be merged.
+ */
+enum OutputMergeType { CONCAT_LO_RANK, CONCAT_HI_RANK, SUM, MUL };
+
+/**
+ * An enumeration type for the different ways the input of a layer in a dense network may be concatenated
+ * to its output.
+ */
+enum DenseConcatType { LOWEST_RANK, HIGHEST_RANK };
 
 /**********************************
  * NON-SEQUENTIAL NEURAL NETWORKS *
