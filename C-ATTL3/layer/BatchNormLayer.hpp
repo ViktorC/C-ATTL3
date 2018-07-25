@@ -13,6 +13,8 @@
 
 #include "core/Layer.hpp"
 #include "core/NumericUtils.hpp"
+#include "parameter_initialization/OneParameterInitialization.hpp"
+#include "parameter_initialization/ZeroParameterInitialization.hpp"
 #include "parameters/HostParameters.hpp"
 
 namespace cattle {
@@ -41,29 +43,21 @@ public:
 	 * @param epsilon A small constant used to maintain numerical stability.
 	 */
 	inline BatchNormLayer(const Dimensions<std::size_t,Rank>& dims, Scalar norm_avg_decay = .1,
-			Scalar epsilon = NumericUtils<Scalar>::EPSILON2) :
+			Scalar epsilon = NumericUtils<Scalar>::EPSILON2, ParamRegSharedPtr<Scalar> gamma_reg = nullptr,
+			Scalar gamma_clip = 0, Scalar gamma_max_l1_norm = 0, Scalar gamma_max_l2_norm = 0,
+			Scalar gamma_grad_clip = 0, Scalar gamma_grad_max_l1_norm = 0, Scalar gamma_grad_max_l2_norm = 0,
+			ParamRegSharedPtr<Scalar> beta_reg = nullptr, Scalar beta_clip = 0, Scalar beta_max_l1_norm = 0,
+			Scalar beta_max_l2_norm = 0, Scalar beta_grad_clip = 0, Scalar beta_grad_max_l1_norm = 0,
+			Scalar beta_grad_max_l2_norm = 0) :
+				owner(*this),
 				dims(dims),
-				gamma_reg(gamma_reg),
-				beta_reg(beta_reg),
-				gamma_max_norm_constraint(gamma_max_norm_constraint),
-				beta_max_norm_constraint(beta_max_norm_constraint),
-				gamma_max_norm(NumericUtils<Scalar>::decidedly_greater(gamma_max_norm_constraint, (Scalar) 0)),
-				beta_max_norm(NumericUtils<Scalar>::decidedly_greater(beta_max_norm_constraint, (Scalar) 0)),
 				norm_avg_decay(norm_avg_decay),
 				epsilon(epsilon),
 				channels(dims(Rank - 1)),
 				input_layer(false),
-				frozen(false),
 				offsets(),
 				extents(dims.template promote<>()),
-				avg_means(),
-				avg_inv_sds(),
-				avgs_init(false),
-				params(),
-				params_grad(),
-				params_ref(params),
-				owner(*this),
-				cache_vec(channels) {
+				memb_vec(channels) {
 		assert(gamma_reg != nullptr);
 		assert(beta_reg != nullptr);
 		assert(norm_avg_decay >= 0 && norm_avg_decay <= 1 &&
@@ -71,6 +65,15 @@ public:
 		assert(epsilon > 0 && "epsilon must be greater than 0");
 		offsets.fill(0);
 		extents[Rank] = 1;
+		auto gamma_init = std::make_shared<OneParameterInitialization<Scalar>>();
+		auto beta_init = std::make_shared<ZeroParameterInitialization<Scalar>>();
+		for (std::size_t i; i < channels; ++i) {
+			ChannelSpecificMembers& memb = memb_vec[i];
+			memb.avg_means;
+			memb.avg_inv_sds;
+			memb.gammas;
+			memb.betas;
+		}
 	}
 	inline BatchNormLayer(const Self& layer, bool share_params = false) :
 			dims(layer.dims),
@@ -104,10 +107,10 @@ public:
 	inline const Base& get_params_owner() const {
 		return owner;
 	}
-	inline const Dimensions<std::size_t,Rank>& get_input_dims() const {
+	inline const typename Base::Dims& get_input_dims() const {
 		return dims;
 	}
-	inline const Dimensions<std::size_t,Rank>& get_output_dims() const {
+	inline const typename Base::Dims& get_output_dims() const {
 		return dims;
 	}
 	inline bool is_input_layer() const {
@@ -115,6 +118,16 @@ public:
 	}
 	inline void set_input_layer(bool input_layer) {
 		this->input_layer = input_layer;
+	}
+	inline std::vector<const Parameters<Scalar>*>& get_params() const {
+		std::vector<const Parameters<Scalar>*> params_vec(channels * 4);
+		populate_params_vector<std::vector<const Parameters<Scalar>*>>(params_vec);
+		return params_vec;
+	}
+	inline std::vector<Parameters<Scalar>*>& get_params() {
+		std::vector<Parameters<Scalar>*> params_vec(channels * 4);
+		populate_params_vector<std::vector<const Parameters<Scalar>*>>(params_vec);
+		return params_vec;
 	}
 	inline void empty_cache() {
 		for (unsigned i = 0; i < memb_vec.size(); ++i)
@@ -210,6 +223,16 @@ private:
 		return (((locations * std_in_grad_mat).array() - std_in_grad_mat.sum()).matrix() -
 				memb.std_in_mat_cache * memb.std_in_mat_cache.cwiseProduct(std_in_grad_mat).sum()) *
 				(((Scalar) 1 / locations) * memb.inv_in_sd_cache);
+	}
+	template<typename ParamsVec>
+	inline void populate_params_vector(ParamsVec params_vec) {
+		for (std::size_t i; i < channels; ++i) {
+			ChannelSpecificMembers& memb = memb_vec[i];
+			params_vec.push_back(memb.avg_means);
+			params_vec.push_back(memb.avg_inv_sds);
+			params_vec.push_back(memb.gammas);
+			params_vec.push_back(memb.betas);
+		}
 	}
 	const Self& owner;
 	const typename Base::Dims dims;

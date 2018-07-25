@@ -55,7 +55,7 @@ protected:
 	 * @param weights The weight parameters; cannot be null.
 	 * @param bias The bias parameters; cannot be null.
 	 */
-	inline KernelLayer(const typename Base::Dims& input_dims, const Dims& output_dims,
+	inline KernelLayer(const typename Base::Dims& input_dims, const Base::Dims& output_dims,
 			ParamsSharedPtr<Scalar> weights, ParamsSharedPtr<Scalar> bias) :
 				owner(*this),
 				input_dims(input_dims),
