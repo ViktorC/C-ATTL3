@@ -31,6 +31,14 @@ public:
 	 */
 	virtual bool are_optimizable() const = 0;
 	/**
+	 * @return The number of rows of the parameter matrix.
+	 */
+	virtual std::size_t get_rows() const = 0;
+	/**
+	 * @return The number of columns of the parameter matrix.
+	 */
+	virtual std::size_t get_cols() const = 0;
+	/**
 	 * It initializes the parameters.
 	 */
 	virtual void init() = 0;
@@ -39,23 +47,19 @@ public:
 	 */
 	virtual const Matrix<Scalar>& get_values() const = 0;
 	/**
-	 * @param values_delta The values delta that is to be added to the
-	 * current values of the parameters.
+	 * @param values The new values of the parameters. The matrix is expected to havey
+	 * the dimensions specified by the get_rows() and get_cols() methods.
 	 */
-	virtual void update_values(const Matrix<Scalar>& values_delta) = 0;
+	virtual void set_values(Matrix<Scalar> values) = 0;
 	/**
 	 * @return A constant reference to the gradient of the parameters.
 	 */
 	virtual const Matrix<Scalar>& get_grad() const = 0;
 	/**
-	 * It updates the gradient of the parameters by the specified values.
-	 * It allows for the accumulation of gradients of shared parameters
-	 * assuming they are not reset between layers during backpropagation.
-	 *
-	 * @param grad The gradient delta that is to be added to the current
-	 * gradient of the parameters.
+	 * @param grad The gradient of the parameters. It is expected to have the dimensions
+	 * specified by the get_rows() and get_cols() methods.
 	 */
-	virtual void update_grad(const Matrix<Scalar>& grad_delta) = 0;
+	virtual void set_grad(Matrix<Scalar> grad) = 0;
 	/**
 	 * It resets the gradient to all zeroes.
 	 */

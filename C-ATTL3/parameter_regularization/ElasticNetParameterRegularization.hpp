@@ -35,7 +35,7 @@ public:
 				(Scalar) .5 * sqrd_lambda * params.array().square().sum();
 	}
 	inline Matrix<Scalar> d_function(const Matrix<Scalar>& params) const {
-		return params.unaryExpr([abs_lambda](Scalar m) { return m >= 0 ? abs_lambda : -abs_lambda; }) +
+		return params.unaryExpr([this](Scalar e) { return e >= 0 ? abs_lambda : -abs_lambda; }) +
 				sqrd_lambda * params;
 	}
 private:

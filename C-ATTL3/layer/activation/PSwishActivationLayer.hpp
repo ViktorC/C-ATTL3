@@ -88,8 +88,12 @@ public:
 		assert(out_grad.dimension(0) > 0 && conversion_dims[0] == out_grad.dimension(0));
 		MatrixMap<Scalar> out_grad_mat(out_grad.data(), conversion_dims[0], out_grad.size() / conversion_dims[0]);
 		Matrix<Scalar> one_min_sig_out_mat = 1 - sig_out_mat_cache.array();
-		Base::params->update_grad(sig_out_mat_cache.cwiseProduct(one_min_sig_out_mat).cwiseProduct(in_mat_cache)
-				.cwiseProduct(in_mat_cache).cwiseProduct(out_grad_mat).colwise().sum());
+		auto betas_grad = sig_out_mat_cache.cwiseProduct(one_min_sig_out_mat).cwiseProduct(in_mat_cache)
+				.cwiseProduct(in_mat_cache).cwiseProduct(out_grad_mat).colwise().sum();
+		if (Root::is_shared_params_clone())
+			Base::params->set_grad(Base::params->get_grad() + betas_grad);
+		else
+			Base::params->set_grad(betas_grad);
 		if (Base::is_input_layer())
 			return typename Root::Data();
 		Matrix<Scalar> prev_out_grad_mat = sig_out_mat_cache.cwiseProduct(((one_min_sig_out_mat *

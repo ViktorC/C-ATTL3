@@ -50,8 +50,10 @@ enum IMDBObjType { BINARY, SMOOTH, CATEGORICAL };
  */
 template<typename Scalar, IMDBObjType ObjType = BINARY>
 class IMDBDataProvider : public JointFileDataProvider<Scalar,1,true> {
-	typedef JointFileDataProvider<Scalar,1,true> Base;
 	static_assert(ObjType >= BINARY && ObjType <= CATEGORICAL, "invalid IMDB objective type");
+	typedef DataProvider<Scalar,1,true> Root;
+	typedef JointFileDataProvider<Scalar,1,true> Base;
+	typedef std::array<std::size_t,Root::DATA_RANK> RankwiseArray;
 	static constexpr std::size_t PREALLOC_SEQ_LENGTH = 100;
 public:
 	static constexpr std::size_t PAD_IND = 0;
@@ -172,8 +174,8 @@ protected:
 			std::size_t batch_size) {
 		assert(batch_size > 0);
 		const bool fixed_seq_length = seq_length != 0;
-		Tensor<Scalar,3> obs(1, (fixed_seq_length ? seq_length : +PREALLOC_SEQ_LENGTH), Base::obs_dims(0u));
-		Tensor<Scalar,3> obj(1, 1, Base::obj_dims(0u));
+		typename Root::Data obs(1, (fixed_seq_length ? seq_length : +PREALLOC_SEQ_LENGTH), Base::obs_dims(0u));
+		typename Root::Data obj(1, 1, Base::obj_dims(0u));
 		obs.setZero();
 		// Parse the rating from the name of the file.
 		std::size_t last_under_score = file_name.find_last_of('_');
@@ -207,9 +209,9 @@ protected:
 			Vocab::const_iterator val = vocab->find(word);
 			ind = (val != vocab->end()) ? val->second : +UNK_IND;
 			if (!fixed_seq_length && time_step >= obs.dimension(1)) {
-				Tensor<Scalar,3> extra_obs(1, +PREALLOC_SEQ_LENGTH, Base::obs_dims(0u));
+				typename Root::Data extra_obs(1, +PREALLOC_SEQ_LENGTH, Base::obs_dims(0u));
 				extra_obs.setZero();
-				obs = Tensor<Scalar,3>(obs.concatenate(std::move(extra_obs), 1));
+				obs = typename Root::Data(obs.concatenate(std::move(extra_obs), 1));
 			}
 			obs(0u,time_step++,ind) = (Scalar) 1;
 		}
@@ -218,9 +220,9 @@ protected:
 				obs(0u,time_step,+PAD_IND) = (Scalar) 1;
 		} else {
 			if (time_step < obs.dimension(1)) {
-				std::array<std::size_t,3> offsets({ 0u, 0u, 0u });
-				std::array<std::size_t,3> extents({ 1u, time_step, Base::obs_dims(0u) });
-				obs = Tensor<Scalar,3>(obs.slice(offsets, extents));
+				RankwiseArray offsets({ 0u, 0u, 0u });
+				RankwiseArray extents({ 1u, time_step, Base::obs_dims(0u) });
+				obs = typename Root::Data(obs.slice(offsets, extents));
 			}
 		}
 		return std::make_pair(std::move(obs), std::move(obj));

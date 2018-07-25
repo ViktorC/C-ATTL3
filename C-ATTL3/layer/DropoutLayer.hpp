@@ -1,12 +1,12 @@
 /*
- * ReshapeLayer.hpp
+ * DropoutLayer.hpp
  *
  *  Created on: 24 Jul 2018
  *      Author: Viktor Csomor
  */
 
-#ifndef C_ATTL3_LAYER_RESHAPELAYER_H_
-#define C_ATTL3_LAYER_RESHAPELAYER_H_
+#ifndef C_ATTL3_LAYER_DROPOUTLAYER_H_
+#define C_ATTL3_LAYER_DROPOUTLAYER_H_
 
 #include <cassert>
 #include <utility>
@@ -102,4 +102,4 @@ private:
 
 } /* namespace cattle */
 
-#endif /* C_ATTL3_LAYER_RESHAPELAYER_H_ */
+#endif /* C_ATTL3_LAYER_DROPOUTLAYER_H_ */

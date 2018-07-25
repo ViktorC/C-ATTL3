@@ -29,7 +29,7 @@ public:
 		return lambda * params.cwiseAbs().sum();
 	}
 	inline Matrix<Scalar> d_function(const Matrix<Scalar>& params) const {
-		return params.unaryExpr([lambda](Scalar m) { return m >= 0 ? lambda : -lambda; });
+		return params.unaryExpr([this](Scalar e) { return e >= 0 ? lambda : -lambda; });
 	}
 private:
 	const Scalar lambda;

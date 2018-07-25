@@ -90,8 +90,8 @@ public:
 		assert(out_grad.dimension(0) > 0 && conversion_dims[0] == out_grad.dimension(0));
 		MatrixMap<Scalar> out_grad_mat(out_grad.data(), conversion_dims[0], out_grad.size() / conversion_dims[0]);
 		Matrix<Scalar> prev_out_grad_mat = Matrix<Scalar>(in_mat_cache.rows(), in_mat_cache.cols());
-		const Matrix<Scalar>& alpha = Base::params->get_values();
-		Matrix<Scalar> alpha_grad = Matrix<Scalar>::Zero(1, out_grad_mat.cols());
+		const Matrix<Scalar>& alphas = Base::params->get_values();
+		Matrix<Scalar> alphas_grad = Matrix<Scalar>::Zero(1, out_grad_mat.cols());
 		for (int i = 0; i < in_mat_cache.cols(); ++i) {
 			for (int j = 0; j < in_mat_cache.rows(); ++j) {
 				Scalar in_mat_ji = in_mat_cache(j,i);
@@ -99,12 +99,15 @@ public:
 				if (in_mat_ji >= 0)
 					prev_out_grad_mat(j,i) = out_mat_ji;
 				else {
-					prev_out_grad_mat(j,i) = alpha(0,i) * out_mat_ji;
-					alpha_grad(0,i) += in_mat_ji * out_mat_ji;
+					prev_out_grad_mat(j,i) = alphas(0,i) * out_mat_ji;
+					alphas_grad(0,i) += in_mat_ji * out_mat_ji;
 				}
 			}
 		}
-		Base::params->update_grad(alpha_grad);
+		if (Root::is_shared_params_clone())
+			Base::params->set_grad(Base::params->get_grad() + alphas_grad);
+		else
+			Base::params->set_grad(std::move(alphas_grad));
 		return TensorMap<Scalar,Root::DATA_RANK>(prev_out_grad_mat.data(), conversion_dims);
 	}
 private:

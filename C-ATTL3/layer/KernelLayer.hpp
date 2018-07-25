@@ -15,6 +15,15 @@
 
 namespace cattle {
 
+/**
+ * An alias for a shared pointer to a Parameters instance.
+ */
+template<typename Scalar>
+using ParamsSharedPtr = std::shared_ptr<Parameters<Scalar>>;
+
+/**
+ * An abstract class template that represents a kernel-based linear transformation function layer.
+ */
 template<typename Scalar, std::size_t Rank>
 class KernelLayer : public Layer<Scalar,Rank> {
 	typedef Layer<Scalar,Rank> Base;

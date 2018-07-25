@@ -104,8 +104,15 @@ public:
 		assert(out_grad.dimension(0) > 0 && out_conversion_dims[0] == out_grad.dimension(0));
 		// Compute the gradient of the outputs with respect to the weights and the bias.
 		MatrixMap<Scalar> out_grad_mat(out_grad.data(), out_grad.dimension(0), Base::output_dims.get_volume());
-		Base::weights->update_grad(in_mat_cache.transpose() * out_grad_mat);
-		Base::bias->update_grad(out_grad_mat.colwise().sum());
+		auto weights_grad = in_mat_cache.transpose() * out_grad_mat;
+		auto bias_grad = out_grad_mat.colwise().sum();
+		if (Root::is_shared_params_clone()) {
+			Base::weights->set_grad(Base::weights->get_grad() + weights_grad);
+			Base::bias->set_grad(Base::bias->get_grad() + bias_grad);
+		} else {
+			Base::weights->set_grad(weights_grad);
+			Base::bias->set_grad(bias_grad);
+		}
 		if (Base::is_input_layer())
 			return typename Root::Data();
 		// Compute the gradient of the previous layer's output.

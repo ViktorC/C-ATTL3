@@ -57,8 +57,8 @@ public:
 protected:
 	inline DataPair<Scalar,3,false> _get_data(const std::string& file_name, std::ifstream& file_stream,
 			std::size_t batch_size) {
-		Tensor<Scalar,4> obs(batch_size, Base::obs_dims(0), Base::obs_dims(1), Base::obs_dims(2));
-		Tensor<Scalar,4> obj(batch_size, Base::obj_dims(0), Base::obj_dims(1), Base::obj_dims(2));
+		typename Root::Data obs(batch_size, Base::obs_dims(0), Base::obs_dims(1), Base::obs_dims(2));
+		typename Root::Data obj(batch_size, Base::obj_dims(0), Base::obj_dims(1), Base::obj_dims(2));
 		obj.setZero();
 		std::size_t i;
 		for (i = 0; i < batch_size && file_stream.read(buffer, INSTANCE_LENGTH); ++i) {

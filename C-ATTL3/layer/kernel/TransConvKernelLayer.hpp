@@ -155,8 +155,11 @@ protected:
 		std::size_t patch_ind = 0;
 		patch_extents[0] = rows;
 		// Compute the gradient of the bias.
-		Base::bias->update_grad(MatrixMap<Scalar>(out_grad.data(), rows,
-				ext_output_dims.get_volume()).colwise().sum());
+		auto bias_grad = MatrixMap<Scalar>(out_grad.data(), rows, ext_output_dims.get_volume()).colwise().sum();
+		if (Root::is_shared_params_clone())
+			Base::bias->set_grad(Base::bias->get_grad() + bias_grad);
+		else
+			Base::bias->set_grad(bias_grad);
 		// Spatial padding.
 		if (vertical_padding > 0 || horizontal_padding > 0)
 			out_grad = Tensor<Scalar,4>(out_grad.pad(paddings));
@@ -177,7 +180,11 @@ protected:
 			}
 		}
 		assert(patch_ind == total_patches);
-		Base::weights->update_grad(in_mat_cache.transpose() * out_grad_conv_mat);
+		auto weights_grad = in_mat_cache.transpose() * out_grad_conv_mat;
+		if (Root::is_shared_params_clone())
+			Base::weights->set_grad(Base::weights->get_grad() + weights_grad);
+		else
+			Base::weights->set_grad(weights_grad);
 		if (Base::is_input_layer())
 			return Tensor<Scalar,4>();
 		Matrix<Scalar> prev_out_grad = out_grad_conv_mat * Base::weights->get_values().transpose();

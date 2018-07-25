@@ -151,8 +151,15 @@ protected:
 		std::size_t total_patches = rows * patches_per_sample;
 		std::size_t receptor_vol = Base::weights->get_values().rows();
 		MatrixMap<Scalar> out_grad_mat(out_grad.data(), total_patches, filters);
-		Base::weights->update_grad(in_conv_mat_cache.transpose() * out_grad_mat);
-		Base::bias->update_grad(out_grad_mat.colwise().sum());
+		auto weights_grad = in_conv_mat_cache.transpose() * out_grad_mat;
+		auto bias_grad = out_grad_mat.colwise().sum();
+		if (Root::is_shared_params_clone()) {
+			Base::weights->set_grad(Base::weights->get_grad() + weights_grad);
+			Base::bias->set_grad(Base::bias->get_grad() + bias_grad);
+		} else {
+			Base::weights->set_grad(weights_grad);
+			Base::bias->set_grad(bias_grad);
+		}
 		if (Base::is_input_layer())
 			return Tensor<Scalar,4>();
 		// Compute the gradient of the previous layer's output.

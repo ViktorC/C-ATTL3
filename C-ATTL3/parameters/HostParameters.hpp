@@ -82,6 +82,12 @@ public:
 	inline bool are_optimizable() const {
 		return optimizable;
 	}
+	std::size_t get_rows() const {
+		return rows;
+	}
+	std::size_t get_cols() const {
+		return cols;
+	}
 	inline void init() {
 		values = Matrix<Scalar>(rows, cols);
 		if (param_init)
@@ -91,9 +97,9 @@ public:
 	inline const Matrix<Scalar>& get_values() const {
 		return values;
 	}
-	inline void update_values(const Matrix<Scalar>& values) {
+	inline void set_values(const Matrix<Scalar>& values) {
 		assert(values.rows() == rows && values.cols() == cols);
-		this->values += values;
+		this->values = std::move(values);
 		enforce_clip_constraint(this->values, value_clip);
 		enforce_l1_norm_constraint(this->values, value_max_l1_norm);
 		enforce_l2_norm_constraint(this->values, value_max_l2_norm);
@@ -101,11 +107,11 @@ public:
 	inline const Matrix<Scalar>& get_grad() const {
 		return grad;
 	}
-	inline void update_grad(const Matrix<Scalar>& grad) {
+	inline void set_grad(Matrix<Scalar> grad) {
 		if (!optimizable)
 			return;
 		assert(grad.rows() == rows && grad.cols() == cols);
-		this->grad += grad;
+		this->grad = std::move(grad);
 		enforce_clip_constraint(this->grad, grad_clip);
 		enforce_l1_norm_constraint(this->grad, grad_max_l1_norm);
 		enforce_l2_norm_constraint(this->grad, grad_max_l2_norm);
