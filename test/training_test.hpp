@@ -47,7 +47,7 @@ inline void train_test(std::string name, DataProvider<Scalar,Rank,Sequential>& t
 	net.init();
 	opt.fit(net);
 	Scalar loss = opt.train(net, train_prov, epochs, 0, epsilon, verbose);
-	EXPECT_TRUE(internal::NumericUtils<Scalar>::almost_equal((Scalar) 0, loss, epsilon));
+	EXPECT_TRUE(NumericUtils<Scalar>::almost_equal((Scalar) 0, loss, epsilon));
 }
 
 /**
@@ -148,7 +148,7 @@ TEST(TrainingTest, VanillaSGD) {
  * Performs training tests using a momentum accelerated stochastic gradient descent optimizer.
  */
 template<typename Scalar>
-inline void momentum_accelerated_sgd_train_test() {
+inline void momentum_sgd_train_test() {
 	const unsigned samples = 20;
 	const unsigned time_steps = 3;
 	const unsigned epochs = 500;
@@ -157,29 +157,29 @@ inline void momentum_accelerated_sgd_train_test() {
 	const Dimensions<std::size_t,3> dims({ 6u, 6u, 2u });
 	auto loss = std::make_shared<SquaredLoss<Scalar,3,false>>();
 	ffnn_train_test<Scalar,3>("momentum accelerated sgd batch",
-			OptimizerPtr<Scalar,3,false>(new MomentumAcceleratedSGDOptimizer<Scalar,3,false>(loss, samples, 2e-3)),
+			OptimizerPtr<Scalar,3,false>(new MomentumSGDOptimizer<Scalar,3,false>(loss, samples, 2e-3)),
 			dims, samples, epochs, epsilon);
 	ffnn_train_test<Scalar,3>("momentum accelerated sgd mini-batch",
-			OptimizerPtr<Scalar,3,false>(new MomentumAcceleratedSGDOptimizer<Scalar,3,false>(loss, 10, 1e-3, 1e-2, .99)),
+			OptimizerPtr<Scalar,3,false>(new MomentumSGDOptimizer<Scalar,3,false>(loss, 10, 1e-3, 1e-2, .99)),
 			dims, samples, epochs, epsilon);
 	ffnn_train_test<Scalar,3>("momentum accelerated sgd online",
-			OptimizerPtr<Scalar,3,false>(new MomentumAcceleratedSGDOptimizer<Scalar,3,false>(loss, 1, 5e-4)),
+			OptimizerPtr<Scalar,3,false>(new MomentumSGDOptimizer<Scalar,3,false>(loss, 1, 5e-4)),
 			dims, samples, epochs, epsilon);
 	auto seq_loss = std::make_shared<SquaredLoss<Scalar,3,true>>();
 	rnn_train_test<Scalar,3>("momentum accelerated sgd batch",
-			OptimizerPtr<Scalar,3,true>(new MomentumAcceleratedSGDOptimizer<Scalar,3,true>(seq_loss, samples, 2e-3)),
+			OptimizerPtr<Scalar,3,true>(new MomentumSGDOptimizer<Scalar,3,true>(seq_loss, samples, 2e-3)),
 			dims, samples, time_steps, epochs, seq_epsilon);
 	rnn_train_test<Scalar,3>("momentum accelerated sgd mini-batch",
-			OptimizerPtr<Scalar,3,true>(new MomentumAcceleratedSGDOptimizer<Scalar,3,true>(seq_loss, 10, 1e-3, 1e-2, .99)),
+			OptimizerPtr<Scalar,3,true>(new MomentumSGDOptimizer<Scalar,3,true>(seq_loss, 10, 1e-3, 1e-2, .99)),
 			dims, samples, time_steps, epochs, seq_epsilon);
 	rnn_train_test<Scalar,3>("momentum accelerated sgd online",
-			OptimizerPtr<Scalar,3,true>(new MomentumAcceleratedSGDOptimizer<Scalar,3,true>(seq_loss, 1, 5e-4)),
+			OptimizerPtr<Scalar,3,true>(new MomentumSGDOptimizer<Scalar,3,true>(seq_loss, 1, 5e-4)),
 			dims, samples, time_steps, epochs, seq_epsilon);
 }
 
-TEST(TrainingTest, MomentumAcceleratedSGD) {
-	momentum_accelerated_sgd_train_test<float>();
-	momentum_accelerated_sgd_train_test<double>();
+TEST(TrainingTest, MomentumSGD) {
+	momentum_sgd_train_test<float>();
+	momentum_sgd_train_test<double>();
 }
 
 /**
@@ -187,7 +187,7 @@ TEST(TrainingTest, MomentumAcceleratedSGD) {
  * optimizer.
  */
 template<typename Scalar>
-inline void nesterov_momentum_accelerated_sgd_train_test() {
+inline void nesterov_momentum_sgd_train_test() {
 	const unsigned samples = 20;
 	const unsigned time_steps = 3;
 	const unsigned epochs = 500;
@@ -196,29 +196,29 @@ inline void nesterov_momentum_accelerated_sgd_train_test() {
 	const Dimensions<std::size_t,3> dims({ 6u, 6u, 2u });
 	auto loss = std::make_shared<SquaredLoss<Scalar,3,false>>();
 	ffnn_train_test<Scalar,3>("nesterov momentum accelerated sgd batch",
-			OptimizerPtr<Scalar,3,false>(new NesterovMomentumAcceleratedSGDOptimizer<Scalar,3,false>(loss, samples)),
+			OptimizerPtr<Scalar,3,false>(new NesterovMomentumSGDOptimizer<Scalar,3,false>(loss, samples)),
 			dims, samples, epochs, epsilon);
 	ffnn_train_test<Scalar,3>("nesterov momentum accelerated sgd mini-batch",
-			OptimizerPtr<Scalar,3,false>(new NesterovMomentumAcceleratedSGDOptimizer<Scalar,3,false>(loss, 10, 1e-3, 1e-2, .99)),
+			OptimizerPtr<Scalar,3,false>(new NesterovMomentumSGDOptimizer<Scalar,3,false>(loss, 10, 1e-3, 1e-2, .99)),
 			dims, samples, epochs, epsilon);
 	ffnn_train_test<Scalar,3>("nesterov momentum accelerated sgd online",
-			OptimizerPtr<Scalar,3,false>(new NesterovMomentumAcceleratedSGDOptimizer<Scalar,3,false>(loss, 1, 5e-4)),
+			OptimizerPtr<Scalar,3,false>(new NesterovMomentumSGDOptimizer<Scalar,3,false>(loss, 1, 5e-4)),
 			dims, samples, epochs, epsilon);
 //	auto seq_loss = std::make_shared<SquaredLoss<Scalar,3,true>>();
 //	rnn_train_test<Scalar,3>("nesterov momentum accelerated sgd batch",
-//			OptimizerPtr<Scalar,3,true>(new NesterovMomentumAcceleratedSGDOptimizer<Scalar,3,true>(seq_loss, samples)),
+//			OptimizerPtr<Scalar,3,true>(new NesterovMomentumSGDOptimizer<Scalar,3,true>(seq_loss, samples)),
 //			dims, samples, time_steps, epochs, seq_epsilon);
 //	rnn_train_test<Scalar,3>("nesterov momentum accelerated sgd mini-batch",
-//			OptimizerPtr<Scalar,3,true>(new NesterovMomentumAcceleratedSGDOptimizer<Scalar,3,true>(seq_loss, 10, 1e-3, 1e-2, .99)),
+//			OptimizerPtr<Scalar,3,true>(new NesterovMomentumSGDOptimizer<Scalar,3,true>(seq_loss, 10, 1e-3, 1e-2, .99)),
 //			dims, samples, time_steps, epochs, seq_epsilon);
 //	rnn_train_test<Scalar,3>("nesterov momentum accelerated sgd online",
-//			OptimizerPtr<Scalar,3,true>(new NesterovMomentumAcceleratedSGDOptimizer<Scalar,3,true>(seq_loss, 1, 5e-4)),
+//			OptimizerPtr<Scalar,3,true>(new NesterovMomentumSGDOptimizer<Scalar,3,true>(seq_loss, 1, 5e-4)),
 //			dims, samples, time_steps, epochs, seq_epsilon);
 }
 
-TEST(TrainingTest, NesterovMomentumAcceleratedSGD) {
-	nesterov_momentum_accelerated_sgd_train_test<float>();
-	nesterov_momentum_accelerated_sgd_train_test<double>();
+TEST(TrainingTest, NesterovMomentumSGD) {
+	nesterov_momentum_sgd_train_test<float>();
+	nesterov_momentum_sgd_train_test<double>();
 }
 
 /**

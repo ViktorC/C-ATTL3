@@ -82,10 +82,10 @@ public:
 	inline bool are_optimizable() const {
 		return optimizable;
 	}
-	std::size_t get_rows() const {
+	inline std::size_t get_rows() const {
 		return rows;
 	}
-	std::size_t get_cols() const {
+	inline std::size_t get_cols() const {
 		return cols;
 	}
 	inline void init() {
@@ -97,7 +97,7 @@ public:
 	inline const Matrix<Scalar>& get_values() const {
 		return values;
 	}
-	inline void set_values(const Matrix<Scalar>& values) {
+	inline void set_values(Matrix<Scalar> values) {
 		assert(values.rows() == rows && values.cols() == cols);
 		this->values = std::move(values);
 		enforce_clip_constraint(this->values, value_clip);
@@ -127,7 +127,7 @@ public:
 	}
 	inline void regularize() {
 		if (optimizable && param_reg)
-			update_grad(param_reg->d_function(values));
+			set_grad(this->grad + param_reg->d_function(values));
 	}
 	inline bool are_frozen() const {
 		return frozen;

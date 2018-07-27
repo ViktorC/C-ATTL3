@@ -88,8 +88,6 @@ protected:
 	}
 	inline ConvKernelLayerBase(const ConvKernelLayerBase<Scalar,Rank>& layer, bool share_params = false) :
 			Base::KernelLayer(layer, share_params),
-			ext_input_dims(layer.ext_input_dims),
-			ext_output_dims(layer.ext_output_dims),
 			filters(layer.filters),
 			receptor_height(layer.receptor_height),
 			receptor_width(layer.receptor_width),
@@ -99,6 +97,8 @@ protected:
 			horizontal_stride(layer.horizontal_stride),
 			vertical_dilation(layer.vertical_dilation),
 			horizontal_dilation(layer.horizontal_dilation),
+			ext_input_dims(layer.ext_input_dims),
+			ext_output_dims(layer.ext_output_dims),
 			padded_height(layer.padded_height),
 			padded_width(layer.padded_width),
 			dil_receptor_height(layer.dil_receptor_height),
@@ -293,12 +293,12 @@ public:
 			Scalar weight_grad_max_l2_norm = 0, ParamRegSharedPtr<Scalar> bias_reg = nullptr, Scalar bias_clip = 0,
 			Scalar bias_max_l1_norm = 0, Scalar bias_max_l2_norm = 0, Scalar bias_grad_clip = 0,
 			Scalar bias_grad_max_l1_norm = 0, Scalar bias_grad_max_l2_norm = 0) :
-				ConvBase::ConvKernelLayerBase(input_dims, filters, weight_init, receptor_height, receptor_width,
-						vertical_padding, horizontal_padding, vertical_stride, horizontal_stride, vertical_dilation,
-						horizontal_dilation, weight_reg, weight_clip, weight_max_l1_norm, weight_max_l2_norm,
-						weight_grad_clip, weight_grad_max_l1_norm, weight_grad_max_l2_norm, bias_reg, bias_clip,
-						bias_max_l1_norm, bias_max_l2_norm, bias_grad_clip, bias_grad_max_l1_norm,
-						bias_grad_max_l2_norm) { }
+				ConvBase::ConvKernelLayerBase(input_dims, filters, receptor_height, receptor_width, vertical_padding,
+						horizontal_padding, vertical_stride, horizontal_stride, vertical_dilation,
+						horizontal_dilation, weight_init, weight_reg, weight_clip, weight_max_l1_norm,
+						weight_max_l2_norm, weight_grad_clip, weight_grad_max_l1_norm, weight_grad_max_l2_norm,
+						bias_reg, bias_clip, bias_max_l1_norm, bias_max_l2_norm, bias_grad_clip,
+						bias_grad_max_l1_norm, bias_grad_max_l2_norm) { }
 	inline ConvKernelLayer(const ConvKernelLayer<Scalar,Rank>& layer, bool share_params = false) :
 			ConvBase::ConvKernelLayerBase(layer, share_params),
 			batch_size(layer.batch_size) { }
@@ -385,12 +385,12 @@ public:
 			Scalar weight_grad_max_l2_norm = 0, ParamRegSharedPtr<Scalar> bias_reg = nullptr, Scalar bias_clip = 0,
 			Scalar bias_max_l1_norm = 0, Scalar bias_max_l2_norm = 0, Scalar bias_grad_clip = 0,
 			Scalar bias_grad_max_l1_norm = 0, Scalar bias_grad_max_l2_norm = 0) :
-				ConvBase::ConvKernelLayerBase(input_dims, filters, weight_init, receptor_height, receptor_width,
-						vertical_padding, horizontal_padding, vertical_stride, horizontal_stride, vertical_dilation,
-						horizontal_dilation, weight_reg, weight_clip, weight_max_l1_norm, weight_max_l2_norm,
-						weight_grad_clip, weight_grad_max_l1_norm, weight_grad_max_l2_norm, bias_reg, bias_clip,
-						bias_max_l1_norm, bias_max_l2_norm, bias_grad_clip, bias_grad_max_l1_norm,
-						bias_grad_max_l2_norm) { }
+				ConvBase::ConvKernelLayerBase(input_dims, filters, receptor_height, receptor_width, vertical_padding,
+						horizontal_padding, vertical_stride, horizontal_stride, vertical_dilation,
+						horizontal_dilation, weight_init, weight_reg, weight_clip, weight_max_l1_norm,
+						weight_max_l2_norm, weight_grad_clip, weight_grad_max_l1_norm, weight_grad_max_l2_norm,
+						bias_reg, bias_clip, bias_max_l1_norm, bias_max_l2_norm, bias_grad_clip,
+						bias_grad_max_l1_norm, bias_grad_max_l2_norm) { }
 	inline ConvKernelLayer(const ConvKernelLayer<Scalar,2>& layer, bool share_params) :
 			ConvBase::ConvKernelLayerBase(layer, share_params),
 			batch_size(layer.batch_size) { }
@@ -404,9 +404,9 @@ public:
 		assert((Dimensions<std::size_t,3>(in.dimensions()).template demote<>()) == KernelBase::input_dims);
 		assert(in.dimension(0) > 0);
 		batch_size = in.dimension(0);
-		return ConvBase::_pass_forward(TensorMap<Scalar,4>(in.data(),
-				{ batch_size, in.dimension(1), in.dimension(2), 1u }), training).reshape({ batch_size,
-						KernelBase::output_dims(0), KernelBase::output_dims(1) });
+		return ConvBase::_pass_forward(TensorMap<Scalar,4>(in.data(), { batch_size, in.dimension(1),
+				in.dimension(2), 1u }), training).reshape(std::array<std::size_t,3>({ batch_size,
+						KernelBase::output_dims(0), KernelBase::output_dims(1) }));
 	}
 	inline typename Root::Data pass_back(typename Root::Data out_grad) {
 		assert((Dimensions<std::size_t,3>(out_grad.dimensions()).template demote<>()) == KernelBase::output_dims);
@@ -478,11 +478,11 @@ public:
 			ParamRegSharedPtr<Scalar> bias_reg = nullptr, Scalar bias_clip = 0, Scalar bias_max_l1_norm = 0,
 			Scalar bias_max_l2_norm = 0, Scalar bias_grad_clip = 0, Scalar bias_grad_max_l1_norm = 0,
 			Scalar bias_grad_max_l2_norm = 0) :
-				ConvBase::ConvKernelLayerBase(input_dims, filters, weight_init, receptor_length, 1,
-						padding, 0, stride, 1, dilation, 0, weight_reg, weight_clip, weight_max_l1_norm,
-						weight_max_l2_norm, weight_grad_clip, weight_grad_max_l1_norm, weight_grad_max_l2_norm,
-						bias_reg, bias_clip, bias_max_l1_norm, bias_max_l2_norm, bias_grad_clip,
-						bias_grad_max_l1_norm, bias_grad_max_l2_norm) { }
+				ConvBase::ConvKernelLayerBase(input_dims, filters, receptor_length, 1, padding, 0, stride, 1,
+						dilation, 0, weight_init, weight_reg, weight_clip, weight_max_l1_norm, weight_max_l2_norm,
+						weight_grad_clip, weight_grad_max_l1_norm, weight_grad_max_l2_norm, bias_reg, bias_clip,
+						bias_max_l1_norm, bias_max_l2_norm, bias_grad_clip, bias_grad_max_l1_norm,
+						bias_grad_max_l2_norm) { }
 	inline ConvKernelLayer(ConvKernelLayer<Scalar,1>& layer, bool share_params) :
 			ConvBase::ConvKernelLayerBase(layer, share_params),
 			batch_size(layer.batch_size) { }
@@ -497,7 +497,7 @@ public:
 		assert(in.dimension(0) > 0);
 		batch_size = in.dimension(0);
 		return ConvBase::_pass_forward(TensorMap<Scalar,4>(in.data(), { batch_size, in.dimension(1), 1u, 1u }),
-				training).reshape({ batch_size, KernelBase::output_dims(0) });
+				training).reshape(std::array<std::size_t,2>({ batch_size, KernelBase::output_dims(0) }));
 	}
 	inline typename Root::Data pass_back(typename Root::Data out_grad) {
 		assert((Dimensions<std::size_t,2>(out_grad.dimensions()).template demote<>()) == KernelBase::output_dims);

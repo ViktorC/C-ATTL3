@@ -158,8 +158,8 @@ public:
 		assert(in.dimension(0) > 0);
 		batch_size = in.dimension(0);
 		return PoolBase::_pass_forward(TensorMap<Scalar,4>(in.data(), { batch_size, in.dimension(1),
-				in.dimension(2), 1u }), training).reshape({ batch_size, PoolBase::output_dims(0),
-						PoolBase::output_dims(1) });
+				in.dimension(2), 1u }), training).reshape(std::array<std::size_t,3>({ batch_size,
+						PoolBase::output_dims(0), PoolBase::output_dims(1) }));
 	}
 	inline typename Root::Data pass_back(typename Root::Data out_grad) {
 		assert((Dimensions<std::size_t,3>(out_grad.dimensions()).template demote<>()) == PoolBase::output_dims);
@@ -204,7 +204,8 @@ public:
 		assert(in.dimension(0) > 0);
 		batch_size = in.dimension(0);
 		return PoolBase::_pass_forward(TensorMap<Scalar,4>(in.data(), { batch_size,
-				in.dimension(1), 1u, 1u }), training).reshape({ batch_size, PoolBase::output_dims(0) });
+				in.dimension(1), 1u, 1u }), training).reshape(std::array<std::size_t,2>({ batch_size,
+						PoolBase::output_dims(0) }));
 	}
 	inline typename Root::Data pass_back(typename Root::Data out_grad) {
 		assert((Dimensions<std::size_t,2>(out_grad.dimensions()).template demote<>()) == PoolBase::output_dims);

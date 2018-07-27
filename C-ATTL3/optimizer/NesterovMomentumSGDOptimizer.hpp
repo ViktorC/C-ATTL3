@@ -41,15 +41,16 @@ public:
 						momentum) { };
 protected:
 	inline void _update_params(std::vector<Parameters<Scalar>*>& params_vec, std::size_t epoch) {
-		Scalar learning_rate = calculate_learning_rate(epoch);
+		Scalar learning_rate = Base::calculate_learning_rate(epoch);
 		std::size_t i = 0;
 		for (auto params_ptr : params_vec) {
 			if (params_ptr->are_frozen())
 				continue;
 			Matrix<Scalar> old_acc_params_grad = Base::params_grad_vec[i];
-			params_grad_vec[i] = old_acc_params_grad * Base::momentum - params_ptr->get_grad * learning_rate;
+			Base::params_grad_vec[i] = old_acc_params_grad * Base::momentum -
+					params_ptr->get_grad() * learning_rate;
 			params_ptr->set_values(params_ptr->get_values() + old_acc_params_grad * -Base::momentum +
-					params_grad_vec[i++] * (1 + Base::momentum));
+					Base::params_grad_vec[i++] * (1 + Base::momentum));
 		}
 	}
 };

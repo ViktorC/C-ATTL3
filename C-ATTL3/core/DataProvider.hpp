@@ -31,6 +31,7 @@ template<typename Scalar, std::size_t Rank, bool Sequential>
 class DataProvider {
 	static_assert(std::is_floating_point<Scalar>::value, "non floating-point scalar type");
 	static_assert(Rank > 0 && Rank < 4, "illegal data provider rank");
+protected:
 	static constexpr std::size_t DATA_RANK = Rank + Sequential + 1;
 	typedef Tensor<Scalar,DATA_RANK> Data;
 	typedef Dimensions<std::size_t,Rank> Dims;

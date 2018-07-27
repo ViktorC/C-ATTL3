@@ -62,10 +62,10 @@ public:
 	inline void set_input_layer(bool input_layer) {
 		this->input_layer = input_layer;
 	}
-	inline std::vector<const Parameters<Scalar>*>& get_params() const {
+	inline std::vector<const Parameters<Scalar>*> get_params() const {
 		return std::vector<const Parameters<Scalar>*>(0);
 	}
-	inline std::vector<Parameters<Scalar>*>& get_params() {
+	inline std::vector<Parameters<Scalar>*> get_params() {
 		return std::vector<Parameters<Scalar>*>(0);
 	}
 	inline void empty_cache() {

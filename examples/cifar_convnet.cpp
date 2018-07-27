@@ -54,7 +54,7 @@ int main() {
 	unsigned wrong = 0;
 	unsigned correct = 0;
 	for (std::size_t i = 0; i < prediction.dimension(0); ++i) {
-		float max = internal::NumericUtils<float>::MIN;
+		float max = NumericUtils<float>::MIN;
 		std::size_t max_ind = 0;
 		for (std::size_t j = 0; j < prediction.dimension(1); ++j) {
 			float val = prediction(i,j,0u,0u);

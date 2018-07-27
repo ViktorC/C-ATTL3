@@ -45,10 +45,10 @@ public:
 	inline void set_input_layer(bool input_layer) {
 		this->input_layer = input_layer;
 	}
-	inline std::vector<const Parameters<Scalar>*>& get_params() const {
+	inline std::vector<const Parameters<Scalar>*> get_params() const {
 		return std::vector<const Parameters<Scalar>*>({ weights.get(), bias.get() });
 	}
-	inline std::vector<Parameters<Scalar>*>& get_params() {
+	inline std::vector<Parameters<Scalar>*> get_params() {
 		return std::vector<Parameters<Scalar>*>({ weights.get(), bias.get() });
 	}
 protected:
@@ -72,8 +72,8 @@ protected:
 			owner(share_params ? layer.owner : *this),
 			input_dims(layer.input_dims),
 			output_dims(layer.output_dims),
-			weights(share_params ? layer.weights : ParamsSharedPtr<Scalar>(layer.weights.clone())),
-			bias(share_params ? layer.bias : ParamsSharedPtr<Scalar>(layer.bias.clone())),
+			weights(share_params ? layer.weights : ParamsSharedPtr<Scalar>(layer.weights->clone())),
+			bias(share_params ? layer.bias : ParamsSharedPtr<Scalar>(layer.bias->clone())),
 			input_layer(layer.input_layer) { }
 	const Self& owner;
 	const typename Base::Dims input_dims, output_dims;

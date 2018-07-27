@@ -139,7 +139,7 @@ inline KernelPtr<Scalar,Rank> kernel_layer(const typename std::enable_if<Rank !=
 		Dimensions<std::size_t,Rank>>::type& input_dims) {
 	return KernelPtr<Scalar,Rank>(
 			new ConvKernelLayer<Scalar,Rank>(input_dims, input_dims.template extend<3 - Rank>()(2),
-			WeightInitSharedPtr<Scalar>(new HeWeightInitialization<Scalar>())));
+			ParameterInitSharedPtr<Scalar>(new HeParameterInitialization<Scalar>())));
 }
 
 /**
@@ -151,7 +151,7 @@ inline KernelPtr<Scalar,Rank> kernel_layer(const typename std::enable_if<Rank ==
 		Dimensions<std::size_t,Rank>>::type& input_dims) {
 	return KernelPtr<Scalar,Rank>(
 			new DenseKernelLayer<Scalar,Rank>(input_dims, input_dims.get_volume(),
-			WeightInitSharedPtr<Scalar>(new GlorotWeightInitialization<Scalar>())));
+			ParameterInitSharedPtr<Scalar>(new GlorotParameterInitialization<Scalar>())));
 }
 
 /**
@@ -226,7 +226,7 @@ inline NeuralNetPtr<Scalar,Rank,true> recurrent_neural_net(const Dimensions<std:
 template<typename Scalar, std::size_t Rank>
 inline NeuralNetPtr<Scalar,Rank,true> single_output_recurrent_neural_net(const Dimensions<std::size_t,Rank>& input_dims,
 		std::function<std::pair<std::size_t,std::size_t>(std::size_t)> seq_schedule_func) {
-	auto init = std::make_shared<GlorotWeightInitialization<Scalar>>();
+	auto init = std::make_shared<GlorotParameterInitialization<Scalar>>();
 	return NeuralNetPtr<Scalar,Rank,true>(new RecurrentNeuralNetwork<Scalar,Rank>(kernel_layer<Scalar,Rank>(input_dims),
 			kernel_layer<Scalar,Rank>(input_dims), KernelPtr<Scalar,Rank>(new DenseKernelLayer<Scalar,Rank>(input_dims, 1, init)),
 			ActivationPtr<Scalar,Rank>(new TanhActivationLayer<Scalar,Rank>(input_dims)),
@@ -240,7 +240,7 @@ inline NeuralNetPtr<Scalar,Rank,true> single_output_recurrent_neural_net(const D
  */
 template<typename Scalar, std::size_t Rank>
 inline NeuralNetPtr<Scalar,Rank,false> single_output_net(NeuralNetPtr<Scalar,Rank,false> net) {
-	auto init = std::make_shared<GlorotWeightInitialization<Scalar>>();
+	auto init = std::make_shared<GlorotParameterInitialization<Scalar>>();
 	std::vector<NeuralNetPtr<Scalar,Rank,false>> modules(2);
 	modules[0] = std::move(net);
 	modules[1] = NeuralNetPtr<Scalar,Rank,false>(new FeedforwardNeuralNetwork<Scalar,Rank>(

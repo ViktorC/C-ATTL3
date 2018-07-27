@@ -116,10 +116,10 @@ public:
 				memb1.gammas = memb2.gammas;
 				memb1.betas = memb2.betas;
 			} else {
-				memb1.avg_means = HostParamsSharedPtr(memb2.avg_means.clone());
-				memb1.avg_inv_sds = HostParamsSharedPtr(memb2.avg_inv_sds.clone());
-				memb1.gammas = HostParamsSharedPtr(memb2.gammas.clone());
-				memb1.betas = HostParamsSharedPtr(memb2.betas.clone());
+				memb1.avg_means = HostParamsSharedPtr(memb2.avg_means->clone());
+				memb1.avg_inv_sds = HostParamsSharedPtr(memb2.avg_inv_sds->clone());
+				memb1.gammas = HostParamsSharedPtr(memb2.gammas->clone());
+				memb1.betas = HostParamsSharedPtr(memb2.betas->clone());
 			}
 			memb1.avgs_init = memb2.avgs_init;
 			memb1.inv_in_sd_cache = memb2.inv_in_sd_cache;
@@ -147,12 +147,12 @@ public:
 	inline void set_input_layer(bool input_layer) {
 		this->input_layer = input_layer;
 	}
-	inline std::vector<const Parameters<Scalar>*>& get_params() const {
+	inline std::vector<const Parameters<Scalar>*> get_params() const {
 		std::vector<const Parameters<Scalar>*> params_vec(channels * 4);
 		populate_params_vector<const Parameters<Scalar>*>(params_vec);
 		return params_vec;
 	}
-	inline std::vector<Parameters<Scalar>*>& get_params() {
+	inline std::vector<Parameters<Scalar>*> get_params() {
 		std::vector<Parameters<Scalar>*> params_vec(channels * 4);
 		populate_params_vector<Parameters<Scalar>*>(params_vec);
 		return params_vec;
@@ -390,8 +390,12 @@ public:
 	inline void set_input_layer(bool input_layer) {
 		this->input_layer = input_layer;
 	}
-	inline std::vector<Parameters<Scalar>*>& get_params() {
+	inline std::vector<Parameters<Scalar>*> get_params() {
 		return std::vector<Parameters<Scalar>*>({ avg_means.get(), avg_inv_sds.get(),
+				gammas.get(), betas.get() });
+	}
+	inline std::vector<const Parameters<Scalar>*> get_params() const  {
+		return std::vector<const Parameters<Scalar>*>({ avg_means.get(), avg_inv_sds.get(),
 				gammas.get(), betas.get() });
 	}
 	inline void empty_cache() {

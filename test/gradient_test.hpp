@@ -144,11 +144,11 @@ inline void layer_grad_test(std::string name, LayerPtr<Scalar,Rank> layer1, Laye
  */
 template<typename Scalar>
 inline void dense_kernel_layer_grad_test() {
-	auto init1 = WeightInitSharedPtr<Scalar>(new GlorotWeightInitialization<Scalar>());
-	auto init2 = WeightInitSharedPtr<Scalar>(new LeCunWeightInitialization<Scalar>());
-	auto reg1 = ParamRegSharedPtr<Scalar>(new AbsoluteParameterRegularization<Scalar>());
-	auto reg2 = ParamRegSharedPtr<Scalar>(new SquaredParameterRegularization<Scalar>());
-	auto reg3 = ParamRegSharedPtr<Scalar>(new ElasticNetParameterRegularization<Scalar>());
+	auto init1 = std::make_shared<GlorotParameterInitialization<Scalar>>();
+	auto init2 = std::make_shared<LeCunParameterInitialization<Scalar>>();
+	auto reg1 = std::make_shared<AbsoluteParameterRegularization<Scalar>>();
+	auto reg2 = std::make_shared<SquaredParameterRegularization<Scalar>>();
+	auto reg3 = std::make_shared<ElasticNetParameterRegularization<Scalar>>();
 	LayerPtr<Scalar,1> layer1_1(new DenseKernelLayer<Scalar,1>({ 32u }, 16, init1));
 	LayerPtr<Scalar,1> layer1_2(new DenseKernelLayer<Scalar,1>(layer1_1->get_output_dims(), 1, init1, reg3));
 	layer_grad_test<Scalar,1>("dense kernel layer", std::move(layer1_1), std::move(layer1_2), 5, ScalarTraits<Scalar>::step_size,
@@ -172,19 +172,18 @@ TEST(GradientTest, DenseKernelLayer) {
  */
 template<typename Scalar>
 inline void conv_kernel_layer_grad_test() {
-	auto init = WeightInitSharedPtr<Scalar>(new HeWeightInitialization<Scalar>());
-	auto reg = ParamRegSharedPtr<Scalar>(new SquaredParameterRegularization<Scalar>());
-	LayerPtr<Scalar,1> layer1_1(new ConvKernelLayer<Scalar,1>({ 32u }, 5, init,
-			ConvKernelLayer<Scalar>::NO_PARAM_REG, 3, 2, 1, 1));
-	LayerPtr<Scalar,1> layer2_1(new ConvKernelLayer<Scalar,1>(layer1_1->get_output_dims(), 1, init, reg, 1, 1));
+	auto init = std::make_shared<HeParameterInitialization<Scalar>>();
+	auto reg = std::make_shared<SquaredParameterRegularization<Scalar>>();
+	LayerPtr<Scalar,1> layer1_1(new ConvKernelLayer<Scalar,1>({ 32u }, 5, init, 3, 2, 1, 1));
+	LayerPtr<Scalar,1> layer2_1(new ConvKernelLayer<Scalar,1>(layer1_1->get_output_dims(), 1, init, 3, 1, 1, 0, reg));
 	layer_grad_test<Scalar,1>("convolution kernel layer ", std::move(layer1_1), std::move(layer2_1));
-	LayerPtr<Scalar,2> layer1_2(new ConvKernelLayer<Scalar,2>({ 10u, 10u }, 5, init,
-			ConvKernelLayer<Scalar>::NO_PARAM_REG, 3, 2, 1, 2, 1, 2, 1, 0));
-	LayerPtr<Scalar,2> layer2_2(new ConvKernelLayer<Scalar,2>(layer1_2->get_output_dims(), 1, init, reg, 1, 1));
+	LayerPtr<Scalar,2> layer1_2(new ConvKernelLayer<Scalar,2>({ 10u, 10u }, 5, init, 3, 2, 1, 2, 1, 2, 1, 0));
+	LayerPtr<Scalar,2> layer2_2(new ConvKernelLayer<Scalar,2>(layer1_2->get_output_dims(), 1, init, 2, 2, 1, 1,
+			1, 1, 0, 0, reg));
 	layer_grad_test<Scalar,2>("convolution kernel layer ", std::move(layer1_2), std::move(layer2_2));
-	LayerPtr<Scalar,3> layer1_3(new ConvKernelLayer<Scalar>({ 8u, 8u, 2u }, 5, init,
-			ConvKernelLayer<Scalar>::NO_PARAM_REG, 3, 2, 1, 2, 1, 2, 1, 0));
-	LayerPtr<Scalar,3> layer2_3(new ConvKernelLayer<Scalar>(layer1_3->get_output_dims(), 1, init, reg, 1, 1));
+	LayerPtr<Scalar,3> layer1_3(new ConvKernelLayer<Scalar>({ 8u, 8u, 2u }, 5, init, 3, 2, 1, 2, 1, 2, 1, 0));
+	LayerPtr<Scalar,3> layer2_3(new ConvKernelLayer<Scalar>(layer1_3->get_output_dims(), 1, init, reg, 2, 2, 1,
+			1, 1, 1, 0, 0, reg));
 	layer_grad_test<Scalar,3>("convolution kernel layer ", std::move(layer1_3), std::move(layer2_3));
 }
 
@@ -197,26 +196,25 @@ TEST(GradientTest, ConvKernelLayer) {
  * Performs gradient checks on transposed convolutional layers.
  */
 template<typename Scalar>
-inline void deconv_kernel_layer_grad_test() {
-	auto init = WeightInitSharedPtr<Scalar>(new HeWeightInitialization<Scalar>());
+inline void trans_conv_kernel_layer_grad_test() {
+	auto init = ParamInitSharedPtr<Scalar>(new HeParameterInitialization<Scalar>());
 	auto reg = ParamRegSharedPtr<Scalar>(new SquaredParameterRegularization<Scalar>());
-	LayerPtr<Scalar,1> layer1_1(new DeconvKernelLayer<Scalar,1>({ 16u }, 5, init,
-			DeconvKernelLayer<Scalar>::NO_PARAM_REG, 4, 1, 1, 1));
-	LayerPtr<Scalar,1> layer2_1(new DeconvKernelLayer<Scalar,1>(layer1_1->get_output_dims(), 1, init, reg, 1, 1));
-	layer_grad_test<Scalar,1>("deconvolution kernel layer ", std::move(layer1_1), std::move(layer2_1));
-	LayerPtr<Scalar,2> layer1_2(new DeconvKernelLayer<Scalar,2>({ 4u, 5u }, 5, init,
-			DeconvKernelLayer<Scalar>::NO_PARAM_REG, 5, 3, 1, 0, 1, 2, 0, 1));
-	LayerPtr<Scalar,2> layer2_2(new DeconvKernelLayer<Scalar,2>(layer1_2->get_output_dims(), 1, init, reg, 1, 1));
-	layer_grad_test<Scalar,2>("deconvolution kernel layer ", std::move(layer1_2), std::move(layer2_2));
-	LayerPtr<Scalar,3> layer1_3(new DeconvKernelLayer<Scalar>({ 2u, 3u, 2u }, 5, init,
-			DeconvKernelLayer<Scalar>::NO_PARAM_REG, 5, 3, 1, 0, 1, 2, 0, 1));
-	LayerPtr<Scalar,3> layer2_3(new DeconvKernelLayer<Scalar>(layer1_3->get_output_dims(), 1, init, reg, 1, 1));
-	layer_grad_test<Scalar,3>("deconvolution kernel layer ", std::move(layer1_3), std::move(layer2_3));
+	LayerPtr<Scalar,1> layer1_1(new TransConvKernelLayer<Scalar,1>({ 16u }, 5, init, 4, 1, 1, 1));
+	LayerPtr<Scalar,1> layer2_1(new TransConvKernelLayer<Scalar,1>(layer1_1->get_output_dims(), 1, init, 1, 1, 1, 0, reg));
+	layer_grad_test<Scalar,1>("trans_convolution kernel layer ", std::move(layer1_1), std::move(layer2_1));
+	LayerPtr<Scalar,2> layer1_2(new TransConvKernelLayer<Scalar,2>({ 4u, 5u }, 5, init, 5, 3, 1, 0, 1, 2, 0, 1));
+	LayerPtr<Scalar,2> layer2_2(new TransConvKernelLayer<Scalar,2>(layer1_2->get_output_dims(), 1, init, 2, 2, 1, 1,
+			1, 1, 0, 0, reg));
+	layer_grad_test<Scalar,2>("trans_convolution kernel layer ", std::move(layer1_2), std::move(layer2_2));
+	LayerPtr<Scalar,3> layer1_3(new TransConvKernelLayer<Scalar>({ 2u, 3u, 2u }, 5, init, 5, 3, 1, 0, 1, 2, 0, 1));
+	LayerPtr<Scalar,3> layer2_3(new TransConvKernelLayer<Scalar>(layer1_3->get_output_dims(), 1, init, 2, 2, 1, 1,
+			1, 1, 0, 0, reg));
+	layer_grad_test<Scalar,3>("trans_convolution kernel layer ", std::move(layer1_3), std::move(layer2_3));
 }
 
-TEST(GradientTest, DeconvKernelLayer) {
-	deconv_kernel_layer_grad_test<float>();
-	deconv_kernel_layer_grad_test<double>();
+TEST(GradientTest, TransConvKernelLayer) {
+	trans_conv_kernel_layer_grad_test<float>();
+	trans_conv_kernel_layer_grad_test<double>();
 }
 
 /**
@@ -224,7 +222,7 @@ TEST(GradientTest, DeconvKernelLayer) {
  */
 template<typename Scalar, std::size_t Rank>
 inline void activation_layer_grad_test(const Dimensions<std::size_t,Rank>& dims) {
-	auto init = WeightInitSharedPtr<Scalar>(new GlorotWeightInitialization<Scalar>());
+	auto init = ParamInitSharedPtr<Scalar>(new GlorotParameterInitialization<Scalar>());
 	LayerPtr<Scalar,Rank> kernel_layer_1 = kernel_layer<Scalar,Rank>(dims);
 	Dimensions<std::size_t,Rank> dims_1 = kernel_layer_1->get_output_dims();
 	layer_grad_test<Scalar,Rank>("identity activation layer", std::move(kernel_layer_1),
@@ -302,7 +300,7 @@ TEST(GradientTest, ActivationLayer) {
  */
 template<typename Scalar>
 inline void pool_layer_grad_test() {
-	auto init = WeightInitSharedPtr<Scalar>(new HeWeightInitialization<Scalar>());
+	auto init = ParamInitSharedPtr<Scalar>(new HeParameterInitialization<Scalar>());
 	Dimensions<std::size_t,1> dims_1({ 32u });
 	LayerPtr<Scalar,1> mean_layer1_1(new ConvKernelLayer<Scalar,1>(dims_1, 1, init));
 	LayerPtr<Scalar,1> mean_layer2_1(new MeanPoolLayer<Scalar,1>(mean_layer1_1->get_output_dims(), 2, 2));
@@ -336,7 +334,7 @@ TEST(GradientTest, PoolLayer) {
  */
 template<typename Scalar>
 inline void broadcast_layer_grad_test() {
-	auto init = WeightInitSharedPtr<Scalar>(new HeWeightInitialization<Scalar>());
+	auto init = ParamInitSharedPtr<Scalar>(new HeParameterInitialization<Scalar>());
 	LayerPtr<Scalar,1> layer1_1(new DenseKernelLayer<Scalar,1>({ 8u }, 8, init));
 	LayerPtr<Scalar,1> layer2_1(new BroadcastLayer<Scalar,1>(layer1_1->get_output_dims(), { 3u }));
 	layer_grad_test<Scalar,1>("broadcast layer", std::move(layer1_1), std::move(layer2_1));
@@ -358,7 +356,7 @@ TEST(GradientTest, BroadcastLayer) {
  */
 template<typename Scalar>
 inline void batch_norm_layer_grad_test() {
-	auto init = WeightInitSharedPtr<Scalar>(new HeWeightInitialization<Scalar>());
+	auto init = ParamInitSharedPtr<Scalar>(new HeParameterInitialization<Scalar>());
 	auto reg1 = ParamRegSharedPtr<Scalar>(new AbsoluteParameterRegularization<Scalar>());
 	auto reg2 = ParamRegSharedPtr<Scalar>(new SquaredParameterRegularization<Scalar>());
 	LayerPtr<Scalar,1> layer1_1(new DenseKernelLayer<Scalar,1>({ 32u }, 16, init));
@@ -389,7 +387,7 @@ TEST(GradientTest, BatchNormLayer) {
  */
 template<typename Scalar>
 inline void reshape_layer_grad_test() {
-	auto init = WeightInitSharedPtr<Scalar>(new HeWeightInitialization<Scalar>());
+	auto init = ParamInitSharedPtr<Scalar>(new HeParameterInitialization<Scalar>());
 	LayerPtr<Scalar,2> layer1_2(new DenseKernelLayer<Scalar,2>({ 6u, 6u }, 12, init));
 	LayerPtr<Scalar,2> layer2_2(new ReshapeLayer<Scalar,2>(layer1_2->get_output_dims(), { 4u, 3u }));
 	layer_grad_test<Scalar,2>("reshape layer", std::move(layer1_2), std::move(layer2_2));
@@ -412,7 +410,7 @@ TEST(GradientTest, ReshapeLayer) {
  */
 template<typename Scalar>
 inline void parallel_net_grad_test() {
-	auto init = WeightInitSharedPtr<Scalar>(new GlorotWeightInitialization<Scalar>());
+	auto init = ParamInitSharedPtr<Scalar>(new GlorotParameterInitialization<Scalar>());
 	// Rank 1 with summation.
 	Dimensions<std::size_t,1> dims_1({ 32u });
 	std::vector<NeuralNetPtr<Scalar,1,false>> lanes1_1;
@@ -428,7 +426,7 @@ inline void parallel_net_grad_test() {
 	lane3_1_1_layers[0] = LayerPtr<Scalar,1>(new DenseKernelLayer<Scalar,1>(dims_1, 4, init));
 	lane3_1_1_layers[1] = LayerPtr<Scalar,1>(new DenseKernelLayer<Scalar,1>(lane3_1_1_layers[0]->get_output_dims(), 6, init));
 	lanes1_1.push_back(NeuralNetPtr<Scalar,1,false>(new FeedforwardNeuralNetwork<Scalar,1>(std::move(lane3_1_1_layers))));
-	NeuralNetPtr<Scalar,1,false> parallel_net1_1(new ParallelNeuralNetwork<Scalar,1,SUM>(std::move(lanes1_1)));
+	NeuralNetPtr<Scalar,1,false> parallel_net1_1(new ParallelNeuralNetwork<Scalar,1,PARALLEL_SUM>(std::move(lanes1_1)));
 	ASSERT_TRUE((parallel_net1_1->get_output_dims() == Dimensions<std::size_t,1>({ 6 })));
 	nonseq_network_grad_test<Scalar,1>("parallel net with summation", std::move(parallel_net1_1));
 	// Rank 1 with multiplication.
@@ -445,7 +443,7 @@ inline void parallel_net_grad_test() {
 	lane3_2_1_layers[0] = LayerPtr<Scalar,1>(new DenseKernelLayer<Scalar,1>(dims_1, 4, init));
 	lane3_2_1_layers[1] = LayerPtr<Scalar,1>(new DenseKernelLayer<Scalar,1>(lane3_2_1_layers[0]->get_output_dims(), 6, init));
 	lanes2_1.push_back(NeuralNetPtr<Scalar,1,false>(new FeedforwardNeuralNetwork<Scalar,1>(std::move(lane3_2_1_layers))));
-	NeuralNetPtr<Scalar,1,false> parallel_net2_1(new ParallelNeuralNetwork<Scalar,1,MUL>(std::move(lanes2_1)));
+	NeuralNetPtr<Scalar,1,false> parallel_net2_1(new ParallelNeuralNetwork<Scalar,1,PARALLEL_MUL>(std::move(lanes2_1)));
 	ASSERT_TRUE((parallel_net2_1->get_output_dims() == Dimensions<std::size_t,1>({ 6 })));
 	nonseq_network_grad_test<Scalar,1>("parallel net with multiplication", std::move(parallel_net2_1));
 	// Rank 2 with lowest rank concatenation.
@@ -457,7 +455,7 @@ inline void parallel_net_grad_test() {
 	std::vector<LayerPtr<Scalar,2>> lane2_2_layers(1);
 	lane2_2_layers[0] = LayerPtr<Scalar,2>(new DenseKernelLayer<Scalar,2>(dims_2, 12, init));
 	lanes_2.push_back(NeuralNetPtr<Scalar,2,false>(new FeedforwardNeuralNetwork<Scalar,2>(std::move(lane2_2_layers))));
-	NeuralNetPtr<Scalar,2,false> parallel_net_2(new ParallelNeuralNetwork<Scalar,2,CONCAT_LO_RANK>(std::move(lanes_2)));
+	NeuralNetPtr<Scalar,2,false> parallel_net_2(new ParallelNeuralNetwork<Scalar,2,PARALLEL_CONCAT_LO_RANK>(std::move(lanes_2)));
 	ASSERT_TRUE((parallel_net_2->get_output_dims() == Dimensions<std::size_t,2>({ 18, 1 })));
 	nonseq_network_grad_test<Scalar,2>("parallel net with lowest rank concatenation", std::move(parallel_net_2));
 	// Rank 3 with highest rank concatenation.
@@ -484,7 +482,7 @@ TEST(GradientTest, ParallelNet) {
  */
 template<typename Scalar>
 inline void residual_net_grad_test() {
-	auto init = WeightInitSharedPtr<Scalar>(new GlorotWeightInitialization<Scalar>());
+	auto init = ParamInitSharedPtr<Scalar>(new GlorotParameterInitialization<Scalar>());
 	// Rank 1.
 	std::vector<NeuralNetPtr<Scalar,1,false>> modules_1;
 	std::vector<NeuralNetPtr<Scalar,1,false>> sub_modules1_1;
@@ -527,7 +525,7 @@ TEST(GradientTest, ResidualNet) {
  */
 template<typename Scalar>
 inline void dense_net_grad_test() {
-	auto init = WeightInitSharedPtr<Scalar>(new GlorotWeightInitialization<Scalar>());
+	auto init = ParamInitSharedPtr<Scalar>(new GlorotParameterInitialization<Scalar>());
 	// Rank 1.
 	Dimensions<std::size_t,1> dims_1({ 32u });
 	std::vector<NeuralNetPtr<Scalar,1,false>> modules_1;
@@ -559,7 +557,7 @@ inline void dense_net_grad_test() {
 			new FeedforwardNeuralNetwork<Scalar,2>(LayerPtr<Scalar,2>(
 			new DenseKernelLayer<Scalar,2>(dims_2.add_along_rank(modules_2[0]->get_output_dims(), 1), 6, init)))))));
 	nonseq_network_grad_test<Scalar,2>("dense net", NeuralNetPtr<Scalar,2,false>(
-			new DenseNeuralNetwork<Scalar,2,HIGHEST_RANK>(std::move(modules_2))));
+			new DenseNeuralNetwork<Scalar,2,DENSE_HIGHEST_RANK>(std::move(modules_2))));
 	// Rank 3.
 	Dimensions<std::size_t,3> dims_3({ 4u, 4u, 3u });
 	std::vector<NeuralNetPtr<Scalar,3,false>> modules_3;
@@ -575,7 +573,7 @@ inline void dense_net_grad_test() {
 			new FeedforwardNeuralNetwork<Scalar,3>(LayerPtr<Scalar,3>(
 			new ConvKernelLayer<Scalar>(dims_3.add_along_rank(modules_3[0]->get_output_dims(), 0), 3, init)))))));
 	nonseq_network_grad_test<Scalar,3>("dense net", NeuralNetPtr<Scalar,3,false>(
-			new DenseNeuralNetwork<Scalar,3,LOWEST_RANK>(std::move(modules_3))));
+			new DenseNeuralNetwork<Scalar,3,DENSE_LOWEST_RANK>(std::move(modules_3))));
 }
 
 TEST(GradientTest, DenseNet) {
@@ -588,7 +586,7 @@ TEST(GradientTest, DenseNet) {
  */
 template<typename Scalar>
 inline void sequential_net_grad_test() {
-	auto init = WeightInitSharedPtr<Scalar>(new GlorotWeightInitialization<Scalar>());
+	auto init = ParamInitSharedPtr<Scalar>(new GlorotParameterInitialization<Scalar>());
 	// Rank 1.
 	std::vector<LayerPtr<Scalar,1>> layers_1(3);
 	layers_1[0] = LayerPtr<Scalar,1>(new DenseKernelLayer<Scalar,1>({ 32u }, 16, init));
@@ -618,7 +616,7 @@ TEST(GradientTest, SequentialNet) {
  */
 template<typename Scalar>
 inline void recurrent_net_grad_test() {
-	auto init = WeightInitSharedPtr<Scalar>(new OrthogonalWeightInitialization<Scalar>());
+	auto init = ParamInitSharedPtr<Scalar>(new OrthogonalParameterInitialization<Scalar>());
 	auto reg = ParamRegSharedPtr<Scalar>(new SquaredParameterRegularization<Scalar>());
 	// Rank 1.
 	KernelPtr<Scalar,1> input_kernel1_1(new DenseKernelLayer<Scalar,1>({ 12u }, 12, init, reg));
@@ -670,7 +668,7 @@ TEST(GradientTest, RecurrentNet) {
  */
 template<typename Scalar>
 inline void lstm_net_grad_test() {
-	auto init = WeightInitSharedPtr<Scalar>(new OrthogonalWeightInitialization<Scalar>());
+	auto init = ParamInitSharedPtr<Scalar>(new OrthogonalParameterInitialization<Scalar>());
 	auto reg = ParamRegSharedPtr<Scalar>(new SquaredParameterRegularization<Scalar>());
 	// Rank 1.
 	Dimensions<std::size_t,1> input_dims_1({ 32u });
@@ -766,7 +764,7 @@ TEST(GradientTest, LSTMNet) {
  */
 template<typename Scalar>
 inline void bidirectional_net_grad_test() {
-	auto init = WeightInitSharedPtr<Scalar>(new OrthogonalWeightInitialization<Scalar>());
+	auto init = ParamInitSharedPtr<Scalar>(new OrthogonalParameterInitialization<Scalar>());
 	auto reg = ParamRegSharedPtr<Scalar>(new SquaredParameterRegularization<Scalar>());
 	// 3rd degree RNN with highest rank concatenation.
 	KernelPtr<Scalar,3> input_kernel1(new ConvKernelLayer<Scalar>({ 4u, 4u, 2u }, 5, init, reg));
@@ -775,7 +773,7 @@ inline void bidirectional_net_grad_test() {
 	ActivationPtr<Scalar,3> state_act1(new SigmoidActivationLayer<Scalar,3>(input_kernel1->get_output_dims()));
 	ActivationPtr<Scalar,3> output_act1(new IdentityActivationLayer<Scalar,3>(output_kernel1->get_output_dims()));
 	seq_network_grad_test("bidirectional recurrent net with highest rank concatenation", NeuralNetPtr<Scalar,3,true>(
-			new BidirectionalNeuralNetwork<Scalar,3,CONCAT_HI_RANK>(UnidirNeuralNetPtr<Scalar,3>(
+			new BidirectionalNeuralNetwork<Scalar,3,BIDIRECTIONAL_CONCAT_HI_RANK>(UnidirNeuralNetPtr<Scalar,3>(
 					new RecurrentNeuralNetwork<Scalar,3,true>(std::move(input_kernel1), std::move(state_kernel1),
 							std::move(output_kernel1), std::move(state_act1), std::move(output_act1),
 							[](std::size_t input_seq_length) { return std::make_pair(3, 2); })))), 7, 3);
@@ -796,7 +794,7 @@ inline void bidirectional_net_grad_test() {
 	ActivationPtr<Scalar,2> state_act2(new SoftplusActivationLayer<Scalar,2>(output_dims));
 	ActivationPtr<Scalar,2> read_act2(new SigmoidActivationLayer<Scalar,2>(output_dims));
 	seq_network_grad_test("bidirectional lstm net with lowest rank concatenation", NeuralNetPtr<Scalar,2,true>(
-			new BidirectionalNeuralNetwork<Scalar,2,CONCAT_LO_RANK>(UnidirNeuralNetPtr<Scalar,2>(
+			new BidirectionalNeuralNetwork<Scalar,2,BIDIRECTIONAL_CONCAT_LO_RANK>(UnidirNeuralNetPtr<Scalar,2>(
 					new LSTMNeuralNetwork<Scalar,2,true>(std::move(forget_input_kernel2),
 							std::move(forget_output_kernel2), std::move(write_input_kernel2),
 							std::move(write_output_kernel2), std::move(candidate_input_kernel2),
@@ -811,7 +809,7 @@ inline void bidirectional_net_grad_test() {
 	ActivationPtr<Scalar,1> state_act3(new SigmoidActivationLayer<Scalar,1>(input_kernel3->get_output_dims()));
 	ActivationPtr<Scalar,1> output_act3(new SigmoidActivationLayer<Scalar,1>(output_kernel3->get_output_dims()));
 	seq_network_grad_test("bidirectional recurrent net with summation", NeuralNetPtr<Scalar,1,true>(
-			new BidirectionalNeuralNetwork<Scalar,1,SUM>(UnidirNeuralNetPtr<Scalar,1>(
+			new BidirectionalNeuralNetwork<Scalar,1,BIDIRECTIONAL_SUM>(UnidirNeuralNetPtr<Scalar,1>(
 					new RecurrentNeuralNetwork<Scalar,1>(std::move(input_kernel3), std::move(state_kernel3),
 							std::move(output_kernel3), std::move(state_act3), std::move(output_act3),
 							[](std::size_t input_seq_length) { return std::make_pair(5, 2); })))), 7, 5);
@@ -822,7 +820,7 @@ inline void bidirectional_net_grad_test() {
 	ActivationPtr<Scalar,3> state_act4(new SigmoidActivationLayer<Scalar,3>(input_kernel4->get_output_dims()));
 	ActivationPtr<Scalar,3> output_act4(new IdentityActivationLayer<Scalar,3>(output_kernel4->get_output_dims()));
 	seq_network_grad_test("bidirectional recurrent net with multiplication", NeuralNetPtr<Scalar,3,true>(
-			new BidirectionalNeuralNetwork<Scalar,3,MUL>(UnidirNeuralNetPtr<Scalar,3>(
+			new BidirectionalNeuralNetwork<Scalar,3,BIDIRECTIONAL_MUL>(UnidirNeuralNetPtr<Scalar,3>(
 					new RecurrentNeuralNetwork<Scalar,3,true>(std::move(input_kernel4), std::move(state_kernel4),
 							std::move(output_kernel4), std::move(state_act4), std::move(output_act4),
 							[](std::size_t input_seq_length) { return std::make_pair(3, 2); })))), 7, 3);
@@ -1007,7 +1005,7 @@ inline void binary_cross_entropy_loss_grad_test(const Dimensions<std::size_t,Ran
 	// Non-sequential.
 	std::vector<LayerPtr<Scalar,Rank>> layers(2);
 	layers[0] = LayerPtr<Scalar,Rank>(new DenseKernelLayer<Scalar,Rank>(dims, 1,
-			WeightInitSharedPtr<Scalar>(new GlorotWeightInitialization<Scalar>())));
+			ParamInitSharedPtr<Scalar>(new GlorotParameterInitialization<Scalar>())));
 	layers[1] = LayerPtr<Scalar,Rank>(new SigmoidActivationLayer<Scalar,Rank>(layers[0]->get_output_dims()));
 	auto net = NeuralNetPtr<Scalar,Rank,false>(new FeedforwardNeuralNetwork<Scalar,Rank>(std::move(layers)));
 	net->init();

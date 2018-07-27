@@ -14,7 +14,7 @@ The lowest level building blocks of neural networks in C-ATTL3 are the layers. T
   * [KernelLayer](https://viktorc.github.io/C-ATTL3/html/classcattle_1_1_kernel_layer.html) [A]
     * [DenseKernelLayer](https://viktorc.github.io/C-ATTL3/html/classcattle_1_1_dense_kernel_layer.html)
     * [ConvKernelLayer](https://viktorc.github.io/C-ATTL3/html/classcattle_1_1_conv_kernel_layer.html)
-    * [DeconvKernelLayer](https://viktorc.github.io/C-ATTL3/html/classcattle_1_1_deconv_kernel_layer.html)
+    * [TransConvKernelLayer](https://viktorc.github.io/C-ATTL3/html/classcattle_1_1_trans_conv_kernel_layer.html)
   * [ActivationLayer](https://viktorc.github.io/C-ATTL3/html/classcattle_1_1_activation_layer.html) [A]
     * [IdentityActivationLayer](https://viktorc.github.io/C-ATTL3/html/classcattle_1_1_identity_activation_layer.html)
     * [ScaledActivationLayer](https://viktorc.github.io/C-ATTL3/html/classcattle_1_1_scaled_activation_layer.html)
@@ -40,24 +40,24 @@ The lowest level building blocks of neural networks in C-ATTL3 are the layers. T
 
 All layers can handle data of rank 1, 2, or 3. The actual rank of the input and output of the layers is one greater than the nominal rank of the layers to allow for batch learning. In the case of a layer with a nominal rank of 3, the input tensor is expected to be a rank 4 tensor with its ranks representing the sample number, height, width, and depth/channel (N,H,W,C) respectively. The nominal dimensionalities of the accepted input tensors of the different layers are specified using instances of the [Dimensions](https://viktorc.github.io/C-ATTL3/html/classcattle_1_1_dimensions.html) class which relies on expression templates and compile time polymorphism to enable the fast and easy computation of the input dimensions of intermediary layers in complex neural networks. Besides the input dimensions, the one parameter required by all, most layers rely on multiple other hyper-parameters as well (e.g. max-norm constraint, dilation, receptor field size, etc.). These parameters may need to be fine-tuned manually or via random search (or in some other way) to optimize the behaviour of the networks.
 
-#### WeightInitialization
+#### ParameterInitialization
 The kernel layers (fully-connected and convolutional) also require weight initialization. The out-of-the-box weight initializations include:
-* [WeightInitialization](https://viktorc.github.io/C-ATTL3/html/classcattle_1_1_weight_initialization.html) [A]
-  * [ZeroWeightInitialization](https://viktorc.github.io/C-ATTL3/html/classcattle_1_1_zero_weight_initialization.html)
-  * [OneWeightInitialization](https://viktorc.github.io/C-ATTL3/html/classcattle_1_1_one_weight_initialization.html)
-  * [IncrementalWeightInitialization](https://viktorc.github.io/C-ATTL3/html/classcattle_1_1_incremental_weight_initialization.html)
-  * [GaussianWeightInitialization](https://viktorc.github.io/C-ATTL3/html/classcattle_1_1_gaussian_weight_initialization.html)
-    * [LeCunWeightInitialization](https://viktorc.github.io/C-ATTL3/html/classcattle_1_1_le_cun_weight_initialization.html)
-    * [GlorotWeightInitialization](https://viktorc.github.io/C-ATTL3/html/classcattle_1_1_glorot_weight_initialization.html)
-    * [HeWeightInitialization](https://viktorc.github.io/C-ATTL3/html/classcattle_1_1_he_weight_initialization.html)
-    * [OrthogonalWeightInitialization](https://viktorc.github.io/C-ATTL3/html/classcattle_1_1_orthogonal_weight_initialization.html)
+* [ParameterInitialization](https://viktorc.github.io/C-ATTL3/html/classcattle_1_1_parameter_initialization.html) [A]
+  * [ZeroParameterInitialization](https://viktorc.github.io/C-ATTL3/html/classcattle_1_1_zero_parameter_initialization.html)
+  * [OneParameterInitialization](https://viktorc.github.io/C-ATTL3/html/classcattle_1_1_one_parameter_initialization.html)
+  * [ConstantParameterInitialization](https://viktorc.github.io/C-ATTL3/html/classcattle_1_1_constant_parameter_initialization.html)
+  * [IncrementalParameterInitialization](https://viktorc.github.io/C-ATTL3/html/classcattle_1_1_incremental_parameter_initialization.html)
+  * [GaussianParameterInitialization](https://viktorc.github.io/C-ATTL3/html/classcattle_1_1_gaussian_parameter_initialization.html)
+    * [LeCunParameterInitialization](https://viktorc.github.io/C-ATTL3/html/classcattle_1_1_le_cun_parameter_initialization.html)
+    * [GlorotParameterInitialization](https://viktorc.github.io/C-ATTL3/html/classcattle_1_1_glorot_parameter_initialization.html)
+    * [HeParameterInitialization](https://viktorc.github.io/C-ATTL3/html/classcattle_1_1_he_parameter_initialization.html)
+    * [OrthogonalParameterInitialization](https://viktorc.github.io/C-ATTL3/html/classcattle_1_1_orthogonal_parameter_initialization.html)
 
 These weight initializations aim to mitigate the problem of vanishing and exploding gradients. Weight initialization can make or break neural networks, however the usage of batch normalization layers may reduce the networks' sensitivity to initialization.
 
 #### ParameterRegularization
 Parametric layers, i.e. layers with learnable parameters, also support parameter regularization. The standard regularization penalty functions are:
 * [ParameterRegularization](https://viktorc.github.io/C-ATTL3/html/classcattle_1_1_regularization_penalty.html) [A]
-  * [NoParameterRegularization](https://viktorc.github.io/C-ATTL3/html/classcattle_1_1_no_parameter_regularization.html)
   * [AbsoluteParameterRegularization](https://viktorc.github.io/C-ATTL3/html/classcattle_1_1_absolute_parameter_regularization.html)
   * [SquaredParameterRegularization](https://viktorc.github.io/C-ATTL3/html/classcattle_1_1_squared_parameter_regularization.html)
   * [ElasticNetParameterRegularization](https://viktorc.github.io/C-ATTL3/html/classcattle_1_1_elastic_net_parameter_regularization.html)
@@ -88,8 +88,8 @@ The library also provides optimizers that can be used to train the networks via 
 * [Optimizer](https://viktorc.github.io/C-ATTL3/html/classcattle_1_1_optimizer.html) [A]
   * [SGDOptimizer](https://viktorc.github.io/C-ATTL3/html/classcattle_1_1_s_g_d_optimizer.html) [A]
     * [VanillaSGDOptimizer](https://viktorc.github.io/C-ATTL3/html/classcattle_1_1_vanilla_s_g_d_optimizer.html)
-    * [MomentumAcceleratedSGDOptimizer](https://viktorc.github.io/C-ATTL3/html/classcattle_1_1_momentum_accelerated_s_g_d_optimizer.html)
-      * [NesterovMomentumAcceleratedSGDOptimizer](https://viktorc.github.io/C-ATTL3/html/classcattle_1_1_nesterov_momentum_accelerated_s_g_d_optimizer.html)
+    * [MomentumSGDOptimizer](https://viktorc.github.io/C-ATTL3/html/classcattle_1_1_momentum_s_g_d_optimizer.html)
+      * [NesterovMomentumSGDOptimizer](https://viktorc.github.io/C-ATTL3/html/classcattle_1_1_nesterov_momentum_s_g_d_optimizer.html)
     * [AdaGradOptimizer](https://viktorc.github.io/C-ATTL3/html/classcattle_1_1_ada_grad_optimizer.html)
       * [RMSPropOptimizer](https://viktorc.github.io/C-ATTL3/html/classcattle_1_1_r_m_s_prop_optimizer.html)
     * [AdaDeltaOptimizer](https://viktorc.github.io/C-ATTL3/html/classcattle_1_1_ada_delta_optimizer.html)
@@ -162,7 +162,7 @@ MemoryDataProvider<float,3,false> test_prov(std::move(test_obs_ptr), std::move(t
 ```
 The test data provider is created similarly. However, it is important not to re-fit the preprocessor to the observation data set to ensure that the same transformation is applied to both the training and the test data. This test data is used to assess the accuracy of the neural network on data it has not encountered during the training process. This provides a measure of the network's generalization ability; the difference between the network's accuracy on the training data and that on the test data is a metric of overfitting. The test data is usually a smaller portion of all the available data than the training data. In our example, it is 20 samples as opposed to the 80 comprising the training data. Note that all the other ranks of the test observation and objective tensors must match those of the training observation and objective tensors.
 ```cpp
-auto init = std::make_shared<HeWeightInitialization<float>>();
+auto init = std::make_shared<HeParameterInitialization<float>>();
 auto reg = std::make_shared<SquaredParameterRegularization<float>>();
 std::vector<LayerPtr<float,3>> layers(9);
 layers[0] = LayerPtr<float,3>(new ConvKernelLayer<float>(train_prov.get_obs_dims(), 10, init, reg, 5, 5, 2, 2));
@@ -176,7 +176,7 @@ layers[7] = LayerPtr<float,3>(new ReLUActivationLayer<float,3>(layers[6]->get_ou
 layers[8] = LayerPtr<float,3>(new DenseKernelLayer<float,3>(layers[7]->get_output_dims(), 1, init, reg));
 FeedforwardNeuralNetwork<float,3> nn(std::move(layers));
 ```
-The next step is the construction of the neural network. The above snippet demonstrates that of a simple convolutional neural network. The neural network implementation used is `FeedforwardNeuralNetwork` which takes a vector of unique layer pointers. Each layer in the vector must have the same input dimensions as the output dimensions of the preceding layer. Notice how the dimensions of the outputs of the layers do not need to be calculated manually; they can be simply retrieved using the `get_output_dims` members of the previous layers. It should also be noted that all neural networks require their layers to be of the same nominal rank and scalar type as the network itself. The example network consists of convolutional, max pooling, rectified linear unit, and fully connected layers. Convolutional and fully connected layers require weight initialization; due to its well-known compatibility with ReLU activations, He weight initialization is a good choice in our situation. As the `WeightInitialization` class specifies a stateless interface, multiple layers can use the same implementation instance (this is the reason they take a shared pointer). The same can be said about the`ParameterRegularization` abstract type. All layers with learnable parameters, including the fully connected and convolutional ones above, support optional parameter regularization. In our example, the choice fell upon the popular L2 regularization penalty function for all parameteric layers. Similarly to the unique tensor pointer arguments of the data providers, the vector of unique layer pointers required by the network's constructor must be moved as well, as unique smart pointers cannot be copied.
+The next step is the construction of the neural network. The above snippet demonstrates that of a simple convolutional neural network. The neural network implementation used is `FeedforwardNeuralNetwork` which takes a vector of unique layer pointers. Each layer in the vector must have the same input dimensions as the output dimensions of the preceding layer. Notice how the dimensions of the outputs of the layers do not need to be calculated manually; they can be simply retrieved using the `get_output_dims` members of the previous layers. It should also be noted that all neural networks require their layers to be of the same nominal rank and scalar type as the network itself. The example network consists of convolutional, max pooling, rectified linear unit, and fully connected layers. Convolutional and fully connected layers require weight initialization; due to its well-known compatibility with ReLU activations, He weight initialization is a good choice in our situation. As the `ParameterInitialization` class specifies a stateless interface, multiple layers can use the same implementation instance (this is the reason they take a shared pointer). The same can be said about the`ParameterRegularization` abstract type. All layers with learnable parameters, including the fully connected and convolutional ones above, support optional parameter regularization. In our example, the choice fell upon the popular L2 regularization penalty function for all parameteric layers. Similarly to the unique tensor pointer arguments of the data providers, the vector of unique layer pointers required by the network's constructor must be moved as well, as unique smart pointers cannot be copied.
 ```cpp
 nn.init();
 ```
@@ -185,7 +185,7 @@ Once the network is constructed, it is appropriate to initialize it. An unitiali
 auto loss = std::make_shared<SquaredLoss<float,3,false>>();
 NadamOptimizer<float,3,false> opt(loss, 20);
 ```
-Having set up the data providers and the network, it is time to specify the loss function and the optimizer. For the sake of simplicity (concerning the data generation), the quadratic loss function is used in our example. Like `WeightInitialization`and `ParameterRegularization`, `Loss` also defines a stateless interface; this is why it is wrapped in a shared pointer and why a single instance can be used by multiple optimizers. The optimizer used in our example is the `NadamOptimizer` which is generally a good first choice. Note the consistency of the template arguments; the data providers, the neural network, the loss function, and the optimizer must all have the same scalar type, rank, and sequentiality. As specified by the third argument of the optimizer's constructor, the batch size used for training and testing is 20. This means that both the training and the test data instances are processed in batches of 20. After the processing of each training batch, the parameters of the network's layers are updated. In our case, an epoch thus involves 4 parameter updates. It should be noted that most optimizers have several hyper-parameters that usually have reasonable default values and thus do not necessarily need to be specified.
+Having set up the data providers and the network, it is time to specify the loss function and the optimizer. For the sake of simplicity (concerning the data generation), the quadratic loss function is used in our example. Like `ParameterInitialization`and `ParameterRegularization`, `Loss` also defines a stateless interface; this is why it is wrapped in a shared pointer and why a single instance can be used by multiple optimizers. The optimizer used in our example is the `NadamOptimizer` which is generally a good first choice. Note the consistency of the template arguments; the data providers, the neural network, the loss function, and the optimizer must all have the same scalar type, rank, and sequentiality. As specified by the third argument of the optimizer's constructor, the batch size used for training and testing is 20. This means that both the training and the test data instances are processed in batches of 20. After the processing of each training batch, the parameters of the network's layers are updated. In our case, an epoch thus involves 4 parameter updates. It should be noted that most optimizers have several hyper-parameters that usually have reasonable default values and thus do not necessarily need to be specified.
 ```cpp
 opt.optimize(nn, train_prov, test_prov, 500);
 ```	

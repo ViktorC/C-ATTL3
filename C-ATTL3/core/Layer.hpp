@@ -104,13 +104,13 @@ public:
 	 *
 	 * @return A vector of constant pointers to the parameters of the layer.
 	 */
-	virtual std::vector<const Parameters<Scalar>*>& get_params() const = 0;
+	virtual std::vector<const Parameters<Scalar>*> get_params() const = 0;
 	/**
 	 * It returns a vector of non-owning pointers to the parameters of the layer.
 	 *
 	 * @return A vector of pointers to the parameters of the layer.
 	 */
-	virtual std::vector<Parameters<Scalar>*>& get_params() = 0;
+	virtual std::vector<Parameters<Scalar>*> get_params() = 0;
 	/**
 	 * It has the function represented by the layer applied to the input tensor.
 	 *

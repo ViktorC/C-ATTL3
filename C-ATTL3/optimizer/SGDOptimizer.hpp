@@ -26,10 +26,13 @@ public:
 	}
 	virtual ~SGDOptimizer() = default;
 	inline void fit(typename Base::Net& net) {
+		target_net_ptr = &net;
 		_fit(get_optimizable_params(net));
 	}
 protected:
-	inline Scalar _train(typename Base::Net& net, typename Base::Provider& training_prov, std::size_t epoch, bool verbose) {
+	inline Scalar _train(typename Base::Net& net, typename Base::Provider& training_prov, std::size_t epoch,
+			bool verbose) {
+		assert(target_net_ptr == &net);
 		Scalar obj_loss = 0;
 		Scalar reg_loss = 0;
 		std::size_t instances = 0;
@@ -48,7 +51,8 @@ protected:
 			 * not divisible by the batch size and the last batch of the epoch contains fewer
 			 * instances than the others) to make sure that the magnitude of the gradient is
 			 * proportional to the batch size (just like its 'accuracy' is). */
-			net.backpropagate(Base::loss->d_function(std::move(out), std::move(data_pair.second)) / (Scalar) batch_size);
+			net.backpropagate(Base::loss->d_function(std::move(out),
+					std::move(data_pair.second)) / (Scalar) batch_size);
 			// Update the values of the parameters.
 			std::size_t i = 0;
 			for (auto params_ptr : params_vec) {
@@ -73,6 +77,7 @@ protected:
 	}
 	inline Scalar _test(typename Base::Net& net, typename Base::Provider& test_prov, std::size_t epoch,
 			bool verbose) {
+		assert(target_net_ptr == &net);
 		Scalar obj_loss = 0;
 		Scalar instances = 0;
 		std::vector<Parameters<Scalar>*> params_vec = get_optimizable_params(net);
@@ -125,6 +130,8 @@ protected:
 		}
 	}
 	const std::size_t batch_size;
+private:
+	const typename Base::Net* target_net_ptr;
 };
 
 } /* namespace cattle */
