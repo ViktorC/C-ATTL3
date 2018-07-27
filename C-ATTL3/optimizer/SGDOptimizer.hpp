@@ -1,7 +1,7 @@
 /*
  * SGDOptimizer.hpp
  *
- *  Created on: 21 Jul 2018
+ *  Created on: 26 Jul 2018
  *      Author: Viktor Csomor
  */
 
@@ -25,17 +25,23 @@ public:
 		assert(batch_size > 0);
 	}
 	virtual ~SGDOptimizer() = default;
+	inline void fit(typename Base::Net& net) {
+		_fit(get_optimizable_params(net));
+	}
 protected:
 	inline Scalar _train(typename Base::Net& net, typename Base::Provider& training_prov, std::size_t epoch, bool verbose) {
-		Scalar training_loss = 0;
-		Scalar instances = 0;
-		std::vector<Layer<Scalar,Rank>*> layers = Base::get_layers(net);
+		Scalar obj_loss = 0;
+		Scalar reg_loss = 0;
+		std::size_t instances = 0;
+		std::size_t updates = 0;
+		// Get all the optimizable parameters.
+		std::vector<Parameters<Scalar>*> params_vec = get_optimizable_params(net);
 		// Perform an entire training epoch.
 		while (training_prov.has_more()) {
 			DataPair<Scalar,Rank,Sequential> data_pair = training_prov.get_data(batch_size);
 			instances += data_pair.first.dimension(0);
 			typename Base::Data out = net.propagate(std::move(data_pair.first), false);
-			training_loss += Base::loss->function(out, data_pair.second).sum();
+			obj_loss += Base::loss->function(out, data_pair.second).sum();
 			/* Divide the gradient by the batch size to decouple the learning rate and the batch
 			 * size hyper-parameters. Use the nominal batch size as the denominator even if the
 			 * actual batch size is different (in case the number of samples in the data set is
@@ -43,76 +49,82 @@ protected:
 			 * instances than the others) to make sure that the magnitude of the gradient is
 			 * proportional to the batch size (just like its 'accuracy' is). */
 			net.backpropagate(Base::loss->d_function(std::move(out), std::move(data_pair.second)) / (Scalar) batch_size);
+			// Update the values of the parameters.
 			std::size_t i = 0;
-			for (auto layer_ptr : layers) {
-				if (!layer_ptr)
+			for (auto params_ptr : params_vec) {
+				if (params_ptr->are_frozen())
 					continue;
-				for (auto params_ptr : layer_ptr->get_params()) {
-					if (!params_ptr || !params_ptr->are_optimizable() || params_ptr->are_frozen())
-						continue;
-					params_ptr->regularize();
-					_update_params(*params_ptr, i, epoch - 1);
-				}
+				reg_loss += params_ptr->get_regularization_penalty();
+				params_ptr->regularize();
 			}
+			_update_params(params_vec, epoch - 1);
+			++updates;
+			// Reset the gradients of the optimizable parameters.
+			for (auto params_ptr : params_vec)
+				params_ptr->reset_grad();
 		}
-		return training_loss / instances;
+		Scalar mean_obj_loss = obj_loss / instances;
+		Scalar mean_reg_loss = reg_loss / updates;
+		if (verbose) {
+			std::cout << "\ttraining obj loss: " << std::to_string(mean_obj_loss) << std::endl;
+			std::cout << "\ttraining reg loss: " << std::to_string(mean_reg_loss) << std::endl;
+		}
+		return mean_obj_loss + mean_reg_loss;
 	}
-	inline Scalar _test(typename Base::Net& net, typename Base::Provider& test_prov, std::size_t epoch, bool verbose) {
+	inline Scalar _test(typename Base::Net& net, typename Base::Provider& test_prov, std::size_t epoch,
+			bool verbose) {
 		Scalar obj_loss = 0;
 		Scalar instances = 0;
-		std::vector<Layer<Scalar,Rank>*> layers = Base::get_layers(net);
+		std::vector<Parameters<Scalar>*> params_vec = get_optimizable_params(net);
 		// Perform an entire test epoch.
 		while (test_prov.has_more()) {
 			DataPair<Scalar,Rank,Sequential> data_pair = test_prov.get_data(batch_size);
 			instances += data_pair.first.dimension(0);
-			obj_loss += Base::loss->function(net.infer(std::move(data_pair.first)), std::move(data_pair.second)).sum();
+			obj_loss += Base::loss->function(net.infer(std::move(data_pair.first)),
+					std::move(data_pair.second)).sum();
 		}
 		Scalar mean_obj_loss = obj_loss / instances;
 		Scalar reg_loss = 0;
-		for (std::size_t j = 0; j < layers.size(); ++j) {
-			Layer<Scalar,Rank>& layer = *(layers[j]);
-			if (Base::is_parametric(layer) && !layer.is_frozen())
-				reg_loss += Base::get_regularization_penalty(layer);
+		for (auto params_ptr : params_vec) {
+			if (!params_ptr->are_frozen())
+				reg_loss += params_ptr->get_regularization_penalty();
 		}
 		if (verbose) {
-			std::cout << "\tobj loss: " << std::to_string(mean_obj_loss) << std::endl;
-			std::cout << "\treg loss: " << std::to_string(reg_loss) << std::endl;
+			std::cout << "\ttest obj loss: " << std::to_string(mean_obj_loss) << std::endl;
+			std::cout << "\ttest reg loss: " << std::to_string(reg_loss) << std::endl;
 		}
 		return mean_obj_loss + reg_loss;
 	}
 	/**
-	 * It updates the parameters of based on their gradients after back-propagation.
+	 * It fits the optimizer to the provided parameters.
 	 *
-	 * @param params A reference to the parameters to be updated.
-	 * @param i The index of the parameters.
+	 * @param params_vec The optimizable parameters of the network that are to be
+	 * learned.
+	 */
+	virtual void _fit(std::vector<Parameters<Scalar>*>& params_vec) = 0;
+	/**
+	 * It updates the parameters based on their gradients after back-propagation.
+	 *
+	 * @param params_vec The parameters that are to be updated (unless they are frozen).
 	 * @param epoch The index of the epoch.
 	 */
-	virtual void _update_params(Parameters<Scalar>& params, std::size_t i, std::size_t epoch) = 0;
-	const std::size_t batch_size;
-private:
-	inline void update_all_params(std::vector<Layer<Scalar,Rank>*>& layers, std::size_t epoch) {
-		std::size_t i = 0;
-		for (auto layer_ptr : layers) {
+	virtual void _update_params(std::vector<Parameters<Scalar>*>& params_vec, std::size_t epoch) = 0;
+	/**
+	 * @param net The network whose optimizable parameters are to be retrieved.
+	 * @return A vector of pointers to the optimizable parameters of the network.
+	 */
+	inline static std::vector<Parameters<Scalar>*> get_optimizable_params(typename Base::Net& net) {
+		std::vector<Parameters<Scalar>*> params_vec;
+		for (auto layer_ptr : net.get_layers()) {
 			if (!layer_ptr)
 				continue;
-			for (auto params_ptr : layer_ptr->get_params()) {
-				if (!params_ptr || !params_ptr->are_optimizable() || params_ptr->are_frozen())
-					continue;
-				params_ptr->regularize();
-				_update_params(*params_ptr, i++, epoch - 1);
-			}
-		}
-	}
-	inline void reset_all_grads(std::vector<Layer<Scalar,Rank>*>& layers) {
-		for (auto layer_ptr : layers) {
-			if (!layer_ptr)
-				continue;
-			for (auto params_ptr : layer_ptr->get_params()) {
+			for (auto params_ptr : layer_ptr.get_params()) {
 				if (params_ptr && params_ptr->are_optimizable())
-					params_ptr->reset_grad();
+					params_vec.push_back(params_ptr);
 			}
 		}
 	}
+	const std::size_t batch_size;
 };
 
 } /* namespace cattle */

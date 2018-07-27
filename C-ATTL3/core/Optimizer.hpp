@@ -30,6 +30,13 @@
 namespace cattle {
 
 /**
+ * An alias for a unique pointer to a loss function of arbitrary rank, scalar type and
+ * sequentiality.
+ */
+template<typename Scalar, std::size_t Rank, bool Sequential>
+using LossSharedPtr = std::shared_ptr<Loss<Scalar,Rank,Sequential>>;
+
+/**
  * An abstract class template for neural network optimizer algorithm implementations.
  */
 template<typename Scalar, std::size_t Rank, bool Sequential>
@@ -316,133 +323,6 @@ protected:
 	virtual Scalar _test(Net& net, Provider& test_prov, std::size_t epoch, bool verbose) = 0;
 private:
 	const LossSharedPtr<Scalar,Rank,Sequential> loss;
-};
-
-/**
- * A class template for a vanilla SGD optimizer.
- */
-template<typename Scalar, std::size_t Rank, bool Sequential>
-class VanillaSGDOptimizer : public SGDOptimizer<Scalar,Rank,Sequential> {
-	typedef Optimizer<Scalar,Rank,Sequential> Root;
-public:
-	/**
-	 * @param loss A shared pointer to the loss function to use.
-	 * @param batch_size The batch size to use for training and testing. It is expected to
-	 * be greater than 0.
-	 * @param learning_rate The learning rate (a.k.a. step size) to use. It is expected to
-	 * be greater than 0.
-	 */
-	inline VanillaSGDOptimizer(LossSharedPtr<Scalar,Rank,Sequential> loss, std::size_t batch_size = 1,
-			Scalar learning_rate = 1e-3) :
-				SGDOptimizer<Scalar,Rank,Sequential>::SGDOptimizer(loss, batch_size),
-				learning_rate(learning_rate) {
-		assert(learning_rate > 0);
-	}
-	inline void fit(NeuralNetwork<Scalar,Rank,Sequential>& net) { }
-protected:
-	inline void _update_params(Layer<Scalar,Rank>& layer, std::size_t i, std::size_t epoch) {
-		Matrix<Scalar>& params = Root::get_params(layer);
-		params -= Root::get_params_grad(layer) * learning_rate;
-	}
-	const Scalar learning_rate;
-};
-
-/**
- * A class template for a momentum accelerated SGD optimizer.
- */
-template<typename Scalar, std::size_t Rank, bool Sequential>
-class MomentumAcceleratedSGDOptimizer : public SGDOptimizer<Scalar,Rank,Sequential> {
-	typedef Optimizer<Scalar,Rank,Sequential> Root;
-public:
-	/**
-	 * @param loss A shared pointer to the loss function to use.
-	 * @param batch_size The batch size to use for training and testing. It is expected to
-	 * be greater than 0.
-	 * @param init_learning_rate The initial learning rate (a.k.a. step size) to use. It
-	 * is expected to be greater than 0.
-	 * @param annealing_rate The rate at which the learning rate is to be annealed. It is
-	 * expected to be greater than or equal to 0. The greater it is, the faster the learning
-	 * rate decreases.
-	 * @param momentum The momentum rate to use. The greater the momentum, the lesser the
-	 * effect of newer gradients. It is expected to be greater than 0 and less than 1.
-	 */
-	inline MomentumAcceleratedSGDOptimizer(LossSharedPtr<Scalar,Rank,Sequential> loss, std::size_t batch_size = 1,
-			Scalar init_learning_rate = 1e-3, Scalar annealing_rate = 1e-3, Scalar momentum = .9) :
-				SGDOptimizer<Scalar,Rank,Sequential>::SGDOptimizer(loss, batch_size),
-				init_learning_rate(init_learning_rate),
-				annealing_rate(annealing_rate),
-				momentum(momentum) {
-		assert(init_learning_rate > 0);
-		assert(annealing_rate >= 0);
-		assert(momentum > 0 && momentum < 1);
-	}
-	virtual ~MomentumAcceleratedSGDOptimizer() = default;
-	inline void fit(NeuralNetwork<Scalar,Rank,Sequential>& net) {
-		std::vector<Layer<Scalar,Rank>*> layers = Root::get_layers(net);
-		params_grad_vec = std::vector<Matrix<Scalar>>(layers.size());
-		for (std::size_t i = 0; i < params_grad_vec.size(); ++i) {
-			Layer<Scalar,Rank>& layer = *(layers[i]);
-			const Matrix<Scalar>& params_grad = Root::get_params_grad(layer);
-			Matrix<Scalar> acc_params_grad = Matrix<Scalar>::Zero(params_grad.rows(), params_grad.cols());
-			params_grad_vec[i] = acc_params_grad;
-		}
-	}
-protected:
-	inline void _update_params(Layer<Scalar,Rank>& layer, std::size_t i, std::size_t epoch) {
-		Scalar learning_rate = calculate_learning_rate(epoch);
-		Matrix<Scalar>& params_grad = params_grad_vec[i];
-		Matrix<Scalar>& params = Root::get_params(layer);
-		params += params_grad * momentum - Root::get_params_grad(layer) * learning_rate;
-	}
-	/**
-	 * It calculates the annealed learning rate as a function of the epoch index.
-	 *
-	 * @param epoch The epoch index.
-	 * @return The learning rate to use.
-	 */
-	Scalar calculate_learning_rate(std::size_t epoch) {
-		return init_learning_rate / (1 + annealing_rate * epoch);
-	}
-	const Scalar init_learning_rate;
-	const Scalar annealing_rate;
-	const Scalar momentum;
-	std::vector<Matrix<Scalar>> params_grad_vec;
-};
-
-/**
- * A class template for Nesterov momentum accelerated SGD optimizers.
- *
- * \see https://arxiv.org/abs/1212.0901
- */
-template<typename Scalar, std::size_t Rank, bool Sequential>
-class NesterovMomentumAcceleratedSGDOptimizer : public MomentumAcceleratedSGDOptimizer<Scalar,Rank,Sequential> {
-	typedef Optimizer<Scalar,Rank,Sequential> Root;
-	typedef MomentumAcceleratedSGDOptimizer<Scalar,Rank,Sequential> Base;
-public:
-	/**
-	 * @param loss A shared pointer to the loss function to use.
-	 * @param batch_size The batch size to use for training and testing. It is expected to
-	 * be greater than 0.
-	 * @param init_learning_rate The initial learning rate (a.k.a. step size) to use. It is
-	 * expected to be greater than 0.
-	 * @param annealing_rate The rate at which the learning rate is to be annealed. It is
-	 * expected to be greater than or equal to 0. The greater it is, the faster the learning
-	 * rate decreases.
-	 * @param momentum The momentum rate to use. The greater the momentum, the lesser the
-	 * effect of newer gradients. It is expected to be greater than 0 and less than 1.
-	 */
-	inline NesterovMomentumAcceleratedSGDOptimizer(LossSharedPtr<Scalar,Rank,Sequential> loss,
-			std::size_t batch_size = 1, Scalar init_learning_rate = 1e-3, Scalar annealing_rate = 1e-3, Scalar momentum = .9) :
-				Base::MomentumAcceleratedSGDOptimizer(loss, batch_size, init_learning_rate, annealing_rate, momentum) { };
-protected:
-	inline void _update_params(Layer<Scalar,Rank>& layer, std::size_t i, std::size_t epoch) {
-		Scalar learning_rate = Base::calculate_learning_rate(epoch);
-		Matrix<Scalar>& acc_params_grad = Base::params_grad_vec[i];
-		Matrix<Scalar>& params = Root::get_params(layer);
-		Matrix<Scalar> params_grad_bak = acc_params_grad;
-		acc_params_grad = acc_params_grad * Base::momentum - Root::get_params_grad(layer) * learning_rate;
-		params += params_grad_bak * -Base::momentum + acc_params_grad * (1 + Base::momentum);
-	}
 };
 
 /**
