@@ -51,7 +51,7 @@ public:
 		assert((Dimensions<std::size_t,Base::DATA_RANK>(in.dimensions()).template demote<>()) == Base::dims);
 		assert(in.dimension(0) > 0);
 		in_cache = std::move(in);
-		return in_cache.cwiseMax(in * alpha);
+		return in_cache.cwiseMax(in_cache * alpha);
 	}
 	inline typename Root::Data pass_back(typename Root::Data out_grad) {
 		assert((Dimensions<std::size_t,Base::DATA_RANK>(out_grad.dimensions()).template demote<>()) == Base::dims);

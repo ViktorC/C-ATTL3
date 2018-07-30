@@ -34,7 +34,7 @@ template<typename Scalar>
 using ParamRegSharedPtr = std::shared_ptr<ParameterRegularization<Scalar>>;
 
 template<typename Scalar>
-class HostParameters : Parameters<Scalar> {
+class HostParameters : public Parameters<Scalar> {
 public:
 	/**
 	 * @param rows The number of rows of the parameter matrix.

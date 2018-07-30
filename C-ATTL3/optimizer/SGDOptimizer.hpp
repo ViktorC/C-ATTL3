@@ -27,7 +27,7 @@ public:
 	virtual ~SGDOptimizer() = default;
 	inline void fit(typename Base::Net& net) {
 		target_net_ptr = &net;
-		_fit(get_optimizable_params(net));
+		_fit(Base::get_unique_optimizable_params(net));
 	}
 protected:
 	inline Scalar _train(typename Base::Net& net, typename Base::Provider& training_prov, std::size_t epoch,
@@ -38,7 +38,7 @@ protected:
 		std::size_t instances = 0;
 		std::size_t updates = 0;
 		// Get all the optimizable parameters.
-		std::vector<Parameters<Scalar>*> params_vec = get_optimizable_params(net);
+		std::vector<Parameters<Scalar>*> params_vec = Base::get_unique_optimizable_params(net);
 		// Perform an entire training epoch.
 		while (training_prov.has_more()) {
 			DataPair<Scalar,Rank,Sequential> data_pair = training_prov.get_data(batch_size);
@@ -80,7 +80,7 @@ protected:
 		assert(target_net_ptr == &net);
 		Scalar obj_loss = 0;
 		Scalar instances = 0;
-		std::vector<Parameters<Scalar>*> params_vec = get_optimizable_params(net);
+		std::vector<Parameters<Scalar>*> params_vec = Base::get_unique_optimizable_params(net);
 		// Perform an entire test epoch.
 		while (test_prov.has_more()) {
 			DataPair<Scalar,Rank,Sequential> data_pair = test_prov.get_data(batch_size);
@@ -103,32 +103,17 @@ protected:
 	/**
 	 * It fits the optimizer to the provided parameters.
 	 *
-	 * @param params_vec The optimizable parameters of the network that are to be
+	 * @param params_vec The unique, optimizable parameters of the network that are to be
 	 * learned.
 	 */
-	virtual void _fit(std::vector<Parameters<Scalar>*>& params_vec) = 0;
+	virtual void _fit(const std::vector<Parameters<Scalar>*>& params_vec) = 0;
 	/**
 	 * It updates the parameters based on their gradients after back-propagation.
 	 *
-	 * @param params_vec The parameters that are to be updated (unless they are frozen).
+	 * @param params_vec The unique parameters that are to be updated (unless they are frozen).
 	 * @param epoch The index of the epoch.
 	 */
-	virtual void _update_params(std::vector<Parameters<Scalar>*>& params_vec, std::size_t epoch) = 0;
-	/**
-	 * @param net The network whose optimizable parameters are to be retrieved.
-	 * @return A vector of pointers to the optimizable parameters of the network.
-	 */
-	inline static std::vector<Parameters<Scalar>*> get_optimizable_params(typename Base::Net& net) {
-		std::vector<Parameters<Scalar>*> params_vec;
-		for (auto layer_ptr : net.get_layers()) {
-			if (!layer_ptr)
-				continue;
-			for (auto params_ptr : layer_ptr.get_params()) {
-				if (params_ptr && params_ptr->are_optimizable())
-					params_vec.push_back(params_ptr);
-			}
-		}
-	}
+	virtual void _update_params(const std::vector<Parameters<Scalar>*>& params_vec, std::size_t epoch) = 0;
 	const std::size_t batch_size;
 private:
 	const typename Base::Net* target_net_ptr;

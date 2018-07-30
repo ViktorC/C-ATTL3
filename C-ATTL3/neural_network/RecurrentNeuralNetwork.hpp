@@ -150,7 +150,7 @@ public:
 		return foremost;
 	}
 	inline void set_foremost(bool foremost) {
-		main_cell.input_kernel->set_foremost(foremost);
+		main_cell.input_kernel->set_input_layer(foremost);
 		this->foremost = foremost;
 	}
 	inline void empty_caches() {
@@ -218,22 +218,18 @@ public:
 					in_i_seq = input.slice(input_offsets, input_extents);
 					input_offsets[1] += 1;
 				}
+				TensorMap<Scalar,Rank + 1> in_i(in_i_seq.data(), input_time_step_dims);
 				if (MulInt) {
 					if (training) {
 						/* If multiplicative integration is enabled, cache the factors of the multiplication so that
 						 * the function can be differentiated in the backward pass. */
 						cell.state_kernel_cache = state;
-						cell.input_kernel_cache = cell.input_kernel->pass_forward(
-								TensorMap<Scalar,Rank + 1>(in_i_seq.data(), input_time_step_dims), training);
+						cell.input_kernel_cache = cell.input_kernel->pass_forward(in_i, training);
 						state *= cell.input_kernel_cache;
-					} else {
-						state *= cell.input_kernel->pass_forward(TensorMap<Scalar,Rank + 1>(in_i_seq.data(),
-								input_time_step_dims), training);
-					}
-				} else {
-					state += cell.input_kernel->pass_forward(TensorMap<Scalar,Rank + 1>(in_i_seq.data(),
-							input_time_step_dims), training);
-				}
+					} else
+						state *= cell.input_kernel->pass_forward(in_i, training);
+				} else
+					state += cell.input_kernel->pass_forward(in_i, training);
 			}
 			state = cell.state_act->pass_forward(std::move(state), training);
 			// If there is an output for the time step...
@@ -241,11 +237,11 @@ public:
 				// If the output is a single time step prediction, just return it.
 				TimeStepData act_out_i = cell.output_act->pass_forward(
 						cell.output_kernel->pass_forward(state, training), training);
-				if (output_seq_length == 1) {
-					out = TensorMap<Scalar,Root::DATA_RANK>(act_out_i.data(), output_extents);
-				} else {
-					out.slice(output_offsets, output_extents) = TensorMap<Scalar,Root::DATA_RANK>(act_out_i.data(),
-							output_extents);
+				TensorMap<Scalar,Root::DATA_RANK> out_i_seq(act_out_i.data(), output_extents);
+				if (output_seq_length == 1)
+					out = out_i_seq;
+				else {
+					out.slice(output_offsets, output_extents) = out_i_seq;
 					output_offsets[1] += 1;
 				}
 			}
@@ -294,51 +290,42 @@ public:
 				}
 				TimeStepData out_grad_i = cell.output_act->pass_back(
 						TensorMap<Scalar,Rank + 1>(out_grad_seq_i.data(), out_time_step_dims));
-				cell.output_act->empty_cache();
 				state_grad += cell.output_kernel->pass_back(std::move(out_grad_i));
-				cell.output_kernel->empty_cache();
 			}
 			// Always back-propagate the state gradient.
 			state_grad = cell.state_act->pass_back(std::move(state_grad));
-			cell.state_act->empty_cache();
 			// If there was an input at the time step...
 			if (i < input_seq_length) {
 				// If it is the foremost layer, the gradients do not need to be propagated further back.
 				if (foremost) {
-					if (MulInt) { // Multiplicative integration.
+					if (MulInt) // Multiplicative integration.
 						cell.input_kernel->pass_back(cell.state_kernel_cache * state_grad);
-						cell.state_kernel_cache = TimeStepData();
-					} else // Additive integration.
+					else // Additive integration.
 						cell.input_kernel->pass_back(state_grad);
 				} else if (input_seq_length == 1) {
 					TimeStepData input_i;
-					if (MulInt) {
+					if (MulInt)
 						input_i = cell.input_kernel->pass_back(cell.state_kernel_cache * state_grad);
-						cell.state_kernel_cache = TimeStepData();
-					} else
+					else
 						input_i = cell.input_kernel->pass_back(state_grad);
 					prev_out_grad = TensorMap<Scalar,Root::DATA_RANK>(input_i.data(), input_extents);
 				} else {
 					TimeStepData input_i;
-					if (MulInt) {
+					if (MulInt)
 						input_i = cell.input_kernel->pass_back(cell.state_kernel_cache * state_grad);
-						cell.state_kernel_cache = TimeStepData();
-					} else
+					else
 						input_i = cell.input_kernel->pass_back(state_grad);
 					prev_out_grad.slice(input_offsets, input_extents) =
 							TensorMap<Scalar,Root::DATA_RANK>(input_i.data(), input_extents);
 					input_offsets[1] -= 1;
 				}
-				cell.input_kernel->empty_cache();
 				// Compute the the state kernel's gradient.
-				if (MulInt) {
+				if (MulInt)
 					state_grad = cell.state_kernel->pass_back(cell.input_kernel_cache * state_grad);
-					cell.input_kernel_cache = TimeStepData();
-				} else
+				else
 					state_grad = cell.state_kernel->pass_back(std::move(state_grad));
 			} else
 				state_grad = cell.state_kernel->pass_back(std::move(state_grad));
-			cell.state_kernel->empty_cache();
 		}
 		return prev_out_grad;
 	}
@@ -377,19 +364,19 @@ private:
 			// Unroll the network by creating n -1 copies of the main cell;
 			for (int j = 1; j < time_steps; ++j) {
 				Cell& cell = cells[j - 1];
-				cell.state_kernel = KernelPtr<Scalar,Rank>((KernelLayer<Scalar,Rank>*)
-						main_cell.state_kernel->clone_with_shared_params());
-				cell.state_act = ActivationPtr<Scalar,Rank>((ActivationLayer<Scalar,Rank>*)
-						main_cell.state_act->clone_with_shared_params());
+				cell.state_kernel = KernelPtr<Scalar,Rank>(static_cast<KernelLayer<Scalar,Rank>*>(
+						main_cell.state_kernel->clone_with_shared_params()));
+				cell.state_act = ActivationPtr<Scalar,Rank>(static_cast<ActivationLayer<Scalar,Rank>*>(
+						main_cell.state_act->clone_with_shared_params()));
 				// Only copy the kernels and activations that will actually be used.
 				if (j < input_seq_length)
-					cell.input_kernel = KernelPtr<Scalar,Rank>((KernelLayer<Scalar,Rank>*)
-							main_cell.input_kernel->clone_with_shared_params());
+					cell.input_kernel = KernelPtr<Scalar,Rank>(static_cast<KernelLayer<Scalar,Rank>*>(
+							main_cell.input_kernel->clone_with_shared_params()));
 				if (j >= output_seq_delay && j < output_end) {
-					cell.output_kernel = KernelPtr<Scalar,Rank>((KernelLayer<Scalar,Rank>*)
-							main_cell.output_kernel->clone_with_shared_params());
-					cell.output_act = ActivationPtr<Scalar,Rank>((ActivationLayer<Scalar,Rank>*)
-							main_cell.output_act->clone_with_shared_params());
+					cell.output_kernel = KernelPtr<Scalar,Rank>(static_cast<KernelLayer<Scalar,Rank>*>(
+							main_cell.output_kernel->clone_with_shared_params()));
+					cell.output_act = ActivationPtr<Scalar,Rank>(static_cast<ActivationLayer<Scalar,Rank>*>(
+							main_cell.output_act->clone_with_shared_params()));
 				}
 			}
 		} else
@@ -424,11 +411,16 @@ private:
 	struct Cell {
 		inline Cell() { }
 		inline Cell(const Cell& cell) :
-				input_kernel(KernelPtr<Scalar,Rank>((KernelLayer<Scalar,Rank>*) cell.input_kernel->clone())),
-				state_kernel(KernelPtr<Scalar,Rank>((KernelLayer<Scalar,Rank>*) cell.state_kernel->clone())),
-				output_kernel(KernelPtr<Scalar,Rank>((KernelLayer<Scalar,Rank>*) cell.output_kernel->clone())),
-				state_act(ActivationPtr<Scalar,Rank>((ActivationLayer<Scalar,Rank>*) cell.state_act->clone())),
-				output_act(ActivationPtr<Scalar,Rank>((ActivationLayer<Scalar,Rank>*) cell.output_act->clone())),
+				input_kernel(KernelPtr<Scalar,Rank>(static_cast<KernelLayer<Scalar,Rank>*>(
+						cell.input_kernel->clone()))),
+				state_kernel(KernelPtr<Scalar,Rank>(static_cast<KernelLayer<Scalar,Rank>*>(
+						cell.state_kernel->clone()))),
+				output_kernel(KernelPtr<Scalar,Rank>(static_cast<KernelLayer<Scalar,Rank>*>(
+						cell.output_kernel->clone()))),
+				state_act(ActivationPtr<Scalar,Rank>(static_cast<ActivationLayer<Scalar,Rank>*>(
+						cell.state_act->clone()))),
+				output_act(ActivationPtr<Scalar,Rank>(static_cast<ActivationLayer<Scalar,Rank>*>(
+						cell.output_act->clone()))),
 				state_kernel_cache(cell.state_kernel_cache),
 				input_kernel_cache(cell.input_kernel_cache) { }
 		KernelPtr<Scalar,Rank> input_kernel, state_kernel, output_kernel;

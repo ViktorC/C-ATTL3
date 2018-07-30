@@ -13,6 +13,7 @@
 #include <iostream>
 #include <limits>
 #include <memory>
+#include <set>
 #include <string>
 #include <type_traits>
 
@@ -79,62 +80,58 @@ public:
 		 * back-propagate is to be divided by the number of observations in the batch. */
 		net.backpropagate(loss->d_function(net.propagate(data_pair.first, true),
 				data_pair.second) / (Scalar) instances);
-		std::vector<Layer<Scalar,Rank>*> layers = net.get_layers();
-		for (std::size_t i = 0; i < layers.size(); ++i) {
-			std::vector<Parameters<Scalar>*> params_vec = layers[i]->get_params();
-			for (auto params_ptr : params_vec) {
-				if (!params_ptr || !params_ptr->are_optimizable())
-					continue;
-				Parameters<Scalar>& params = *params_ptr;
-				if (verbose) {
-					std::cout << "Layer " << std::setw(3) << std::to_string(i + 1) <<
-							std::string(28, '-') << std::endl;
-				}
-				/* Add the derivative of the regularization function w.r.t. to the parameters of the layer to the
-				 * parameters' gradient. */
-				params.regularize();
-				Matrix<Scalar> params_values = params.get_values();
-				const Matrix<Scalar>& params_grad = params.get_grad();
-				for (int j = 0; j < params_values.rows(); ++j) {
-					for (int k = 0; k < params_values.cols(); ++k) {
-						if (verbose)
-							std::cout << "\tParam[" << i << "," << j << "," << k << "]:" << std::endl;
-						Scalar ana_grad = params_grad(j,k);
-						if (verbose)
-							std::cout << "\t\tAnalytic gradient = " << ana_grad << std::endl;
-						Scalar param = params_values(j,k);
-						params_values(j,k) = param + step_size;
-						params.set_values(params_values);
-						/* Compute the numerical gradients in training mode to ensure that the means and standard
-						 * deviations used for batch normalization are the same as those used during the analytic
-						 * gradient computation. */
-						Scalar loss_inc = loss->function(net.propagate(data_pair.first, true),
-								data_pair.second).mean();
-						/* Calculate the new regularization penalty as its derivative w.r.t. the layer's
-						 * parameters is included in the gradient. */
-						Scalar reg_pen_inc = params.get_regularization_penalty();
-						params_values(j,k) = param - step_size;
-						params.set_values(params_values);
-						Scalar loss_dec = loss->function(net.propagate(data_pair.first, true),
-								data_pair.second).mean();
-						Scalar reg_pen_dec = params.get_regularization_penalty();
-						params_values(j,k) = param;
-						params.set_values(params_values);
-						// Include the regularization penalty as well.
-						Scalar num_grad = (loss_inc + reg_pen_inc - (loss_dec + reg_pen_dec)) / (2 * step_size);
-						if (verbose)
-							std::cout << "\t\tNumerical gradient = " << num_grad;
-						if (!NumericUtils<Scalar>::almost_equal(ana_grad, num_grad, abs_epsilon, rel_epsilon)) {
-							if (verbose)
-								std::cout << " *****FAIL*****";
-							failure = true;
-						}
-						if (verbose)
-							std::cout << std::endl;
-					}
-				}
-				params.reset_grad();
+		std::vector<Parameters<Scalar>*> params_vec = get_unique_optimizable_params(net);
+		std::cout << "params_size: " << params_vec.size() << std::endl;
+		for (std::size_t i = 0; i < params_vec.size(); ++i) {
+			Parameters<Scalar>& params = *(params_vec[i]);
+			if (verbose) {
+				std::cout << "Parameter Set " << std::setw(3) << std::to_string(i) <<
+						std::string(28, '-') << std::endl;
 			}
+			/* Add the derivative of the regularization function w.r.t. to the parameters of the layer to the
+			 * parameters' gradient. */
+			params.regularize();
+			Matrix<Scalar> params_values = params.get_values();
+			const Matrix<Scalar>& params_grad = params.get_grad();
+			for (int j = 0; j < params_values.rows(); ++j) {
+				for (int k = 0; k < params_values.cols(); ++k) {
+					if (verbose)
+						std::cout << "\tParam[" << i << "," << j << "," << k << "]:" << std::endl;
+					Scalar ana_grad = params_grad(j,k);
+					if (verbose)
+						std::cout << "\t\tAnalytic gradient = " << ana_grad << std::endl;
+					Scalar param = params_values(j,k);
+					params_values(j,k) = param + step_size;
+					params.set_values(params_values);
+					/* Compute the numerical gradients in training mode to ensure that the means and standard
+					 * deviations used for batch normalization are the same as those used during the analytic
+					 * gradient computation. */
+					Scalar loss_inc = loss->function(net.propagate(data_pair.first, true),
+							data_pair.second).mean();
+					/* Calculate the new regularization penalty as its derivative w.r.t. the layer's
+					 * parameters is included in the gradient. */
+					Scalar reg_pen_inc = params.get_regularization_penalty();
+					params_values(j,k) = param - step_size;
+					params.set_values(params_values);
+					Scalar loss_dec = loss->function(net.propagate(data_pair.first, true),
+							data_pair.second).mean();
+					Scalar reg_pen_dec = params.get_regularization_penalty();
+					params_values(j,k) = param;
+					params.set_values(params_values);
+					// Include the regularization penalty as well.
+					Scalar num_grad = (loss_inc + reg_pen_inc - (loss_dec + reg_pen_dec)) / (2 * step_size);
+					if (verbose)
+						std::cout << "\t\tNumerical gradient = " << num_grad;
+					if (!NumericUtils<Scalar>::almost_equal(ana_grad, num_grad, abs_epsilon, rel_epsilon)) {
+						if (verbose)
+							std::cout << " *****FAIL*****";
+						failure = true;
+					}
+					if (verbose)
+						std::cout << std::endl;
+				}
+			}
+			params.reset_grad();
 		}
 		// Empty the network caches.
 		net.empty_caches();
@@ -315,7 +312,28 @@ protected:
 	 * @return The test loss of the epoch.
 	 */
 	virtual Scalar _test(Net& net, Provider& test_prov, std::size_t epoch, bool verbose) = 0;
-private:
+	/**
+	 * Returns a vector of unique pointers to the optimizable parameters of a network.
+	 *
+	 * @param net The network whose optimizable parameters are to be retrieved.
+	 * @return A vector of pointers to the unique, optimizable parameters of the network.
+	 */
+	inline static std::vector<Parameters<Scalar>*> get_unique_optimizable_params(Net& net) {
+		std::vector<Parameters<Scalar>*> params_vec;
+		std::set<Parameters<Scalar>*> params_set;
+		for (auto layer_ptr : net.get_layers()) {
+			if (!layer_ptr)
+				continue;
+			for (auto params_ptr : layer_ptr->get_params()) {
+				if (params_ptr && params_ptr->are_optimizable() &&
+						params_set.find(params_ptr) == params_set.end()) {
+					params_set.insert(params_ptr);
+					params_vec.push_back(params_ptr);
+				}
+			}
+		}
+		return params_vec;
+	}
 	const LossSharedPtr<Scalar,Rank,Sequential> loss;
 };
 

@@ -22,8 +22,9 @@ template<typename Scalar, std::size_t Rank>
 class PoolLayer : public Layer<Scalar,Rank> {
 	typedef Layer<Scalar,Rank> Base;
 public:
+	virtual Base* clone() const = 0;
 	inline Base* clone_with_shared_params() {
-		return Base::clone();
+		return clone();
 	}
 	inline const Base& get_params_owner() const {
 		return *this;

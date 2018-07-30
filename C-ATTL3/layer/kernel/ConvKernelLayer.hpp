@@ -142,7 +142,7 @@ protected:
 		}
 		assert(patch_ind == total_patches);
 		Matrix<Scalar> out_mat = (in_conv_mat_cache * Base::weights->get_values()).rowwise() +
-				Base::bias->get_values();
+				Base::bias->get_values().row(0);
 		out_conversion_dims[0] = rows;
 		return TensorMap<Scalar,4>(out_mat.data(), out_conversion_dims);
 	}

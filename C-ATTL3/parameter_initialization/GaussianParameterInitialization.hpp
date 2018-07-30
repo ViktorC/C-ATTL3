@@ -28,10 +28,10 @@ public:
 		int rows = weights.rows();
 		int cols = weights.cols();
 		std::default_random_engine gen;
-		std::normal_distribution<Scalar> dist(0, sd_scaling_factor * _sd(rows -  1, cols));
-		for (int i = 0; i < rows; ++i) {
-			for (int j = 0; j < cols; ++j)
-				weights(i,j) = dist(gen);
+		std::normal_distribution<Scalar> dist(0, sd_scaling_factor * _sd(rows, cols));
+		for (int i = 0; i < cols; ++i) {
+			for (int j = 0; j < rows; ++j)
+				weights(j,i) = dist(gen);
 		}
 	}
 protected:

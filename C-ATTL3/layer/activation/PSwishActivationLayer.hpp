@@ -79,7 +79,7 @@ public:
 		assert(in.dimension(0) > 0);
 		conversion_dims[0] = in.dimension(0);
 		in_mat_cache = MatrixMap<Scalar>(in.data(), conversion_dims[0], in.size() / conversion_dims[0]);
-		sig_out_mat_cache = ((in_mat_cache * -Base::params->get_values().asDiagonal()).array().exp() + 1).inverse();
+		sig_out_mat_cache = ((in_mat_cache * (-Base::params->get_values()).asDiagonal()).array().exp() + 1).inverse();
 		Matrix<Scalar> out_mat = in_mat_cache.cwiseProduct(sig_out_mat_cache);
 		return TensorMap<Scalar,Root::DATA_RANK>(out_mat.data(), conversion_dims);
 	}

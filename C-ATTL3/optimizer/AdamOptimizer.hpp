@@ -52,18 +52,18 @@ public:
 	}
 	virtual ~AdamOptimizer() = default;
 protected:
-	inline void _fit(std::vector<Parameters<Scalar>*>& params_vec) {
+	inline void _fit(const std::vector<Parameters<Scalar>*>& params_vec) {
 		pgn_vec = std::vector<ParamsGradNorms>();
 		for (auto params_ptr : params_vec) {
 			if (params_ptr->are_frozen())
 				continue;
 			ParamsGradNorms pgn;
-			pgn.params_grad_l1 = Matrix<Scalar>::Zero(params_ptr->rows(), params_ptr->cols());
-			pgn.params_grad_l2 = Matrix<Scalar>::Zero(params_ptr->rows(), params_ptr->cols());
+			pgn.params_grad_l1 = Matrix<Scalar>::Zero(params_ptr->get_rows(), params_ptr->get_cols());
+			pgn.params_grad_l2 = Matrix<Scalar>::Zero(params_ptr->get_rows(), params_ptr->get_cols());
 			pgn_vec.push_back(std::move(pgn));
 		}
 	}
-	inline void _update_params(std::vector<Parameters<Scalar>*>& params_vec, std::size_t epoch) {
+	inline void _update_params(const std::vector<Parameters<Scalar>*>& params_vec, std::size_t epoch) {
 		Scalar l1_corr = (Scalar) 1 / (1 - pow(1 - l1_decay, epoch + 1) + epsilon);
 		Scalar l2_corr = (Scalar) 1 / (1 - pow(1 - l2_decay, epoch + 1) + epsilon);
 		std::size_t i = 0;

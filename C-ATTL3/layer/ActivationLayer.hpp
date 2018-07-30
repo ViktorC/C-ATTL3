@@ -27,8 +27,9 @@ class ActivationLayer : public Layer<Scalar,Rank> {
 	typedef ActivationLayer<Scalar,Rank> Self;
 public:
 	virtual ~ActivationLayer() = default;
+	virtual Base* clone() const = 0;
 	inline Base* clone_with_shared_params() {
-		return Base::clone();
+		return clone();
 	}
 	inline const Base& get_params_owner() const {
 		return owner;
@@ -46,14 +47,12 @@ public:
 		this->input_layer = input_layer;
 	}
 	inline std::vector<const Parameters<Scalar>*> get_params() const {
-		std::vector<const Parameters<Scalar>*> params_vec;
-		if (params)
-			params_vec.push_back(params.get());
+		return params ? std::vector<const Parameters<Scalar>*>({ params.get() }) :
+				std::vector<const Parameters<Scalar>*>(0);
 	}
 	inline std::vector<Parameters<Scalar>*> get_params() {
-		std::vector<Parameters<Scalar>*> params_vec;
-		if (params)
-			params_vec.push_back(params.get());
+		return params ? std::vector<Parameters<Scalar>*>({ params.get() }) :
+				std::vector<Parameters<Scalar>*>(0);
 	}
 protected:
 	/**

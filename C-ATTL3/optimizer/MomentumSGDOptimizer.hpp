@@ -44,14 +44,14 @@ public:
 	}
 	virtual ~MomentumSGDOptimizer() = default;
 protected:
-	inline void _fit(std::vector<Parameters<Scalar>*>& params_vec) {
+	inline void _fit(const std::vector<Parameters<Scalar>*>& params_vec) {
 		params_grad_vec = std::vector<Matrix<Scalar>>();
 		for (auto params_ptr : params_vec) {
 			if (!params_ptr->are_frozen())
-				params_grad_vec.push_back(Matrix<Scalar>::Zero(params_ptr->rows(), params_ptr->cols()));
+				params_grad_vec.push_back(Matrix<Scalar>::Zero(params_ptr->get_rows(), params_ptr->get_cols()));
 		}
 	}
-	inline void _update_params(std::vector<Parameters<Scalar>*>& params_vec, std::size_t epoch) {
+	inline void _update_params(const std::vector<Parameters<Scalar>*>& params_vec, std::size_t epoch) {
 		Scalar learning_rate = calculate_learning_rate(epoch);
 		std::size_t i = 0;
 		for (auto params_ptr : params_vec) {

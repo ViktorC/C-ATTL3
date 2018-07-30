@@ -114,8 +114,6 @@ public:
 		for (std::size_t i = 0; i < layers.size(); ++i) {
 			Layer<Scalar,Rank>& layer = *layers[i];
 			input = layer.pass_forward(std::move(input), training);
-			if (!training)
-				layer.empty_cache();
 		}
 		return input;
 	}
@@ -124,7 +122,6 @@ public:
 		for (int i = layers.size() - 1; i >= 0; --i) {
 			Layer<Scalar,Rank>& layer = *layers[i];
 			out_grad = layer.pass_back(std::move(out_grad));
-			layer.empty_cache();
 		}
 		return out_grad;
 	}

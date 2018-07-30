@@ -65,7 +65,7 @@ public:
 			ParamRegSharedPtr<Scalar> bias_reg = nullptr, Scalar bias_clip = 0, Scalar bias_max_l1_norm = 0,
 			Scalar bias_max_l2_norm = 0, Scalar bias_grad_clip = 0, Scalar bias_grad_max_l1_norm = 0,
 			Scalar bias_grad_max_l2_norm = 0) :
-				Base::KernelLayer(input_dims, output_size,
+				Base::KernelLayer(input_dims, { output_size },
 						std::make_shared<HostParameters<Scalar>>(input_dims.get_volume(), output_size, true,
 								weight_init, weight_reg, weight_clip, weight_max_l1_norm, weight_max_l2_norm,
 								weight_grad_clip, weight_grad_max_l1_norm, weight_grad_max_l2_norm),
@@ -96,7 +96,8 @@ public:
 		out_conversion_dims[0] = rows;
 		prev_out_conversion_dims[0] = rows;
 		in_mat_cache = MatrixMap<Scalar>(in.data(), in.dimension(0), Base::input_dims.get_volume());
-		Matrix<Scalar> out_mat = (in_mat_cache * Base::weights->get_values()).rowwise() + Base::bias->get_values();
+		Matrix<Scalar> out_mat = (in_mat_cache * Base::weights->get_values()).rowwise() +
+				Base::bias->get_values().row(0);
 		return TensorMap<Scalar,Root::DATA_RANK>(out_mat.data(), out_conversion_dims);
 	}
 	inline typename Root::Data pass_back(typename Root::Data out_grad) {

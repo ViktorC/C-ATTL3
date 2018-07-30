@@ -137,9 +137,9 @@ inline TensorPtr<Scalar,Rank> random_multi_hot_tensor(const std::array<std::size
 template<typename Scalar, std::size_t Rank>
 inline KernelPtr<Scalar,Rank> kernel_layer(const typename std::enable_if<Rank != 1,
 		Dimensions<std::size_t,Rank>>::type& input_dims) {
-	return KernelPtr<Scalar,Rank>(
-			new ConvKernelLayer<Scalar,Rank>(input_dims, input_dims.template extend<3 - Rank>()(2),
-			ParameterInitSharedPtr<Scalar>(new HeParameterInitialization<Scalar>())));
+	return KernelPtr<Scalar,Rank>(new ConvKernelLayer<Scalar,Rank>(
+			input_dims, input_dims.template extend<3 - Rank>()(2),
+			std::make_shared<HeParameterInitialization<Scalar>>()));
 }
 
 /**
@@ -149,9 +149,9 @@ inline KernelPtr<Scalar,Rank> kernel_layer(const typename std::enable_if<Rank !=
 template<typename Scalar, std::size_t Rank>
 inline KernelPtr<Scalar,Rank> kernel_layer(const typename std::enable_if<Rank == 1,
 		Dimensions<std::size_t,Rank>>::type& input_dims) {
-	return KernelPtr<Scalar,Rank>(
-			new DenseKernelLayer<Scalar,Rank>(input_dims, input_dims.get_volume(),
-			ParameterInitSharedPtr<Scalar>(new GlorotParameterInitialization<Scalar>())));
+	return KernelPtr<Scalar,Rank>(new DenseKernelLayer<Scalar,Rank>(
+			input_dims, input_dims.get_volume(),
+			std::make_shared<GlorotParameterInitialization<Scalar>>()));
 }
 
 /**

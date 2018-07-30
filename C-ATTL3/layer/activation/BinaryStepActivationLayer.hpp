@@ -38,6 +38,7 @@ public:
 	inline Root* clone() const {
 		return new BinaryStepActivationLayer(*this);
 	}
+	inline void empty_cache() { }
 	inline typename Root::Data pass_forward(typename Root::Data in, bool training) {
 		assert((Dimensions<std::size_t,Base::DATA_RANK>(in.dimensions()).template demote<>()) == Base::dims);
 		assert(in.dimension(0) > 0);

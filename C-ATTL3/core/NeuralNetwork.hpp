@@ -102,22 +102,26 @@ public:
 	 * via optimization) or active.
 	 */
 	inline virtual void set_frozen(bool frozen) {
-		std::vector<Layer<Scalar,Rank>*> layers = get_layers();
-		for (std::size_t i = 0; i < layers.size(); ++i) {
-			std::vector<Parameters<Scalar>*> params = layers[i]->get_params();
-			for (std::size_t j = 0; j < params.size(); ++j)
-				params[j]->set_frozen(frozen);
+		for (auto layer_ptr : get_layers()) {
+			if (!layer_ptr)
+				continue;
+			for (auto params_ptr : layer_ptr->get_params()) {
+				if (params_ptr)
+					params_ptr->set_frozen(frozen);
+			}
 		}
 	}
 	/**
 	 * Initializes all parameters of the network.
 	 */
 	inline virtual void init() {
-		std::vector<Layer<Scalar,Rank>*> layers = get_layers();
-		for (std::size_t i = 0; i < layers.size(); ++i) {
-			std::vector<Parameters<Scalar>*> params = layers[i]->get_params();
-			for (std::size_t j = 0; j < params.size(); ++j)
-				params[j]->init();
+		for (auto layer_ptr : get_layers()) {
+			if (!layer_ptr)
+				continue;
+			for (auto params_ptr : layer_ptr->get_params()) {
+				if (params_ptr)
+					params_ptr->init();
+			}
 		}
 	}
 	/**

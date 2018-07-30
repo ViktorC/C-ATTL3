@@ -20,13 +20,19 @@
 namespace cattle {
 
 /**
+ * An alias for a unique pointer to a tensor.
+ */
+template<typename Scalar, std::size_t Rank>
+using TensorPtr = std::unique_ptr<Tensor<Scalar,Rank>>;
+
+/**
  * A data provider that reads from the memory. It requires the entire observation and
  * objective data sets to be loaded into memory, but it fetches pairs faster.
  */
 template<typename Scalar, std::size_t Rank, bool Sequential, bool Shuffle = true>
 class MemoryDataProvider : public DataProvider<Scalar,Rank,Sequential> {
 	typedef DataProvider<Scalar,Rank,Sequential> Base;
-	typedef std::unique_ptr<Tensor<Scalar,Rank>> DataPtr;
+	typedef TensorPtr<Scalar,Base::DATA_RANK> DataPtr;
 	typedef std::array<std::size_t,Base::DATA_RANK> RankwiseArray;
 public:
 	/**

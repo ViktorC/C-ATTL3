@@ -84,7 +84,7 @@ public:
 		extents[Rank] = 1;
 		auto gamma_init = std::make_shared<OneParameterInitialization<Scalar>>();
 		auto beta_init = std::make_shared<ZeroParameterInitialization<Scalar>>();
-		for (std::size_t i; i < channels; ++i) {
+		for (std::size_t i = 0; i < channels; ++i) {
 			ChannelSpecificMembers& memb = memb_vec[i];
 			memb.avg_means = std::make_shared<HostParameters<Scalar>>(1, 1, false);
 			memb.avg_inv_sds = std::make_shared<HostParameters<Scalar>>(1, 1, false);
@@ -98,7 +98,7 @@ public:
 		}
 	}
 	inline BatchNormLayer(const Self& layer, bool share_params = false) :
-			owner(share_params || layer.is_shared_params_clone() ? layer.owner : *this),
+			owner(share_params ? layer.owner : *this),
 			dims(layer.dims),
 			norm_avg_decay(layer.norm_avg_decay),
 			epsilon(layer.epsilon),
@@ -107,19 +107,23 @@ public:
 			offsets(layer.offsets),
 			extents(layer.extents),
 			memb_vec(channels) {
-		for (std::size_t i; i < channels; ++i) {
+		for (std::size_t i = 0; i < channels; ++i) {
 			ChannelSpecificMembers& memb1 = memb_vec[i];
-			ChannelSpecificMembers& memb2 = layer.memb_vec[i];
+			const ChannelSpecificMembers& memb2 = layer.memb_vec[i];
 			if (share_params) {
 				memb1.avg_means = memb2.avg_means;
 				memb1.avg_inv_sds = memb2.avg_inv_sds;
 				memb1.gammas = memb2.gammas;
 				memb1.betas = memb2.betas;
 			} else {
-				memb1.avg_means = HostParamsSharedPtr(memb2.avg_means->clone());
-				memb1.avg_inv_sds = HostParamsSharedPtr(memb2.avg_inv_sds->clone());
-				memb1.gammas = HostParamsSharedPtr(memb2.gammas->clone());
-				memb1.betas = HostParamsSharedPtr(memb2.betas->clone());
+				memb1.avg_means = HostParamsSharedPtr(static_cast<HostParameters<Scalar>*>(
+						memb2.avg_means->clone()));
+				memb1.avg_inv_sds = HostParamsSharedPtr(static_cast<HostParameters<Scalar>*>(
+						memb2.avg_inv_sds->clone()));
+				memb1.gammas = HostParamsSharedPtr(static_cast<HostParameters<Scalar>*>(
+						memb2.gammas->clone()));
+				memb1.betas = HostParamsSharedPtr(static_cast<HostParameters<Scalar>*>(
+						memb2.betas->clone()));
 			}
 			memb1.avgs_init = memb2.avgs_init;
 			memb1.inv_in_sd_cache = memb2.inv_in_sd_cache;
@@ -148,12 +152,12 @@ public:
 		this->input_layer = input_layer;
 	}
 	inline std::vector<const Parameters<Scalar>*> get_params() const {
-		std::vector<const Parameters<Scalar>*> params_vec(channels * 4);
+		std::vector<const Parameters<Scalar>*> params_vec;
 		populate_params_vector<const Parameters<Scalar>*>(params_vec);
 		return params_vec;
 	}
 	inline std::vector<Parameters<Scalar>*> get_params() {
-		std::vector<Parameters<Scalar>*> params_vec(channels * 4);
+		std::vector<Parameters<Scalar>*> params_vec;
 		populate_params_vector<Parameters<Scalar>*>(params_vec);
 		return params_vec;
 	}
@@ -220,37 +224,38 @@ private:
 		Matrix<Scalar> out_mat;
 		ChannelSpecificMembers& memb = memb_vec[i];
 		if (training) {
-			Matrix<Scalar> mean_mat(1, 1, in.mean());
-			Matrix<Scalar> norm_in_mat = in.array() - mean_mat(0,0);
+			Scalar mean = in.mean();
+			Matrix<Scalar> norm_in_mat = in.array() - mean;
 			memb.inv_in_sd_cache = 1 / sqrt(norm_in_mat.array().square().mean() + epsilon);
 			memb.std_in_mat_cache = norm_in_mat * memb.inv_in_sd_cache;
 			out_mat = memb.std_in_mat_cache;
 			if (memb.avgs_init) {
-				memb.avg_means->set_values((1 - norm_avg_decay) * memb.avg_means->get_values() +
-						norm_avg_decay * mean_mat);
+				memb.avg_means->set_values((1 - norm_avg_decay) * memb.avg_means->get_values().array() +
+						norm_avg_decay * mean);
 				memb.avg_inv_sds->set_values((1 - norm_avg_decay) * memb.avg_inv_sds->get_values().array() +
 						norm_avg_decay * memb.inv_in_sd_cache);
 			} else {
-				memb.avg_means->set_values(mean_mat);
-				memb.avg_inv_sds->set_values(memb.inv_in_sd_cache);
+				memb.avg_means->set_values(Matrix<Scalar>::Constant(1, 1, mean));
+				memb.avg_inv_sds->set_values(Matrix<Scalar>::Constant(1, 1, memb.inv_in_sd_cache));
 				memb.avgs_init = true;
 			}
 		} else {
 			assert(memb.avgs_init);
 			out_mat = (in.array() - memb.avg_means->get_values()(0,0)) * memb.avg_inv_sds->get_values()(0,0);
 		}
-		return (out_mat * memb.gammas(0,0)).array() + memb.betas(0,0);
+		return (out_mat * memb.gammas->get_values()(0,0)).array() + memb.betas->get_values()(0,0);
 	}
 	inline Matrix<Scalar> _pass_back(MatrixMap<Scalar>& out_grad, std::size_t i) {
 		ChannelSpecificMembers& memb = memb_vec[i];
-		auto gammas_grad = out_grad.cwiseProduct(memb.std_in_mat_cache).sum();
-		auto betas_grad = Matrix<Scalar>(1, 1, out_grad.sum());
+		Matrix<Scalar> gammas_grad = Matrix<Scalar>::Constant(1, 1,
+				out_grad.cwiseProduct(memb.std_in_mat_cache).sum());
+		Matrix<Scalar> betas_grad = Matrix<Scalar>::Constant(1, 1, out_grad.sum());
 		if (Base::is_shared_params_clone()) {
 			memb.gammas->set_grad(memb.gammas->get_grad() + gammas_grad);
 			memb.betas->set_grad(memb.betas->get_grad() + betas_grad);
 		} else {
-			memb.gammas->set_grad(gammas_grad);
-			memb.betas->set_grad(betas_grad);
+			memb.gammas->set_grad(std::move(gammas_grad));
+			memb.betas->set_grad(std::move(betas_grad));
 		}
 		if (input_layer)
 			return Matrix<Scalar>();
@@ -261,13 +266,13 @@ private:
 				(((Scalar) 1 / locations) * memb.inv_in_sd_cache);
 	}
 	template<typename _ParamsPtr>
-	inline void populate_params_vector(std::vector<_ParamsPtr> params_vec) {
-		for (std::size_t i; i < channels; ++i) {
-			ChannelSpecificMembers& memb = memb_vec[i];
-			params_vec.push_back(memb.avg_means);
-			params_vec.push_back(memb.avg_inv_sds);
-			params_vec.push_back(memb.gammas);
-			params_vec.push_back(memb.betas);
+	inline void populate_params_vector(std::vector<_ParamsPtr>& params_vec) const {
+		for (std::size_t i = 0; i < channels; ++i) {
+			const ChannelSpecificMembers& memb = memb_vec[i];
+			params_vec.push_back(memb.avg_means.get());
+			params_vec.push_back(memb.avg_inv_sds.get());
+			params_vec.push_back(memb.gammas.get());
+			params_vec.push_back(memb.betas.get());
 		}
 	}
 	const Self& owner;
@@ -362,11 +367,15 @@ public:
 			norm_avg_decay(layer.norm_avg_decay),
 			epsilon(layer.epsilon),
 			input_layer(layer.input_layer),
-			avg_means(share_params ? layer.avg_means : HostParamsSharedPtr(layer.avg_means.clone())),
-			avg_inv_sds(share_params ? layer.avg_inv_sds : HostParamsSharedPtr(layer.avg_inv_sds.clone())),
+			avg_means(share_params ? layer.avg_means :
+					HostParamsSharedPtr(static_cast<HostParameters<Scalar>*>(layer.avg_means->clone()))),
+			avg_inv_sds(share_params ? layer.avg_inv_sds :
+					HostParamsSharedPtr(static_cast<HostParameters<Scalar>*>(layer.avg_inv_sds->clone()))),
 			avgs_init(layer.avgs_init),
-			gammas(share_params ? layer.gammas : HostParamsSharedPtr(layer.gammas.clone())),
-			betas(share_params ? layer.betas : HostParamsSharedPtr(layer.betas.clone())),
+			gammas(share_params ? layer.gammas :
+					HostParamsSharedPtr(static_cast<HostParameters<Scalar>*>(layer.gammas->clone()))),
+			betas(share_params ? layer.betas :
+					HostParamsSharedPtr(static_cast<HostParameters<Scalar>*>(layer.betas->clone()))),
 			inv_in_sd_cache(layer.inv_in_sd_cache),
 			std_in_mat_cache(layer.std_in_mat_cache) { }
 	inline Base* clone() const {
@@ -426,9 +435,10 @@ public:
 		} else {
 			// For testing, use the moving averages.
 			assert(avgs_init);
-			in_mat = (in_mat.rowwise() - avg_means->get_values()) * avg_inv_sds.asDiagonal()->get_values();
+			in_mat = (in_mat.rowwise() - avg_means->get_values().row(0)) * avg_inv_sds->get_values().asDiagonal();
 		}
-		Matrix<Scalar> out_mat = (in_mat * gammas->get_values().asDiagonal()).rowwise() + betas->get_values();
+		Matrix<Scalar> out_mat = (in_mat * gammas->get_values().asDiagonal()).rowwise() +
+				betas->get_values().row(0);
 		return TensorMap<Scalar,Base::DATA_RANK>(out_mat.data(), in.dimensions());
 	}
 	inline typename Base::Data pass_back(typename Base::Data out_grad) {

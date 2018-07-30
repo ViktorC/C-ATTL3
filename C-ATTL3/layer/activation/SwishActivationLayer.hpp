@@ -45,7 +45,7 @@ public:
 	inline typename Root::Data pass_forward(typename Root::Data in, bool training) {
 		assert((Dimensions<std::size_t,Base::DATA_RANK>(in.dimensions()).template demote<>()) == Base::dims);
 		assert(in.dimension(0) > 0);
-		sig_out_cache = (-beta * in).exp() + in.constant(1).inverse();
+		sig_out_cache = ((-beta * in).exp() + in.constant(1)).inverse();
 		in_cache = std::move(in);
 		return in_cache * sig_out_cache;
 	}

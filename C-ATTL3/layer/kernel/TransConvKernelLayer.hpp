@@ -35,11 +35,11 @@ protected:
 			std::size_t receptor_height, std::size_t receptor_width, std::size_t vertical_padding,
 			std::size_t horizontal_padding, std::size_t vertical_stride, std::size_t horizontal_stride,
 			std::size_t vertical_dilation, std::size_t horizontal_dilation, ParamInitSharedPtr<Scalar> weight_init,
-			ParamRegSharedPtr<Scalar> weight_reg = nullptr, Scalar weight_clip = 0, Scalar weight_max_l1_norm = 0,
-			Scalar weight_max_l2_norm = 0, Scalar weight_grad_clip = 0, Scalar weight_grad_max_l1_norm = 0,
-			Scalar weight_grad_max_l2_norm = 0, ParamRegSharedPtr<Scalar> bias_reg = nullptr, Scalar bias_clip = 0,
-			Scalar bias_max_l1_norm = 0, Scalar bias_max_l2_norm = 0, Scalar bias_grad_clip = 0,
-			Scalar bias_grad_max_l1_norm = 0, Scalar bias_grad_max_l2_norm = 0) :
+			ParamRegSharedPtr<Scalar> weight_reg, Scalar weight_clip, Scalar weight_max_l1_norm,
+			Scalar weight_max_l2_norm, Scalar weight_grad_clip, Scalar weight_grad_max_l1_norm,
+			Scalar weight_grad_max_l2_norm, ParamRegSharedPtr<Scalar> bias_reg, Scalar bias_clip,
+			Scalar bias_max_l1_norm, Scalar bias_max_l2_norm, Scalar bias_grad_clip,
+			Scalar bias_grad_max_l1_norm, Scalar bias_grad_max_l2_norm) :
 				Base::KernelLayer(input_dims, calculate_adjusted_output_dims(input_dims, filters,
 						receptor_height, receptor_width, vertical_padding, horizontal_padding,
 						vertical_stride, horizontal_stride, vertical_dilation, horizontal_dilation),
@@ -146,7 +146,7 @@ protected:
 			out = Tensor<Scalar,4>(out.slice(no_padding_offsets, no_padding_extents));
 		}
 		MatrixMap<Scalar> out_mat(out.data(), rows, ext_output_dims.get_volume());
-		out_mat.rowwise() += Base::bias->get_values();
+		out_mat.rowwise() += Base::bias->get_values().row(0);
 		return out;
 	}
 	inline Tensor<Scalar,4> _pass_back(Tensor<Scalar,4> out_grad) {

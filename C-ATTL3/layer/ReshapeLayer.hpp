@@ -29,7 +29,7 @@ public:
 	 * @param output_dims The dimensions of the reshaped tensor. The output tensor must have
 	 * the same volume as the input tensor.
 	 */
-	inline ReshapeLayer(const typename Base::Data& input_dims, const typename Base::Data& output_dims) :
+	inline ReshapeLayer(const typename Base::Dims& input_dims, const typename Base::Dims& output_dims) :
 				input_dims(input_dims),
 				output_dims(output_dims),
 				input_layer(false),
