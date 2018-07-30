@@ -107,11 +107,11 @@ public:
 	inline const Matrix<Scalar>& get_grad() const {
 		return grad;
 	}
-	inline void set_grad(Matrix<Scalar> grad) {
+	inline void accumulate_grad(const Matrix<Scalar>& grad) {
 		if (!optimizable)
 			return;
 		assert(grad.rows() == rows && grad.cols() == cols);
-		this->grad = std::move(grad);
+		this->grad += grad;
 		enforce_clip_constraint(this->grad, grad_clip);
 		enforce_l1_norm_constraint(this->grad, grad_max_l1_norm);
 		enforce_l2_norm_constraint(this->grad, grad_max_l2_norm);
@@ -127,7 +127,7 @@ public:
 	}
 	inline void regularize() {
 		if (optimizable && param_reg)
-			set_grad(this->grad + param_reg->d_function(values));
+			accumulate_grad(param_reg->d_function(values));
 	}
 	inline bool are_frozen() const {
 		return frozen;

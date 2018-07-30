@@ -63,7 +63,7 @@ public:
 			input_dims(network.input_dims),
 			output_dims(network.output_dims) {
 		for (std::size_t i = 0; i < modules.size(); ++i)
-			modules[i] = Module((Base*) network.modules[i]->clone());
+			modules[i] = Module(network.modules[i]->clone());
 	}
 	inline ResidualNeuralNetwork(Self&& network) {
 		swap(*this, network);

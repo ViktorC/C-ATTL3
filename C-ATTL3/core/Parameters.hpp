@@ -56,10 +56,10 @@ public:
 	 */
 	virtual const Matrix<Scalar>& get_grad() const = 0;
 	/**
-	 * @param grad The gradient of the parameters. It is expected to have the dimensions
-	 * specified by the get_rows() and get_cols() methods.
+	 * @param grad The values to add to the current gradient of the parameters. The matrix
+	 * is expected to have the dimensions specified by the get_rows() and get_cols() methods.
 	 */
-	virtual void set_grad(Matrix<Scalar> grad) = 0;
+	virtual void accumulate_grad(const Matrix<Scalar>& grad) = 0;
 	/**
 	 * It resets the gradient to all zeroes.
 	 */

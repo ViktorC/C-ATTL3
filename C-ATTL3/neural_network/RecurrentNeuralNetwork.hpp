@@ -288,9 +288,8 @@ public:
 					out_grad_seq_i = out_grad.slice(output_offsets, output_extents);
 					output_offsets[1] -= 1;
 				}
-				TimeStepData out_grad_i = cell.output_act->pass_back(
-						TensorMap<Scalar,Rank + 1>(out_grad_seq_i.data(), out_time_step_dims));
-				state_grad += cell.output_kernel->pass_back(std::move(out_grad_i));
+				state_grad += cell.output_kernel->pass_back(cell.output_act->pass_back(
+						TensorMap<Scalar,Rank + 1>(out_grad_seq_i.data(), out_time_step_dims)));
 			}
 			// Always back-propagate the state gradient.
 			state_grad = cell.state_act->pass_back(std::move(state_grad));
@@ -369,9 +368,10 @@ private:
 				cell.state_act = ActivationPtr<Scalar,Rank>(static_cast<ActivationLayer<Scalar,Rank>*>(
 						main_cell.state_act->clone_with_shared_params()));
 				// Only copy the kernels and activations that will actually be used.
-				if (j < input_seq_length)
+				if (j < input_seq_length) {
 					cell.input_kernel = KernelPtr<Scalar,Rank>(static_cast<KernelLayer<Scalar,Rank>*>(
 							main_cell.input_kernel->clone_with_shared_params()));
+				}
 				if (j >= output_seq_delay && j < output_end) {
 					cell.output_kernel = KernelPtr<Scalar,Rank>(static_cast<KernelLayer<Scalar,Rank>*>(
 							main_cell.output_kernel->clone_with_shared_params()));

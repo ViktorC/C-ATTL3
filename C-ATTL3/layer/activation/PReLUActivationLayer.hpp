@@ -104,10 +104,7 @@ public:
 				}
 			}
 		}
-		if (Root::is_shared_params_clone())
-			Base::params->set_grad(Base::params->get_grad() + alphas_grad);
-		else
-			Base::params->set_grad(std::move(alphas_grad));
+		Base::params->accumulate_grad(alphas_grad);
 		return TensorMap<Scalar,Root::DATA_RANK>(prev_out_grad_mat.data(), conversion_dims);
 	}
 private:

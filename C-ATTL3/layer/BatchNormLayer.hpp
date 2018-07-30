@@ -247,16 +247,9 @@ private:
 	}
 	inline Matrix<Scalar> _pass_back(MatrixMap<Scalar>& out_grad, std::size_t i) {
 		ChannelSpecificMembers& memb = memb_vec[i];
-		Matrix<Scalar> gammas_grad = Matrix<Scalar>::Constant(1, 1,
-				out_grad.cwiseProduct(memb.std_in_mat_cache).sum());
-		Matrix<Scalar> betas_grad = Matrix<Scalar>::Constant(1, 1, out_grad.sum());
-		if (Base::is_shared_params_clone()) {
-			memb.gammas->set_grad(memb.gammas->get_grad() + gammas_grad);
-			memb.betas->set_grad(memb.betas->get_grad() + betas_grad);
-		} else {
-			memb.gammas->set_grad(std::move(gammas_grad));
-			memb.betas->set_grad(std::move(betas_grad));
-		}
+		memb.gammas->accumulate_grad(Matrix<Scalar>::Constant(1, 1,
+				out_grad.cwiseProduct(memb.std_in_mat_cache).sum()));
+		memb.betas->accumulate_grad(Matrix<Scalar>::Constant(1, 1, out_grad.sum()));
 		if (input_layer)
 			return Matrix<Scalar>();
 		std::size_t locations = out_grad.size();
@@ -446,15 +439,8 @@ public:
 		assert(out_grad.dimension(0) > 0 && std_in_mat_cache.rows() == out_grad.dimension(0));
 		std::size_t rows = out_grad.dimension(0);
 		MatrixMap<Scalar> out_grad_mat(out_grad.data(), rows, out_grad.size() / rows);
-		auto gammas_grad = out_grad_mat.cwiseProduct(std_in_mat_cache).colwise().sum();
-		auto betas_grad = out_grad_mat.colwise().sum();
-		if (Base::is_shared_params_clone()) {
-			gammas->set_grad(gammas->get_grad() + gammas_grad);
-			betas->set_grad(betas->get_grad() + betas_grad);
-		} else {
-			gammas->set_grad(gammas_grad);
-			betas->set_grad(betas_grad);
-		}
+		gammas->accumulate_grad(out_grad_mat.cwiseProduct(std_in_mat_cache).colwise().sum());
+		betas->accumulate_grad(out_grad_mat.colwise().sum());
 		if (input_layer)
 			return typename Base::Data();
 		Matrix<Scalar> std_in_grad_mat = out_grad_mat * gammas->get_values().asDiagonal();

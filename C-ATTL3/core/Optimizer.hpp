@@ -81,7 +81,6 @@ public:
 		net.backpropagate(loss->d_function(net.propagate(data_pair.first, true),
 				data_pair.second) / (Scalar) instances);
 		std::vector<Parameters<Scalar>*> params_vec = get_unique_optimizable_params(net);
-		std::cout << "params_size: " << params_vec.size() << std::endl;
 		for (std::size_t i = 0; i < params_vec.size(); ++i) {
 			Parameters<Scalar>& params = *(params_vec[i]);
 			if (verbose) {

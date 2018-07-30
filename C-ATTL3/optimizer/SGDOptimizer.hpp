@@ -43,7 +43,7 @@ protected:
 		while (training_prov.has_more()) {
 			DataPair<Scalar,Rank,Sequential> data_pair = training_prov.get_data(batch_size);
 			instances += data_pair.first.dimension(0);
-			typename Base::Data out = net.propagate(std::move(data_pair.first), false);
+			typename Base::Data out = net.propagate(std::move(data_pair.first), true);
 			obj_loss += Base::loss->function(out, data_pair.second).sum();
 			/* Divide the gradient by the batch size to decouple the learning rate and the batch
 			 * size hyper-parameters. Use the nominal batch size as the denominator even if the

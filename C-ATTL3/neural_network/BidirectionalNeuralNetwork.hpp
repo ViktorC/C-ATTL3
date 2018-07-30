@@ -61,7 +61,7 @@ public:
 			net(std::move(network)),
 			foremost(foremost) {
 		assert(this->net);
-		net_rev = UnidirNet((UnidirectionalNeuralNetwork<Scalar,Rank>*) this->net->clone());
+		net_rev = UnidirNet(static_cast<UnidirectionalNeuralNetwork<Scalar,Rank>*>(this->net->clone()));
 		net_rev->reverse();
 		input_dims = this->net->get_input_dims();
 		output_dims = this->net->get_output_dims();
@@ -69,8 +69,8 @@ public:
 			output_dims(+CONCAT_RANK) *= 2;
 	}
 	inline BidirectionalNeuralNetwork(const Self& network) :
-			net(UnidirNet((UnidirectionalNeuralNetwork<Scalar,Rank>*) network.net->clone())),
-			net_rev(UnidirNet((UnidirectionalNeuralNetwork<Scalar,Rank>*) network.net_rev->clone())),
+			net(UnidirNet(static_cast<UnidirectionalNeuralNetwork<Scalar,Rank>*>(network.net->clone()))),
+			net_rev(UnidirNet(static_cast<UnidirectionalNeuralNetwork<Scalar,Rank>*>(network.net_rev->clone()))),
 			foremost(network.foremost),
 			input_dims(network.input_dims),
 			output_dims(network.output_dims),
