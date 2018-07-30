@@ -55,7 +55,7 @@ protected:
 		for (auto params_ptr : params_vec) {
 			if (params_ptr->are_frozen())
 				continue;
-			ParamsGradAndUpdateSqrs& pgus = pgus_vec[i];
+			ParamsGradAndUpdateSqrs& pgus = pgus_vec[i++];
 			const Matrix<Scalar>& params_grad = params_ptr->get_grad();
 			pgus.params_grad = pgus.params_grad * (1 - decay) + params_grad.cwiseProduct(params_grad) * decay;
 			Matrix<Scalar> weight_updates = -params_grad.array() * (pgus.params_update.array() + epsilon).sqrt() /

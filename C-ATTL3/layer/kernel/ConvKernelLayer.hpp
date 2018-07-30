@@ -253,8 +253,10 @@ public:
 	 * @param vertical_dilation The extent of vertical dilation to apply to the receptor.
 	 * @param horizontal_dilation The extent of horizontal dilation to apply to the receptor.
 	 * @param weight_reg An optional regularization function to apply to the weights.
-	 * @param weight_clip The maximum allowed absolute weight value. If it is 0 or less, no less, no
-	 * L1 max norm constraint is enforced.
+	 * @param weight_clip The maximum allowed absolute weight value. If it is 0 or less, no value
+	 * clipping is performed.
+	 * @param weight_max_l1_norm The maximum allowed L1 weight value norm. If it is 0 or less, no L1
+	 * max norm constraint is enforced.
 	 * @param weight_max_l2_norm The maximum allowed L2 weight value norm. If it is 0 or less, no L2
 	 * max norm constraint is enforced.
 	 * @param weight_grad_clip The maximum allowed absolute weight gradient. If it is 0 or less, no
@@ -345,8 +347,10 @@ public:
 	 * @param vertical_dilation The extent of vertical dilation to apply to the receptor.
 	 * @param horizontal_dilation The extent of horizontal dilation to apply to the receptor.
 	 * @param weight_reg An optional regularization function to apply to the weights.
-	 * @param weight_clip The maximum allowed absolute weight value. If it is 0 or less, no less, no
-	 * L1 max norm constraint is enforced.
+	 * @param weight_clip The maximum allowed absolute weight value. If it is 0 or less, no value
+	 * clipping is performed.
+	 * @param weight_max_l1_norm The maximum allowed L1 weight value norm. If it is 0 or less, no L1
+	 * max norm constraint is enforced.
 	 * @param weight_max_l2_norm The maximum allowed L2 weight value norm. If it is 0 or less, no L2
 	 * max norm constraint is enforced.
 	 * @param weight_grad_clip The maximum allowed absolute weight gradient. If it is 0 or less, no
@@ -439,8 +443,10 @@ public:
 	 * shifted along the length of the input tensor.
 	 * @param dilation The extent of dilation to apply to the receptor.
 	 * @param weight_reg An optional regularization function to apply to the weights.
-	 * @param weight_clip The maximum allowed absolute weight value. If it is 0 or less, no less, no
-	 * L1 max norm constraint is enforced.
+	 * @param weight_clip The maximum allowed absolute weight value. If it is 0 or less, no value
+	 * clipping is performed.
+	 * @param weight_max_l1_norm The maximum allowed L1 weight value norm. If it is 0 or less, no L1
+	 * max norm constraint is enforced.
 	 * @param weight_max_l2_norm The maximum allowed L2 weight value norm. If it is 0 or less, no L2
 	 * max norm constraint is enforced.
 	 * @param weight_grad_clip The maximum allowed absolute weight gradient. If it is 0 or less, no

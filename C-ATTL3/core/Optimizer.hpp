@@ -95,10 +95,10 @@ public:
 			for (int j = 0; j < params_values.rows(); ++j) {
 				for (int k = 0; k < params_values.cols(); ++k) {
 					if (verbose)
-						std::cout << "\tParam[" << i << "," << j << "," << k << "]:" << std::endl;
+						std::cout << "\tparam[" << i << "," << j << "," << k << "]:" << std::endl;
 					Scalar ana_grad = params_grad(j,k);
 					if (verbose)
-						std::cout << "\t\tAnalytic gradient = " << ana_grad << std::endl;
+						std::cout << "\t\tanalytic gradient = " << ana_grad << std::endl;
 					Scalar param = params_values(j,k);
 					params_values(j,k) = param + step_size;
 					params.set_values(params_values);
@@ -120,7 +120,7 @@ public:
 					// Include the regularization penalty as well.
 					Scalar num_grad = (loss_inc + reg_pen_inc - (loss_dec + reg_pen_dec)) / (2 * step_size);
 					if (verbose)
-						std::cout << "\t\tNumerical gradient = " << num_grad;
+						std::cout << "\t\tnumerical gradient = " << num_grad;
 					if (!NumericUtils<Scalar>::almost_equal(ana_grad, num_grad, abs_epsilon, rel_epsilon)) {
 						if (verbose)
 							std::cout << " *****FAIL*****";
@@ -173,16 +173,19 @@ public:
 			// Train.
 			if (i != 0) {
 				training_prov.reset();
+				Scalar train_loss = _train(net, training_prov, i, verbose);
 				if (verbose) {
-					std::cout << "\ttraining loss: " <<
-							std::to_string(_train(net, training_prov, i, verbose)) << std::endl;
+					std::cout << std::left << std::setw(20) << "\ttraining loss: " << std::right <<
+							std::to_string(train_loss) << std::endl;
 				}
 			}
 			// Validate.
 			test_prov.reset();
 			Scalar test_loss = _test(net, test_prov, i, verbose);
-			if (verbose)
-				std::cout << "\ttest loss: " << std::to_string(test_loss);
+			if (verbose) {
+				std::cout << std::left << std::setw(20) << "\ttest loss: " << std::right <<
+						std::to_string(test_loss);
+			}
 			if (test_loss >= prev_test_loss) {
 				cons_loss_inc++;
 				if (verbose)
@@ -235,8 +238,10 @@ public:
 				std::cout << "Epoch " << std::setw(3) << i << std::string(28, '-') << std::endl;
 			prov.reset();
 			train_loss = _train(net, prov, i, verbose);
-			if (verbose)
-				std::cout << "\ttraining loss: " << std::to_string(train_loss);
+			if (verbose) {
+				std::cout << std::left << std::setw(20) << "\ttraining loss: " << std::right <<
+						std::to_string(train_loss);
+			}
 			if (train_loss >= prev_train_loss) {
 				cons_loss_inc++;
 				if (verbose)
@@ -273,8 +278,10 @@ public:
 			std::cout << "<Testing>" << std::endl;
 		prov.reset();
 		Scalar test_loss = _test(net, prov, 0, verbose);
-		if (verbose)
-			std::cout << "\ttest loss: " << std::to_string(test_loss);
+		if (verbose) {
+			std::cout << std::left << std::setw(20) << "\ttest loss: " << std::right <<
+					std::to_string(test_loss) << std::endl;
+		}
 		prov.reset();
 		net.empty_caches();
 		return test_loss;

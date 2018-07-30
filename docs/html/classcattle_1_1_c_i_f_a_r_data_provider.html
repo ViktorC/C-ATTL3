@@ -84,7 +84,7 @@ $(function() {
 <p>A data provider template for the CIFAR-10 and CIFAR-100 data sets.  
  <a href="classcattle_1_1_c_i_f_a_r_data_provider.html#details">More...</a></p>
 
-<p><code>#include &lt;<a class="el" href="_data_provider_8hpp_source.html">DataProvider.hpp</a>&gt;</code></p>
+<p><code>#include &lt;<a class="el" href="_c_i_f_a_r_data_provider_8hpp_source.html">CIFARDataProvider.hpp</a>&gt;</code></p>
 <div class="dynheader">
 Inheritance diagram for cattle::CIFARDataProvider&lt; Scalar, CIFARType &gt;:</div>
 <div class="dyncontent">
@@ -102,12 +102,6 @@ Public Member Functions</h2></td></tr>
 <tr class="separator:aea897b5488b2c1f5b1352703de7edc56"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:acad45a9be6ec504c355d8b82e0b4d20f"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_c_i_f_a_r_data_provider.html#acad45a9be6ec504c355d8b82e0b4d20f">CIFARDataProvider</a> (std::string file_path)</td></tr>
 <tr class="separator:acad45a9be6ec504c355d8b82e0b4d20f"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ab8c86d2e8a78146b84e070b879c9ab85"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="classcattle_1_1_dimensions.html">Dimensions</a>&lt; std::size_t, 3 &gt; &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_c_i_f_a_r_data_provider.html#ab8c86d2e8a78146b84e070b879c9ab85">get_obs_dims</a> () const</td></tr>
-<tr class="memdesc:ab8c86d2e8a78146b84e070b879c9ab85"><td class="mdescLeft">&#160;</td><td class="mdescRight">A simple constant getter method for the dimensions of the observations.  <a href="#ab8c86d2e8a78146b84e070b879c9ab85">More...</a><br /></td></tr>
-<tr class="separator:ab8c86d2e8a78146b84e070b879c9ab85"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:af60eefbce63dbbfb982807c160768f61"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="classcattle_1_1_dimensions.html">Dimensions</a>&lt; std::size_t, 3 &gt; &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_c_i_f_a_r_data_provider.html#af60eefbce63dbbfb982807c160768f61">get_obj_dims</a> () const</td></tr>
-<tr class="memdesc:af60eefbce63dbbfb982807c160768f61"><td class="mdescLeft">&#160;</td><td class="mdescRight">A simple constant getter method for the dimensions of the objectives.  <a href="#af60eefbce63dbbfb982807c160768f61">More...</a><br /></td></tr>
-<tr class="separator:af60eefbce63dbbfb982807c160768f61"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pro-methods"></a>
 Protected Member Functions</h2></td></tr>
@@ -307,72 +301,8 @@ template&lt;typename Scalar , CIFARType CIFARType = CIFAR_10&gt; </div>
 
 </div>
 </div>
-<a id="af60eefbce63dbbfb982807c160768f61"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#af60eefbce63dbbfb982807c160768f61">&#9670;&nbsp;</a></span>get_obj_dims()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<div class="memtemplate">
-template&lt;typename Scalar , CIFARType CIFARType = CIFAR_10&gt; </div>
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">const <a class="el" href="classcattle_1_1_dimensions.html">Dimensions</a>&lt;std::size_t,3&gt;&amp; <a class="el" href="classcattle_1_1_c_i_f_a_r_data_provider.html">cattle::CIFARDataProvider</a>&lt; Scalar, <a class="el" href="namespacecattle.html#a3aba4c1d42028d369dfb60a0507d3785">CIFARType</a> &gt;::get_obj_dims </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td> const</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">virtual</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>A simple constant getter method for the dimensions of the objectives. </p>
-<dl class="section return"><dt>Returns</dt><dd>A constant reference to the dimensions of the objectives. </dd></dl>
-
-<p>Implements <a class="el" href="classcattle_1_1_data_provider.html#a797875a230c677d448455d87ee00ff78">cattle::DataProvider&lt; Scalar, Rank, Sequential &gt;</a>.</p>
-
-</div>
-</div>
-<a id="ab8c86d2e8a78146b84e070b879c9ab85"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ab8c86d2e8a78146b84e070b879c9ab85">&#9670;&nbsp;</a></span>get_obs_dims()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<div class="memtemplate">
-template&lt;typename Scalar , CIFARType CIFARType = CIFAR_10&gt; </div>
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">const <a class="el" href="classcattle_1_1_dimensions.html">Dimensions</a>&lt;std::size_t,3&gt;&amp; <a class="el" href="classcattle_1_1_c_i_f_a_r_data_provider.html">cattle::CIFARDataProvider</a>&lt; Scalar, <a class="el" href="namespacecattle.html#a3aba4c1d42028d369dfb60a0507d3785">CIFARType</a> &gt;::get_obs_dims </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td> const</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">virtual</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>A simple constant getter method for the dimensions of the observations. </p>
-<dl class="section return"><dt>Returns</dt><dd>A constant reference to the dimensions of the observations. </dd></dl>
-
-<p>Implements <a class="el" href="classcattle_1_1_data_provider.html#a8f877a9733373af4c29e86eb5235d00e">cattle::DataProvider&lt; Scalar, Rank, Sequential &gt;</a>.</p>
-
-</div>
-</div>
 <hr/>The documentation for this class was generated from the following file:<ul>
-<li>C:/Users/Viktor/git/C-ATTL3/C-ATTL3/<a class="el" href="_data_provider_8hpp_source.html">DataProvider.hpp</a></li>
+<li>C:/Users/Viktor/git/C-ATTL3/C-ATTL3/data_provider/<a class="el" href="_c_i_f_a_r_data_provider_8hpp_source.html">CIFARDataProvider.hpp</a></li>
 </ul>
 </div><!-- contents -->
 <!-- start footer part -->

@@ -84,7 +84,7 @@ $(function() {
 <p>A data provider template for the MNIST data set.  
  <a href="classcattle_1_1_m_n_i_s_t_data_provider.html#details">More...</a></p>
 
-<p><code>#include &lt;<a class="el" href="_data_provider_8hpp_source.html">DataProvider.hpp</a>&gt;</code></p>
+<p><code>#include &lt;<a class="el" href="_m_n_i_s_t_data_provider_8hpp_source.html">MNISTDataProvider.hpp</a>&gt;</code></p>
 <div class="dynheader">
 Inheritance diagram for cattle::MNISTDataProvider&lt; Scalar &gt;:</div>
 <div class="dyncontent">
@@ -100,12 +100,6 @@ Inheritance diagram for cattle::MNISTDataProvider&lt; Scalar &gt;:</div>
 Public Member Functions</h2></td></tr>
 <tr class="memitem:a6ea7c7026514c600ed595c6f7fdb5696"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_m_n_i_s_t_data_provider.html#a6ea7c7026514c600ed595c6f7fdb5696">MNISTDataProvider</a> (std::string obs_path, std::string labels_path)</td></tr>
 <tr class="separator:a6ea7c7026514c600ed595c6f7fdb5696"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a372ff8d80ed8d3a50e6fa2dccf866592"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="classcattle_1_1_dimensions.html">Dimensions</a>&lt; std::size_t, 3 &gt; &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_m_n_i_s_t_data_provider.html#a372ff8d80ed8d3a50e6fa2dccf866592">get_obs_dims</a> () const</td></tr>
-<tr class="memdesc:a372ff8d80ed8d3a50e6fa2dccf866592"><td class="mdescLeft">&#160;</td><td class="mdescRight">A simple constant getter method for the dimensions of the observations.  <a href="#a372ff8d80ed8d3a50e6fa2dccf866592">More...</a><br /></td></tr>
-<tr class="separator:a372ff8d80ed8d3a50e6fa2dccf866592"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a979b4d19ecb48e3ea5be7887819b4658"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="classcattle_1_1_dimensions.html">Dimensions</a>&lt; std::size_t, 3 &gt; &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_m_n_i_s_t_data_provider.html#a979b4d19ecb48e3ea5be7887819b4658">get_obj_dims</a> () const</td></tr>
-<tr class="memdesc:a979b4d19ecb48e3ea5be7887819b4658"><td class="mdescLeft">&#160;</td><td class="mdescRight">A simple constant getter method for the dimensions of the objectives.  <a href="#a979b4d19ecb48e3ea5be7887819b4658">More...</a><br /></td></tr>
-<tr class="separator:a979b4d19ecb48e3ea5be7887819b4658"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pro-methods"></a>
 Protected Member Functions</h2></td></tr>
@@ -351,72 +345,8 @@ template&lt;typename Scalar &gt; </div>
 
 </div>
 </div>
-<a id="a979b4d19ecb48e3ea5be7887819b4658"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a979b4d19ecb48e3ea5be7887819b4658">&#9670;&nbsp;</a></span>get_obj_dims()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<div class="memtemplate">
-template&lt;typename Scalar &gt; </div>
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">const <a class="el" href="classcattle_1_1_dimensions.html">Dimensions</a>&lt;std::size_t,3&gt;&amp; <a class="el" href="classcattle_1_1_m_n_i_s_t_data_provider.html">cattle::MNISTDataProvider</a>&lt; Scalar &gt;::get_obj_dims </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td> const</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">virtual</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>A simple constant getter method for the dimensions of the objectives. </p>
-<dl class="section return"><dt>Returns</dt><dd>A constant reference to the dimensions of the objectives. </dd></dl>
-
-<p>Implements <a class="el" href="classcattle_1_1_data_provider.html#a797875a230c677d448455d87ee00ff78">cattle::DataProvider&lt; Scalar, Rank, Sequential &gt;</a>.</p>
-
-</div>
-</div>
-<a id="a372ff8d80ed8d3a50e6fa2dccf866592"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a372ff8d80ed8d3a50e6fa2dccf866592">&#9670;&nbsp;</a></span>get_obs_dims()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<div class="memtemplate">
-template&lt;typename Scalar &gt; </div>
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">const <a class="el" href="classcattle_1_1_dimensions.html">Dimensions</a>&lt;std::size_t,3&gt;&amp; <a class="el" href="classcattle_1_1_m_n_i_s_t_data_provider.html">cattle::MNISTDataProvider</a>&lt; Scalar &gt;::get_obs_dims </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td> const</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">virtual</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>A simple constant getter method for the dimensions of the observations. </p>
-<dl class="section return"><dt>Returns</dt><dd>A constant reference to the dimensions of the observations. </dd></dl>
-
-<p>Implements <a class="el" href="classcattle_1_1_data_provider.html#a8f877a9733373af4c29e86eb5235d00e">cattle::DataProvider&lt; Scalar, Rank, Sequential &gt;</a>.</p>
-
-</div>
-</div>
 <hr/>The documentation for this class was generated from the following file:<ul>
-<li>C:/Users/Viktor/git/C-ATTL3/C-ATTL3/<a class="el" href="_data_provider_8hpp_source.html">DataProvider.hpp</a></li>
+<li>C:/Users/Viktor/git/C-ATTL3/C-ATTL3/data_provider/<a class="el" href="_m_n_i_s_t_data_provider_8hpp_source.html">MNISTDataProvider.hpp</a></li>
 </ul>
 </div><!-- contents -->
 <!-- start footer part -->

@@ -74,7 +74,6 @@ $(function() {
 <div class="header">
   <div class="summary">
 <a href="#pub-methods">Public Member Functions</a> &#124;
-<a href="#pro-methods">Protected Member Functions</a> &#124;
 <a href="classcattle_1_1_recurrent_neural_network-members.html">List of all members</a>  </div>
   <div class="headertitle">
 <div class="title">cattle::RecurrentNeuralNetwork&lt; Scalar, Rank, MulInt, Stateful &gt; Class Template Reference</div>  </div>
@@ -84,7 +83,7 @@ $(function() {
 <p>A class template for a simple recurrent neural network (RNN).  
  <a href="classcattle_1_1_recurrent_neural_network.html#details">More...</a></p>
 
-<p><code>#include &lt;<a class="el" href="_neural_network_8hpp_source.html">NeuralNetwork.hpp</a>&gt;</code></p>
+<p><code>#include &lt;<a class="el" href="_recurrent_neural_network_8hpp_source.html">RecurrentNeuralNetwork.hpp</a>&gt;</code></p>
 <div class="dynheader">
 Inheritance diagram for cattle::RecurrentNeuralNetwork&lt; Scalar, Rank, MulInt, Stateful &gt;:</div>
 <div class="dyncontent">
@@ -109,8 +108,6 @@ Public Member Functions</h2></td></tr>
 void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_recurrent_neural_network.html#a315780fd2e06405a11065e903c0561eb">reverse</a> ()</td></tr>
 <tr class="memdesc:a315780fd2e06405a11065e903c0561eb"><td class="mdescLeft">&#160;</td><td class="mdescRight">Flips the direction along the time-step rank in which the network processes its inputs is reversed. <br /></td></tr>
 <tr class="separator:a315780fd2e06405a11065e903c0561eb"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ab3790738cc9ac1b654a2e357465d0ce1"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_recurrent_neural_network.html#ab3790738cc9ac1b654a2e357465d0ce1">is_foremost</a> () const</td></tr>
-<tr class="separator:ab3790738cc9ac1b654a2e357465d0ce1"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aa570e1c7a8baa09fbee96aa9457050dd"><td class="memItemLeft" align="right" valign="top">const Root::Dims &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_recurrent_neural_network.html#aa570e1c7a8baa09fbee96aa9457050dd">get_input_dims</a> () const</td></tr>
 <tr class="separator:aa570e1c7a8baa09fbee96aa9457050dd"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a65378382938c173044d138d1fe35f84e"><td class="memItemLeft" align="right" valign="top">const Root::Dims &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_recurrent_neural_network.html#a65378382938c173044d138d1fe35f84e">get_output_dims</a> () const</td></tr>
@@ -119,22 +116,8 @@ void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="clas
 <tr class="separator:ae18e6bd4e095d74d13c0e42fd24f0635"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a4938ecae0c0430d75f7f57e732a10c8b"><td class="memItemLeft" align="right" valign="top">std::vector&lt; <a class="el" href="classcattle_1_1_layer.html">Layer</a>&lt; Scalar, Rank &gt; * &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_recurrent_neural_network.html#a4938ecae0c0430d75f7f57e732a10c8b">get_layers</a> ()</td></tr>
 <tr class="separator:a4938ecae0c0430d75f7f57e732a10c8b"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="inherit_header pub_methods_classcattle_1_1_neural_network"><td colspan="2" onclick="javascript:toggleInherit('pub_methods_classcattle_1_1_neural_network')"><img src="closed.png" alt="-"/>&#160;Public Member Functions inherited from <a class="el" href="classcattle_1_1_neural_network.html">cattle::NeuralNetwork&lt; Scalar, Rank, true &gt;</a></td></tr>
-<tr class="memitem:a94a8c8170471486c5f10ba09a5709ad6 inherit pub_methods_classcattle_1_1_neural_network"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_neural_network.html#a94a8c8170471486c5f10ba09a5709ad6">set_frozen</a> (bool frozen)</td></tr>
-<tr class="memdesc:a94a8c8170471486c5f10ba09a5709ad6 inherit pub_methods_classcattle_1_1_neural_network"><td class="mdescLeft">&#160;</td><td class="mdescRight">Invokes the Layer::set_frozen(bool) method of all layers of the network with the provided argument.  <a href="classcattle_1_1_neural_network.html#a94a8c8170471486c5f10ba09a5709ad6">More...</a><br /></td></tr>
-<tr class="separator:a94a8c8170471486c5f10ba09a5709ad6 inherit pub_methods_classcattle_1_1_neural_network"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ae59c0963d75b1f2de4f18a6c8fe85fa8 inherit pub_methods_classcattle_1_1_neural_network"><td class="memItemLeft" align="right" valign="top"><a id="ae59c0963d75b1f2de4f18a6c8fe85fa8"></a>
-virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_neural_network.html#ae59c0963d75b1f2de4f18a6c8fe85fa8">init</a> ()</td></tr>
-<tr class="memdesc:ae59c0963d75b1f2de4f18a6c8fe85fa8 inherit pub_methods_classcattle_1_1_neural_network"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initializes all layers of the network. <br /></td></tr>
-<tr class="separator:ae59c0963d75b1f2de4f18a6c8fe85fa8 inherit pub_methods_classcattle_1_1_neural_network"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ac88007e2f8fa2a208de0e51c8ac422cc inherit pub_methods_classcattle_1_1_neural_network"><td class="memItemLeft" align="right" valign="top">virtual Data&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_neural_network.html#ac88007e2f8fa2a208de0e51c8ac422cc">infer</a> (Data input)</td></tr>
-<tr class="memdesc:ac88007e2f8fa2a208de0e51c8ac422cc inherit pub_methods_classcattle_1_1_neural_network"><td class="mdescLeft">&#160;</td><td class="mdescRight">It propagates the input through the neural network and outputs its prediction according to its current parameters.  <a href="classcattle_1_1_neural_network.html#ac88007e2f8fa2a208de0e51c8ac422cc">More...</a><br /></td></tr>
-<tr class="separator:ac88007e2f8fa2a208de0e51c8ac422cc inherit pub_methods_classcattle_1_1_neural_network"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ac055ea579a66d6ef10fc1a38dd3401aa inherit pub_methods_classcattle_1_1_neural_network"><td class="memItemLeft" align="right" valign="top">virtual std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_neural_network.html#ac055ea579a66d6ef10fc1a38dd3401aa">to_string</a> () const</td></tr>
-<tr class="separator:ac055ea579a66d6ef10fc1a38dd3401aa inherit pub_methods_classcattle_1_1_neural_network"><td class="memSeparator" colspan="2">&#160;</td></tr>
-</table><table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pro-methods"></a>
-Protected Member Functions</h2></td></tr>
+<tr class="memitem:ab3790738cc9ac1b654a2e357465d0ce1"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_recurrent_neural_network.html#ab3790738cc9ac1b654a2e357465d0ce1">is_foremost</a> () const</td></tr>
+<tr class="separator:ab3790738cc9ac1b654a2e357465d0ce1"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:afa0abaa4d3214a0d57fa615f532093a2"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_recurrent_neural_network.html#afa0abaa4d3214a0d57fa615f532093a2">set_foremost</a> (bool foremost)</td></tr>
 <tr class="memdesc:afa0abaa4d3214a0d57fa615f532093a2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Sets the foremost status of the network.  <a href="#afa0abaa4d3214a0d57fa615f532093a2">More...</a><br /></td></tr>
 <tr class="separator:afa0abaa4d3214a0d57fa615f532093a2"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -148,6 +131,17 @@ void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="clas
 <tr class="memitem:a9205a3e4630f5cb56ee61114aa7cf573"><td class="memItemLeft" align="right" valign="top">Root::Data&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_recurrent_neural_network.html#a9205a3e4630f5cb56ee61114aa7cf573">backpropagate</a> (typename Root::Data out_grad)</td></tr>
 <tr class="memdesc:a9205a3e4630f5cb56ee61114aa7cf573"><td class="mdescLeft">&#160;</td><td class="mdescRight">It back-propagates the derivative of the loss function w.r.t.  <a href="#a9205a3e4630f5cb56ee61114aa7cf573">More...</a><br /></td></tr>
 <tr class="separator:a9205a3e4630f5cb56ee61114aa7cf573"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="inherit_header pub_methods_classcattle_1_1_neural_network"><td colspan="2" onclick="javascript:toggleInherit('pub_methods_classcattle_1_1_neural_network')"><img src="closed.png" alt="-"/>&#160;Public Member Functions inherited from <a class="el" href="classcattle_1_1_neural_network.html">cattle::NeuralNetwork&lt; Scalar, Rank, true &gt;</a></td></tr>
+<tr class="memitem:a94a8c8170471486c5f10ba09a5709ad6 inherit pub_methods_classcattle_1_1_neural_network"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_neural_network.html#a94a8c8170471486c5f10ba09a5709ad6">set_frozen</a> (bool frozen)</td></tr>
+<tr class="memdesc:a94a8c8170471486c5f10ba09a5709ad6 inherit pub_methods_classcattle_1_1_neural_network"><td class="mdescLeft">&#160;</td><td class="mdescRight">Invokes the Layer::set_frozen(bool) method of all layers of the network with the provided argument.  <a href="classcattle_1_1_neural_network.html#a94a8c8170471486c5f10ba09a5709ad6">More...</a><br /></td></tr>
+<tr class="separator:a94a8c8170471486c5f10ba09a5709ad6 inherit pub_methods_classcattle_1_1_neural_network"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae59c0963d75b1f2de4f18a6c8fe85fa8 inherit pub_methods_classcattle_1_1_neural_network"><td class="memItemLeft" align="right" valign="top"><a id="ae59c0963d75b1f2de4f18a6c8fe85fa8"></a>
+virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_neural_network.html#ae59c0963d75b1f2de4f18a6c8fe85fa8">init</a> ()</td></tr>
+<tr class="memdesc:ae59c0963d75b1f2de4f18a6c8fe85fa8 inherit pub_methods_classcattle_1_1_neural_network"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initializes all parameters of the network. <br /></td></tr>
+<tr class="separator:ae59c0963d75b1f2de4f18a6c8fe85fa8 inherit pub_methods_classcattle_1_1_neural_network"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac88007e2f8fa2a208de0e51c8ac422cc inherit pub_methods_classcattle_1_1_neural_network"><td class="memItemLeft" align="right" valign="top">virtual Data&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_neural_network.html#ac88007e2f8fa2a208de0e51c8ac422cc">infer</a> (Data input)</td></tr>
+<tr class="memdesc:ac88007e2f8fa2a208de0e51c8ac422cc inherit pub_methods_classcattle_1_1_neural_network"><td class="mdescLeft">&#160;</td><td class="mdescRight">It propagates the input through the neural network and outputs its prediction according to its current parameters.  <a href="classcattle_1_1_neural_network.html#ac88007e2f8fa2a208de0e51c8ac422cc">More...</a><br /></td></tr>
+<tr class="separator:ac88007e2f8fa2a208de0e51c8ac422cc inherit pub_methods_classcattle_1_1_neural_network"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="inherited"></a>
 Additional Inherited Members</h2></td></tr>
@@ -155,22 +149,6 @@ Additional Inherited Members</h2></td></tr>
 <tr class="memitem:ad7c71f700c1ac964c6a10a0864b5589a inherit pub_static_methods_classcattle_1_1_unidirectional_neural_network"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_unidirectional_neural_network.html#ad7c71f700c1ac964c6a10a0864b5589a">reverse_along_time_axis</a> (typename Base::Data &amp;tensor)</td></tr>
 <tr class="memdesc:ad7c71f700c1ac964c6a10a0864b5589a inherit pub_static_methods_classcattle_1_1_unidirectional_neural_network"><td class="mdescLeft">&#160;</td><td class="mdescRight">Reverses a tensor along its time axis.  <a href="classcattle_1_1_unidirectional_neural_network.html#ad7c71f700c1ac964c6a10a0864b5589a">More...</a><br /></td></tr>
 <tr class="separator:ad7c71f700c1ac964c6a10a0864b5589a inherit pub_static_methods_classcattle_1_1_unidirectional_neural_network"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="inherit_header pro_static_methods_classcattle_1_1_neural_network"><td colspan="2" onclick="javascript:toggleInherit('pro_static_methods_classcattle_1_1_neural_network')"><img src="closed.png" alt="-"/>&#160;Static Protected Member Functions inherited from <a class="el" href="classcattle_1_1_neural_network.html">cattle::NeuralNetwork&lt; Scalar, Rank, true &gt;</a></td></tr>
-<tr class="memitem:a6cdd26677f188f7c499f520a01082b60 inherit pro_static_methods_classcattle_1_1_neural_network"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_neural_network.html#a6cdd26677f188f7c499f520a01082b60">set_input_layer</a> (<a class="el" href="classcattle_1_1_layer.html">Layer</a>&lt; Scalar, Rank &gt; &amp;layer, bool on)</td></tr>
-<tr class="memdesc:a6cdd26677f188f7c499f520a01082b60 inherit pro_static_methods_classcattle_1_1_neural_network"><td class="mdescLeft">&#160;</td><td class="mdescRight">A method to expose protected methods of the Layer class to subclasses of NeuralNetwork that are not friend classes of Layer.  <a href="classcattle_1_1_neural_network.html#a6cdd26677f188f7c499f520a01082b60">More...</a><br /></td></tr>
-<tr class="separator:a6cdd26677f188f7c499f520a01082b60 inherit pro_static_methods_classcattle_1_1_neural_network"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a417cb77f47eab00bb62f2f5347aff86f inherit pro_static_methods_classcattle_1_1_neural_network"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_neural_network.html#a417cb77f47eab00bb62f2f5347aff86f">empty_cache</a> (<a class="el" href="classcattle_1_1_layer.html">Layer</a>&lt; Scalar, Rank &gt; &amp;layer)</td></tr>
-<tr class="memdesc:a417cb77f47eab00bb62f2f5347aff86f inherit pro_static_methods_classcattle_1_1_neural_network"><td class="mdescLeft">&#160;</td><td class="mdescRight">A method to expose protected methods of the Layer class to subclasses of NeuralNetwork that are not friend classes of Layer.  <a href="classcattle_1_1_neural_network.html#a417cb77f47eab00bb62f2f5347aff86f">More...</a><br /></td></tr>
-<tr class="separator:a417cb77f47eab00bb62f2f5347aff86f inherit pro_static_methods_classcattle_1_1_neural_network"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a7daf5b9eb47ba2c78c05928a39799cc0 inherit pro_static_methods_classcattle_1_1_neural_network"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="namespacecattle.html#a8b9323ad928764340e46f0802bf27fbb">Tensor</a>&lt; Scalar, Rank+1 &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_neural_network.html#a7daf5b9eb47ba2c78c05928a39799cc0">pass_forward</a> (<a class="el" href="classcattle_1_1_layer.html">Layer</a>&lt; Scalar, Rank &gt; &amp;layer, <a class="el" href="namespacecattle.html#a8b9323ad928764340e46f0802bf27fbb">Tensor</a>&lt; Scalar, Rank+1 &gt; prev_out, bool training)</td></tr>
-<tr class="memdesc:a7daf5b9eb47ba2c78c05928a39799cc0 inherit pro_static_methods_classcattle_1_1_neural_network"><td class="mdescLeft">&#160;</td><td class="mdescRight">A method to expose protected methods of the Layer class to subclasses of NeuralNetwork that are not friend classes of Layer.  <a href="classcattle_1_1_neural_network.html#a7daf5b9eb47ba2c78c05928a39799cc0">More...</a><br /></td></tr>
-<tr class="separator:a7daf5b9eb47ba2c78c05928a39799cc0 inherit pro_static_methods_classcattle_1_1_neural_network"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aabc39ba2e29abb0ab2e34e26dea38f02 inherit pro_static_methods_classcattle_1_1_neural_network"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="namespacecattle.html#a8b9323ad928764340e46f0802bf27fbb">Tensor</a>&lt; Scalar, Rank+1 &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_neural_network.html#aabc39ba2e29abb0ab2e34e26dea38f02">pass_back</a> (<a class="el" href="classcattle_1_1_layer.html">Layer</a>&lt; Scalar, Rank &gt; &amp;layer, <a class="el" href="namespacecattle.html#a8b9323ad928764340e46f0802bf27fbb">Tensor</a>&lt; Scalar, Rank+1 &gt; out_grad)</td></tr>
-<tr class="memdesc:aabc39ba2e29abb0ab2e34e26dea38f02 inherit pro_static_methods_classcattle_1_1_neural_network"><td class="mdescLeft">&#160;</td><td class="mdescRight">A method to expose protected methods of the Layer class to subclasses of NeuralNetwork that are not friend classes of Layer.  <a href="classcattle_1_1_neural_network.html#aabc39ba2e29abb0ab2e34e26dea38f02">More...</a><br /></td></tr>
-<tr class="separator:aabc39ba2e29abb0ab2e34e26dea38f02 inherit pro_static_methods_classcattle_1_1_neural_network"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a64b361839ba75dd77dd4f5cc02323d7d inherit pro_static_methods_classcattle_1_1_neural_network"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="namespacecattle.html#a1d78623a47279d516750a44dbad6090b">Matrix</a>&lt; Scalar &gt; &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_neural_network.html#a64b361839ba75dd77dd4f5cc02323d7d">get_params_grad</a> (<a class="el" href="classcattle_1_1_layer.html">Layer</a>&lt; Scalar, Rank &gt; &amp;layer)</td></tr>
-<tr class="memdesc:a64b361839ba75dd77dd4f5cc02323d7d inherit pro_static_methods_classcattle_1_1_neural_network"><td class="mdescLeft">&#160;</td><td class="mdescRight">A method to expose protected methods of the Layer class to subclasses of NeuralNetwork that are not friend classes of Layer.  <a href="classcattle_1_1_neural_network.html#a64b361839ba75dd77dd4f5cc02323d7d">More...</a><br /></td></tr>
-<tr class="separator:a64b361839ba75dd77dd4f5cc02323d7d inherit pro_static_methods_classcattle_1_1_neural_network"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><h3>template&lt;typename Scalar, std::size_t Rank, bool MulInt = false, bool Stateful = false&gt;<br />
@@ -288,7 +266,7 @@ template&lt;typename Scalar , std::size_t Rank, bool MulInt = false, bool Statef
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">protected</span><span class="mlabel">virtual</span></span>  </td>
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">virtual</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
@@ -550,7 +528,7 @@ template&lt;typename Scalar , std::size_t Rank, bool MulInt = false, bool Statef
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">protected</span><span class="mlabel">virtual</span></span>  </td>
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">virtual</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
@@ -590,7 +568,7 @@ template&lt;typename Scalar , std::size_t Rank, bool MulInt = false, bool Statef
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">protected</span><span class="mlabel">virtual</span></span>  </td>
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">virtual</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
@@ -608,7 +586,7 @@ template&lt;typename Scalar , std::size_t Rank, bool MulInt = false, bool Statef
 </div>
 </div>
 <hr/>The documentation for this class was generated from the following file:<ul>
-<li>C:/Users/Viktor/git/C-ATTL3/C-ATTL3/<a class="el" href="_neural_network_8hpp_source.html">NeuralNetwork.hpp</a></li>
+<li>C:/Users/Viktor/git/C-ATTL3/C-ATTL3/neural_network/<a class="el" href="_recurrent_neural_network_8hpp_source.html">RecurrentNeuralNetwork.hpp</a></li>
 </ul>
 </div><!-- contents -->
 <!-- start footer part -->

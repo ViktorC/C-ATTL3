@@ -70,8 +70,10 @@ protected:
 		Scalar mean_obj_loss = obj_loss / instances;
 		Scalar mean_reg_loss = reg_loss / updates;
 		if (verbose) {
-			std::cout << "\ttraining obj loss: " << std::to_string(mean_obj_loss) << std::endl;
-			std::cout << "\ttraining reg loss: " << std::to_string(mean_reg_loss) << std::endl;
+			std::cout << std::left << std::setw(20) << "\ttraining obj loss: " << std::right <<
+					std::to_string(mean_obj_loss) << std::endl;
+			std::cout << std::left << std::setw(20) << "\ttraining reg loss: " << std::right <<
+					std::to_string(mean_reg_loss) << std::endl;
 		}
 		return mean_obj_loss + mean_reg_loss;
 	}
@@ -95,8 +97,10 @@ protected:
 				reg_loss += params_ptr->get_regularization_penalty();
 		}
 		if (verbose) {
-			std::cout << "\ttest obj loss: " << std::to_string(mean_obj_loss) << std::endl;
-			std::cout << "\ttest reg loss: " << std::to_string(reg_loss) << std::endl;
+			std::cout << std::left << std::setw(20) << "\ttest obj loss: " << std::right <<
+					std::to_string(mean_obj_loss) << std::endl;
+			std::cout << std::left << std::setw(20) << "\ttest reg loss: " << std::right <<
+					std::to_string(reg_loss) << std::endl;
 		}
 		return mean_obj_loss + reg_loss;
 	}

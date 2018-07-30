@@ -86,7 +86,7 @@ $(function() {
 <p>A data provider template for the IMDB Large Movie Review Dataset.  
  <a href="classcattle_1_1_i_m_d_b_data_provider.html#details">More...</a></p>
 
-<p><code>#include &lt;<a class="el" href="_data_provider_8hpp_source.html">DataProvider.hpp</a>&gt;</code></p>
+<p><code>#include &lt;<a class="el" href="_i_m_d_b_data_provider_8hpp_source.html">IMDBDataProvider.hpp</a>&gt;</code></p>
 <div class="dynheader">
 Inheritance diagram for cattle::IMDBDataProvider&lt; Scalar, ObjType &gt;:</div>
 <div class="dyncontent">
@@ -102,12 +102,6 @@ Inheritance diagram for cattle::IMDBDataProvider&lt; Scalar, ObjType &gt;:</div>
 Public Member Functions</h2></td></tr>
 <tr class="memitem:a34f28b48d9891286bec6ccf4c2f13e01"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_i_m_d_b_data_provider.html#a34f28b48d9891286bec6ccf4c2f13e01">IMDBDataProvider</a> (std::string pos_reviews_folder_path, std::string neg_reviews_folder_path, <a class="el" href="namespacecattle.html#ab83dc53a6ce7d48a5ec75509683397ad">VocabSharedPtr</a> vocab, std::size_t seq_length=0)</td></tr>
 <tr class="separator:a34f28b48d9891286bec6ccf4c2f13e01"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a2812022195762ad6bcfe5494171ae2e1"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="classcattle_1_1_dimensions.html">Dimensions</a>&lt; std::size_t, 1 &gt; &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_i_m_d_b_data_provider.html#a2812022195762ad6bcfe5494171ae2e1">get_obs_dims</a> () const</td></tr>
-<tr class="memdesc:a2812022195762ad6bcfe5494171ae2e1"><td class="mdescLeft">&#160;</td><td class="mdescRight">A simple constant getter method for the dimensions of the observations.  <a href="#a2812022195762ad6bcfe5494171ae2e1">More...</a><br /></td></tr>
-<tr class="separator:a2812022195762ad6bcfe5494171ae2e1"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:af88a1af25204d331cee01af8ba4d903f"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="classcattle_1_1_dimensions.html">Dimensions</a>&lt; std::size_t, 1 &gt; &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_i_m_d_b_data_provider.html#af88a1af25204d331cee01af8ba4d903f">get_obj_dims</a> () const</td></tr>
-<tr class="memdesc:af88a1af25204d331cee01af8ba4d903f"><td class="mdescLeft">&#160;</td><td class="mdescRight">A simple constant getter method for the dimensions of the objectives.  <a href="#af88a1af25204d331cee01af8ba4d903f">More...</a><br /></td></tr>
-<tr class="separator:af88a1af25204d331cee01af8ba4d903f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-static-methods"></a>
 Static Public Member Functions</h2></td></tr>
@@ -438,70 +432,6 @@ template&lt;typename Scalar , IMDBObjType ObjType = BINARY&gt; </div>
 
 </div>
 </div>
-<a id="af88a1af25204d331cee01af8ba4d903f"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#af88a1af25204d331cee01af8ba4d903f">&#9670;&nbsp;</a></span>get_obj_dims()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<div class="memtemplate">
-template&lt;typename Scalar , IMDBObjType ObjType = BINARY&gt; </div>
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">const <a class="el" href="classcattle_1_1_dimensions.html">Dimensions</a>&lt;std::size_t,1&gt;&amp; <a class="el" href="classcattle_1_1_i_m_d_b_data_provider.html">cattle::IMDBDataProvider</a>&lt; Scalar, ObjType &gt;::get_obj_dims </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td> const</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">virtual</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>A simple constant getter method for the dimensions of the objectives. </p>
-<dl class="section return"><dt>Returns</dt><dd>A constant reference to the dimensions of the objectives. </dd></dl>
-
-<p>Implements <a class="el" href="classcattle_1_1_data_provider.html#a797875a230c677d448455d87ee00ff78">cattle::DataProvider&lt; Scalar, Rank, Sequential &gt;</a>.</p>
-
-</div>
-</div>
-<a id="a2812022195762ad6bcfe5494171ae2e1"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a2812022195762ad6bcfe5494171ae2e1">&#9670;&nbsp;</a></span>get_obs_dims()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<div class="memtemplate">
-template&lt;typename Scalar , IMDBObjType ObjType = BINARY&gt; </div>
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">const <a class="el" href="classcattle_1_1_dimensions.html">Dimensions</a>&lt;std::size_t,1&gt;&amp; <a class="el" href="classcattle_1_1_i_m_d_b_data_provider.html">cattle::IMDBDataProvider</a>&lt; Scalar, ObjType &gt;::get_obs_dims </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td> const</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">virtual</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>A simple constant getter method for the dimensions of the observations. </p>
-<dl class="section return"><dt>Returns</dt><dd>A constant reference to the dimensions of the observations. </dd></dl>
-
-<p>Implements <a class="el" href="classcattle_1_1_data_provider.html#a8f877a9733373af4c29e86eb5235d00e">cattle::DataProvider&lt; Scalar, Rank, Sequential &gt;</a>.</p>
-
-</div>
-</div>
 <a id="ac49326c75dd304d90090a56716eda9fe"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#ac49326c75dd304d90090a56716eda9fe">&#9670;&nbsp;</a></span>read_files_in_dir()</h2>
 
@@ -594,7 +524,7 @@ template&lt;typename Scalar , IMDBObjType ObjType = BINARY&gt; </div>
 </div>
 </div>
 <hr/>The documentation for this class was generated from the following file:<ul>
-<li>C:/Users/Viktor/git/C-ATTL3/C-ATTL3/<a class="el" href="_data_provider_8hpp_source.html">DataProvider.hpp</a></li>
+<li>C:/Users/Viktor/git/C-ATTL3/C-ATTL3/data_provider/<a class="el" href="_i_m_d_b_data_provider_8hpp_source.html">IMDBDataProvider.hpp</a></li>
 </ul>
 </div><!-- contents -->
 <!-- start footer part -->

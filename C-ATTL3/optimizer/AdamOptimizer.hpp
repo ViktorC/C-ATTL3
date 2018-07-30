@@ -70,7 +70,7 @@ protected:
 		for (auto params_ptr : params_vec) {
 			if (params_ptr->are_frozen())
 				continue;
-			ParamsGradNorms& grad_norms = pgn_vec[i];
+			ParamsGradNorms& grad_norms = pgn_vec[i++];
 			const Matrix<Scalar>& params_grad = params_ptr->get_grad();
 			grad_norms.params_grad_l1 = grad_norms.params_grad_l1 * (1 - l1_decay) + params_grad * l1_decay;
 			grad_norms.params_grad_l2 = grad_norms.params_grad_l2 * (1 - l2_decay) +

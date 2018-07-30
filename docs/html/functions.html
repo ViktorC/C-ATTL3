@@ -76,7 +76,18 @@ $(function() {
 , <a class="el" href="classcattle_1_1_universal_loss_3_01_scalar_00_01_rank_00_01true_01_4.html#a9798706682b90f022ecde4ea2448efb6">cattle::UniversalLoss&lt; Scalar, Rank, true &gt;</a>
 </li>
 <li>_d_reduce()
-: <a class="el" href="classcattle_1_1_pool_layer.html#a88b451faf349bb303657bc6c6d60abf8">cattle::PoolLayer&lt; Scalar, Rank &gt;</a>
+: <a class="el" href="classcattle_1_1_max_pool_layer_base.html#af34fe1a2706503a74ef87f2ed8364a6f">cattle::MaxPoolLayerBase&lt; Scalar, Rank &gt;</a>
+, <a class="el" href="classcattle_1_1_mean_pool_layer_base.html#a11d69acda36367bdb1187f7485b90f9e">cattle::MeanPoolLayerBase&lt; Scalar, Rank &gt;</a>
+, <a class="el" href="classcattle_1_1_pool_layer.html#a88b451faf349bb303657bc6c6d60abf8">cattle::PoolLayer&lt; Scalar, Rank &gt;</a>
+</li>
+<li>_fit()
+: <a class="el" href="classcattle_1_1_ada_delta_optimizer.html#a0e560efb335db6e2271e7113edf32747">cattle::AdaDeltaOptimizer&lt; Scalar, Rank, Sequential &gt;</a>
+, <a class="el" href="classcattle_1_1_ada_grad_optimizer.html#a8b7ae8c5ee2a36fdf01ce51bd5917b54">cattle::AdaGradOptimizer&lt; Scalar, Rank, Sequential &gt;</a>
+, <a class="el" href="classcattle_1_1_adam_optimizer.html#a045f91fc038e583e1ac38f8d7ac6b594">cattle::AdamOptimizer&lt; Scalar, Rank, Sequential &gt;</a>
+, <a class="el" href="classcattle_1_1_a_m_s_grad_optimizer.html#a0e37ca2a9f650bbbcc9f7367381363c6">cattle::AMSGradOptimizer&lt; Scalar, Rank, Sequential &gt;</a>
+, <a class="el" href="classcattle_1_1_momentum_s_g_d_optimizer.html#a9026386f5291232069eb7691dae3209c">cattle::MomentumSGDOptimizer&lt; Scalar, Rank, Sequential &gt;</a>
+, <a class="el" href="classcattle_1_1_s_g_d_optimizer.html#aa07ebb6237cafa7f50b7a76ce1842c95">cattle::SGDOptimizer&lt; Scalar, Rank, Sequential &gt;</a>
+, <a class="el" href="classcattle_1_1_vanilla_s_g_d_optimizer.html#ab61bd3413fabf361894dd9a0e568bcfd">cattle::VanillaSGDOptimizer&lt; Scalar, Rank, Sequential &gt;</a>
 </li>
 <li>_function()
 : <a class="el" href="classcattle_1_1_absolute_loss.html#a0a6408dc2f0c2921a7880d531d0a4f3f">cattle::AbsoluteLoss&lt; Scalar, Rank, Sequential &gt;</a>
@@ -99,17 +110,20 @@ $(function() {
 , <a class="el" href="classcattle_1_1_split_file_data_provider.html#ab443a66f5304b476091a638153aaa25e">cattle::SplitFileDataProvider&lt; Scalar, Rank, Sequential, ObsBinary, ObjBinary &gt;</a>
 </li>
 <li>_init_cache()
-: <a class="el" href="classcattle_1_1_pool_layer.html#ae5c4d2b057b9f7edc6eb3ca4c1b9ade8">cattle::PoolLayer&lt; Scalar, Rank &gt;</a>
+: <a class="el" href="classcattle_1_1_max_pool_layer_base.html#a069f031d5c41d7602bf65f4f21c8fcd2">cattle::MaxPoolLayerBase&lt; Scalar, Rank &gt;</a>
+, <a class="el" href="classcattle_1_1_mean_pool_layer_base.html#ab7afcbc0dacf7a340d313c521c6a4d87">cattle::MeanPoolLayerBase&lt; Scalar, Rank &gt;</a>
+, <a class="el" href="classcattle_1_1_pool_layer.html#ae5c4d2b057b9f7edc6eb3ca4c1b9ade8">cattle::PoolLayer&lt; Scalar, Rank &gt;</a>
 </li>
 <li>_reduce()
-: <a class="el" href="classcattle_1_1_pool_layer.html#af4ba868123db71633f79628f5112fa06">cattle::PoolLayer&lt; Scalar, Rank &gt;</a>
+: <a class="el" href="classcattle_1_1_max_pool_layer_base.html#adba251e3a789c00b852d896e3742f3b4">cattle::MaxPoolLayerBase&lt; Scalar, Rank &gt;</a>
+, <a class="el" href="classcattle_1_1_mean_pool_layer_base.html#a0b9a18aa55e2c5e3653f85950980ab74">cattle::MeanPoolLayerBase&lt; Scalar, Rank &gt;</a>
+, <a class="el" href="classcattle_1_1_pool_layer.html#af4ba868123db71633f79628f5112fa06">cattle::PoolLayer&lt; Scalar, Rank &gt;</a>
 </li>
 <li>_sd()
-: <a class="el" href="classcattle_1_1_gaussian_weight_initialization.html#a3832b44192a20a6c4039008edaa9cab5">cattle::GaussianWeightInitialization&lt; Scalar &gt;</a>
-, <a class="el" href="classcattle_1_1_glorot_weight_initialization.html#a399e14a822992ce9c8cd8127a9407e50">cattle::GlorotWeightInitialization&lt; Scalar &gt;</a>
-, <a class="el" href="classcattle_1_1_he_weight_initialization.html#a7d05aa855a4ddcbe1696a8d1d469ac62">cattle::HeWeightInitialization&lt; Scalar &gt;</a>
-, <a class="el" href="classcattle_1_1_le_cun_weight_initialization.html#ac8de55ced39c6e9695f99153fce3f034">cattle::LeCunWeightInitialization&lt; Scalar &gt;</a>
-, <a class="el" href="classcattle_1_1_orthogonal_weight_initialization.html#aef8bd77b145ce1b31cfbc5b0b2992aef">cattle::OrthogonalWeightInitialization&lt; Scalar &gt;</a>
+: <a class="el" href="classcattle_1_1_gaussian_parameter_initialization.html#a34d4eddc64703330b7dbd722589258a3">cattle::GaussianParameterInitialization&lt; Scalar &gt;</a>
+, <a class="el" href="classcattle_1_1_glorot_parameter_initialization.html#a4fde8453053ca47563ec30affdf6c02c">cattle::GlorotParameterInitialization&lt; Scalar &gt;</a>
+, <a class="el" href="classcattle_1_1_he_parameter_initialization.html#afff9ea96abeaa0233e238c9d47718caf">cattle::HeParameterInitialization&lt; Scalar &gt;</a>
+, <a class="el" href="classcattle_1_1_le_cun_parameter_initialization.html#adb41228f51c7a66e0ae5673075e5e3ef">cattle::LeCunParameterInitialization&lt; Scalar &gt;</a>
 </li>
 <li>_set_to_beg()
 : <a class="el" href="classcattle_1_1_joint_file_data_provider.html#ab7f245fc6c0596e3751c26a5448f4175">cattle::JointFileDataProvider&lt; Scalar, Rank, Sequential, Binary &gt;</a>
@@ -124,28 +138,28 @@ $(function() {
 , <a class="el" href="classcattle_1_1_split_file_data_provider.html#ae019495dd5a51091e18f18c90fdee421">cattle::SplitFileDataProvider&lt; Scalar, Rank, Sequential, ObsBinary, ObjBinary &gt;</a>
 </li>
 <li>_test()
-: <a class="el" href="classcattle_1_1_optimizer.html#ad3fa995b370df8011f6993b3ee121f93">cattle::Optimizer&lt; Scalar, Rank, Sequential &gt;</a>
-, <a class="el" href="classcattle_1_1_s_g_d_optimizer.html#afe74bff294c933acd9d716f73538bcaa">cattle::SGDOptimizer&lt; Scalar, Rank, Sequential &gt;</a>
+: <a class="el" href="classcattle_1_1_optimizer.html#a50cddf9bc4a4e1bee002454582ce9d8f">cattle::Optimizer&lt; Scalar, Rank, Sequential &gt;</a>
+, <a class="el" href="classcattle_1_1_s_g_d_optimizer.html#a854d7d01cad8f34085b9db71970e11e2">cattle::SGDOptimizer&lt; Scalar, Rank, Sequential &gt;</a>
 </li>
 <li>_train()
-: <a class="el" href="classcattle_1_1_optimizer.html#a3be9925988952c49bbb2f4574a2b7dee">cattle::Optimizer&lt; Scalar, Rank, Sequential &gt;</a>
-, <a class="el" href="classcattle_1_1_s_g_d_optimizer.html#a9155a01fd2ed942ed7112e2f4dbff381">cattle::SGDOptimizer&lt; Scalar, Rank, Sequential &gt;</a>
+: <a class="el" href="classcattle_1_1_optimizer.html#a83006f48fb25418cfef79b7239799924">cattle::Optimizer&lt; Scalar, Rank, Sequential &gt;</a>
+, <a class="el" href="classcattle_1_1_s_g_d_optimizer.html#a88c4134991b6391911f45b160515fe2d">cattle::SGDOptimizer&lt; Scalar, Rank, Sequential &gt;</a>
 </li>
 <li>_update_acc_params_grad_sqrs()
 : <a class="el" href="classcattle_1_1_ada_grad_optimizer.html#a1abe74ef8a8814f306c39470ff89f8d6">cattle::AdaGradOptimizer&lt; Scalar, Rank, Sequential &gt;</a>
 , <a class="el" href="classcattle_1_1_r_m_s_prop_optimizer.html#ae2991e561c9c95c8434460c0712e7f41">cattle::RMSPropOptimizer&lt; Scalar, Rank, Sequential &gt;</a>
 </li>
 <li>_update_params()
-: <a class="el" href="classcattle_1_1_ada_delta_optimizer.html#accd5c7fada1abaf98395d52c7c74566d">cattle::AdaDeltaOptimizer&lt; Scalar, Rank, Sequential &gt;</a>
-, <a class="el" href="classcattle_1_1_ada_grad_optimizer.html#a4d5d88db356acf022c8b4ffe26ead4c4">cattle::AdaGradOptimizer&lt; Scalar, Rank, Sequential &gt;</a>
-, <a class="el" href="classcattle_1_1_ada_max_optimizer.html#a16720ce259264c97b339fbe144e44aa6">cattle::AdaMaxOptimizer&lt; Scalar, Rank, Sequential &gt;</a>
-, <a class="el" href="classcattle_1_1_adam_optimizer.html#aca3d6c46cd4a9be07ccd4094ae5efe6c">cattle::AdamOptimizer&lt; Scalar, Rank, Sequential &gt;</a>
-, <a class="el" href="classcattle_1_1_a_m_s_grad_optimizer.html#a4eeceb4869488b637966033db84eb63b">cattle::AMSGradOptimizer&lt; Scalar, Rank, Sequential &gt;</a>
-, <a class="el" href="classcattle_1_1_momentum_accelerated_s_g_d_optimizer.html#a39e75583dfd1b7c19d6ea86317d114aa">cattle::MomentumAcceleratedSGDOptimizer&lt; Scalar, Rank, Sequential &gt;</a>
-, <a class="el" href="classcattle_1_1_nadam_optimizer.html#ada71e3d1bf3482422cc7b0262593b034">cattle::NadamOptimizer&lt; Scalar, Rank, Sequential &gt;</a>
-, <a class="el" href="classcattle_1_1_nesterov_momentum_accelerated_s_g_d_optimizer.html#aa3a9ceb0c50184e41c018c897798afa2">cattle::NesterovMomentumAcceleratedSGDOptimizer&lt; Scalar, Rank, Sequential &gt;</a>
-, <a class="el" href="classcattle_1_1_s_g_d_optimizer.html#ae937dbf0ae64bce50d53e3593be25385">cattle::SGDOptimizer&lt; Scalar, Rank, Sequential &gt;</a>
-, <a class="el" href="classcattle_1_1_vanilla_s_g_d_optimizer.html#a1d44a8a15e06b086d649bed95d5dc0d1">cattle::VanillaSGDOptimizer&lt; Scalar, Rank, Sequential &gt;</a>
+: <a class="el" href="classcattle_1_1_ada_delta_optimizer.html#aec578d690d133bcf401e22160251293f">cattle::AdaDeltaOptimizer&lt; Scalar, Rank, Sequential &gt;</a>
+, <a class="el" href="classcattle_1_1_ada_grad_optimizer.html#ac8f3cf0569db0ae246a1fd3184bfa1fa">cattle::AdaGradOptimizer&lt; Scalar, Rank, Sequential &gt;</a>
+, <a class="el" href="classcattle_1_1_ada_max_optimizer.html#a21dcdad228f481a8010f60a692b50c1e">cattle::AdaMaxOptimizer&lt; Scalar, Rank, Sequential &gt;</a>
+, <a class="el" href="classcattle_1_1_adam_optimizer.html#a6a5e42b994f50eeec27a7d8526b6ba10">cattle::AdamOptimizer&lt; Scalar, Rank, Sequential &gt;</a>
+, <a class="el" href="classcattle_1_1_a_m_s_grad_optimizer.html#ac4f7b78c5c8787167a32106912a23ee7">cattle::AMSGradOptimizer&lt; Scalar, Rank, Sequential &gt;</a>
+, <a class="el" href="classcattle_1_1_momentum_s_g_d_optimizer.html#a8ced4ae90bd6ea28b7337b52830b9dcd">cattle::MomentumSGDOptimizer&lt; Scalar, Rank, Sequential &gt;</a>
+, <a class="el" href="classcattle_1_1_nadam_optimizer.html#aad31889d38536735b205275fcb2ff558">cattle::NadamOptimizer&lt; Scalar, Rank, Sequential &gt;</a>
+, <a class="el" href="classcattle_1_1_nesterov_momentum_s_g_d_optimizer.html#a801d37f4af5612d6f8367c878756027d">cattle::NesterovMomentumSGDOptimizer&lt; Scalar, Rank, Sequential &gt;</a>
+, <a class="el" href="classcattle_1_1_s_g_d_optimizer.html#ae85365a0f7c8609b23b81d48e6e85617">cattle::SGDOptimizer&lt; Scalar, Rank, Sequential &gt;</a>
+, <a class="el" href="classcattle_1_1_vanilla_s_g_d_optimizer.html#a292e471088668353316d825a35a0e386">cattle::VanillaSGDOptimizer&lt; Scalar, Rank, Sequential &gt;</a>
 </li>
 </ul>
 </div><!-- contents -->

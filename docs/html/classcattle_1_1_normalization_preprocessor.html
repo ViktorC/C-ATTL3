@@ -83,7 +83,7 @@ $(function() {
 <p>A class template for a normalization (mean-subtraction) preprocessor that optionally also standardizes the data (divides it by the standard deviation).  
  <a href="classcattle_1_1_normalization_preprocessor.html#details">More...</a></p>
 
-<p><code>#include &lt;<a class="el" href="_preprocessor_8hpp_source.html">Preprocessor.hpp</a>&gt;</code></p>
+<p><code>#include &lt;<a class="el" href="_normalization_preprocessor_8hpp_source.html">NormalizationPreprocessor.hpp</a>&gt;</code></p>
 <div class="dynheader">
 Inheritance diagram for cattle::NormalizationPreprocessor&lt; Scalar, Rank, Standardize, PerLastRank &gt;:</div>
 <div class="dyncontent">
@@ -100,8 +100,8 @@ Inheritance diagram for cattle::NormalizationPreprocessor&lt; Scalar, Rank, Stan
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:aca4d266cd7b0b7a069b26224250e9611"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_normalization_preprocessor.html#aca4d266cd7b0b7a069b26224250e9611">NormalizationPreprocessor</a> (Scalar epsilon=<a class="el" href="classcattle_1_1internal_1_1_numeric_utils.html">internal::NumericUtils</a>&lt; Scalar &gt;::EPSILON2)</td></tr>
-<tr class="separator:aca4d266cd7b0b7a069b26224250e9611"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a851cba3ef2aa08605deb3df0c05d58da"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_normalization_preprocessor.html#a851cba3ef2aa08605deb3df0c05d58da">NormalizationPreprocessor</a> (Scalar epsilon=<a class="el" href="classcattle_1_1_numeric_utils.html">NumericUtils</a>&lt; Scalar &gt;::EPSILON2)</td></tr>
+<tr class="separator:a851cba3ef2aa08605deb3df0c05d58da"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="inherit_header pub_methods_classcattle_1_1_preprocessor"><td colspan="2" onclick="javascript:toggleInherit('pub_methods_classcattle_1_1_preprocessor')"><img src="closed.png" alt="-"/>&#160;Public Member Functions inherited from <a class="el" href="classcattle_1_1_preprocessor.html">cattle::Preprocessor&lt; Scalar, Rank, false &gt;</a></td></tr>
 <tr class="memitem:a939ef7f0d6351ad52ce53fb1431df5db inherit pub_methods_classcattle_1_1_preprocessor"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_preprocessor.html#a939ef7f0d6351ad52ce53fb1431df5db">fit</a> (const <a class="el" href="namespacecattle.html#a8b9323ad928764340e46f0802bf27fbb">Tensor</a>&lt; Scalar, Rank+Sequential+1 &gt; &amp;data)=0</td></tr>
 <tr class="memdesc:a939ef7f0d6351ad52ce53fb1431df5db inherit pub_methods_classcattle_1_1_preprocessor"><td class="mdescLeft">&#160;</td><td class="mdescRight">It fits the preprocessor to the specified data.  <a href="classcattle_1_1_preprocessor.html#a939ef7f0d6351ad52ce53fb1431df5db">More...</a><br /></td></tr>
@@ -116,8 +116,8 @@ class cattle::NormalizationPreprocessor&lt; Scalar, Rank, Standardize, PerLastRa
 
 <p>A class template for a normalization (mean-subtraction) preprocessor that optionally also standardizes the data (divides it by the standard deviation). </p>
 </div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
-<a id="aca4d266cd7b0b7a069b26224250e9611"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aca4d266cd7b0b7a069b26224250e9611">&#9670;&nbsp;</a></span>NormalizationPreprocessor()</h2>
+<a id="a851cba3ef2aa08605deb3df0c05d58da"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a851cba3ef2aa08605deb3df0c05d58da">&#9670;&nbsp;</a></span>NormalizationPreprocessor()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -131,7 +131,7 @@ template&lt;typename Scalar , std::size_t Rank, bool Standardize = false, bool P
           <td class="memname"><a class="el" href="classcattle_1_1_normalization_preprocessor.html">cattle::NormalizationPreprocessor</a>&lt; Scalar, Rank, Standardize, PerLastRank &gt;::<a class="el" href="classcattle_1_1_normalization_preprocessor.html">NormalizationPreprocessor</a> </td>
           <td>(</td>
           <td class="paramtype">Scalar&#160;</td>
-          <td class="paramname"><em>epsilon</em> = <code><a class="el" href="classcattle_1_1internal_1_1_numeric_utils.html">internal::NumericUtils</a>&lt;Scalar&gt;::EPSILON2</code></td><td>)</td>
+          <td class="paramname"><em>epsilon</em> = <code><a class="el" href="classcattle_1_1_numeric_utils.html">NumericUtils</a>&lt;Scalar&gt;::EPSILON2</code></td><td>)</td>
           <td></td>
         </tr>
       </table>
@@ -151,7 +151,7 @@ template&lt;typename Scalar , std::size_t Rank, bool Standardize = false, bool P
 </div>
 </div>
 <hr/>The documentation for this class was generated from the following file:<ul>
-<li>C:/Users/Viktor/git/C-ATTL3/C-ATTL3/<a class="el" href="_preprocessor_8hpp_source.html">Preprocessor.hpp</a></li>
+<li>C:/Users/Viktor/git/C-ATTL3/C-ATTL3/preprocessor/<a class="el" href="_normalization_preprocessor_8hpp_source.html">NormalizationPreprocessor.hpp</a></li>
 </ul>
 </div><!-- contents -->
 <!-- start footer part -->

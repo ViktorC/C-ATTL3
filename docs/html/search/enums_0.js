@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['cifartype',['CIFARType',['../namespacecattle.html#a3aba4c1d42028d369dfb60a0507d3785',1,'cattle']]]
+  ['bidirectionaloutputmergetype',['BidirectionalOutputMergeType',['../namespacecattle.html#a6a9990c0572d90cec86e4891a58363fd',1,'cattle']]]
 ];

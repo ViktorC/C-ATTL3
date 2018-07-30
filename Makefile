@@ -18,14 +18,14 @@ INCLUDES := -IC-ATTL3 -IEigen -I$(GTEST_DIR)/include -Itest/
 LIBS := -lpthread -lgomp
 HEADERS := $(shell find C-ATTL3 -name '*.hpp')
 SOURCE_DIR := test
-SOURCES := test.cpp
+SOURCES := gradient_test.cpp training_test.cpp main_test.cpp
 BUILD_DIR := build
 COV_DIR := $(BUILD_DIR)/cov
 TARGET_DIR := bin
 TARGET_NAME := cattle_test.exe
 GTEST_MAKE_PATH := $(GTEST_DIR)/make
 TARGET := $(TARGET_DIR)/$(TARGET_NAME)
-OBJECTS := $(BUILD_DIR)/$(SOURCES:%.cpp=%.o)
+OBJECTS := $(SOURCES:%.cpp=$(BUILD_DIR)/%.o)
 $(OBJECTS): $(BUILD_DIR)/%.o: $(SOURCE_DIR)/%.cpp
 	@cd $(GTEST_MAKE_PATH) && make gtest-all.o && cd $(CURDIR)
 	@mkdir -p $(BUILD_DIR)

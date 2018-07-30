@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['imdbobjtype',['IMDBObjType',['../namespacecattle.html#a63e81f333116ee5d70c1e71258a3ac5a',1,'cattle']]]
+  ['denseconcattype',['DenseConcatType',['../namespacecattle.html#a962c4b25a74fac744864b9fa4fca4a0b',1,'cattle']]]
 ];

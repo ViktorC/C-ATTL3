@@ -16,7 +16,7 @@ int main() {
 	IMDBDataProvider<float> train_prov(imdb_folder + "train/pos", imdb_folder + "train/neg", vocab);
 	// Set up the word2vec neural network.
 	const std::size_t latent_dims = 100;
-	auto init = std::make_shared<GlorotWeightInitialization<float>>();
+	auto init = std::make_shared<GlorotParameterInitialization<float>>();
 	std::vector<NeuralNetPtr<float,1,false>> modules(2);
 	modules[0] = NeuralNetPtr<float,1,false>(new FeedforwardNeuralNetwork<float,1>(
 			LayerPtr<float,1>(new DenseKernelLayer<float>({ vocab_size }, latent_dims, init))));

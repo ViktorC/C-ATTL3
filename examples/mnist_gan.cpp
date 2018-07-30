@@ -28,7 +28,7 @@ int main() {
 			TensorPtr<float,4>(new Tensor<float,4>(std::move(mnist_test_data))),
 			TensorPtr<float,4>(new Tensor<float,4>(std::move(mnist_test_label))));
 	// Create the GAN.
-	auto init = std::make_shared<GaussianWeightInitialization<float>>(2e-2);
+	auto init = std::make_shared<GaussianParameterInitialization<float>>(2e-2);
 	float lrelu_alpha = .2;
 	float dropout = .3;
 	std::vector<LayerPtr<float,3>> generator_layers(9);

@@ -83,7 +83,7 @@ $(function() {
 <p>Partial template specialization of the PCA preprocessor for single channel data.  
  <a href="classcattle_1_1_p_c_a_preprocessor_3_01_scalar_00_01_rank_00_01_standardize_00_01_whiten_00_01false_01_4.html#details">More...</a></p>
 
-<p><code>#include &lt;<a class="el" href="_preprocessor_8hpp_source.html">Preprocessor.hpp</a>&gt;</code></p>
+<p><code>#include &lt;<a class="el" href="_p_c_a_preprocessor_8hpp_source.html">PCAPreprocessor.hpp</a>&gt;</code></p>
 <div class="dynheader">
 Inheritance diagram for cattle::PCAPreprocessor&lt; Scalar, Rank, Standardize, Whiten, false &gt;:</div>
 <div class="dyncontent">
@@ -98,11 +98,11 @@ Inheritance diagram for cattle::PCAPreprocessor&lt; Scalar, Rank, Standardize, W
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:a723dff2b8ec862dc7e25aaf4234f0b95"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_p_c_a_preprocessor_3_01_scalar_00_01_rank_00_01_standardize_00_01_whiten_00_01false_01_4.html#a723dff2b8ec862dc7e25aaf4234f0b95">PCAPreprocessor</a> (Scalar min_rel_var_to_retain=1, Scalar epsilon=<a class="el" href="classcattle_1_1internal_1_1_numeric_utils.html">internal::NumericUtils</a>&lt; Scalar &gt;::EPSILON2)</td></tr>
-<tr class="separator:a723dff2b8ec862dc7e25aaf4234f0b95"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a82089827a13ef147c4d704de6904de93"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_p_c_a_preprocessor_3_01_scalar_00_01_rank_00_01_standardize_00_01_whiten_00_01false_01_4.html#a82089827a13ef147c4d704de6904de93">PCAPreprocessor</a> (Scalar min_rel_var_to_retain=1, Scalar epsilon=<a class="el" href="classcattle_1_1_numeric_utils.html">NumericUtils</a>&lt; Scalar &gt;::EPSILON2)</td></tr>
+<tr class="separator:a82089827a13ef147c4d704de6904de93"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="inherit_header pub_methods_classcattle_1_1_normalization_preprocessor"><td colspan="2" onclick="javascript:toggleInherit('pub_methods_classcattle_1_1_normalization_preprocessor')"><img src="closed.png" alt="-"/>&#160;Public Member Functions inherited from <a class="el" href="classcattle_1_1_normalization_preprocessor.html">cattle::NormalizationPreprocessor&lt; Scalar, Rank, Standardize, PerLastRank &gt;</a></td></tr>
-<tr class="memitem:aca4d266cd7b0b7a069b26224250e9611 inherit pub_methods_classcattle_1_1_normalization_preprocessor"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_normalization_preprocessor.html#aca4d266cd7b0b7a069b26224250e9611">NormalizationPreprocessor</a> (Scalar epsilon=<a class="el" href="classcattle_1_1internal_1_1_numeric_utils.html">internal::NumericUtils</a>&lt; Scalar &gt;::EPSILON2)</td></tr>
-<tr class="separator:aca4d266cd7b0b7a069b26224250e9611 inherit pub_methods_classcattle_1_1_normalization_preprocessor"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a851cba3ef2aa08605deb3df0c05d58da inherit pub_methods_classcattle_1_1_normalization_preprocessor"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_normalization_preprocessor.html#a851cba3ef2aa08605deb3df0c05d58da">NormalizationPreprocessor</a> (Scalar epsilon=<a class="el" href="classcattle_1_1_numeric_utils.html">NumericUtils</a>&lt; Scalar &gt;::EPSILON2)</td></tr>
+<tr class="separator:a851cba3ef2aa08605deb3df0c05d58da inherit pub_methods_classcattle_1_1_normalization_preprocessor"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="inherit_header pub_methods_classcattle_1_1_preprocessor"><td colspan="2" onclick="javascript:toggleInherit('pub_methods_classcattle_1_1_preprocessor')"><img src="closed.png" alt="-"/>&#160;Public Member Functions inherited from <a class="el" href="classcattle_1_1_preprocessor.html">cattle::Preprocessor&lt; Scalar, Rank, false &gt;</a></td></tr>
 <tr class="memitem:a939ef7f0d6351ad52ce53fb1431df5db inherit pub_methods_classcattle_1_1_preprocessor"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_preprocessor.html#a939ef7f0d6351ad52ce53fb1431df5db">fit</a> (const <a class="el" href="namespacecattle.html#a8b9323ad928764340e46f0802bf27fbb">Tensor</a>&lt; Scalar, Rank+Sequential+1 &gt; &amp;data)=0</td></tr>
 <tr class="memdesc:a939ef7f0d6351ad52ce53fb1431df5db inherit pub_methods_classcattle_1_1_preprocessor"><td class="mdescLeft">&#160;</td><td class="mdescRight">It fits the preprocessor to the specified data.  <a href="classcattle_1_1_preprocessor.html#a939ef7f0d6351ad52ce53fb1431df5db">More...</a><br /></td></tr>
@@ -117,8 +117,8 @@ class cattle::PCAPreprocessor&lt; Scalar, Rank, Standardize, Whiten, false &gt;<
 
 <p>Partial template specialization of the PCA preprocessor for single channel data. </p>
 </div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
-<a id="a723dff2b8ec862dc7e25aaf4234f0b95"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a723dff2b8ec862dc7e25aaf4234f0b95">&#9670;&nbsp;</a></span>PCAPreprocessor()</h2>
+<a id="a82089827a13ef147c4d704de6904de93"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a82089827a13ef147c4d704de6904de93">&#9670;&nbsp;</a></span>PCAPreprocessor()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -138,7 +138,7 @@ template&lt;typename Scalar , std::size_t Rank, bool Standardize, bool Whiten&gt
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">Scalar&#160;</td>
-          <td class="paramname"><em>epsilon</em> = <code><a class="el" href="classcattle_1_1internal_1_1_numeric_utils.html">internal::NumericUtils</a>&lt;Scalar&gt;::EPSILON2</code>&#160;</td>
+          <td class="paramname"><em>epsilon</em> = <code><a class="el" href="classcattle_1_1_numeric_utils.html">NumericUtils</a>&lt;Scalar&gt;::EPSILON2</code>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -163,7 +163,7 @@ template&lt;typename Scalar , std::size_t Rank, bool Standardize, bool Whiten&gt
 </div>
 </div>
 <hr/>The documentation for this class was generated from the following file:<ul>
-<li>C:/Users/Viktor/git/C-ATTL3/C-ATTL3/<a class="el" href="_preprocessor_8hpp_source.html">Preprocessor.hpp</a></li>
+<li>C:/Users/Viktor/git/C-ATTL3/C-ATTL3/preprocessor/<a class="el" href="_p_c_a_preprocessor_8hpp_source.html">PCAPreprocessor.hpp</a></li>
 </ul>
 </div><!-- contents -->
 <!-- start footer part -->

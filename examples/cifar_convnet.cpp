@@ -18,8 +18,8 @@ int main() {
 	// Create a data provider for the test data as well.
 	CIFARDataProvider<float> file_test_prov(cifar_folder + "test_batch.bin");
 	// Specify the weight initializations.
-	auto conv_init = std::make_shared<HeWeightInitialization<float>>(1e-1);
-	auto dense_init = std::make_shared<GlorotWeightInitialization<float>>(1e-1);
+	auto conv_init = std::make_shared<HeParameterInitialization<float>>(1e-1);
+	auto dense_init = std::make_shared<GlorotParameterInitialization<float>>(1e-1);
 	// Create the network.
 	std::vector<LayerPtr<float,3>> layers(12);
 	layers[0] = LayerPtr<float,3>(new ConvKernelLayer<float>(file_train_prov.get_obs_dims(), 8, conv_init));
@@ -39,7 +39,7 @@ int main() {
 	nn.init();
 	// Specify the loss and the optimizer.
 	auto loss = std::make_shared<CrossEntropyLoss<float,3,false>>();
-	AdaDeltaOptimizer<float,3,false> opt(loss, 200);
+	NadamOptimizer<float,3,false> opt(loss, 200);
 	// Optimize the network and measure how long it takes.
 	std::chrono::steady_clock::time_point begin = std::chrono::steady_clock::now();
 	opt.optimize(nn, file_train_prov, file_test_prov, 10);

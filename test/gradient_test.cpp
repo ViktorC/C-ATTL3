@@ -1,12 +1,9 @@
 /*
- * gradient_test.hpp
+ * gradient_test.cpp
  *
  *  Created on: 19.04.2018
  *      Author: Viktor Csomor
  */
-
-#ifndef GRADIENT_TEST_HPP_
-#define GRADIENT_TEST_HPP_
 
 #include <algorithm>
 #include <array>
@@ -1316,5 +1313,3 @@ TEST(GradientTest, MultiLabelLogLoss) {
 
 } /* namespace test */
 } /* namespace cattle */
-
-#endif /* GRADIENT_TEST_HPP_ */

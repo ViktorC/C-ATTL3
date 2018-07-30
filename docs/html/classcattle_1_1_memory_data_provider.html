@@ -74,7 +74,6 @@ $(function() {
 <div class="header">
   <div class="summary">
 <a href="#pub-methods">Public Member Functions</a> &#124;
-<a href="#pro-methods">Protected Member Functions</a> &#124;
 <a href="classcattle_1_1_memory_data_provider-members.html">List of all members</a>  </div>
   <div class="headertitle">
 <div class="title">cattle::MemoryDataProvider&lt; Scalar, Rank, Sequential, Shuffle &gt; Class Template Reference</div>  </div>
@@ -84,7 +83,7 @@ $(function() {
 <p>A data provider that reads from the memory.  
  <a href="classcattle_1_1_memory_data_provider.html#details">More...</a></p>
 
-<p><code>#include &lt;<a class="el" href="_data_provider_8hpp_source.html">DataProvider.hpp</a>&gt;</code></p>
+<p><code>#include &lt;<a class="el" href="_memory_data_provider_8hpp_source.html">MemoryDataProvider.hpp</a>&gt;</code></p>
 <div class="dynheader">
 Inheritance diagram for cattle::MemoryDataProvider&lt; Scalar, Rank, Sequential, Shuffle &gt;:</div>
 <div class="dyncontent">
@@ -97,15 +96,15 @@ Inheritance diagram for cattle::MemoryDataProvider&lt; Scalar, Rank, Sequential,
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:a6376047b2d04dafb02a033275eb28fce"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_memory_data_provider.html#a6376047b2d04dafb02a033275eb28fce">MemoryDataProvider</a> (typename Base::DataPtr obs, typename Base::DataPtr obj)</td></tr>
-<tr class="memdesc:a6376047b2d04dafb02a033275eb28fce"><td class="mdescLeft">&#160;</td><td class="mdescRight">It constructs a data provider backed by the specified tensors.  <a href="#a6376047b2d04dafb02a033275eb28fce">More...</a><br /></td></tr>
-<tr class="separator:a6376047b2d04dafb02a033275eb28fce"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:acca261042393126d0c6b0fb7ed1b025e"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="classcattle_1_1_dimensions.html">Dimensions</a>&lt; std::size_t, Rank &gt; &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_memory_data_provider.html#acca261042393126d0c6b0fb7ed1b025e">get_obs_dims</a> () const</td></tr>
-<tr class="memdesc:acca261042393126d0c6b0fb7ed1b025e"><td class="mdescLeft">&#160;</td><td class="mdescRight">A simple constant getter method for the dimensions of the observations.  <a href="#acca261042393126d0c6b0fb7ed1b025e">More...</a><br /></td></tr>
-<tr class="separator:acca261042393126d0c6b0fb7ed1b025e"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ae5ca8e3e35775c1f118d9c8029b7b507"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="classcattle_1_1_dimensions.html">Dimensions</a>&lt; std::size_t, Rank &gt; &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_memory_data_provider.html#ae5ca8e3e35775c1f118d9c8029b7b507">get_obj_dims</a> () const</td></tr>
-<tr class="memdesc:ae5ca8e3e35775c1f118d9c8029b7b507"><td class="mdescLeft">&#160;</td><td class="mdescRight">A simple constant getter method for the dimensions of the objectives.  <a href="#ae5ca8e3e35775c1f118d9c8029b7b507">More...</a><br /></td></tr>
-<tr class="separator:ae5ca8e3e35775c1f118d9c8029b7b507"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aea84331dd52e3caddedb1a292aa32d74"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_memory_data_provider.html#aea84331dd52e3caddedb1a292aa32d74">MemoryDataProvider</a> (DataPtr obs, DataPtr obj)</td></tr>
+<tr class="memdesc:aea84331dd52e3caddedb1a292aa32d74"><td class="mdescLeft">&#160;</td><td class="mdescRight">It constructs a data provider backed by the specified tensors.  <a href="#aea84331dd52e3caddedb1a292aa32d74">More...</a><br /></td></tr>
+<tr class="separator:aea84331dd52e3caddedb1a292aa32d74"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a8c2481eb2a81c316f8f5119f02b8cc02"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="classcattle_1_1_dimensions.html">Base::Dims</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_memory_data_provider.html#a8c2481eb2a81c316f8f5119f02b8cc02">get_obs_dims</a> () const</td></tr>
+<tr class="memdesc:a8c2481eb2a81c316f8f5119f02b8cc02"><td class="mdescLeft">&#160;</td><td class="mdescRight">A simple constant getter method for the dimensions of the observations.  <a href="#a8c2481eb2a81c316f8f5119f02b8cc02">More...</a><br /></td></tr>
+<tr class="separator:a8c2481eb2a81c316f8f5119f02b8cc02"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2c1d7f5615ffdf1bb422450d189a9d95"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="classcattle_1_1_dimensions.html">Base::Dims</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_memory_data_provider.html#a2c1d7f5615ffdf1bb422450d189a9d95">get_obj_dims</a> () const</td></tr>
+<tr class="memdesc:a2c1d7f5615ffdf1bb422450d189a9d95"><td class="mdescLeft">&#160;</td><td class="mdescRight">A simple constant getter method for the dimensions of the objectives.  <a href="#a2c1d7f5615ffdf1bb422450d189a9d95">More...</a><br /></td></tr>
+<tr class="separator:a2c1d7f5615ffdf1bb422450d189a9d95"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a3b0281356e976cd5cd61985e3bd245b9"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_memory_data_provider.html#a3b0281356e976cd5cd61985e3bd245b9">has_more</a> ()</td></tr>
 <tr class="memdesc:a3b0281356e976cd5cd61985e3bd245b9"><td class="mdescLeft">&#160;</td><td class="mdescRight">A method that returns whether the data provider instance has more data to provide.  <a href="#a3b0281356e976cd5cd61985e3bd245b9">More...</a><br /></td></tr>
 <tr class="separator:a3b0281356e976cd5cd61985e3bd245b9"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -116,9 +115,6 @@ Public Member Functions</h2></td></tr>
 void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_memory_data_provider.html#acd2d39fd367b01f0eb0499978eac43ac">reset</a> ()</td></tr>
 <tr class="memdesc:acd2d39fd367b01f0eb0499978eac43ac"><td class="mdescLeft">&#160;</td><td class="mdescRight">It resets the reader head to the beginning of the data storage. <br /></td></tr>
 <tr class="separator:acd2d39fd367b01f0eb0499978eac43ac"><td class="memSeparator" colspan="2">&#160;</td></tr>
-</table><table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pro-methods"></a>
-Protected Member Functions</h2></td></tr>
 <tr class="memitem:a80b122ac739ec1614856fc6d01d3876d"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_memory_data_provider.html#a80b122ac739ec1614856fc6d01d3876d">skip</a> (std::size_t instances)</td></tr>
 <tr class="memdesc:a80b122ac739ec1614856fc6d01d3876d"><td class="mdescLeft">&#160;</td><td class="mdescRight">It skips the specified number of data points.  <a href="#a80b122ac739ec1614856fc6d01d3876d">More...</a><br /></td></tr>
 <tr class="separator:a80b122ac739ec1614856fc6d01d3876d"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -130,8 +126,8 @@ class cattle::MemoryDataProvider&lt; Scalar, Rank, Sequential, Shuffle &gt;</h3>
 <p>A data provider that reads from the memory. </p>
 <p>It requires the entire observation and objective data sets to be loaded into memory, but it fetches pairs faster. </p>
 </div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
-<a id="a6376047b2d04dafb02a033275eb28fce"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a6376047b2d04dafb02a033275eb28fce">&#9670;&nbsp;</a></span>MemoryDataProvider()</h2>
+<a id="aea84331dd52e3caddedb1a292aa32d74"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aea84331dd52e3caddedb1a292aa32d74">&#9670;&nbsp;</a></span>MemoryDataProvider()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -144,13 +140,13 @@ template&lt;typename Scalar , std::size_t Rank, bool Sequential, bool Shuffle = 
         <tr>
           <td class="memname"><a class="el" href="classcattle_1_1_memory_data_provider.html">cattle::MemoryDataProvider</a>&lt; Scalar, Rank, Sequential, Shuffle &gt;::<a class="el" href="classcattle_1_1_memory_data_provider.html">MemoryDataProvider</a> </td>
           <td>(</td>
-          <td class="paramtype">typename Base::DataPtr&#160;</td>
+          <td class="paramtype">DataPtr&#160;</td>
           <td class="paramname"><em>obs</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">typename Base::DataPtr&#160;</td>
+          <td class="paramtype">DataPtr&#160;</td>
           <td class="paramname"><em>obj</em>&#160;</td>
         </tr>
         <tr>
@@ -218,8 +214,8 @@ template&lt;typename Scalar , std::size_t Rank, bool Sequential, bool Shuffle = 
 
 </div>
 </div>
-<a id="ae5ca8e3e35775c1f118d9c8029b7b507"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ae5ca8e3e35775c1f118d9c8029b7b507">&#9670;&nbsp;</a></span>get_obj_dims()</h2>
+<a id="a2c1d7f5615ffdf1bb422450d189a9d95"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a2c1d7f5615ffdf1bb422450d189a9d95">&#9670;&nbsp;</a></span>get_obj_dims()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -230,7 +226,7 @@ template&lt;typename Scalar , std::size_t Rank, bool Sequential, bool Shuffle = 
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">const <a class="el" href="classcattle_1_1_dimensions.html">Dimensions</a>&lt;std::size_t,Rank&gt;&amp; <a class="el" href="classcattle_1_1_memory_data_provider.html">cattle::MemoryDataProvider</a>&lt; Scalar, Rank, Sequential, Shuffle &gt;::get_obj_dims </td>
+          <td class="memname">const <a class="el" href="classcattle_1_1_dimensions.html">Base::Dims</a>&amp; <a class="el" href="classcattle_1_1_memory_data_provider.html">cattle::MemoryDataProvider</a>&lt; Scalar, Rank, Sequential, Shuffle &gt;::get_obj_dims </td>
           <td>(</td>
           <td class="paramname"></td><td>)</td>
           <td> const</td>
@@ -246,12 +242,12 @@ template&lt;typename Scalar , std::size_t Rank, bool Sequential, bool Shuffle = 
 <p>A simple constant getter method for the dimensions of the objectives. </p>
 <dl class="section return"><dt>Returns</dt><dd>A constant reference to the dimensions of the objectives. </dd></dl>
 
-<p>Implements <a class="el" href="classcattle_1_1_data_provider.html#a797875a230c677d448455d87ee00ff78">cattle::DataProvider&lt; Scalar, Rank, Sequential &gt;</a>.</p>
+<p>Implements <a class="el" href="classcattle_1_1_data_provider.html#a372ae0fde2d0322edb5bb3692b552e42">cattle::DataProvider&lt; Scalar, Rank, Sequential &gt;</a>.</p>
 
 </div>
 </div>
-<a id="acca261042393126d0c6b0fb7ed1b025e"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#acca261042393126d0c6b0fb7ed1b025e">&#9670;&nbsp;</a></span>get_obs_dims()</h2>
+<a id="a8c2481eb2a81c316f8f5119f02b8cc02"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a8c2481eb2a81c316f8f5119f02b8cc02">&#9670;&nbsp;</a></span>get_obs_dims()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -262,7 +258,7 @@ template&lt;typename Scalar , std::size_t Rank, bool Sequential, bool Shuffle = 
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">const <a class="el" href="classcattle_1_1_dimensions.html">Dimensions</a>&lt;std::size_t,Rank&gt;&amp; <a class="el" href="classcattle_1_1_memory_data_provider.html">cattle::MemoryDataProvider</a>&lt; Scalar, Rank, Sequential, Shuffle &gt;::get_obs_dims </td>
+          <td class="memname">const <a class="el" href="classcattle_1_1_dimensions.html">Base::Dims</a>&amp; <a class="el" href="classcattle_1_1_memory_data_provider.html">cattle::MemoryDataProvider</a>&lt; Scalar, Rank, Sequential, Shuffle &gt;::get_obs_dims </td>
           <td>(</td>
           <td class="paramname"></td><td>)</td>
           <td> const</td>
@@ -278,7 +274,7 @@ template&lt;typename Scalar , std::size_t Rank, bool Sequential, bool Shuffle = 
 <p>A simple constant getter method for the dimensions of the observations. </p>
 <dl class="section return"><dt>Returns</dt><dd>A constant reference to the dimensions of the observations. </dd></dl>
 
-<p>Implements <a class="el" href="classcattle_1_1_data_provider.html#a8f877a9733373af4c29e86eb5235d00e">cattle::DataProvider&lt; Scalar, Rank, Sequential &gt;</a>.</p>
+<p>Implements <a class="el" href="classcattle_1_1_data_provider.html#ad9897f3c8b40599ebae56c8d77c57b90">cattle::DataProvider&lt; Scalar, Rank, Sequential &gt;</a>.</p>
 
 </div>
 </div>
@@ -336,7 +332,7 @@ template&lt;typename Scalar , std::size_t Rank, bool Sequential, bool Shuffle = 
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">protected</span><span class="mlabel">virtual</span></span>  </td>
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">virtual</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
@@ -355,7 +351,7 @@ template&lt;typename Scalar , std::size_t Rank, bool Sequential, bool Shuffle = 
 </div>
 </div>
 <hr/>The documentation for this class was generated from the following file:<ul>
-<li>C:/Users/Viktor/git/C-ATTL3/C-ATTL3/<a class="el" href="_data_provider_8hpp_source.html">DataProvider.hpp</a></li>
+<li>C:/Users/Viktor/git/C-ATTL3/C-ATTL3/data_provider/<a class="el" href="_memory_data_provider_8hpp_source.html">MemoryDataProvider.hpp</a></li>
 </ul>
 </div><!-- contents -->
 <!-- start footer part -->

@@ -74,7 +74,6 @@ $(function() {
 <div class="header">
   <div class="summary">
 <a href="#pub-methods">Public Member Functions</a> &#124;
-<a href="#pro-methods">Protected Member Functions</a> &#124;
 <a href="classcattle_1_1_dropout_layer-members.html">List of all members</a>  </div>
   <div class="headertitle">
 <div class="title">cattle::DropoutLayer&lt; Scalar, Rank &gt; Class Template Reference</div>  </div>
@@ -84,7 +83,7 @@ $(function() {
 <p>A class template representing a drop-out layer.  
  <a href="classcattle_1_1_dropout_layer.html#details">More...</a></p>
 
-<p><code>#include &lt;<a class="el" href="_layer_8hpp_source.html">Layer.hpp</a>&gt;</code></p>
+<p><code>#include &lt;<a class="el" href="_dropout_layer_8hpp_source.html">DropoutLayer.hpp</a>&gt;</code></p>
 <div class="dynheader">
 Inheritance diagram for cattle::DropoutLayer&lt; Scalar, Rank &gt;:</div>
 <div class="dyncontent">
@@ -97,8 +96,8 @@ Inheritance diagram for cattle::DropoutLayer&lt; Scalar, Rank &gt;:</div>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:aaa346c955d02369927de664087a32999"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_dropout_layer.html#aaa346c955d02369927de664087a32999">DropoutLayer</a> (const <a class="el" href="classcattle_1_1_dimensions.html">Dimensions</a>&lt; std::size_t, Rank &gt; &amp;dims, Scalar dropout_prob, Scalar epsilon=<a class="el" href="classcattle_1_1internal_1_1_numeric_utils.html">internal::NumericUtils</a>&lt; Scalar &gt;::EPSILON2)</td></tr>
-<tr class="separator:aaa346c955d02369927de664087a32999"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad1702a56e7165547f1bfb86ea2594f47"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_dropout_layer.html#ad1702a56e7165547f1bfb86ea2594f47">DropoutLayer</a> (const typename <a class="el" href="classcattle_1_1_dimensions.html">Base::Dims</a> &amp;dims, Scalar dropout_prob, Scalar epsilon=<a class="el" href="classcattle_1_1_numeric_utils.html">NumericUtils</a>&lt; Scalar &gt;::EPSILON2)</td></tr>
+<tr class="separator:ad1702a56e7165547f1bfb86ea2594f47"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a0206c8917c45b9ac3f4388fa29ab9a26"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classcattle_1_1_layer.html">Base</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_dropout_layer.html#a0206c8917c45b9ac3f4388fa29ab9a26">clone</a> () const</td></tr>
 <tr class="memdesc:a0206c8917c45b9ac3f4388fa29ab9a26"><td class="mdescLeft">&#160;</td><td class="mdescRight">It returns a clone of the layer instance.  <a href="#a0206c8917c45b9ac3f4388fa29ab9a26">More...</a><br /></td></tr>
 <tr class="separator:a0206c8917c45b9ac3f4388fa29ab9a26"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -108,72 +107,41 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a8fb4d7ea9030d99c74a04902bea3d477"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="classcattle_1_1_layer.html">Base</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_dropout_layer.html#a8fb4d7ea9030d99c74a04902bea3d477">get_params_owner</a> () const</td></tr>
 <tr class="memdesc:a8fb4d7ea9030d99c74a04902bea3d477"><td class="mdescLeft">&#160;</td><td class="mdescRight">It returns a reference to the layer owning the parameters used.  <a href="#a8fb4d7ea9030d99c74a04902bea3d477">More...</a><br /></td></tr>
 <tr class="separator:a8fb4d7ea9030d99c74a04902bea3d477"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a24cc229aaaa68fe8889c4c05f5a1529a"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="classcattle_1_1_dimensions.html">Dimensions</a>&lt; std::size_t, Rank &gt; &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_dropout_layer.html#a24cc229aaaa68fe8889c4c05f5a1529a">get_input_dims</a> () const</td></tr>
-<tr class="memdesc:a24cc229aaaa68fe8889c4c05f5a1529a"><td class="mdescLeft">&#160;</td><td class="mdescRight">A simple constant getter method for the input dimensionality of the layer.  <a href="#a24cc229aaaa68fe8889c4c05f5a1529a">More...</a><br /></td></tr>
-<tr class="separator:a24cc229aaaa68fe8889c4c05f5a1529a"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a4eaac782e31cae389237b843ce7569e5"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="classcattle_1_1_dimensions.html">Dimensions</a>&lt; std::size_t, Rank &gt; &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_dropout_layer.html#a4eaac782e31cae389237b843ce7569e5">get_output_dims</a> () const</td></tr>
-<tr class="memdesc:a4eaac782e31cae389237b843ce7569e5"><td class="mdescLeft">&#160;</td><td class="mdescRight">A simple constant getter method for the output dimensionality of the layer.  <a href="#a4eaac782e31cae389237b843ce7569e5">More...</a><br /></td></tr>
-<tr class="separator:a4eaac782e31cae389237b843ce7569e5"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a60266bc0cc76f7639bca2541890e870b"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="namespacecattle.html#a1d78623a47279d516750a44dbad6090b">Matrix</a>&lt; Scalar &gt; &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_dropout_layer.html#a60266bc0cc76f7639bca2541890e870b">get_params</a> () const</td></tr>
-<tr class="memdesc:a60266bc0cc76f7639bca2541890e870b"><td class="mdescLeft">&#160;</td><td class="mdescRight">It returns a constant reference to the learnable parameters of the layer.  <a href="#a60266bc0cc76f7639bca2541890e870b">More...</a><br /></td></tr>
-<tr class="separator:a60266bc0cc76f7639bca2541890e870b"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a046463edd1e0b4b335cefeae6bf5b614"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="namespacecattle.html#a1d78623a47279d516750a44dbad6090b">Matrix</a>&lt; Scalar &gt; &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_dropout_layer.html#a046463edd1e0b4b335cefeae6bf5b614">get_params_grad</a> () const</td></tr>
-<tr class="memdesc:a046463edd1e0b4b335cefeae6bf5b614"><td class="mdescLeft">&#160;</td><td class="mdescRight">It returns a constant reference to the gradient of the learnable parameters of the layer.  <a href="#a046463edd1e0b4b335cefeae6bf5b614">More...</a><br /></td></tr>
-<tr class="separator:a046463edd1e0b4b335cefeae6bf5b614"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a506589d195f7cf7440ce005b85c4be8e"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_dropout_layer.html#a506589d195f7cf7440ce005b85c4be8e">is_frozen</a> () const</td></tr>
-<tr class="memdesc:a506589d195f7cf7440ce005b85c4be8e"><td class="mdescLeft">&#160;</td><td class="mdescRight">It determines whether the parameters of the layer, if there are any, are to be updated during optimization.  <a href="#a506589d195f7cf7440ce005b85c4be8e">More...</a><br /></td></tr>
-<tr class="separator:a506589d195f7cf7440ce005b85c4be8e"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a0da23b87533c9f9825948d31538a5e06"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_dropout_layer.html#a0da23b87533c9f9825948d31538a5e06">set_frozen</a> (bool frozen)</td></tr>
-<tr class="memdesc:a0da23b87533c9f9825948d31538a5e06"><td class="mdescLeft">&#160;</td><td class="mdescRight">It sets whether the parameters of the layer should not be updated during optimization.  <a href="#a0da23b87533c9f9825948d31538a5e06">More...</a><br /></td></tr>
-<tr class="separator:a0da23b87533c9f9825948d31538a5e06"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a89ad20c1cdf2ec2de893665aa417e0f1"><td class="memItemLeft" align="right" valign="top"><a id="a89ad20c1cdf2ec2de893665aa417e0f1"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_dropout_layer.html#a89ad20c1cdf2ec2de893665aa417e0f1">init</a> ()</td></tr>
-<tr class="memdesc:a89ad20c1cdf2ec2de893665aa417e0f1"><td class="mdescLeft">&#160;</td><td class="mdescRight">It initializes the layer and its parameters. <br /></td></tr>
-<tr class="separator:a89ad20c1cdf2ec2de893665aa417e0f1"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="inherit_header pub_methods_classcattle_1_1_layer"><td colspan="2" onclick="javascript:toggleInherit('pub_methods_classcattle_1_1_layer')"><img src="closed.png" alt="-"/>&#160;Public Member Functions inherited from <a class="el" href="classcattle_1_1_layer.html">cattle::Layer&lt; Scalar, Rank &gt;</a></td></tr>
-<tr class="memitem:ac92d606818b5a240d0ce898e35afe63d inherit pub_methods_classcattle_1_1_layer"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_layer.html#ac92d606818b5a240d0ce898e35afe63d">is_shared_params_clone</a> () const</td></tr>
-<tr class="memdesc:ac92d606818b5a240d0ce898e35afe63d inherit pub_methods_classcattle_1_1_layer"><td class="mdescLeft">&#160;</td><td class="mdescRight">It determines whether the layer instance is a clone using the shared parameters of another instance.  <a href="classcattle_1_1_layer.html#ac92d606818b5a240d0ce898e35afe63d">More...</a><br /></td></tr>
-<tr class="separator:ac92d606818b5a240d0ce898e35afe63d inherit pub_methods_classcattle_1_1_layer"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a3ba02f76506a7f8a72f44be78693209e inherit pub_methods_classcattle_1_1_layer"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_layer.html#a3ba02f76506a7f8a72f44be78693209e">is_parametric</a> () const</td></tr>
-<tr class="memdesc:a3ba02f76506a7f8a72f44be78693209e inherit pub_methods_classcattle_1_1_layer"><td class="mdescLeft">&#160;</td><td class="mdescRight">A method that returns whether the layer has parameters that can be learned.  <a href="classcattle_1_1_layer.html#a3ba02f76506a7f8a72f44be78693209e">More...</a><br /></td></tr>
-<tr class="separator:a3ba02f76506a7f8a72f44be78693209e inherit pub_methods_classcattle_1_1_layer"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a984f124ef5a2de9b2466ccb5a591eca2 inherit pub_methods_classcattle_1_1_layer"><td class="memItemLeft" align="right" valign="top">virtual std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_layer.html#a984f124ef5a2de9b2466ccb5a591eca2">to_string</a> () const</td></tr>
-<tr class="separator:a984f124ef5a2de9b2466ccb5a591eca2 inherit pub_methods_classcattle_1_1_layer"><td class="memSeparator" colspan="2">&#160;</td></tr>
-</table><table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pro-methods"></a>
-Protected Member Functions</h2></td></tr>
+<tr class="memitem:af1fd380c06276301044ec6e8111398e1"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="classcattle_1_1_dimensions.html">Base::Dims</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_dropout_layer.html#af1fd380c06276301044ec6e8111398e1">get_input_dims</a> () const</td></tr>
+<tr class="memdesc:af1fd380c06276301044ec6e8111398e1"><td class="mdescLeft">&#160;</td><td class="mdescRight">A simple constant getter method for the input dimensionality of the layer.  <a href="#af1fd380c06276301044ec6e8111398e1">More...</a><br /></td></tr>
+<tr class="separator:af1fd380c06276301044ec6e8111398e1"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5fdf29e307592b198536aca8d50a81cc"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="classcattle_1_1_dimensions.html">Base::Dims</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_dropout_layer.html#a5fdf29e307592b198536aca8d50a81cc">get_output_dims</a> () const</td></tr>
+<tr class="memdesc:a5fdf29e307592b198536aca8d50a81cc"><td class="mdescLeft">&#160;</td><td class="mdescRight">A simple constant getter method for the output dimensionality of the layer.  <a href="#a5fdf29e307592b198536aca8d50a81cc">More...</a><br /></td></tr>
+<tr class="separator:a5fdf29e307592b198536aca8d50a81cc"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a601eec2c307fd047dd390e2e4347cc58"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_dropout_layer.html#a601eec2c307fd047dd390e2e4347cc58">is_input_layer</a> () const</td></tr>
 <tr class="memdesc:a601eec2c307fd047dd390e2e4347cc58"><td class="mdescLeft">&#160;</td><td class="mdescRight">A constant method that returns whether this layer functions as an input layer.  <a href="#a601eec2c307fd047dd390e2e4347cc58">More...</a><br /></td></tr>
 <tr class="separator:a601eec2c307fd047dd390e2e4347cc58"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ae1d090be4a0c212daaf625f5acbd9f22"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_dropout_layer.html#ae1d090be4a0c212daaf625f5acbd9f22">set_input_layer</a> (bool input_layer)</td></tr>
 <tr class="memdesc:ae1d090be4a0c212daaf625f5acbd9f22"><td class="mdescLeft">&#160;</td><td class="mdescRight">Sets this instance's input layer status to the given value.  <a href="#ae1d090be4a0c212daaf625f5acbd9f22">More...</a><br /></td></tr>
 <tr class="separator:ae1d090be4a0c212daaf625f5acbd9f22"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae25a9edd15a2ecaab73300cbfb0759dc"><td class="memItemLeft" align="right" valign="top">std::vector&lt; const Parameters&lt; Scalar &gt; * &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_dropout_layer.html#ae25a9edd15a2ecaab73300cbfb0759dc">get_params</a> () const</td></tr>
+<tr class="memdesc:ae25a9edd15a2ecaab73300cbfb0759dc"><td class="mdescLeft">&#160;</td><td class="mdescRight">It returns a vector of constant non-owning pointers to the parameters of the layer.  <a href="#ae25a9edd15a2ecaab73300cbfb0759dc">More...</a><br /></td></tr>
+<tr class="separator:ae25a9edd15a2ecaab73300cbfb0759dc"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a232f450a14225cd09e5c84d5c9040b3f"><td class="memItemLeft" align="right" valign="top">std::vector&lt; Parameters&lt; Scalar &gt; * &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_dropout_layer.html#a232f450a14225cd09e5c84d5c9040b3f">get_params</a> ()</td></tr>
+<tr class="memdesc:a232f450a14225cd09e5c84d5c9040b3f"><td class="mdescLeft">&#160;</td><td class="mdescRight">It returns a vector of non-owning pointers to the parameters of the layer.  <a href="#a232f450a14225cd09e5c84d5c9040b3f">More...</a><br /></td></tr>
+<tr class="separator:a232f450a14225cd09e5c84d5c9040b3f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:af82f4022e6bbd0c328729342d18432cd"><td class="memItemLeft" align="right" valign="top"><a id="af82f4022e6bbd0c328729342d18432cd"></a>
 void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_dropout_layer.html#af82f4022e6bbd0c328729342d18432cd">empty_cache</a> ()</td></tr>
 <tr class="memdesc:af82f4022e6bbd0c328729342d18432cd"><td class="mdescLeft">&#160;</td><td class="mdescRight">It empties the layer's caches such as those required for the derivation of the function represented by the layer. <br /></td></tr>
 <tr class="separator:af82f4022e6bbd0c328729342d18432cd"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:afdf7ed4bac91e56664c0f5ed6a9dafda"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespacecattle.html#a1d78623a47279d516750a44dbad6090b">Matrix</a>&lt; Scalar &gt; &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_dropout_layer.html#afdf7ed4bac91e56664c0f5ed6a9dafda">get_params</a> ()</td></tr>
-<tr class="memdesc:afdf7ed4bac91e56664c0f5ed6a9dafda"><td class="mdescLeft">&#160;</td><td class="mdescRight">It returns a reference to the learnable parameters of the layer.  <a href="#afdf7ed4bac91e56664c0f5ed6a9dafda">More...</a><br /></td></tr>
-<tr class="separator:afdf7ed4bac91e56664c0f5ed6a9dafda"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ac72ed377cf408274f15e280de3266044"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespacecattle.html#a1d78623a47279d516750a44dbad6090b">Matrix</a>&lt; Scalar &gt; &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_dropout_layer.html#ac72ed377cf408274f15e280de3266044">get_params_grad</a> ()</td></tr>
-<tr class="memdesc:ac72ed377cf408274f15e280de3266044"><td class="mdescLeft">&#160;</td><td class="mdescRight">It returns a reference to the gradient of the learnable parameters of the layer.  <a href="#ac72ed377cf408274f15e280de3266044">More...</a><br /></td></tr>
-<tr class="separator:ac72ed377cf408274f15e280de3266044"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a970a990edc47ed017ae845ed9fe1a430"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_dropout_layer.html#a970a990edc47ed017ae845ed9fe1a430">regularize</a> ()</td></tr>
-<tr class="memdesc:a970a990edc47ed017ae845ed9fe1a430"><td class="mdescLeft">&#160;</td><td class="mdescRight">It computes the derivative of the regularization function w.r.t.  <a href="#a970a990edc47ed017ae845ed9fe1a430">More...</a><br /></td></tr>
-<tr class="separator:a970a990edc47ed017ae845ed9fe1a430"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ac19d7798baf005d3729f620d1eb9a58b"><td class="memItemLeft" align="right" valign="top">Scalar&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_dropout_layer.html#ac19d7798baf005d3729f620d1eb9a58b">get_regularization_penalty</a> () const</td></tr>
-<tr class="memdesc:ac19d7798baf005d3729f620d1eb9a58b"><td class="mdescLeft">&#160;</td><td class="mdescRight">It calculates the regularization penalty of the layer's parameters.  <a href="#ac19d7798baf005d3729f620d1eb9a58b">More...</a><br /></td></tr>
-<tr class="separator:ac19d7798baf005d3729f620d1eb9a58b"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a21cafbb1c42e3fd63551e4056eaa9d8a"><td class="memItemLeft" align="right" valign="top"><a id="a21cafbb1c42e3fd63551e4056eaa9d8a"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_dropout_layer.html#a21cafbb1c42e3fd63551e4056eaa9d8a">enforce_constraints</a> ()</td></tr>
-<tr class="memdesc:a21cafbb1c42e3fd63551e4056eaa9d8a"><td class="mdescLeft">&#160;</td><td class="mdescRight">It applies constraints such as max-norm to the parameters of the layer (if applicable). <br /></td></tr>
-<tr class="separator:a21cafbb1c42e3fd63551e4056eaa9d8a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a0c833b2176304d5f975e7f66ac203d15"><td class="memItemLeft" align="right" valign="top">Base::Data&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_dropout_layer.html#a0c833b2176304d5f975e7f66ac203d15">pass_forward</a> (typename Base::Data in, bool training)</td></tr>
 <tr class="memdesc:a0c833b2176304d5f975e7f66ac203d15"><td class="mdescLeft">&#160;</td><td class="mdescRight">It has the function represented by the layer applied to the input tensor.  <a href="#a0c833b2176304d5f975e7f66ac203d15">More...</a><br /></td></tr>
 <tr class="separator:a0c833b2176304d5f975e7f66ac203d15"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a7d71b25a0789d9b8b852f9fdfd86f183"><td class="memItemLeft" align="right" valign="top">Base::Data&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_dropout_layer.html#a7d71b25a0789d9b8b852f9fdfd86f183">pass_back</a> (typename Base::Data out_grad)</td></tr>
 <tr class="memdesc:a7d71b25a0789d9b8b852f9fdfd86f183"><td class="mdescLeft">&#160;</td><td class="mdescRight">It back-propagates the derivative of the error function w.r.t.  <a href="#a7d71b25a0789d9b8b852f9fdfd86f183">More...</a><br /></td></tr>
 <tr class="separator:a7d71b25a0789d9b8b852f9fdfd86f183"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="inherit_header pub_methods_classcattle_1_1_layer"><td colspan="2" onclick="javascript:toggleInherit('pub_methods_classcattle_1_1_layer')"><img src="closed.png" alt="-"/>&#160;Public Member Functions inherited from <a class="el" href="classcattle_1_1_layer.html">cattle::Layer&lt; Scalar, Rank &gt;</a></td></tr>
+<tr class="memitem:ac92d606818b5a240d0ce898e35afe63d inherit pub_methods_classcattle_1_1_layer"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_layer.html#ac92d606818b5a240d0ce898e35afe63d">is_shared_params_clone</a> () const</td></tr>
+<tr class="memdesc:ac92d606818b5a240d0ce898e35afe63d inherit pub_methods_classcattle_1_1_layer"><td class="mdescLeft">&#160;</td><td class="mdescRight">It determines whether the layer instance is a clone using the shared parameters of another instance.  <a href="classcattle_1_1_layer.html#ac92d606818b5a240d0ce898e35afe63d">More...</a><br /></td></tr>
+<tr class="separator:ac92d606818b5a240d0ce898e35afe63d inherit pub_methods_classcattle_1_1_layer"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3ba02f76506a7f8a72f44be78693209e inherit pub_methods_classcattle_1_1_layer"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_layer.html#a3ba02f76506a7f8a72f44be78693209e">is_parametric</a> () const</td></tr>
+<tr class="memdesc:a3ba02f76506a7f8a72f44be78693209e inherit pub_methods_classcattle_1_1_layer"><td class="mdescLeft">&#160;</td><td class="mdescRight">A method that returns whether the layer has parameters.  <a href="classcattle_1_1_layer.html#a3ba02f76506a7f8a72f44be78693209e">More...</a><br /></td></tr>
+<tr class="separator:a3ba02f76506a7f8a72f44be78693209e inherit pub_methods_classcattle_1_1_layer"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><h3>template&lt;typename Scalar, std::size_t Rank&gt;<br />
@@ -184,8 +152,8 @@ class cattle::DropoutLayer&lt; Scalar, Rank &gt;</h3>
 <dd>
 <a href="http://www.cs.toronto.edu/~rsalakhu/papers/srivastava14a.pdf">http://www.cs.toronto.edu/~rsalakhu/papers/srivastava14a.pdf</a> </dd></dl>
 </div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
-<a id="aaa346c955d02369927de664087a32999"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aaa346c955d02369927de664087a32999">&#9670;&nbsp;</a></span>DropoutLayer()</h2>
+<a id="ad1702a56e7165547f1bfb86ea2594f47"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad1702a56e7165547f1bfb86ea2594f47">&#9670;&nbsp;</a></span>DropoutLayer()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -198,7 +166,7 @@ template&lt;typename Scalar , std::size_t Rank&gt; </div>
         <tr>
           <td class="memname"><a class="el" href="classcattle_1_1_dropout_layer.html">cattle::DropoutLayer</a>&lt; Scalar, Rank &gt;::<a class="el" href="classcattle_1_1_dropout_layer.html">DropoutLayer</a> </td>
           <td>(</td>
-          <td class="paramtype">const <a class="el" href="classcattle_1_1_dimensions.html">Dimensions</a>&lt; std::size_t, Rank &gt; &amp;&#160;</td>
+          <td class="paramtype">const typename <a class="el" href="classcattle_1_1_dimensions.html">Base::Dims</a> &amp;&#160;</td>
           <td class="paramname"><em>dims</em>, </td>
         </tr>
         <tr>
@@ -211,7 +179,7 @@ template&lt;typename Scalar , std::size_t Rank&gt; </div>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">Scalar&#160;</td>
-          <td class="paramname"><em>epsilon</em> = <code><a class="el" href="classcattle_1_1internal_1_1_numeric_utils.html">internal::NumericUtils</a>&lt;Scalar&gt;::EPSILON2</code>&#160;</td>
+          <td class="paramname"><em>epsilon</em> = <code><a class="el" href="classcattle_1_1_numeric_utils.html">NumericUtils</a>&lt;Scalar&gt;::EPSILON2</code>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -302,8 +270,8 @@ template&lt;typename Scalar , std::size_t Rank&gt; </div>
 
 </div>
 </div>
-<a id="a24cc229aaaa68fe8889c4c05f5a1529a"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a24cc229aaaa68fe8889c4c05f5a1529a">&#9670;&nbsp;</a></span>get_input_dims()</h2>
+<a id="af1fd380c06276301044ec6e8111398e1"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af1fd380c06276301044ec6e8111398e1">&#9670;&nbsp;</a></span>get_input_dims()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -314,7 +282,7 @@ template&lt;typename Scalar , std::size_t Rank&gt; </div>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">const <a class="el" href="classcattle_1_1_dimensions.html">Dimensions</a>&lt;std::size_t,Rank&gt;&amp; <a class="el" href="classcattle_1_1_dropout_layer.html">cattle::DropoutLayer</a>&lt; Scalar, Rank &gt;::get_input_dims </td>
+          <td class="memname">const <a class="el" href="classcattle_1_1_dimensions.html">Base::Dims</a>&amp; <a class="el" href="classcattle_1_1_dropout_layer.html">cattle::DropoutLayer</a>&lt; Scalar, Rank &gt;::get_input_dims </td>
           <td>(</td>
           <td class="paramname"></td><td>)</td>
           <td> const</td>
@@ -330,12 +298,12 @@ template&lt;typename Scalar , std::size_t Rank&gt; </div>
 <p>A simple constant getter method for the input dimensionality of the layer. </p>
 <dl class="section return"><dt>Returns</dt><dd>A constant reference to the member variable denoting the dimensions of the tensors accepted by the layer as its input (except for the first rank which denotes the variable sample size). </dd></dl>
 
-<p>Implements <a class="el" href="classcattle_1_1_layer.html#a616670d011b739c619fe2c8f6d14baa4">cattle::Layer&lt; Scalar, Rank &gt;</a>.</p>
+<p>Implements <a class="el" href="classcattle_1_1_layer.html#a450d75b5f9e084552819ad8fdcf2ad59">cattle::Layer&lt; Scalar, Rank &gt;</a>.</p>
 
 </div>
 </div>
-<a id="a4eaac782e31cae389237b843ce7569e5"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a4eaac782e31cae389237b843ce7569e5">&#9670;&nbsp;</a></span>get_output_dims()</h2>
+<a id="a5fdf29e307592b198536aca8d50a81cc"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a5fdf29e307592b198536aca8d50a81cc">&#9670;&nbsp;</a></span>get_output_dims()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -346,7 +314,7 @@ template&lt;typename Scalar , std::size_t Rank&gt; </div>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">const <a class="el" href="classcattle_1_1_dimensions.html">Dimensions</a>&lt;std::size_t,Rank&gt;&amp; <a class="el" href="classcattle_1_1_dropout_layer.html">cattle::DropoutLayer</a>&lt; Scalar, Rank &gt;::get_output_dims </td>
+          <td class="memname">const <a class="el" href="classcattle_1_1_dimensions.html">Base::Dims</a>&amp; <a class="el" href="classcattle_1_1_dropout_layer.html">cattle::DropoutLayer</a>&lt; Scalar, Rank &gt;::get_output_dims </td>
           <td>(</td>
           <td class="paramname"></td><td>)</td>
           <td> const</td>
@@ -362,12 +330,12 @@ template&lt;typename Scalar , std::size_t Rank&gt; </div>
 <p>A simple constant getter method for the output dimensionality of the layer. </p>
 <dl class="section return"><dt>Returns</dt><dd>A constant reference to the member variable denoting the dimensions of the tensors output by the layer along all ranks except the first one. </dd></dl>
 
-<p>Implements <a class="el" href="classcattle_1_1_layer.html#a26f50624ba25185ae1c9a7c855ffc0d6">cattle::Layer&lt; Scalar, Rank &gt;</a>.</p>
+<p>Implements <a class="el" href="classcattle_1_1_layer.html#af29a87e0166c1dedc60af30ee392d099">cattle::Layer&lt; Scalar, Rank &gt;</a>.</p>
 
 </div>
 </div>
-<a id="a60266bc0cc76f7639bca2541890e870b"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a60266bc0cc76f7639bca2541890e870b">&#9670;&nbsp;</a></span>get_params() <span class="overload">[1/2]</span></h2>
+<a id="ae25a9edd15a2ecaab73300cbfb0759dc"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae25a9edd15a2ecaab73300cbfb0759dc">&#9670;&nbsp;</a></span>get_params() <span class="overload">[1/2]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -378,7 +346,7 @@ template&lt;typename Scalar , std::size_t Rank&gt; </div>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">const <a class="el" href="namespacecattle.html#a1d78623a47279d516750a44dbad6090b">Matrix</a>&lt;Scalar&gt;&amp; <a class="el" href="classcattle_1_1_dropout_layer.html">cattle::DropoutLayer</a>&lt; Scalar, Rank &gt;::get_params </td>
+          <td class="memname">std::vector&lt;const Parameters&lt;Scalar&gt;*&gt; <a class="el" href="classcattle_1_1_dropout_layer.html">cattle::DropoutLayer</a>&lt; Scalar, Rank &gt;::get_params </td>
           <td>(</td>
           <td class="paramname"></td><td>)</td>
           <td> const</td>
@@ -391,15 +359,15 @@ template&lt;typename Scalar , std::size_t Rank&gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p>It returns a constant reference to the learnable parameters of the layer. </p>
-<dl class="section return"><dt>Returns</dt><dd>A constant reference to the parameters of the layer that are to be learned. </dd></dl>
+<p>It returns a vector of constant non-owning pointers to the parameters of the layer. </p>
+<dl class="section return"><dt>Returns</dt><dd>A vector of constant pointers to the parameters of the layer. </dd></dl>
 
-<p>Implements <a class="el" href="classcattle_1_1_layer.html#ab67312e1fc860a8a246f6f9aeadffbb4">cattle::Layer&lt; Scalar, Rank &gt;</a>.</p>
+<p>Implements <a class="el" href="classcattle_1_1_layer.html#a0ec2fb727209b884263e29759fdf3b39">cattle::Layer&lt; Scalar, Rank &gt;</a>.</p>
 
 </div>
 </div>
-<a id="afdf7ed4bac91e56664c0f5ed6a9dafda"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#afdf7ed4bac91e56664c0f5ed6a9dafda">&#9670;&nbsp;</a></span>get_params() <span class="overload">[2/2]</span></h2>
+<a id="a232f450a14225cd09e5c84d5c9040b3f"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a232f450a14225cd09e5c84d5c9040b3f">&#9670;&nbsp;</a></span>get_params() <span class="overload">[2/2]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -410,42 +378,10 @@ template&lt;typename Scalar , std::size_t Rank&gt; </div>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="namespacecattle.html#a1d78623a47279d516750a44dbad6090b">Matrix</a>&lt;Scalar&gt;&amp; <a class="el" href="classcattle_1_1_dropout_layer.html">cattle::DropoutLayer</a>&lt; Scalar, Rank &gt;::get_params </td>
+          <td class="memname">std::vector&lt;Parameters&lt;Scalar&gt;*&gt; <a class="el" href="classcattle_1_1_dropout_layer.html">cattle::DropoutLayer</a>&lt; Scalar, Rank &gt;::get_params </td>
           <td>(</td>
           <td class="paramname"></td><td>)</td>
           <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">protected</span><span class="mlabel">virtual</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>It returns a reference to the learnable parameters of the layer. </p>
-<dl class="section return"><dt>Returns</dt><dd>A non-constant reference to the parameters of the layer that are to be learned. </dd></dl>
-
-<p>Implements <a class="el" href="classcattle_1_1_layer.html#abd799a16024c5aee49dbc0a5fe2f3183">cattle::Layer&lt; Scalar, Rank &gt;</a>.</p>
-
-</div>
-</div>
-<a id="a046463edd1e0b4b335cefeae6bf5b614"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a046463edd1e0b4b335cefeae6bf5b614">&#9670;&nbsp;</a></span>get_params_grad() <span class="overload">[1/2]</span></h2>
-
-<div class="memitem">
-<div class="memproto">
-<div class="memtemplate">
-template&lt;typename Scalar , std::size_t Rank&gt; </div>
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">const <a class="el" href="namespacecattle.html#a1d78623a47279d516750a44dbad6090b">Matrix</a>&lt;Scalar&gt;&amp; <a class="el" href="classcattle_1_1_dropout_layer.html">cattle::DropoutLayer</a>&lt; Scalar, Rank &gt;::get_params_grad </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td> const</td>
         </tr>
       </table>
   </td>
@@ -455,42 +391,10 @@ template&lt;typename Scalar , std::size_t Rank&gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p>It returns a constant reference to the gradient of the learnable parameters of the layer. </p>
-<dl class="section return"><dt>Returns</dt><dd>A constant reference to the gradient of the parameters of the layer. </dd></dl>
+<p>It returns a vector of non-owning pointers to the parameters of the layer. </p>
+<dl class="section return"><dt>Returns</dt><dd>A vector of pointers to the parameters of the layer. </dd></dl>
 
-<p>Implements <a class="el" href="classcattle_1_1_layer.html#a60fbc161deece174499e4be12b730255">cattle::Layer&lt; Scalar, Rank &gt;</a>.</p>
-
-</div>
-</div>
-<a id="ac72ed377cf408274f15e280de3266044"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ac72ed377cf408274f15e280de3266044">&#9670;&nbsp;</a></span>get_params_grad() <span class="overload">[2/2]</span></h2>
-
-<div class="memitem">
-<div class="memproto">
-<div class="memtemplate">
-template&lt;typename Scalar , std::size_t Rank&gt; </div>
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="namespacecattle.html#a1d78623a47279d516750a44dbad6090b">Matrix</a>&lt;Scalar&gt;&amp; <a class="el" href="classcattle_1_1_dropout_layer.html">cattle::DropoutLayer</a>&lt; Scalar, Rank &gt;::get_params_grad </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">protected</span><span class="mlabel">virtual</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>It returns a reference to the gradient of the learnable parameters of the layer. </p>
-<dl class="section return"><dt>Returns</dt><dd>A non-constant reference to the gradient of the parameters of the layer. </dd></dl>
-
-<p>Implements <a class="el" href="classcattle_1_1_layer.html#a6e2e726f9677758ea61c6916a5c88b92">cattle::Layer&lt; Scalar, Rank &gt;</a>.</p>
+<p>Implements <a class="el" href="classcattle_1_1_layer.html#ad2ec670602524164665de1d0e6eb0b19">cattle::Layer&lt; Scalar, Rank &gt;</a>.</p>
 
 </div>
 </div>
@@ -520,75 +424,10 @@ template&lt;typename Scalar , std::size_t Rank&gt; </div>
 </div><div class="memdoc">
 
 <p>It returns a reference to the layer owning the parameters used. </p>
-<p>If this owner goes out of scope (in case this one is a clone with shared parameters), the behavior of the clone is undefined.</p>
+<p>If this owner goes out of scope (in case this one is a clone with shared parameters), the behaviour of the clone is undefined.</p>
 <dl class="section return"><dt>Returns</dt><dd>A reference to the layer owning the parameters. If this layer is not using shared parameters, it returns a reference to itself. </dd></dl>
 
 <p>Implements <a class="el" href="classcattle_1_1_layer.html#a683f9b67748863329938da07e86ecd8c">cattle::Layer&lt; Scalar, Rank &gt;</a>.</p>
-
-</div>
-</div>
-<a id="ac19d7798baf005d3729f620d1eb9a58b"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ac19d7798baf005d3729f620d1eb9a58b">&#9670;&nbsp;</a></span>get_regularization_penalty()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<div class="memtemplate">
-template&lt;typename Scalar , std::size_t Rank&gt; </div>
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">Scalar <a class="el" href="classcattle_1_1_dropout_layer.html">cattle::DropoutLayer</a>&lt; Scalar, Rank &gt;::get_regularization_penalty </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td> const</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">protected</span><span class="mlabel">virtual</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>It calculates the regularization penalty of the layer's parameters. </p>
-<p>If the layer is not parametric, 0 is returned.</p>
-<dl class="section return"><dt>Returns</dt><dd>A scalar representing the penalty on the magnitude of the layer's parameters. </dd></dl>
-
-<p>Implements <a class="el" href="classcattle_1_1_layer.html#ab3719ffa784c45277252f2fb16b209d5">cattle::Layer&lt; Scalar, Rank &gt;</a>.</p>
-
-</div>
-</div>
-<a id="a506589d195f7cf7440ce005b85c4be8e"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a506589d195f7cf7440ce005b85c4be8e">&#9670;&nbsp;</a></span>is_frozen()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<div class="memtemplate">
-template&lt;typename Scalar , std::size_t Rank&gt; </div>
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">bool <a class="el" href="classcattle_1_1_dropout_layer.html">cattle::DropoutLayer</a>&lt; Scalar, Rank &gt;::is_frozen </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td> const</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">virtual</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>It determines whether the parameters of the layer, if there are any, are to be updated during optimization. </p>
-<dl class="section return"><dt>Returns</dt><dd>Whether the parameters should not be updated during optimization. </dd></dl>
-
-<p>Implements <a class="el" href="classcattle_1_1_layer.html#a9b9374ca0299ed3b599c0403174a79af">cattle::Layer&lt; Scalar, Rank &gt;</a>.</p>
 
 </div>
 </div>
@@ -612,7 +451,7 @@ template&lt;typename Scalar , std::size_t Rank&gt; </div>
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">protected</span><span class="mlabel">virtual</span></span>  </td>
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">virtual</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
@@ -646,13 +485,13 @@ template&lt;typename Scalar , std::size_t Rank&gt; </div>
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">protected</span><span class="mlabel">virtual</span></span>  </td>
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">virtual</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
 
 <p>It back-propagates the derivative of the error function w.r.t. </p>
-<p>the output of the layer updating the gradient of its learnable parameters along the way if there are any. If there are, it also calculates the derivative of the regularization penalty w.r.t. to the layer's parameters and adds it to their gradient.</p>
+<p>the output of the layer updating the gradient of its learnable parameters along the way if there are any.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">out_grad</td><td>The derivative of the loss function w.r.t. the output of the layer </td></tr>
@@ -696,7 +535,7 @@ template&lt;typename Scalar , std::size_t Rank&gt; </div>
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">protected</span><span class="mlabel">virtual</span></span>  </td>
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">virtual</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
@@ -712,77 +551,6 @@ template&lt;typename Scalar , std::size_t Rank&gt; </div>
 <dl class="section return"><dt>Returns</dt><dd>The output of the function represented by the layer applied to the input tensor. </dd></dl>
 
 <p>Implements <a class="el" href="classcattle_1_1_layer.html#a6c1ea7b25d9f882364b7f2288f02d8da">cattle::Layer&lt; Scalar, Rank &gt;</a>.</p>
-
-</div>
-</div>
-<a id="a970a990edc47ed017ae845ed9fe1a430"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a970a990edc47ed017ae845ed9fe1a430">&#9670;&nbsp;</a></span>regularize()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<div class="memtemplate">
-template&lt;typename Scalar , std::size_t Rank&gt; </div>
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">void <a class="el" href="classcattle_1_1_dropout_layer.html">cattle::DropoutLayer</a>&lt; Scalar, Rank &gt;::regularize </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">protected</span><span class="mlabel">virtual</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>It computes the derivative of the regularization function w.r.t. </p>
-<p>the parameters of the layer and adds it to their gradient. If the layer is not parametric, calling this method has no effect. </p>
-
-<p>Implements <a class="el" href="classcattle_1_1_layer.html#aae685cf7e708e0c4f32ddc4c10254046">cattle::Layer&lt; Scalar, Rank &gt;</a>.</p>
-
-</div>
-</div>
-<a id="a0da23b87533c9f9825948d31538a5e06"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a0da23b87533c9f9825948d31538a5e06">&#9670;&nbsp;</a></span>set_frozen()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<div class="memtemplate">
-template&lt;typename Scalar , std::size_t Rank&gt; </div>
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">void <a class="el" href="classcattle_1_1_dropout_layer.html">cattle::DropoutLayer</a>&lt; Scalar, Rank &gt;::set_frozen </td>
-          <td>(</td>
-          <td class="paramtype">bool&#160;</td>
-          <td class="paramname"><em>frozen</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">virtual</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>It sets whether the parameters of the layer should not be updated during optimization. </p>
-<p>Frozen layers are not regularized either.</p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">frozen</td><td>Whether the parameters of the layer are to be frozen, i.e. not updatable via optimization. </td></tr>
-  </table>
-  </dd>
-</dl>
-
-<p>Implements <a class="el" href="classcattle_1_1_layer.html#a2efa46d4b10ec998cb7b09a3c430e025">cattle::Layer&lt; Scalar, Rank &gt;</a>.</p>
 
 </div>
 </div>
@@ -807,7 +575,7 @@ template&lt;typename Scalar , std::size_t Rank&gt; </div>
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">protected</span><span class="mlabel">virtual</span></span>  </td>
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">virtual</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
@@ -825,7 +593,7 @@ template&lt;typename Scalar , std::size_t Rank&gt; </div>
 </div>
 </div>
 <hr/>The documentation for this class was generated from the following file:<ul>
-<li>C:/Users/Viktor/git/C-ATTL3/C-ATTL3/<a class="el" href="_layer_8hpp_source.html">Layer.hpp</a></li>
+<li>C:/Users/Viktor/git/C-ATTL3/C-ATTL3/layer/<a class="el" href="_dropout_layer_8hpp_source.html">DropoutLayer.hpp</a></li>
 </ul>
 </div><!-- contents -->
 <!-- start footer part -->
