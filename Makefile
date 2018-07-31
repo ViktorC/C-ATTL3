@@ -16,7 +16,7 @@ GTEST_DIR := test/gtest
 # For Clang on Windows, omp.h must be copied from GCC.
 INCLUDES := -IC-ATTL3 -IEigen -I$(GTEST_DIR)/include -Itest/
 LIBS := -lpthread -lgomp
-HEADERS := $(shell find C-ATTL3 -name '*.hpp')
+HEADERS := $(shell find C-ATTL3 -type f -name '*.hpp' -printf "%f\n")
 SOURCE_DIR := test
 SOURCES := gradient_test.cpp training_test.cpp main_test.cpp
 BUILD_DIR := build
