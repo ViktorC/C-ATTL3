@@ -148,19 +148,16 @@ inline void dense_kernel_layer_grad_test() {
 	auto reg3 = std::make_shared<ElasticNetParameterRegularization<Scalar>>();
 	LayerPtr<Scalar,1> layer1_1(new DenseKernelLayer<Scalar,1>({ 32u }, 16, init1));
 	LayerPtr<Scalar,1> layer1_2(new DenseKernelLayer<Scalar,1>(layer1_1->get_output_dims(), 1, init1, reg3));
-	layer_grad_test<Scalar,1>("dense kernel layer", std::move(layer1_1), std::move(layer1_2), 5, ScalarTraits<Scalar>::step_size,
-			ScalarTraits<float>::abs_epsilon, ScalarTraits<float>::rel_epsilon);
+	layer_grad_test<Scalar,1>("dense kernel layer", std::move(layer1_1), std::move(layer1_2));
 	LayerPtr<Scalar,2> layer2_1(new DenseKernelLayer<Scalar,2>({ 6u, 6u }, 16, init2));
 	LayerPtr<Scalar,2> layer2_2(new DenseKernelLayer<Scalar,2>(layer2_1->get_output_dims(), 2, init2, reg1));
-	layer_grad_test<Scalar,2>("dense kernel layer", std::move(layer2_1), std::move(layer2_2), 5, ScalarTraits<Scalar>::step_size,
-			ScalarTraits<float>::abs_epsilon, ScalarTraits<float>::rel_epsilon);
+	layer_grad_test<Scalar,2>("dense kernel layer", std::move(layer2_1), std::move(layer2_2));
 	LayerPtr<Scalar,3> layer3_1(new DenseKernelLayer<Scalar,3>({ 4u, 4u, 2u }, 16, init1, reg2));
 	LayerPtr<Scalar,3> layer3_2(new DenseKernelLayer<Scalar,3>(layer3_1->get_output_dims(), 4, init1, reg2));
 	layer_grad_test<Scalar,3>("dense kernel layer", std::move(layer3_1), std::move(layer3_2));
 }
 
 TEST(GradientTest, DenseKernelLayer) {
-	dense_kernel_layer_grad_test<float>();
 	dense_kernel_layer_grad_test<double>();
 }
 
@@ -185,7 +182,6 @@ inline void conv_kernel_layer_grad_test() {
 }
 
 TEST(GradientTest, ConvKernelLayer) {
-	conv_kernel_layer_grad_test<float>();
 	conv_kernel_layer_grad_test<double>();
 }
 
@@ -210,7 +206,6 @@ inline void trans_conv_kernel_layer_grad_test() {
 }
 
 TEST(GradientTest, TransConvKernelLayer) {
-	trans_conv_kernel_layer_grad_test<float>();
 	trans_conv_kernel_layer_grad_test<double>();
 }
 
@@ -288,7 +283,6 @@ inline void activation_layer_grad_test() {
 }
 
 TEST(GradientTest, ActivationLayer) {
-	activation_layer_grad_test<float>();
 	activation_layer_grad_test<double>();
 }
 
@@ -322,7 +316,6 @@ inline void pool_layer_grad_test() {
 }
 
 TEST(GradientTest, PoolLayer) {
-	pool_layer_grad_test<float>();
 	pool_layer_grad_test<double>();
 }
 
@@ -344,7 +337,6 @@ inline void broadcast_layer_grad_test() {
 }
 
 TEST(GradientTest, BroadcastLayer) {
-	broadcast_layer_grad_test<float>();
 	broadcast_layer_grad_test<double>();
 }
 
@@ -378,7 +370,6 @@ inline void batch_norm_layer_grad_test() {
 }
 
 TEST(GradientTest, BatchNormLayer) {
-	batch_norm_layer_grad_test<float>();
 	batch_norm_layer_grad_test<double>();
 }
 
@@ -397,7 +388,6 @@ inline void reshape_layer_grad_test() {
 }
 
 TEST(GradientTest, ReshapeLayer) {
-	reshape_layer_grad_test<float>();
 	reshape_layer_grad_test<double>();
 }
 
@@ -473,7 +463,6 @@ inline void parallel_net_grad_test() {
 }
 
 TEST(GradientTest, ParallelNet) {
-	parallel_net_grad_test<float>();
 	parallel_net_grad_test<double>();
 }
 
@@ -516,7 +505,6 @@ inline void residual_net_grad_test() {
 }
 
 TEST(GradientTest, ResidualNet) {
-	residual_net_grad_test<float>();
 	residual_net_grad_test<double>();
 }
 
@@ -577,7 +565,6 @@ inline void dense_net_grad_test() {
 }
 
 TEST(GradientTest, DenseNet) {
-	dense_net_grad_test<float>();
 	dense_net_grad_test<double>();
 }
 
@@ -607,7 +594,6 @@ inline void sequential_net_grad_test() {
 }
 
 TEST(GradientTest, SequentialNet) {
-	sequential_net_grad_test<float>();
 	sequential_net_grad_test<double>();
 }
 
@@ -624,11 +610,11 @@ inline void recurrent_net_grad_test() {
 	KernelPtr<Scalar,1> output_kernel1_1(new DenseKernelLayer<Scalar,1>(state_kernel1_1->get_output_dims(), 4, init, reg));
 	ActivationPtr<Scalar,1> state_act1_1(new TanhActivationLayer<Scalar,1>(state_kernel1_1->get_output_dims()));
 	ActivationPtr<Scalar,1> output_act1_1(new IdentityActivationLayer<Scalar,1>(output_kernel1_1->get_output_dims()));
-	KernelPtr<Scalar,1> input_kernel2_1((DenseKernelLayer<Scalar,1>*) input_kernel1_1->clone());
-	KernelPtr<Scalar,1> state_kernel2_1((DenseKernelLayer<Scalar,1>*) state_kernel1_1->clone());
-	KernelPtr<Scalar,1> output_kernel2_1((DenseKernelLayer<Scalar,1>*) output_kernel1_1->clone());
-	ActivationPtr<Scalar,1> state_act2_1((TanhActivationLayer<Scalar,1>*) state_act1_1->clone());
-	ActivationPtr<Scalar,1> output_act2_1((IdentityActivationLayer<Scalar,1>*) output_act1_1->clone());
+	KernelPtr<Scalar,1> input_kernel2_1(static_cast<DenseKernelLayer<Scalar,1>*>(input_kernel1_1->clone()));
+	KernelPtr<Scalar,1> state_kernel2_1(static_cast<DenseKernelLayer<Scalar,1>*>(state_kernel1_1->clone()));
+	KernelPtr<Scalar,1> output_kernel2_1(static_cast<DenseKernelLayer<Scalar,1>*>(output_kernel1_1->clone()));
+	ActivationPtr<Scalar,1> state_act2_1(static_cast<TanhActivationLayer<Scalar,1>*>(state_act1_1->clone()));
+	ActivationPtr<Scalar,1> output_act2_1(static_cast<IdentityActivationLayer<Scalar,1>*>(output_act1_1->clone()));
 	seq_network_grad_test("recurrent net", NeuralNetPtr<Scalar,1,true>(
 			new RecurrentNeuralNetwork<Scalar,1>(std::move(input_kernel1_1), std::move(state_kernel1_1),
 					std::move(output_kernel1_1), std::move(state_act1_1), std::move(output_act1_1),
@@ -645,11 +631,11 @@ inline void recurrent_net_grad_test() {
 	KernelPtr<Scalar,3> output_kernel1_3(new DenseKernelLayer<Scalar,3>(state_kernel1_3->get_output_dims(), 2, init, reg));
 	ActivationPtr<Scalar,3> state_act1_3(new SoftsignActivationLayer<Scalar,3>(state_kernel1_3->get_output_dims()));
 	ActivationPtr<Scalar,3> output_act1_3(new IdentityActivationLayer<Scalar,3>(output_kernel1_3->get_output_dims()));
-	KernelPtr<Scalar,3> input_kernel2_3((ConvKernelLayer<Scalar>*) input_kernel1_3->clone());
-	KernelPtr<Scalar,3> state_kernel2_3((ConvKernelLayer<Scalar>*) state_kernel1_3->clone());
-	KernelPtr<Scalar,3> output_kernel2_3((DenseKernelLayer<Scalar,3>*) output_kernel1_3->clone());
-	ActivationPtr<Scalar,3> state_act2_3((SoftsignActivationLayer<Scalar,3>*) state_act1_3->clone());
-	ActivationPtr<Scalar,3> output_act2_3((IdentityActivationLayer<Scalar,3>*) output_act1_3->clone());
+	KernelPtr<Scalar,3> input_kernel2_3(static_cast<ConvKernelLayer<Scalar>*>(input_kernel1_3->clone()));
+	KernelPtr<Scalar,3> state_kernel2_3(static_cast<ConvKernelLayer<Scalar>*>(state_kernel1_3->clone()));
+	KernelPtr<Scalar,3> output_kernel2_3(static_cast<DenseKernelLayer<Scalar,3>*>(output_kernel1_3->clone()));
+	ActivationPtr<Scalar,3> state_act2_3(static_cast<SoftsignActivationLayer<Scalar,3>*>(state_act1_3->clone()));
+	ActivationPtr<Scalar,3> output_act2_3(static_cast<IdentityActivationLayer<Scalar,3>*>(output_act1_3->clone()));
 	seq_network_grad_test("recurrent net", NeuralNetPtr<Scalar,3,true>(
 			new RecurrentNeuralNetwork<Scalar,3>(std::move(input_kernel1_3), std::move(state_kernel1_3),
 					std::move(output_kernel1_3), std::move(state_act1_3), std::move(output_act1_3),
@@ -661,7 +647,6 @@ inline void recurrent_net_grad_test() {
 }
 
 TEST(GradientTest, RecurrentNet) {
-	recurrent_net_grad_test<float>();
 	recurrent_net_grad_test<double>();
 }
 
@@ -688,19 +673,19 @@ inline void lstm_net_grad_test() {
 	ActivationPtr<Scalar,1> candidate_act1_1(new TanhActivationLayer<Scalar,1>(output_dims_1));
 	ActivationPtr<Scalar,1> state_act1_1(new TanhActivationLayer<Scalar,1>(output_dims_1));
 	ActivationPtr<Scalar,1> read_act1_1(new SigmoidActivationLayer<Scalar,1>(output_dims_1));
-	KernelPtr<Scalar,1> forget_input_kernel2_1((DenseKernelLayer<Scalar,1>*) forget_input_kernel1_1->clone());
-	KernelPtr<Scalar,1> forget_output_kernel2_1((DenseKernelLayer<Scalar,1>*) forget_output_kernel1_1->clone());
-	KernelPtr<Scalar,1> write_input_kernel2_1((DenseKernelLayer<Scalar,1>*) write_input_kernel1_1->clone());
-	KernelPtr<Scalar,1> write_output_kernel2_1((DenseKernelLayer<Scalar,1>*) write_output_kernel1_1->clone());
-	KernelPtr<Scalar,1> candidate_input_kernel2_1((DenseKernelLayer<Scalar,1>*) candidate_input_kernel1_1->clone());
-	KernelPtr<Scalar,1> candidate_output_kernel2_1((DenseKernelLayer<Scalar,1>*) candidate_output_kernel1_1->clone());
-	KernelPtr<Scalar,1> read_input_kernel2_1((DenseKernelLayer<Scalar,1>*) read_input_kernel1_1->clone());
-	KernelPtr<Scalar,1> read_output_kernel2_1((DenseKernelLayer<Scalar,1>*) read_output_kernel1_1->clone());
-	ActivationPtr<Scalar,1> forget_act2_1((SigmoidActivationLayer<Scalar,1>*) forget_act1_1->clone());
-	ActivationPtr<Scalar,1> write_act2_1((SigmoidActivationLayer<Scalar,1>*) write_act1_1->clone());
-	ActivationPtr<Scalar,1> candidate_act2_1((TanhActivationLayer<Scalar,1>*) candidate_act1_1->clone());
-	ActivationPtr<Scalar,1> state_act2_1((TanhActivationLayer<Scalar,1>*) state_act1_1->clone());
-	ActivationPtr<Scalar,1> read_act2_1((SigmoidActivationLayer<Scalar,1>*) read_act1_1->clone());
+	KernelPtr<Scalar,1> forget_input_kernel2_1(static_cast<DenseKernelLayer<Scalar,1>*>(forget_input_kernel1_1->clone()));
+	KernelPtr<Scalar,1> forget_output_kernel2_1(static_cast<DenseKernelLayer<Scalar,1>*>(forget_output_kernel1_1->clone()));
+	KernelPtr<Scalar,1> write_input_kernel2_1(static_cast<DenseKernelLayer<Scalar,1>*>(write_input_kernel1_1->clone()));
+	KernelPtr<Scalar,1> write_output_kernel2_1(static_cast<DenseKernelLayer<Scalar,1>*>(write_output_kernel1_1->clone()));
+	KernelPtr<Scalar,1> candidate_input_kernel2_1(static_cast<DenseKernelLayer<Scalar,1>*>(candidate_input_kernel1_1->clone()));
+	KernelPtr<Scalar,1> candidate_output_kernel2_1(static_cast<DenseKernelLayer<Scalar,1>*>(candidate_output_kernel1_1->clone()));
+	KernelPtr<Scalar,1> read_input_kernel2_1(static_cast<DenseKernelLayer<Scalar,1>*>(read_input_kernel1_1->clone()));
+	KernelPtr<Scalar,1> read_output_kernel2_1(static_cast<DenseKernelLayer<Scalar,1>*>(read_output_kernel1_1->clone()));
+	ActivationPtr<Scalar,1> forget_act2_1(static_cast<SigmoidActivationLayer<Scalar,1>*>(forget_act1_1->clone()));
+	ActivationPtr<Scalar,1> write_act2_1(static_cast<SigmoidActivationLayer<Scalar,1>*>(write_act1_1->clone()));
+	ActivationPtr<Scalar,1> candidate_act2_1(static_cast<TanhActivationLayer<Scalar,1>*>(candidate_act1_1->clone()));
+	ActivationPtr<Scalar,1> state_act2_1(static_cast<TanhActivationLayer<Scalar,1>*>(state_act1_1->clone()));
+	ActivationPtr<Scalar,1> read_act2_1(static_cast<SigmoidActivationLayer<Scalar,1>*>(read_act1_1->clone()));
 	seq_network_grad_test("lstm net", NeuralNetPtr<Scalar,1,true>(
 			new LSTMNeuralNetwork<Scalar,1>(std::move(forget_input_kernel1_1), std::move(forget_output_kernel1_1),
 					std::move(write_input_kernel1_1), std::move(write_output_kernel1_1), std::move(candidate_input_kernel1_1),
@@ -729,19 +714,19 @@ inline void lstm_net_grad_test() {
 	ActivationPtr<Scalar,3> candidate_act1_3(new TanhActivationLayer<Scalar,3>(output_dims_3));
 	ActivationPtr<Scalar,3> state_act1_3(new TanhActivationLayer<Scalar,3>(output_dims_3));
 	ActivationPtr<Scalar,3> read_act1_3(new SigmoidActivationLayer<Scalar,3>(output_dims_3));
-	KernelPtr<Scalar,3> forget_input_kernel2_3((ConvKernelLayer<Scalar>*) forget_input_kernel1_3->clone());
-	KernelPtr<Scalar,3> forget_output_kernel2_3((ConvKernelLayer<Scalar>*) forget_output_kernel1_3->clone());
-	KernelPtr<Scalar,3> write_input_kernel2_3((ConvKernelLayer<Scalar>*) write_input_kernel1_3->clone());
-	KernelPtr<Scalar,3> write_output_kernel2_3((ConvKernelLayer<Scalar>*) write_output_kernel1_3->clone());
-	KernelPtr<Scalar,3> candidate_input_kernel2_3((ConvKernelLayer<Scalar>*) candidate_input_kernel1_3->clone());
-	KernelPtr<Scalar,3> candidate_output_kernel2_3((ConvKernelLayer<Scalar>*) candidate_output_kernel1_3->clone());
-	KernelPtr<Scalar,3> read_input_kernel2_3((ConvKernelLayer<Scalar>*) read_input_kernel1_3->clone());
-	KernelPtr<Scalar,3> read_output_kernel2_3((ConvKernelLayer<Scalar>*) read_output_kernel1_3->clone());
-	ActivationPtr<Scalar,3> forget_act2_3((SigmoidActivationLayer<Scalar,3>*) forget_act1_3->clone());
-	ActivationPtr<Scalar,3> write_act2_3((SigmoidActivationLayer<Scalar,3>*) write_act1_3->clone());
-	ActivationPtr<Scalar,3> candidate_act2_3((TanhActivationLayer<Scalar,3>*) candidate_act1_3->clone());
-	ActivationPtr<Scalar,3> state_act2_3((TanhActivationLayer<Scalar,3>*) state_act1_3->clone());
-	ActivationPtr<Scalar,3> read_act2_3((SigmoidActivationLayer<Scalar,3>*) read_act1_3->clone());
+	KernelPtr<Scalar,3> forget_input_kernel2_3(static_cast<ConvKernelLayer<Scalar>*>(forget_input_kernel1_3->clone()));
+	KernelPtr<Scalar,3> forget_output_kernel2_3(static_cast<ConvKernelLayer<Scalar>*>(forget_output_kernel1_3->clone()));
+	KernelPtr<Scalar,3> write_input_kernel2_3(static_cast<ConvKernelLayer<Scalar>*>(write_input_kernel1_3->clone()));
+	KernelPtr<Scalar,3> write_output_kernel2_3(static_cast<ConvKernelLayer<Scalar>*>(write_output_kernel1_3->clone()));
+	KernelPtr<Scalar,3> candidate_input_kernel2_3(static_cast<ConvKernelLayer<Scalar>*>(candidate_input_kernel1_3->clone()));
+	KernelPtr<Scalar,3> candidate_output_kernel2_3(static_cast<ConvKernelLayer<Scalar>*>(candidate_output_kernel1_3->clone()));
+	KernelPtr<Scalar,3> read_input_kernel2_3(static_cast<ConvKernelLayer<Scalar>*>(read_input_kernel1_3->clone()));
+	KernelPtr<Scalar,3> read_output_kernel2_3(static_cast<ConvKernelLayer<Scalar>*>(read_output_kernel1_3->clone()));
+	ActivationPtr<Scalar,3> forget_act2_3(static_cast<SigmoidActivationLayer<Scalar,3>*>(forget_act1_3->clone()));
+	ActivationPtr<Scalar,3> write_act2_3(static_cast<SigmoidActivationLayer<Scalar,3>*>(write_act1_3->clone()));
+	ActivationPtr<Scalar,3> candidate_act2_3(static_cast<TanhActivationLayer<Scalar,3>*>(candidate_act1_3->clone()));
+	ActivationPtr<Scalar,3> state_act2_3(static_cast<TanhActivationLayer<Scalar,3>*>(state_act1_3->clone()));
+	ActivationPtr<Scalar,3> read_act2_3(static_cast<SigmoidActivationLayer<Scalar,3>*>(read_act1_3->clone()));
 	seq_network_grad_test("lstm net", NeuralNetPtr<Scalar,3,true>(
 			new LSTMNeuralNetwork<Scalar,3>(std::move(forget_input_kernel1_3), std::move(forget_output_kernel1_3),
 					std::move(write_input_kernel1_3), std::move(write_output_kernel1_3), std::move(candidate_input_kernel1_3),
@@ -757,7 +742,6 @@ inline void lstm_net_grad_test() {
 }
 
 TEST(GradientTest, LSTMNet) {
-	lstm_net_grad_test<float>();
 	lstm_net_grad_test<double>();
 }
 
@@ -829,7 +813,6 @@ inline void bidirectional_net_grad_test() {
 }
 
 TEST(GradientTest, BidirectionalNet) {
-	bidirectional_net_grad_test<float>();
 	bidirectional_net_grad_test<double>();
 }
 
@@ -885,7 +868,6 @@ inline void negated_loss_grad_test() {
 }
 
 TEST(GradientTest, NegatedLoss) {
-	negated_loss_grad_test<float>();
 	negated_loss_grad_test<double>();
 }
 
@@ -935,7 +917,6 @@ inline void absolute_loss_grad_test() {
 }
 
 TEST(GradientTest, AbsoluteLoss) {
-	absolute_loss_grad_test<float>();
 	absolute_loss_grad_test<double>();
 }
 
@@ -992,7 +973,6 @@ inline void hinge_loss_grad_test() {
 }
 
 TEST(GradientTest, HingeLoss) {
-	hinge_loss_grad_test<float>();
 	hinge_loss_grad_test<double>();
 }
 
@@ -1050,7 +1030,6 @@ inline void binary_cross_entropy_loss_grad_test() {
 }
 
 TEST(GradientTest, BinaryCrossEntropyLoss) {
-	binary_cross_entropy_loss_grad_test<float>();
 	binary_cross_entropy_loss_grad_test<double>();
 }
 
@@ -1100,7 +1079,6 @@ inline void cross_entropy_loss_grad_test() {
 }
 
 TEST(GradientTest, CrossEntropyLoss) {
-	cross_entropy_loss_grad_test<float>();
 	cross_entropy_loss_grad_test<double>();
 }
 
@@ -1150,7 +1128,6 @@ inline void softmax_cross_entropy_loss_grad_test() {
 }
 
 TEST(GradientTest, SoftmaxCrossEntropyLoss) {
-	softmax_cross_entropy_loss_grad_test<float>();
 	softmax_cross_entropy_loss_grad_test<double>();
 }
 
@@ -1200,7 +1177,6 @@ inline void kullback_leibler_loss_grad_test() {
 }
 
 TEST(GradientTest, KullbackLieblerLoss) {
-	kullback_leibler_loss_grad_test<float>();
 	kullback_leibler_loss_grad_test<double>();
 }
 
@@ -1257,7 +1233,6 @@ inline void multi_label_hinge_loss_grad_test() {
 }
 
 TEST(GradientTest, MultiLabelHingeLoss) {
-	multi_label_hinge_loss_grad_test<float>();
 	multi_label_hinge_loss_grad_test<double>();
 }
 
@@ -1307,7 +1282,6 @@ inline void multi_label_log_loss_grad_test() {
 }
 
 TEST(GradientTest, MultiLabelLogLoss) {
-	multi_label_log_loss_grad_test<float>();
 	multi_label_log_loss_grad_test<double>();
 }
 
