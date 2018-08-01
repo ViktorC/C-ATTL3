@@ -27,7 +27,7 @@ class GradientCheck {
 	static_assert(Rank > 0 && Rank < 4, "illegal optimizer rank");
 	typedef DataProvider<Scalar,Rank,Sequential> Provider;
 	typedef NeuralNetwork<Scalar,Rank,Sequential> Net;
-	typedef Loss<Scalar,Rank,Sequential> Loss;
+	typedef Loss<Scalar,Rank,Sequential> LossType;
 public:
 	/**
 	 * It performs a gradient check to verify the correctness of the neural network and layer implementations.
@@ -45,7 +45,7 @@ public:
 	 * the numerical and analytic gradients.
 	 * @return Whether the gradient check has been passed or failed.
 	 */
-	inline static bool verify_gradients(Provider& provider, Net& net, const Loss& loss, bool verbose = true,
+	inline static bool verify_gradients(Provider& provider, Net& net, const LossType& loss, bool verbose = true,
 			Scalar step_size = NumericUtils<Scalar>::EPSILON2 / 2,
 			Scalar abs_epsilon = NumericUtils<Scalar>::EPSILON2,
 			Scalar rel_epsilon = NumericUtils<Scalar>::EPSILON2) {
