@@ -5,8 +5,8 @@
  *      Author: Viktor Csomor
  */
 
-#ifndef C_ATTL3_PARAMETERS_H_
-#define C_ATTL3_PARAMETERS_H_
+#ifndef C_ATTL3_CORE_PARAMETERS_H_
+#define C_ATTL3_CORE_PARAMETERS_H_
 
 #include "EigenProxy.hpp"
 
@@ -85,4 +85,4 @@ public:
 
 } /* namespace cattle */
 
-#endif /* C_ATTL3_PARAMETERS_H_ */
+#endif /* C_ATTL3_CORE_PARAMETERS_H_ */

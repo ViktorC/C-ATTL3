@@ -132,6 +132,10 @@ virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" hr
 <tr class="memitem:a550bd7dea6ddac56160b5cafd54e8962"><td class="memItemLeft" align="right" valign="top">virtual Data&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_neural_network.html#a550bd7dea6ddac56160b5cafd54e8962">backpropagate</a> (Data out_grad)=0</td></tr>
 <tr class="memdesc:a550bd7dea6ddac56160b5cafd54e8962"><td class="mdescLeft">&#160;</td><td class="mdescRight">It back-propagates the derivative of the loss function w.r.t.  <a href="#a550bd7dea6ddac56160b5cafd54e8962">More...</a><br /></td></tr>
 <tr class="separator:a550bd7dea6ddac56160b5cafd54e8962"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:afadc71d57e50328c50e6114ed30fc308"><td class="memItemLeft" align="right" valign="top">std::vector&lt; Parameters&lt; Scalar &gt; * &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_neural_network.html#afadc71d57e50328c50e6114ed30fc308">get_all_params</a> ()</td></tr>
+<tr class="separator:afadc71d57e50328c50e6114ed30fc308"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af1d0c3e44f75d06c9beb1da3fb4fcf60"><td class="memItemLeft" align="right" valign="top">std::vector&lt; Parameters&lt; Scalar &gt; * &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_neural_network.html#af1d0c3e44f75d06c9beb1da3fb4fcf60">get_unique_optimizable_params</a> ()</td></tr>
+<tr class="separator:af1d0c3e44f75d06c9beb1da3fb4fcf60"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a94a8c8170471486c5f10ba09a5709ad6"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_neural_network.html#a94a8c8170471486c5f10ba09a5709ad6">set_frozen</a> (bool frozen)</td></tr>
 <tr class="memdesc:a94a8c8170471486c5f10ba09a5709ad6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Invokes the Layer::set_frozen(bool) method of all layers of the network with the provided argument.  <a href="#a94a8c8170471486c5f10ba09a5709ad6">More...</a><br /></td></tr>
 <tr class="separator:a94a8c8170471486c5f10ba09a5709ad6"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -219,6 +223,34 @@ template&lt;typename Scalar, std::size_t Rank, bool Sequential&gt; </div>
 <dl class="section return"><dt>Returns</dt><dd>A pointer to a copy of the instance. The instance does not take ownership of the returned pointer (i.e. the caller is responsible for deleting it). </dd></dl>
 
 <p>Implemented in <a class="el" href="classcattle_1_1_l_s_t_m_neural_network.html#acfe39bea97e1f01279024a8d2a2adbba">cattle::LSTMNeuralNetwork&lt; Scalar, Rank, MulInt, Stateful &gt;</a>, <a class="el" href="classcattle_1_1_recurrent_neural_network.html#a24cdf0e19a4704b59d22d23ec371e6c3">cattle::RecurrentNeuralNetwork&lt; Scalar, Rank, MulInt, Stateful &gt;</a>, <a class="el" href="classcattle_1_1_parallel_neural_network.html#a8a0293c70c8583ca3446f9ef7998852f">cattle::ParallelNeuralNetwork&lt; Scalar, Rank, MergeType &gt;</a>, <a class="el" href="classcattle_1_1_dense_neural_network.html#a42a9bae4ecdbd18ba5dabe3f73eacc57">cattle::DenseNeuralNetwork&lt; Scalar, Rank, ConcatType &gt;</a>, <a class="el" href="classcattle_1_1_bidirectional_neural_network.html#ac3200af26b657df73ee81b230d710fa6">cattle::BidirectionalNeuralNetwork&lt; Scalar, Rank, MergeType &gt;</a>, <a class="el" href="classcattle_1_1_feedforward_neural_network.html#ab0366180102ce798b97bf28634523a3c">cattle::FeedforwardNeuralNetwork&lt; Scalar, Rank &gt;</a>, <a class="el" href="classcattle_1_1_residual_neural_network.html#a88ddc363dd51b731194a5cd00f940ac5">cattle::ResidualNeuralNetwork&lt; Scalar, Rank &gt;</a>, <a class="el" href="classcattle_1_1_stacked_neural_network.html#ae59cff8422eeeb2bc3d0f95f8ea3dcf8">cattle::StackedNeuralNetwork&lt; Scalar, Rank, Sequential &gt;</a>, and <a class="el" href="classcattle_1_1_sequential_neural_network.html#ab66f9630a90d2098bdefee44e4afc29b">cattle::SequentialNeuralNetwork&lt; Scalar, Rank &gt;</a>.</p>
+
+</div>
+</div>
+<a id="afadc71d57e50328c50e6114ed30fc308"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#afadc71d57e50328c50e6114ed30fc308">&#9670;&nbsp;</a></span>get_all_params()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename Scalar, std::size_t Rank, bool Sequential&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::vector&lt;Parameters&lt;Scalar&gt;*&gt; <a class="el" href="classcattle_1_1_neural_network.html">cattle::NeuralNetwork</a>&lt; Scalar, Rank, Sequential &gt;::get_all_params </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<dl class="section return"><dt>Returns</dt><dd>A vector of pointers to the parameters of the network. The pointers are not necessarily unique. </dd></dl>
 
 </div>
 </div>
@@ -339,6 +371,34 @@ template&lt;typename Scalar, std::size_t Rank, bool Sequential&gt; </div>
 <dl class="section return"><dt>Returns</dt><dd>A constant reference to the member variable denoting the dimensions of the tensors output by the network (except for the first rank which denotes the variable sample size and in case of sequential networks the second rank which denotes the variable time steps). </dd></dl>
 
 <p>Implemented in <a class="el" href="classcattle_1_1_l_s_t_m_neural_network.html#ae10aa3773f5b55532301a6301d9d2cad">cattle::LSTMNeuralNetwork&lt; Scalar, Rank, MulInt, Stateful &gt;</a>, <a class="el" href="classcattle_1_1_recurrent_neural_network.html#a65378382938c173044d138d1fe35f84e">cattle::RecurrentNeuralNetwork&lt; Scalar, Rank, MulInt, Stateful &gt;</a>, <a class="el" href="classcattle_1_1_parallel_neural_network.html#a10e0039aa177ae89c690d962a871fa93">cattle::ParallelNeuralNetwork&lt; Scalar, Rank, MergeType &gt;</a>, <a class="el" href="classcattle_1_1_dense_neural_network.html#acaeefc0dd5a374061d25b5f1e02eb434">cattle::DenseNeuralNetwork&lt; Scalar, Rank, ConcatType &gt;</a>, <a class="el" href="classcattle_1_1_bidirectional_neural_network.html#aac567c95a4dd332dd2239c5a6714bc75">cattle::BidirectionalNeuralNetwork&lt; Scalar, Rank, MergeType &gt;</a>, <a class="el" href="classcattle_1_1_feedforward_neural_network.html#a5776c02f5fe06b1fad8d34db93c6448f">cattle::FeedforwardNeuralNetwork&lt; Scalar, Rank &gt;</a>, <a class="el" href="classcattle_1_1_residual_neural_network.html#adc9105475aaa8dc60782bc6d6607a766">cattle::ResidualNeuralNetwork&lt; Scalar, Rank &gt;</a>, <a class="el" href="classcattle_1_1_stacked_neural_network.html#a68836fa59e256e0dde0958b156f72588">cattle::StackedNeuralNetwork&lt; Scalar, Rank, Sequential &gt;</a>, and <a class="el" href="classcattle_1_1_sequential_neural_network.html#aea6d5fd31e744bae0faee3fcec5b9114">cattle::SequentialNeuralNetwork&lt; Scalar, Rank &gt;</a>.</p>
+
+</div>
+</div>
+<a id="af1d0c3e44f75d06c9beb1da3fb4fcf60"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af1d0c3e44f75d06c9beb1da3fb4fcf60">&#9670;&nbsp;</a></span>get_unique_optimizable_params()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename Scalar, std::size_t Rank, bool Sequential&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::vector&lt;Parameters&lt;Scalar&gt;*&gt; <a class="el" href="classcattle_1_1_neural_network.html">cattle::NeuralNetwork</a>&lt; Scalar, Rank, Sequential &gt;::get_unique_optimizable_params </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<dl class="section return"><dt>Returns</dt><dd>A vector of pointers to the unique, optimizable parameters of the network. </dd></dl>
 
 </div>
 </div>

@@ -5,8 +5,8 @@
  *      Author: Viktor Csomor
  */
 
-#ifndef CATTL3_UTILS_NUMERICUTILS_H_
-#define CATTL3_UTILS_NUMERICUTILS_H_
+#ifndef C_ATTL3_CORE_NUMERICUTILS_H_
+#define C_ATTL3_CORE_NUMERICUTILS_H_
 
 #include <algorithm>
 #include <limits>
@@ -117,4 +117,4 @@ public:
 
 }
 
-#endif /* CATTL3_UTILS_NUMERICUTILS_H_ */
+#endif /* C_ATTL3_CORE_NUMERICUTILS_H_ */

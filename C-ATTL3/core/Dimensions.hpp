@@ -5,8 +5,8 @@
  *      Author: Viktor Csomor
  */
 
-#ifndef CATTL3_DIMENSIONS_H_
-#define CATTL3_DIMENSIONS_H_
+#ifndef C_ATTL3_CORE_DIMENSIONS_H_
+#define C_ATTL3_CORE_DIMENSIONS_H_
 
 #include <algorithm>
 #include <array>
@@ -424,4 +424,4 @@ public:
 
 } /* namespace cattle */
 
-#endif /* CATTL3_DIMENSIONS_H_ */
+#endif /* C_ATTL3_CORE_DIMENSIONS_H_ */

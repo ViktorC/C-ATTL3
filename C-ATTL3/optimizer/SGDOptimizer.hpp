@@ -27,7 +27,7 @@ public:
 	virtual ~SGDOptimizer() = default;
 	inline void fit(typename Base::Net& net) {
 		target_net_ptr = &net;
-		_fit(Base::get_unique_optimizable_params(net));
+		_fit(net.get_unique_optimizable_params());
 	}
 protected:
 	inline Scalar _train(typename Base::Net& net, typename Base::Provider& training_prov, std::size_t epoch,
@@ -38,7 +38,7 @@ protected:
 		std::size_t instances = 0;
 		std::size_t updates = 0;
 		// Get all the optimizable parameters.
-		std::vector<Parameters<Scalar>*> params_vec = Base::get_unique_optimizable_params(net);
+		std::vector<Parameters<Scalar>*> params_vec = net.get_unique_optimizable_params();
 		// Perform an entire training epoch.
 		while (training_prov.has_more()) {
 			DataPair<Scalar,Rank,Sequential> data_pair = training_prov.get_data(batch_size);
@@ -82,7 +82,7 @@ protected:
 		assert(target_net_ptr == &net);
 		Scalar obj_loss = 0;
 		Scalar instances = 0;
-		std::vector<Parameters<Scalar>*> params_vec = Base::get_unique_optimizable_params(net);
+		std::vector<Parameters<Scalar>*> params_vec = net.get_unique_optimizable_params();
 		// Perform an entire test epoch.
 		while (test_prov.has_more()) {
 			DataPair<Scalar,Rank,Sequential> data_pair = test_prov.get_data(batch_size);

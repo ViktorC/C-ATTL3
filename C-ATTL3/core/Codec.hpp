@@ -5,8 +5,8 @@
  *      Author: Viktor Csomor
  */
 
-#ifndef C_ATTL3_CODEC_H_
-#define C_ATTL3_CODEC_H_
+#ifndef C_ATTL3_CORE_CODEC_H_
+#define C_ATTL3_CORE_CODEC_H_
 
 #include <cstddef>
 #include <string>
@@ -42,4 +42,4 @@ public:
 
 } /* namespace cattle */
 
-#endif /* C_ATTL3_CODEC_H_ */
+#endif /* C_ATTL3_CORE_CODEC_H_ */

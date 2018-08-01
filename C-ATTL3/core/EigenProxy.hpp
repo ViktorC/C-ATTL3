@@ -5,8 +5,8 @@
  *      Author: Viktor Csomor
  */
 
-#ifndef CATTL3_UTILS_EIGENPROXY_H_
-#define CATTL3_UTILS_EIGENPROXY_H_
+#ifndef C_ATTL3_CORE_EIGENPROXY_H_
+#define C_ATTL3_CORE_EIGENPROXY_H_
 
 #define EIGEN_USE_THREADS
 
@@ -110,4 +110,4 @@ public:
 
 }
 
-#endif /* CATTL3_UTILS_EIGENPROXY_H_ */
+#endif /* C_ATTL3_CORE_EIGENPROXY_H_ */

@@ -37,8 +37,10 @@ public:
 	 * @param norm_avg_decay The decay rate of the maintained means and variances.
 	 * @param epsilon A small constant used to maintain numerical stability.
 	 * @param gamma_reg An optional regularization function to apply to the gammas.
-	 * @param gamma_clip The maximum allowed absolute gamma value. If it is 0 or less, no less, no
-	 * L1 max norm constraint is enforced.
+	 * @param gamma_clip The maximum allowed absolute gamma value. If it is 0 or less, no value
+	 * clipping is performed.
+	 * @param gamma_max_l1_norm The maximum allowed L1 gamma value norm. If it is 0 or less, no L1
+	 * max norm constraint is enforced.
 	 * @param gamma_max_l2_norm The maximum allowed L2 gamma value norm. If it is 0 or less, no L2
 	 * max norm constraint is enforced.
 	 * @param gamma_grad_clip The maximum allowed absolute gamma gradient. If it is 0 or less, no
@@ -303,8 +305,10 @@ public:
 	 * @param norm_avg_decay The decay rate of the maintained means and variances.
 	 * @param epsilon A small constant used to maintain numerical stability.
 	 * @param gamma_reg An optional regularization function to apply to the gammas.
-	 * @param gamma_clip The maximum allowed absolute gamma value. If it is 0 or less, no less, no
-	 * L1 max norm constraint is enforced.
+	 * @param gamma_clip The maximum allowed absolute gamma value. If it is 0 or less, no value
+	 * clipping is performed.
+	 * @param gamma_max_l1_norm The maximum allowed L1 gamma value norm. If it is 0 or less, no L1
+	 * max norm constraint is enforced
 	 * @param gamma_max_l2_norm The maximum allowed L2 gamma value norm. If it is 0 or less, no L2
 	 * max norm constraint is enforced.
 	 * @param gamma_grad_clip The maximum allowed absolute gamma gradient. If it is 0 or less, no

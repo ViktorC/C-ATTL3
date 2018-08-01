@@ -281,7 +281,8 @@ template&lt;typename Scalar , std::size_t Rank&gt; </div>
     <tr><td class="paramname">norm_avg_decay</td><td>The decay rate of the maintained means and variances. </td></tr>
     <tr><td class="paramname">epsilon</td><td>A small constant used to maintain numerical stability. </td></tr>
     <tr><td class="paramname">gamma_reg</td><td>An optional regularization function to apply to the gammas. </td></tr>
-    <tr><td class="paramname">gamma_clip</td><td>The maximum allowed absolute gamma value. If it is 0 or less, no less, no L1 max norm constraint is enforced. </td></tr>
+    <tr><td class="paramname">gamma_clip</td><td>The maximum allowed absolute gamma value. If it is 0 or less, no value clipping is performed. </td></tr>
+    <tr><td class="paramname">gamma_max_l1_norm</td><td>The maximum allowed L1 gamma value norm. If it is 0 or less, no L1 max norm constraint is enforced </td></tr>
     <tr><td class="paramname">gamma_max_l2_norm</td><td>The maximum allowed L2 gamma value norm. If it is 0 or less, no L2 max norm constraint is enforced. </td></tr>
     <tr><td class="paramname">gamma_grad_clip</td><td>The maximum allowed absolute gamma gradient. If it is 0 or less, no gradient clipping is performed. </td></tr>
     <tr><td class="paramname">gamma_grad_max_l1_norm</td><td>The maximum allowed L1 gamma gradient norm. If it is 0 or less, no L1 gradient max norm constraint is enforced. </td></tr>

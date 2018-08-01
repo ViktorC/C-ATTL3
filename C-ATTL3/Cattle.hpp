@@ -5,10 +5,24 @@
  *      Author: Viktor Csomor
  */
 
-#ifndef CATTL3_CATTLE_H_
-#define CATTL3_CATTLE_H_
+#ifndef C_ATTL3_CATTLE_H_
+#define C_ATTL3_CATTLE_H_
 
 #include "codec/PPMCodec.hpp"
+#include "core/Codec.hpp"
+#include "core/DataProvider.hpp"
+#include "core/Dimensions.hpp"
+#include "core/EigenProxy.hpp"
+#include "core/GradientCheck.hpp"
+#include "core/Layer.hpp"
+#include "core/Loss.hpp"
+#include "core/NeuralNetwork.hpp"
+#include "core/NumericUtils.hpp"
+#include "core/Optimizer.hpp"
+#include "core/ParameterInitialization.hpp"
+#include "core/ParameterRegularization.hpp"
+#include "core/Parameters.hpp"
+#include "core/Preprocessor.hpp"
 #include "data_provider/CIFARDataProvider.hpp"
 #include "data_provider/IMDBDataProvider.hpp"
 #include "data_provider/JointFileDataProvider.hpp"
@@ -88,4 +102,4 @@
 #include "preprocessor/NormalizationPreprocessor.hpp"
 #include "preprocessor/PCAPreprocessor.hpp"
 
-#endif /* CATTL3_CATTLE_H_ */
+#endif /* C_ATTL3_CATTLE_H_ */

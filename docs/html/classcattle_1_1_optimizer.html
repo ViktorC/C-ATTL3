@@ -75,7 +75,6 @@ $(function() {
   <div class="summary">
 <a href="#pub-methods">Public Member Functions</a> &#124;
 <a href="#pro-methods">Protected Member Functions</a> &#124;
-<a href="#pro-static-methods">Static Protected Member Functions</a> &#124;
 <a href="classcattle_1_1_optimizer-members.html">List of all members</a>  </div>
   <div class="headertitle">
 <div class="title">cattle::Optimizer&lt; Scalar, Rank, Sequential &gt; Class Template Reference<span class="mlabels"><span class="mlabel">abstract</span></span></div>  </div>
@@ -108,9 +107,6 @@ Inheritance diagram for cattle::Optimizer&lt; Scalar, Rank, Sequential &gt;:</di
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:a898ace6f699e2a28203605659b9e5cb3"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_optimizer.html#a898ace6f699e2a28203605659b9e5cb3">verify_gradients</a> (<a class="el" href="classcattle_1_1_neural_network.html">Net</a> &amp;net, <a class="el" href="classcattle_1_1_data_provider.html">Provider</a> &amp;provider, bool verbose=true, Scalar step_size=<a class="el" href="classcattle_1_1_numeric_utils.html">NumericUtils</a>&lt; Scalar &gt;::EPSILON2/2, Scalar abs_epsilon=<a class="el" href="classcattle_1_1_numeric_utils.html">NumericUtils</a>&lt; Scalar &gt;::EPSILON2, Scalar rel_epsilon=<a class="el" href="classcattle_1_1_numeric_utils.html">NumericUtils</a>&lt; Scalar &gt;::EPSILON2) const</td></tr>
-<tr class="memdesc:a898ace6f699e2a28203605659b9e5cb3"><td class="mdescLeft">&#160;</td><td class="mdescRight">It performs a gradient check to verify the correctness of the neural network and layer implementations.  <a href="#a898ace6f699e2a28203605659b9e5cb3">More...</a><br /></td></tr>
-<tr class="separator:a898ace6f699e2a28203605659b9e5cb3"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aa227b3dd57601cfc0b879c3b5b54ec11"><td class="memItemLeft" align="right" valign="top">Scalar&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_optimizer.html#aa227b3dd57601cfc0b879c3b5b54ec11">optimize</a> (<a class="el" href="classcattle_1_1_neural_network.html">Net</a> &amp;net, <a class="el" href="classcattle_1_1_data_provider.html">Provider</a> &amp;training_prov, <a class="el" href="classcattle_1_1_data_provider.html">Provider</a> &amp;test_prov, std::size_t epochs, std::size_t early_stop=0, Scalar target_loss=<a class="el" href="classcattle_1_1_numeric_utils.html">NumericUtils</a>&lt; Scalar &gt;::MIN, bool verbose=true)</td></tr>
 <tr class="memdesc:aa227b3dd57601cfc0b879c3b5b54ec11"><td class="mdescLeft">&#160;</td><td class="mdescRight">It optimizes the specified neural network using the given data providers according to the optimizers loss function.  <a href="#aa227b3dd57601cfc0b879c3b5b54ec11">More...</a><br /></td></tr>
 <tr class="separator:aa227b3dd57601cfc0b879c3b5b54ec11"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -132,12 +128,6 @@ Protected Member Functions</h2></td></tr>
 <tr class="memitem:a50cddf9bc4a4e1bee002454582ce9d8f"><td class="memItemLeft" align="right" valign="top">virtual Scalar&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_optimizer.html#a50cddf9bc4a4e1bee002454582ce9d8f">_test</a> (<a class="el" href="classcattle_1_1_neural_network.html">Net</a> &amp;net, <a class="el" href="classcattle_1_1_data_provider.html">Provider</a> &amp;test_prov, std::size_t epoch, bool verbose)=0</td></tr>
 <tr class="memdesc:a50cddf9bc4a4e1bee002454582ce9d8f"><td class="mdescLeft">&#160;</td><td class="mdescRight">It tests the specified neural network for a single epoch on the test data provided by the specified data provider.  <a href="#a50cddf9bc4a4e1bee002454582ce9d8f">More...</a><br /></td></tr>
 <tr class="separator:a50cddf9bc4a4e1bee002454582ce9d8f"><td class="memSeparator" colspan="2">&#160;</td></tr>
-</table><table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pro-static-methods"></a>
-Static Protected Member Functions</h2></td></tr>
-<tr class="memitem:afbd7093593d856e249f387e68cdeb6e1"><td class="memItemLeft" align="right" valign="top">static std::vector&lt; Parameters&lt; Scalar &gt; * &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_optimizer.html#afbd7093593d856e249f387e68cdeb6e1">get_unique_optimizable_params</a> (<a class="el" href="classcattle_1_1_neural_network.html">Net</a> &amp;net)</td></tr>
-<tr class="memdesc:afbd7093593d856e249f387e68cdeb6e1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns a vector of unique pointers to the optimizable parameters of a network.  <a href="#afbd7093593d856e249f387e68cdeb6e1">More...</a><br /></td></tr>
-<tr class="separator:afbd7093593d856e249f387e68cdeb6e1"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><h3>template&lt;typename Scalar, std::size_t Rank, bool Sequential&gt;<br />
@@ -309,43 +299,6 @@ template&lt;typename Scalar , std::size_t Rank, bool Sequential&gt; </div>
 </dl>
 
 <p>Implemented in <a class="el" href="classcattle_1_1_s_g_d_optimizer.html#af8403d63003485d12509c29eb0a7cb56">cattle::SGDOptimizer&lt; Scalar, Rank, Sequential &gt;</a>.</p>
-
-</div>
-</div>
-<a id="afbd7093593d856e249f387e68cdeb6e1"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#afbd7093593d856e249f387e68cdeb6e1">&#9670;&nbsp;</a></span>get_unique_optimizable_params()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<div class="memtemplate">
-template&lt;typename Scalar , std::size_t Rank, bool Sequential&gt; </div>
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">static std::vector&lt;Parameters&lt;Scalar&gt;*&gt; <a class="el" href="classcattle_1_1_optimizer.html">cattle::Optimizer</a>&lt; Scalar, Rank, Sequential &gt;::get_unique_optimizable_params </td>
-          <td>(</td>
-          <td class="paramtype"><a class="el" href="classcattle_1_1_neural_network.html">Net</a> &amp;&#160;</td>
-          <td class="paramname"><em>net</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span><span class="mlabel">protected</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Returns a vector of unique pointers to the optimizable parameters of a network. </p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">net</td><td>The network whose optimizable parameters are to be retrieved. </td></tr>
-  </table>
-  </dd>
-</dl>
-<dl class="section return"><dt>Returns</dt><dd>A vector of pointers to the unique, optimizable parameters of the network. </dd></dl>
 
 </div>
 </div>
@@ -563,83 +516,6 @@ template&lt;typename Scalar , std::size_t Rank, bool Sequential&gt; </div>
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>The training loss of the last epoch. </dd></dl>
-
-</div>
-</div>
-<a id="a898ace6f699e2a28203605659b9e5cb3"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a898ace6f699e2a28203605659b9e5cb3">&#9670;&nbsp;</a></span>verify_gradients()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<div class="memtemplate">
-template&lt;typename Scalar , std::size_t Rank, bool Sequential&gt; </div>
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">bool <a class="el" href="classcattle_1_1_optimizer.html">cattle::Optimizer</a>&lt; Scalar, Rank, Sequential &gt;::verify_gradients </td>
-          <td>(</td>
-          <td class="paramtype"><a class="el" href="classcattle_1_1_neural_network.html">Net</a> &amp;&#160;</td>
-          <td class="paramname"><em>net</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype"><a class="el" href="classcattle_1_1_data_provider.html">Provider</a> &amp;&#160;</td>
-          <td class="paramname"><em>provider</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">bool&#160;</td>
-          <td class="paramname"><em>verbose</em> = <code>true</code>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">Scalar&#160;</td>
-          <td class="paramname"><em>step_size</em> = <code><a class="el" href="classcattle_1_1_numeric_utils.html">NumericUtils</a>&lt;Scalar&gt;::EPSILON2&#160;/&#160;2</code>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">Scalar&#160;</td>
-          <td class="paramname"><em>abs_epsilon</em> = <code><a class="el" href="classcattle_1_1_numeric_utils.html">NumericUtils</a>&lt;Scalar&gt;::EPSILON2</code>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">Scalar&#160;</td>
-          <td class="paramname"><em>rel_epsilon</em> = <code><a class="el" href="classcattle_1_1_numeric_utils.html">NumericUtils</a>&lt;Scalar&gt;::EPSILON2</code>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td> const</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>It performs a gradient check to verify the correctness of the neural network and layer implementations. </p>
-<p>It is recommended to use double precision floating points; however, non-differentiable layers such as rectified linear units may still fail.</p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">net</td><td>A reference to the network on which the gradient check is to be performed. </td></tr>
-    <tr><td class="paramname">provider</td><td>A reference to the data provider to use for the gradient check. </td></tr>
-    <tr><td class="paramname">verbose</td><td>Whether the analytic and numerical derivatives of the variables should be printed to the standard out stream. </td></tr>
-    <tr><td class="paramname">step_size</td><td>The step size for numerical differentiation. </td></tr>
-    <tr><td class="paramname">abs_epsilon</td><td>The maximum acceptable absolute difference between the numerical and analytic gradients. </td></tr>
-    <tr><td class="paramname">rel_epsilon</td><td>The maximum acceptable relative (to the greater out of the two) difference between the numerical and analytic gradients. </td></tr>
-  </table>
-  </dd>
-</dl>
-<dl class="section return"><dt>Returns</dt><dd>Whether the gradient check has been passed or failed. </dd></dl>
 
 </div>
 </div>

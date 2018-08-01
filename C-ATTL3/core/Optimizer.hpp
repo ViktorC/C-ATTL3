@@ -5,8 +5,8 @@
  *      Author: Viktor Csomor
  */
 
-#ifndef CATTL3_OPTIMIZER_H_
-#define CATTL3_OPTIMIZER_H_
+#ifndef C_ATTL3_CORE_OPTIMIZER_H_
+#define C_ATTL3_CORE_OPTIMIZER_H_
 
 #include <cassert>
 #include <iomanip>
@@ -48,94 +48,6 @@ public:
 		assert(loss != nullptr);
 	}
 	virtual ~Optimizer() = default;
-	/**
-	 * It performs a gradient check to verify the correctness of the neural network and layer implementations.
-	 * It is recommended to use double precision floating points; however, non-differentiable layers such as
-	 * rectified linear units may still fail.
-	 *
-	 * @param net A reference to the network on which the gradient check is to be performed.
-	 * @param provider A reference to the data provider to use for the gradient check.
-	 * @param verbose Whether the analytic and numerical derivatives of the variables should be printed to the
-	 * standard out stream.
-	 * @param step_size The step size for numerical differentiation.
-	 * @param abs_epsilon The maximum acceptable absolute difference between the numerical and analytic
-	 * gradients.
-	 * @param rel_epsilon The maximum acceptable relative (to the greater out of the two) difference between
-	 * the numerical and analytic gradients.
-	 * @return Whether the gradient check has been passed or failed.
-	 */
-	inline bool verify_gradients(Net& net, Provider& provider, bool verbose = true,
-			Scalar step_size = NumericUtils<Scalar>::EPSILON2 / 2,
-			Scalar abs_epsilon = NumericUtils<Scalar>::EPSILON2,
-			Scalar rel_epsilon = NumericUtils<Scalar>::EPSILON2) const {
-		assert(net.get_input_dims() == provider.get_obs_dims());
-		assert(net.get_output_dims() == provider.get_obj_dims());
-		assert(step_size > 0);
-		assert(abs_epsilon >= 0 && rel_epsilon > 0);
-		bool failure = false;
-		DataPair<Scalar,Rank,Sequential> data_pair = provider.get_data(std::numeric_limits<std::size_t>::max());
-		std::size_t instances = data_pair.first.dimension(0);
-		provider.reset();
-		/* As the loss to minimize is the mean of the losses for all the training observations, the gradient to
-		 * back-propagate is to be divided by the number of observations in the batch. */
-		net.backpropagate(loss->d_function(net.propagate(data_pair.first, true),
-				data_pair.second) / (Scalar) instances);
-		std::vector<Parameters<Scalar>*> params_vec = get_unique_optimizable_params(net);
-		for (std::size_t i = 0; i < params_vec.size(); ++i) {
-			Parameters<Scalar>& params = *(params_vec[i]);
-			if (verbose) {
-				std::cout << "Parameter Set " << std::setw(3) << std::to_string(i) <<
-						std::string(28, '-') << std::endl;
-			}
-			/* Add the derivative of the regularization function w.r.t. to the parameters of the layer to the
-			 * parameters' gradient. */
-			params.regularize();
-			Matrix<Scalar> params_values = params.get_values();
-			const Matrix<Scalar>& params_grad = params.get_grad();
-			for (int j = 0; j < params_values.rows(); ++j) {
-				for (int k = 0; k < params_values.cols(); ++k) {
-					if (verbose)
-						std::cout << "\tparam[" << i << "," << j << "," << k << "]:" << std::endl;
-					Scalar ana_grad = params_grad(j,k);
-					if (verbose)
-						std::cout << "\t\tanalytic gradient = " << ana_grad << std::endl;
-					Scalar param = params_values(j,k);
-					params_values(j,k) = param + step_size;
-					params.set_values(params_values);
-					/* Compute the numerical gradients in training mode to ensure that the means and standard
-					 * deviations used for batch normalization are the same as those used during the analytic
-					 * gradient computation. */
-					Scalar loss_inc = loss->function(net.propagate(data_pair.first, true),
-							data_pair.second).mean();
-					/* Calculate the new regularization penalty as its derivative w.r.t. the layer's
-					 * parameters is included in the gradient. */
-					Scalar reg_pen_inc = params.get_regularization_penalty();
-					params_values(j,k) = param - step_size;
-					params.set_values(params_values);
-					Scalar loss_dec = loss->function(net.propagate(data_pair.first, true),
-							data_pair.second).mean();
-					Scalar reg_pen_dec = params.get_regularization_penalty();
-					params_values(j,k) = param;
-					params.set_values(params_values);
-					// Include the regularization penalty as well.
-					Scalar num_grad = (loss_inc + reg_pen_inc - (loss_dec + reg_pen_dec)) / (2 * step_size);
-					if (verbose)
-						std::cout << "\t\tnumerical gradient = " << num_grad;
-					if (!NumericUtils<Scalar>::almost_equal(ana_grad, num_grad, abs_epsilon, rel_epsilon)) {
-						if (verbose)
-							std::cout << " *****FAIL*****";
-						failure = true;
-					}
-					if (verbose)
-						std::cout << std::endl;
-				}
-			}
-			params.reset_grad();
-		}
-		// Empty the network caches.
-		net.empty_caches();
-		return !failure;
-	}
 	/**
 	 * It optimizes the specified neural network using the given data providers according to the
 	 * optimizers loss function. It also fits the optimizer to the network before the otpimization
@@ -318,31 +230,9 @@ protected:
 	 * @return The test loss of the epoch.
 	 */
 	virtual Scalar _test(Net& net, Provider& test_prov, std::size_t epoch, bool verbose) = 0;
-	/**
-	 * Returns a vector of unique pointers to the optimizable parameters of a network.
-	 *
-	 * @param net The network whose optimizable parameters are to be retrieved.
-	 * @return A vector of pointers to the unique, optimizable parameters of the network.
-	 */
-	inline static std::vector<Parameters<Scalar>*> get_unique_optimizable_params(Net& net) {
-		std::vector<Parameters<Scalar>*> params_vec;
-		std::set<Parameters<Scalar>*> params_set;
-		for (auto layer_ptr : net.get_layers()) {
-			if (!layer_ptr)
-				continue;
-			for (auto params_ptr : layer_ptr->get_params()) {
-				if (params_ptr && params_ptr->are_optimizable() &&
-						params_set.find(params_ptr) == params_set.end()) {
-					params_set.insert(params_ptr);
-					params_vec.push_back(params_ptr);
-				}
-			}
-		}
-		return params_vec;
-	}
 	const LossSharedPtr<Scalar,Rank,Sequential> loss;
 };
 
 } /* namespace cattle */
 
-#endif /* CATTL3_OPTIMIZER_H_ */
+#endif /* C_ATTL3_CORE_OPTIMIZER_H_ */

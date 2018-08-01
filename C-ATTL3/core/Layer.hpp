@@ -5,8 +5,8 @@
  *      Author: Viktor Csomor
  */
 
-#ifndef CATTL3_LAYER_H_
-#define CATTL3_LAYER_H_
+#ifndef C_ATTL3_CORE_LAYER_H_
+#define C_ATTL3_CORE_LAYER_H_
 
 #include <memory>
 #include <type_traits>
@@ -156,4 +156,4 @@ public:
 
 } /* namespace cattle */
 
-#endif /* CATTL3_LAYER_H_ */
+#endif /* C_ATTL3_CORE_LAYER_H_ */

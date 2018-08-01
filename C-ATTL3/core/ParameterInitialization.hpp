@@ -5,8 +5,8 @@
  *      Author: Viktor Csomor
  */
 
-#ifndef C_ATTL3_PARAMETERINITIALIZATION_H_
-#define C_ATTL3_PARAMETERINITIALIZATION_H_
+#ifndef C_ATTL3_CORE_PARAMETERINITIALIZATION_H_
+#define C_ATTL3_CORE_PARAMETERINITIALIZATION_H_
 
 #include <type_traits>
 
@@ -33,4 +33,4 @@ public:
 
 } /* namespace cattle */
 
-#endif /* C_ATTL3_PARAMETERINITIALIZATION_H_ */
+#endif /* C_ATTL3_CORE_PARAMETERINITIALIZATION_H_ */

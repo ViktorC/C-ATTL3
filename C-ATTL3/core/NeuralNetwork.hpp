@@ -5,8 +5,8 @@
  *      Author: Viktor Csomor
  */
 
-#ifndef CATTL3_NEURALNETWORK_H_
-#define CATTL3_NEURALNETWORK_H_
+#ifndef C_ATTL3_CORE_NEURALNETWORK_H_
+#define C_ATTL3_CORE_NEURALNETWORK_H_
 
 #include "Layer.hpp"
 
@@ -95,6 +95,41 @@ public:
 	 */
 	virtual Data backpropagate(Data out_grad) = 0;
 	/**
+	 * @return A vector of pointers to the parameters of the network. The pointers are
+	 * not necessarily unique.
+	 */
+	inline std::vector<Parameters<Scalar>*> get_all_params() {
+		std::vector<Parameters<Scalar>*> params_vec;
+		for (auto layer_ptr : get_layers()) {
+			if (!layer_ptr)
+				continue;
+			for (auto params_ptr : layer_ptr->get_params()) {
+				if (params_ptr)
+					params_vec.push_back(params_ptr);
+			}
+		}
+		return params_vec;
+	}
+	/**
+	 * @return A vector of pointers to the unique, optimizable parameters of the network.
+	 */
+	inline std::vector<Parameters<Scalar>*> get_unique_optimizable_params() {
+		std::vector<Parameters<Scalar>*> params_vec;
+		std::set<Parameters<Scalar>*> params_set;
+		for (auto layer_ptr : get_layers()) {
+			if (!layer_ptr)
+				continue;
+			for (auto params_ptr : layer_ptr->get_params()) {
+				if (params_ptr && params_ptr->are_optimizable() &&
+						params_set.find(params_ptr) == params_set.end()) {
+					params_set.insert(params_ptr);
+					params_vec.push_back(params_ptr);
+				}
+			}
+		}
+		return params_vec;
+	}
+	/**
 	 * Invokes the Layer#set_frozen(bool) method of all layers of the network with the
 	 * provided argument. A frozen networks parameters are not regularized.
 	 *
@@ -102,27 +137,15 @@ public:
 	 * via optimization) or active.
 	 */
 	inline virtual void set_frozen(bool frozen) {
-		for (auto layer_ptr : get_layers()) {
-			if (!layer_ptr)
-				continue;
-			for (auto params_ptr : layer_ptr->get_params()) {
-				if (params_ptr)
-					params_ptr->set_frozen(frozen);
-			}
-		}
+		for (auto params_ptr : get_all_params())
+			params_ptr->set_frozen(frozen);
 	}
 	/**
 	 * Initializes all parameters of the network.
 	 */
 	inline virtual void init() {
-		for (auto layer_ptr : get_layers()) {
-			if (!layer_ptr)
-				continue;
-			for (auto params_ptr : layer_ptr->get_params()) {
-				if (params_ptr)
-					params_ptr->init();
-			}
-		}
+		for (auto params_ptr : get_all_params())
+			params_ptr->init();
 	}
 	/**
 	 * It propagates the input through the neural network and outputs its prediction
@@ -138,4 +161,4 @@ public:
 
 } /* namespace cattle */
 
-#endif /* CATTL3_NEURALNETWORK_H_ */
+#endif /* C_ATTL3_CORE_NEURALNETWORK_H_ */

@@ -32,7 +32,7 @@ extern bool verbose;
  * @param name The name of the gradient test.
  * @param prov The data provider to use for gradient checking.
  * @param net The neural network whose differentiation is to be checked.
- * @param opt The optimizer to use for the gradient check.
+ * @param loss The loss function to use for the gradient check.
  * @param step_size The step size for numerical differentiation.
  * @param abs_epsilon The maximum acceptable absolute difference between the analytic and
  * numerical gradients.
@@ -41,11 +41,13 @@ extern bool verbose;
  */
 template<typename Scalar, std::size_t Rank, bool Sequential>
 inline void grad_test(std::string name, DataProvider<Scalar,Rank,Sequential>& prov,
-		NeuralNetwork<Scalar,Rank,Sequential>& net, Optimizer<Scalar,Rank,Sequential>& opt,
+		NeuralNetwork<Scalar,Rank,Sequential>& net, const Loss<Scalar,Rank,Sequential>& loss,
 		Scalar step_size = ScalarTraits<Scalar>::step_size, Scalar abs_epsilon = ScalarTraits<Scalar>::abs_epsilon,
 		Scalar rel_epsilon = ScalarTraits<Scalar>::rel_epsilon) {
 	print_test_header<Scalar,Rank,Sequential>("gradient check", name);
-	EXPECT_TRUE(opt.verify_gradients(net, prov, verbose, step_size, abs_epsilon, rel_epsilon));
+	bool pass = GradientCheck<Scalar,Rank,Sequential>::verify_gradients(prov, net, loss, verbose, step_size,
+			abs_epsilon, rel_epsilon);
+	EXPECT_TRUE(pass);
 }
 
 /**
@@ -71,9 +73,8 @@ inline void nonseq_network_grad_test(std::string name, NeuralNetPtr<Scalar,Rank,
 	TensorPtr<Scalar,Rank + 1> obj = random_tensor<Scalar,Rank + 1>(output_dims);
 	MemoryDataProvider<Scalar,Rank,false> prov(std::move(obs), std::move(obj));
 	net->init();
-	auto loss = LossSharedPtr<Scalar,Rank,false>(new SquaredLoss<Scalar,Rank,false>());
-	VanillaSGDOptimizer<Scalar,Rank,false> opt(loss, samples);
-	grad_test<Scalar,Rank,false>(name, prov, *net, opt, step_size, abs_epsilon, rel_epsilon);
+	SquaredLoss<Scalar,Rank,false> loss;
+	grad_test<Scalar,Rank,false>(name, prov, *net, loss, step_size, abs_epsilon, rel_epsilon);
 }
 
 /**
@@ -103,9 +104,8 @@ inline void seq_network_grad_test(std::string name, NeuralNetPtr<Scalar,Rank,tru
 	TensorPtr<Scalar,Rank + 2> obj = random_tensor<Scalar,Rank + 2>(output_dims);
 	MemoryDataProvider<Scalar,Rank,true> prov(std::move(obs), std::move(obj));
 	net->init();
-	auto loss = LossSharedPtr<Scalar,Rank,true>(new SquaredLoss<Scalar,Rank,true>());
-	VanillaSGDOptimizer<Scalar,Rank,true> opt(loss, samples);
-	grad_test<Scalar,Rank,true>(name, prov, *net, opt, step_size, abs_epsilon, rel_epsilon);
+	SquaredLoss<Scalar,Rank,true> loss;
+	grad_test<Scalar,Rank,true>(name, prov, *net, loss, step_size, abs_epsilon, rel_epsilon);
 }
 
 /**
@@ -838,9 +838,8 @@ inline void negated_loss_grad_test(const Dimensions<std::size_t,Rank>& dims, std
 	MemoryDataProvider<Scalar,Rank,false> prov(random_tensor<Scalar,Rank + 1>(batch_dims),
 			random_tensor<Scalar,Rank + 1>(batch_out_dims));
 	auto loss = std::make_shared<SquaredLoss<Scalar,Rank,false>>();
-	auto neg_loss = std::make_shared<NegatedLoss<Scalar,Rank,false>>(loss);
-	VanillaSGDOptimizer<Scalar,Rank,false> opt(neg_loss, samples);
-	grad_test<Scalar,Rank,false>("negated quadratic loss", prov, *net, opt);
+	NegatedLoss<Scalar,Rank,false> neg_loss(loss);
+	grad_test<Scalar,Rank,false>("negated quadratic loss", prov, *net, neg_loss);
 	// Sequential.
 	SequentialNeuralNetwork<Scalar,Rank> seq_net(std::move(net));
 	Dimensions<std::size_t,Rank + 2> seq_batch_dims = dims.template promote<2>();
@@ -852,9 +851,8 @@ inline void negated_loss_grad_test(const Dimensions<std::size_t,Rank>& dims, std
 	MemoryDataProvider<Scalar,Rank,true> seq_prov(random_tensor<Scalar,Rank + 2>(seq_batch_dims),
 			random_tensor<Scalar,Rank + 2>(seq_batch_out_dims));
 	auto seq_loss = std::make_shared<SquaredLoss<Scalar,Rank,true>>();
-	auto seq_neg_loss = std::make_shared<NegatedLoss<Scalar,Rank,true>>(seq_loss);
-	VanillaSGDOptimizer<Scalar,Rank,true> seq_opt(seq_neg_loss, samples);
-	grad_test<Scalar,Rank,true>("negated quadratic loss", seq_prov, seq_net, seq_opt);
+	NegatedLoss<Scalar,Rank,true> seq_neg_loss(seq_loss);
+	grad_test<Scalar,Rank,true>("negated quadratic loss", seq_prov, seq_net, seq_neg_loss);
 }
 
 /**
@@ -888,9 +886,8 @@ inline void absolute_loss_grad_test(const Dimensions<std::size_t,Rank>& dims, st
 	batch_out_dims(0) = samples;
 	MemoryDataProvider<Scalar,Rank,false> prov(random_tensor<Scalar,Rank + 1>(batch_dims),
 			random_tensor<Scalar,Rank + 1>(batch_out_dims));
-	auto loss = std::make_shared<AbsoluteLoss<Scalar,Rank,false>>();
-	VanillaSGDOptimizer<Scalar,Rank,false> opt(loss, samples);
-	grad_test<Scalar,Rank,false>("absolute loss", prov, *net, opt);
+	AbsoluteLoss<Scalar,Rank,false> loss;
+	grad_test<Scalar,Rank,false>("absolute loss", prov, *net, loss);
 	// Sequential.
 	SequentialNeuralNetwork<Scalar,Rank> seq_net(std::move(net));
 	Dimensions<std::size_t,Rank + 2> seq_batch_dims = dims.template promote<2>();
@@ -901,9 +898,8 @@ inline void absolute_loss_grad_test(const Dimensions<std::size_t,Rank>& dims, st
 	seq_batch_out_dims(1) = time_steps;
 	MemoryDataProvider<Scalar,Rank,true> seq_prov(random_tensor<Scalar,Rank + 2>(seq_batch_dims),
 			random_tensor<Scalar,Rank + 2>(seq_batch_out_dims));
-	auto seq_loss = std::make_shared<AbsoluteLoss<Scalar,Rank,true>>();
-	VanillaSGDOptimizer<Scalar,Rank,true> seq_opt(seq_loss, samples);
-	grad_test<Scalar,Rank,true>("absolute loss", seq_prov, seq_net, seq_opt);
+	AbsoluteLoss<Scalar,Rank,true> seq_loss;
+	grad_test<Scalar,Rank,true>("absolute loss", seq_prov, seq_net, seq_loss);
 }
 
 /**
@@ -937,10 +933,9 @@ inline void hinge_loss_grad_test(const Dimensions<std::size_t,Rank>& dims, std::
 	batch_out_dims(0) = samples;
 	MemoryDataProvider<Scalar,Rank,false> prov(random_tensor<Scalar,Rank + 1>(batch_dims),
 			random_one_hot_tensor<Scalar,Rank + 1,false>(batch_out_dims));
-	auto loss = std::make_shared<HingeLoss<Scalar,Rank,false>>();
-	VanillaSGDOptimizer<Scalar,Rank,false> opt(loss, samples);
+	HingeLoss<Scalar,Rank,false> loss;
 	std::string name = std::string(Squared ? "squared " : "") + std::string("hinge loss");
-	grad_test<Scalar,Rank,false>(name, prov, *net, opt);
+	grad_test<Scalar,Rank,false>(name, prov, *net, loss);
 	// Sequential.
 	SequentialNeuralNetwork<Scalar,Rank> seq_net(std::move(net));
 	Dimensions<std::size_t,Rank + 2> seq_batch_dims = dims.template promote<2>();
@@ -951,9 +946,8 @@ inline void hinge_loss_grad_test(const Dimensions<std::size_t,Rank>& dims, std::
 	seq_batch_out_dims(1) = time_steps;
 	MemoryDataProvider<Scalar,Rank,true> seq_prov(random_tensor<Scalar,Rank + 2>(seq_batch_dims),
 			random_one_hot_tensor<Scalar,Rank + 2,true>(seq_batch_out_dims));
-	auto seq_loss = std::make_shared<HingeLoss<Scalar,Rank,true>>();
-	VanillaSGDOptimizer<Scalar,Rank,true> seq_opt(seq_loss, samples);
-	grad_test<Scalar,Rank,true>(name, seq_prov, seq_net, seq_opt);
+	HingeLoss<Scalar,Rank,true> seq_loss;
+	grad_test<Scalar,Rank,true>(name, seq_prov, seq_net, seq_loss);
 }
 
 /**
@@ -999,9 +993,8 @@ inline void binary_cross_entropy_loss_grad_test(const Dimensions<std::size_t,Ran
 	*obj_tensor = obj_tensor->unaryExpr([](Scalar i) { return (Scalar) (i >= 0 ? 1 : 0); });
 	MemoryDataProvider<Scalar,Rank,false> prov(random_tensor<Scalar,Rank + 1>(batch_dims),
 			std::move(obj_tensor));
-	auto loss = std::make_shared<BinaryCrossEntropyLoss<Scalar,Rank,false>>();
-	VanillaSGDOptimizer<Scalar,Rank,false> opt(loss, samples);
-	grad_test<Scalar,Rank,false>("binary cross entropy loss", prov, *net, opt);
+	BinaryCrossEntropyLoss<Scalar,Rank,false> loss;
+	grad_test<Scalar,Rank,false>("binary cross entropy loss", prov, *net, loss);
 	// Sequential.
 	SequentialNeuralNetwork<Scalar,Rank> seq_net(std::move(net));
 	Dimensions<std::size_t,Rank + 2> seq_batch_dims = dims.template promote<2>();
@@ -1014,9 +1007,8 @@ inline void binary_cross_entropy_loss_grad_test(const Dimensions<std::size_t,Ran
 	*seq_obj_tensor = seq_obj_tensor->unaryExpr([](Scalar i) { return (Scalar) (i >= 0 ? 1 : 0); });
 	MemoryDataProvider<Scalar,Rank,true> seq_prov(random_tensor<Scalar,Rank + 2>(seq_batch_dims),
 			std::move(seq_obj_tensor));
-	auto seq_loss = std::make_shared<BinaryCrossEntropyLoss<Scalar,Rank,true>>();
-	VanillaSGDOptimizer<Scalar,Rank,true> seq_opt(seq_loss, samples);
-	grad_test<Scalar,Rank,true>("binary cross entropy loss", seq_prov, seq_net, seq_opt);
+	BinaryCrossEntropyLoss<Scalar,Rank,true> seq_loss;
+	grad_test<Scalar,Rank,true>("binary cross entropy loss", seq_prov, seq_net, seq_loss);
 }
 
 /**
@@ -1050,9 +1042,8 @@ inline void cross_entropy_loss_grad_test(const Dimensions<std::size_t,Rank>& dim
 	batch_out_dims(0) = samples;
 	MemoryDataProvider<Scalar,Rank,false> prov(random_tensor<Scalar,Rank + 1>(batch_dims),
 			random_one_hot_tensor<Scalar,Rank + 1,false>(batch_out_dims));
-	auto loss = std::make_shared<CrossEntropyLoss<Scalar,Rank,false>>();
-	VanillaSGDOptimizer<Scalar,Rank,false> opt(loss, samples);
-	grad_test<Scalar,Rank,false>("cross entropy loss", prov, *net, opt);
+	CrossEntropyLoss<Scalar,Rank,false> loss;
+	grad_test<Scalar,Rank,false>("cross entropy loss", prov, *net, loss);
 	// Sequential.
 	SequentialNeuralNetwork<Scalar,Rank> seq_net(std::move(net));
 	Dimensions<std::size_t,Rank + 2> seq_batch_dims = dims.template promote<2>();
@@ -1063,9 +1054,8 @@ inline void cross_entropy_loss_grad_test(const Dimensions<std::size_t,Rank>& dim
 	seq_batch_out_dims(1) = time_steps;
 	MemoryDataProvider<Scalar,Rank,true> seq_prov(random_tensor<Scalar,Rank + 2>(seq_batch_dims),
 			random_one_hot_tensor<Scalar,Rank + 2,true>(seq_batch_out_dims));
-	auto seq_loss = std::make_shared<CrossEntropyLoss<Scalar,Rank,true>>();
-	VanillaSGDOptimizer<Scalar,Rank,true> seq_opt(seq_loss, samples);
-	grad_test<Scalar,Rank,true>("cross entropy loss", seq_prov, seq_net, seq_opt);
+	CrossEntropyLoss<Scalar,Rank,true> seq_loss;
+	grad_test<Scalar,Rank,true>("cross entropy loss", seq_prov, seq_net, seq_loss);
 }
 
 /**
@@ -1099,9 +1089,8 @@ inline void softmax_cross_entropy_loss_grad_test(const Dimensions<std::size_t,Ra
 	batch_out_dims(0) = samples;
 	MemoryDataProvider<Scalar,Rank,false> prov(random_tensor<Scalar,Rank + 1>(batch_dims),
 			random_one_hot_tensor<Scalar,Rank + 1,false>(batch_out_dims));
-	auto loss = std::make_shared<SoftmaxCrossEntropyLoss<Scalar,Rank,false>>();
-	VanillaSGDOptimizer<Scalar,Rank,false> opt(loss, samples);
-	grad_test<Scalar,Rank,false>("softmax cross entropy loss", prov, *net, opt);
+	SoftmaxCrossEntropyLoss<Scalar,Rank,false> loss;
+	grad_test<Scalar,Rank,false>("softmax cross entropy loss", prov, *net, loss);
 	// Sequential.
 	SequentialNeuralNetwork<Scalar,Rank> seq_net(std::move(net));
 	Dimensions<std::size_t,Rank + 2> seq_batch_dims = dims.template promote<2>();
@@ -1112,9 +1101,8 @@ inline void softmax_cross_entropy_loss_grad_test(const Dimensions<std::size_t,Ra
 	seq_batch_out_dims(1) = time_steps;
 	MemoryDataProvider<Scalar,Rank,true> seq_prov(random_tensor<Scalar,Rank + 2>(seq_batch_dims),
 			random_one_hot_tensor<Scalar,Rank + 2,true>(seq_batch_out_dims));
-	auto seq_loss = std::make_shared<SoftmaxCrossEntropyLoss<Scalar,Rank,true>>();
-	VanillaSGDOptimizer<Scalar,Rank,true> seq_opt(seq_loss, samples);
-	grad_test<Scalar,Rank,true>("softmax cross entropy loss", seq_prov, seq_net, seq_opt);
+	SoftmaxCrossEntropyLoss<Scalar,Rank,true> seq_loss;
+	grad_test<Scalar,Rank,true>("softmax cross entropy loss", seq_prov, seq_net, seq_loss);
 }
 
 /**
@@ -1148,9 +1136,8 @@ inline void kullback_leibler_loss_grad_test(const Dimensions<std::size_t,Rank>& 
 	batch_out_dims(0) = samples;
 	MemoryDataProvider<Scalar,Rank,false> prov(random_tensor<Scalar,Rank + 1>(batch_dims),
 			random_one_hot_tensor<Scalar,Rank + 1,false>(batch_out_dims));
-	auto loss = std::make_shared<KullbackLeiblerLoss<Scalar,Rank,false>>();
-	VanillaSGDOptimizer<Scalar,Rank,false> opt(loss, samples);
-	grad_test<Scalar,Rank,false>("kullback-leibler loss", prov, *net, opt);
+	KullbackLeiblerLoss<Scalar,Rank,false> loss;
+	grad_test<Scalar,Rank,false>("kullback-leibler loss", prov, *net, loss);
 	// Sequential.
 	SequentialNeuralNetwork<Scalar,Rank> seq_net(std::move(net));
 	Dimensions<std::size_t,Rank + 2> seq_batch_dims = dims.template promote<2>();
@@ -1161,9 +1148,8 @@ inline void kullback_leibler_loss_grad_test(const Dimensions<std::size_t,Rank>& 
 	seq_batch_out_dims(1) = time_steps;
 	MemoryDataProvider<Scalar,Rank,true> seq_prov(random_tensor<Scalar,Rank + 2>(seq_batch_dims),
 			random_one_hot_tensor<Scalar,Rank + 2,true>(seq_batch_out_dims));
-	auto seq_loss = std::make_shared<KullbackLeiblerLoss<Scalar,Rank,true>>();
-	VanillaSGDOptimizer<Scalar,Rank,true> seq_opt(seq_loss, samples);
-	grad_test<Scalar,Rank,true>("kullback-leibler loss", seq_prov, seq_net, seq_opt);
+	KullbackLeiblerLoss<Scalar,Rank,true> seq_loss;
+	grad_test<Scalar,Rank,true>("kullback-leibler loss", seq_prov, seq_net, seq_loss);
 }
 
 /**
@@ -1197,10 +1183,9 @@ inline void multi_label_hinge_loss_grad_test(const Dimensions<std::size_t,Rank>&
 	batch_out_dims(0) = samples;
 	MemoryDataProvider<Scalar,Rank,false> prov(random_tensor<Scalar,Rank + 1>(batch_dims),
 			random_multi_hot_tensor<Scalar,Rank + 1>(batch_out_dims, -1));
-	auto loss = std::make_shared<MultiLabelHingeLoss<Scalar,Rank,false>>();
-	VanillaSGDOptimizer<Scalar,Rank,false> opt(loss, samples);
+	MultiLabelHingeLoss<Scalar,Rank,false> loss;
 	std::string name = std::string(Squared ? "squared " : "") + std::string("multi-label hinge loss");
-	grad_test<Scalar,Rank,false>(name, prov, *net, opt);
+	grad_test<Scalar,Rank,false>(name, prov, *net, loss);
 	// Sequential.
 	SequentialNeuralNetwork<Scalar,Rank> seq_net(std::move(net));
 	Dimensions<std::size_t,Rank + 2> seq_batch_dims = dims.template promote<2>();
@@ -1211,9 +1196,8 @@ inline void multi_label_hinge_loss_grad_test(const Dimensions<std::size_t,Rank>&
 	seq_batch_out_dims(1) = time_steps;
 	MemoryDataProvider<Scalar,Rank,true> seq_prov(random_tensor<Scalar,Rank + 2>(seq_batch_dims),
 			random_multi_hot_tensor<Scalar,Rank + 2>(seq_batch_out_dims, -1));
-	auto seq_loss = std::make_shared<MultiLabelHingeLoss<Scalar,Rank,true>>();
-	VanillaSGDOptimizer<Scalar,Rank,true> seq_opt(seq_loss, samples);
-	grad_test<Scalar,Rank,true>(name, seq_prov, seq_net, seq_opt);
+	MultiLabelHingeLoss<Scalar,Rank,true> seq_loss;
+	grad_test<Scalar,Rank,true>(name, seq_prov, seq_net, seq_loss);
 }
 
 /**
@@ -1253,9 +1237,8 @@ inline void multi_label_log_loss_grad_test(const Dimensions<std::size_t,Rank>& d
 	batch_out_dims(0) = samples;
 	MemoryDataProvider<Scalar,Rank,false> prov(random_tensor<Scalar,Rank + 1>(batch_dims),
 			random_multi_hot_tensor<Scalar,Rank + 1>(batch_out_dims));
-	auto loss = std::make_shared<MultiLabelLogLoss<Scalar,Rank,false>>();
-	VanillaSGDOptimizer<Scalar,Rank,false> opt(loss, samples);
-	grad_test<Scalar,Rank,false>("multi-label log loss", prov, *net, opt);
+	MultiLabelLogLoss<Scalar,Rank,false> loss;
+	grad_test<Scalar,Rank,false>("multi-label log loss", prov, *net, loss);
 	// Sequential.
 	SequentialNeuralNetwork<Scalar,Rank> seq_net(std::move(net));
 	Dimensions<std::size_t,Rank + 2> seq_batch_dims = dims.template promote<2>();
@@ -1266,9 +1249,8 @@ inline void multi_label_log_loss_grad_test(const Dimensions<std::size_t,Rank>& d
 	seq_batch_out_dims(1) = time_steps;
 	MemoryDataProvider<Scalar,Rank,true> seq_prov(random_tensor<Scalar,Rank + 2>(seq_batch_dims),
 			random_multi_hot_tensor<Scalar,Rank + 2>(seq_batch_out_dims));
-	auto seq_loss = std::make_shared<MultiLabelLogLoss<Scalar,Rank,true>>();
-	VanillaSGDOptimizer<Scalar,Rank,true> seq_opt(seq_loss, samples);
-	grad_test<Scalar,Rank,true>("multi-label log loss", seq_prov, seq_net, seq_opt);
+	MultiLabelLogLoss<Scalar,Rank,true> seq_loss;
+	grad_test<Scalar,Rank,true>("multi-label log loss", seq_prov, seq_net, seq_loss);
 }
 
 /**

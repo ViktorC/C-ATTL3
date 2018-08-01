@@ -5,8 +5,8 @@
  *      Author: Viktor Csomor
  */
 
-#ifndef CATTL3_DATAPROVIDER_H_
-#define CATTL3_DATAPROVIDER_H_
+#ifndef C_ATTL3_CORE_DATAPROVIDER_H_
+#define C_ATTL3_CORE_DATAPROVIDER_H_
 
 #include <cstddef>
 #include <memory>
@@ -84,4 +84,4 @@ public:
 
 } /* namespace cattle */
 
-#endif /* CATTL3_DATAPROVIDER_H_ */
+#endif /* C_ATTL3_CORE_DATAPROVIDER_H_ */

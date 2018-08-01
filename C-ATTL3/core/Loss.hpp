@@ -5,8 +5,8 @@
  *      Author: Viktor Csomor
  */
 
-#ifndef C_ATTL3_LOSS_H_
-#define C_ATTL3_LOSS_H_
+#ifndef C_ATTL3_CORE_LOSS_H_
+#define C_ATTL3_CORE_LOSS_H_
 
 #include <array>
 #include <cassert>
@@ -55,4 +55,4 @@ public:
 
 } /* namespace cattle */
 
-#endif /* C_ATTL3_LOSS_H_ */
+#endif /* C_ATTL3_CORE_LOSS_H_ */
