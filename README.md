@@ -115,7 +115,7 @@ Similarly to the layers, optimizers rely on several hyper-parameters as well. Be
     * [MultiLabelHingeLoss](https://viktorc.github.io/C-ATTL3/html/classcattle_1_1_multi_label_hinge_loss.html)
     * [MultiLabelLogLoss](https://viktorc.github.io/C-ATTL3/html/classcattle_1_1_multi_label_log_loss.html)
 
-Given a loss function and some hyper-parameters, optimizers can be constructed and used for gradient checks (e.g. to test self-implemented sub-classes of the core interfaces) and network training. Both of these methods are parameterized by a neural network and data providers.
+Given a loss function and some hyper-parameters, optimizers can be constructed and used for network training which is parameterized by a neural network and data providers.
 
 ### DataProvider
 Data providers are responsible for supplying the data used for gradient verification, training, and testing. The currently available data providers include:
@@ -165,10 +165,12 @@ The test data provider is created similarly. However, it is important not to re-
 auto init = std::make_shared<HeParameterInitialization<float>>();
 auto reg = std::make_shared<SquaredParameterRegularization<float>>();
 std::vector<LayerPtr<float,3>> layers(9);
-layers[0] = LayerPtr<float,3>(new ConvKernelLayer<float>(train_prov.get_obs_dims(), 10, init, reg, 5, 5, 2, 2));
+layers[0] = LayerPtr<float,3>(new ConvKernelLayer<float>(train_prov.get_obs_dims(), 10, init,
+		5, 5, 2, 2, 1, 1, 0, 0, reg));
 layers[1] = LayerPtr<float,3>(new ReLUActivationLayer<float,3>(layers[0]->get_output_dims()));
 layers[2] = LayerPtr<float,3>(new MaxPoolLayer<float>(layers[1]->get_output_dims()));
-layers[3] = LayerPtr<float,3>(new ConvKernelLayer<float>(layers[2]->get_output_dims(), 20, init, reg));
+layers[3] = LayerPtr<float,3>(new ConvKernelLayer<float>(layers[2]->get_output_dims(), 20, init,
+		3, 3, 1, 1, 1, 1, 0, 0, reg));
 layers[4] = LayerPtr<float,3>(new ReLUActivationLayer<float,3>(layers[3]->get_output_dims()));
 layers[5] = LayerPtr<float,3>(new MaxPoolLayer<float>(layers[4]->get_output_dims()));
 layers[6] = LayerPtr<float,3>(new DenseKernelLayer<float,3>(layers[5]->get_output_dims(), 500, init, reg));
