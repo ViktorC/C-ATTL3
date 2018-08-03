@@ -9,6 +9,8 @@
 #define C_ATTL3_CORE_GRADIENTCHECK_H_
 
 #include <cassert>
+#include <iomanip>
+#include <string>
 #include <type_traits>
 
 #include "DataProvider.hpp"
@@ -61,9 +63,11 @@ public:
 		 * back-propagate is to be divided by the number of observations in the batch. */
 		net.backpropagate(loss.d_function(net.propagate(data_pair.first, true),
 				data_pair.second) / (Scalar) instances);
-		std::vector<Parameters<Scalar>*> params_vec = net.get_unique_optimizable_params();
-		for (std::size_t i = 0; i < params_vec.size(); ++i) {
-			Parameters<Scalar>& params = *(params_vec[i]);
+		std::size_t i = 0;
+		for (auto params_ptr : net.get_all_unique_params()) {
+			if (!params_ptr->are_optimizable())
+				continue;
+			Parameters<Scalar>& params = *params_ptr;
 			if (verbose) {
 				std::cout << "Parameter Set " << std::setw(3) << std::to_string(i) <<
 						std::string(28, '-') << std::endl;
@@ -112,6 +116,7 @@ public:
 				}
 			}
 			params.reset_grad();
+			++i;
 		}
 		// Empty the network caches.
 		net.empty_caches();

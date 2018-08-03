@@ -42,7 +42,7 @@ protected:
 	inline void _fit(const std::vector<Parameters<Scalar>*>& params_vec) {
 		pgus_vec = std::vector<ParamsGradAndUpdateSqrs>();
 		for (auto params_ptr : params_vec) {
-			if (params_ptr->are_frozen())
+			if (!params_ptr->are_optimizable() || params_ptr->are_frozen())
 				continue;
 			ParamsGradAndUpdateSqrs pgus;
 			pgus.params_grad = Matrix<Scalar>::Zero(params_ptr->get_rows(), params_ptr->get_cols());
@@ -53,7 +53,7 @@ protected:
 	inline void _update_params(const std::vector<Parameters<Scalar>*>& params_vec, std::size_t epoch) {
 		std::size_t i = 0;
 		for (auto params_ptr : params_vec) {
-			if (params_ptr->are_frozen())
+			if (!params_ptr->are_optimizable() || params_ptr->are_frozen())
 				continue;
 			ParamsGradAndUpdateSqrs& pgus = pgus_vec[i++];
 			const Matrix<Scalar>& params_grad = params_ptr->get_grad();

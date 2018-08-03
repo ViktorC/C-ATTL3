@@ -42,14 +42,14 @@ protected:
 	inline void _fit(const std::vector<Parameters<Scalar>*>& params_vec) {
 		params_grad_sqrs_vec = std::vector<Matrix<Scalar>>();
 		for (auto params_ptr : params_vec) {
-			if (!params_ptr->are_frozen())
+			if (params_ptr->are_optimizable() && !params_ptr->are_frozen())
 				params_grad_sqrs_vec.push_back(Matrix<Scalar>::Zero(params_ptr->get_rows(), params_ptr->get_cols()));
 		}
 	}
 	inline void _update_params(const std::vector<Parameters<Scalar>*>& params_vec, std::size_t epoch) {
 		std::size_t i = 0;
 		for (auto params_ptr : params_vec) {
-			if (params_ptr->are_frozen())
+			if (!params_ptr->are_optimizable() || params_ptr->are_frozen())
 				continue;
 			const Matrix<Scalar>& params_grad = params_ptr->get_grad();
 			Matrix<Scalar>& params_grad_sqrs = params_grad_sqrs_vec[i++];

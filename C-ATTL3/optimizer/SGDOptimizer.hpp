@@ -27,7 +27,7 @@ public:
 	virtual ~SGDOptimizer() = default;
 	inline void fit(typename Base::Net& net) {
 		target_net_ptr = &net;
-		_fit(net.get_unique_optimizable_params());
+		_fit(net.get_all_unique_params());
 	}
 protected:
 	inline Scalar _train(typename Base::Net& net, typename Base::Provider& training_prov, std::size_t epoch,
@@ -38,7 +38,7 @@ protected:
 		std::size_t instances = 0;
 		std::size_t updates = 0;
 		// Get all the optimizable parameters.
-		std::vector<Parameters<Scalar>*> params_vec = net.get_unique_optimizable_params();
+		std::vector<Parameters<Scalar>*> params_vec = net.get_all_unique_params();
 		// Perform an entire training epoch.
 		while (training_prov.has_more()) {
 			DataPair<Scalar,Rank,Sequential> data_pair = training_prov.get_data(batch_size);
@@ -56,7 +56,7 @@ protected:
 			// Update the values of the parameters.
 			std::size_t i = 0;
 			for (auto params_ptr : params_vec) {
-				if (params_ptr->are_frozen())
+				if (!params_ptr->are_optimizable() || params_ptr->are_frozen())
 					continue;
 				reg_loss += params_ptr->get_regularization_penalty();
 				params_ptr->regularize();
@@ -82,7 +82,7 @@ protected:
 		assert(target_net_ptr == &net);
 		Scalar obj_loss = 0;
 		Scalar instances = 0;
-		std::vector<Parameters<Scalar>*> params_vec = net.get_unique_optimizable_params();
+		std::vector<Parameters<Scalar>*> params_vec = net.get_all_unique_params();
 		// Perform an entire test epoch.
 		while (test_prov.has_more()) {
 			DataPair<Scalar,Rank,Sequential> data_pair = test_prov.get_data(batch_size);
@@ -93,7 +93,7 @@ protected:
 		Scalar mean_obj_loss = obj_loss / instances;
 		Scalar reg_loss = 0;
 		for (auto params_ptr : params_vec) {
-			if (!params_ptr->are_frozen())
+			if (params_ptr->are_optimizable() && !params_ptr->are_frozen())
 				reg_loss += params_ptr->get_regularization_penalty();
 		}
 		if (verbose) {
@@ -107,14 +107,13 @@ protected:
 	/**
 	 * It fits the optimizer to the provided parameters.
 	 *
-	 * @param params_vec The unique, optimizable parameters of the network that are to be
-	 * learned.
+	 * @param params_vec All the unique parameters of the network.
 	 */
 	virtual void _fit(const std::vector<Parameters<Scalar>*>& params_vec) = 0;
 	/**
 	 * It updates the parameters based on their gradients after back-propagation.
 	 *
-	 * @param params_vec The unique parameters that are to be updated (unless they are frozen).
+	 * @param params_vec All the unique parameters of the network.
 	 * @param epoch The index of the epoch.
 	 */
 	virtual void _update_params(const std::vector<Parameters<Scalar>*>& params_vec, std::size_t epoch) = 0;

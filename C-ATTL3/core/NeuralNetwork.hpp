@@ -8,6 +8,8 @@
 #ifndef C_ATTL3_CORE_NEURALNETWORK_H_
 #define C_ATTL3_CORE_NEURALNETWORK_H_
 
+#include <set>
+
 #include "Layer.hpp"
 
 namespace cattle {
@@ -24,6 +26,7 @@ protected:
 	static constexpr std::size_t DATA_RANK = Rank + Sequential + 1;
 	typedef Tensor<Scalar,DATA_RANK> Data;
 	typedef Dimensions<std::size_t,Rank> Dims;
+	static std::string PARAM_SERIAL_PREFIX;
 public:
 	virtual ~NeuralNetwork() = default;
 	/**
@@ -95,6 +98,22 @@ public:
 	 */
 	virtual Data backpropagate(Data out_grad) = 0;
 	/**
+	 * @return A vector of pointers to the constant parameters of the network. The pointers
+	 * are not necessarily unique.
+	 */
+	inline std::vector<const Parameters<Scalar>*> get_all_params() const {
+		std::vector<const Parameters<Scalar>*> params_vec;
+		for (auto layer_ptr : get_layers()) {
+			if (!layer_ptr)
+				continue;
+			for (auto params_ptr : layer_ptr->get_params()) {
+				if (params_ptr)
+					params_vec.push_back(params_ptr);
+			}
+		}
+		return params_vec;
+	}
+	/**
 	 * @return A vector of pointers to the parameters of the network. The pointers are
 	 * not necessarily unique.
 	 */
@@ -111,40 +130,48 @@ public:
 		return params_vec;
 	}
 	/**
-	 * @return A vector of pointers to the unique, optimizable parameters of the network.
+	 * @return A vector of pointers to the constant, unique parameters of the network.
 	 */
-	inline std::vector<Parameters<Scalar>*> get_unique_optimizable_params() {
-		std::vector<Parameters<Scalar>*> params_vec;
-		std::set<Parameters<Scalar>*> params_set;
-		for (auto layer_ptr : get_layers()) {
-			if (!layer_ptr)
-				continue;
-			for (auto params_ptr : layer_ptr->get_params()) {
-				if (params_ptr && params_ptr->are_optimizable() &&
-						params_set.find(params_ptr) == params_set.end()) {
-					params_set.insert(params_ptr);
-					params_vec.push_back(params_ptr);
-				}
+	inline std::vector<const Parameters<Scalar>*> get_all_unique_params() const {
+		std::vector<const Parameters<Scalar>*> params_vec;
+		std::set<const Parameters<Scalar>*> params_set;
+		for (auto params_ptr : get_all_params()) {
+			if (params_set.find(params_ptr) == params_set.end()) {
+				params_set.insert(params_ptr);
+				params_vec.push_back(params_ptr);
 			}
 		}
 		return params_vec;
 	}
 	/**
-	 * Invokes the Layer#set_frozen(bool) method of all layers of the network with the
-	 * provided argument. A frozen networks parameters are not regularized.
+	 * @return A vector of pointers to the unique parameters of the network.
+	 */
+	inline std::vector<Parameters<Scalar>*> get_all_unique_params() {
+		std::vector<Parameters<Scalar>*> params_vec;
+		std::set<Parameters<Scalar>*> params_set;
+		for (auto params_ptr : get_all_params()) {
+			if (params_set.find(params_ptr) == params_set.end()) {
+				params_set.insert(params_ptr);
+				params_vec.push_back(params_ptr);
+			}
+		}
+		return params_vec;
+	}
+	/**
+	 * Sets all parameters of the network to the specified frozens state.
 	 *
-	 * @param frozen Whether the parameters of all layers should be frozen (i.e. not updatable
-	 * via optimization) or active.
+	 * @param frozen Whether the parameters of the network should be frozen i.e. temporarily
+	 * not optimizable.
 	 */
 	inline virtual void set_frozen(bool frozen) {
-		for (auto params_ptr : get_all_params())
+		for (auto params_ptr : get_all_unique_params())
 			params_ptr->set_frozen(frozen);
 	}
 	/**
 	 * Initializes all parameters of the network.
 	 */
 	inline virtual void init() {
-		for (auto params_ptr : get_all_params())
+		for (auto params_ptr : get_all_unique_params())
 			params_ptr->init();
 	}
 	/**
@@ -157,7 +184,48 @@ public:
 	inline virtual Data infer(Data input) {
 		return propagate(std::move(input), false);
 	}
+	/**
+	 * It serializes the values of the unique parameters of the network into files in a
+	 * specified folder.
+	 *
+	 * @param dir_path The path to the directory.
+	 * @param binary Whether the parameters are to be serialized into a binary format.
+	 * @param file_name_prefix A prefix to the names of the serialized parameter files.
+	 */
+	inline void save_params_values(const std::string& dir_path, bool binary = true,
+			const std::string& file_name_prefix = PARAM_SERIAL_PREFIX) const {
+		std::vector<const Parameters<Scalar>*> params_vec = get_all_unique_params();
+		for (std::size_t i = 0; i < params_vec.size(); ++i) {
+			const Matrix<Scalar>& values = params_vec[i]->get_values();
+			std::string file_path = dir_path + "/" + file_name_prefix + std::to_string(i) + ".prms";
+			if (binary)
+				serialize_binary<Scalar>(values, file_path);
+			else
+				serialize<Scalar>(values, file_path);
+		}
+	}
+	/**
+	 * It sets the values of the unique parameters of the network from files containing
+	 * serialized parameter values.
+	 *
+	 * @param dir_path The path to the directory containing the parameter files.
+	 * @param binary Whether the parameter files binary.
+	 * @param file_name_prefix The prefix of the names of the parameter files.
+	 */
+	inline void load_params_values(const std::string& dir_path, bool binary = true,
+			const std::string& file_name_prefix = PARAM_SERIAL_PREFIX) {
+		std::vector<Parameters<Scalar>*> params_vec = get_all_unique_params();
+		for (std::size_t i = 0; i < params_vec.size(); ++i) {
+			std::string file_path = dir_path + "/" + file_name_prefix + std::to_string(i) + ".prms";
+			params_vec[i]->set_values(binary ? deserialize_binary<Scalar>(file_path) :
+					deserialize<Scalar>(file_path));
+		}
+	}
 };
+
+template<typename Scalar, std::size_t Rank, bool Sequential>
+std::string NeuralNetwork<Scalar,Rank,Sequential>::PARAM_SERIAL_PREFIX =
+		"c-attl3_neural_net_params_";
 
 } /* namespace cattle */
 

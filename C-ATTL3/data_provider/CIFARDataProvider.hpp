@@ -10,11 +10,6 @@
 
 #include <algorithm>
 #include <array>
-#include <cassert>
-#include <fstream>
-#include <iostream>
-#include <utility>
-#include <vector>
 
 #include "JointFileDataProvider.hpp"
 

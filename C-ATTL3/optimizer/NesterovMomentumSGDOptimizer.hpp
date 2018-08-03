@@ -44,7 +44,7 @@ protected:
 		Scalar learning_rate = Base::calculate_learning_rate(epoch);
 		std::size_t i = 0;
 		for (auto params_ptr : params_vec) {
-			if (params_ptr->are_frozen())
+			if (!params_ptr->are_optimizable() || params_ptr->are_frozen())
 				continue;
 			Matrix<Scalar> old_acc_params_grad = Base::params_grad_vec[i];
 			Base::params_grad_vec[i] = old_acc_params_grad * Base::momentum -

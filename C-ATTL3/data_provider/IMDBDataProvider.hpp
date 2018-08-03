@@ -10,19 +10,14 @@
 
 #include <algorithm>
 #include <array>
-#include <cassert>
 #include <cctype>
 #include <dirent.h>
-#include <fstream>
-#include <iostream>
 #include <map>
 #include <memory>
 #include <regex>
 #include <sstream>
 #include <string>
 #include <sys/types.h>
-#include <utility>
-#include <vector>
 
 #include "JointFileDataProvider.hpp"
 

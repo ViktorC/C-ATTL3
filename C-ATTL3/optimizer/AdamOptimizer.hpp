@@ -55,7 +55,7 @@ protected:
 	inline void _fit(const std::vector<Parameters<Scalar>*>& params_vec) {
 		pgn_vec = std::vector<ParamsGradNorms>();
 		for (auto params_ptr : params_vec) {
-			if (params_ptr->are_frozen())
+			if (!params_ptr->are_optimizable() || params_ptr->are_frozen())
 				continue;
 			ParamsGradNorms pgn;
 			pgn.params_grad_l1 = Matrix<Scalar>::Zero(params_ptr->get_rows(), params_ptr->get_cols());
@@ -68,7 +68,7 @@ protected:
 		Scalar l2_corr = (Scalar) 1 / (1 - pow(1 - l2_decay, epoch + 1) + epsilon);
 		std::size_t i = 0;
 		for (auto params_ptr : params_vec) {
-			if (params_ptr->are_frozen())
+			if (!params_ptr->are_optimizable() || params_ptr->are_frozen())
 				continue;
 			ParamsGradNorms& grad_norms = pgn_vec[i++];
 			const Matrix<Scalar>& params_grad = params_ptr->get_grad();
