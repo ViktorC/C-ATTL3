@@ -132,12 +132,16 @@ virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" hr
 <tr class="memitem:a550bd7dea6ddac56160b5cafd54e8962"><td class="memItemLeft" align="right" valign="top">virtual Data&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_neural_network.html#a550bd7dea6ddac56160b5cafd54e8962">backpropagate</a> (Data out_grad)=0</td></tr>
 <tr class="memdesc:a550bd7dea6ddac56160b5cafd54e8962"><td class="mdescLeft">&#160;</td><td class="mdescRight">It back-propagates the derivative of the loss function w.r.t.  <a href="#a550bd7dea6ddac56160b5cafd54e8962">More...</a><br /></td></tr>
 <tr class="separator:a550bd7dea6ddac56160b5cafd54e8962"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3603ff7538a781c451796463b00e7eec"><td class="memItemLeft" align="right" valign="top">std::vector&lt; const Parameters&lt; Scalar &gt; * &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_neural_network.html#a3603ff7538a781c451796463b00e7eec">get_all_params</a> () const</td></tr>
+<tr class="separator:a3603ff7538a781c451796463b00e7eec"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:afadc71d57e50328c50e6114ed30fc308"><td class="memItemLeft" align="right" valign="top">std::vector&lt; Parameters&lt; Scalar &gt; * &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_neural_network.html#afadc71d57e50328c50e6114ed30fc308">get_all_params</a> ()</td></tr>
 <tr class="separator:afadc71d57e50328c50e6114ed30fc308"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:af1d0c3e44f75d06c9beb1da3fb4fcf60"><td class="memItemLeft" align="right" valign="top">std::vector&lt; Parameters&lt; Scalar &gt; * &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_neural_network.html#af1d0c3e44f75d06c9beb1da3fb4fcf60">get_unique_optimizable_params</a> ()</td></tr>
-<tr class="separator:af1d0c3e44f75d06c9beb1da3fb4fcf60"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae1db5849f0a79739514a0b42a89cefb7"><td class="memItemLeft" align="right" valign="top">std::vector&lt; const Parameters&lt; Scalar &gt; * &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_neural_network.html#ae1db5849f0a79739514a0b42a89cefb7">get_all_unique_params</a> () const</td></tr>
+<tr class="separator:ae1db5849f0a79739514a0b42a89cefb7"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:adcc3d097c8c4f01e76499f55b30ad0c2"><td class="memItemLeft" align="right" valign="top">std::vector&lt; Parameters&lt; Scalar &gt; * &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_neural_network.html#adcc3d097c8c4f01e76499f55b30ad0c2">get_all_unique_params</a> ()</td></tr>
+<tr class="separator:adcc3d097c8c4f01e76499f55b30ad0c2"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a94a8c8170471486c5f10ba09a5709ad6"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_neural_network.html#a94a8c8170471486c5f10ba09a5709ad6">set_frozen</a> (bool frozen)</td></tr>
-<tr class="memdesc:a94a8c8170471486c5f10ba09a5709ad6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Invokes the Layer::set_frozen(bool) method of all layers of the network with the provided argument.  <a href="#a94a8c8170471486c5f10ba09a5709ad6">More...</a><br /></td></tr>
+<tr class="memdesc:a94a8c8170471486c5f10ba09a5709ad6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Sets all parameters of the network to the specified frozens state.  <a href="#a94a8c8170471486c5f10ba09a5709ad6">More...</a><br /></td></tr>
 <tr class="separator:a94a8c8170471486c5f10ba09a5709ad6"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ae59c0963d75b1f2de4f18a6c8fe85fa8"><td class="memItemLeft" align="right" valign="top"><a id="ae59c0963d75b1f2de4f18a6c8fe85fa8"></a>
 virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_neural_network.html#ae59c0963d75b1f2de4f18a6c8fe85fa8">init</a> ()</td></tr>
@@ -146,6 +150,12 @@ virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" hr
 <tr class="memitem:ac88007e2f8fa2a208de0e51c8ac422cc"><td class="memItemLeft" align="right" valign="top">virtual Data&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_neural_network.html#ac88007e2f8fa2a208de0e51c8ac422cc">infer</a> (Data input)</td></tr>
 <tr class="memdesc:ac88007e2f8fa2a208de0e51c8ac422cc"><td class="mdescLeft">&#160;</td><td class="mdescRight">It propagates the input through the neural network and outputs its prediction according to its current parameters.  <a href="#ac88007e2f8fa2a208de0e51c8ac422cc">More...</a><br /></td></tr>
 <tr class="separator:ac88007e2f8fa2a208de0e51c8ac422cc"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac14be0b39d0f699b2873bf6dadfdad71"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_neural_network.html#ac14be0b39d0f699b2873bf6dadfdad71">save_params_values</a> (const std::string &amp;dir_path, bool binary=true, const std::string &amp;file_name_prefix=PARAM_SERIAL_PREFIX) const</td></tr>
+<tr class="memdesc:ac14be0b39d0f699b2873bf6dadfdad71"><td class="mdescLeft">&#160;</td><td class="mdescRight">It serializes the values of the unique parameters of the network into files in a specified folder.  <a href="#ac14be0b39d0f699b2873bf6dadfdad71">More...</a><br /></td></tr>
+<tr class="separator:ac14be0b39d0f699b2873bf6dadfdad71"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5014412fabda5972141fc979ca1081e6"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_neural_network.html#a5014412fabda5972141fc979ca1081e6">load_params_values</a> (const std::string &amp;dir_path, bool binary=true, const std::string &amp;file_name_prefix=PARAM_SERIAL_PREFIX)</td></tr>
+<tr class="memdesc:a5014412fabda5972141fc979ca1081e6"><td class="mdescLeft">&#160;</td><td class="mdescRight">It sets the values of the unique parameters of the network from files containing serialized parameter values.  <a href="#a5014412fabda5972141fc979ca1081e6">More...</a><br /></td></tr>
+<tr class="separator:a5014412fabda5972141fc979ca1081e6"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><h3>template&lt;typename Scalar, std::size_t Rank, bool Sequential&gt;<br />
@@ -226,8 +236,36 @@ template&lt;typename Scalar, std::size_t Rank, bool Sequential&gt; </div>
 
 </div>
 </div>
+<a id="a3603ff7538a781c451796463b00e7eec"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a3603ff7538a781c451796463b00e7eec">&#9670;&nbsp;</a></span>get_all_params() <span class="overload">[1/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename Scalar, std::size_t Rank, bool Sequential&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::vector&lt;const Parameters&lt;Scalar&gt;*&gt; <a class="el" href="classcattle_1_1_neural_network.html">cattle::NeuralNetwork</a>&lt; Scalar, Rank, Sequential &gt;::get_all_params </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<dl class="section return"><dt>Returns</dt><dd>A vector of pointers to the constant parameters of the network. The pointers are not necessarily unique. </dd></dl>
+
+</div>
+</div>
 <a id="afadc71d57e50328c50e6114ed30fc308"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#afadc71d57e50328c50e6114ed30fc308">&#9670;&nbsp;</a></span>get_all_params()</h2>
+<h2 class="memtitle"><span class="permalink"><a href="#afadc71d57e50328c50e6114ed30fc308">&#9670;&nbsp;</a></span>get_all_params() <span class="overload">[2/2]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -251,6 +289,62 @@ template&lt;typename Scalar, std::size_t Rank, bool Sequential&gt; </div>
 </table>
 </div><div class="memdoc">
 <dl class="section return"><dt>Returns</dt><dd>A vector of pointers to the parameters of the network. The pointers are not necessarily unique. </dd></dl>
+
+</div>
+</div>
+<a id="ae1db5849f0a79739514a0b42a89cefb7"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae1db5849f0a79739514a0b42a89cefb7">&#9670;&nbsp;</a></span>get_all_unique_params() <span class="overload">[1/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename Scalar, std::size_t Rank, bool Sequential&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::vector&lt;const Parameters&lt;Scalar&gt;*&gt; <a class="el" href="classcattle_1_1_neural_network.html">cattle::NeuralNetwork</a>&lt; Scalar, Rank, Sequential &gt;::get_all_unique_params </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<dl class="section return"><dt>Returns</dt><dd>A vector of pointers to the constant, unique parameters of the network. </dd></dl>
+
+</div>
+</div>
+<a id="adcc3d097c8c4f01e76499f55b30ad0c2"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#adcc3d097c8c4f01e76499f55b30ad0c2">&#9670;&nbsp;</a></span>get_all_unique_params() <span class="overload">[2/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename Scalar, std::size_t Rank, bool Sequential&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::vector&lt;Parameters&lt;Scalar&gt;*&gt; <a class="el" href="classcattle_1_1_neural_network.html">cattle::NeuralNetwork</a>&lt; Scalar, Rank, Sequential &gt;::get_all_unique_params </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<dl class="section return"><dt>Returns</dt><dd>A vector of pointers to the unique parameters of the network. </dd></dl>
 
 </div>
 </div>
@@ -374,34 +468,6 @@ template&lt;typename Scalar, std::size_t Rank, bool Sequential&gt; </div>
 
 </div>
 </div>
-<a id="af1d0c3e44f75d06c9beb1da3fb4fcf60"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#af1d0c3e44f75d06c9beb1da3fb4fcf60">&#9670;&nbsp;</a></span>get_unique_optimizable_params()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<div class="memtemplate">
-template&lt;typename Scalar, std::size_t Rank, bool Sequential&gt; </div>
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">std::vector&lt;Parameters&lt;Scalar&gt;*&gt; <a class="el" href="classcattle_1_1_neural_network.html">cattle::NeuralNetwork</a>&lt; Scalar, Rank, Sequential &gt;::get_unique_optimizable_params </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-<dl class="section return"><dt>Returns</dt><dd>A vector of pointers to the unique, optimizable parameters of the network. </dd></dl>
-
-</div>
-</div>
 <a id="ac88007e2f8fa2a208de0e51c8ac422cc"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#ac88007e2f8fa2a208de0e51c8ac422cc">&#9670;&nbsp;</a></span>infer()</h2>
 
@@ -469,6 +535,60 @@ template&lt;typename Scalar, std::size_t Rank, bool Sequential&gt; </div>
 
 </div>
 </div>
+<a id="a5014412fabda5972141fc979ca1081e6"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a5014412fabda5972141fc979ca1081e6">&#9670;&nbsp;</a></span>load_params_values()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename Scalar, std::size_t Rank, bool Sequential&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void <a class="el" href="classcattle_1_1_neural_network.html">cattle::NeuralNetwork</a>&lt; Scalar, Rank, Sequential &gt;::load_params_values </td>
+          <td>(</td>
+          <td class="paramtype">const std::string &amp;&#160;</td>
+          <td class="paramname"><em>dir_path</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">bool&#160;</td>
+          <td class="paramname"><em>binary</em> = <code>true</code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const std::string &amp;&#160;</td>
+          <td class="paramname"><em>file_name_prefix</em> = <code>PARAM_SERIAL_PREFIX</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>It sets the values of the unique parameters of the network from files containing serialized parameter values. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">dir_path</td><td>The path to the directory containing the parameter files. </td></tr>
+    <tr><td class="paramname">binary</td><td>Whether the parameter files binary. </td></tr>
+    <tr><td class="paramname">file_name_prefix</td><td>The prefix of the names of the parameter files. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
 <a id="a6ade9cd95110766ff25e7b157c9fddcf"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a6ade9cd95110766ff25e7b157c9fddcf">&#9670;&nbsp;</a></span>propagate()</h2>
 
@@ -516,6 +636,60 @@ template&lt;typename Scalar, std::size_t Rank, bool Sequential&gt; </div>
 <dl class="section return"><dt>Returns</dt><dd>The output tensor of the network in response to the input. </dd></dl>
 
 <p>Implemented in <a class="el" href="classcattle_1_1_l_s_t_m_neural_network.html#a06041a938c2b82c3cbbee3545e7f904f">cattle::LSTMNeuralNetwork&lt; Scalar, Rank, MulInt, Stateful &gt;</a>, <a class="el" href="classcattle_1_1_recurrent_neural_network.html#ad280f608bd81c202f82ab497e203e11e">cattle::RecurrentNeuralNetwork&lt; Scalar, Rank, MulInt, Stateful &gt;</a>, <a class="el" href="classcattle_1_1_parallel_neural_network.html#a824cc55e65521f52e08c6d19768b7bb8">cattle::ParallelNeuralNetwork&lt; Scalar, Rank, MergeType &gt;</a>, <a class="el" href="classcattle_1_1_dense_neural_network.html#a252b20495010a47ed646089564643a35">cattle::DenseNeuralNetwork&lt; Scalar, Rank, ConcatType &gt;</a>, <a class="el" href="classcattle_1_1_bidirectional_neural_network.html#aeea3e43b89d4bdd0ac9b9e81c6815aa9">cattle::BidirectionalNeuralNetwork&lt; Scalar, Rank, MergeType &gt;</a>, <a class="el" href="classcattle_1_1_feedforward_neural_network.html#a5ba42a837437bbc9ed7d70e532107fe0">cattle::FeedforwardNeuralNetwork&lt; Scalar, Rank &gt;</a>, <a class="el" href="classcattle_1_1_residual_neural_network.html#a2b3df37e544c34170dcdd8f30bd6ece7">cattle::ResidualNeuralNetwork&lt; Scalar, Rank &gt;</a>, <a class="el" href="classcattle_1_1_stacked_neural_network.html#ad0723d3b9577bda94b20bfdde66f5628">cattle::StackedNeuralNetwork&lt; Scalar, Rank, Sequential &gt;</a>, and <a class="el" href="classcattle_1_1_sequential_neural_network.html#a7938e9ded5e59b86b748a07d25b2a6b7">cattle::SequentialNeuralNetwork&lt; Scalar, Rank &gt;</a>.</p>
+
+</div>
+</div>
+<a id="ac14be0b39d0f699b2873bf6dadfdad71"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac14be0b39d0f699b2873bf6dadfdad71">&#9670;&nbsp;</a></span>save_params_values()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename Scalar, std::size_t Rank, bool Sequential&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void <a class="el" href="classcattle_1_1_neural_network.html">cattle::NeuralNetwork</a>&lt; Scalar, Rank, Sequential &gt;::save_params_values </td>
+          <td>(</td>
+          <td class="paramtype">const std::string &amp;&#160;</td>
+          <td class="paramname"><em>dir_path</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">bool&#160;</td>
+          <td class="paramname"><em>binary</em> = <code>true</code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const std::string &amp;&#160;</td>
+          <td class="paramname"><em>file_name_prefix</em> = <code>PARAM_SERIAL_PREFIX</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>It serializes the values of the unique parameters of the network into files in a specified folder. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">dir_path</td><td>The path to the directory. </td></tr>
+    <tr><td class="paramname">binary</td><td>Whether the parameters are to be serialized into a binary format. </td></tr>
+    <tr><td class="paramname">file_name_prefix</td><td>A prefix to the names of the serialized parameter files. </td></tr>
+  </table>
+  </dd>
+</dl>
 
 </div>
 </div>
@@ -583,11 +757,10 @@ template&lt;typename Scalar, std::size_t Rank, bool Sequential&gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p>Invokes the Layer::set_frozen(bool) method of all layers of the network with the provided argument. </p>
-<p>A frozen networks parameters are not regularized.</p>
+<p>Sets all parameters of the network to the specified frozens state. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">frozen</td><td>Whether the parameters of all layers should be frozen (i.e. not updatable via optimization) or active. </td></tr>
+    <tr><td class="paramname">frozen</td><td>Whether the parameters of the network should be frozen i.e. temporarily not optimizable. </td></tr>
   </table>
   </dd>
 </dl>

@@ -71,7 +71,8 @@ $(function() {
   <div class="summary">
 <a href="#nested-classes">Classes</a> &#124;
 <a href="#typedef-members">Typedefs</a> &#124;
-<a href="#enum-members">Enumerations</a>  </div>
+<a href="#enum-members">Enumerations</a> &#124;
+<a href="#func-members">Functions</a>  </div>
   <div class="headertitle">
 <div class="title">cattle Namespace Reference</div>  </div>
 </div><!--header-->
@@ -174,9 +175,6 @@ Classes</h2></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_dropout_layer.html">DropoutLayer</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">A class template representing a drop-out layer.  <a href="classcattle_1_1_dropout_layer.html#details">More...</a><br /></td></tr>
-<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_eigen_proxy.html">EigenProxy</a></td></tr>
-<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">A struct for retrieving and setting the number of threads Eigen should use for matrix multiplication and other parallelized operations.  <a href="classcattle_1_1_eigen_proxy.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_elastic_net_parameter_regularization.html">ElasticNetParameterRegularization</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">A class template for the elastic net regularization penalty which is a combination of the L1 and L2 regularization penalties.  <a href="classcattle_1_1_elastic_net_parameter_regularization.html#details">More...</a><br /></td></tr>
@@ -564,6 +562,45 @@ Enumerations</h2></td></tr>
 <tr class="memitem:a0a2499731eab78887807e601f355fbaf"><td class="memItemLeft" align="right" valign="top"><a id="a0a2499731eab78887807e601f355fbaf"></a>enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacecattle.html#a0a2499731eab78887807e601f355fbaf">ParallelOutputMergeType</a> </td></tr>
 <tr class="memdesc:a0a2499731eab78887807e601f355fbaf"><td class="mdescLeft">&#160;</td><td class="mdescRight">An enumeration type for the different ways the outputs of sub-modules of neural networks may be merged. <br /></td></tr>
 <tr class="separator:a0a2499731eab78887807e601f355fbaf"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
+Functions</h2></td></tr>
+<tr class="memitem:ad8bac69b844017213ccca0706d78f57b"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacecattle.html#ad8bac69b844017213ccca0706d78f57b">num_of_eval_threads</a> ()</td></tr>
+<tr class="separator:ad8bac69b844017213ccca0706d78f57b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1d969682436efdeab15466e2a014e84e"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacecattle.html#a1d969682436efdeab15466e2a014e84e">set_num_of_eval_threads</a> (int num_of_threads)</td></tr>
+<tr class="separator:a1d969682436efdeab15466e2a014e84e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0f1d06b205cbd3dc142653b1a95e9f59"><td class="memTemplParams" colspan="2">template&lt;typename Scalar &gt; </td></tr>
+<tr class="memitem:a0f1d06b205cbd3dc142653b1a95e9f59"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespacecattle.html#a0f1d06b205cbd3dc142653b1a95e9f59">serialize</a> (const <a class="el" href="namespacecattle.html#a1d78623a47279d516750a44dbad6090b">Matrix</a>&lt; Scalar &gt; &amp;matrix, std::ostream &amp;out_stream)</td></tr>
+<tr class="memdesc:a0f1d06b205cbd3dc142653b1a95e9f59"><td class="mdescLeft">&#160;</td><td class="mdescRight">It serializes the matrix in a format such that the first two numbers denote the matrix's number of rows and columns respectively and the remaining numbers represent the coefficients of the matrix in column-major order.  <a href="#a0f1d06b205cbd3dc142653b1a95e9f59">More...</a><br /></td></tr>
+<tr class="separator:a0f1d06b205cbd3dc142653b1a95e9f59"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a063aee388c9882a7ee05562166ef2160"><td class="memTemplParams" colspan="2">template&lt;typename Scalar &gt; </td></tr>
+<tr class="memitem:a063aee388c9882a7ee05562166ef2160"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespacecattle.html#a063aee388c9882a7ee05562166ef2160">serialize</a> (const <a class="el" href="namespacecattle.html#a1d78623a47279d516750a44dbad6090b">Matrix</a>&lt; Scalar &gt; &amp;matrix, const std::string &amp;file_path)</td></tr>
+<tr class="memdesc:a063aee388c9882a7ee05562166ef2160"><td class="mdescLeft">&#160;</td><td class="mdescRight">It serializes the matrix into a file at the specified file path.  <a href="#a063aee388c9882a7ee05562166ef2160">More...</a><br /></td></tr>
+<tr class="separator:a063aee388c9882a7ee05562166ef2160"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a97059f21448850dfa6a8f8c925b87ce2"><td class="memTemplParams" colspan="2">template&lt;typename Scalar &gt; </td></tr>
+<tr class="memitem:a97059f21448850dfa6a8f8c925b87ce2"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespacecattle.html#a97059f21448850dfa6a8f8c925b87ce2">serialize_binary</a> (const <a class="el" href="namespacecattle.html#a1d78623a47279d516750a44dbad6090b">Matrix</a>&lt; Scalar &gt; &amp;matrix, std::ostream &amp;out_stream)</td></tr>
+<tr class="memdesc:a97059f21448850dfa6a8f8c925b87ce2"><td class="mdescLeft">&#160;</td><td class="mdescRight">It serializes the matrix in a format such that the first 2 bytes denote the size of a single coefficient of the matrix in bytes, the second and third 4 bytes denote the matrix's number of rows and columns respectively, and the remaining bytes contain the coefficients of the matrix in column-major order.  <a href="#a97059f21448850dfa6a8f8c925b87ce2">More...</a><br /></td></tr>
+<tr class="separator:a97059f21448850dfa6a8f8c925b87ce2"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5d710f7b334b20eb888754439f983637"><td class="memTemplParams" colspan="2">template&lt;typename Scalar &gt; </td></tr>
+<tr class="memitem:a5d710f7b334b20eb888754439f983637"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespacecattle.html#a5d710f7b334b20eb888754439f983637">serialize_binary</a> (const <a class="el" href="namespacecattle.html#a1d78623a47279d516750a44dbad6090b">Matrix</a>&lt; Scalar &gt; &amp;matrix, const std::string &amp;file_path)</td></tr>
+<tr class="memdesc:a5d710f7b334b20eb888754439f983637"><td class="mdescLeft">&#160;</td><td class="mdescRight">It serializes the matrix into a binary file at the specified file path.  <a href="#a5d710f7b334b20eb888754439f983637">More...</a><br /></td></tr>
+<tr class="separator:a5d710f7b334b20eb888754439f983637"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aad23338fe4e2086a14828112f3822e80"><td class="memTemplParams" colspan="2">template&lt;typename Scalar &gt; </td></tr>
+<tr class="memitem:aad23338fe4e2086a14828112f3822e80"><td class="memTemplItemLeft" align="right" valign="top"><a class="el" href="namespacecattle.html#a1d78623a47279d516750a44dbad6090b">Matrix</a>&lt; Scalar &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespacecattle.html#aad23338fe4e2086a14828112f3822e80">deserialize</a> (std::istream &amp;in_stream)</td></tr>
+<tr class="memdesc:aad23338fe4e2086a14828112f3822e80"><td class="mdescLeft">&#160;</td><td class="mdescRight">It deserializes a matrix assuming the serialized format matches that used by the <a class="el" href="namespacecattle.html#a0f1d06b205cbd3dc142653b1a95e9f59" title="It serializes the matrix in a format such that the first two numbers denote the matrix&#39;s number of ro...">serialize()</a> method.  <a href="#aad23338fe4e2086a14828112f3822e80">More...</a><br /></td></tr>
+<tr class="separator:aad23338fe4e2086a14828112f3822e80"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a55f24f87becc3b7823eb5380c0615963"><td class="memTemplParams" colspan="2">template&lt;typename Scalar &gt; </td></tr>
+<tr class="memitem:a55f24f87becc3b7823eb5380c0615963"><td class="memTemplItemLeft" align="right" valign="top"><a class="el" href="namespacecattle.html#a1d78623a47279d516750a44dbad6090b">Matrix</a>&lt; Scalar &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespacecattle.html#a55f24f87becc3b7823eb5380c0615963">deserialize</a> (const std::string &amp;file_path)</td></tr>
+<tr class="memdesc:a55f24f87becc3b7823eb5380c0615963"><td class="mdescLeft">&#160;</td><td class="mdescRight">It deserializes a matrix from the file at the provided file path.  <a href="#a55f24f87becc3b7823eb5380c0615963">More...</a><br /></td></tr>
+<tr class="separator:a55f24f87becc3b7823eb5380c0615963"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9a2a081fb207a96b7cf8ae57202e5aec"><td class="memTemplParams" colspan="2">template&lt;typename Scalar &gt; </td></tr>
+<tr class="memitem:a9a2a081fb207a96b7cf8ae57202e5aec"><td class="memTemplItemLeft" align="right" valign="top"><a class="el" href="namespacecattle.html#a1d78623a47279d516750a44dbad6090b">Matrix</a>&lt; Scalar &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespacecattle.html#a9a2a081fb207a96b7cf8ae57202e5aec">deserialize_binary</a> (std::istream &amp;in_stream)</td></tr>
+<tr class="memdesc:a9a2a081fb207a96b7cf8ae57202e5aec"><td class="mdescLeft">&#160;</td><td class="mdescRight">It deserializes a matrix assuming the serialized format matches that used by the <a class="el" href="namespacecattle.html#a97059f21448850dfa6a8f8c925b87ce2" title="It serializes the matrix in a format such that the first 2 bytes denote the size of a single coeffici...">serialize_binary()</a> method.  <a href="#a9a2a081fb207a96b7cf8ae57202e5aec">More...</a><br /></td></tr>
+<tr class="separator:a9a2a081fb207a96b7cf8ae57202e5aec"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac8f3faa22d06a100cb9e1ddd189f82cb"><td class="memTemplParams" colspan="2">template&lt;typename Scalar &gt; </td></tr>
+<tr class="memitem:ac8f3faa22d06a100cb9e1ddd189f82cb"><td class="memTemplItemLeft" align="right" valign="top"><a class="el" href="namespacecattle.html#a1d78623a47279d516750a44dbad6090b">Matrix</a>&lt; Scalar &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespacecattle.html#ac8f3faa22d06a100cb9e1ddd189f82cb">deserialize_binary</a> (const std::string &amp;file_path)</td></tr>
+<tr class="memdesc:ac8f3faa22d06a100cb9e1ddd189f82cb"><td class="mdescLeft">&#160;</td><td class="mdescRight">It deserializes a matrix from the binary file at the provided file path.  <a href="#ac8f3faa22d06a100cb9e1ddd189f82cb">More...</a><br /></td></tr>
+<tr class="separator:ac8f3faa22d06a100cb9e1ddd189f82cb"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>The namespace containing all classes and typedefs of the C-ATTL3 library. </p>
@@ -584,6 +621,401 @@ template&lt;typename Scalar , std::size_t Rank, bool Sequential&gt; </div>
 
 <p>An alias for a pair of two tensors of the same rank. </p>
 <p>It represents observation-objective pairs. </p>
+
+</div>
+</div>
+<h2 class="groupheader">Function Documentation</h2>
+<a id="aad23338fe4e2086a14828112f3822e80"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aad23338fe4e2086a14828112f3822e80">&#9670;&nbsp;</a></span>deserialize() <span class="overload">[1/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename Scalar &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="namespacecattle.html#a1d78623a47279d516750a44dbad6090b">Matrix</a>&lt;Scalar&gt; cattle::deserialize </td>
+          <td>(</td>
+          <td class="paramtype">std::istream &amp;&#160;</td>
+          <td class="paramname"><em>in_stream</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>It deserializes a matrix assuming the serialized format matches that used by the <a class="el" href="namespacecattle.html#a0f1d06b205cbd3dc142653b1a95e9f59" title="It serializes the matrix in a format such that the first two numbers denote the matrix&#39;s number of ro...">serialize()</a> method. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">in_stream</td><td>The stream to the serialized matrix. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>The unserialized matrix. </dd></dl>
+
+</div>
+</div>
+<a id="a55f24f87becc3b7823eb5380c0615963"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a55f24f87becc3b7823eb5380c0615963">&#9670;&nbsp;</a></span>deserialize() <span class="overload">[2/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename Scalar &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="namespacecattle.html#a1d78623a47279d516750a44dbad6090b">Matrix</a>&lt;Scalar&gt; cattle::deserialize </td>
+          <td>(</td>
+          <td class="paramtype">const std::string &amp;&#160;</td>
+          <td class="paramname"><em>file_path</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>It deserializes a matrix from the file at the provided file path. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">file_path</td><td>The path to the file containing the serialized matrix. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>The deserialized matrix. </dd></dl>
+
+</div>
+</div>
+<a id="a9a2a081fb207a96b7cf8ae57202e5aec"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a9a2a081fb207a96b7cf8ae57202e5aec">&#9670;&nbsp;</a></span>deserialize_binary() <span class="overload">[1/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename Scalar &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="namespacecattle.html#a1d78623a47279d516750a44dbad6090b">Matrix</a>&lt;Scalar&gt; cattle::deserialize_binary </td>
+          <td>(</td>
+          <td class="paramtype">std::istream &amp;&#160;</td>
+          <td class="paramname"><em>in_stream</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>It deserializes a matrix assuming the serialized format matches that used by the <a class="el" href="namespacecattle.html#a97059f21448850dfa6a8f8c925b87ce2" title="It serializes the matrix in a format such that the first 2 bytes denote the size of a single coeffici...">serialize_binary()</a> method. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">in_stream</td><td>The binary stream to the serialized matrix. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>The unserialized matrix. </dd></dl>
+
+</div>
+</div>
+<a id="ac8f3faa22d06a100cb9e1ddd189f82cb"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac8f3faa22d06a100cb9e1ddd189f82cb">&#9670;&nbsp;</a></span>deserialize_binary() <span class="overload">[2/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename Scalar &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="namespacecattle.html#a1d78623a47279d516750a44dbad6090b">Matrix</a>&lt;Scalar&gt; cattle::deserialize_binary </td>
+          <td>(</td>
+          <td class="paramtype">const std::string &amp;&#160;</td>
+          <td class="paramname"><em>file_path</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>It deserializes a matrix from the binary file at the provided file path. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">file_path</td><td>The path to the binary file containing the serialized matrix. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>The deserialized matrix. </dd></dl>
+
+</div>
+</div>
+<a id="ad8bac69b844017213ccca0706d78f57b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad8bac69b844017213ccca0706d78f57b">&#9670;&nbsp;</a></span>num_of_eval_threads()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">int cattle::num_of_eval_threads </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<dl class="section return"><dt>Returns</dt><dd>The number of threads used by Eigen to accelerate operations supporting multithreading. </dd></dl>
+
+</div>
+</div>
+<a id="a0f1d06b205cbd3dc142653b1a95e9f59"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a0f1d06b205cbd3dc142653b1a95e9f59">&#9670;&nbsp;</a></span>serialize() <span class="overload">[1/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename Scalar &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void cattle::serialize </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="namespacecattle.html#a1d78623a47279d516750a44dbad6090b">Matrix</a>&lt; Scalar &gt; &amp;&#160;</td>
+          <td class="paramname"><em>matrix</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">std::ostream &amp;&#160;</td>
+          <td class="paramname"><em>out_stream</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>It serializes the matrix in a format such that the first two numbers denote the matrix's number of rows and columns respectively and the remaining numbers represent the coefficients of the matrix in column-major order. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">matrix</td><td>The matrix to serialize. </td></tr>
+    <tr><td class="paramname">out_stream</td><td>The non-binary stream to serialize the matrix to. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="a063aee388c9882a7ee05562166ef2160"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a063aee388c9882a7ee05562166ef2160">&#9670;&nbsp;</a></span>serialize() <span class="overload">[2/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename Scalar &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void cattle::serialize </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="namespacecattle.html#a1d78623a47279d516750a44dbad6090b">Matrix</a>&lt; Scalar &gt; &amp;&#160;</td>
+          <td class="paramname"><em>matrix</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const std::string &amp;&#160;</td>
+          <td class="paramname"><em>file_path</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>It serializes the matrix into a file at the specified file path. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">matrix</td><td>The matrix to serialize. </td></tr>
+    <tr><td class="paramname">file_path</td><td>The path to the file to which the matrix is to be serialized. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="a97059f21448850dfa6a8f8c925b87ce2"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a97059f21448850dfa6a8f8c925b87ce2">&#9670;&nbsp;</a></span>serialize_binary() <span class="overload">[1/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename Scalar &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void cattle::serialize_binary </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="namespacecattle.html#a1d78623a47279d516750a44dbad6090b">Matrix</a>&lt; Scalar &gt; &amp;&#160;</td>
+          <td class="paramname"><em>matrix</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">std::ostream &amp;&#160;</td>
+          <td class="paramname"><em>out_stream</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>It serializes the matrix in a format such that the first 2 bytes denote the size of a single coefficient of the matrix in bytes, the second and third 4 bytes denote the matrix's number of rows and columns respectively, and the remaining bytes contain the coefficients of the matrix in column-major order. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">matrix</td><td>The matrix to serialize. </td></tr>
+    <tr><td class="paramname">out_stream</td><td>The binary stream to serialize the matrix to. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="a5d710f7b334b20eb888754439f983637"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a5d710f7b334b20eb888754439f983637">&#9670;&nbsp;</a></span>serialize_binary() <span class="overload">[2/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename Scalar &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void cattle::serialize_binary </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="namespacecattle.html#a1d78623a47279d516750a44dbad6090b">Matrix</a>&lt; Scalar &gt; &amp;&#160;</td>
+          <td class="paramname"><em>matrix</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const std::string &amp;&#160;</td>
+          <td class="paramname"><em>file_path</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>It serializes the matrix into a binary file at the specified file path. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">matrix</td><td>The matrix to serialize. </td></tr>
+    <tr><td class="paramname">file_path</td><td>The path to the binary file to which the matrix is to be serialized. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="a1d969682436efdeab15466e2a014e84e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a1d969682436efdeab15466e2a014e84e">&#9670;&nbsp;</a></span>set_num_of_eval_threads()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void cattle::set_num_of_eval_threads </td>
+          <td>(</td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>num_of_threads</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">num_of_threads</td><td>The number of threads Eigen should use to accelerate operations supporting multithreading. The lower bound of the actual value applied is 1 while the upper bound is the maximum of 1 and the level of hardware concurrency detected. </td></tr>
+  </table>
+  </dd>
+</dl>
 
 </div>
 </div>

@@ -7,6 +7,8 @@ var searchData=
   ['demote',['demote',['../classcattle_1_1_dimensions.html#a3f279dec6f26b6e1fbe9adb5c1369bab',1,'cattle::Dimensions']]],
   ['densekernellayer',['DenseKernelLayer',['../classcattle_1_1_dense_kernel_layer.html#a936c5534a45ab6bf9a66d8a555ba3990',1,'cattle::DenseKernelLayer']]],
   ['denseneuralnetwork',['DenseNeuralNetwork',['../classcattle_1_1_dense_neural_network.html#ae1f29fc3b643d61d125fc082eed9ec89',1,'cattle::DenseNeuralNetwork::DenseNeuralNetwork(std::vector&lt; Module &gt; &amp;&amp;modules, bool foremost=true)'],['../classcattle_1_1_dense_neural_network.html#a714633b6ad63253ca1baf7d1716d414a',1,'cattle::DenseNeuralNetwork::DenseNeuralNetwork(Module &amp;&amp;module, bool foremost=true)']]],
+  ['deserialize',['deserialize',['../namespacecattle.html#aad23338fe4e2086a14828112f3822e80',1,'cattle::deserialize(std::istream &amp;in_stream)'],['../namespacecattle.html#a55f24f87becc3b7823eb5380c0615963',1,'cattle::deserialize(const std::string &amp;file_path)']]],
+  ['deserialize_5fbinary',['deserialize_binary',['../namespacecattle.html#a9a2a081fb207a96b7cf8ae57202e5aec',1,'cattle::deserialize_binary(std::istream &amp;in_stream)'],['../namespacecattle.html#ac8f3faa22d06a100cb9e1ddd189f82cb',1,'cattle::deserialize_binary(const std::string &amp;file_path)']]],
   ['divide_5falong_5frank',['divide_along_rank',['../classcattle_1_1_dim_expression.html#aa4651f18fd078bc3a0b60999c463261a',1,'cattle::DimExpression']]],
   ['dropoutlayer',['DropoutLayer',['../classcattle_1_1_dropout_layer.html#ad1702a56e7165547f1bfb86ea2594f47',1,'cattle::DropoutLayer']]]
 ];
