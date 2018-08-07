@@ -14,7 +14,7 @@ namespace cattle {
 
 /**
  * A weight initializer that assigns linearly increasing values to the elements
- * of the weight matrix. It is meant to be used for testing.
+ * of the parameter matrix. It is meant to be used for testing.
  */
 template<typename Scalar>
 class IncrementalParameterInitialization : public ParameterInitialization<Scalar> {
@@ -26,11 +26,11 @@ public:
 	inline IncrementalParameterInitialization(Scalar start, Scalar inc) :
 			start(start),
 			inc(inc) { }
-	inline void apply(Matrix<Scalar>& weights) const {
+	inline void apply(Matrix<Scalar>& params) const {
 		Scalar val = start;
-		for (std::size_t i = 0; i < weights.cols(); ++i) {
-			for (std::size_t j = 0; j < weights.rows(); ++j) {
-				weights(j,i) = val;
+		for (std::size_t i = 0; i < params.cols(); ++i) {
+			for (std::size_t j = 0; j < params.rows(); ++j) {
+				params(j,i) = val;
 				val += inc;
 			}
 		}

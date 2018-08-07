@@ -13,13 +13,13 @@
 namespace cattle {
 
 /**
- * A class template for a weight initialization that sets all values to 0.
+ * A class template for a parameter initialization that sets all values to 0.
  */
 template<typename Scalar>
 class ZeroParameterInitialization : public ParameterInitialization<Scalar> {
 public:
-	inline void apply(Matrix<Scalar>& weights) const {
-		weights.setZero(weights.rows(), weights.cols());
+	inline void apply(Matrix<Scalar>& params) const {
+		params.setZero(params.rows(), params.cols());
 	}
 };
 

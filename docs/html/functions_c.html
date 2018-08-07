@@ -74,8 +74,11 @@ $(function() {
 <li>calculate_learning_rate()
 : <a class="el" href="classcattle_1_1_momentum_s_g_d_optimizer.html#afce694fe0fff65f14f35343926f35d07">cattle::MomentumSGDOptimizer&lt; Scalar, Rank, Sequential &gt;</a>
 </li>
+<li>channels()
+: <a class="el" href="classcattle_1_1gpu_1_1_cu_d_n_n_tensor.html#a159a7f5ab933a8a4794cacf894cb3691">cattle::gpu::CuDNNTensor&lt; Scalar &gt;</a>
+</li>
 <li>CIFARDataProvider()
-: <a class="el" href="classcattle_1_1_c_i_f_a_r_data_provider.html#aea897b5488b2c1f5b1352703de7edc56">cattle::CIFARDataProvider&lt; Scalar, CIFARType &gt;</a>
+: <a class="el" href="classcattle_1_1_c_i_f_a_r_data_provider.html#acad45a9be6ec504c355d8b82e0b4d20f">cattle::CIFARDataProvider&lt; Scalar, CIFARType &gt;</a>
 </li>
 <li>clean_document()
 : <a class="el" href="classcattle_1_1_i_m_d_b_data_provider.html#aa03cfb93ebecff50781a3e47c3fe704f">cattle::IMDBDataProvider&lt; Scalar, ObjType &gt;</a>
@@ -149,6 +152,15 @@ $(function() {
 <li>contract()
 : <a class="el" href="classcattle_1_1_dimensions.html#aa34ca504ab537adb21e0e2b22ad7fe19">cattle::Dimensions&lt; IndexType, Rank &gt;</a>
 </li>
+<li>conv2d_output_dims()
+: <a class="el" href="classcattle_1_1gpu_1_1_cu_d_n_n_handle.html#a5235c1df2f08ca95f3d32003e611a267">cattle::gpu::CuDNNHandle&lt; Scalar &gt;</a>
+</li>
+<li>convert_from_cudnn_to_eigen()
+: <a class="el" href="classcattle_1_1gpu_1_1_tensor_conversion.html#ad449ff3bfeb1a80dac52d10a2829fc75">cattle::gpu::TensorConversion&lt; Scalar &gt;</a>
+</li>
+<li>convert_from_eigen_to_cudnn()
+: <a class="el" href="classcattle_1_1gpu_1_1_tensor_conversion.html#a1f023ade4f863d63be1034f1c29bda2a">cattle::gpu::TensorConversion&lt; Scalar &gt;</a>
+</li>
 <li>convert_to_text()
 : <a class="el" href="classcattle_1_1_i_m_d_b_data_provider.html#a495eec65a59a164a35c66eaff0d4cac8">cattle::IMDBDataProvider&lt; Scalar, ObjType &gt;</a>
 </li>
@@ -157,8 +169,47 @@ $(function() {
 , <a class="el" href="classcattle_1_1_conv_kernel_layer_3_01_scalar_00_011_01_4.html#a22c3028d79491f8345d0eeffa697eacc">cattle::ConvKernelLayer&lt; Scalar, 1 &gt;</a>
 , <a class="el" href="classcattle_1_1_conv_kernel_layer_3_01_scalar_00_012_01_4.html#ad6ebf05c8c127c96d080fb9387cccb6b">cattle::ConvKernelLayer&lt; Scalar, 2 &gt;</a>
 </li>
+<li>convolution2d_bwd()
+: <a class="el" href="classcattle_1_1gpu_1_1_cu_d_n_n_handle.html#abcccacd4760726a246ef1fc12f2d8dc3">cattle::gpu::CuDNNHandle&lt; Scalar &gt;</a>
+</li>
+<li>convolution2d_fwd()
+: <a class="el" href="classcattle_1_1gpu_1_1_cu_d_n_n_handle.html#ae20e54711de984e3c4669065cede0c1d">cattle::gpu::CuDNNHandle&lt; Scalar &gt;</a>
+</li>
+<li>copy_from_host()
+: <a class="el" href="classcattle_1_1gpu_1_1_c_u_d_a_array.html#a53a0b01db3d84497c5c7c47a8582a22d">cattle::gpu::CUDAArray&lt; Scalar &gt;</a>
+</li>
+<li>copy_to_host()
+: <a class="el" href="classcattle_1_1gpu_1_1_c_u_d_a_array.html#ab3aeb7d6d0bb4583880a3b187a3c5945">cattle::gpu::CUDAArray&lt; Scalar &gt;</a>
+</li>
+<li>create_filter_descriptor()
+: <a class="el" href="classcattle_1_1gpu_1_1_cu_d_n_n_filter.html#a66407263449217a5e544a9a73835dbbf">cattle::gpu::CuDNNFilter&lt; Scalar &gt;</a>
+</li>
+<li>create_tensor_descriptor()
+: <a class="el" href="classcattle_1_1gpu_1_1_cu_d_n_n_tensor.html#afed1d051b60b5bec470cb343a39b140b">cattle::gpu::CuDNNTensor&lt; Scalar &gt;</a>
+</li>
 <li>CrossEntropyLoss()
 : <a class="el" href="classcattle_1_1_cross_entropy_loss.html#a06b3b5b23ec16ca35889a8a59228c4e3">cattle::CrossEntropyLoss&lt; Scalar, Rank, Sequential &gt;</a>
+</li>
+<li>CuBLASError()
+: <a class="el" href="classcattle_1_1gpu_1_1_cu_b_l_a_s_error.html#a88b472fcf6ee5d4551bb68e56bc61b2c">cattle::gpu::CuBLASError</a>
+</li>
+<li>CUDAArray()
+: <a class="el" href="classcattle_1_1gpu_1_1_c_u_d_a_array.html#a7e697aa1a2e02fedbd79fb97a810b018">cattle::gpu::CUDAArray&lt; Scalar &gt;</a>
+</li>
+<li>CUDAError()
+: <a class="el" href="classcattle_1_1gpu_1_1_c_u_d_a_error.html#af959bdd7e4a171ad178cac8e612a22be">cattle::gpu::CUDAError</a>
+</li>
+<li>CuDNNError()
+: <a class="el" href="classcattle_1_1gpu_1_1_cu_d_n_n_error.html#a5824bb205795a2a0550660c576e7304d">cattle::gpu::CuDNNError</a>
+</li>
+<li>CuDNNFilter()
+: <a class="el" href="classcattle_1_1gpu_1_1_cu_d_n_n_filter.html#a3b642ddbe60db93d4f10e1db6964f9a5">cattle::gpu::CuDNNFilter&lt; Scalar &gt;</a>
+</li>
+<li>CuDNNTensor()
+: <a class="el" href="classcattle_1_1gpu_1_1_cu_d_n_n_tensor.html#ac6b7b616ec8965672b82f8186066bc29">cattle::gpu::CuDNNTensor&lt; Scalar &gt;</a>
+</li>
+<li>CuRANDError()
+: <a class="el" href="classcattle_1_1gpu_1_1_cu_r_a_n_d_error.html#affa7d32d5c987e0cec286647f2ba41ad">cattle::gpu::CuRANDError</a>
 </li>
 </ul>
 </div><!-- contents -->

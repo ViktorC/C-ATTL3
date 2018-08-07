@@ -25,15 +25,15 @@ public:
 	 */
 	inline OrthogonalParameterInitialization(Scalar sd = 1) :
 			GaussianParameterInitialization<Scalar>::GaussianParameterInitialization(sd) { }
-	inline void apply(Matrix<Scalar>& weights) const {
-		GaussianParameterInitialization<Scalar>::apply(weights);
-		int rows = weights.rows();
-		int cols = weights.cols();
+	inline void apply(Matrix<Scalar>& params) const {
+		GaussianParameterInitialization<Scalar>::apply(params);
+		int rows = params.rows();
+		int cols = params.cols();
 		bool more_rows = rows > cols;
 		SVD<Scalar> svd;
-		weights.block(0, 0, rows, cols) = more_rows ?
-				svd.compute(weights, SVDOptions::ComputeFullU).matrixU().block(0, 0, rows, cols) :
-				svd.compute(weights, SVDOptions::ComputeFullV).matrixV().block(0, 0, rows, cols);
+		params.block(0, 0, rows, cols) = more_rows ?
+				svd.compute(params, SVDOptions::ComputeFullU).matrixU().block(0, 0, rows, cols) :
+				svd.compute(params, SVDOptions::ComputeFullV).matrixV().block(0, 0, rows, cols);
 	}
 };
 

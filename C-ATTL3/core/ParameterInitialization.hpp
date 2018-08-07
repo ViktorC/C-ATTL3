@@ -23,12 +23,11 @@ class ParameterInitialization {
 public:
 	virtual ~ParameterInitialization() = default;
 	/**
-	 * It initializes the values of the kernel. It is assumed that the last row of the kernel
-	 * is the bias row and is thus treated differently.
+	 * It initializes the values of the parameters.
 	 *
-	 * @param weights A reference to the weight matrix.
+	 * @param params A reference to the parameter matrix.
 	 */
-	virtual void apply(Matrix<Scalar>& weights) const = 0;
+	virtual void apply(Matrix<Scalar>& params) const = 0;
 };
 
 } /* namespace cattle */

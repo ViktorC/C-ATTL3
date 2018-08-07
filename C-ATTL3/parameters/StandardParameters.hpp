@@ -1,12 +1,12 @@
 /*
- * HostParameters.hpp
+ * StandardParameters.hpp
  *
  *  Created on: 20 Jul 2018
  *      Author: Viktor Csomor
  */
 
-#ifndef C_ATTL3_PARAMETERS_HOSTPARAMETERS_H_
-#define C_ATTL3_PARAMETERS_HOSTPARAMETERS_H_
+#ifndef C_ATTL3_PARAMETERS_STANDARDPARAMETERS_H_
+#define C_ATTL3_PARAMETERS_STANDARDPARAMETERS_H_
 
 #include <cassert>
 #include <cstddef>
@@ -34,7 +34,7 @@ template<typename Scalar>
 using ParamRegSharedPtr = std::shared_ptr<ParameterRegularization<Scalar>>;
 
 template<typename Scalar>
-class HostParameters : public Parameters<Scalar> {
+class StandardParameters : public Parameters<Scalar> {
 public:
 	/**
 	 * @param rows The number of rows of the parameter matrix.
@@ -58,7 +58,7 @@ public:
 	 * @param grad_max_l2_norm The maximum allowed L2 parameter gradient norm. If it
 	 * is 0 or less, no L2 gradient max norm constraint is enforced.
 	 */
-	inline HostParameters(std::size_t rows, std::size_t cols, bool optimizable = true,
+	inline StandardParameters(std::size_t rows, std::size_t cols, bool optimizable = true,
 			ParamInitSharedPtr<Scalar> init = nullptr, ParamRegSharedPtr<Scalar> reg = nullptr,
 			Scalar value_clip = 0, Scalar value_max_l1_norm = 0, Scalar value_max_l2_norm = 0,
 			Scalar grad_clip = 0, Scalar grad_max_l1_norm = 0, Scalar grad_max_l2_norm = 0) :
@@ -77,7 +77,7 @@ public:
 		assert(rows > 0 && cols > 0);
 	}
 	inline Parameters<Scalar>* clone() const {
-		return new HostParameters<Scalar>(*this);
+		return new StandardParameters<Scalar>(*this);
 	}
 	inline bool are_optimizable() const {
 		return optimizable;
@@ -187,4 +187,4 @@ protected:
 
 } /* namespace cattle */
 
-#endif /* C_ATTL3_PARAMETERS_HOSTPARAMETERS_H_ */
+#endif /* C_ATTL3_PARAMETERS_STANDARDPARAMETERS_H_ */

@@ -1,6 +1,7 @@
 var searchData=
 [
   ['d_5ffunction',['d_function',['../classcattle_1_1_loss.html#a6c969739a6cd464af2f89fcd6270a377',1,'cattle::Loss::d_function()'],['../classcattle_1_1_parameter_regularization.html#a21fbf2b94837fa83f62e65d10f979013',1,'cattle::ParameterRegularization::d_function()'],['../classcattle_1_1_negated_loss.html#a5bf449a045f3dc3c343ff68036c17ebb',1,'cattle::NegatedLoss::d_function()'],['../classcattle_1_1_universal_loss.html#afba23a7f00f3067e2bd38a33d63b2ad8',1,'cattle::UniversalLoss::d_function()'],['../classcattle_1_1_universal_loss_3_01_scalar_00_01_rank_00_01true_01_4.html#a55d3046825929436790b354404e103d1',1,'cattle::UniversalLoss&lt; Scalar, Rank, true &gt;::d_function()'],['../classcattle_1_1_absolute_parameter_regularization.html#a81172e348ef53545ae4fe22a958a2f93',1,'cattle::AbsoluteParameterRegularization::d_function()'],['../classcattle_1_1_elastic_net_parameter_regularization.html#a52626aeccd5f12fd22923d2c9573e79e',1,'cattle::ElasticNetParameterRegularization::d_function()'],['../classcattle_1_1_squared_parameter_regularization.html#adf112279b074e0ed4a48a80e98df9604',1,'cattle::SquaredParameterRegularization::d_function()']]],
+  ['data',['data',['../classcattle_1_1gpu_1_1_c_u_d_a_array.html#a3bd7455c00b1cb1cf3d31a849429e4d9',1,'cattle::gpu::CUDAArray::data() const'],['../classcattle_1_1gpu_1_1_c_u_d_a_array.html#a5b8ace0183f8b7a7f99ce906d55d7d16',1,'cattle::gpu::CUDAArray::data()']]],
   ['datapair',['DataPair',['../namespacecattle.html#aaf234deaf1504300126fed57912a132e',1,'cattle']]],
   ['dataprovider',['DataProvider',['../classcattle_1_1_data_provider.html',1,'cattle']]],
   ['decidedly_5fgreater',['decidedly_greater',['../classcattle_1_1_numeric_utils.html#a6e445382c9d5f9b1b754bca5b70682dd',1,'cattle::NumericUtils']]],
@@ -10,8 +11,11 @@ var searchData=
   ['denseconcattype',['DenseConcatType',['../namespacecattle.html#a962c4b25a74fac744864b9fa4fca4a0b',1,'cattle']]],
   ['densekernellayer',['DenseKernelLayer',['../classcattle_1_1_dense_kernel_layer.html',1,'cattle::DenseKernelLayer&lt; Scalar, Rank &gt;'],['../classcattle_1_1_dense_kernel_layer.html#a936c5534a45ab6bf9a66d8a555ba3990',1,'cattle::DenseKernelLayer::DenseKernelLayer()']]],
   ['denseneuralnetwork',['DenseNeuralNetwork',['../classcattle_1_1_dense_neural_network.html',1,'cattle::DenseNeuralNetwork&lt; Scalar, Rank, ConcatType &gt;'],['../classcattle_1_1_dense_neural_network.html#ae1f29fc3b643d61d125fc082eed9ec89',1,'cattle::DenseNeuralNetwork::DenseNeuralNetwork(std::vector&lt; Module &gt; &amp;&amp;modules, bool foremost=true)'],['../classcattle_1_1_dense_neural_network.html#a714633b6ad63253ca1baf7d1716d414a',1,'cattle::DenseNeuralNetwork::DenseNeuralNetwork(Module &amp;&amp;module, bool foremost=true)']]],
+  ['desc',['desc',['../classcattle_1_1gpu_1_1_cu_d_n_n_tensor.html#ad877d89c5fba27e4676659d0fc515faa',1,'cattle::gpu::CuDNNTensor']]],
   ['deserialize',['deserialize',['../namespacecattle.html#aad23338fe4e2086a14828112f3822e80',1,'cattle::deserialize(std::istream &amp;in_stream)'],['../namespacecattle.html#a55f24f87becc3b7823eb5380c0615963',1,'cattle::deserialize(const std::string &amp;file_path)']]],
   ['deserialize_5fbinary',['deserialize_binary',['../namespacecattle.html#a9a2a081fb207a96b7cf8ae57202e5aec',1,'cattle::deserialize_binary(std::istream &amp;in_stream)'],['../namespacecattle.html#ac8f3faa22d06a100cb9e1ddd189f82cb',1,'cattle::deserialize_binary(const std::string &amp;file_path)']]],
+  ['destroy_5ffilter_5fdescriptor',['destroy_filter_descriptor',['../classcattle_1_1gpu_1_1_cu_d_n_n_filter.html#a0907f08f4b5bf7b20e07641764d6d655',1,'cattle::gpu::CuDNNFilter']]],
+  ['destroy_5ftensor_5fdescriptor',['destroy_tensor_descriptor',['../classcattle_1_1gpu_1_1_cu_d_n_n_tensor.html#aae03ac08e0d7c75a1151bf6ba0aeb173',1,'cattle::gpu::CuDNNTensor']]],
   ['dimensions',['Dimensions',['../classcattle_1_1_dimensions.html',1,'cattle']]],
   ['dimensions_3c_20std_3a_3asize_5ft_2c_203_20_3e',['Dimensions&lt; std::size_t, 3 &gt;',['../classcattle_1_1_dimensions.html',1,'cattle']]],
   ['dimensions_3c_20std_3a_3asize_5ft_2c_20rank_20_3e',['Dimensions&lt; std::size_t, Rank &gt;',['../classcattle_1_1_dimensions.html',1,'cattle']]],
@@ -23,5 +27,9 @@ var searchData=
   ['dimexpression_3c_20unarydimexpression_3c_20indextype_2c_20rank_2c_20lhsexpr_2c_20optype_20_3e_2c_20indextype_2c_20rank_20_3e',['DimExpression&lt; UnaryDimExpression&lt; IndexType, Rank, LhsExpr, OpType &gt;, IndexType, Rank &gt;',['../classcattle_1_1_dim_expression.html',1,'cattle']]],
   ['dimexpression_3c_20unaryrankwisedimexpression_3c_20indextype_2c_20rank_2c_20lhsexpr_2c_20optype_20_3e_2c_20indextype_2c_20rank_20_3e',['DimExpression&lt; UnaryRankWiseDimExpression&lt; IndexType, Rank, LhsExpr, OpType &gt;, IndexType, Rank &gt;',['../classcattle_1_1_dim_expression.html',1,'cattle']]],
   ['divide_5falong_5frank',['divide_along_rank',['../classcattle_1_1_dim_expression.html#aa4651f18fd078bc3a0b60999c463261a',1,'cattle::DimExpression']]],
+  ['dropout_5fbwd',['dropout_bwd',['../classcattle_1_1gpu_1_1_cu_d_n_n_handle.html#add52a4fba7477ecec00e00dc963edf9c',1,'cattle::gpu::CuDNNHandle']]],
+  ['dropout_5ffwd',['dropout_fwd',['../classcattle_1_1gpu_1_1_cu_d_n_n_handle.html#ada21ae436615ef9f57f0196c626878d8',1,'cattle::gpu::CuDNNHandle']]],
+  ['dropout_5freserve_5fsize',['dropout_reserve_size',['../classcattle_1_1gpu_1_1_cu_d_n_n_handle.html#a42e76b2f949cdee02b78d78332b54391',1,'cattle::gpu::CuDNNHandle']]],
+  ['dropout_5fstate_5fsize',['dropout_state_size',['../classcattle_1_1gpu_1_1_cu_d_n_n_handle.html#a998d83500dc32fc4eccbc620d888a8e4',1,'cattle::gpu::CuDNNHandle']]],
   ['dropoutlayer',['DropoutLayer',['../classcattle_1_1_dropout_layer.html',1,'cattle::DropoutLayer&lt; Scalar, Rank &gt;'],['../classcattle_1_1_dropout_layer.html#ad1702a56e7165547f1bfb86ea2594f47',1,'cattle::DropoutLayer::DropoutLayer()']]]
 ];

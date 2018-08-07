@@ -13,15 +13,15 @@
 namespace cattle {
 
 /**
- * A class template for a weight initialization that sets all values to a constant.
+ * A class template for a parameter initialization that sets all values to a constant.
  */
 template<typename Scalar>
 class ConstantParameterInitialization : public ParameterInitialization<Scalar> {
 public:
 	ConstantParameterInitialization(Scalar constant) :
 			constant(constant) { }
-	inline void apply(Matrix<Scalar>& weights) const {
-		weights.setConstant(weights.rows(), weights.cols(), constant);
+	inline void apply(Matrix<Scalar>& params) const {
+		params.setConstant(params.rows(), params.cols(), constant);
 	}
 private:
 	Scalar constant;

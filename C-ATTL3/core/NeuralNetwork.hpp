@@ -192,7 +192,7 @@ public:
 	 * @param binary Whether the parameters are to be serialized into a binary format.
 	 * @param file_name_prefix A prefix to the names of the serialized parameter files.
 	 */
-	inline void save_params_values(const std::string& dir_path, bool binary = true,
+	inline void save_all_unique_params_values(const std::string& dir_path, bool binary = true,
 			const std::string& file_name_prefix = PARAM_SERIAL_PREFIX) const {
 		std::vector<const Parameters<Scalar>*> params_vec = get_all_unique_params();
 		for (std::size_t i = 0; i < params_vec.size(); ++i) {
@@ -212,7 +212,7 @@ public:
 	 * @param binary Whether the parameter files binary.
 	 * @param file_name_prefix The prefix of the names of the parameter files.
 	 */
-	inline void load_params_values(const std::string& dir_path, bool binary = true,
+	inline void load_all_unique_params_values(const std::string& dir_path, bool binary = true,
 			const std::string& file_name_prefix = PARAM_SERIAL_PREFIX) {
 		std::vector<Parameters<Scalar>*> params_vec = get_all_unique_params();
 		for (std::size_t i = 0; i < params_vec.size(); ++i) {

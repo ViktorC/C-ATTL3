@@ -12,6 +12,12 @@
 <link href="search/search.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="search/searchdata.js"></script>
 <script type="text/javascript" src="search/search.js"></script>
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    extensions: ["tex2jax.js"],
+    jax: ["input/TeX","output/HTML-CSS"],
+});
+</script><script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/MathJax.js"></script>
 <link href="doxygen.css" rel="stylesheet" type="text/css" />
 </head>
 <body>
@@ -22,7 +28,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">C-ATTL3
-   &#160;<span id="projectnumber">0.1</span>
+   &#160;<span id="projectnumber">0.5</span>
    </div>
   </td>
  </tr>
@@ -62,56 +68,11 @@ $(function() {
 </div>
 
 <div class="contents">
-<div class="textblock">Here is a list of all class members with links to the classes they belong to:</div>
+<div class="textblock">Here is a list of all documented class members with links to the class documentation for each member:</div>
 
 <h3><a id="index_w"></a>- w -</h3><ul>
-<li>weight_init
-: <a class="el" href="classcattle_1_1_kernel_layer.html#a2af03d22c438b0ab3e118381a48218eb">cattle::KernelLayer&lt; Scalar, Rank &gt;</a>
-</li>
-<li>weight_reg
-: <a class="el" href="classcattle_1_1_kernel_layer.html#ab96220969abe12d7a4363679e6e1676c">cattle::KernelLayer&lt; Scalar, Rank &gt;</a>
-</li>
-<li>weighted_input_candidate_cache
-: <a class="el" href="structcattle_1_1_l_s_t_m_neural_network_1_1_cell.html#ae00da687eb1e4e20a173a34f7ceb4387">cattle::LSTMNeuralNetwork&lt; Scalar, Rank, MulInt, Stateful &gt;::Cell</a>
-</li>
-<li>weighted_input_forget_cache
-: <a class="el" href="structcattle_1_1_l_s_t_m_neural_network_1_1_cell.html#a981690eec34c7cdf0ea9beceecf8f5f3">cattle::LSTMNeuralNetwork&lt; Scalar, Rank, MulInt, Stateful &gt;::Cell</a>
-</li>
-<li>weighted_input_read_cache
-: <a class="el" href="structcattle_1_1_l_s_t_m_neural_network_1_1_cell.html#a3d581f508d31b8306504fafcb5083500">cattle::LSTMNeuralNetwork&lt; Scalar, Rank, MulInt, Stateful &gt;::Cell</a>
-</li>
-<li>weighted_input_write_cache
-: <a class="el" href="structcattle_1_1_l_s_t_m_neural_network_1_1_cell.html#a908da099b051fa2e8fad04da6797d5ac">cattle::LSTMNeuralNetwork&lt; Scalar, Rank, MulInt, Stateful &gt;::Cell</a>
-</li>
-<li>weighted_output_candidate_cache
-: <a class="el" href="structcattle_1_1_l_s_t_m_neural_network_1_1_cell.html#abd2cfd90108e2363a6bb556a27a700f5">cattle::LSTMNeuralNetwork&lt; Scalar, Rank, MulInt, Stateful &gt;::Cell</a>
-</li>
-<li>weighted_output_forget_cache
-: <a class="el" href="structcattle_1_1_l_s_t_m_neural_network_1_1_cell.html#a78f0c4596eadc9bf90ea3410a07e929a">cattle::LSTMNeuralNetwork&lt; Scalar, Rank, MulInt, Stateful &gt;::Cell</a>
-</li>
-<li>weighted_output_read_cache
-: <a class="el" href="structcattle_1_1_l_s_t_m_neural_network_1_1_cell.html#ab03a90bea8237dd48359f304b920354c">cattle::LSTMNeuralNetwork&lt; Scalar, Rank, MulInt, Stateful &gt;::Cell</a>
-</li>
-<li>weighted_output_write_cache
-: <a class="el" href="structcattle_1_1_l_s_t_m_neural_network_1_1_cell.html#a1c356dd115b4ef9a7a28272772deb50b">cattle::LSTMNeuralNetwork&lt; Scalar, Rank, MulInt, Stateful &gt;::Cell</a>
-</li>
-<li>weights
-: <a class="el" href="classcattle_1_1_kernel_layer.html#ae2ec7584aa02d1bae4f47bb57cd71ae5">cattle::KernelLayer&lt; Scalar, Rank &gt;</a>
-</li>
-<li>weights_grad
-: <a class="el" href="classcattle_1_1_kernel_layer.html#aa8a0a400d5b5ed4fb107317777843d48">cattle::KernelLayer&lt; Scalar, Rank &gt;</a>
-</li>
-<li>weights_ref
-: <a class="el" href="classcattle_1_1_kernel_layer.html#a31713651225cd4a9a5b219fa7ba585c4">cattle::KernelLayer&lt; Scalar, Rank &gt;</a>
-</li>
-<li>width_rem
-: <a class="el" href="classcattle_1_1_pooling_layer.html#a9833f8360941213c0719e97a1cbfbe71">cattle::PoolingLayer&lt; Scalar &gt;</a>
-</li>
-<li>write_act
-: <a class="el" href="structcattle_1_1_l_s_t_m_neural_network_1_1_cell.html#a57af2cc1fbc306eb568116ad4048616c">cattle::LSTMNeuralNetwork&lt; Scalar, Rank, MulInt, Stateful &gt;::Cell</a>
-</li>
-<li>write_filter_cache
-: <a class="el" href="structcattle_1_1_l_s_t_m_neural_network_1_1_cell.html#a637b73f406c8b8fc7c55562e0be492e3">cattle::LSTMNeuralNetwork&lt; Scalar, Rank, MulInt, Stateful &gt;::Cell</a>
+<li>width()
+: <a class="el" href="classcattle_1_1gpu_1_1_cu_d_n_n_tensor.html#ad48aa03288eb330549d7038813183456">cattle::gpu::CuDNNTensor&lt; Scalar &gt;</a>
 </li>
 </ul>
 </div><!-- contents -->

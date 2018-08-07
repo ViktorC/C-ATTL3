@@ -80,7 +80,7 @@ $(function() {
 </div><!--header-->
 <div class="contents">
 
-<p>A class template for a weight initialization that sets all values to 0.  
+<p>A class template for a parameter initialization that sets all values to 0.  
  <a href="classcattle_1_1_zero_parameter_initialization.html#details">More...</a></p>
 
 <p><code>#include &lt;<a class="el" href="_zero_parameter_initialization_8hpp_source.html">ZeroParameterInitialization.hpp</a>&gt;</code></p>
@@ -96,18 +96,18 @@ Inheritance diagram for cattle::ZeroParameterInitialization&lt; Scalar &gt;:</di
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:a8a5f707f41bc0a8dbe2c421013ec999b"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_zero_parameter_initialization.html#a8a5f707f41bc0a8dbe2c421013ec999b">apply</a> (<a class="el" href="namespacecattle.html#a1d78623a47279d516750a44dbad6090b">Matrix</a>&lt; Scalar &gt; &amp;weights) const</td></tr>
-<tr class="memdesc:a8a5f707f41bc0a8dbe2c421013ec999b"><td class="mdescLeft">&#160;</td><td class="mdescRight">It initializes the values of the kernel.  <a href="#a8a5f707f41bc0a8dbe2c421013ec999b">More...</a><br /></td></tr>
-<tr class="separator:a8a5f707f41bc0a8dbe2c421013ec999b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a76100a740be7c8dda4f191c4bbffb5a9"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_zero_parameter_initialization.html#a76100a740be7c8dda4f191c4bbffb5a9">apply</a> (<a class="el" href="namespacecattle.html#a1d78623a47279d516750a44dbad6090b">Matrix</a>&lt; Scalar &gt; &amp;params) const</td></tr>
+<tr class="memdesc:a76100a740be7c8dda4f191c4bbffb5a9"><td class="mdescLeft">&#160;</td><td class="mdescRight">It initializes the values of the parameters.  <a href="#a76100a740be7c8dda4f191c4bbffb5a9">More...</a><br /></td></tr>
+<tr class="separator:a76100a740be7c8dda4f191c4bbffb5a9"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><h3>template&lt;typename Scalar&gt;<br />
 class cattle::ZeroParameterInitialization&lt; Scalar &gt;</h3>
 
-<p>A class template for a weight initialization that sets all values to 0. </p>
+<p>A class template for a parameter initialization that sets all values to 0. </p>
 </div><h2 class="groupheader">Member Function Documentation</h2>
-<a id="a8a5f707f41bc0a8dbe2c421013ec999b"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a8a5f707f41bc0a8dbe2c421013ec999b">&#9670;&nbsp;</a></span>apply()</h2>
+<a id="a76100a740be7c8dda4f191c4bbffb5a9"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a76100a740be7c8dda4f191c4bbffb5a9">&#9670;&nbsp;</a></span>apply()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -121,7 +121,7 @@ template&lt;typename Scalar &gt; </div>
           <td class="memname">void <a class="el" href="classcattle_1_1_zero_parameter_initialization.html">cattle::ZeroParameterInitialization</a>&lt; Scalar &gt;::apply </td>
           <td>(</td>
           <td class="paramtype"><a class="el" href="namespacecattle.html#a1d78623a47279d516750a44dbad6090b">Matrix</a>&lt; Scalar &gt; &amp;&#160;</td>
-          <td class="paramname"><em>weights</em></td><td>)</td>
+          <td class="paramname"><em>params</em></td><td>)</td>
           <td> const</td>
         </tr>
       </table>
@@ -132,16 +132,15 @@ template&lt;typename Scalar &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p>It initializes the values of the kernel. </p>
-<p>It is assumed that the last row of the kernel is the bias row and is thus treated differently.</p>
+<p>It initializes the values of the parameters. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">weights</td><td>A reference to the weight matrix. </td></tr>
+    <tr><td class="paramname">params</td><td>A reference to the parameter matrix. </td></tr>
   </table>
   </dd>
 </dl>
 
-<p>Implements <a class="el" href="classcattle_1_1_parameter_initialization.html#af35141f35f2a18649b91bb86d00d531e">cattle::ParameterInitialization&lt; Scalar &gt;</a>.</p>
+<p>Implements <a class="el" href="classcattle_1_1_parameter_initialization.html#ae5b13c39866e7fbd191817252261207c">cattle::ParameterInitialization&lt; Scalar &gt;</a>.</p>
 
 </div>
 </div>

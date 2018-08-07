@@ -16,7 +16,7 @@
 #include "core/NumericUtils.hpp"
 #include "parameter_initialization/OneParameterInitialization.hpp"
 #include "parameter_initialization/ZeroParameterInitialization.hpp"
-#include "parameters/HostParameters.hpp"
+#include "parameters/StandardParameters.hpp"
 
 namespace cattle {
 
@@ -30,7 +30,7 @@ class BatchNormLayer : public Layer<Scalar,Rank> {
 	typedef Layer<Scalar,Rank> Base;
 	typedef BatchNormLayer<Scalar,Rank,PerLastRank> Self;
 	typedef std::array<std::size_t,Base::DATA_RANK> RankwiseArray;
-	typedef std::shared_ptr<HostParameters<Scalar>> HostParamsSharedPtr;
+	typedef std::shared_ptr<StandardParameters<Scalar>> StdParamsSharedPtr;
 public:
 	/**
 	 * @param dims The dimensionality of the input tensor.
@@ -88,12 +88,12 @@ public:
 		auto beta_init = std::make_shared<ZeroParameterInitialization<Scalar>>();
 		for (std::size_t i = 0; i < channels; ++i) {
 			ChannelSpecificMembers& memb = memb_vec[i];
-			memb.avg_means = std::make_shared<HostParameters<Scalar>>(1, 1, false);
-			memb.avg_inv_sds = std::make_shared<HostParameters<Scalar>>(1, 1, false);
-			memb.gammas = std::make_shared<HostParameters<Scalar>>(1, 1, true, gamma_init, gamma_reg,
+			memb.avg_means = std::make_shared<StandardParameters<Scalar>>(1, 1, false);
+			memb.avg_inv_sds = std::make_shared<StandardParameters<Scalar>>(1, 1, false);
+			memb.gammas = std::make_shared<StandardParameters<Scalar>>(1, 1, true, gamma_init, gamma_reg,
 					gamma_clip, gamma_max_l1_norm, gamma_max_l2_norm, gamma_grad_clip, gamma_grad_max_l1_norm,
 					gamma_grad_max_l2_norm);
-			memb.betas = std::make_shared<HostParameters<Scalar>>(1, 1, true, beta_init, beta_reg, beta_clip,
+			memb.betas = std::make_shared<StandardParameters<Scalar>>(1, 1, true, beta_init, beta_reg, beta_clip,
 					beta_max_l1_norm, beta_max_l2_norm, beta_grad_clip, beta_grad_max_l1_norm,
 					beta_grad_max_l2_norm);
 			memb.avgs_init = false;
@@ -118,13 +118,13 @@ public:
 				memb1.gammas = memb2.gammas;
 				memb1.betas = memb2.betas;
 			} else {
-				memb1.avg_means = HostParamsSharedPtr(static_cast<HostParameters<Scalar>*>(
+				memb1.avg_means = StdParamsSharedPtr(static_cast<StandardParameters<Scalar>*>(
 						memb2.avg_means->clone()));
-				memb1.avg_inv_sds = HostParamsSharedPtr(static_cast<HostParameters<Scalar>*>(
+				memb1.avg_inv_sds = StdParamsSharedPtr(static_cast<StandardParameters<Scalar>*>(
 						memb2.avg_inv_sds->clone()));
-				memb1.gammas = HostParamsSharedPtr(static_cast<HostParameters<Scalar>*>(
+				memb1.gammas = StdParamsSharedPtr(static_cast<StandardParameters<Scalar>*>(
 						memb2.gammas->clone()));
-				memb1.betas = HostParamsSharedPtr(static_cast<HostParameters<Scalar>*>(
+				memb1.betas = StdParamsSharedPtr(static_cast<StandardParameters<Scalar>*>(
 						memb2.betas->clone()));
 			}
 			memb1.avgs_init = memb2.avgs_init;
@@ -278,10 +278,10 @@ private:
 	RankwiseArray offsets, extents;
 	struct ChannelSpecificMembers {
 		// Dynamic batch normalization parameters.
-		HostParamsSharedPtr avg_means, avg_inv_sds;
+		StdParamsSharedPtr avg_means, avg_inv_sds;
 		bool avgs_init;
 		// The optimizable parameters.
-		HostParamsSharedPtr gammas, betas;
+		StdParamsSharedPtr gammas, betas;
 		// Staged computation cache.
 		Scalar inv_in_sd_cache;
 		Matrix<Scalar> std_in_mat_cache;
@@ -298,7 +298,7 @@ template<typename Scalar, std::size_t Rank>
 class BatchNormLayer<Scalar,Rank,false> : public Layer<Scalar,Rank> {
 	typedef Layer<Scalar,Rank> Base;
 	typedef BatchNormLayer<Scalar,Rank,false> Self;
-	typedef std::shared_ptr<HostParameters<Scalar>> HostParamsSharedPtr;
+	typedef std::shared_ptr<StandardParameters<Scalar>> StdParamsSharedPtr;
 public:
 	/**
 	 * @param dims The dimensionality of the input tensor.
@@ -342,14 +342,14 @@ public:
 				dims(dims),
 				norm_avg_decay(norm_avg_decay),
 				epsilon(epsilon),
-				avg_means(std::make_shared<HostParameters<Scalar>>(1, dims.get_volume(), false)),
-				avg_inv_sds(std::make_shared<HostParameters<Scalar>>(1, dims.get_volume(), false)),
+				avg_means(std::make_shared<StandardParameters<Scalar>>(1, dims.get_volume(), false)),
+				avg_inv_sds(std::make_shared<StandardParameters<Scalar>>(1, dims.get_volume(), false)),
 				avgs_init(false),
-				gammas(std::make_shared<HostParameters<Scalar>>(1, dims.get_volume(), true,
+				gammas(std::make_shared<StandardParameters<Scalar>>(1, dims.get_volume(), true,
 						std::make_shared<OneParameterInitialization<Scalar>>(), gamma_reg, gamma_clip,
 						gamma_max_l1_norm, gamma_max_l2_norm, gamma_grad_clip, gamma_grad_max_l1_norm,
 						gamma_grad_max_l2_norm)),
-				betas(std::make_shared<HostParameters<Scalar>>(1, dims.get_volume(), true,
+				betas(std::make_shared<StandardParameters<Scalar>>(1, dims.get_volume(), true,
 						std::make_shared<ZeroParameterInitialization<Scalar>>(), beta_reg, beta_clip,
 						beta_max_l1_norm, beta_max_l2_norm, beta_grad_clip, beta_grad_max_l1_norm,
 						beta_grad_max_l2_norm)),
@@ -365,14 +365,14 @@ public:
 			epsilon(layer.epsilon),
 			input_layer(layer.input_layer),
 			avg_means(share_params ? layer.avg_means :
-					HostParamsSharedPtr(static_cast<HostParameters<Scalar>*>(layer.avg_means->clone()))),
+					StdParamsSharedPtr(static_cast<StandardParameters<Scalar>*>(layer.avg_means->clone()))),
 			avg_inv_sds(share_params ? layer.avg_inv_sds :
-					HostParamsSharedPtr(static_cast<HostParameters<Scalar>*>(layer.avg_inv_sds->clone()))),
+					StdParamsSharedPtr(static_cast<StandardParameters<Scalar>*>(layer.avg_inv_sds->clone()))),
 			avgs_init(layer.avgs_init),
 			gammas(share_params ? layer.gammas :
-					HostParamsSharedPtr(static_cast<HostParameters<Scalar>*>(layer.gammas->clone()))),
+					StdParamsSharedPtr(static_cast<StandardParameters<Scalar>*>(layer.gammas->clone()))),
 			betas(share_params ? layer.betas :
-					HostParamsSharedPtr(static_cast<HostParameters<Scalar>*>(layer.betas->clone()))),
+					StdParamsSharedPtr(static_cast<StandardParameters<Scalar>*>(layer.betas->clone()))),
 			inv_in_sd_cache(layer.inv_in_sd_cache),
 			std_in_mat_cache(layer.std_in_mat_cache) { }
 	inline Base* clone() const {
@@ -460,10 +460,10 @@ private:
 	const Scalar norm_avg_decay, epsilon;
 	bool input_layer;
 	// Dynamic batch normalization parameters.
-	HostParamsSharedPtr avg_means, avg_inv_sds;
+	StdParamsSharedPtr avg_means, avg_inv_sds;
 	bool avgs_init;
 	// Betas and gammas
-	HostParamsSharedPtr gammas, betas;
+	StdParamsSharedPtr gammas, betas;
 	// Staged computation caches.
 	RowVector<Scalar> inv_in_sd_cache;
 	Matrix<Scalar> std_in_mat_cache;

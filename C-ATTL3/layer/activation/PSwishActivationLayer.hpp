@@ -14,7 +14,7 @@
 
 #include "layer/ActivationLayer.hpp"
 #include "parameter_initialization/ConstantParameterInitialization.hpp"
-#include "parameters/HostParameters.hpp"
+#include "parameters/StandardParameters.hpp"
 
 namespace cattle {
 
@@ -54,7 +54,7 @@ public:
 			ParamRegSharedPtr<Scalar> beta_reg = nullptr, Scalar beta_clip = 0, Scalar beta_max_l1_norm = 0,
 			Scalar beta_max_l2_norm = 0, Scalar beta_grad_clip = 0, Scalar beta_grad_max_l1_norm = 0,
 			Scalar beta_grad_max_l2_norm = 0) :
-				Base::ActivationLayer(dims, std::make_shared<HostParameters<Scalar>>(1, dims.get_volume(),
+				Base::ActivationLayer(dims, std::make_shared<StandardParameters<Scalar>>(1, dims.get_volume(),
 						true, std::make_shared<ConstantParameterInitialization<Scalar>>(init_beta),
 						beta_reg, beta_clip, beta_max_l1_norm, beta_max_l2_norm, beta_grad_clip,
 						beta_grad_max_l1_norm, beta_grad_max_l2_norm)),

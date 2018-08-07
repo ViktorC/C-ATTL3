@@ -86,5 +86,5 @@ int main() {
 		}
 	}
 	// Save the learned parameters.
-	w2v.get_modules()[0]->save_params_values("imdb_w2v_params");
+	w2v.get_modules()[0]->save_all_unique_params_values("imdb_w2v_params");
 }

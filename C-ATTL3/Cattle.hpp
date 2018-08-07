@@ -98,7 +98,7 @@
 #include "parameter_regularization/AbsoluteParameterRegularization.hpp"
 #include "parameter_regularization/ElasticNetParameterRegularization.hpp"
 #include "parameter_regularization/SquaredParameterRegularization.hpp"
-#include "parameters/HostParameters.hpp"
+#include "parameters/StandardParameters.hpp"
 #include "preprocessor/NormalizationPreprocessor.hpp"
 #include "preprocessor/PCAPreprocessor.hpp"
 

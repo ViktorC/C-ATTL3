@@ -81,7 +81,7 @@ $(function() {
 </div><!--header-->
 <div class="contents">
 
-<p>An abstract class template representing a random weight initialization method that samples from a Gaussian distribution.  
+<p>An abstract class template representing a random parameter initialization method that samples from a Gaussian distribution.  
  <a href="classcattle_1_1_gaussian_parameter_initialization.html#details">More...</a></p>
 
 <p><code>#include &lt;<a class="el" href="_gaussian_parameter_initialization_8hpp_source.html">GaussianParameterInitialization.hpp</a>&gt;</code></p>
@@ -101,9 +101,9 @@ Inheritance diagram for cattle::GaussianParameterInitialization&lt; Scalar &gt;:
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:a1928e9da684c9ff620e27481d79a3ea3"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_gaussian_parameter_initialization.html#a1928e9da684c9ff620e27481d79a3ea3">apply</a> (<a class="el" href="namespacecattle.html#a1d78623a47279d516750a44dbad6090b">Matrix</a>&lt; Scalar &gt; &amp;weights) const</td></tr>
-<tr class="memdesc:a1928e9da684c9ff620e27481d79a3ea3"><td class="mdescLeft">&#160;</td><td class="mdescRight">It initializes the values of the kernel.  <a href="#a1928e9da684c9ff620e27481d79a3ea3">More...</a><br /></td></tr>
-<tr class="separator:a1928e9da684c9ff620e27481d79a3ea3"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa2c613481dabb4a9be6c2953899031f8"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_gaussian_parameter_initialization.html#aa2c613481dabb4a9be6c2953899031f8">apply</a> (<a class="el" href="namespacecattle.html#a1d78623a47279d516750a44dbad6090b">Matrix</a>&lt; Scalar &gt; &amp;params) const</td></tr>
+<tr class="memdesc:aa2c613481dabb4a9be6c2953899031f8"><td class="mdescLeft">&#160;</td><td class="mdescRight">It initializes the values of the parameters.  <a href="#aa2c613481dabb4a9be6c2953899031f8">More...</a><br /></td></tr>
+<tr class="separator:aa2c613481dabb4a9be6c2953899031f8"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pro-methods"></a>
 Protected Member Functions</h2></td></tr>
@@ -115,7 +115,7 @@ Protected Member Functions</h2></td></tr>
 <div class="textblock"><h3>template&lt;typename Scalar&gt;<br />
 class cattle::GaussianParameterInitialization&lt; Scalar &gt;</h3>
 
-<p>An abstract class template representing a random weight initialization method that samples from a Gaussian distribution. </p>
+<p>An abstract class template representing a random parameter initialization method that samples from a Gaussian distribution. </p>
 </div><h2 class="groupheader">Member Function Documentation</h2>
 <a id="a34d4eddc64703330b7dbd722589258a3"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a34d4eddc64703330b7dbd722589258a3">&#9670;&nbsp;</a></span>_sd()</h2>
@@ -167,8 +167,8 @@ template&lt;typename Scalar &gt; </div>
 
 </div>
 </div>
-<a id="a1928e9da684c9ff620e27481d79a3ea3"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a1928e9da684c9ff620e27481d79a3ea3">&#9670;&nbsp;</a></span>apply()</h2>
+<a id="aa2c613481dabb4a9be6c2953899031f8"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa2c613481dabb4a9be6c2953899031f8">&#9670;&nbsp;</a></span>apply()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -182,7 +182,7 @@ template&lt;typename Scalar &gt; </div>
           <td class="memname">virtual void <a class="el" href="classcattle_1_1_gaussian_parameter_initialization.html">cattle::GaussianParameterInitialization</a>&lt; Scalar &gt;::apply </td>
           <td>(</td>
           <td class="paramtype"><a class="el" href="namespacecattle.html#a1d78623a47279d516750a44dbad6090b">Matrix</a>&lt; Scalar &gt; &amp;&#160;</td>
-          <td class="paramname"><em>weights</em></td><td>)</td>
+          <td class="paramname"><em>params</em></td><td>)</td>
           <td> const</td>
         </tr>
       </table>
@@ -193,18 +193,17 @@ template&lt;typename Scalar &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p>It initializes the values of the kernel. </p>
-<p>It is assumed that the last row of the kernel is the bias row and is thus treated differently.</p>
+<p>It initializes the values of the parameters. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">weights</td><td>A reference to the weight matrix. </td></tr>
+    <tr><td class="paramname">params</td><td>A reference to the parameter matrix. </td></tr>
   </table>
   </dd>
 </dl>
 
-<p>Implements <a class="el" href="classcattle_1_1_parameter_initialization.html#af35141f35f2a18649b91bb86d00d531e">cattle::ParameterInitialization&lt; Scalar &gt;</a>.</p>
+<p>Implements <a class="el" href="classcattle_1_1_parameter_initialization.html#ae5b13c39866e7fbd191817252261207c">cattle::ParameterInitialization&lt; Scalar &gt;</a>.</p>
 
-<p>Reimplemented in <a class="el" href="classcattle_1_1_orthogonal_parameter_initialization.html#a955e7ededdf8b84f68d6d472cb8d41c9">cattle::OrthogonalParameterInitialization&lt; Scalar &gt;</a>.</p>
+<p>Reimplemented in <a class="el" href="classcattle_1_1_orthogonal_parameter_initialization.html#a69be8e801456d2b592baa7cddc3e9a9b">cattle::OrthogonalParameterInitialization&lt; Scalar &gt;</a>.</p>
 
 </div>
 </div>

@@ -13,7 +13,7 @@
 
 #include "layer/KernelLayer.hpp"
 #include "parameter_initialization/ZeroParameterInitialization.hpp"
-#include "parameters/HostParameters.hpp"
+#include "parameters/StandardParameters.hpp"
 
 namespace cattle {
 
@@ -45,11 +45,11 @@ protected:
 				Base::KernelLayer(input_dims, calculate_adjusted_output_dims(input_dims, filters,
 						receptor_height, receptor_width, vertical_padding, horizontal_padding,
 						vertical_stride, horizontal_stride, vertical_dilation, horizontal_dilation),
-						std::make_shared<HostParameters<Scalar>>(receptor_height * receptor_width *
+						std::make_shared<StandardParameters<Scalar>>(receptor_height * receptor_width *
 								input_dims.template extend<3 - Rank>()(2), filters, true, weight_init,
 								weight_reg, weight_clip, weight_max_l1_norm, weight_max_l2_norm,
 								weight_grad_clip, weight_grad_max_l1_norm, weight_grad_max_l2_norm),
-						std::make_shared<HostParameters<Scalar>>(1, filters, true,
+						std::make_shared<StandardParameters<Scalar>>(1, filters, true,
 								std::make_shared<ZeroParameterInitialization<Scalar>>(), bias_reg,
 								bias_clip, bias_max_l1_norm, bias_max_l2_norm, bias_grad_clip,
 								bias_grad_max_l1_norm, bias_grad_max_l2_norm)),

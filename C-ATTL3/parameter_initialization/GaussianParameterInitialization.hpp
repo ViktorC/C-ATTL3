@@ -15,7 +15,7 @@
 namespace cattle {
 
 /**
- * An abstract class template representing a random weight initialization method
+ * An abstract class template representing a random parameter initialization method
  * that samples from a Gaussian distribution.
  */
 template<typename Scalar>
@@ -24,14 +24,14 @@ public:
 	inline GaussianParameterInitialization(Scalar sd_scaling_factor = 1) :
 		sd_scaling_factor(sd_scaling_factor) { }
 	virtual ~GaussianParameterInitialization() = default;
-	inline virtual void apply(Matrix<Scalar>& weights) const {
-		int rows = weights.rows();
-		int cols = weights.cols();
+	inline virtual void apply(Matrix<Scalar>& params) const {
+		int rows = params.rows();
+		int cols = params.cols();
 		std::default_random_engine gen;
 		std::normal_distribution<Scalar> dist(0, sd_scaling_factor * _sd(rows, cols));
 		for (int i = 0; i < cols; ++i) {
 			for (int j = 0; j < rows; ++j)
-				weights(j,i) = dist(gen);
+				params(j,i) = dist(gen);
 		}
 	}
 protected:

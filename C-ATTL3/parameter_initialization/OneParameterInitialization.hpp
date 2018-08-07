@@ -13,13 +13,13 @@
 namespace cattle {
 
 /**
- * A class template for a weight initialization that sets all values to 1.
+ * A class template for a parameter initialization that sets all values to 1.
  */
 template<typename Scalar>
 class OneParameterInitialization : public ParameterInitialization<Scalar> {
 public:
-	inline void apply(Matrix<Scalar>& weights) const {
-		weights.setOnes(weights.rows(), weights.cols());
+	inline void apply(Matrix<Scalar>& params) const {
+		params.setOnes(params.rows(), params.cols());
 	}
 };
 
