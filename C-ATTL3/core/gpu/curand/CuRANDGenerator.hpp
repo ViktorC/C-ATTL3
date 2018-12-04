@@ -18,25 +18,15 @@ namespace {
 
 template<typename Scalar>
 using NormalGenerationRoutine = curandStatus_t (*)(curandGenerator_t, Scalar*, std::size_t, Scalar, Scalar);
-
-template<typename Scalar> __inline__ NormalGenerationRoutine<Scalar> resolve_normal_gen_routine() {
-	return &curandGenerateNormalDouble;
-}
-
-template<> __inline__ NormalGenerationRoutine<float> resolve_normal_gen_routine() {
-	return &curandGenerateNormal;
-}
+template<typename Scalar>
+__inline__ NormalGenerationRoutine<Scalar> normal_gen_routine() { return &curandGenerateNormalDouble; }
+template<> __inline__ NormalGenerationRoutine<float> normal_gen_routine() { return &curandGenerateNormal; }
 
 template<typename Scalar>
 using UniformGenerationRoutine = curandStatus_t (*)(curandGenerator_t, Scalar*, std::size_t);
-
-template<typename Scalar> __inline__ UniformGenerationRoutine<Scalar> resolve_uniform_gen_routine() {
-	return &curandGenerateUniformDouble;
-}
-
-template<> __inline__ UniformGenerationRoutine<float> resolve_uniform_gen_routine() {
-	return &curandGenerateUniform;
-}
+template<typename Scalar>
+__inline__ UniformGenerationRoutine<Scalar> uniform_gen_routine() { return &curandGenerateUniformDouble; }
+template<> __inline__ UniformGenerationRoutine<float> uniform_gen_routine() { return &curandGenerateUniform; }
 
 }
 
@@ -61,14 +51,14 @@ public:
 	 * @param array The device array to fill with the randomly generated numbers.
 	 */
 	inline void generate_normal(Scalar mean, Scalar sd, CUDAArray<Scalar>& array) const {
-		NormalGenerationRoutine<Scalar> norm_gen = resolve_normal_gen_routine<Scalar>();
+		NormalGenerationRoutine<Scalar> norm_gen = normal_gen_routine<Scalar>();
 		curandAssert(norm_gen(gen, array.data(), array.size() * sizeof(Scalar), mean, sd));
 	}
 	/**
 	 * @param array The device array to fill with the randomly generated numbers.
 	 */
 	inline void generate_uniform(CUDAArray<Scalar>& array) const {
-		UniformGenerationRoutine<Scalar> uni_gen = resolve_uniform_gen_routine<Scalar>();
+		UniformGenerationRoutine<Scalar> uni_gen = uniform_gen_routine<Scalar>();
 		curandAssert(uni_gen(gen, array.data(), array.size() * sizeof(Scalar)));
 	}
 private:

@@ -96,8 +96,8 @@ Inheritance diagram for cattle::ElasticNetParameterRegularization&lt; Scalar &gt
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:a86ddcfde14ec8649730653f362290821"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_elastic_net_parameter_regularization.html#a86ddcfde14ec8649730653f362290821">ElasticNetParameterRegularization</a> (Scalar abs_lambda=1e-2, Scalar sqrd_lambda=1e-2)</td></tr>
-<tr class="separator:a86ddcfde14ec8649730653f362290821"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a863f8f9672d6629ca5867aa1501eff12"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_elastic_net_parameter_regularization.html#a863f8f9672d6629ca5867aa1501eff12">ElasticNetParameterRegularization</a> (Scalar l1_lambda=1e-2, Scalar l2_lambda=1e-2)</td></tr>
+<tr class="separator:a863f8f9672d6629ca5867aa1501eff12"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aa4f6e529ada73c8a802a30096fe06b46"><td class="memItemLeft" align="right" valign="top">Scalar&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_elastic_net_parameter_regularization.html#aa4f6e529ada73c8a802a30096fe06b46">function</a> (const <a class="el" href="namespacecattle.html#a1d78623a47279d516750a44dbad6090b">Matrix</a>&lt; Scalar &gt; &amp;params) const</td></tr>
 <tr class="memdesc:aa4f6e529ada73c8a802a30096fe06b46"><td class="mdescLeft">&#160;</td><td class="mdescRight">It computes the regularization penalty for the given parameter values.  <a href="#aa4f6e529ada73c8a802a30096fe06b46">More...</a><br /></td></tr>
 <tr class="separator:aa4f6e529ada73c8a802a30096fe06b46"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -110,11 +110,11 @@ Public Member Functions</h2></td></tr>
 class cattle::ElasticNetParameterRegularization&lt; Scalar &gt;</h3>
 
 <p>A class template for the elastic net regularization penalty which is a combination of the L1 and L2 regularization penalties. </p>
-<p>\(P = \sum\limits_{i = 1}^n \left|w_i\right| + w_i^2\)</p>
+<p>\(P = \lambda_1 \sum\limits_{i = 1}^n \left|w_i\right| + \frac{\lambda_2}{2} \sum\limits_{i = 1}^n w_i^2\)</p>
 <dl class="section see"><dt>See also</dt><dd><a href="http://citeseerx.ist.psu.edu/viewdoc/summary?doi=10.1.1.124.4696">http://citeseerx.ist.psu.edu/viewdoc/summary?doi=10.1.1.124.4696</a> </dd></dl>
 </div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
-<a id="a86ddcfde14ec8649730653f362290821"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a86ddcfde14ec8649730653f362290821">&#9670;&nbsp;</a></span>ElasticNetParameterRegularization()</h2>
+<a id="a863f8f9672d6629ca5867aa1501eff12"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a863f8f9672d6629ca5867aa1501eff12">&#9670;&nbsp;</a></span>ElasticNetParameterRegularization()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -128,13 +128,13 @@ template&lt;typename Scalar &gt; </div>
           <td class="memname"><a class="el" href="classcattle_1_1_elastic_net_parameter_regularization.html">cattle::ElasticNetParameterRegularization</a>&lt; Scalar &gt;::<a class="el" href="classcattle_1_1_elastic_net_parameter_regularization.html">ElasticNetParameterRegularization</a> </td>
           <td>(</td>
           <td class="paramtype">Scalar&#160;</td>
-          <td class="paramname"><em>abs_lambda</em> = <code>1e-2</code>, </td>
+          <td class="paramname"><em>l1_lambda</em> = <code>1e-2</code>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">Scalar&#160;</td>
-          <td class="paramname"><em>sqrd_lambda</em> = <code>1e-2</code>&#160;</td>
+          <td class="paramname"><em>l2_lambda</em> = <code>1e-2</code>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -150,8 +150,8 @@ template&lt;typename Scalar &gt; </div>
 </div><div class="memdoc">
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">abs_lambda</td><td>The constant by which the L1 penalty is to be scaled. </td></tr>
-    <tr><td class="paramname">sqrd_lambda</td><td>The constant by which the L2 penalty is to be scaled. </td></tr>
+    <tr><td class="paramname">l1_lambda</td><td>The constant by which the L1 penalty is to be scaled. </td></tr>
+    <tr><td class="paramname">l2_lambda</td><td>The constant by which the L2 penalty is to be scaled. </td></tr>
   </table>
   </dd>
 </dl>
@@ -239,7 +239,7 @@ template&lt;typename Scalar &gt; </div>
 </div>
 </div>
 <hr/>The documentation for this class was generated from the following file:<ul>
-<li>C:/Users/Viktor/git/C-ATTL3/C-ATTL3/parameter_regularization/<a class="el" href="_elastic_net_parameter_regularization_8hpp_source.html">ElasticNetParameterRegularization.hpp</a></li>
+<li>/Users/viktorcsomor/git/C-ATTL3/C-ATTL3/parameter_regularization/<a class="el" href="_elastic_net_parameter_regularization_8hpp_source.html">ElasticNetParameterRegularization.hpp</a></li>
 </ul>
 </div><!-- contents -->
 <!-- start footer part -->

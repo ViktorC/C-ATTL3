@@ -58,8 +58,8 @@ These weight initializations aim to mitigate the problem of vanishing and explod
 #### ParameterRegularization
 Parametric layers, i.e. layers with learnable parameters, also support parameter regularization. The standard regularization penalty functions are:
 * [ParameterRegularization](https://viktorc.github.io/C-ATTL3/html/classcattle_1_1_regularization_penalty.html) [A]
-  * [AbsoluteParameterRegularization](https://viktorc.github.io/C-ATTL3/html/classcattle_1_1_absolute_parameter_regularization.html)
-  * [SquaredParameterRegularization](https://viktorc.github.io/C-ATTL3/html/classcattle_1_1_squared_parameter_regularization.html)
+  * [L1ParameterRegularization](https://viktorc.github.io/C-ATTL3/html/classcattle_1_1_l1_parameter_regularization.html)
+  * [L2ParameterRegularization](https://viktorc.github.io/C-ATTL3/html/classcattle_1_1_l2_parameter_regularization.html)
   * [ElasticNetParameterRegularization](https://viktorc.github.io/C-ATTL3/html/classcattle_1_1_elastic_net_parameter_regularization.html)
 
 These regularizations are counter measures against overfitting. They are especially useful in complex networks with a huge number of parameters. L1 regularization adds the sum of the absolute values of the parameters to the total loss, L2 regularization adds the sum of the squared values of the paramaters to the loss, and the elastic net regularization combines the other two.
@@ -163,7 +163,7 @@ MemoryDataProvider<float,3,false> test_prov(std::move(test_obs_ptr), std::move(t
 The test data provider is created similarly. However, it is important not to re-fit the preprocessor to the observation data set to ensure that the same transformation is applied to both the training and the test data. This test data is used to assess the accuracy of the neural network on data it has not encountered during the training process. This provides a measure of the network's generalization ability; the difference between the network's accuracy on the training data and that on the test data is a metric of overfitting. The test data is usually a smaller portion of all the available data than the training data. In our example, it is 20 samples as opposed to the 80 comprising the training data. Note that all the other ranks of the test observation and objective tensors must match those of the training observation and objective tensors.
 ```cpp
 auto init = std::make_shared<HeParameterInitialization<float>>();
-auto reg = std::make_shared<SquaredParameterRegularization<float>>();
+auto reg = std::make_shared<L2ParameterRegularization<float>>();
 std::vector<LayerPtr<float,3>> layers(9);
 layers[0] = LayerPtr<float,3>(new ConvKernelLayer<float>(train_prov.get_obs_dims(), 10, init,
 		5, 5, 2, 2, 1, 1, 0, 0, reg));

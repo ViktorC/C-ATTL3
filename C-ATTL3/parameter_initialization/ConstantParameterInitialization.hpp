@@ -18,6 +18,10 @@ namespace cattle {
 template<typename Scalar>
 class ConstantParameterInitialization : public ParameterInitialization<Scalar> {
 public:
+	/**
+	 * @param constant The value to which all elements of the parameter matrix are to be
+	 * initialized.
+	 */
 	ConstantParameterInitialization(Scalar constant) :
 			constant(constant) { }
 	inline void apply(Matrix<Scalar>& params) const {

@@ -65,7 +65,7 @@ public:
 			ParamRegSharedPtr<Scalar> bias_reg = nullptr, Scalar bias_clip = 0, Scalar bias_max_l1_norm = 0,
 			Scalar bias_max_l2_norm = 0, Scalar bias_grad_clip = 0, Scalar bias_grad_max_l1_norm = 0,
 			Scalar bias_grad_max_l2_norm = 0) :
-				Base::KernelLayer(input_dims, { output_size },
+				Base(input_dims, { output_size },
 						std::make_shared<StandardParameters<Scalar>>(input_dims.get_volume(), output_size, true,
 								weight_init, weight_reg, weight_clip, weight_max_l1_norm, weight_max_l2_norm,
 								weight_grad_clip, weight_grad_max_l1_norm, weight_grad_max_l2_norm),
@@ -76,7 +76,7 @@ public:
 				out_conversion_dims(Base::output_dims.template promote<>()),
 				prev_out_conversion_dims(Base::input_dims.template promote<>()) { }
 	inline DenseKernelLayer(const DenseKernelLayer<Scalar,Rank>& layer, bool share_params = false) :
-				Base::KernelLayer(layer, share_params),
+				Base(layer, share_params),
 				out_conversion_dims(layer.out_conversion_dims),
 				prev_out_conversion_dims(layer.prev_out_conversion_dims),
 				in_mat_cache(layer.in_mat_cache) { }

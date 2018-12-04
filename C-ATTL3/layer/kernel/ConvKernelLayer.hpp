@@ -42,9 +42,9 @@ protected:
 			Scalar bias_grad_max_l1_norm, Scalar bias_grad_max_l2_norm) :
 				/* For every filter, there is a column in the weight matrix with the same number of
 				 * elements as the area of the receptive field (F * F * D). */
-				Base::KernelLayer(input_dims, calculate_adjusted_output_dims(input_dims, filters,
-						receptor_height, receptor_width, vertical_padding, horizontal_padding,
-						vertical_stride, horizontal_stride, vertical_dilation, horizontal_dilation),
+				Base(input_dims, calculate_adjusted_output_dims(input_dims, filters, receptor_height,
+						receptor_width, vertical_padding, horizontal_padding, vertical_stride, horizontal_stride,
+						vertical_dilation, horizontal_dilation),
 						std::make_shared<StandardParameters<Scalar>>(receptor_height * receptor_width *
 								input_dims.template extend<3 - Rank>()(2), filters, true, weight_init,
 								weight_reg, weight_clip, weight_max_l1_norm, weight_max_l2_norm,
@@ -87,7 +87,7 @@ protected:
 				ext_input_dims(1) + 2 * horizontal_padding >= dil_receptor_width);
 	}
 	inline ConvKernelLayerBase(const ConvKernelLayerBase<Scalar,Rank>& layer, bool share_params = false) :
-			Base::KernelLayer(layer, share_params),
+			Base(layer, share_params),
 			filters(layer.filters),
 			receptor_height(layer.receptor_height),
 			receptor_width(layer.receptor_width),

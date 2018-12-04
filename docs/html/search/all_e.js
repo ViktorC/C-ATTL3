@@ -9,6 +9,7 @@ var searchData=
   ['neuralnetwork_3c_20scalar_2c_20rank_2c_20true_20_3e',['NeuralNetwork&lt; Scalar, Rank, true &gt;',['../classcattle_1_1_neural_network.html',1,'cattle']]],
   ['normalizationpreprocessor',['NormalizationPreprocessor',['../classcattle_1_1_normalization_preprocessor.html',1,'cattle::NormalizationPreprocessor&lt; Scalar, Rank, Standardize, PerLastRank &gt;'],['../classcattle_1_1_normalization_preprocessor.html#a851cba3ef2aa08605deb3df0c05d58da',1,'cattle::NormalizationPreprocessor::NormalizationPreprocessor()'],['../classcattle_1_1_normalization_preprocessor_3_01_scalar_00_01_rank_00_01_standardize_00_01false_01_4.html#a1529c1e96e81eeb597e4958942a07964',1,'cattle::NormalizationPreprocessor&lt; Scalar, Rank, Standardize, false &gt;::NormalizationPreprocessor()']]],
   ['normalizationpreprocessor_3c_20scalar_2c_20rank_2c_20standardize_2c_20false_20_3e',['NormalizationPreprocessor&lt; Scalar, Rank, Standardize, false &gt;',['../classcattle_1_1_normalization_preprocessor_3_01_scalar_00_01_rank_00_01_standardize_00_01false_01_4.html',1,'cattle']]],
+  ['nrm2',['nrm2',['../classcattle_1_1gpu_1_1_cu_b_l_a_s_matrix.html#a43c2a87d43b3bed5ae656a8252c6afbb',1,'cattle::gpu::CuBLASMatrix']]],
   ['num_5fof_5feval_5fthreads',['num_of_eval_threads',['../namespacecattle.html#ad8bac69b844017213ccca0706d78f57b',1,'cattle']]],
   ['numericutils',['NumericUtils',['../classcattle_1_1_numeric_utils.html',1,'cattle']]]
 ];

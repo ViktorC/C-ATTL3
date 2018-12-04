@@ -8,6 +8,7 @@
 #ifndef C_ATTL3_PARAMETER_INITIALIZATION_GAUSSIANPARAMETERINITIALIZATION_H_
 #define C_ATTL3_PARAMETER_INITIALIZATION_GAUSSIANPARAMETERINITIALIZATION_H_
 
+#include <cassert>
 #include <random>
 
 #include "core/ParameterInitialization.hpp"
@@ -21,14 +22,21 @@ namespace cattle {
 template<typename Scalar>
 class GaussianParameterInitialization : public ParameterInitialization<Scalar> {
 public:
-	inline GaussianParameterInitialization(Scalar sd_scaling_factor = 1) :
-		sd_scaling_factor(sd_scaling_factor) { }
+	/**
+	 * @param mean The mean of the distribution.
+	 * @param sd_scaling_factor The standard deviation scaling factor.
+	 */
+	inline GaussianParameterInitialization(Scalar mean = 0, Scalar sd_scaling_factor = 1) :
+			mean(mean),
+			sd_scaling_factor(sd_scaling_factor) {
+		assert(sd_scaling_factor > 0);
+	}
 	virtual ~GaussianParameterInitialization() = default;
 	inline virtual void apply(Matrix<Scalar>& params) const {
 		int rows = params.rows();
 		int cols = params.cols();
 		std::default_random_engine gen;
-		std::normal_distribution<Scalar> dist(0, sd_scaling_factor * _sd(rows, cols));
+		std::normal_distribution<Scalar> dist(mean, sd_scaling_factor * _sd(rows, cols));
 		for (int i = 0; i < cols; ++i) {
 			for (int j = 0; j < rows; ++j)
 				params(j,i) = dist(gen);
@@ -49,7 +57,7 @@ protected:
 		return 1;
 	}
 private:
-	const Scalar sd_scaling_factor;
+	const Scalar mean, sd_scaling_factor;
 };
 
 }

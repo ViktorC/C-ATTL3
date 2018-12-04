@@ -40,9 +40,9 @@ protected:
 			Scalar weight_grad_max_l2_norm, ParamRegSharedPtr<Scalar> bias_reg, Scalar bias_clip,
 			Scalar bias_max_l1_norm, Scalar bias_max_l2_norm, Scalar bias_grad_clip,
 			Scalar bias_grad_max_l1_norm, Scalar bias_grad_max_l2_norm) :
-				Base::KernelLayer(input_dims, calculate_adjusted_output_dims(input_dims, filters,
-						receptor_height, receptor_width, vertical_padding, horizontal_padding,
-						vertical_stride, horizontal_stride, vertical_dilation, horizontal_dilation),
+				Base(input_dims, calculate_adjusted_output_dims(input_dims, filters, receptor_height,
+						receptor_width, vertical_padding, horizontal_padding, vertical_stride, horizontal_stride,
+						vertical_dilation, horizontal_dilation),
 						std::make_shared<StandardParameters<Scalar>>(input_dims.template extend<3 - Rank>()(2),
 								receptor_height * receptor_width * filters, true, weight_init, weight_reg,
 								weight_clip, weight_max_l1_norm, weight_max_l2_norm, weight_grad_clip,
@@ -87,7 +87,7 @@ protected:
 				ext_output_dims(1) + 2 * horizontal_padding >= dil_receptor_width);
 	}
 	inline TransConvKernelLayerBase(const TransConvKernelLayerBase<Scalar,Rank>& layer, bool share_params = false) :
-			Base::KernelLayer(layer, share_params),
+			Base(layer, share_params),
 			filters(layer.filters),
 			receptor_height(layer.receptor_height),
 			receptor_width(layer.receptor_width),

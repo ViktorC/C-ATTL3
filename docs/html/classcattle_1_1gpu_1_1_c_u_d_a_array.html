@@ -90,13 +90,15 @@ Inheritance diagram for cattle::gpu::CUDAArray&lt; Scalar &gt;:</div>
  <div class="center">
   <img src="classcattle_1_1gpu_1_1_c_u_d_a_array.png" usemap="#cattle::gpu::CUDAArray_3C_20Scalar_20_3E_map" alt=""/>
   <map id="cattle::gpu::CUDAArray_3C_20Scalar_20_3E_map" name="cattle::gpu::CUDAArray_3C_20Scalar_20_3E_map">
-<area href="classcattle_1_1gpu_1_1_cu_d_n_n_tensor.html" title="A template class for representing cuDNN device tensors of different data types. " alt="cattle::gpu::CuDNNTensor&lt; Scalar &gt;" shape="rect" coords="0,56,218,80"/>
-<area href="classcattle_1_1gpu_1_1_cu_d_n_n_filter.html" title="A template class representing cuDNN filter tensors for convolution. " alt="cattle::gpu::CuDNNFilter&lt; Scalar &gt;" shape="rect" coords="0,112,218,136"/>
+<area href="classcattle_1_1gpu_1_1_cu_b_l_a_s_matrix.html" title="A template class for column-major cuBLAS device matrices of different data types. ..." alt="cattle::gpu::CuBLASMatrix&lt; Scalar &gt;" shape="rect" coords="0,56,219,80"/>
+<area href="classcattle_1_1gpu_1_1_cu_d_n_n_tensor.html" title="A template class for representing row-major cuDNN device tensors of different data types..." alt="cattle::gpu::CuDNNTensor&lt; Scalar &gt;" shape="rect" coords="229,56,448,80"/>
 </map>
  </div></div>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
+<tr class="memitem:a9c8b083433ece6cdbcb48a4af77cdd18"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1gpu_1_1_c_u_d_a_array.html#a9c8b083433ece6cdbcb48a4af77cdd18">CUDAArray</a> (Scalar *<a class="el" href="classcattle_1_1gpu_1_1_c_u_d_a_array.html#a3bd7455c00b1cb1cf3d31a849429e4d9">data</a>, std::size_t <a class="el" href="classcattle_1_1gpu_1_1_c_u_d_a_array.html#a5d242f9908e1a4448a4585e220ef7ca1">size</a>)</td></tr>
+<tr class="separator:a9c8b083433ece6cdbcb48a4af77cdd18"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a7e697aa1a2e02fedbd79fb97a810b018"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1gpu_1_1_c_u_d_a_array.html#a7e697aa1a2e02fedbd79fb97a810b018">CUDAArray</a> (std::size_t <a class="el" href="classcattle_1_1gpu_1_1_c_u_d_a_array.html#a5d242f9908e1a4448a4585e220ef7ca1">size</a>)</td></tr>
 <tr class="separator:a7e697aa1a2e02fedbd79fb97a810b018"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a5d242f9908e1a4448a4585e220ef7ca1"><td class="memItemLeft" align="right" valign="top">std::size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1gpu_1_1_c_u_d_a_array.html#a5d242f9908e1a4448a4585e220ef7ca1">size</a> () const</td></tr>
@@ -105,6 +107,8 @@ Public Member Functions</h2></td></tr>
 <tr class="separator:a3bd7455c00b1cb1cf3d31a849429e4d9"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a5b8ace0183f8b7a7f99ce906d55d7d16"><td class="memItemLeft" align="right" valign="top">Scalar *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1gpu_1_1_c_u_d_a_array.html#a5b8ace0183f8b7a7f99ce906d55d7d16">data</a> ()</td></tr>
 <tr class="separator:a5b8ace0183f8b7a7f99ce906d55d7d16"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab931d02fc70e4c845fc9227c3c943c96"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1gpu_1_1_c_u_d_a_array.html#ab931d02fc70e4c845fc9227c3c943c96">wrapper</a> () const</td></tr>
+<tr class="separator:ab931d02fc70e4c845fc9227c3c943c96"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a386d142c81ce70f35b43bc0802a89ad3"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1gpu_1_1_c_u_d_a_array.html#a386d142c81ce70f35b43bc0802a89ad3">set_values</a> (int value)</td></tr>
 <tr class="separator:a386d142c81ce70f35b43bc0802a89ad3"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a53a0b01db3d84497c5c7c47a8582a22d"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1gpu_1_1_c_u_d_a_array.html#a53a0b01db3d84497c5c7c47a8582a22d">copy_from_host</a> (const Scalar *host_array)</td></tr>
@@ -120,8 +124,53 @@ class cattle::gpu::CUDAArray&lt; Scalar &gt;</h3>
 
 <p>A template class for CUDA device arrays of different data types. </p>
 </div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
+<a id="a9c8b083433ece6cdbcb48a4af77cdd18"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a9c8b083433ece6cdbcb48a4af77cdd18">&#9670;&nbsp;</a></span>CUDAArray() <span class="overload">[1/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename Scalar&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classcattle_1_1gpu_1_1_c_u_d_a_array.html">cattle::gpu::CUDAArray</a>&lt; Scalar &gt;::<a class="el" href="classcattle_1_1gpu_1_1_c_u_d_a_array.html">CUDAArray</a> </td>
+          <td>(</td>
+          <td class="paramtype">Scalar *&#160;</td>
+          <td class="paramname"><em>data</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">std::size_t&#160;</td>
+          <td class="paramname"><em>size</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">data</td><td>The device array to wrap in a <a class="el" href="classcattle_1_1gpu_1_1_c_u_d_a_array.html" title="A template class for CUDA device arrays of different data types. ">CUDAArray</a>. The ownership of the pointer is not transfered to the created <a class="el" href="classcattle_1_1gpu_1_1_c_u_d_a_array.html" title="A template class for CUDA device arrays of different data types. ">CUDAArray</a> instance. </td></tr>
+    <tr><td class="paramname">size</td><td>The number of elements the array is to have. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
 <a id="a7e697aa1a2e02fedbd79fb97a810b018"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a7e697aa1a2e02fedbd79fb97a810b018">&#9670;&nbsp;</a></span>CUDAArray()</h2>
+<h2 class="memtitle"><span class="permalink"><a href="#a7e697aa1a2e02fedbd79fb97a810b018">&#9670;&nbsp;</a></span>CUDAArray() <span class="overload">[2/2]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -345,8 +394,36 @@ template&lt;typename Scalar&gt; </div>
 
 </div>
 </div>
+<a id="ab931d02fc70e4c845fc9227c3c943c96"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab931d02fc70e4c845fc9227c3c943c96">&#9670;&nbsp;</a></span>wrapper()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename Scalar&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool <a class="el" href="classcattle_1_1gpu_1_1_c_u_d_a_array.html">cattle::gpu::CUDAArray</a>&lt; Scalar &gt;::wrapper </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<dl class="section return"><dt>Returns</dt><dd>Whether the instance is just a wrapper over a device array that it does not own. </dd></dl>
+
+</div>
+</div>
 <hr/>The documentation for this class was generated from the following file:<ul>
-<li>C:/Users/Viktor/git/C-ATTL3/C-ATTL3/core/gpu/cuda/<a class="el" href="_c_u_d_a_array_8hpp_source.html">CUDAArray.hpp</a></li>
+<li>/Users/viktorcsomor/git/C-ATTL3/C-ATTL3/core/gpu/cuda/<a class="el" href="_c_u_d_a_array_8hpp_source.html">CUDAArray.hpp</a></li>
 </ul>
 </div><!-- contents -->
 <!-- start footer part -->

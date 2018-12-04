@@ -24,7 +24,7 @@ public:
 	 * @param sd The standard deviation of the normal distribution to sample from.
 	 */
 	inline OrthogonalParameterInitialization(Scalar sd = 1) :
-			GaussianParameterInitialization<Scalar>::GaussianParameterInitialization(sd) { }
+			GaussianParameterInitialization<Scalar>(0, sd) { }
 	inline void apply(Matrix<Scalar>& params) const {
 		GaussianParameterInitialization<Scalar>::apply(params);
 		int rows = params.rows();

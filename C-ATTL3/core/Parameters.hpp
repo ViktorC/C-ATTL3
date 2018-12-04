@@ -39,9 +39,13 @@ public:
 	 */
 	virtual std::size_t get_cols() const = 0;
 	/**
-	 * It initializes the parameters.
+	 * It initializes the values of the parameters.
 	 */
-	virtual void init() = 0;
+	virtual void init_values() = 0;
+	/**
+	 * It initializes the gradient of the parameters.
+	 */
+	virtual void init_grad() = 0;
 	/**
 	 * @return A constant reference to the values of the parameters.
 	 */
@@ -81,6 +85,13 @@ public:
 	 * @param frozen Whether the parameters are to be frozen, i.e. not to be updated.
 	 */
 	virtual void set_frozen(bool frozen) = 0;
+	/**
+	 * It initializes both the values and the gradient of the parameters.
+	 */
+	inline virtual void init() {
+		init_values();
+		init_grad();
+	}
 };
 
 } /* namespace cattle */

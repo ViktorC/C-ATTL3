@@ -88,11 +88,16 @@ public:
 	inline std::size_t get_cols() const {
 		return cols;
 	}
-	inline void init() {
+	inline void init_values() {
 		values = Matrix<Scalar>(rows, cols);
 		if (param_init)
 			param_init->apply(values);
-		reset_grad();
+	}
+	inline void init_grad() {
+		if (optimizable) {
+			grad = Matrix<Scalar>(rows, cols);
+			reset_grad();
+		}
 	}
 	inline const Matrix<Scalar>& get_values() const {
 		return values;
@@ -118,7 +123,7 @@ public:
 	}
 	inline void reset_grad() {
 		if (optimizable)
-			grad = Matrix<Scalar>::Zero(rows, cols);
+			grad.setZero();
 	}
 	inline Scalar get_regularization_penalty() const {
 		if (optimizable && param_reg)

@@ -19,7 +19,6 @@
 #include "Cattle.hpp"
 #include "test_utils.hpp"
 
-
 namespace cattle {
 namespace test {
 
@@ -143,8 +142,8 @@ template<typename Scalar>
 inline void dense_kernel_layer_grad_test() {
 	auto init1 = std::make_shared<GlorotParameterInitialization<Scalar>>();
 	auto init2 = std::make_shared<LeCunParameterInitialization<Scalar>>();
-	auto reg1 = std::make_shared<AbsoluteParameterRegularization<Scalar>>();
-	auto reg2 = std::make_shared<SquaredParameterRegularization<Scalar>>();
+	auto reg1 = std::make_shared<L1ParameterRegularization<Scalar>>();
+	auto reg2 = std::make_shared<L2ParameterRegularization<Scalar>>();
 	auto reg3 = std::make_shared<ElasticNetParameterRegularization<Scalar>>();
 	LayerPtr<Scalar,1> layer1_1(new DenseKernelLayer<Scalar,1>({ 32u }, 16, init1));
 	LayerPtr<Scalar,1> layer1_2(new DenseKernelLayer<Scalar,1>(layer1_1->get_output_dims(), 1, init1, reg3));
@@ -167,7 +166,7 @@ TEST(GradientTest, DenseKernelLayer) {
 template<typename Scalar>
 inline void conv_kernel_layer_grad_test() {
 	auto init = std::make_shared<HeParameterInitialization<Scalar>>();
-	auto reg = std::make_shared<SquaredParameterRegularization<Scalar>>();
+	auto reg = std::make_shared<L2ParameterRegularization<Scalar>>();
 	LayerPtr<Scalar,1> layer1_1(new ConvKernelLayer<Scalar,1>({ 32u }, 5, init, 3, 2, 1, 1));
 	LayerPtr<Scalar,1> layer2_1(new ConvKernelLayer<Scalar,1>(layer1_1->get_output_dims(), 1, init, 3, 1, 1, 0, reg));
 	layer_grad_test<Scalar,1>("convolution kernel layer ", std::move(layer1_1), std::move(layer2_1));
@@ -191,7 +190,7 @@ TEST(GradientTest, ConvKernelLayer) {
 template<typename Scalar>
 inline void trans_conv_kernel_layer_grad_test() {
 	auto init = ParamInitSharedPtr<Scalar>(new HeParameterInitialization<Scalar>());
-	auto reg = ParamRegSharedPtr<Scalar>(new SquaredParameterRegularization<Scalar>());
+	auto reg = ParamRegSharedPtr<Scalar>(new L2ParameterRegularization<Scalar>());
 	LayerPtr<Scalar,1> layer1_1(new TransConvKernelLayer<Scalar,1>({ 16u }, 5, init, 4, 1, 1, 1));
 	LayerPtr<Scalar,1> layer2_1(new TransConvKernelLayer<Scalar,1>(layer1_1->get_output_dims(), 1, init, 1, 1, 1, 0, reg));
 	layer_grad_test<Scalar,1>("trans_convolution kernel layer ", std::move(layer1_1), std::move(layer2_1));
@@ -259,7 +258,7 @@ inline void activation_layer_grad_test(const Dimensions<std::size_t,Rank>& dims)
 	Dimensions<std::size_t,Rank> dims_11 = kernel_layer_11->get_output_dims();
 	layer_grad_test<Scalar,Rank>("elu activation layer", std::move(kernel_layer_11),
 			LayerPtr<Scalar,Rank>(new ELUActivationLayer<Scalar,Rank>(dims_11, 2e-1)));
-	auto reg = ParamRegSharedPtr<Scalar>(new SquaredParameterRegularization<Scalar>());
+	auto reg = ParamRegSharedPtr<Scalar>(new L2ParameterRegularization<Scalar>());
 	layer_grad_test<Scalar,Rank>("prelu activation layer rank",
 			LayerPtr<Scalar,Rank>(new PReLUActivationLayer<Scalar,Rank>(dims, 2e-1, reg)),
 			LayerPtr<Scalar,Rank>(new PReLUActivationLayer<Scalar,Rank>(dims)));
@@ -346,8 +345,8 @@ TEST(GradientTest, BroadcastLayer) {
 template<typename Scalar>
 inline void batch_norm_layer_grad_test() {
 	auto init = ParamInitSharedPtr<Scalar>(new HeParameterInitialization<Scalar>());
-	auto reg1 = ParamRegSharedPtr<Scalar>(new AbsoluteParameterRegularization<Scalar>());
-	auto reg2 = ParamRegSharedPtr<Scalar>(new SquaredParameterRegularization<Scalar>());
+	auto reg1 = ParamRegSharedPtr<Scalar>(new L1ParameterRegularization<Scalar>());
+	auto reg2 = ParamRegSharedPtr<Scalar>(new L2ParameterRegularization<Scalar>());
 	LayerPtr<Scalar,1> layer1_1(new DenseKernelLayer<Scalar,1>({ 32u }, 16, init));
 	LayerPtr<Scalar,1> layer1_2(new BatchNormLayer<Scalar,1>(layer1_1->get_output_dims(), .2,
 			NumericUtils<Scalar>::EPSILON2, reg2, 0, 0, 0, 0, 0, 0, reg1));
@@ -603,7 +602,7 @@ TEST(GradientTest, SequentialNet) {
 template<typename Scalar>
 inline void recurrent_net_grad_test() {
 	auto init = ParamInitSharedPtr<Scalar>(new OrthogonalParameterInitialization<Scalar>());
-	auto reg = ParamRegSharedPtr<Scalar>(new SquaredParameterRegularization<Scalar>());
+	auto reg = ParamRegSharedPtr<Scalar>(new L2ParameterRegularization<Scalar>());
 	// Rank 1.
 	KernelPtr<Scalar,1> input_kernel1_1(new DenseKernelLayer<Scalar,1>({ 12u }, 12, init, reg));
 	KernelPtr<Scalar,1> state_kernel1_1(new DenseKernelLayer<Scalar,1>(input_kernel1_1->get_output_dims(), 12, init, reg));
@@ -656,7 +655,7 @@ TEST(GradientTest, RecurrentNet) {
 template<typename Scalar>
 inline void lstm_net_grad_test() {
 	auto init = ParamInitSharedPtr<Scalar>(new OrthogonalParameterInitialization<Scalar>());
-	auto reg = ParamRegSharedPtr<Scalar>(new SquaredParameterRegularization<Scalar>());
+	auto reg = ParamRegSharedPtr<Scalar>(new L2ParameterRegularization<Scalar>());
 	// Rank 1.
 	Dimensions<std::size_t,1> input_dims_1({ 32u });
 	Dimensions<std::size_t,1> output_dims_1({ 5u });
@@ -751,7 +750,7 @@ TEST(GradientTest, LSTMNet) {
 template<typename Scalar>
 inline void bidirectional_net_grad_test() {
 	auto init = ParamInitSharedPtr<Scalar>(new OrthogonalParameterInitialization<Scalar>());
-	auto reg = ParamRegSharedPtr<Scalar>(new SquaredParameterRegularization<Scalar>());
+	auto reg = ParamRegSharedPtr<Scalar>(new L2ParameterRegularization<Scalar>());
 	// 3rd degree RNN with highest rank concatenation.
 	KernelPtr<Scalar,3> input_kernel1(new ConvKernelLayer<Scalar>({ 4u, 4u, 2u }, 5, init, 3, 3, 1, 1, 1, 1, 0, 0, reg));
 	KernelPtr<Scalar,3> state_kernel1(new ConvKernelLayer<Scalar>(input_kernel1->get_output_dims(), 5, init, 3, 3, 1, 1, 1, 1, 0, 0, reg));

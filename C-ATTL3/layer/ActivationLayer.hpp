@@ -8,6 +8,8 @@
 #ifndef C_ATTL3_LAYER_ACTIVATIONLAYER_H_
 #define C_ATTL3_LAYER_ACTIVATIONLAYER_H_
 
+#include <memory>
+
 #include "core/Layer.hpp"
 
 namespace cattle {

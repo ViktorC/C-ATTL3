@@ -1,7 +1,6 @@
 var searchData=
 [
   ['absoluteloss',['AbsoluteLoss',['../classcattle_1_1_absolute_loss.html',1,'cattle']]],
-  ['absoluteparameterregularization',['AbsoluteParameterRegularization',['../classcattle_1_1_absolute_parameter_regularization.html',1,'cattle']]],
   ['activationlayer',['ActivationLayer',['../classcattle_1_1_activation_layer.html',1,'cattle']]],
   ['adadeltaoptimizer',['AdaDeltaOptimizer',['../classcattle_1_1_ada_delta_optimizer.html',1,'cattle']]],
   ['adagradoptimizer',['AdaGradOptimizer',['../classcattle_1_1_ada_grad_optimizer.html',1,'cattle']]],

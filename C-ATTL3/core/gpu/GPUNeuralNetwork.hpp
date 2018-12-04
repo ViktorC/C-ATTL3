@@ -28,22 +28,20 @@ public:
 	virtual CuDNNTensor<Scalar> backpropagate(CuDNNTensor<Scalar> out_grad) = 0;
 	inline typename Base::Data propagate(typename Base::Data input, bool training) {
 		auto rows = input.dimension(0);
-		auto in_cuda_dims = input.template extend<>();
-		in_cuda_dims(0) = rows;
-		auto out_extended = TensorConversion<Scalar>::convert_from_cudnn_to_eigen(
-				propagate(TensorConversion<Scalar>::convert_from_eigen_to_cudnn(
-						TensorMap<Scalar,4>(input.data(), in_cuda_dims)), training));
+		auto in_gpu_dims = get_gpu_input_dims().template extend<>();
+		in_gpu_dims(0) = rows;
+		Tensor<Scalar,4> out_extended = propagate(CuDNNTensor<Scalar>(TensorMap<Scalar,4>(input.data(),
+				in_gpu_dims)), training);
 		auto out_dims = get_output_dims().template extend<>();
 		out_dims(0) = rows;
 		return TensorMap<Scalar,Base::DATA_RANK>(out_extended.data(), out_dims);
 	}
 	inline typename Base::Data backpropagate(typename Base::Data out_grad) {
 		auto rows = out_grad.dimension(0);
-		auto out_cuda_dims = get_cuda_output_dims().template extend<>();
-		out_cuda_dims(0) = rows;
-		auto prev_out_grad_extended = TensorConversion<Scalar>::convert_from_cudnn_to_eigen(
-				backpropagate(TensorConversion<Scalar>::convert_from_eigen_to_cudnn(
-						TensorMap<Scalar,4>(out_grad.data(), out_cuda_dims))));
+		auto out_gpu_dims = get_gpu_output_dims().template extend<>();
+		out_gpu_dims(0) = rows;
+		Tensor<Scalar,4> prev_out_grad_extended = backpropagate(CuDNNTensor<Scalar>(
+				TensorMap<Scalar,4>(out_grad.data(), out_gpu_dims)));
 		auto in_dims = get_input_dims().template extend<>();
 		in_dims(0) = rows;
 		return TensorMap<Scalar,Base::DATA_RANK>(prev_out_grad_extended.data(), in_dims);
