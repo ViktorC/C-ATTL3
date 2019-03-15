@@ -1,1 +1,3 @@
 data/* linguist-vendored
+Eigen/* linguist-vendored
+docs/* linguist-documentation
