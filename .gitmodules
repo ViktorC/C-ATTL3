@@ -1,3 +1,6 @@
 [submodule "Eigen"]
 	path = Eigen
 	url = https://github.com/ViktorC/Eigen-for-C-ATTL3
+[submodule "data"]
+	path = data
+	url = https://github.com/ViktorC/Data-for-C-ATTL3
