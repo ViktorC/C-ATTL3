@@ -26,6 +26,7 @@ public:
 	}
 	virtual ~SGDOptimizer() = default;
 	inline void fit(typename Base::Net& net) {
+		timestep = 0;
 		target_net_ptr = &net;
 		_fit(net.get_all_unique_params());
 	}
@@ -61,8 +62,9 @@ protected:
 				reg_loss += params_ptr->get_regularization_penalty();
 				params_ptr->regularize();
 			}
-			_update_params(params_vec, epoch - 1);
+			_update_params(params_vec, epoch - 1, timestep);
 			++updates;
+			++timestep;
 			// Reset the gradients of the optimizable parameters.
 			for (auto params_ptr : params_vec)
 				params_ptr->reset_grad();
@@ -115,10 +117,12 @@ protected:
 	 *
 	 * @param params_vec All the unique parameters of the network.
 	 * @param epoch The index of the epoch.
+	 * @param timestep The index of the update (time step).
 	 */
-	virtual void _update_params(const std::vector<Parameters<Scalar>*>& params_vec, std::size_t epoch) = 0;
+	virtual void _update_params(const std::vector<Parameters<Scalar>*>& params_vec, std::size_t epoch, std::size_t timestep) = 0;
 	const std::size_t batch_size;
 private:
+	std::size_t timestep;
 	const typename Base::Net* target_net_ptr;
 };
 

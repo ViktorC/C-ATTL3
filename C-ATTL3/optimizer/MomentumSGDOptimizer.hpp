@@ -51,7 +51,7 @@ protected:
 				params_grad_vec.push_back(Matrix<Scalar>::Zero(params_ptr->get_rows(), params_ptr->get_cols()));
 		}
 	}
-	inline void _update_params(const std::vector<Parameters<Scalar>*>& params_vec, std::size_t epoch) {
+	inline void _update_params(const std::vector<Parameters<Scalar>*>& params_vec, std::size_t epoch, std::size_t timestep) {
 		Scalar learning_rate = calculate_learning_rate(epoch);
 		std::size_t i = 0;
 		for (auto params_ptr : params_vec) {

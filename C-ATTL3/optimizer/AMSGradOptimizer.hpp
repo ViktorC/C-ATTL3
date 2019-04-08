@@ -47,7 +47,7 @@ protected:
 		for (std::size_t i = 0; i < params_grad_l2_max.size(); ++i)
 			params_grad_l2_max[i] = Base::pgn_vec[i].params_grad_l2;
 	}
-	inline void _update_params(const std::vector<Parameters<Scalar>*>& params_vec, std::size_t epoch) {
+	inline void _update_params(const std::vector<Parameters<Scalar>*>& params_vec, std::size_t epoch, std::size_t timestep) {
 		std::size_t i = 0;
 		for (auto params_ptr : params_vec) {
 			if (!params_ptr->are_optimizable() || params_ptr->are_frozen())

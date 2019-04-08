@@ -35,7 +35,7 @@ public:
 	}
 protected:
 	inline void _fit(const std::vector<Parameters<Scalar>*>& params_vec) { }
-	inline void _update_params(const std::vector<Parameters<Scalar>*>& params_vec, std::size_t epoch) {
+	inline void _update_params(const std::vector<Parameters<Scalar>*>& params_vec, std::size_t epoch, std::size_t timestep) {
 		for (auto params_ptr : params_vec) {
 			if (params_ptr->are_optimizable() && !params_ptr->are_frozen())
 				params_ptr->set_values(params_ptr->get_values() - params_ptr->get_grad() * learning_rate);

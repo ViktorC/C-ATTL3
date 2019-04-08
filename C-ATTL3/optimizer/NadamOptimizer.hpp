@@ -41,10 +41,10 @@ public:
 			Scalar epsilon = NumericUtils<Scalar>::EPSILON2) :
 				Base::AdamOptimizer(loss, batch_size, learning_rate, l1_decay, l2_decay, epsilon) { }
 protected:
-	inline void _update_params(const std::vector<Parameters<Scalar>*>& params_vec, std::size_t epoch) {
-		Scalar l1_corr = (Scalar) 1 / (1 - pow(1 - Base::l1_decay, epoch + 1) + Base::epsilon);
-		Scalar l1_next_corr = (Scalar) 1 / (1 - pow(1 - Base::l1_decay, epoch + 2) + Base::epsilon);
-		Scalar l2_corr = (Scalar) 1 / (1 - pow(1 - Base::l2_decay, epoch + 1) + Base::epsilon);
+	inline void _update_params(const std::vector<Parameters<Scalar>*>& params_vec, std::size_t epoch, std::size_t timestep) {
+		Scalar l1_corr = (Scalar) 1 / (1 - pow(1 - Base::l1_decay, timestep + 1) + Base::epsilon);
+		Scalar l1_next_corr = (Scalar) 1 / (1 - pow(1 - Base::l1_decay, timestep + 2) + Base::epsilon);
+		Scalar l2_corr = (Scalar) 1 / (1 - pow(1 - Base::l2_decay, timestep + 1) + Base::epsilon);
 		std::size_t i = 0;
 		for (auto params_ptr : params_vec) {
 			if (!params_ptr->are_optimizable() || params_ptr->are_frozen())

@@ -127,9 +127,9 @@ Protected Member Functions</h2></td></tr>
 <tr class="memitem:a0e560efb335db6e2271e7113edf32747"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_ada_delta_optimizer.html#a0e560efb335db6e2271e7113edf32747">_fit</a> (const std::vector&lt; Parameters&lt; Scalar &gt; *&gt; &amp;params_vec)</td></tr>
 <tr class="memdesc:a0e560efb335db6e2271e7113edf32747"><td class="mdescLeft">&#160;</td><td class="mdescRight">It fits the optimizer to the provided parameters.  <a href="#a0e560efb335db6e2271e7113edf32747">More...</a><br /></td></tr>
 <tr class="separator:a0e560efb335db6e2271e7113edf32747"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aec578d690d133bcf401e22160251293f"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_ada_delta_optimizer.html#aec578d690d133bcf401e22160251293f">_update_params</a> (const std::vector&lt; Parameters&lt; Scalar &gt; *&gt; &amp;params_vec, std::size_t epoch)</td></tr>
-<tr class="memdesc:aec578d690d133bcf401e22160251293f"><td class="mdescLeft">&#160;</td><td class="mdescRight">It updates the parameters based on their gradients after back-propagation.  <a href="#aec578d690d133bcf401e22160251293f">More...</a><br /></td></tr>
-<tr class="separator:aec578d690d133bcf401e22160251293f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a6b9bd3a30e44632679d6e777c1878f06"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_ada_delta_optimizer.html#a6b9bd3a30e44632679d6e777c1878f06">_update_params</a> (const std::vector&lt; Parameters&lt; Scalar &gt; *&gt; &amp;params_vec, std::size_t epoch, std::size_t timestep)</td></tr>
+<tr class="memdesc:a6b9bd3a30e44632679d6e777c1878f06"><td class="mdescLeft">&#160;</td><td class="mdescRight">It updates the parameters based on their gradients after back-propagation.  <a href="#a6b9bd3a30e44632679d6e777c1878f06">More...</a><br /></td></tr>
+<tr class="separator:a6b9bd3a30e44632679d6e777c1878f06"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="inherit_header pro_methods_classcattle_1_1_s_g_d_optimizer"><td colspan="2" onclick="javascript:toggleInherit('pro_methods_classcattle_1_1_s_g_d_optimizer')"><img src="closed.png" alt="-"/>&#160;Protected Member Functions inherited from <a class="el" href="classcattle_1_1_s_g_d_optimizer.html">cattle::SGDOptimizer&lt; Scalar, Rank, Sequential &gt;</a></td></tr>
 <tr class="memitem:a88c4134991b6391911f45b160515fe2d inherit pro_methods_classcattle_1_1_s_g_d_optimizer"><td class="memItemLeft" align="right" valign="top">Scalar&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_s_g_d_optimizer.html#a88c4134991b6391911f45b160515fe2d">_train</a> (typename <a class="el" href="classcattle_1_1_neural_network.html">Base::Net</a> &amp;net, typename <a class="el" href="classcattle_1_1_data_provider.html">Base::Provider</a> &amp;training_prov, std::size_t epoch, bool verbose)</td></tr>
 <tr class="memdesc:a88c4134991b6391911f45b160515fe2d inherit pro_methods_classcattle_1_1_s_g_d_optimizer"><td class="mdescLeft">&#160;</td><td class="mdescRight">It trains the specified neural network for a single epoch on data provided by the specified data provider.  <a href="classcattle_1_1_s_g_d_optimizer.html#a88c4134991b6391911f45b160515fe2d">More...</a><br /></td></tr>
@@ -243,8 +243,8 @@ template&lt;typename Scalar , std::size_t Rank, bool Sequential&gt; </div>
 
 </div>
 </div>
-<a id="aec578d690d133bcf401e22160251293f"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aec578d690d133bcf401e22160251293f">&#9670;&nbsp;</a></span>_update_params()</h2>
+<a id="a6b9bd3a30e44632679d6e777c1878f06"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a6b9bd3a30e44632679d6e777c1878f06">&#9670;&nbsp;</a></span>_update_params()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -264,7 +264,13 @@ template&lt;typename Scalar , std::size_t Rank, bool Sequential&gt; </div>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">std::size_t&#160;</td>
-          <td class="paramname"><em>epoch</em>&#160;</td>
+          <td class="paramname"><em>epoch</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">std::size_t&#160;</td>
+          <td class="paramname"><em>timestep</em>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -284,11 +290,12 @@ template&lt;typename Scalar , std::size_t Rank, bool Sequential&gt; </div>
   <table class="params">
     <tr><td class="paramname">params_vec</td><td>All the unique parameters of the network. </td></tr>
     <tr><td class="paramname">epoch</td><td>The index of the epoch. </td></tr>
+    <tr><td class="paramname">timestep</td><td>The index of the update (time step). </td></tr>
   </table>
   </dd>
 </dl>
 
-<p>Implements <a class="el" href="classcattle_1_1_s_g_d_optimizer.html#ae85365a0f7c8609b23b81d48e6e85617">cattle::SGDOptimizer&lt; Scalar, Rank, Sequential &gt;</a>.</p>
+<p>Implements <a class="el" href="classcattle_1_1_s_g_d_optimizer.html#a43a33f44122cbdf02ca37a1f77997990">cattle::SGDOptimizer&lt; Scalar, Rank, Sequential &gt;</a>.</p>
 
 </div>
 </div>

@@ -40,7 +40,7 @@ public:
 				Base::MomentumSGDOptimizer(loss, batch_size, init_learning_rate, annealing_rate,
 						momentum) { };
 protected:
-	inline void _update_params(const std::vector<Parameters<Scalar>*>& params_vec, std::size_t epoch) {
+	inline void _update_params(const std::vector<Parameters<Scalar>*>& params_vec, std::size_t epoch, std::size_t timestep) {
 		Scalar learning_rate = Base::calculate_learning_rate(epoch);
 		std::size_t i = 0;
 		for (auto params_ptr : params_vec) {

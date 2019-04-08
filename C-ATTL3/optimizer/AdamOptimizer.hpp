@@ -63,9 +63,9 @@ protected:
 			pgn_vec.push_back(std::move(pgn));
 		}
 	}
-	inline void _update_params(const std::vector<Parameters<Scalar>*>& params_vec, std::size_t epoch) {
-		Scalar l1_corr = (Scalar) 1 / (1 - pow(1 - l1_decay, epoch + 1) + epsilon);
-		Scalar l2_corr = (Scalar) 1 / (1 - pow(1 - l2_decay, epoch + 1) + epsilon);
+	inline void _update_params(const std::vector<Parameters<Scalar>*>& params_vec, std::size_t epoch, std::size_t timestep) {
+		Scalar l1_corr = (Scalar) 1 / (1 - pow(1 - l1_decay, timestep + 1) + epsilon);
+		Scalar l2_corr = (Scalar) 1 / (1 - pow(1 - l2_decay, timestep + 1) + epsilon);
 		std::size_t i = 0;
 		for (auto params_ptr : params_vec) {
 			if (!params_ptr->are_optimizable() || params_ptr->are_frozen())

@@ -132,9 +132,9 @@ Protected Member Functions</h2></td></tr>
 <tr class="memitem:aa07ebb6237cafa7f50b7a76ce1842c95"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_s_g_d_optimizer.html#aa07ebb6237cafa7f50b7a76ce1842c95">_fit</a> (const std::vector&lt; Parameters&lt; Scalar &gt; *&gt; &amp;params_vec)=0</td></tr>
 <tr class="memdesc:aa07ebb6237cafa7f50b7a76ce1842c95"><td class="mdescLeft">&#160;</td><td class="mdescRight">It fits the optimizer to the provided parameters.  <a href="#aa07ebb6237cafa7f50b7a76ce1842c95">More...</a><br /></td></tr>
 <tr class="separator:aa07ebb6237cafa7f50b7a76ce1842c95"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ae85365a0f7c8609b23b81d48e6e85617"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_s_g_d_optimizer.html#ae85365a0f7c8609b23b81d48e6e85617">_update_params</a> (const std::vector&lt; Parameters&lt; Scalar &gt; *&gt; &amp;params_vec, std::size_t epoch)=0</td></tr>
-<tr class="memdesc:ae85365a0f7c8609b23b81d48e6e85617"><td class="mdescLeft">&#160;</td><td class="mdescRight">It updates the parameters based on their gradients after back-propagation.  <a href="#ae85365a0f7c8609b23b81d48e6e85617">More...</a><br /></td></tr>
-<tr class="separator:ae85365a0f7c8609b23b81d48e6e85617"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a43a33f44122cbdf02ca37a1f77997990"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcattle_1_1_s_g_d_optimizer.html#a43a33f44122cbdf02ca37a1f77997990">_update_params</a> (const std::vector&lt; Parameters&lt; Scalar &gt; *&gt; &amp;params_vec, std::size_t epoch, std::size_t timestep)=0</td></tr>
+<tr class="memdesc:a43a33f44122cbdf02ca37a1f77997990"><td class="mdescLeft">&#160;</td><td class="mdescRight">It updates the parameters based on their gradients after back-propagation.  <a href="#a43a33f44122cbdf02ca37a1f77997990">More...</a><br /></td></tr>
+<tr class="separator:a43a33f44122cbdf02ca37a1f77997990"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><h3>template&lt;typename Scalar, std::size_t Rank, bool Sequential&gt;<br />
@@ -308,8 +308,8 @@ template&lt;typename Scalar , std::size_t Rank, bool Sequential&gt; </div>
 
 </div>
 </div>
-<a id="ae85365a0f7c8609b23b81d48e6e85617"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ae85365a0f7c8609b23b81d48e6e85617">&#9670;&nbsp;</a></span>_update_params()</h2>
+<a id="a43a33f44122cbdf02ca37a1f77997990"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a43a33f44122cbdf02ca37a1f77997990">&#9670;&nbsp;</a></span>_update_params()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -329,7 +329,13 @@ template&lt;typename Scalar , std::size_t Rank, bool Sequential&gt; </div>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">std::size_t&#160;</td>
-          <td class="paramname"><em>epoch</em>&#160;</td>
+          <td class="paramname"><em>epoch</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">std::size_t&#160;</td>
+          <td class="paramname"><em>timestep</em>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -349,11 +355,12 @@ template&lt;typename Scalar , std::size_t Rank, bool Sequential&gt; </div>
   <table class="params">
     <tr><td class="paramname">params_vec</td><td>All the unique parameters of the network. </td></tr>
     <tr><td class="paramname">epoch</td><td>The index of the epoch. </td></tr>
+    <tr><td class="paramname">timestep</td><td>The index of the update (time step). </td></tr>
   </table>
   </dd>
 </dl>
 
-<p>Implemented in <a class="el" href="classcattle_1_1_adam_optimizer.html#a6a5e42b994f50eeec27a7d8526b6ba10">cattle::AdamOptimizer&lt; Scalar, Rank, Sequential &gt;</a>, <a class="el" href="classcattle_1_1_momentum_s_g_d_optimizer.html#a8ced4ae90bd6ea28b7337b52830b9dcd">cattle::MomentumSGDOptimizer&lt; Scalar, Rank, Sequential &gt;</a>, <a class="el" href="classcattle_1_1_ada_delta_optimizer.html#aec578d690d133bcf401e22160251293f">cattle::AdaDeltaOptimizer&lt; Scalar, Rank, Sequential &gt;</a>, <a class="el" href="classcattle_1_1_a_m_s_grad_optimizer.html#ac4f7b78c5c8787167a32106912a23ee7">cattle::AMSGradOptimizer&lt; Scalar, Rank, Sequential &gt;</a>, <a class="el" href="classcattle_1_1_ada_grad_optimizer.html#ac8f3cf0569db0ae246a1fd3184bfa1fa">cattle::AdaGradOptimizer&lt; Scalar, Rank, Sequential &gt;</a>, <a class="el" href="classcattle_1_1_ada_max_optimizer.html#a21dcdad228f481a8010f60a692b50c1e">cattle::AdaMaxOptimizer&lt; Scalar, Rank, Sequential &gt;</a>, <a class="el" href="classcattle_1_1_nadam_optimizer.html#aad31889d38536735b205275fcb2ff558">cattle::NadamOptimizer&lt; Scalar, Rank, Sequential &gt;</a>, <a class="el" href="classcattle_1_1_nesterov_momentum_s_g_d_optimizer.html#a801d37f4af5612d6f8367c878756027d">cattle::NesterovMomentumSGDOptimizer&lt; Scalar, Rank, Sequential &gt;</a>, and <a class="el" href="classcattle_1_1_vanilla_s_g_d_optimizer.html#a292e471088668353316d825a35a0e386">cattle::VanillaSGDOptimizer&lt; Scalar, Rank, Sequential &gt;</a>.</p>
+<p>Implemented in <a class="el" href="classcattle_1_1_adam_optimizer.html#a25b7ccb9c39ce4e76286cdb2d2875372">cattle::AdamOptimizer&lt; Scalar, Rank, Sequential &gt;</a>, <a class="el" href="classcattle_1_1_momentum_s_g_d_optimizer.html#ad43d615599565394eb94dce67a28fe18">cattle::MomentumSGDOptimizer&lt; Scalar, Rank, Sequential &gt;</a>, <a class="el" href="classcattle_1_1_ada_delta_optimizer.html#a6b9bd3a30e44632679d6e777c1878f06">cattle::AdaDeltaOptimizer&lt; Scalar, Rank, Sequential &gt;</a>, <a class="el" href="classcattle_1_1_a_m_s_grad_optimizer.html#ae9e33bfea1a7e23b15120a9b7939cb74">cattle::AMSGradOptimizer&lt; Scalar, Rank, Sequential &gt;</a>, <a class="el" href="classcattle_1_1_ada_grad_optimizer.html#af2dde1484d94c01f33afc106efef0883">cattle::AdaGradOptimizer&lt; Scalar, Rank, Sequential &gt;</a>, <a class="el" href="classcattle_1_1_ada_max_optimizer.html#ae0e75cb1c468b4c8b8be1eaa18f999a1">cattle::AdaMaxOptimizer&lt; Scalar, Rank, Sequential &gt;</a>, <a class="el" href="classcattle_1_1_nadam_optimizer.html#aa40db2348250bf0afcdbb431406838a6">cattle::NadamOptimizer&lt; Scalar, Rank, Sequential &gt;</a>, <a class="el" href="classcattle_1_1_nesterov_momentum_s_g_d_optimizer.html#a5943a9b3dac43804c430d1f6f7ba87e5">cattle::NesterovMomentumSGDOptimizer&lt; Scalar, Rank, Sequential &gt;</a>, and <a class="el" href="classcattle_1_1_vanilla_s_g_d_optimizer.html#a7c7d589a8697f424bb7e97d0fd3ad020">cattle::VanillaSGDOptimizer&lt; Scalar, Rank, Sequential &gt;</a>.</p>
 
 </div>
 </div>
