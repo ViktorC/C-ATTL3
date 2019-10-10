@@ -1,2 +1,7 @@
-/bin/
-/build/
+bin/
+build/
+.settings/
+.cproject
+.project
+.depend
+*.o
