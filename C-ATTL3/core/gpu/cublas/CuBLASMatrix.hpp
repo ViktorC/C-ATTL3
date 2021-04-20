@@ -120,7 +120,7 @@ public:
 	 */
 	inline Scalar l1_norm() const {
 		Scalar res;
-		asum(Base::size(), 1, *this, &res);
+		asum(Base::size(), 1, *this, res);
 		return res;
 	}
 	/**
@@ -128,7 +128,7 @@ public:
 	 */
 	inline Scalar l2_norm() const {
 		Scalar res;
-		nrm2(Base::size(), 1, *this, &res);
+		nrm2(Base::size(), 1, *this, res);
 		return res;
 	}
 	inline Self& operator+=(const Self& rhs) {
@@ -143,12 +143,13 @@ public:
 		gemm(*this, false, rhs, false, 1, 1, *this);
 		return *this;
 	}
-	inline Self operator*=(Scalar rhs) {
+	inline Self& operator*=(Scalar rhs) {
 		scal(Base::size(), rhs, 1, *this);
 		return *this;
 	}
-	inline Self operator*=(Scalar rhs) {
-		return *this * (1 / rhs);
+	inline Self& operator/=(Scalar rhs) {
+		scal(Base::size(), rhs, 1 / rhs, *this);
+		return *this;
 	}
 	inline friend Self operator+(Self lhs, const Self& rhs) {
 		return lhs += rhs;

@@ -68,8 +68,6 @@ protected:
 		Scalar l2_corr = (Scalar) 1 / (1 - pow(1 - l2_decay, timestep + 1) + epsilon);
 		std::size_t i = 0;
 		for (auto params_ptr : params_vec) {
-			if (!params_ptr->are_optimizable() || params_ptr->are_frozen())
-				continue;
 			ParamsGradNorms& grad_norms = pgn_vec[i++];
 			const Matrix<Scalar>& params_grad = params_ptr->get_grad();
 			grad_norms.params_grad_l1 = grad_norms.params_grad_l1 * (1 - l1_decay) + params_grad * l1_decay;

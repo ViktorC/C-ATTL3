@@ -48,8 +48,7 @@ public:
 	inline CUDAArray() :
 			CUDAArray(0u) { }
 	inline CUDAArray(const Self& array) :
-			CUDAArray(array._size),
-			_wrapper(false) {
+			CUDAArray(array._size) {
 		if (_size > 0)
 			cudaAssert(cudaMemcpy(_data, array._data, _size * sizeof(Scalar), cudaMemcpyDeviceToDevice));
 	}

@@ -15,7 +15,7 @@ namespace cattle {
 namespace gpu {
 
 template<typename Scalar, std::size_t Rank>
-class ActivationGPULayer : public GPULayer<Scalar,Rank>,
+class ActivationGPULayer : public virtual GPULayer<Scalar,Rank>,
 		public virtual ActivationLayer<Scalar,Rank> {
 	typedef Layer<Scalar,Rank> Root;
 	typedef ActivationLayer<Scalar,Rank> Base;
@@ -24,7 +24,7 @@ class ActivationGPULayer : public GPULayer<Scalar,Rank>,
 public:
 	inline virtual ~ActivationGPULayer() = default;
 	inline GPUBase* gpu_clone_with_shared_params() {
-		return gpu_clone();
+		return GPUBase::gpu_clone();
 	}
 	inline const typename GPUBase::GPUDims& get_gpu_input_dims() const {
 		return gpu_dims;
@@ -33,12 +33,12 @@ public:
 		return gpu_dims;
 	}
 	inline std::vector<const GPUParameters<Scalar>*> get_gpu_params() const {
-		return params ? std::vector<const GPUParameters<Scalar>*>({
+		return Base::params ? std::vector<const GPUParameters<Scalar>*>({
 				static_cast<const GPUParameters<Scalar>*>(Base::params.get()) }) :
 				std::vector<const GPUParameters<Scalar>*>(0);
 	}
 	inline std::vector<GPUParameters<Scalar>*> get_gpu_params() {
-		return params ? std::vector<GPUParameters<Scalar>*>({
+		return Base::params ? std::vector<GPUParameters<Scalar>*>({
 				static_cast<GPUParameters<Scalar>*>(Base::params.get()) }) :
 				std::vector<GPUParameters<Scalar>*>(0);
 	}

@@ -48,9 +48,9 @@ public:
 		return new StandardGPUParameters<Scalar>(*this);
 	}
 	inline const CuDNNTensor<Scalar>& get_gpu_values() const {
-		return tensor_values;
+		return values;
 	}
-	inline void set_gpu_tensorvalues(CuDNNTensor<Scalar> values) {
+	inline void set_gpu_values(CuDNNTensor<Scalar> values) {
 		assert(values.samples() == samples && values.height() == height &&
 				values.width() == width && values.channels() == channels);
 		this->values = std::move(values);

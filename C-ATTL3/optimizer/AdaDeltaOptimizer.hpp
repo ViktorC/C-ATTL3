@@ -53,8 +53,6 @@ protected:
 	inline void _update_params(const std::vector<Parameters<Scalar>*>& params_vec, std::size_t epoch, std::size_t timestep) {
 		std::size_t i = 0;
 		for (auto params_ptr : params_vec) {
-			if (!params_ptr->are_optimizable() || params_ptr->are_frozen())
-				continue;
 			ParamsGradAndUpdateSqrs& pgus = pgus_vec[i++];
 			const Matrix<Scalar>& params_grad = params_ptr->get_grad();
 			pgus.params_grad = pgus.params_grad * (1 - decay) + params_grad.cwiseProduct(params_grad) * decay;

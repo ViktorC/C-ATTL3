@@ -154,10 +154,10 @@ public:
 		return _filter_desc;
 	}
 	/**
-	 * @param value The value to which all elemetnts of the tensor are to be set.
+	 * @param value The value to which all elements of the tensor are to be set.
 	 */
 	inline void set_values(Scalar value) {
-		cudnnAssert(cudnnSetTensor(CuDNNHandle::get_instance(), _desc, _data, value));
+		cudnnAssert(cudnnSetTensor(CuDNNHandle::get_instance(), _desc, Base::data(), value));
 	}
 	/**
 	 * Performs a reduction along all ranks of the tensor.
@@ -349,7 +349,7 @@ public:
 		swap(tensor1._filter_desc, tensor2._filter_desc);
 	}
 	/**
-	 * @param desc A reference to the tensor descri ptor object.
+	 * @param desc A reference to the tensor descriptor object.
 	 * @param samples The batch size.
 	 * @param height The height.
 	 * @param width The width.
@@ -448,7 +448,7 @@ public:
 			Scalar beta, /* in/out */ Self& b) {
 		// Create the reduction operation descriptor.
 		cudnnReduceTensorDescriptor_t desc;
-		cudnnAssert(createReduceTensorDescriptor_t(&desc));
+		cudnnAssert(cudnnCreateReduceTensorDescriptor(&desc));
 		cudnnAssert(cudnnSetReduceTensorDescriptor(desc, op_type, DATA_TYPE, NAN_PROP,
 				CUDNN_REDUCE_TENSOR_NO_INDICES, CUDNN_32BIT_INDICES));
 		// Calculate the array size needed for the indices (should be 0).

@@ -34,7 +34,7 @@ public:
 								receptor_width, vertical_padding, horizontal_padding, vertical_stride,
 								horizontal_stride, vertical_dilation, horizontal_dilation),
 						std::make_shared<StandardGPUParameters<Scalar>>(filters, receptor_height, receptor_width,
-								in.dimension(3), true, weight_init, weight_reg),
+								input_dims.dimension(3), true, weight_init, weight_reg),
 						std::make_shared<StandardGPUParameters<Scalar>>(1, filters, true,
 								std::make_shared<ZeroParameterInitialization<Scalar>>(), bias_reg)),
 				filters(filters),
@@ -96,10 +96,12 @@ public:
 				horizontal_stride, vertical_dilation, horizontal_dilation, CUDNN_CROSS_CORRELATION,
 				CuDNNTensor<Scalar>::DATA_TYPE));
 		// Have cuDNN find the most performant algorithm given the convolution parameters.
-		cudnnConvolutionFwdAlgo_t conv_algo;
-		cudnnAssert(cudnnGetConvolutionForwardAlgorithm(CuDNNHandle::get_instance(), in_cache.desc(),
-				weights.get_gpu_values().filter_desc(), conv_desc, out.desc(), CUDNN_CONVOLUTION_FWD_PREFER_FASTEST,
-				0, &conv_algo));
+		int returned_algo_count;
+		cudnnConvolutionFwdAlgoPerf_t conv_algo_perf;
+		cudnnAssert(cudnnGetConvolutionForwardAlgorithm_v7(CuDNNHandle::get_instance(), in_cache.desc(),
+				weights.get_gpu_values().filter_desc(), conv_desc, out.desc(), 1,
+				&returned_algo_count, &conv_algo_perf));
+		cudnnConvolutionFwdAlgo_t conv_algo = conv_algo_perf.algo;
 		/* Have cuDNN compute the workspace memory required for the selected convolution algorithm given
 		 * the convolution parameters. */
 		std::size_t workspace_size;
@@ -133,10 +135,12 @@ public:
 				vertical_stride, horizontal_stride, vertical_dilation, horizontal_dilation, CUDNN_CROSS_CORRELATION,
 				CuDNNTensor<Scalar>::DATA_TYPE));
 		// Have cuDNN find the most performant algorithm given the convolution parameters.
-		cudnnConvolutionBwdFilterAlgo_t dconv_filter_algo;
-		cudnnAssert(cudnnGetConvolutionBackwardFilterAlgorithm(CuDNNHandle::get_instance(), in_cache.desc(),
-				out_grad.desc(), dconv_desc, weights_grad.filter_desc(), CUDNN_CONVOLUTION_BWD_FILTER_PREFER_FASTEST,
-				0, &dconv_filter_algo));
+		int returned_algo_count;
+		cudnnConvolutionBwdFilterAlgoPerf_t dconv_filter_algo_perf;
+		cudnnAssert(cudnnGetConvolutionBackwardFilterAlgorithm_v7(CuDNNHandle::get_instance(), in_cache.desc(),
+				out_grad.desc(), dconv_desc, weights_grad.filter_desc(), 1,
+				&returned_algo_count, &dconv_filter_algo_perf));
+		cudnnConvolutionBwdFilterAlgo_t dconv_filter_algo = dconv_filter_algo_perf.algo;
 		/* Have cuDNN compute the data_workspace memory required for the selected backward convolution algorithms given
 		 * the convolution parameters. */
 		std::size_t filter_workspace_size;
@@ -162,10 +166,11 @@ public:
 		CuDNNTensor<Scalar> prev_out_grad(out_grad.samples(), GPUBase::gpu_input_dims(0), GPUBase::gpu_input_dims(1),
 				GPUBase::gpu_input_dims(2));
 		// Get the backward data convolution algorithm.
-		cudnnConvolutionBwdDataAlgo_t dconv_data_algo;
-		cudnnAssert(cudnnGetConvolutionBackwardDataAlgorithm(CuDNNHandle::get_instance(),
+		cudnnConvolutionBwdDataAlgoPerf_t dconv_data_algo_perf;
+		cudnnAssert(cudnnGetConvolutionBackwardDataAlgorithm_v7(CuDNNHandle::get_instance(),
 				weights.get_gpu_values().filter_desc(), out_grad.desc(), dconv_desc, prev_out_grad.desc(),
-				CUDNN_CONVOLUTION_BWD_DATA_PREFER_FASTEST, 0, &dconv_data_algo));
+				1, &returned_algo_count, &dconv_data_algo_perf));
+		cudnnConvolutionBwdDataAlgo_t dconv_data_algo = dconv_data_algo_perf.algo;
 		// Calculate the workspace size needed.
 		std::size_t data_workspace_size;
 		cudnnAssert(cudnnGetConvolutionBackwardDataWorkspaceSize(CuDNNHandle::get_instance(),

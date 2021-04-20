@@ -32,7 +32,7 @@ public:
 		in_gpu_dims(0) = rows;
 		Tensor<Scalar,4> out_extended = propagate(CuDNNTensor<Scalar>(TensorMap<Scalar,4>(input.data(),
 				in_gpu_dims)), training);
-		auto out_dims = get_output_dims().template extend<>();
+		auto out_dims = Base::get_output_dims().template extend<>();
 		out_dims(0) = rows;
 		return TensorMap<Scalar,Base::DATA_RANK>(out_extended.data(), out_dims);
 	}
@@ -42,7 +42,7 @@ public:
 		out_gpu_dims(0) = rows;
 		Tensor<Scalar,4> prev_out_grad_extended = backpropagate(CuDNNTensor<Scalar>(
 				TensorMap<Scalar,4>(out_grad.data(), out_gpu_dims)));
-		auto in_dims = get_input_dims().template extend<>();
+		auto in_dims = Base::get_input_dims().template extend<>();
 		in_dims(0) = rows;
 		return TensorMap<Scalar,Base::DATA_RANK>(prev_out_grad_extended.data(), in_dims);
 	}

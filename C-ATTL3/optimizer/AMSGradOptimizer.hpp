@@ -50,8 +50,6 @@ protected:
 	inline void _update_params(const std::vector<Parameters<Scalar>*>& params_vec, std::size_t epoch, std::size_t timestep) {
 		std::size_t i = 0;
 		for (auto params_ptr : params_vec) {
-			if (!params_ptr->are_optimizable() || params_ptr->are_frozen())
-				continue;
 			typename Base::ParamsGradNorms& grad_norms = Base::pgn_vec[i];
 			const Matrix<Scalar>& params_grad = params_ptr->get_grad();
 			grad_norms.params_grad_l1 = grad_norms.params_grad_l1 * (1 - Base::l1_decay) +

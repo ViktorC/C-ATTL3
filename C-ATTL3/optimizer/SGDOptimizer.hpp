@@ -40,6 +40,11 @@ protected:
 		std::size_t updates = 0;
 		// Get all the optimizable parameters.
 		std::vector<Parameters<Scalar>*> params_vec = net.get_all_unique_params();
+		std::vector<Parameters<Scalar>*> optimizable_params_vec;
+		for (auto params_ptr : params_vec) {
+			if (params_ptr->are_optimizable() || !params_ptr->are_frozen())
+				optimizable_params_vec.push_back(params_ptr);
+		}
 		// Perform an entire training epoch.
 		while (training_prov.has_more()) {
 			DataPair<Scalar,Rank,Sequential> data_pair = training_prov.get_data(batch_size);
@@ -56,13 +61,11 @@ protected:
 					std::move(data_pair.second)) / (Scalar) batch_size);
 			// Update the values of the parameters.
 			std::size_t i = 0;
-			for (auto params_ptr : params_vec) {
-				if (!params_ptr->are_optimizable() || params_ptr->are_frozen())
-					continue;
+			for (auto params_ptr : optimizable_params_vec) {
 				reg_loss += params_ptr->get_regularization_penalty();
 				params_ptr->regularize();
 			}
-			_update_params(params_vec, epoch - 1, timestep);
+			_update_params(optimizable_params_vec, epoch - 1, timestep);
 			++updates;
 			++timestep;
 			// Reset the gradients of the optimizable parameters.
@@ -115,11 +118,14 @@ protected:
 	/**
 	 * It updates the parameters based on their gradients after back-propagation.
 	 *
-	 * @param params_vec All the unique parameters of the network.
+	 * @param params_vec All the unique optimizable parameters of the network.
 	 * @param epoch The index of the epoch.
 	 * @param timestep The index of the update (time step).
 	 */
-	virtual void _update_params(const std::vector<Parameters<Scalar>*>& params_vec, std::size_t epoch, std::size_t timestep) = 0;
+	virtual void _update_params(
+			const std::vector<Parameters<Scalar>*>& params_vec,
+			std::size_t epoch,
+			std::size_t timestep) = 0;
 	const std::size_t batch_size;
 private:
 	std::size_t timestep;

@@ -55,8 +55,6 @@ protected:
 		Scalar learning_rate = calculate_learning_rate(epoch);
 		std::size_t i = 0;
 		for (auto params_ptr : params_vec) {
-			if (!params_ptr->are_optimizable() || params_ptr->are_frozen())
-				continue;
 			params_grad_vec[i] = params_grad_vec[i] * momentum + params_ptr->get_grad() * learning_rate;
 			params_ptr->set_values(params_ptr->get_values() - params_grad_vec[i++]);
 		}

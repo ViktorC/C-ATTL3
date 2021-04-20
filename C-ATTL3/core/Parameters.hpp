@@ -73,8 +73,8 @@ public:
 	 */
 	virtual Scalar get_regularization_penalty() const = 0;
 	/**
-	 * It adds the derivative of the regularization function w.r.t.t values of the
-	 * parameters to the gradient of the parameters.
+	 * It adds the derivative of the regularization function w.r.t. to the parameters to the
+	 * gradient.
 	 */
 	virtual void regularize() = 0;
 	/**

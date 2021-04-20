@@ -31,13 +31,13 @@ public:
 	}
 	inline std::vector<const GPUParameters<Scalar>*> get_gpu_params() const {
 		return std::vector<const GPUParameters<Scalar>*>({
-				static_cast<const GPUParameters<Scalar>*>(weights.get()),
-				static_cast<const GPUParameters<Scalar>*>(bias.get()) });
+				static_cast<const GPUParameters<Scalar>*>(Base::weights.get()),
+				static_cast<const GPUParameters<Scalar>*>(Base::bias.get()) });
 	}
 	inline std::vector<GPUParameters<Scalar>*> get_gpu_params() {
 		return std::vector<GPUParameters<Scalar>*>({
-				static_cast<GPUParameters<Scalar>*>(weights.get()),
-				static_cast<GPUParameters<Scalar>*>(bias.get()) });
+				static_cast<GPUParameters<Scalar>*>(Base::weights.get()),
+				static_cast<GPUParameters<Scalar>*>(Base::bias.get()) });
 	}
 protected:
 	typedef std::shared_ptr<GPUParameters<Scalar>> GPUParamsSharedPtr;

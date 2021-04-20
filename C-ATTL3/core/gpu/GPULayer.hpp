@@ -30,10 +30,10 @@ public:
 	virtual std::vector<GPUParameters<Scalar>*> get_gpu_params() = 0;
 	virtual CuDNNTensor<Scalar> pass_forward(CuDNNTensor<Scalar> in, bool training) = 0;
 	virtual CuDNNTensor<Scalar> pass_back(CuDNNTensor<Scalar> out_grad) = 0;
-	inline Layer<Scalar,Rank>* clone() const {
+	inline virtual Layer<Scalar,Rank>* clone() const {
 		return gpu_clone();
 	}
-	inline Layer<Scalar,Rank>* clone_with_shared_params() {
+	inline virtual Layer<Scalar,Rank>* clone_with_shared_params() {
 		return gpu_clone_with_shared_params();
 	}
 	inline typename Base::Data pass_forward(typename Base::Data in, bool training) {
@@ -42,7 +42,7 @@ public:
 		in_gpu_dims(0) = rows;
 		Tensor<Scalar,4> out_extended = pass_forward(CuDNNTensor<Scalar>(TensorMap<Scalar,4>(in.data(),
 				in_gpu_dims)), training);
-		auto out_dims = get_output_dims().template extend<>();
+		auto out_dims = Base::get_output_dims().template extend<>();
 		out_dims(0) = rows;
 		return TensorMap<Scalar,Base::DATA_RANK>(out_extended.data(), out_dims);
 	}
@@ -52,7 +52,7 @@ public:
 		out_gpu_dims(0) = rows;
 		Tensor<Scalar,4> prev_out_grad_extended = pass_back(TensorMap<Scalar,4>(out_grad.data(),
 				out_gpu_dims));
-		auto in_dims = get_input_dims().template extend<>();
+		auto in_dims = Base::get_input_dims().template extend<>();
 		in_dims(0) = rows;
 		return TensorMap<Scalar,Base::DATA_RANK>(prev_out_grad_extended.data(), in_dims);
 	}

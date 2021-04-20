@@ -135,6 +135,30 @@ inline void layer_grad_test(std::string name, LayerPtr<Scalar,Rank> layer1, Laye
  * LAYER GRADIENT TESTS *
  ************************/
 
+#ifdef CATTL3_USE_CUDA
+
+template<typename Scalar>
+inline void dense_kernel_gpu_layer_grad_test() {
+	auto init1 = std::make_shared<cattle::gpu::GlorotGPUParameterInitialization<Scalar>>();
+	auto init2 = std::make_shared<cattle::gpu::LeCunGPUParameterInitialization<Scalar>>();
+	auto reg = std::make_shared<cattle::gpu::L2GPUParameterRegularization<Scalar>>();
+	LayerPtr<Scalar,1> layer1_1(new cattle::gpu::DenseKernelGPULayer<Scalar,1>({ 32u }, 16, init1));
+	LayerPtr<Scalar,1> layer1_2(new cattle::gpu::DenseKernelGPULayer<Scalar,1>(layer1_1->get_output_dims(), 1, init1, reg));
+	layer_grad_test<Scalar,1>("dense kernel GPU layer", std::move(layer1_1), std::move(layer1_2));
+	LayerPtr<Scalar,2> layer2_1(new cattle::gpu::DenseKernelGPULayer<Scalar,2>({ 6u, 6u }, 16, init2));
+	LayerPtr<Scalar,2> layer2_2(new cattle::gpu::DenseKernelGPULayer<Scalar,2>(layer2_1->get_output_dims(), 2, init2, reg));
+	layer_grad_test<Scalar,2>("dense kernel GPU layer", std::move(layer2_1), std::move(layer2_2));
+	LayerPtr<Scalar,3> layer3_1(new cattle::gpu::DenseKernelGPULayer<Scalar,3>({ 4u, 4u, 2u }, 16, init1, reg));
+	LayerPtr<Scalar,3> layer3_2(new cattle::gpu::DenseKernelGPULayer<Scalar,3>(layer3_1->get_output_dims(), 4, init1, reg));
+	layer_grad_test<Scalar,3>("dense kernel GPU layer", std::move(layer3_1), std::move(layer3_2));
+}
+
+TEST(GradientTest, DenseKernelGPULayer) {
+	dense_kernel_gpu_layer_grad_test<double>();
+}
+
+#endif
+
 /**
  * Performs gradient checks on fully-connected layers.
  */

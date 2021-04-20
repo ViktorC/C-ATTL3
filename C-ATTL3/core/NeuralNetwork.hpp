@@ -158,7 +158,7 @@ public:
 		return params_vec;
 	}
 	/**
-	 * Sets all parameters of the network to the specified frozens state.
+	 * Sets all parameters of the network to the specified frozen state.
 	 *
 	 * @param frozen Whether the parameters of the network should be frozen i.e. temporarily
 	 * not optimizable.
