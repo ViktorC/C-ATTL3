@@ -14,17 +14,15 @@
 namespace cattle {
 namespace gpu {
 
-template<typename Scalar>
+template <typename Scalar>
 class GPUParameterRegularization : public virtual ParameterRegularization<Scalar> {
-public:
-	virtual Scalar function(const CuBLASMatrix<Scalar>& params) const;
-	virtual CuBLASMatrix<Scalar> d_function(const CuBLASMatrix<Scalar>& params) const;
-	inline Scalar function(const Matrix<Scalar>& params) const {
-		return function(CuBLASMatrix<Scalar>(params));
-	}
-	inline Matrix<Scalar> d_function(const Matrix<Scalar>& params) const {
-		return d_function(CuBLASMatrix<Scalar>(params));
-	}
+ public:
+  virtual Scalar function(const CuBLASMatrix<Scalar>& params) const;
+  virtual CuBLASMatrix<Scalar> d_function(const CuBLASMatrix<Scalar>& params) const;
+  inline Scalar function(const Matrix<Scalar>& params) const { return function(CuBLASMatrix<Scalar>(params)); }
+  inline Matrix<Scalar> d_function(const Matrix<Scalar>& params) const {
+    return d_function(CuBLASMatrix<Scalar>(params));
+  }
 };
 
 } /* namespace gpu */

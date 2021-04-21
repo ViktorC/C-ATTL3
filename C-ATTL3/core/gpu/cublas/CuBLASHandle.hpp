@@ -19,28 +19,22 @@ namespace gpu {
  * A singleton cuBLAS handle class.
  */
 class CuBLASHandle {
-public:
-	inline CuBLASHandle(const CuBLASHandle&) = delete;
-	inline ~CuBLASHandle() {
-		cublasAssert(cublasDestroy(handle));
-	}
-	inline CuBLASHandle& operator=(const CuBLASHandle&) = delete;
-	inline operator const cublasHandle_t&() const {
-		return handle;
-	}
-	/**
-	 * @return A reference to the only instance of the class.
-	 */
-	inline static const CuBLASHandle& get_instance() {
-		static CuBLASHandle instance;
-		return instance;
-	}
-private:
-	cublasHandle_t handle;
-	inline CuBLASHandle() :
-			handle() {
-		cublasAssert(cublasCreate(&handle));
-	}
+ public:
+  inline CuBLASHandle(const CuBLASHandle&) = delete;
+  inline ~CuBLASHandle() { cublasAssert(cublasDestroy(handle)); }
+  inline CuBLASHandle& operator=(const CuBLASHandle&) = delete;
+  inline operator const cublasHandle_t&() const { return handle; }
+  /**
+   * @return A reference to the only instance of the class.
+   */
+  inline static const CuBLASHandle& get_instance() {
+    static CuBLASHandle instance;
+    return instance;
+  }
+
+ private:
+  cublasHandle_t handle;
+  inline CuBLASHandle() : handle() { cublasAssert(cublasCreate(&handle)); }
 };
 
 } /* namespace gpu */

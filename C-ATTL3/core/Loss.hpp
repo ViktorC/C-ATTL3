@@ -24,33 +24,37 @@
 namespace cattle {
 
 /**
- * An abstract class template for loss functions. Implementations of this class should be stateless.
+ * An abstract class template for loss functions. Implementations of this class
+ * should be stateless.
  */
-template<typename Scalar, std::size_t Rank, bool Sequential>
+template <typename Scalar, std::size_t Rank, bool Sequential>
 class Loss {
-	static_assert(std::is_floating_point<Scalar>::value, "non floating-point scalar type");
-	static_assert(Rank > 0 && Rank < 4, "illegal loss rank");
-protected:
-	static constexpr std::size_t DATA_RANK = Rank + Sequential + 1;
-	typedef Tensor<Scalar,DATA_RANK> Data;
-public:
-	virtual ~Loss() = default;
-	/**
-	 * It calculates the error on each sample given the output and the objective tensors.
-	 *
-	 * @param out The output tensor.
-	 * @param obj The objective tensor (of the same dimensionality as the output).
-	 * @return A column vector containing the loss for each sample.
-	 */
-	virtual ColVector<Scalar> function(Data out, Data obj) const = 0;
-	/**
-	 * It calculates the derivative of the loss function w.r.t. the output.
-	 *
-	 * @param out The output tensor.
-	 * @param obj The objective tensor (of the same dimensionality as the output).
-	 * @return The derivative of the loss function w.r.t. the output.
-	 */
-	virtual Data d_function(Data out, Data obj) const = 0;
+  static_assert(std::is_floating_point<Scalar>::value, "non floating-point scalar type");
+  static_assert(Rank > 0 && Rank < 4, "illegal loss rank");
+
+ protected:
+  static constexpr std::size_t DATA_RANK = Rank + Sequential + 1;
+  typedef Tensor<Scalar, DATA_RANK> Data;
+
+ public:
+  virtual ~Loss() = default;
+  /**
+   * It calculates the error on each sample given the output and the objective
+   * tensors.
+   *
+   * @param out The output tensor.
+   * @param obj The objective tensor (of the same dimensionality as the output).
+   * @return A column vector containing the loss for each sample.
+   */
+  virtual ColVector<Scalar> function(Data out, Data obj) const = 0;
+  /**
+   * It calculates the derivative of the loss function w.r.t. the output.
+   *
+   * @param out The output tensor.
+   * @param obj The objective tensor (of the same dimensionality as the output).
+   * @return The derivative of the loss function w.r.t. the output.
+   */
+  virtual Data d_function(Data out, Data obj) const = 0;
 };
 
 } /* namespace cattle */

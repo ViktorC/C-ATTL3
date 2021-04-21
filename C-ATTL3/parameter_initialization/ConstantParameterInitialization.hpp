@@ -13,24 +13,24 @@
 namespace cattle {
 
 /**
- * A class template for a parameter initialization that sets all values to a constant.
+ * A class template for a parameter initialization that sets all values to a
+ * constant.
  */
-template<typename Scalar>
+template <typename Scalar>
 class ConstantParameterInitialization : public ParameterInitialization<Scalar> {
-public:
-	/**
-	 * @param constant The value to which all elements of the parameter matrix are to be
-	 * initialized.
-	 */
-	ConstantParameterInitialization(Scalar constant) :
-			constant(constant) { }
-	inline void apply(Matrix<Scalar>& params) const {
-		params.setConstant(params.rows(), params.cols(), constant);
-	}
-private:
-	Scalar constant;
+ public:
+  /**
+   * @param constant The value to which all elements of the parameter matrix are
+   * to be initialized.
+   */
+  ConstantParameterInitialization(Scalar constant) : constant(constant) {}
+  inline void apply(Matrix<Scalar>& params) const { params.setConstant(params.rows(), params.cols(), constant); }
+
+ private:
+  Scalar constant;
 };
 
-}
+}  // namespace cattle
 
-#endif /* C_ATTL3_PARAMETER_INITIALIZATION_CONSTANTPARAMETERINITIALIZATION_H_ */
+#endif /* C_ATTL3_PARAMETER_INITIALIZATION_CONSTANTPARAMETERINITIALIZATION_H_ \
+        */

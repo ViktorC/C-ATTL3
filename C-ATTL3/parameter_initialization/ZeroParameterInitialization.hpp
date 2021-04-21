@@ -15,14 +15,12 @@ namespace cattle {
 /**
  * A class template for a parameter initialization that sets all values to 0.
  */
-template<typename Scalar>
+template <typename Scalar>
 class ZeroParameterInitialization : public ParameterInitialization<Scalar> {
-public:
-	inline void apply(Matrix<Scalar>& params) const {
-		params.setZero(params.rows(), params.cols());
-	}
+ public:
+  inline void apply(Matrix<Scalar>& params) const { params.setZero(params.rows(), params.cols()); }
 };
 
-}
+}  // namespace cattle
 
 #endif /* C_ATTL3_PARAMETER_INITIALIZATION_ZEROPARAMETERINITIALIZATION_H_ */

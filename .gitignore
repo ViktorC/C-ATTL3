@@ -3,6 +3,7 @@ build/
 .settings/
 .cproject
 .project
+.vscode
 .depend
 *.o
 *.a

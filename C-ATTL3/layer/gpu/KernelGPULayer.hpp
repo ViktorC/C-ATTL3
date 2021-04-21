@@ -14,45 +14,62 @@
 namespace cattle {
 namespace gpu {
 
-template<typename Scalar, std::size_t Rank>
-class KernelGPULayer : public GPULayer<Scalar,Rank>,
-		public virtual KernelLayer<Scalar,Rank> {
-	typedef Layer<Scalar,Rank> Root;
-	typedef KernelLayer<Scalar,Rank> Base;
-	typedef GPULayer<Scalar,Rank> GPUBase;
-	typedef KernelGPULayer<Scalar,Rank> Self;
-public:
-	inline virtual ~KernelGPULayer() = default;
-	inline const typename GPUBase::GPUDims& get_gpu_input_dims() const {
-		return gpu_input_dims;
-	}
-	inline const typename GPUBase::GPUDims& get_gpu_output_dims() const {
-		return gpu_output_dims;
-	}
-	inline std::vector<const GPUParameters<Scalar>*> get_gpu_params() const {
-		return std::vector<const GPUParameters<Scalar>*>({
-				static_cast<const GPUParameters<Scalar>*>(Base::weights.get()),
-				static_cast<const GPUParameters<Scalar>*>(Base::bias.get()) });
-	}
-	inline std::vector<GPUParameters<Scalar>*> get_gpu_params() {
-		return std::vector<GPUParameters<Scalar>*>({
-				static_cast<GPUParameters<Scalar>*>(Base::weights.get()),
-				static_cast<GPUParameters<Scalar>*>(Base::bias.get()) });
-	}
-protected:
-	typedef std::shared_ptr<GPUParameters<Scalar>> GPUParamsSharedPtr;
-	inline KernelGPULayer(const typename Root::Dims& input_dims, const typename Root::Dims& output_dims,
-			const typename GPUBase::GPUDims& gpu_input_dims, const typename GPUBase::GPUDims& gpu_output_dims,
-			GPUParamsSharedPtr weights, GPUParamsSharedPtr bias) :
-				Base(input_dims, output_dims, std::static_pointer_cast<ParamsSharedPtr<Scalar>>(weights),
-						std::static_pointer_cast<ParamsSharedPtr<Scalar>>(bias)),
-				gpu_input_dims(gpu_input_dims),
-				gpu_output_dims(gpu_output_dims) { }
-	inline KernelGPULayer(const Self& layer, bool share_params = false) :
-			Base(layer, share_params),
-			gpu_input_dims(layer.gpu_input_dims),
-			gpu_output_dims(layer.gpu_output_dims) { }
-	const typename GPUBase::GPUDims gpu_input_dims, gpu_output_dims;
+template <typename Scalar, std::size_t Rank>
+class KernelGPULayer : public GPULayer<Scalar, Rank> {
+  typedef Layer<Scalar, Rank> Root;
+  typedef GPULayer<Scalar, Rank> Base;
+  typedef KernelGPULayer<Scalar, Rank> Self;
+
+ public:
+  inline virtual ~KernelGPULayer() = default;
+  inline const Base& get_params_owner() const { return owner; }
+  inline const typename Root::Dims& get_input_dims() const { return input_dims; }
+  inline const typename Root::Dims& get_output_dims() const { return output_dims; }
+  inline bool is_input_layer() const { return input_layer; }
+  inline void set_input_layer(bool input_layer) { this->input_layer = input_layer; }
+  inline std::vector<const Parameters<Scalar>*> get_params() const {
+    return std::vector<const Parameters<Scalar>*>({weights.get(), bias.get()});
+  }
+  inline std::vector<Parameters<Scalar>*> get_params() {
+    return std::vector<Parameters<Scalar>*>({weights.get(), bias.get()});
+  }
+  inline const typename Base::GPUDims& get_gpu_input_dims() const { return gpu_input_dims; }
+  inline const typename Base::GPUDims& get_gpu_output_dims() const { return gpu_output_dims; }
+  inline std::vector<const GPUParameters<Scalar>*> get_gpu_params() const {
+    return std::vector<const GPUParameters<Scalar>*>({weights.get(), bias.get()});
+  }
+  inline std::vector<GPUParameters<Scalar>*> get_gpu_params() {
+    return std::vector<GPUParameters<Scalar>*>({weights.get(), bias.get()});
+  }
+
+ protected:
+  inline KernelGPULayer(const typename Root::Dims& input_dims, const typename Root::Dims& output_dims,
+                        const typename Base::GPUDims& gpu_input_dims, const typename Base::GPUDims& gpu_output_dims,
+                        GPUParamsSharedPtr<Scalar> weights, GPUParamsSharedPtr<Scalar> bias)
+      : owner(*this),
+        input_dims(input_dims),
+        output_dims(output_dims),
+        gpu_input_dims(gpu_input_dims),
+        gpu_output_dims(gpu_output_dims),
+        weights(weights),
+        bias(bias),
+        input_layer(false) {
+    assert(weights && bias);
+  }
+  inline KernelGPULayer(const Self& layer, bool share_params = false)
+      : owner(share_params ? layer.owner : *this),
+        input_dims(layer.input_dims),
+        output_dims(layer.output_dims),
+        gpu_input_dims(layer.gpu_input_dims),
+        gpu_output_dims(layer.gpu_output_dims),
+        weights(share_params ? layer.weights : GPUParamsSharedPtr<Scalar>(layer.weights->gpu_clone())),
+        bias(share_params ? layer.bias : GPUParamsSharedPtr<Scalar>(layer.bias->gpu_clone())),
+        input_layer(layer.input_layer) {}
+  const Self& owner;
+  const typename Root::Dims input_dims, output_dims;
+  const typename Base::GPUDims gpu_input_dims, gpu_output_dims;
+  GPUParamsSharedPtr<Scalar> weights, bias;
+  bool input_layer;
 };
 
 } /* namespace gpu */

@@ -13,15 +13,14 @@
 namespace cattle {
 namespace gpu {
 
-template<typename Scalar>
+template <typename Scalar>
 class OneGPUParameterInitialization : public GPUParameterInitialization<Scalar> {
-public:
-	inline void apply(CuBLASMatrix<Scalar>& params) const {
-		params.set_values(1);
-	}
+ public:
+  inline void apply(CuBLASMatrix<Scalar>& params) const { params.set_values(1); }
 };
 
 } /* namespace gpu */
 } /* namespace cattle */
 
-#endif /* C_ATTL3_PARAMETER_INITIALIZATION_GPU_ONEGPUPARAMETERINITIALIZATION_H_ */
+#endif /* C_ATTL3_PARAMETER_INITIALIZATION_GPU_ONEGPUPARAMETERINITIALIZATION_H_ \
+        */
