@@ -94,6 +94,10 @@ class Parameters {
     init_values();
     init_grad();
   }
+  /**
+   * It synchronizes the values to the host machine if applicable.
+   */
+  inline virtual void sync_values_to_host(){};
 };
 
 } /* namespace cattle */

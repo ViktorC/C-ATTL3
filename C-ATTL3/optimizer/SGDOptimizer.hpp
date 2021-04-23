@@ -68,7 +68,7 @@ class SGDOptimizer : public Optimizer<Scalar, Rank, Sequential> {
       _update_params(optimizable_params_vec, epoch - 1, timestep);
       ++updates;
       ++timestep;
-      // Reset the gradients of the optimizable parameters.
+      // Reset the gradients of the parameters.
       for (auto params_ptr : params_vec) params_ptr->reset_grad();
     }
     Scalar mean_obj_loss = obj_loss / instances;
@@ -85,7 +85,6 @@ class SGDOptimizer : public Optimizer<Scalar, Rank, Sequential> {
     assert(target_net_ptr == &net);
     Scalar obj_loss = 0;
     Scalar instances = 0;
-    std::vector<Parameters<Scalar>*> params_vec = net.get_all_unique_params();
     // Perform an entire test epoch.
     while (test_prov.has_more()) {
       DataPair<Scalar, Rank, Sequential> data_pair = test_prov.get_data(batch_size);
@@ -94,7 +93,7 @@ class SGDOptimizer : public Optimizer<Scalar, Rank, Sequential> {
     }
     Scalar mean_obj_loss = obj_loss / instances;
     Scalar reg_loss = 0;
-    for (auto params_ptr : params_vec) {
+    for (auto params_ptr : net.get_all_unique_params()) {
       if (params_ptr->are_optimizable() && !params_ptr->are_frozen())
         reg_loss += params_ptr->get_regularization_penalty();
     }

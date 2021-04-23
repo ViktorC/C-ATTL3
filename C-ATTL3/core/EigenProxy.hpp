@@ -57,7 +57,7 @@ template <typename Scalar, std::size_t Rank>
 using Tensor = Eigen::Tensor<Scalar, Rank, Eigen::ColMajor, std::size_t>;
 
 /**
- * An for a class that can be used to map raw pointer data to a tensor of
+ * An alias for a class that can be used to map raw pointer data to a tensor of
  * arbitrary rank and scalar type with dynamic dimensionality.
  */
 template <typename Scalar, std::size_t Rank>

@@ -77,7 +77,7 @@ class ConvKernelGPULayer : public KernelGPULayer<Scalar, Rank> {
     return new ConvKernelGPULayer<Scalar, Rank>(*this, true);
   }
   inline void empty_cache() { in_cache = CuDNNTensor<Scalar>(); }
-  inline CuDNNTensor<Scalar> pass_forward(CuDNNTensor<Scalar> in, bool training) {
+  inline CuDNNTensor<Scalar> gpu_pass_forward(CuDNNTensor<Scalar> in, bool training) {
     assert(in.height() == Base::gpu_input_dims(0) && in.width() == Base::gpu_input_dims(1) &&
            in.channels() == Base::gpu_input_dims(2));
     assert(in.samples() > 0);
@@ -118,14 +118,14 @@ class ConvKernelGPULayer : public KernelGPULayer<Scalar, Rank> {
     out += bias.get_gpu_values();
     return out;
   }
-  inline CuDNNTensor<Scalar> pass_back(CuDNNTensor<Scalar> out_grad) {
+  inline CuDNNTensor<Scalar> gpu_pass_back(CuDNNTensor<Scalar> out_grad) {
     assert(out_grad.height() == Base::gpu_output_dims(0) && out_grad.width() == Base::gpu_output_dims(1) &&
            out_grad.channels() == Base::gpu_output_dims(2));
     assert(out_grad.samples() == in_cache.samples());
     StandardGPUParameters<Scalar>& weights = static_cast<StandardGPUParameters<Scalar>&>(*Base::weights);
     StandardGPUParameters<Scalar>& bias = static_cast<StandardGPUParameters<Scalar>&>(*Base::bias);
-    CuDNNTensor<Scalar> weights_grad(weights.samples(), weights.height(), weights.width(), weights.channels());
-    CuDNNTensor<Scalar> bias_grad(bias.samples(), bias.height(), bias.width(), bias.channels());
+    CuDNNTensor<Scalar> weights_grad(weights.get_samples(), weights.get_height(), weights.get_width(), weights.get_channels());
+    CuDNNTensor<Scalar> bias_grad(bias.get_samples(), bias.get_height(), bias.get_width(), bias.get_channels());
     // Create and set up the backward convolution descriptor.
     cudnnConvolutionDescriptor_t dconv_desc;
     cudnnAssert(cudnnCreateConvolutionDescriptor(&dconv_desc));

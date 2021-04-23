@@ -80,10 +80,10 @@ class CuDNNTensor : public CUDAArray<Scalar> {
     }
   }
   inline CuDNNTensor() : CuDNNTensor(0u, 0u, 0u, 0u) {}
-  inline CuDNNTensor(const Tensor<Scalar, 4>& tensor)
+  inline CuDNNTensor(const TensorMap<Scalar, 4>& tensor)
       : CuDNNTensor(tensor.dimension(0), tensor.dimension(1), tensor.dimension(2), tensor.dimension(3)) {
     if (Base::size() > 0) {
-      static std::array<std::size_t, 4> eigen_to_cudnn_layout({2u, 1u, 2u, 0u});
+      static std::array<std::size_t, 4> eigen_to_cudnn_layout({2u, 1u, 3u, 0u});
       Tensor<Scalar, 4> shuffled_tensor = tensor.shuffle(eigen_to_cudnn_layout);
       Base::copy_from_host(shuffled_tensor.data());
     }

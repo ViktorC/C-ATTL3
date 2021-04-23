@@ -24,7 +24,7 @@ class SoftmaxActivationGPULayer : public ActivationGPULayer<Scalar, Rank> {
   inline SoftmaxActivationGPULayer(const typename Root::Dims& dims) : Base(dims), alpha(1), beta(0) {}
   inline GPULayer<Scalar, Rank>* gpu_clone() const { return new SoftmaxActivationGPULayer<Scalar, Rank>(*this); }
   inline void empty_cache() { out_cache = CuDNNTensor<Scalar>(); }
-  inline CuDNNTensor<Scalar> pass_forward(CuDNNTensor<Scalar> in, bool training) {
+  inline CuDNNTensor<Scalar> gpu_pass_forward(CuDNNTensor<Scalar> in, bool training) {
     assert(in.height() == Base::gpu_dims(0) && in.width() == Base::gpu_dims(1) && in.channels() == Base::gpu_dims(2));
     assert(in.samples() > 0);
     cudnnAssert(cudnnSoftmaxForward(CuDNNHandle::get_instance(), CUDNN_SOFTMAX_ACCURATE, CUDNN_SOFTMAX_MODE_INSTANCE,
@@ -32,7 +32,7 @@ class SoftmaxActivationGPULayer : public ActivationGPULayer<Scalar, Rank> {
     if (training) out_cache = in;
     return in;
   }
-  inline CuDNNTensor<Scalar> pass_back(CuDNNTensor<Scalar> out_grad) {
+  inline CuDNNTensor<Scalar> gpu_pass_back(CuDNNTensor<Scalar> out_grad) {
     assert(out_grad.height() == Base::gpu_dims(0) && out_grad.width() == Base::gpu_dims(1) &&
            out_grad.channels() == Base::gpu_dims(2));
     assert(out_grad.samples() == out_cache.samples());

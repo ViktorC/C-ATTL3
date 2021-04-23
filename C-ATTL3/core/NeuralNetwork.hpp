@@ -194,9 +194,11 @@ class NeuralNetwork {
    */
   inline void save_all_unique_params_values(const std::string& dir_path, bool binary = true,
                                             const std::string& file_name_prefix = PARAM_SERIAL_PREFIX) const {
-    std::vector<const Parameters<Scalar>*> params_vec = get_all_unique_params();
+    std::vector<Parameters<Scalar>*> params_vec = get_all_unique_params();
     for (std::size_t i = 0; i < params_vec.size(); ++i) {
-      const Matrix<Scalar>& values = params_vec[i]->get_values();
+      Parameters<Scalar>* params = params_vec[i];
+      params->sync_values_to_host();
+      const Matrix<Scalar>& values = params->get_values();
       std::string file_path = dir_path + "/" + file_name_prefix + std::to_string(i) + ".prms";
       if (binary)
         serialize_binary<Scalar>(values, file_path);
